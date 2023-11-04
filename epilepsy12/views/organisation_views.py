@@ -21,14 +21,17 @@ from ..common_view_functions import (
     all_registered_cases_for_cohort_and_abstraction_level,
     return_tile_for_region,
     get_all_kpi_aggregation_data_for_view,
-    logged_in_user_may_access_this_organisation
+    logged_in_user_may_access_this_organisation,
 )
 from epilepsy12.common_view_functions.render_charts import update_all_data_with_charts
 from ..general_functions import (
     get_current_cohort_data,
     value_from_key,
 )
-from ..tasks import asynchronously_aggregate_kpis_and_update_models_for_cohort_and_abstraction_level, hello
+from ..tasks import (
+    asynchronously_aggregate_kpis_and_update_models_for_cohort_and_abstraction_level,
+    hello,
+)
 
 
 @login_and_otp_required()
@@ -176,8 +179,8 @@ def selected_trust_kpis(request, organisation_id, access):
 
     It then presents each abstraction level's KPIAggregation model.
 
-    It is called by htmx get request from the kpi table, either on page load, or on click of the 
-    refresh or publish buttons in the header. If the publish button is pressed, aggregations are run and the 
+    It is called by htmx get request from the kpi table, either on page load, or on click of the
+    refresh or publish buttons in the header. If the publish button is pressed, aggregations are run and the
     open_access flag is set to true, making that data viewable to the general public
     Otherwise, aggregations are run updating existing data but without setting the open_access flag to True
 
@@ -195,26 +198,32 @@ def selected_trust_kpis(request, organisation_id, access):
     if logged_in_user_may_access_this_organisation(request.user, organisation):
         # user is logged in and allowed to access this organisation
 
-        open_access = False # aggregation flag: set to true if publishing this data for public view
-
-        if request.htmx.trigger_name == 'publish' and access == "private" and request.user:
-            open_access=True
-
-        # perform aggregations and update all the KPIAggregation models only for clinicians
         if access == "private":
-            asynchronously_aggregate_kpis_and_update_models_for_cohort_and_abstraction_level.delay(cohort=cohort, open_access=open_access)
+            # aggregation can only occur if logged in AND not in the open_access template
 
-            # Gather relevant data specific for this view
-            all_data = get_all_kpi_aggregation_data_for_view(
-                organisation=organisation, cohort=cohort, open_access=open_access
+            print("hello")
+
+            open_access = False  # aggregation flag: set to true if publishing this data for public view
+
+            if request.htmx.trigger_name == "publish" and request.user:
+                open_access = True
+
+            # perform aggregations and update all the KPIAggregation models only for clinicians
+            asynchronously_aggregate_kpis_and_update_models_for_cohort_and_abstraction_level.delay(
+                cohort=cohort, open_access=open_access
             )
+
+        # Gather relevant data specific for this view - still show only published data if this is public view
+        all_data = get_all_kpi_aggregation_data_for_view(
+            organisation=organisation, cohort=cohort, open_access=access == "open"
+        )
+
     else:
         # User is not logged in and not eligible to run aggregations
         # Gather relevant open access data specific for this view
         all_data = get_all_kpi_aggregation_data_for_view(
             organisation=organisation, cohort=cohort, open_access=True
         )
-
 
     # Instance of KPI to access field name help text attributes for KPI "Indicator" row values in table
     kpi_instance = KPI(organisation=organisation)
@@ -225,8 +234,10 @@ def selected_trust_kpis(request, organisation_id, access):
         "all_data": all_data,
         "kpis": kpi_instance,
         "kpi_names_list": kpi_names_list,
-        "open_access": False,
-        "organisation_list": Organisation.objects.all().order_by("name"), # for public view dropdown
+        "open": access == "open",
+        "organisation_list": Organisation.objects.all().order_by(
+            "name"
+        ),  # for public view dropdown
     }
 
     return render(
@@ -235,12 +246,16 @@ def selected_trust_kpis(request, organisation_id, access):
         context=context,
     )
 
+
 def selected_trust_open_select(request, organisation_id):
     """
     POST callback on change of RCPCH organisations dropdown in open access view
     Selects new hospital and redirects to open_access endpoint returning table with new organisation
     """
-    url = reverse('open_access', kwargs={"organisation_id":request.POST.get('selected_trust_open_select')})
+    url = reverse(
+        "open_access",
+        kwargs={"organisation_id": request.POST.get("selected_trust_open_select")},
+    )
     return HttpResponseClientRedirect(url)
 
 
@@ -300,9 +315,7 @@ def selected_trust_select_kpi(request, organisation_id):
     cohort = get_current_cohort_data()["cohort"]
 
     all_data = get_all_kpi_aggregation_data_for_view(
-        organisation=organisation,
-        cohort=cohort,
-        open_access=False
+        organisation=organisation, cohort=cohort, open_access=False
     )
 
     all_data = update_all_data_with_charts(

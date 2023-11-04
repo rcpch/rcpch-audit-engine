@@ -526,27 +526,27 @@ class BaseKPIAggregation(BaseKPIMetrics, HelpTextMixin):
                 all_value_counts.update({kpi_metric: value})
         return all_value_counts
 
-    def get_total_cases_included_in_aggregation(self)->int:
-        """Total cases performed for aggregation can be found through 
-        
+    def get_total_cases_included_in_aggregation(self) -> int:
+        """Total cases performed for aggregation can be found through
+
         sum(
-            paediatrician_with_expertise_in_epilepsies_total_eligible, 
+            paediatrician_with_expertise_in_epilepsies_total_eligible,
             paediatrician_with_expertise_in_epilepsies_total_ineligible,
             paediatrician_with_expertise_in_epilepsies_total_incomplete,
             ).
         """
-        
-        kpi = 'paediatrician_with_expertise_in_epilepsies'
+
+        kpi = "paediatrician_with_expertise_in_epilepsies"
         fields = ["total_eligible", "ineligible", "incomplete"]
-        
-        metric_values = [getattr(self, f'{kpi}_{field}') for field in fields]
-        
+
+        metric_values = [getattr(self, f"{kpi}_{field}") for field in fields]
+
         # If no eligible Cases, all values will be None - can just check 1
         if metric_values[0] is None:
             return 0
-        
-        return sum (metric_values)
-    
+
+        return sum(metric_values)
+
     def __str__(self):
         return f"Base KPI aggregation result model"
 
@@ -565,7 +565,9 @@ class OrganisationKPIAggregation(BaseKPIAggregation):
     class Meta:
         verbose_name = _("Organisation KPI Aggregation Model")
         verbose_name_plural = _("Organisation KPI Aggregation Models")
-        ordering = [Upper('abstraction_name'), ]
+        ordering = [
+            Upper("abstraction_name"),
+        ]
 
     def get_abstraction_level(self) -> str:
         return EnumAbstractionLevel.ORGANISATION
@@ -598,7 +600,9 @@ class TrustKPIAggregation(BaseKPIAggregation):
     class Meta:
         verbose_name = _("Trust KPI Aggregation Model")
         verbose_name_plural = _("Trust KPI Aggregation Models")
-        ordering = [Upper('abstraction_name'), ]
+        ordering = [
+            Upper("abstraction_name"),
+        ]
 
     def get_abstraction_level(self) -> str:
         return EnumAbstractionLevel.TRUST
@@ -631,7 +635,9 @@ class LocalHealthBoardKPIAggregation(BaseKPIAggregation):
     class Meta:
         verbose_name = _("Local Health Board KPI Aggregation Model")
         verbose_name_plural = _("Local Health Board KPI Aggregation Models")
-        ordering = [Upper('abstraction_name'), ]
+        ordering = [
+            Upper("abstraction_name"),
+        ]
 
     def get_abstraction_level(self) -> str:
         return EnumAbstractionLevel.LOCAL_HEALTH_BOARD
@@ -665,7 +671,9 @@ class ICBKPIAggregation(BaseKPIAggregation):
     class Meta:
         verbose_name = _("IntegratedCareBoard KPI Aggregation Model")
         verbose_name_plural = _("IntegratedCareBoard KPI Aggregation Models")
-        ordering = [Upper('abstraction_name'), ]
+        ordering = [
+            Upper("abstraction_name"),
+        ]
 
     def get_abstraction_level(self) -> str:
         return EnumAbstractionLevel.ICB
@@ -699,7 +707,9 @@ class NHSEnglandRegionKPIAggregation(BaseKPIAggregation):
     class Meta:
         verbose_name = _("NHSEnglandRegion KPI Aggregation Model")
         verbose_name_plural = _("NHSEnglandRegion KPI Aggregation Models")
-        ordering = [Upper('abstraction_name'), ]
+        ordering = [
+            Upper("abstraction_name"),
+        ]
 
     def get_abstraction_level(self) -> str:
         return EnumAbstractionLevel.NHS_ENGLAND_REGION
@@ -733,7 +743,9 @@ class OpenUKKPIAggregation(BaseKPIAggregation):
     class Meta:
         verbose_name = _("OpenUK KPI Aggregation Model")
         verbose_name_plural = _("OpenUK KPI Aggregation Models")
-        ordering = [Upper('abstraction_name'), ]
+        ordering = [
+            Upper("abstraction_name"),
+        ]
 
     def get_abstraction_level(self) -> str:
         return EnumAbstractionLevel.OPEN_UK
@@ -767,7 +779,9 @@ class CountryKPIAggregation(BaseKPIAggregation):
     class Meta:
         verbose_name = _("Country KPI Aggregation Model")
         verbose_name_plural = _("Country KPI Aggregation Models")
-        ordering = [Upper('abstraction_name'), ]
+        ordering = [
+            Upper("abstraction_name"),
+        ]
 
     def get_abstraction_level(self) -> str:
         return EnumAbstractionLevel.COUNTRY
@@ -798,7 +812,9 @@ class NationalKPIAggregation(BaseKPIAggregation):
     class Meta:
         verbose_name = _("National KPI Aggregation Model")
         verbose_name_plural = _("National KPI Aggregation Models")
-        ordering = [Upper('abstraction_name'), ]
+        ordering = [
+            Upper("abstraction_name"),
+        ]
 
     def get_abstraction_level(self) -> str:
         return EnumAbstractionLevel.NATIONAL

@@ -25,11 +25,11 @@ will be persisted and run as a cron job once a day.
                     </p>
                     
                 </div>
-                {% if not open_access %}
+                {% if not open %}
                     <!-- anyone can refresh and rerun aggregations that is not a member of the public  -->
                     <button 
                         class='ui right floated rcpch_primary button'
-                        hx-get="{% url 'selected_trust_kpis' organisation_id=organisation.pk access='open' %}"
+                        hx-get="{% url 'selected_trust_kpis' organisation_id=organisation.pk access='private' %}"
                         name="refresh" 
                         hx-trigger="click"
                         >
@@ -52,382 +52,81 @@ will be persisted and run as a cron job once a day.
             </div>
         </div>
 
-        <div class="ui raised attached inverted rcpch_dark_blue segment" id="audit_body_segment">
+        {% if all_data.ORGANISATION_KPIS.aggregation_model is not None %}
+        
+            <div class="ui raised attached inverted rcpch_dark_blue segment" id="audit_body_segment">
 
-                <h3>Clinical Team</h3>
-                <table class='ui rcpch stackable small table kpi_table'>
-                    {% include './kpi_table_head.html' with kpi_head_id=1 %}
-                    <tbody>
-                    {% comment %} 
-                    [
-                    'paediatrician_with_expertise_in_epilepsies', 
-                    'epilepsy_specialist_nurse', 
-                    ] 
-                    {% endcomment %}
-                    {% for kpi_name in kpi_names_list|slice:":2" %}
-                        <tr>
-                            <td>
-                                <div class="rcpch_td_data_indicator_wrapper">
-                                <p>{% get_help_label_text_for_kpi kpi_name kpis %}</p>
-                                <i 
-                                    class="rcpch question circle icon"
-                                    id='{{ kpi_name }}'
-                                    data-title='{% render_title_kpi_name kpi_name|title %}'
-                                    data-content="{% get_help_reference_text_for_kpi kpi_name kpis %}. Note: showing percentage passed of total eligible for KPI (count denoted inside brackets)."
-                                    data-position='top right'
-                                    _="init js $('#{{ kpi_name }}').popup(); end">
-                                </i>
-                                </div>
-                            </td>
-                            {% for abstraction, data in all_data.items %}
-                            {% if data.aggregation_model %}
-
-                                
-                                <td class='right aligned'>
-                                    {% get_pct_passed_and_total_eligible data.aggregation_model kpi_name as kpi_data %}
-                                    {% if kpi_data == -1 %}
-                                        <i 
-                                            class="rcpch clock icon"
-                                            id='_{{abstraction}}_{{kpi_name}}'
-                                            data-title='No aggregation data'
-                                            data-content="Aggregation not yet performed"
-                                            data-position='top right'
-                                            _="init js $('#_{{abstraction}}_{{kpi_name}}').popup(); end">
-                                        </i>
-                                    {% elif kpi_data == 0 %}
-                                    
-                                        <i 
-                                            class="rcpch exclamation circle icon"
-                                            id='{{ kpi_name }}_none_eligible_model_icon_{{abstraction}}'
-                                            data-title='None eligible'
-                                            data-html='{% no_eligible_cases data.aggregation_model kpi_name %}'
-                                            data-position='top right'
-                                            _="init js $('#{{ kpi_name }}_none_eligible_model_icon_{{abstraction}}').popup(); end">
-                                        </i>
-                                    {% else %}
-                                        <span
-                                            class="rcpch"
-                                            id='{{ kpi_name }}_data_{{abstraction}}'
-                                            data-title='% Passed Metric'
-                                            data-content="{% get_total_counts_passed data.aggregation_model kpi_name %}. Last updated {{data.aggregation_model.last_updated}}"
-                                            data-position='top right'
-                                            _="init js $('#{{ kpi_name }}_data_{{abstraction}}').popup(); end">
-                                        {{ kpi_data }}
-                                    </span>
-                                    {% endif %}
+                    <h3>Clinical Team</h3>
+                    <table class='ui rcpch stackable small table kpi_table'>
+                        {% include './kpi_table_head.html' with kpi_head_id=1 %}
+                        <tbody>
+                        {% comment %} 
+                        [
+                        'paediatrician_with_expertise_in_epilepsies', 
+                        'epilepsy_specialist_nurse', 
+                        ] 
+                        {% endcomment %}
+                        {% for kpi_name in kpi_names_list|slice:":2" %}
+                            <tr>
+                                <td>
+                                    <div class="rcpch_td_data_indicator_wrapper">
+                                    <p>{% get_help_label_text_for_kpi kpi_name kpis %}</p>
+                                    <i 
+                                        class="rcpch question circle icon"
+                                        id='{{ kpi_name }}'
+                                        data-title='{% render_title_kpi_name kpi_name|title %}'
+                                        data-content="{% get_help_reference_text_for_kpi kpi_name kpis %}. Note: showing percentage passed of total eligible for KPI (count denoted inside brackets)."
+                                        data-position='top right'
+                                        _="init js $('#{{ kpi_name }}').popup(); end">
+                                    </i>
+                                    </div>
                                 </td>
-                            {% endif %}
-                            {% endfor %}
-                        </tr>
-                    {% endfor %}
-                    
-                    {% comment %} tertiary input {% endcomment %}
-                    <tr class="subcategory-header"> 
-                        {% with kpi_name='tertiary_input' %}
-                        <td>
-                            <div class="rcpch_td_data_indicator_wrapper">
-                                <p>{% get_help_label_text_for_kpi kpi_name kpis %}</p>
-                                <i 
-                                    class="rcpch question circle icon"
-                                    id='{{ kpi_name }}'
-                                    data-title='{% render_title_kpi_name kpi_name|title %}'
-                                    data-content="{% get_help_reference_text_for_kpi kpi_name kpis %}. Note: showing percentage passed of total eligible for KPI (count denoted inside brackets)."
-                                    data-position='top right'
-                                    _="init js $('#{{ kpi_name }}').popup(); end">
-                                </i>
-                            </div>
-                        
-                        </td>
-                        {% for abstraction, data in all_data.items %}
-                        {% if data.aggregation_model %}
-                            {% get_pct_passed_and_total_eligible data.aggregation_model kpi_name as kpi_data %}
-                                <td class='right aligned'>
-                                    {% if kpi_data == -1 %}
-                                        <i 
-                                            class="rcpch clock icon"
-                                            id='_{{abstraction}}_{{kpi_name}}'
-                                            data-title='No aggregation data'
-                                            data-content="Aggregation not yet performed"
-                                            data-position='top right'
-                                            _="init js $('#_{{abstraction}}_{{kpi_name}}').popup(); end">
-                                        </i>
-                                    {% elif kpi_data == 0 %}
-                                        <i 
-                                            class="rcpch exclamation circle icon"
-                                            id='{{ kpi_name }}_none_eligible_model_icon_{{abstraction}}'
-                                            data-title='None eligible'
-                                            data-html='{% no_eligible_cases data.aggregation_model kpi_name %}'
-                                            data-position='top right'
-                                            _="init js $('#{{ kpi_name }}_none_eligible_model_icon_{{abstraction}}').popup(); end">
-                                        </i>
-                                    {% else %}
-                                        <span
-                                            class="rcpch"
-                                            id='{{ kpi_name }}_data_{{ abstraction }}'
-                                            data-title='% Passed Metric'
-                                            data-content="{% get_total_counts_passed data.aggregation_model kpi_name %}. Last updated {{data.aggregation_model.last_updated}}"
-                                            data-position='top right'
-                                            _="init js $('#{{ kpi_name }}_data_{{abstraction}}').popup(); end">
+                                
+                                {% for abstraction, data in all_data.items %}
+                                {% if data.aggregation_model %}
+
+                                    
+                                    <td class='right aligned'>
+                                        {% get_pct_passed_and_total_eligible data.aggregation_model kpi_name as kpi_data %}
+                                        {% if kpi_data == -1 %}
+                                            <i 
+                                                class="rcpch clock icon"
+                                                id='_{{abstraction}}_{{kpi_name}}'
+                                                data-title='No aggregation data'
+                                                data-content="Aggregation not yet performed"
+                                                data-position='top right'
+                                                _="init js $('#_{{abstraction}}_{{kpi_name}}').popup(); end">
+                                            </i>
+                                        {% elif kpi_data == 0 %}
+                                        
+                                            <i 
+                                                class="rcpch exclamation circle icon"
+                                                id='{{ kpi_name }}_none_eligible_model_icon_{{abstraction}}'
+                                                data-title='None eligible'
+                                                data-html='{% no_eligible_cases data.aggregation_model kpi_name %}'
+                                                data-position='top right'
+                                                _="init js $('#{{ kpi_name }}_none_eligible_model_icon_{{abstraction}}').popup(); end">
+                                            </i>
+                                        {% else %}
+                                            <span
+                                                class="rcpch"
+                                                id='{{ kpi_name }}_data_{{abstraction}}'
+                                                data-title='% Passed Metric'
+                                                data-content="{% get_total_counts_passed data.aggregation_model kpi_name %}. Last updated {{data.aggregation_model.last_updated}}"
+                                                data-position='top right'
+                                                _="init js $('#{{ kpi_name }}_data_{{abstraction}}').popup(); end">
                                             {{ kpi_data }}
                                         </span>
-                                    {% endif %}
-                                </td>
-                            {% endif %}
-                            {% endfor %}
-                        {% endwith %} 
-                    </tr>
-
-                    {% comment %} 'epilepsy surgery referral', {% endcomment %}
-                    {% for kpi_name in kpi_names_list|slice:"3:4" %}
-                    <tr class="subcategory-row">
-                        <td>
-                            <div class="rcpch_td_data_indicator_wrapper">
-                            <p>{% get_help_label_text_for_kpi kpi_name kpis %}</p>
-                            <i 
-                                class="rcpch question circle icon"
-                                id='{{ kpi_name }}'
-                                data-title='{% render_title_kpi_name kpi_name|title %}'
-                                data-content="{% get_help_reference_text_for_kpi kpi_name kpis %}. Note: showing percentage passed of total eligible for KPI (count denoted inside brackets)."
-                                data-position='top right'
-                                _="init js $('#{{ kpi_name }}').popup(); end">
-                            </i>
-                            </div>
-                        </td>
-                        {% for abstraction, data in all_data.items %}
-                        {% if data.aggregation_model %}
-                            <td class='right aligned'>
-                                {% get_pct_passed_and_total_eligible data.aggregation_model kpi_name as kpi_data %}
-                                {% if kpi_data == -1 %}
-                                    <i 
-                                        class="rcpch clock icon"
-                                        id='_{{abstraction}}_{{kpi_name}}'
-                                        data-title='No aggregation data'
-                                        data-content="Aggregation not yet performed"
-                                        data-position='top right'
-                                        _="init js $('#_{{abstraction}}_{{kpi_name}}').popup(); end">
-                                    </i>
-                                {% elif kpi_data == 0 %}
-                                    <i 
-                                        class="rcpch exclamation circle icon"
-                                        id='{{ kpi_name }}_none_eligible_model_icon_{{abstraction}}'
-                                        data-title='None eligible'
-                                        data-html='{% no_eligible_cases data.aggregation_model kpi_name %}'
-                                        data-position='top right'
-                                        _="init js $('#{{ kpi_name }}_none_eligible_model_icon_{{abstraction}}').popup(); end">
-                                    </i>
-                                {% else %}
-                                    <span
-                                        class="rcpch"
-                                        id='{{ kpi_name }}_data_{{abstraction}}'
-                                        data-title='% Passed Metric'
-                                        data-content="{% get_total_counts_passed data.aggregation_model kpi_name %}. Last updated {{data.aggregation_model.last_updated}}"
-                                        data-position='top right'
-                                        _="init js $('#{{ kpi_name }}_data_{{abstraction}}').popup(); end">
-                                    {{ kpi_data }}
-                                </span>
+                                        {% endif %}
+                                    </td>
                                 {% endif %}
-                            </td>
-                        {% endif %}
+                                {% endfor %}
+                            </tr>
                         {% endfor %}
-                    </tr>
-                    {% endfor %}
-                    </tbody>
-                </table>
-
-                <h3>Investigations</h3>
-                {% comment %} [ECG, MRI,] {% endcomment %}
-                <table class='ui rcpch small table'>
-                    {% include './kpi_table_head.html' with kpi_head_id=2  %}
-                    <tbody>
-                    
-                    {% for kpi_name in kpi_names_list|slice:"4:6" %}
-                        <tr>
-                            <td>
-                                <div class="rcpch_td_data_indicator_wrapper">
-                                <p>{% get_help_label_text_for_kpi kpi_name kpis %}</p>
-                                <i 
-                                    class="rcpch question circle icon"
-                                    id='{{ kpi_name }}'
-                                    data-title='{% render_title_kpi_name kpi_name|title %}'
-                                    data-content="{% get_help_reference_text_for_kpi kpi_name kpis %}. Note: showing percentage passed of total eligible for KPI (count denoted inside brackets)."
-                                    data-position='top right'
-                                    _="init js $('#{{ kpi_name }}').popup(); end">
-                                </i>
-                                </div>
-                            </td>
-                            {% for abstraction, data in all_data.items %}
-                            {% if data.aggregation_model %}
-                                <td class='right aligned'>
-                                    {% get_pct_passed_and_total_eligible data.aggregation_model kpi_name as kpi_data %}
-                                    {% if kpi_data == -1 %}
-                                        <i 
-                                            class="rcpch clock icon"
-                                            id='_{{abstraction}}_{{kpi_name}}'
-                                            data-title='No aggregation data'
-                                            data-content="Aggregation not yet performed"
-                                            data-position='top right'
-                                            _="init js $('#_{{abstraction}}_{{kpi_name}}').popup(); end">
-                                        </i>
-                                    {% elif kpi_data == 0 %}
-                                        <i 
-                                            class="rcpch exclamation circle icon"
-                                            id='{{ kpi_name }}_none_eligible_model_icon_{{abstraction}}'
-                                            data-title='None eligible'
-                                            data-html='{% no_eligible_cases data.aggregation_model kpi_name %}'
-                                            data-position='top right'
-                                            _="init js $('#{{ kpi_name }}_none_eligible_model_icon_{{abstraction}}').popup(); end">
-                                        </i>
-                                    {% else %}
-                                        <span
-                                            class="rcpch"
-                                            id='{{ kpi_name }}_data_{{abstraction}}'
-                                            data-title='% Passed Metric'
-                                            data-content="{% get_total_counts_passed data.aggregation_model kpi_name %}. Last updated {{data.aggregation_model.last_updated}}"
-                                            data-position='top right'
-                                            _="init js $('#{{ kpi_name }}_data_{{abstraction}}').popup(); end">
-                                        {{ kpi_data }}
-                                    </span>
-                                    {% endif %}
-                                </td>
-                            {% endif %}
-                            {% endfor %}
-                        </tr>
-                    {% endfor %}
-                    </tbody>
-                </table>
-
-                <h3>Mental Health</h3>
-                {% comment %} ['assessment_of_mental_health_issues', 'mental_health_support'] {% endcomment %}
-                <table class='ui rcpch small table'>
-                    {% include './kpi_table_head.html' with kpi_head_id=3  %}
-                    <tbody>
-                    
-                    {% for kpi_name in kpi_names_list|slice:"6:8" %}
-                        <tr>
-                            <td>
-                                <div class="rcpch_td_data_indicator_wrapper">
-                                <p>{% get_help_label_text_for_kpi kpi_name kpis %}</p>
-                                <i 
-                                    class="rcpch question circle icon"
-                                    id='{{ kpi_name }}'
-                                    data-title='{% render_title_kpi_name kpi_name|title %}'
-                                    data-content="{% get_help_reference_text_for_kpi kpi_name kpis %}. Note: showing percentage passed of total eligible for KPI (count denoted inside brackets)."
-                                    data-position='top right'
-                                    _="init js $('#{{ kpi_name }}').popup(); end">
-                                </i>
-                                </div>
-                            </td>
-                            {% for abstraction, data in all_data.items %}
-                            {% if data.aggregation_model %}
-                                <td class='right aligned'>
-                                    {% get_pct_passed_and_total_eligible data.aggregation_model kpi_name as kpi_data %}
-                                    {% if kpi_data == -1 %}
-                                        <i 
-                                            class="rcpch clock icon"
-                                            id='_{{abstraction}}_{{kpi_name}}'
-                                            data-title='No aggregation data'
-                                            data-content="Aggregation not yet performed"
-                                            data-position='top right'
-                                            _="init js $('#_{{abstraction}}_{{kpi_name}}').popup(); end">
-                                        </i>
-                                    {% elif kpi_data == 0 %}
-                                        <i 
-                                            class="rcpch exclamation circle icon"
-                                            id='{{ kpi_name }}_none_eligible_model_icon_{{abstraction}}'
-                                            data-title='None eligible'
-                                            data-html='{% no_eligible_cases data.aggregation_model kpi_name %}'
-                                            data-position='top right'
-                                            _="init js $('#{{ kpi_name }}_none_eligible_model_icon_{{abstraction}}').popup(); end">
-                                        </i>
-                                    {% else %}
-                                        <span
-                                            class="rcpch"
-                                            id='{{ kpi_name }}_data_{{abstraction}}'
-                                            data-title='% Passed Metric'
-                                            data-content="{% get_total_counts_passed data.aggregation_model kpi_name %}. Last updated {{data.aggregation_model.last_updated}}"
-                                            data-position='top right'
-                                            _="init js $('#{{ kpi_name }}_data_{{abstraction}}').popup(); end">
-                                        {{ kpi_data }}
-                                    </span>
-                                    {% endif %}
-                                </td>
-                            {% endif %}
-                            {% endfor %}
-                        </tr>
-                    {% endfor %}
-                    </tbody>
-                </table>
-                
-                <h3>Medication</h3>
-                {% comment %} [Sodium valproate] {% endcomment %}
-                <table class='ui rcpch small table'>
-                    {% include './kpi_table_head.html' with kpi_head_id=4  %}
-                    <tbody>
-                    {% comment %}  {% endcomment %}
-                    {% for kpi_name in kpi_names_list|slice:"8:9" %}
-                        <tr>
-                            <td>
-                                <div class="rcpch_td_data_indicator_wrapper">
-                                <p>{% get_help_label_text_for_kpi kpi_name kpis %}</p>
-                                <i 
-                                    class="rcpch question circle icon"
-                                    id='{{ kpi_name }}'
-                                    data-title='{% render_title_kpi_name kpi_name|title %}'
-                                    data-content="{% get_help_reference_text_for_kpi kpi_name kpis %}. Note: showing percentage passed of total eligible for KPI (count denoted inside brackets)."
-                                    data-position='top right'
-                                    _="init js $('#{{ kpi_name }}').popup(); end">
-                                </i>
-                                </div>
-                            </td>
-                            {% for abstraction, data in all_data.items %}
-                            {% if data.aggregation_model %}
-                                <td class='right aligned'>
-                                    {% get_pct_passed_and_total_eligible data.aggregation_model kpi_name as kpi_data %}
-                                    {% if kpi_data == -1 %}
-                                        <i 
-                                            class="rcpch clock icon"
-                                            id='_{{abstraction}}_{{kpi_name}}'
-                                            data-title='No aggregation data'
-                                            data-content="Aggregation not yet performed"
-                                            data-position='top right'
-                                            _="init js $('#_{{abstraction}}_{{kpi_name}}').popup(); end">
-                                        </i>
-                                    {% elif kpi_data == 0 %}
-                                        <i 
-                                            class="rcpch exclamation circle icon"
-                                            id='{{ kpi_name }}_none_eligible_model_icon_{{abstraction}}'
-                                            data-title='None eligible'
-                                            data-html='{% no_eligible_cases data.aggregation_model kpi_name %}'
-                                            data-position='top right'
-                                            _="init js $('#{{ kpi_name }}_none_eligible_model_icon_{{abstraction}}').popup(); end">
-                                        </i>
-                                    {% else %}
-                                        <span
-                                            class="rcpch"
-                                            id='{{ kpi_name }}_data_{{abstraction}}'
-                                            data-title='% Passed Metric'
-                                            data-content="{% get_total_counts_passed data.aggregation_model kpi_name %}. Last updated {{data.aggregation_model.last_updated}}"
-                                            data-position='top right'
-                                            _="init js $('#{{ kpi_name }}_data_{{abstraction}}').popup(); end">
-                                        {{ kpi_data }}
-                                    </span>
-                                    {% endif %}
-                                </td>
-                            {% endif %}
-                            {% endfor %}
-                        </tr>
-                    {% endfor %}
-                    </tbody>
-                </table>
-
-                <h3>Care Planning</h3>
-                {% comment %} ['comprehensive_care_planning_agreement', 'patient_held_individualised_epilepsy_document', 'patient_carer_parent_agreement_to_the_care_planning', 'care_planning_has_been_updated_when_necessary', 'comprehensive_care_planning_content', 'parental_prolonged_seizures_care_plan', 'water_safety', 'first_aid', 'general_participation_and_risk', 'sudep', 'service_contact_details', 'school_individual_healthcare_plan'] {% endcomment %}
-                <table class='ui rcpch small table'>
-                    {% include './kpi_table_head.html' with kpi_head_id=5 %}
-                    <tbody>
-                        {% comment %} comprehensive_care_planning_agreement {% endcomment %}
+                        
+                        {% comment %} tertiary input {% endcomment %}
                         <tr class="subcategory-header"> 
-                            {% with kpi_name='comprehensive_care_planning_agreement' %}
+                            {% with kpi_name='tertiary_input' %}
                             <td>
                                 <div class="rcpch_td_data_indicator_wrapper">
                                     <p>{% get_help_label_text_for_kpi kpi_name kpis %}</p>
@@ -481,8 +180,8 @@ will be persisted and run as a cron job once a day.
                             {% endwith %} 
                         </tr>
 
-                        {% comment %} 'patient_held_individualised_epilepsy_document', 'patient_carer_parent_agreement_to_the_care_planning', 'care_planning_has_been_updated_when_necessary', {% endcomment %}
-                        {% for kpi_name in kpi_names_list|slice:"10:13" %}
+                        {% comment %} 'epilepsy surgery referral', {% endcomment %}
+                        {% for kpi_name in kpi_names_list|slice:"3:4" %}
                         <tr class="subcategory-row">
                             <td>
                                 <div class="rcpch_td_data_indicator_wrapper">
@@ -535,12 +234,19 @@ will be persisted and run as a cron job once a day.
                             {% endfor %}
                         </tr>
                         {% endfor %}
+                        </tbody>
+                    </table>
 
-                        {% comment %} comprehensive_care_planning_content {% endcomment %}
-                        <tr class="subcategory-header"> 
-                            {% with kpi_name='comprehensive_care_planning_content' %}
-                            <td>
-                                <div class="rcpch_td_data_indicator_wrapper">
+                    <h3>Investigations</h3>
+                    {% comment %} [ECG, MRI,] {% endcomment %}
+                    <table class='ui rcpch small table'>
+                        {% include './kpi_table_head.html' with kpi_head_id=2  %}
+                        <tbody>
+                        
+                        {% for kpi_name in kpi_names_list|slice:"4:6" %}
+                            <tr>
+                                <td>
+                                    <div class="rcpch_td_data_indicator_wrapper">
                                     <p>{% get_help_label_text_for_kpi kpi_name kpis %}</p>
                                     <i 
                                         class="rcpch question circle icon"
@@ -550,13 +256,12 @@ will be persisted and run as a cron job once a day.
                                         data-position='top right'
                                         _="init js $('#{{ kpi_name }}').popup(); end">
                                     </i>
-                                </div>
-                            
-                            </td>
-                            {% for abstraction, data in all_data.items %}
-                            {% if data.aggregation_model %}
-                                {% get_pct_passed_and_total_eligible data.aggregation_model kpi_name as kpi_data %}
+                                    </div>
+                                </td>
+                                {% for abstraction, data in all_data.items %}
+                                {% if data.aggregation_model %}
                                     <td class='right aligned'>
+                                        {% get_pct_passed_and_total_eligible data.aggregation_model kpi_name as kpi_data %}
                                         {% if kpi_data == -1 %}
                                             <i 
                                                 class="rcpch clock icon"
@@ -578,138 +283,447 @@ will be persisted and run as a cron job once a day.
                                         {% else %}
                                             <span
                                                 class="rcpch"
-                                                id='{{ kpi_name }}_data_{{ abstraction }}'
+                                                id='{{ kpi_name }}_data_{{abstraction}}'
                                                 data-title='% Passed Metric'
                                                 data-content="{% get_total_counts_passed data.aggregation_model kpi_name %}. Last updated {{data.aggregation_model.last_updated}}"
                                                 data-position='top right'
                                                 _="init js $('#{{ kpi_name }}_data_{{abstraction}}').popup(); end">
-                                                {{ kpi_data }}
-                                            </span>
+                                            {{ kpi_data }}
+                                        </span>
                                         {% endif %}
                                     </td>
                                 {% endif %}
                                 {% endfor %}
-                            {% endwith %} 
-                        </tr>
-
-                        {% comment %} 'parental_prolonged_seizures_care_plan', 'water_safety', 'first_aid', 'general_participation_and_risk', 'sudep', 'service_contact_details' {% endcomment %}
-                        {% for kpi_name in kpi_names_list|slice:"13:20" %}
-                        <tr class="subcategory-row">
-                            <td>
-                                <div class="rcpch_td_data_indicator_wrapper">
-                                <p>{% get_help_label_text_for_kpi kpi_name kpis %}</p>
-                                <i 
-                                    class="rcpch question circle icon"
-                                    id='{{ kpi_name }}'
-                                    data-title='{% render_title_kpi_name kpi_name|title %}'
-                                    data-content="{% get_help_reference_text_for_kpi kpi_name kpis %}. Note: showing percentage passed of total eligible for KPI (count denoted inside brackets)."
-                                    data-position='top right'
-                                    _="init js $('#{{ kpi_name }}').popup(); end">
-                                </i>
-                                </div>
-                            </td>
-                            {% for abstraction, data in all_data.items %}
-                            {% if data.aggregation_model %}
-                                <td class='right aligned'>
-                                    {% get_pct_passed_and_total_eligible data.aggregation_model kpi_name as kpi_data %}
-                                    {% if kpi_data == -1 %}
-                                        <i 
-                                            class="rcpch clock icon"
-                                            id='_{{abstraction}}_{{kpi_name}}'
-                                            data-title='No aggregation data'
-                                            data-content="Aggregation not yet performed"
-                                            data-position='top right'
-                                            _="init js $('#_{{abstraction}}_{{kpi_name}}').popup(); end">
-                                        </i>
-                                    {% elif kpi_data == 0 %}
-                                        <i 
-                                            class="rcpch exclamation circle icon"
-                                            id='{{ kpi_name }}_none_eligible_model_icon_{{abstraction}}'
-                                            data-title='None eligible'
-                                            data-html='{% no_eligible_cases data.aggregation_model kpi_name %}'
-                                            data-position='top right'
-                                            _="init js $('#{{ kpi_name }}_none_eligible_model_icon_{{abstraction}}').popup(); end">
-                                        </i>
-                                    {% else %}
-                                        <span
-                                            class="rcpch"
-                                            id='{{ kpi_name }}_data_{{abstraction}}'
-                                            data-title='% Passed Metric'
-                                            data-content="{% get_total_counts_passed data.aggregation_model kpi_name %}. Last updated {{data.aggregation_model.last_updated}}"
-                                            data-position='top right'
-                                            _="init js $('#{{ kpi_name }}_data_{{abstraction}}').popup(); end">
-                                        {{ kpi_data }}
-                                    </span>
-                                    {% endif %}
-                                </td>
-                            {% endif %}
-                            {% endfor %}
-                        </tr>
+                            </tr>
                         {% endfor %}
+                        </tbody>
+                    </table>
 
-                        {% comment %} 'school_individual_healthcare_plan' {% endcomment %}
-                        {% for kpi_name in kpi_names_list|slice:"20:" %}
-                        <tr>
-                            <td>
-                                <div class="rcpch_td_data_indicator_wrapper">
-                                <p>{% get_help_label_text_for_kpi kpi_name kpis %}</p>
-                                <i 
-                                    class="rcpch question circle icon"
-                                    id='{{ kpi_name }}'
-                                    data-title='{% render_title_kpi_name kpi_name|title %}'
-                                    data-content="{% get_help_reference_text_for_kpi kpi_name kpis %}. Note: showing percentage passed of total eligible for KPI (count denoted inside brackets)."
-                                    data-position='top right'
-                                    _="init js $('#{{ kpi_name }}').popup(); end">
-                                </i>
-                                </div>
-                            </td>
-                            {% for abstraction, data in all_data.items %}
-                            {% if data.aggregation_model %}
-                                <td class='right aligned'>
-                                    {% get_pct_passed_and_total_eligible data.aggregation_model kpi_name as kpi_data %}
-                                    {% if kpi_data == -1 %}
-                                        <i 
-                                            class="rcpch clock icon"
-                                            id='_{{abstraction}}_{{kpi_name}}'
-                                            data-title='No aggregation data'
-                                            data-content="Aggregation not yet performed"
-                                            data-position='top right'
-                                            _="init js $('#_{{abstraction}}_{{kpi_name}}').popup(); end">
-                                        </i>
-                                    {% elif kpi_data == 0 %}
-                                        <i 
-                                            class="rcpch exclamation circle icon"
-                                            id='{{ kpi_name }}_none_eligible_model_icon_{{abstraction}}'
-                                            data-title='None eligible'
-                                            data-html='{% no_eligible_cases data.aggregation_model kpi_name %}'
-                                            data-position='top right'
-                                            _="init js $('#{{ kpi_name }}_none_eligible_model_icon_{{abstraction}}').popup(); end">
-                                        </i>
-                                    {% else %}
-                                        <span
-                                            class="rcpch"
-                                            id='{{ kpi_name }}_data_{{abstraction}}'
-                                            data-title='% Passed Metric'
-                                            data-content="{% get_total_counts_passed data.aggregation_model kpi_name %}. Last updated {{data.aggregation_model.last_updated}}"
-                                            data-position='top right'
-                                            _="init js $('#{{ kpi_name }}_data_{{abstraction}}').popup(); end">
-                                        {{ kpi_data }}
-                                    </span>
-                                    {% endif %}
+                    <h3>Mental Health</h3>
+                    {% comment %} ['assessment_of_mental_health_issues', 'mental_health_support'] {% endcomment %}
+                    <table class='ui rcpch small table'>
+                        {% include './kpi_table_head.html' with kpi_head_id=3  %}
+                        <tbody>
+                        
+                        {% for kpi_name in kpi_names_list|slice:"6:8" %}
+                            <tr>
+                                <td>
+                                    <div class="rcpch_td_data_indicator_wrapper">
+                                    <p>{% get_help_label_text_for_kpi kpi_name kpis %}</p>
+                                    <i 
+                                        class="rcpch question circle icon"
+                                        id='{{ kpi_name }}'
+                                        data-title='{% render_title_kpi_name kpi_name|title %}'
+                                        data-content="{% get_help_reference_text_for_kpi kpi_name kpis %}. Note: showing percentage passed of total eligible for KPI (count denoted inside brackets)."
+                                        data-position='top right'
+                                        _="init js $('#{{ kpi_name }}').popup(); end">
+                                    </i>
+                                    </div>
                                 </td>
-                            {% endif %}
-                            {% endfor %}
-                        </tr>
+                                {% for abstraction, data in all_data.items %}
+                                {% if data.aggregation_model %}
+                                    <td class='right aligned'>
+                                        {% get_pct_passed_and_total_eligible data.aggregation_model kpi_name as kpi_data %}
+                                        {% if kpi_data == -1 %}
+                                            <i 
+                                                class="rcpch clock icon"
+                                                id='_{{abstraction}}_{{kpi_name}}'
+                                                data-title='No aggregation data'
+                                                data-content="Aggregation not yet performed"
+                                                data-position='top right'
+                                                _="init js $('#_{{abstraction}}_{{kpi_name}}').popup(); end">
+                                            </i>
+                                        {% elif kpi_data == 0 %}
+                                            <i 
+                                                class="rcpch exclamation circle icon"
+                                                id='{{ kpi_name }}_none_eligible_model_icon_{{abstraction}}'
+                                                data-title='None eligible'
+                                                data-html='{% no_eligible_cases data.aggregation_model kpi_name %}'
+                                                data-position='top right'
+                                                _="init js $('#{{ kpi_name }}_none_eligible_model_icon_{{abstraction}}').popup(); end">
+                                            </i>
+                                        {% else %}
+                                            <span
+                                                class="rcpch"
+                                                id='{{ kpi_name }}_data_{{abstraction}}'
+                                                data-title='% Passed Metric'
+                                                data-content="{% get_total_counts_passed data.aggregation_model kpi_name %}. Last updated {{data.aggregation_model.last_updated}}"
+                                                data-position='top right'
+                                                _="init js $('#{{ kpi_name }}_data_{{abstraction}}').popup(); end">
+                                            {{ kpi_data }}
+                                        </span>
+                                        {% endif %}
+                                    </td>
+                                {% endif %}
+                                {% endfor %}
+                            </tr>
                         {% endfor %}
-                    </tbody>
-                </table>
-        </div>
+                        </tbody>
+                    </table>
+                    
+                    <h3>Medication</h3>
+                    {% comment %} [Sodium valproate] {% endcomment %}
+                    <table class='ui rcpch small table'>
+                        {% include './kpi_table_head.html' with kpi_head_id=4  %}
+                        <tbody>
+                        {% comment %}  {% endcomment %}
+                        {% for kpi_name in kpi_names_list|slice:"8:9" %}
+                            <tr>
+                                <td>
+                                    <div class="rcpch_td_data_indicator_wrapper">
+                                    <p>{% get_help_label_text_for_kpi kpi_name kpis %}</p>
+                                    <i 
+                                        class="rcpch question circle icon"
+                                        id='{{ kpi_name }}'
+                                        data-title='{% render_title_kpi_name kpi_name|title %}'
+                                        data-content="{% get_help_reference_text_for_kpi kpi_name kpis %}. Note: showing percentage passed of total eligible for KPI (count denoted inside brackets)."
+                                        data-position='top right'
+                                        _="init js $('#{{ kpi_name }}').popup(); end">
+                                    </i>
+                                    </div>
+                                </td>
+                                {% for abstraction, data in all_data.items %}
+                                {% if data.aggregation_model %}
+                                    <td class='right aligned'>
+                                        {% get_pct_passed_and_total_eligible data.aggregation_model kpi_name as kpi_data %}
+                                        {% if kpi_data == -1 %}
+                                            <i 
+                                                class="rcpch clock icon"
+                                                id='_{{abstraction}}_{{kpi_name}}'
+                                                data-title='No aggregation data'
+                                                data-content="Aggregation not yet performed"
+                                                data-position='top right'
+                                                _="init js $('#_{{abstraction}}_{{kpi_name}}').popup(); end">
+                                            </i>
+                                        {% elif kpi_data == 0 %}
+                                            <i 
+                                                class="rcpch exclamation circle icon"
+                                                id='{{ kpi_name }}_none_eligible_model_icon_{{abstraction}}'
+                                                data-title='None eligible'
+                                                data-html='{% no_eligible_cases data.aggregation_model kpi_name %}'
+                                                data-position='top right'
+                                                _="init js $('#{{ kpi_name }}_none_eligible_model_icon_{{abstraction}}').popup(); end">
+                                            </i>
+                                        {% else %}
+                                            <span
+                                                class="rcpch"
+                                                id='{{ kpi_name }}_data_{{abstraction}}'
+                                                data-title='% Passed Metric'
+                                                data-content="{% get_total_counts_passed data.aggregation_model kpi_name %}. Last updated {{data.aggregation_model.last_updated}}"
+                                                data-position='top right'
+                                                _="init js $('#{{ kpi_name }}_data_{{abstraction}}').popup(); end">
+                                            {{ kpi_data }}
+                                        </span>
+                                        {% endif %}
+                                    </td>
+                                {% endif %}
+                                {% endfor %}
+                            </tr>
+                        {% endfor %}
+                        </tbody>
+                    </table>
 
-        <div class="ui bottom attached rcpch_footer info icon message">
-            <i class="info circle icon"></i>
-            These are key indicators for your Organisation, alongside aggregate higher-level data related to your Organisation. Please note that these data are provisional, and may be subject to change before the annual report publication.  
-        </div>
-        
+                    <h3>Care Planning</h3>
+                    {% comment %} ['comprehensive_care_planning_agreement', 'patient_held_individualised_epilepsy_document', 'patient_carer_parent_agreement_to_the_care_planning', 'care_planning_has_been_updated_when_necessary', 'comprehensive_care_planning_content', 'parental_prolonged_seizures_care_plan', 'water_safety', 'first_aid', 'general_participation_and_risk', 'sudep', 'service_contact_details', 'school_individual_healthcare_plan'] {% endcomment %}
+                    <table class='ui rcpch small table'>
+                        {% include './kpi_table_head.html' with kpi_head_id=5 %}
+                        <tbody>
+                            {% comment %} comprehensive_care_planning_agreement {% endcomment %}
+                            <tr class="subcategory-header"> 
+                                {% with kpi_name='comprehensive_care_planning_agreement' %}
+                                <td>
+                                    <div class="rcpch_td_data_indicator_wrapper">
+                                        <p>{% get_help_label_text_for_kpi kpi_name kpis %}</p>
+                                        <i 
+                                            class="rcpch question circle icon"
+                                            id='{{ kpi_name }}'
+                                            data-title='{% render_title_kpi_name kpi_name|title %}'
+                                            data-content="{% get_help_reference_text_for_kpi kpi_name kpis %}. Note: showing percentage passed of total eligible for KPI (count denoted inside brackets)."
+                                            data-position='top right'
+                                            _="init js $('#{{ kpi_name }}').popup(); end">
+                                        </i>
+                                    </div>
+                                
+                                </td>
+                                {% for abstraction, data in all_data.items %}
+                                {% if data.aggregation_model %}
+                                    {% get_pct_passed_and_total_eligible data.aggregation_model kpi_name as kpi_data %}
+                                        <td class='right aligned'>
+                                            {% if kpi_data == -1 %}
+                                                <i 
+                                                    class="rcpch clock icon"
+                                                    id='_{{abstraction}}_{{kpi_name}}'
+                                                    data-title='No aggregation data'
+                                                    data-content="Aggregation not yet performed"
+                                                    data-position='top right'
+                                                    _="init js $('#_{{abstraction}}_{{kpi_name}}').popup(); end">
+                                                </i>
+                                            {% elif kpi_data == 0 %}
+                                                <i 
+                                                    class="rcpch exclamation circle icon"
+                                                    id='{{ kpi_name }}_none_eligible_model_icon_{{abstraction}}'
+                                                    data-title='None eligible'
+                                                    data-html='{% no_eligible_cases data.aggregation_model kpi_name %}'
+                                                    data-position='top right'
+                                                    _="init js $('#{{ kpi_name }}_none_eligible_model_icon_{{abstraction}}').popup(); end">
+                                                </i>
+                                            {% else %}
+                                                <span
+                                                    class="rcpch"
+                                                    id='{{ kpi_name }}_data_{{ abstraction }}'
+                                                    data-title='% Passed Metric'
+                                                    data-content="{% get_total_counts_passed data.aggregation_model kpi_name %}. Last updated {{data.aggregation_model.last_updated}}"
+                                                    data-position='top right'
+                                                    _="init js $('#{{ kpi_name }}_data_{{abstraction}}').popup(); end">
+                                                    {{ kpi_data }}
+                                                </span>
+                                            {% endif %}
+                                        </td>
+                                    {% endif %}
+                                    {% endfor %}
+                                {% endwith %} 
+                            </tr>
+
+                            {% comment %} 'patient_held_individualised_epilepsy_document', 'patient_carer_parent_agreement_to_the_care_planning', 'care_planning_has_been_updated_when_necessary', {% endcomment %}
+                            {% for kpi_name in kpi_names_list|slice:"10:13" %}
+                            <tr class="subcategory-row">
+                                <td>
+                                    <div class="rcpch_td_data_indicator_wrapper">
+                                    <p>{% get_help_label_text_for_kpi kpi_name kpis %}</p>
+                                    <i 
+                                        class="rcpch question circle icon"
+                                        id='{{ kpi_name }}'
+                                        data-title='{% render_title_kpi_name kpi_name|title %}'
+                                        data-content="{% get_help_reference_text_for_kpi kpi_name kpis %}. Note: showing percentage passed of total eligible for KPI (count denoted inside brackets)."
+                                        data-position='top right'
+                                        _="init js $('#{{ kpi_name }}').popup(); end">
+                                    </i>
+                                    </div>
+                                </td>
+                                {% for abstraction, data in all_data.items %}
+                                {% if data.aggregation_model %}
+                                    <td class='right aligned'>
+                                        {% get_pct_passed_and_total_eligible data.aggregation_model kpi_name as kpi_data %}
+                                        {% if kpi_data == -1 %}
+                                            <i 
+                                                class="rcpch clock icon"
+                                                id='_{{abstraction}}_{{kpi_name}}'
+                                                data-title='No aggregation data'
+                                                data-content="Aggregation not yet performed"
+                                                data-position='top right'
+                                                _="init js $('#_{{abstraction}}_{{kpi_name}}').popup(); end">
+                                            </i>
+                                        {% elif kpi_data == 0 %}
+                                            <i 
+                                                class="rcpch exclamation circle icon"
+                                                id='{{ kpi_name }}_none_eligible_model_icon_{{abstraction}}'
+                                                data-title='None eligible'
+                                                data-html='{% no_eligible_cases data.aggregation_model kpi_name %}'
+                                                data-position='top right'
+                                                _="init js $('#{{ kpi_name }}_none_eligible_model_icon_{{abstraction}}').popup(); end">
+                                            </i>
+                                        {% else %}
+                                            <span
+                                                class="rcpch"
+                                                id='{{ kpi_name }}_data_{{abstraction}}'
+                                                data-title='% Passed Metric'
+                                                data-content="{% get_total_counts_passed data.aggregation_model kpi_name %}. Last updated {{data.aggregation_model.last_updated}}"
+                                                data-position='top right'
+                                                _="init js $('#{{ kpi_name }}_data_{{abstraction}}').popup(); end">
+                                            {{ kpi_data }}
+                                        </span>
+                                        {% endif %}
+                                    </td>
+                                {% endif %}
+                                {% endfor %}
+                            </tr>
+                            {% endfor %}
+
+                            {% comment %} comprehensive_care_planning_content {% endcomment %}
+                            <tr class="subcategory-header"> 
+                                {% with kpi_name='comprehensive_care_planning_content' %}
+                                <td>
+                                    <div class="rcpch_td_data_indicator_wrapper">
+                                        <p>{% get_help_label_text_for_kpi kpi_name kpis %}</p>
+                                        <i 
+                                            class="rcpch question circle icon"
+                                            id='{{ kpi_name }}'
+                                            data-title='{% render_title_kpi_name kpi_name|title %}'
+                                            data-content="{% get_help_reference_text_for_kpi kpi_name kpis %}. Note: showing percentage passed of total eligible for KPI (count denoted inside brackets)."
+                                            data-position='top right'
+                                            _="init js $('#{{ kpi_name }}').popup(); end">
+                                        </i>
+                                    </div>
+                                
+                                </td>
+                                {% for abstraction, data in all_data.items %}
+                                {% if data.aggregation_model %}
+                                    {% get_pct_passed_and_total_eligible data.aggregation_model kpi_name as kpi_data %}
+                                        <td class='right aligned'>
+                                            {% if kpi_data == -1 %}
+                                                <i 
+                                                    class="rcpch clock icon"
+                                                    id='_{{abstraction}}_{{kpi_name}}'
+                                                    data-title='No aggregation data'
+                                                    data-content="Aggregation not yet performed"
+                                                    data-position='top right'
+                                                    _="init js $('#_{{abstraction}}_{{kpi_name}}').popup(); end">
+                                                </i>
+                                            {% elif kpi_data == 0 %}
+                                                <i 
+                                                    class="rcpch exclamation circle icon"
+                                                    id='{{ kpi_name }}_none_eligible_model_icon_{{abstraction}}'
+                                                    data-title='None eligible'
+                                                    data-html='{% no_eligible_cases data.aggregation_model kpi_name %}'
+                                                    data-position='top right'
+                                                    _="init js $('#{{ kpi_name }}_none_eligible_model_icon_{{abstraction}}').popup(); end">
+                                                </i>
+                                            {% else %}
+                                                <span
+                                                    class="rcpch"
+                                                    id='{{ kpi_name }}_data_{{ abstraction }}'
+                                                    data-title='% Passed Metric'
+                                                    data-content="{% get_total_counts_passed data.aggregation_model kpi_name %}. Last updated {{data.aggregation_model.last_updated}}"
+                                                    data-position='top right'
+                                                    _="init js $('#{{ kpi_name }}_data_{{abstraction}}').popup(); end">
+                                                    {{ kpi_data }}
+                                                </span>
+                                            {% endif %}
+                                        </td>
+                                    {% endif %}
+                                    {% endfor %}
+                                {% endwith %} 
+                            </tr>
+
+                            {% comment %} 'parental_prolonged_seizures_care_plan', 'water_safety', 'first_aid', 'general_participation_and_risk', 'sudep', 'service_contact_details' {% endcomment %}
+                            {% for kpi_name in kpi_names_list|slice:"13:20" %}
+                            <tr class="subcategory-row">
+                                <td>
+                                    <div class="rcpch_td_data_indicator_wrapper">
+                                    <p>{% get_help_label_text_for_kpi kpi_name kpis %}</p>
+                                    <i 
+                                        class="rcpch question circle icon"
+                                        id='{{ kpi_name }}'
+                                        data-title='{% render_title_kpi_name kpi_name|title %}'
+                                        data-content="{% get_help_reference_text_for_kpi kpi_name kpis %}. Note: showing percentage passed of total eligible for KPI (count denoted inside brackets)."
+                                        data-position='top right'
+                                        _="init js $('#{{ kpi_name }}').popup(); end">
+                                    </i>
+                                    </div>
+                                </td>
+                                {% for abstraction, data in all_data.items %}
+                                {% if data.aggregation_model %}
+                                    <td class='right aligned'>
+                                        {% get_pct_passed_and_total_eligible data.aggregation_model kpi_name as kpi_data %}
+                                        {% if kpi_data == -1 %}
+                                            <i 
+                                                class="rcpch clock icon"
+                                                id='_{{abstraction}}_{{kpi_name}}'
+                                                data-title='No aggregation data'
+                                                data-content="Aggregation not yet performed"
+                                                data-position='top right'
+                                                _="init js $('#_{{abstraction}}_{{kpi_name}}').popup(); end">
+                                            </i>
+                                        {% elif kpi_data == 0 %}
+                                            <i 
+                                                class="rcpch exclamation circle icon"
+                                                id='{{ kpi_name }}_none_eligible_model_icon_{{abstraction}}'
+                                                data-title='None eligible'
+                                                data-html='{% no_eligible_cases data.aggregation_model kpi_name %}'
+                                                data-position='top right'
+                                                _="init js $('#{{ kpi_name }}_none_eligible_model_icon_{{abstraction}}').popup(); end">
+                                            </i>
+                                        {% else %}
+                                            <span
+                                                class="rcpch"
+                                                id='{{ kpi_name }}_data_{{abstraction}}'
+                                                data-title='% Passed Metric'
+                                                data-content="{% get_total_counts_passed data.aggregation_model kpi_name %}. Last updated {{data.aggregation_model.last_updated}}"
+                                                data-position='top right'
+                                                _="init js $('#{{ kpi_name }}_data_{{abstraction}}').popup(); end">
+                                            {{ kpi_data }}
+                                        </span>
+                                        {% endif %}
+                                    </td>
+                                {% endif %}
+                                {% endfor %}
+                            </tr>
+                            {% endfor %}
+
+                            {% comment %} 'school_individual_healthcare_plan' {% endcomment %}
+                            {% for kpi_name in kpi_names_list|slice:"20:" %}
+                            <tr>
+                                <td>
+                                    <div class="rcpch_td_data_indicator_wrapper">
+                                    <p>{% get_help_label_text_for_kpi kpi_name kpis %}</p>
+                                    <i 
+                                        class="rcpch question circle icon"
+                                        id='{{ kpi_name }}'
+                                        data-title='{% render_title_kpi_name kpi_name|title %}'
+                                        data-content="{% get_help_reference_text_for_kpi kpi_name kpis %}. Note: showing percentage passed of total eligible for KPI (count denoted inside brackets)."
+                                        data-position='top right'
+                                        _="init js $('#{{ kpi_name }}').popup(); end">
+                                    </i>
+                                    </div>
+                                </td>
+                                {% for abstraction, data in all_data.items %}
+                                {% if data.aggregation_model %}
+                                    <td class='right aligned'>
+                                        {% get_pct_passed_and_total_eligible data.aggregation_model kpi_name as kpi_data %}
+                                        {% if kpi_data == -1 %}
+                                            <i 
+                                                class="rcpch clock icon"
+                                                id='_{{abstraction}}_{{kpi_name}}'
+                                                data-title='No aggregation data'
+                                                data-content="Aggregation not yet performed"
+                                                data-position='top right'
+                                                _="init js $('#_{{abstraction}}_{{kpi_name}}').popup(); end">
+                                            </i>
+                                        {% elif kpi_data == 0 %}
+                                            <i 
+                                                class="rcpch exclamation circle icon"
+                                                id='{{ kpi_name }}_none_eligible_model_icon_{{abstraction}}'
+                                                data-title='None eligible'
+                                                data-html='{% no_eligible_cases data.aggregation_model kpi_name %}'
+                                                data-position='top right'
+                                                _="init js $('#{{ kpi_name }}_none_eligible_model_icon_{{abstraction}}').popup(); end">
+                                            </i>
+                                        {% else %}
+                                            <span
+                                                class="rcpch"
+                                                id='{{ kpi_name }}_data_{{abstraction}}'
+                                                data-title='% Passed Metric'
+                                                data-content="{% get_total_counts_passed data.aggregation_model kpi_name %}. Last updated {{data.aggregation_model.last_updated}}"
+                                                data-position='top right'
+                                                _="init js $('#{{ kpi_name }}_data_{{abstraction}}').popup(); end">
+                                            {{ kpi_data }}
+                                        </span>
+                                        {% endif %}
+                                    </td>
+                                {% endif %}
+                                {% endfor %}
+                            </tr>
+                            {% endfor %}
+                        </tbody>
+                    </table>
+            </div>
+
+            <div class="ui bottom attached rcpch_footer info icon message">
+                <i class="info circle icon"></i>
+                These are key indicators for your Organisation, alongside aggregate higher-level data related to your Organisation. Please note that these data are provisional, and may be subject to change before the annual report publication.  
+            </div>
+         
+        {% else %}
+            <div class="ui rcpch_info icon message">
+                <i class='exclamation circle icon'></i>
+                <div class="content">
+                    <div class="Header">
+                        No published data
+                    </div>
+                    <p>There is no data currently published for this cohort. For further information on publication dates, please check <a href="www.epilepsy12.rcpch.ac.uk">our Epilepsy12 website</a></p>
+                </div>
+            </div>
+        {% endif %}
     
     </div>
 

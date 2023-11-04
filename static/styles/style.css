@@ -1462,7 +1462,7 @@ a.ui.button {
 
 .ui.rcpch_important.message {
   border-radius: 0%;
-  color: var(--rcpch_charcoal);
+  color: var(--rcpch_black);
   background-color: var(--rcpch_light_blue_tint3);
   -webkit-box-shadow: 0px 0px 0px 1px rgba(51, 102, 204, 0.22) inset,
     0px 0px 0px 0px rgba(0, 0, 0, 0);
@@ -1473,8 +1473,12 @@ a.ui.button {
 }
 
 .ui.rcpch_important.message p {
-  color: var(--rcpch_charcoal);
+  color: var(--rcpch_black);
 }
+
+/* .ui.rcpch_important.message .icon{
+  color: var(--rcpch_black);
+} */
 
 .ui.rcpch_warning.message {
   border-radius: 0%;
