@@ -21,7 +21,6 @@ from ..common_view_functions import (
     all_registered_cases_for_cohort_and_abstraction_level,
     return_tile_for_region,
     get_all_kpi_aggregation_data_for_view,
-    update_all_kpi_agg_models,
 )
 from epilepsy12.common_view_functions.render_charts import update_all_data_with_charts
 from ..general_functions import (
@@ -198,7 +197,7 @@ def selected_trust_kpis(request, organisation_id):
 
     # Gather relevant data specific for this view
     all_data = get_all_kpi_aggregation_data_for_view(
-        organisation=organisation, cohort=cohort
+        organisation=organisation, cohort=cohort, open_access=open_access
     )
 
     # Instance of KPI to access field name help text attributes for KPI "Indicator" row values in table
@@ -280,6 +279,7 @@ def selected_trust_select_kpi(request, organisation_id):
     all_data = get_all_kpi_aggregation_data_for_view(
         organisation=organisation,
         cohort=cohort,
+        open_access=False
     )
 
     all_data = update_all_data_with_charts(

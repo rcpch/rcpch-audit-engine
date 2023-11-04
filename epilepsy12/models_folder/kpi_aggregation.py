@@ -557,7 +557,7 @@ class OrganisationKPIAggregation(BaseKPIAggregation):
     """
 
     # Define relationships
-    abstraction_relation = models.OneToOneField(
+    abstraction_relation = models.ForeignKey(
         to="epilepsy12.Organisation",
         on_delete=models.CASCADE,
     )
@@ -591,7 +591,7 @@ class TrustKPIAggregation(BaseKPIAggregation):
     """
 
     # Define relationships
-    abstraction_relation = models.OneToOneField(
+    abstraction_relation = models.ForeignKey(
         to="epilepsy12.Trust", on_delete=models.CASCADE
     )
 
@@ -624,7 +624,7 @@ class LocalHealthBoardKPIAggregation(BaseKPIAggregation):
     """
 
     # Define relationships
-    abstraction_relation = models.OneToOneField(
+    abstraction_relation = models.ForeignKey(
         to="epilepsy12.LocalHealthBoard", on_delete=models.CASCADE
     )
 
@@ -657,7 +657,7 @@ class ICBKPIAggregation(BaseKPIAggregation):
     """
 
     # Define relationships
-    abstraction_relation = models.OneToOneField(
+    abstraction_relation = models.ForeignKey(
         to="epilepsy12.IntegratedCareBoard",
         on_delete=models.CASCADE,
     )
@@ -691,7 +691,7 @@ class NHSEnglandRegionKPIAggregation(BaseKPIAggregation):
     """
 
     # Define relationships
-    abstraction_relation = models.OneToOneField(
+    abstraction_relation = models.ForeignKey(
         to="epilepsy12.NHSEnglandRegion",
         on_delete=models.CASCADE,
     )
@@ -725,7 +725,7 @@ class OpenUKKPIAggregation(BaseKPIAggregation):
     """
 
     # Define relationships
-    abstraction_relation = models.OneToOneField(
+    abstraction_relation = models.ForeignKey(
         to="epilepsy12.OPENUKNetwork",
         on_delete=models.CASCADE,
     )
@@ -759,7 +759,7 @@ class CountryKPIAggregation(BaseKPIAggregation):
     """
 
     # Define relationships
-    abstraction_relation = models.OneToOneField(
+    abstraction_relation = models.ForeignKey(
         to="epilepsy12.Country",
         on_delete=models.CASCADE,
     )
