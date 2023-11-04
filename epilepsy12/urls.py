@@ -313,14 +313,14 @@ organisation_patterns = [
         name="selected_organisation_summary",
     ),
     path(
-        "selected_trust/<int:organisation_id>/kpis",
+        "selected_trust/<int:organisation_id>/kpis/<str:access>",
         view=selected_trust_kpis,
         name="selected_trust_kpis",
     ),
     path(
-        "selected_trust/<int:organisation_id>/kpis/open",
-        view=selected_trust_kpis_open,
-        name="selected_trust_kpis_open",
+        "selected_trust/<int:organisation_id>/open_select",
+        view=selected_trust_open_select,
+        name="selected_trust_open_select",
     ),
     path(
         "selected_trust_kpis/<int:organisation_id>/select_kpi",

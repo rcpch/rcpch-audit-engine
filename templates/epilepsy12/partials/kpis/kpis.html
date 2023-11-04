@@ -1,7 +1,7 @@
 {% load epilepsy12_template_tags %}
 {% csrf_token %}
 {% comment %}
-This template is the kpis table and is called from selected_trust_kpis and selected_trust_kpis_open, that latter for 
+This template is the kpis table and is called from selected_trust_kpis, that latter for 
 open access. The open_access flag passed in from both endpoints denotes this.
 Currently the aggregation queries are run with every page load, but in future, the open_access results
 will be persisted and run as a cron job once a day.
@@ -29,7 +29,7 @@ will be persisted and run as a cron job once a day.
                     <!-- anyone can refresh and rerun aggregations that is not a member of the public  -->
                     <button 
                         class='ui right floated rcpch_primary button'
-                        hx-get="{% url 'selected_trust_kpis' organisation_id=organisation.pk %}"
+                        hx-get="{% url 'selected_trust_kpis' organisation_id=organisation.pk access='open' %}"
                         name="refresh" 
                         hx-trigger="click"
                         >
@@ -40,7 +40,7 @@ will be persisted and run as a cron job once a day.
                         <!-- Only RCPCH Audit team members and superusers can publish aggregations to the open access page -->
                             <button 
                                 class='ui right floated rcpch_danger button'
-                                hx-get="{% url 'selected_trust_kpis' organisation_id=organisation.pk %}"
+                                hx-get="{% url 'selected_trust_kpis' organisation_id=organisation.pk access='private' %}"
                                 name="publish"
                                 hx-trigger="click">
                                 <!-- TODO needs implementing POST call back to update KPIAggregation model open_access=True -->

@@ -304,7 +304,7 @@
         <div class="sixteen wide column">
             <div
                 class="sixteen wide rcpch segment"
-                hx-get="{% url 'selected_trust_kpis' organisation_id=selected_organisation.pk %}"
+                hx-get="{% url 'selected_trust_kpis' organisation_id=selected_organisation.pk access='private' %}"
                 hx-trigger="load" hx-swap='innerHTML'
                 hx-indicator='#kpis'
                 hx-target="#kpis">

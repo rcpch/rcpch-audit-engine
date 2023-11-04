@@ -364,6 +364,7 @@ def update_kpi_aggregation_model(
             new_obj, created = NationalKPIAggregation.objects.update_or_create(
                 defaults={
                     "cohort": cohort,
+                    "open_access": open_access,
                     **kpi_value_counts,
                 },
                 cohort=cohort,
@@ -394,37 +395,46 @@ def update_kpi_aggregation_model(
         ).first()
 
         if open_access:
-            # create a new record
+            # for public view: create a new record
             value_count["abstraction_relation"]=abstraction_relation_instance
             value_count["cohort"]=cohort
             value_count["open_access"]=open_access
-            new_obj = AbstractionKPIAggregationModel.objects.create(
-                **value_count
-            )
-            print(f"created {new_obj}")
+            try:
+                new_obj = AbstractionKPIAggregationModel.objects.create(
+                    **value_count
+                )
+                print(f"created {new_obj}")
+            except Exception as error:
+                print(
+                    f"Can't save new KPIAggregations for {abstraction_level} for {abstraction_relation_instance}: {error}"
+                )
+                return
 
-        try:
-            new_obj, created = AbstractionKPIAggregationModel.objects.update_or_create(
-                defaults={
-                    "abstraction_relation": abstraction_relation_instance,
-                    "cohort": cohort,
-
-                    **value_count,
-                },
-                abstraction_relation=abstraction_relation_instance,
-                cohort=cohort,
-                open_access=open_access
-            )
-        except Exception as error:
-            print(
-                f"Can't update/save KPIAggregations for {abstraction_level} for {abstraction_relation_instance}: {error}"
-            )
-            return
-
-        if created:
-            print(f"created {new_obj}")
+        
         else:
-            print(f"updated {new_obj}")
+            # not for public view - create or update existing
+            try:
+                new_obj, created = AbstractionKPIAggregationModel.objects.update_or_create(
+                    defaults={
+                        "abstraction_relation": abstraction_relation_instance,
+                        "cohort": cohort,
+
+                        **value_count,
+                    },
+                    abstraction_relation=abstraction_relation_instance,
+                    cohort=cohort,
+                    open_access=open_access
+                )
+            except Exception as error:
+                print(
+                    f"Can't update/save KPIAggregations for {abstraction_level} for {abstraction_relation_instance}: {error}"
+                )
+                return
+
+            if created:
+                print(f"created {new_obj}")
+            else:
+                print(f"updated {new_obj}")
 
 
 def aggregate_kpis_update_models_all_abstractions_for_organisation(

@@ -6,19 +6,7 @@
         <div class='twelve wide centered column'>
             <div class='content'>
                 {% if user.is_verified %}
-                    <div class='ui icon rcpch_warning message'>
-                        <i class='exclamation circle icon'></i>
-                        <div class='content'>
-                            <div class='header'>
-                                403 - Access Denied
-                            </div>
-                            
-                            <p>You are seeing this message because you are trying to access a record where you don't have the right permissions.</p>
-                            <p>This must be frustrating and we are sorry. Unfortunately, the only way this can be resolved is
-                                if you contact your local Epilepsy 12 administrator or RCPCH at {% include 'epilepsy12/partials/contact_email.html' %}.</p>
-                        </div>
-                    </div>
-                    {% else %}
+
                     <div class='ui icon rcpch_important message'>
                         <i class='hourglass half icon'></i>
                         <div class='content'>
@@ -31,8 +19,24 @@
                             <p>If you have enabled it already, try logging out and signing in again, ensuring you complete the Token entry step.</p>
                         </div>
                     </div>
+
+                {% else %}
                     
-                        {% endif %}
+                    <div class='ui icon rcpch_warning message'>
+                        <i class='exclamation circle icon'></i>
+                        <div class='content'>
+                            <div class='header'>
+                                403 - Access Denied
+                            </div>
+                            
+                            <p>You are seeing this message because you are trying to access a record where you don't have the right permissions.</p>
+                            <p>This must be frustrating and we are sorry. Unfortunately, the only way this can be resolved is
+                                if you contact your local Epilepsy 12 administrator or RCPCH at {% include 'epilepsy12/partials/contact_email.html' %}.</p>
+                        </div>
+                    </div>
+                    
+                {% endif %}
+
             </div>
         </div>
     </div>

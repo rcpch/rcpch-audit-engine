@@ -793,9 +793,7 @@ class NationalKPIAggregation(BaseKPIAggregation):
     """
 
     # National can only have cohort as unique
-    cohort = models.PositiveSmallIntegerField(
-        unique=True,
-    )
+    cohort = models.PositiveSmallIntegerField()
 
     class Meta:
         verbose_name = _("National KPI Aggregation Model")
