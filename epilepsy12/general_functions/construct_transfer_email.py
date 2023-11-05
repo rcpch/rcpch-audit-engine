@@ -3,14 +3,12 @@ from django.contrib.sites.shortcuts import get_current_site
 
 
 def construct_transfer_epilepsy12_site_email(
-    request, user, target_organisation, origin_organisation
+    request, target_organisation, origin_organisation
 ):
-    email_template_name = "registration/transer_epilepsy12_site_email.html"
+    email_template_name = "registration/transfer_epilepsy12_site_email.html"
     c = {
-        "email": user.email,
         "domain": get_current_site(request),
         "site_name": "Epilepsy12",
-        "user": user,
         "protocol": "http",
         "target_organisation": target_organisation,
         "origin_organisation": origin_organisation,

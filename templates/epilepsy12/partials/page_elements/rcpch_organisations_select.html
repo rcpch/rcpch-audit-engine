@@ -11,7 +11,7 @@ hx_post: url to post to
 organisation_list: a filtered list of organisations
 test_positive: currently selected organisation id
 {% endcomment %}
-
+{% csrf_token %}
 <div class="field" hx-headers='{"X-CSRFToken": "{{ csrf_token }}"}'>
 
         <div 

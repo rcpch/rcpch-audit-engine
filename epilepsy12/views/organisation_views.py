@@ -3,6 +3,7 @@
 # third party libraries
 from django.shortcuts import render
 from django.urls import reverse
+from django.shortcuts import redirect
 from django_htmx.http import HttpResponseClientRedirect
 
 # E12 imports
@@ -30,9 +31,22 @@ from ..general_functions import (
 )
 from ..tasks import (
     asynchronously_aggregate_kpis_and_update_models_for_cohort_and_abstraction_level,
-    hello,
 )
 
+def selected_organisation_summary_select(request):
+    """
+    callback from organisation select in selected_organisation_summary
+    redirects to new organisation url
+    """
+    # if request.POST.get("selected_organisation_summary") is not None:
+    selected_organisation = Organisation.objects.get(
+        pk=request.POST.get("selected_organisation_summary")
+    )
+    print(f"hello {selected_organisation}")
+    #     template_name = "epilepsy12/partials/selected_organisation_summary.html"
+    # else:
+    response = reverse('selected_organisation_summary', kwargs={"organisation_id": selected_organisation.pk})
+    return redirect(response)
 
 @login_and_otp_required()
 @user_may_view_this_organisation()
@@ -50,15 +64,9 @@ def selected_organisation_summary(request, organisation_id):
     icb_tiles = return_tile_for_region("icb")
     country_tiles = return_tile_for_region("country")
 
-    if request.POST.get("selected_organisation_summary") is not None:
-        selected_organisation = Organisation.objects.get(
-            pk=request.POST.get("selected_organisation_summary")
-        )
-        template_name = "epilepsy12/partials/selected_organisation_summary.html"
-    else:
-        # selected_organisation = return_selected_organisation(user=request.user)
-        selected_organisation = Organisation.objects.get(pk=organisation_id)
-        template_name = "epilepsy12/organisation.html"
+    
+    selected_organisation = Organisation.objects.get(pk=organisation_id)
+    template_name = "epilepsy12/organisation.html"
 
     lhb_tiles = None
 
@@ -200,8 +208,6 @@ def selected_trust_kpis(request, organisation_id, access):
 
         if access == "private":
             # aggregation can only occur if logged in AND not in the open_access template
-
-            print("hello")
 
             open_access = False  # aggregation flag: set to true if publishing this data for public view
 

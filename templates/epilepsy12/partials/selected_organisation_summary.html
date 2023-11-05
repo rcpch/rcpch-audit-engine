@@ -11,16 +11,16 @@
         {% if request.user.is_rcpch_audit_team_member or request.user.is_rcpch_staff or request.user.is_superuser %}
             <div class='sixteen wide column'>
                 <div class="field" hx-headers='{"X-CSRFToken": "{{ csrf_token }}"}'>
-                    {% url 'selected_organisation_summary' organisation_id=selected_organisation.pk as hx_post %}
-                    {% include 'epilepsy12/partials/page_elements/rcpch_organisations_select.html' with organisation_list=organisation_list hx_post=hx_post hx_target="#rcpch_organisation_select" hx_trigger="change" hx_swap="innerHTML" hx_name="selected_organisation_summary" test_positive=selected_organisation.pk label="Select a organisation trust to view" hx_default_text="Search general paediatric organisations..." data_position="top left" %}
+                    {% url 'selected_organisation_summary_select' as hx_post %}
+                    {% include 'epilepsy12/partials/page_elements/rcpch_organisations_select.html' with organisation_list=organisation_list hx_post=hx_post hx_target="#rcpch_organisation_select" hx_trigger="change" hx_swap="innerHTML" hx_name="selected_organisation_summary_select" test_positive=selected_organisation.pk label="Select an organisation to view" hx_default_text="Search general paediatric organisations..." data_position="top left" %}
                 </div>
             </div>
-        {% endif %}
-
-        <div class="fluid row stackable org_view_all_buttons_wrapper">
-            <div class="eight wide column">
-                <a class="ui rcpch_grey fluid button" href="{% url 'epilepsy12_user_list' organisation_id=selected_organisation.pk %}">
-                    View All {{selected_organisation.name}} Epilepsy12 Staff
+            {% endif %}
+            
+            <div class="fluid row stackable org_view_all_buttons_wrapper">
+                <div class="eight wide column">
+                    <a class="ui rcpch_grey fluid button" href="{% url 'epilepsy12_user_list' organisation_id=selected_organisation.pk %}">
+                        View All {{selected_organisation.name}} Epilepsy12 Staff
                 </a>
             </div>
             <div class="eight wide  column">
