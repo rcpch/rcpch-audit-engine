@@ -12,7 +12,6 @@ from django.http import (
     HttpResponse,
 )
 from django.core.exceptions import PermissionDenied
-from django.core.mail import send_mail, BadHeaderError
 from django.urls import reverse_lazy
 from django.contrib.auth.views import PasswordResetView
 from django.contrib.messages.views import SuccessMessageMixin
@@ -504,8 +503,8 @@ def delete_epilepsy12_user(request, organisation_id, epilepsy12_user_id):
 
 class ResetPasswordView(SuccessMessageMixin, PasswordResetView):
     template_name = "registration/password_reset.html"
-    # email_template_name = "registration/password_reset_email.html"
     html_email_template_name = "registration/password_reset_email.html"
+    email_template_name = strip_tags("registration/password_reset_email.html")
     subject_template_name = "registration/password_reset_subject.txt"
     success_message = (
         "We've emailed you instructions for setting your password, "
