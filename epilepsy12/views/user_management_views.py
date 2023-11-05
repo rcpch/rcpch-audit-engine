@@ -42,6 +42,7 @@ from ..constants import (
     AUDIT_CENTRE_ROLES,
     EPILEPSY12_AUDIT_TEAM_FULL_ACCESS,
 )
+from ..tasks import asynchronously_send_email_to_recipients
 
 
 @login_and_otp_required()
@@ -309,33 +310,41 @@ def create_epilepsy12_user(request, organisation_id, user_type, epilepsy12_user_
         )
 
         if form.is_valid():
-            # success message - return to user list
+            # save new user and add to gropup - return to user list with success message
+            # send sign up email asynchronously
+            # If signup unsuccessful, user not saved return to list with error message. Email not sent.
             new_user = form.save(commit=False)
             new_user.set_unusable_password()
             new_user.is_active = True
             new_user.email_confirmed = False
             new_user.view_preference = 0
-            new_user.save()
+            try:
+                new_user.save()
+            except Exception as error:
+                messages.error(request, f"Error: {error}. Account not created. Please contact Epilepsy12 if this issue persists.")
+                return redirect(
+                    "epilepsy12_user_list",
+                    organisation_id=organisation_id,
+                )
 
             new_group = group_for_role(new_user.role)
-            new_user.groups.add(new_group)
+
+            try:
+                new_user.groups.add(new_group)
+            except Exception as error:
+                messages.error(request, f"Error: {error}. Account not created. Please contact Epilepsy12 if this issue persists.")
+                return redirect(
+                    "epilepsy12_user_list",
+                    organisation_id=organisation_id,
+                )
 
             # user created - send email with reset link to new user
             subject = "Password Reset Requested"
             email = construct_confirm_email(request=request, user=new_user)
-            try:
-                send_mail(
-                    subject=subject,
-                    from_email="admin@epilepsy12.rcpch.tech",
-                    recipient_list=[new_user.email],
-                    fail_silently=False,
-                    message=strip_tags(email),
-                    html_message=email,
-                )
-            except BadHeaderError:
-                return HttpResponse("Invalid header found.")
+            
+            asynchronously_send_email_to_recipients.delay(recipients=[new_user.email],subject=subject, message=email)
 
-            messages.success(request, f"{new_user.email} account created successfully.")
+            messages.success(request, f"Account created successfully. Confirmation email has been sent to {new_user.email}.")
             return redirect(
                 "epilepsy12_user_list",
                 organisation_id=organisation_id,
@@ -412,21 +421,12 @@ def edit_epilepsy12_user(request, organisation_id, epilepsy12_user_id):
             email = construct_confirm_email(
                 request=request, user=epilepsy12_user_to_edit
             )
-            try:
-                send_mail(
-                    subject=subject,
-                    from_email="admin@epilepsy12.rcpch.tech",
-                    recipient_list=[epilepsy12_user_to_edit.email],
-                    fail_silently=False,
-                    message=strip_tags(email),
-                    html_message=email,
-                )
-            except BadHeaderError:
-                return HttpResponse("Invalid header found.")
+            
+            asynchronously_send_email_to_recipients.delay(recipients=[epilepsy12_user_to_edit.email], subject=subject, message=email)
 
             messages.success(
                 request,
-                f"Confirmation request sent to {epilepsy12_user_to_edit.email}.",
+                f"Confirmation and password reset request resent to {epilepsy12_user_to_edit.email}.",
             )
             redirect_url = reverse(
                 "epilepsy12_user_list",
