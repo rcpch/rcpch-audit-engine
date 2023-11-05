@@ -67,8 +67,6 @@ def selected_organisation_summary(request, organisation_id):
     icb_tiles = return_tile_for_region("icb")
     country_tiles = return_tile_for_region("country")
 
-    print("hello " + reverse("selected_organisation_summary_select"))
-
     selected_organisation = Organisation.objects.get(pk=organisation_id)
     template_name = "epilepsy12/organisation.html"
 
