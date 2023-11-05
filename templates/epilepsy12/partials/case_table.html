@@ -199,15 +199,27 @@
               {% endif %}
 
               {% if case in cases_in_transfer %}
+                {% url 'transfer_response' organisation_id=organisation_id case_id=case.id organisation_response="accept" as hx_post %}
                 <button
+                  hx-headers='{"X-CSRFToken": "{{ csrf_token }}"}'
                   class="ui rcpch_primary icon button" 
+                  tabindexed="1" 
+                  hx-post="{{hx_post}}"
+                  hx_trigger='click' 
+                  hx-target="#case_table"
                   >
-                  <i class="handshake outline icon"></i>
+                  <span data-tooltip="Accept transfer request"><i class="handshake outline icon"></i></span>
                 </button>
+                {% url 'transfer_response' organisation_id=organisation_id case_id=case.id organisation_response="reject" as hx_post %}
                 <button
+                  hx-headers='{"X-CSRFToken": "{{ csrf_token }}"}'
                   class="ui rcpch_primary icon button" 
+                  tabindexed="1" 
+                  hx-post="{{hx_post}}"
+                  hx_trigger='click' 
+                  hx-target="#case_table"
                   >
-                  <i class="hand paper outline icon"></i>
+                  <span data-tooltip="Reject transfer request"><i class="hand paper outline icon"></i></span>
                 </button>
               {% endif %}
             </td>

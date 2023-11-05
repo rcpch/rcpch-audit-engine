@@ -340,6 +340,37 @@ def case_statistics(request, organisation_id):
 @login_and_otp_required()
 @user_may_view_this_child()
 @permission_required(
+    "epilepsy12.can_transfer_epilepsy12_lead_centre", raise_exception=True
+)
+def transfer_response(request, organisation_id, case_id, organisation_response):
+    """
+    POST callback from case table on click of accept/reject buttons against transfer request
+    """
+    case = Case.objects.get(pk=case_id)
+    site = Site.objects.get(case=case, active_transfer=True)
+    if organisation_response == "reject":
+        # reset the child back to the orgin organisation
+        site.active_transfer = False
+        site.organisation = site.transfer_origin_organisation
+        site.transfer_origin_organisation = None
+        site.transfer_request_date = None
+    elif organisation_response == "accept":
+        site.active_transfer = False
+        site.transfer_origin_organisation = None
+        site.transfer_request_date = None
+    else:
+        raise Exception("No organisation response supplied")
+
+    site.save()
+
+    return HttpResponseClientRedirect(
+        reverse("cases", kwargs={"organisation_id": organisation_id})
+    )
+
+
+@login_and_otp_required()
+@user_may_view_this_child()
+@permission_required(
     "epilepsy12.change_case",
 )
 def case_submit(request, organisation_id, case_id):

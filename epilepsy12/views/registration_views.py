@@ -368,6 +368,7 @@ def update_lead_site(request, registration_id, site_id, update):
             new_lead_site.site_is_primary_centre_of_epilepsy_care = True
             new_lead_site.site_is_actively_involved_in_epilepsy_care = True
             new_lead_site.active_transfer = True
+            new_lead_site.transfer_origin_organisation = origin_organisation
             new_lead_site.transfer_request_date = timezone.now()
             new_lead_site.save()
         else:
@@ -377,6 +378,7 @@ def update_lead_site(request, registration_id, site_id, update):
                 site_is_primary_centre_of_epilepsy_care=True,
                 site_is_actively_involved_in_epilepsy_care=True,
                 active_transfer=True,
+                transfer_origin_organisation=origin_organisation,
                 transfer_request_date=timezone.now(),
                 updated_at=timezone.now(),
                 updated_by=request.user,
