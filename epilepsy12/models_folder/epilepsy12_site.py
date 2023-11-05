@@ -40,6 +40,9 @@ class Site(TimeStampAbstractBaseClass, UserStampAbstractBaseClass):
     site_is_paediatric_neurology_centre = models.BooleanField(default=False, null=True)
     site_is_general_paediatric_centre = models.BooleanField(default=False, null=True)
 
+    active_transfer = models.BooleanField(default=False)
+    transfer_request_date = models.DateField(blank=True, null=True, default=None)
+
     history = HistoricalRecords()
 
     # relationships

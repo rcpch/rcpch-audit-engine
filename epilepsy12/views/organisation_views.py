@@ -3,18 +3,16 @@
 # third party libraries
 from django.shortcuts import render
 from django.urls import reverse
-from django.shortcuts import redirect
+from django.utils import timezone
 from django_htmx.http import HttpResponseClientRedirect
+from dateutil.relativedelta import relativedelta
 
 # E12 imports
 from ..decorator import user_may_view_this_organisation, login_and_otp_required
 from epilepsy12.constants import (
     INDIVIDUAL_KPI_MEASURES,
 )
-from epilepsy12.models import (
-    Organisation,
-    KPI,
-)
+from epilepsy12.models import Organisation, KPI, Site
 from ..common_view_functions import (
     cases_aggregated_by_sex,
     cases_aggregated_by_ethnicity,
@@ -344,40 +342,6 @@ def selected_trust_select_kpi(request, organisation_id):
     template_name = "epilepsy12/partials/organisation/metric.html"
 
     return render(request=request, template_name=template_name, context=context)
-
-
-# def selected_trust_kpis_open(request, organisation_id):
-#     """
-#     Open access endpoint for KPIs table
-#     """
-
-#     organisation = Organisation.objects.get(pk=organisation_id)
-
-#     # run the aggregations TODO This will need ultimately throttling to run only periodically
-
-#     # get aggregated KPIs for level of abstraction from KPIAggregation
-
-#     # create an empty instance of KPI model to access the labels - this is a bit of a hack but works and
-#     # and has very little overhead
-
-#     kpis = KPI.objects.create(
-#         organisation=organisation,
-#     )
-
-#     template_name = "epilepsy12/partials/kpis/kpis.html"
-#     context = {
-#         "organisation": organisation,
-#         "kpis": kpis,
-#         "organisation_list": Organisation.objects.all().order_by("name"),
-#         "open_access": True,
-#     }
-
-#     # remove the temporary instance as otherwise would contribute to totals
-#     kpis.delete()
-
-#     response = render(request=request, template_name=template_name, context=context)
-
-#     return response
 
 
 @login_and_otp_required()

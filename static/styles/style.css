@@ -2151,3 +2151,7 @@ div.sixteen.wide.column.search_field_wrapper > .ui.rcpch.icon.input {
 .captcha {
   height: 3em;
 }
+
+.active_transfer{
+  background-color: var(--rcpch_purple_light_tint2);
+}

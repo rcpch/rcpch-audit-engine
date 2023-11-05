@@ -243,6 +243,8 @@ def case_list(request, organisation_id):
         & Q(site__site_is_actively_involved_in_epilepsy_care=True)
     ).all()
 
+    cases_in_transfer = registered_cases.filter(site__active_transfer=True)
+
     paginator = Paginator(all_cases, 10)
     page_number = request.GET.get("page", 1)
     case_list = paginator.page(page_number)
@@ -280,6 +282,7 @@ def case_list(request, organisation_id):
         "organisation_children": organisation_children,
         "rcpch_choices": rcpch_choices,
         "organisation_id": organisation_id,
+        "cases_in_transfer": cases_in_transfer,
     }
     if request.htmx:
         return render(

@@ -105,6 +105,8 @@
         
           {% if case.registration.days_remaining_before_submission == 0 %}
               <tr class='disabled'>
+          {% elif case in cases_in_transfer %}
+              <tr class='active_transfer'>
           {% else %}
               <tr>
           {% endif %}
@@ -194,6 +196,19 @@
                 <i class="cloud download icon"></i>
               {% else %}
                 <i class="cloud upload icon"></i></button>
+              {% endif %}
+
+              {% if case in cases_in_transfer %}
+                <button
+                  class="ui rcpch_primary icon button" 
+                  >
+                  <i class="handshake outline icon"></i>
+                </button>
+                <button
+                  class="ui rcpch_primary icon button" 
+                  >
+                  <i class="hand paper outline icon"></i>
+                </button>
               {% endif %}
             </td>
           {% else %}
