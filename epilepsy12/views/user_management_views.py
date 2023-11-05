@@ -504,7 +504,8 @@ def delete_epilepsy12_user(request, organisation_id, epilepsy12_user_id):
 
 class ResetPasswordView(SuccessMessageMixin, PasswordResetView):
     template_name = "registration/password_reset.html"
-    email_template_name = "registration/password_reset_email.html"
+    # email_template_name = "registration/password_reset_email.html"
+    html_email_template_name = "registration/password_reset_email.html"
     subject_template_name = "registration/password_reset_subject.txt"
     success_message = (
         "We've emailed you instructions for setting your password, "
