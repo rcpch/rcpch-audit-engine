@@ -15,7 +15,7 @@
                     {% include 'epilepsy12/partials/page_elements/rcpch_organisations_select.html' with organisation_list=organisation_list hx_post=hx_post hx_target="#rcpch_organisation_select" hx_trigger="change" hx_swap="innerHTML" hx_name="selected_organisation_summary_select" test_positive=selected_organisation.pk label="Select an organisation to view" hx_default_text="Search general paediatric organisations..." data_position="top left" %}
                 </div>
             </div>
-            {% endif %}
+        {% endif %}
             
             <div class="fluid row stackable org_view_all_buttons_wrapper">
                 <div class="eight wide column">

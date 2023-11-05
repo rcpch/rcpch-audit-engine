@@ -33,6 +33,7 @@ from ..tasks import (
     asynchronously_aggregate_kpis_and_update_models_for_cohort_and_abstraction_level,
 )
 
+
 def selected_organisation_summary_select(request):
     """
     callback from organisation select in selected_organisation_summary
@@ -40,13 +41,15 @@ def selected_organisation_summary_select(request):
     """
     # if request.POST.get("selected_organisation_summary") is not None:
     selected_organisation = Organisation.objects.get(
-        pk=request.POST.get("selected_organisation_summary")
+        pk=request.POST.get("selected_organisation_summary_select")
     )
-    print(f"hello {selected_organisation}")
-    #     template_name = "epilepsy12/partials/selected_organisation_summary.html"
-    # else:
-    response = reverse('selected_organisation_summary', kwargs={"organisation_id": selected_organisation.pk})
-    return redirect(response)
+
+    response = reverse(
+        "selected_organisation_summary",
+        kwargs={"organisation_id": selected_organisation.pk},
+    )
+    return HttpResponseClientRedirect(response)
+
 
 @login_and_otp_required()
 @user_may_view_this_organisation()
@@ -64,7 +67,8 @@ def selected_organisation_summary(request, organisation_id):
     icb_tiles = return_tile_for_region("icb")
     country_tiles = return_tile_for_region("country")
 
-    
+    print("hello " + reverse("selected_organisation_summary_select"))
+
     selected_organisation = Organisation.objects.get(pk=organisation_id)
     template_name = "epilepsy12/organisation.html"
 

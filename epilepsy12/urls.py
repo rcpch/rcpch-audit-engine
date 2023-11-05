@@ -313,7 +313,7 @@ organisation_patterns = [
         name="selected_organisation_summary",
     ),
     path(
-        "organisation/<int:organisation_id>/summary-select",
+        "organisation/summary-select",
         view=selected_organisation_summary_select,
         name="selected_organisation_summary_select",
     ),
