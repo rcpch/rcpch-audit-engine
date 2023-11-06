@@ -2,10 +2,18 @@
 {% load static %}
 {% block content %}
 <div class="ui container">
-    <div class='ui grid'>
+    <div class='ui padded grid'>
         <div class='twelve wide centered column'>
+            
             <div class='content'>
                 {% if user.is_authenticated %}
+
+                    <div class="ui header">
+                        <img src='{% static "images/epilepsy12-logo-1.png" %}'>
+                        <div class="content">
+                        <h2>Two factor authentication</h2>
+                        </div>
+                    </div>
 
                     <div class='ui icon rcpch_important message'>
                         <i class='hourglass half icon'></i>
@@ -21,16 +29,23 @@
                     </div>
 
                 {% else %}
+
+                    <div class="ui header">
+                        <img src='{% static "images/epilepsy12-logo-1.png" %}'>
+                        <div class="content">
+                        <h2>You need additional privileges in order to go any further</h2>
+                        </div>
+                    </div>
                     
                     <div class='ui icon rcpch_warning message'>
                         <i class='exclamation circle icon'></i>
                         <div class='content'>
                             <div class='header'>
-                                403 - Sorry...
+                                Sorry...
                             </div>
                             
                             <p>You are seeing this message because you are trying to access a page where you are not logged in or you don't have the right permissions.</p>
-                            <p>This must be frustrating and we are sorry. Unfortunately, the only way this can be resolved is
+                            <p>Unfortunately, if this persists, the only it can be resolved is
                                 if you contact your local Epilepsy 12 administrator or RCPCH at {% include 'epilepsy12/partials/contact_email.html' %}.</p>
                         </div>
                     </div>
