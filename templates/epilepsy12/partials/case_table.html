@@ -207,6 +207,20 @@
                   hx-post="{{hx_post}}"
                   hx_trigger='click' 
                   hx-target="#case_table"
+                  {% if not perms.epilepsy12.can_transfer_epilepsy12_lead_centre %}disabled{% endif %}
+                    _="on htmx:confirm(issueRequest)
+                        halt the event
+                        call Swal.fire({
+                            title: 'Confirmation Required',
+                            text: 'Please confirm you are happy to accept {{case}} onto your Epilepsy12 caseload.',
+                            icon: 'warning',
+                            iconColor: '#e00087',
+                            showCancelButton: true,
+                            confirmButtonColor: '#11a7f2',
+                            cancelButtonColor: '#e60700',
+                            confirmButtonText: 'I accept'
+                          })
+                        if result.isConfirmed issueRequest()"
                   >
                   <span data-tooltip="Accept transfer request"><i class="handshake outline icon"></i></span>
                 </button>
@@ -218,6 +232,20 @@
                   hx-post="{{hx_post}}"
                   hx_trigger='click' 
                   hx-target="#case_table"
+                  {% if not perms.epilepsy12.can_transfer_epilepsy12_lead_centre %}disabled{% endif %}
+                    _="on htmx:confirm(issueRequest)
+                        halt the event
+                        call Swal.fire({
+                            title: 'Confirmation Required',
+                            text: 'Please confirm you are rejecting the request to transfer {{case}} onto your Epilepsy12 caseload.',
+                            icon: 'warning',
+                            iconColor: '#e00087',
+                            showCancelButton: true,
+                            confirmButtonColor: '#11a7f2',
+                            cancelButtonColor: '#e60700',
+                            confirmButtonText: 'I accept'
+                          })
+                        if result.isConfirmed issueRequest()"
                   >
                   <span data-tooltip="Reject transfer request"><i class="hand paper outline icon"></i></span>
                 </button>
