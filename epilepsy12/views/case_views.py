@@ -10,13 +10,14 @@ from django.contrib.auth.decorators import permission_required
 from django.contrib.gis.db.models import Q
 from django.contrib import messages
 from django.core.paginator import Paginator
+from django.db import DatabaseError
 
 # third party imports
 from django_htmx.http import trigger_client_event, HttpResponseClientRedirect
 
 # RCPCH imports
 from epilepsy12.forms import CaseForm
-from epilepsy12.models import Organisation, Site, Case, AuditProgress
+from epilepsy12.models import Organisation, Site, Case, AuditProgress, Epilepsy12User
 from ..constants import (
     UNKNOWN_POSTCODES_NO_SPACES,
 )
@@ -25,6 +26,9 @@ from ..decorator import (
     user_may_view_this_child,
     login_and_otp_required,
 )
+
+from ..general_functions import construct_transfer_epilepsy12_site_outcome_email
+from ..tasks import asynchronously_send_email_to_recipients
 
 
 @login_and_otp_required()
@@ -350,6 +354,13 @@ def transfer_response(request, organisation_id, case_id, organisation_response):
 
     case = Case.objects.get(pk=case_id)
     site = Site.objects.get(case=case, active_transfer=True)
+    # prepare email response to requesting organisation clinical lead
+    email = construct_transfer_epilepsy12_site_outcome_email(
+        request=request,
+        target_organisation=Organisation.objects.get(pk=organisation_id),
+        outcome=f"{organisation_response}ed",
+    )
+    origin_organisation = site.transfer_origin_organisation
     if organisation_response == "reject":
         # reset the child back to the orgin organisation
         site.active_transfer = False
@@ -363,7 +374,37 @@ def transfer_response(request, organisation_id, case_id, organisation_response):
     else:
         raise Exception("No organisation response supplied")
 
-    site.save()
+    try:
+        site.save()
+    except:
+        raise DatabaseError
+
+    # send email asynchronously to lead clinician(s) of origin organisation notifying them of outcome
+    outcome = f"{organisation_response.upper()}ED"
+    if Epilepsy12User.objects.filter(
+        (
+            Q(organisation_employer=origin_organisation)
+            & Q(is_active=True)
+            & Q(role=1)  # Audit Centre Lead Clinician
+        )
+    ).exists():
+        recipients = list(
+            Epilepsy12User.objects.filter(
+                (
+                    Q(organisation_employer=origin_organisation)
+                    & Q(is_active=True)
+                    & Q(role=1)  # Audit Centre Lead Clinician
+                )
+            ).values_list("email", flat=True)
+        )
+        subject = f"Epilepsy12 Lead Site Transfer {outcome}"
+    else:
+        recipients = ["epilepsy12@rcpch.ac.uk"]
+        subject = f"Epilepsy12 Lead Site Transfer {outcome}  - NO LEAD CLINICIAN"
+
+    asynchronously_send_email_to_recipients.delay(
+        recipients=recipients, subject=subject, message=email
+    )
 
     return HttpResponseClientRedirect(
         reverse("cases", kwargs={"organisation_id": organisation_id})
