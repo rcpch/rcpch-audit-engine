@@ -24,7 +24,7 @@ from two_factor.views import LoginView as TwoFactorLoginView
 import pandas as pd
 
 # epilepsy12
-from ..models import Epilepsy12User, Organisation, VisitActivity
+from ..models import Epilepsy12User, Organisation, VisitActivity, Site
 from epilepsy12.forms_folder.epilepsy12_user_form import (
     Epilepsy12UserAdminCreationForm,
     CaptchaAuthenticationForm,
@@ -320,7 +320,10 @@ def create_epilepsy12_user(request, organisation_id, user_type, epilepsy12_user_
             try:
                 new_user.save()
             except Exception as error:
-                messages.error(request, f"Error: {error}. Account not created. Please contact Epilepsy12 if this issue persists.")
+                messages.error(
+                    request,
+                    f"Error: {error}. Account not created. Please contact Epilepsy12 if this issue persists.",
+                )
                 return redirect(
                     "epilepsy12_user_list",
                     organisation_id=organisation_id,
@@ -331,7 +334,10 @@ def create_epilepsy12_user(request, organisation_id, user_type, epilepsy12_user_
             try:
                 new_user.groups.add(new_group)
             except Exception as error:
-                messages.error(request, f"Error: {error}. Account not created. Please contact Epilepsy12 if this issue persists.")
+                messages.error(
+                    request,
+                    f"Error: {error}. Account not created. Please contact Epilepsy12 if this issue persists.",
+                )
                 return redirect(
                     "epilepsy12_user_list",
                     organisation_id=organisation_id,
@@ -340,10 +346,15 @@ def create_epilepsy12_user(request, organisation_id, user_type, epilepsy12_user_
             # user created - send email with reset link to new user
             subject = "Password Reset Requested"
             email = construct_confirm_email(request=request, user=new_user)
-            
-            asynchronously_send_email_to_recipients.delay(recipients=[new_user.email],subject=subject, message=email)
 
-            messages.success(request, f"Account created successfully. Confirmation email has been sent to {new_user.email}.")
+            asynchronously_send_email_to_recipients.delay(
+                recipients=[new_user.email], subject=subject, message=email
+            )
+
+            messages.success(
+                request,
+                f"Account created successfully. Confirmation email has been sent to {new_user.email}.",
+            )
             return redirect(
                 "epilepsy12_user_list",
                 organisation_id=organisation_id,
@@ -420,8 +431,12 @@ def edit_epilepsy12_user(request, organisation_id, epilepsy12_user_id):
             email = construct_confirm_email(
                 request=request, user=epilepsy12_user_to_edit
             )
-            
-            asynchronously_send_email_to_recipients.delay(recipients=[epilepsy12_user_to_edit.email], subject=subject, message=email)
+
+            asynchronously_send_email_to_recipients.delay(
+                recipients=[epilepsy12_user_to_edit.email],
+                subject=subject,
+                message=email,
+            )
 
             messages.success(
                 request,
@@ -540,6 +555,21 @@ class RCPCHLoginView(TwoFactorLoginView):
                 org_id = 1
             else:
                 org_id = user.organisation_employer.id
+                # check for outstanding transfers in to this organisation
+                if Site.objects.filter(
+                    active_transfer=True, organisation=user.organisation_employer
+                ).exists() and user.has_perm(
+                    "epilepsy12.can_transfer_epilepsy12_lead_centre"
+                ):
+                    # there is an outstanding request for transfer in to this user's organisation. User is a lead clinician and can act on this
+                    transfers = Site.objects.filter(
+                        active_transfer=True, organisation=user.organisation_employer
+                    )
+                    for transfer in transfers:
+                        messages.info(
+                            self.request,
+                            f"{transfer.transfer_origin_organisation} have requested transfer of {transfer.case} to {user.organisation_employer} for their Epilepsy12 care. Please find {transfer.case} in the case table to accept or decline this transfer request.",
+                        )
 
             # time since last set password
             delta = timezone.now() - user.password_last_set

@@ -164,7 +164,7 @@ user_patterns = [
         name="sort_epilepsy12_users_by_organisation_employer_down",
     ),
     path(
-        "organisation/<int:organisation_id>/case/<int:case_id>/<str:organisation_response>",
+        "organisation/<int:organisation_id>/case/<int:case_id>/transfer-request/<str:organisation_response>",
         transfer_response,
         name="transfer_response",
     ),

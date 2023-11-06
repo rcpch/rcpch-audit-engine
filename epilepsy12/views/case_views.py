@@ -345,7 +345,9 @@ def case_statistics(request, organisation_id):
 def transfer_response(request, organisation_id, case_id, organisation_response):
     """
     POST callback from case table on click of accept/reject buttons against transfer request
+    Updates associated Site instance and redirects back to case table
     """
+
     case = Case.objects.get(pk=case_id)
     site = Site.objects.get(case=case, active_transfer=True)
     if organisation_response == "reject":
@@ -499,6 +501,7 @@ def update_case(request, organisation_id, case_id):
     """
     Django function based view. Receives POST request to update view or delete
     """
+    print("I at least pass through here...")
     case = get_object_or_404(Case, pk=case_id)
     form = CaseForm(instance=case)
 
