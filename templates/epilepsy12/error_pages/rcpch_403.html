@@ -2,28 +2,56 @@
 {% load static %}
 {% block content %}
 <div class="ui container">
-    <div class='ui grid'>
+    <div class='ui padded grid'>
         <div class='twelve wide centered column'>
+            
             <div class='content'>
-                <div class='ui icon rcpch_warning message'>
-                    <i class='exclamation circle icon'></i>
-                    <div class='content'>
-                        <div class='header'>
-                            403 - Access Denied
+                {% if user.is_authenticated %}
+
+                    <div class="ui header">
+                        <img src='{% static "images/epilepsy12-logo-1.png" %}'>
+                        <div class="content">
+                        <h2>Two factor authentication</h2>
                         </div>
-                        
-                        {% if user.is_verified %}
-                        <p>You are seeing this message because you are trying to access a record where you don't have the right permissions.</p>
-                        <p>This must be frustrating and we are sorry. Unfortunately, the only way this can be resolved is
-                            if you contact your local Epilepsy 12 administrator or RCPCH at {% include 'epilepsy12/partials/contact_email.html' %}.</p>
-                        {% else %}
+                    </div>
+
+                    <div class='ui icon rcpch_important message'>
+                        <i class='hourglass half icon'></i>
+                        <div class='content'>
+                            <div class='header'>
+                                Nearly there....
+                            </div>
+                            
                             <p>You are seeing this message because you have not enabled Two-Factor Authentication on your account, or you have not yet entered your token.</p>
                             <p>You can enable Two-Factor Authentication from your <a href="{% url 'two_factor:profile' %}" class="rcpch_blue_link">Account</a> page.</p> 
                             <p>If you have enabled it already, try logging out and signing in again, ensuring you complete the Token entry step.</p>
-                        {% endif %}
-
+                        </div>
                     </div>
-                </div>
+
+                {% else %}
+
+                    <div class="ui header">
+                        <img src='{% static "images/epilepsy12-logo-1.png" %}'>
+                        <div class="content">
+                        <h2>You need additional privileges in order to go any further</h2>
+                        </div>
+                    </div>
+                    
+                    <div class='ui icon rcpch_warning message'>
+                        <i class='exclamation circle icon'></i>
+                        <div class='content'>
+                            <div class='header'>
+                                Sorry...
+                            </div>
+                            
+                            <p>You are seeing this message because you are trying to access a page where you are not logged in or you don't have the right permissions.</p>
+                            <p>Unfortunately, if this persists, the only it can be resolved is
+                                if you contact your local Epilepsy 12 administrator or RCPCH at {% include 'epilepsy12/partials/contact_email.html' %}.</p>
+                        </div>
+                    </div>
+                    
+                {% endif %}
+
             </div>
         </div>
     </div>
