@@ -718,7 +718,7 @@ class NHSEnglandRegionKPIAggregation(BaseKPIAggregation):
         return f"{self.abstraction_name}"
 
     def __str__(self):
-        return f"KPIAggregations (NHSEnglandRegion={self.abstraction_relation}, Cohort {self.cohort})"
+        return f"NHSEnglandRegionKPIAggregations (NHSEnglandRegion={self.abstraction_relation}, Cohort {self.cohort})"
 
     def save(self, *args, **kwargs) -> None:
         # UPDATE THE abstraction_name field
