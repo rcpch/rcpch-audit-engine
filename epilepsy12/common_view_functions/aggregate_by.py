@@ -348,12 +348,15 @@ def update_kpi_aggregation_model(
     # Separate logic for national as no groupby key in aggregation value counts
     if abstraction_level is EnumAbstractionLevel.NATIONAL:
         NationalKPIAggregation = apps.get_model("epilepsy12", "NationalKPIAggregation")
-
         if open_access:
             # create a new record
-            kpi_value_counts["cohort":cohort]
-            kpi_value_counts["open_access":open_access]
-            new_obj = NationalKPIAggregation.objects.create(**kpi_value_counts)
+            new_obj = NationalKPIAggregation.objects.create(
+                **kpi_value_counts,
+                **{
+                    "cohort": cohort,
+                    "open_access": open_access,
+                },
+            )
             print(f"created {new_obj}")
 
         else:
@@ -400,7 +403,7 @@ def update_kpi_aggregation_model(
                 print(f"created {new_obj}")
             except Exception as error:
                 print(
-                    f"Can't save new KPIAggregations for {abstraction_level} for {abstraction_relation_instance}: {error}"
+                    f"PUBLIC VIEW: Can't save new KPIAggregations for {abstraction_level} for {abstraction_relation_instance}: {error}"
                 )
                 return
 
@@ -422,7 +425,7 @@ def update_kpi_aggregation_model(
                 )
             except Exception as error:
                 print(
-                    f"Can't update/save KPIAggregations for {abstraction_level} for {abstraction_relation_instance}: {error}"
+                    f"CLOSED VIEW: Can't update/save KPIAggregations for {abstraction_level} for {abstraction_relation_instance}: {error}"
                 )
                 return
 
