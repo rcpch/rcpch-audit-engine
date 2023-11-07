@@ -258,6 +258,18 @@ def calculate_kpi_value_counts_queryset(
             registration__id__in=welsh_cases.values_list("registration")
         )
 
+    # Wales has no NHS England Region
+    if abstraction_level is EnumAbstractionLevel.NHS_ENGLAND_REGION:
+        Case = apps.get_model("epilepsy12", "Case")
+        welsh_cases = Case.objects.filter(
+            **{f"organisations__{EnumAbstractionLevel.NHS_ENGLAND_REGION.value}": None}
+        )
+
+        # Filter out Welsh Cases from the value count
+        kpi_value_counts = kpi_value_counts.exclude(
+            registration__id__in=welsh_cases.values_list("registration")
+        ) 
+    
     # England HAS NO Local Health Boards
     if abstraction_level is EnumAbstractionLevel.LOCAL_HEALTH_BOARD:
         Case = apps.get_model("epilepsy12", "Case")
