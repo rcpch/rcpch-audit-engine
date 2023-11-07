@@ -132,9 +132,7 @@ def get_abstraction_value_from(organisation, abstraction_level: EnumAbstractionL
 
 
 def get_filtered_cases_queryset_for(
-    abstraction_level: EnumAbstractionLevel,
-    organisation,
-    cohort: int,
+    abstraction_level: EnumAbstractionLevel, organisation, cohort: int
 ):
     """Returns queryset of current audit filtered cases within the same abstraction level.
 
@@ -260,6 +258,18 @@ def calculate_kpi_value_counts_queryset(
             registration__id__in=welsh_cases.values_list("registration")
         )
 
+    # Wales has no NHS England Region
+    if abstraction_level is EnumAbstractionLevel.NHS_ENGLAND_REGION:
+        Case = apps.get_model("epilepsy12", "Case")
+        welsh_cases = Case.objects.filter(
+            **{f"organisations__{EnumAbstractionLevel.NHS_ENGLAND_REGION.value}": None}
+        )
+
+        # Filter out Welsh Cases from the value count
+        kpi_value_counts = kpi_value_counts.exclude(
+            registration__id__in=welsh_cases.values_list("registration")
+        ) 
+    
     # England HAS NO Local Health Boards
     if abstraction_level is EnumAbstractionLevel.LOCAL_HEALTH_BOARD:
         Case = apps.get_model("epilepsy12", "Case")
@@ -326,6 +336,7 @@ def update_kpi_aggregation_model(
     abstraction_level: EnumAbstractionLevel,
     kpi_value_counts,
     cohort: int,
+    open_access=False,
 ) -> None:
     """Updates the relevant KPI Aggregation model, chosen via the `abstraction_level`. Takes output of `calculate_kpi_value_counts_queryset` to update model.
 
@@ -333,6 +344,10 @@ def update_kpi_aggregation_model(
         abstraction_level (EnumAbstractionLevel): chosen abstraction level
         kpi_value_counts (ValuesQuerySet[Model, Dict[str, Any]]): value counts of KPI scorings, grouped by abstraction
         cohort (int): cohort of aggregation
+        open_access: boolean - whether publicly viewable or not. Defaults to False
+
+        If open_access is true, a new KPI aggregation record is created, to store historical publications.
+        If open_access is false, the existing KPI aggregation is updated
     """
 
     abstraction_level_models = get_abstraction_model_from_level(abstraction_level)
@@ -345,19 +360,32 @@ def update_kpi_aggregation_model(
     # Separate logic for national as no groupby key in aggregation value counts
     if abstraction_level is EnumAbstractionLevel.NATIONAL:
         NationalKPIAggregation = apps.get_model("epilepsy12", "NationalKPIAggregation")
-
-        new_obj, created = NationalKPIAggregation.objects.update_or_create(
-            defaults={
-                "cohort": cohort,
+        if open_access:
+            # create a new record
+            new_obj = NationalKPIAggregation.objects.create(
                 **kpi_value_counts,
-            },
-            cohort=cohort,
-        )
-
-        if created:
+                **{
+                    "cohort": cohort,
+                    "open_access": open_access,
+                },
+            )
             print(f"created {new_obj}")
+
         else:
-            print(f"updated {new_obj}")
+            new_obj, created = NationalKPIAggregation.objects.update_or_create(
+                defaults={
+                    "cohort": cohort,
+                    "open_access": open_access,
+                    **kpi_value_counts,
+                },
+                cohort=cohort,
+                open_access=open_access,
+            )
+
+            if created:
+                print(f"created {new_obj}")
+            else:
+                print(f"updated {new_obj}")
 
         return None
 
@@ -377,26 +405,46 @@ def update_kpi_aggregation_model(
             **{f"{related_key_field}": ABSTRACTION_CODE}
         ).first()
 
-        try:
-            new_obj, created = AbstractionKPIAggregationModel.objects.update_or_create(
-                defaults={
-                    "abstraction_relation": abstraction_relation_instance,
-                    "cohort": cohort,
-                    **value_count,
-                },
-                abstraction_relation=abstraction_relation_instance,
-                cohort=cohort,
-            )
-        except Exception as error:
-            print(
-                f"Can't update/save KPIAggregations for {abstraction_level} for {abstraction_relation_instance}: {error}"
-            )
-            return
+        if open_access:
+            # for public view: create a new record
+            value_count["abstraction_relation"] = abstraction_relation_instance
+            value_count["cohort"] = cohort
+            value_count["open_access"] = open_access
+            try:
+                new_obj = AbstractionKPIAggregationModel.objects.create(**value_count)
+                print(f"created {new_obj}")
+            except Exception as error:
+                print(
+                    f"PUBLIC VIEW: Can't save new KPIAggregations for {abstraction_level} for {abstraction_relation_instance}: {error}"
+                )
+                return
 
-        if created:
-            print(f"created {new_obj}")
         else:
-            print(f"updated {new_obj}")
+            # not for public view - create or update existing
+            try:
+                (
+                    new_obj,
+                    created,
+                ) = AbstractionKPIAggregationModel.objects.update_or_create(
+                    defaults={
+                        "abstraction_relation": abstraction_relation_instance,
+                        "cohort": cohort,
+                        **value_count,
+                    },
+                    abstraction_relation=abstraction_relation_instance,
+                    cohort=cohort,
+                    open_access=open_access,
+                )
+            except Exception as error:
+                print(
+                    f"CLOSED VIEW: Can't update/save KPIAggregations for {abstraction_level} for {abstraction_relation_instance}: {error}"
+                )
+                return
+
+            if created:
+                print(f"created {new_obj}")
+            else:
+                print(f"updated {new_obj}")
 
 
 def aggregate_kpis_update_models_all_abstractions_for_organisation(
@@ -429,7 +477,9 @@ def aggregate_kpis_update_models_all_abstractions_for_organisation(
 
 
 def update_all_kpi_agg_models(
-    cohort: int, abstractions: Union[Literal["all"], list[EnumAbstractionLevel]] = "all"
+    cohort: int,
+    abstractions: Union[Literal["all"], list[EnumAbstractionLevel]] = "all",
+    open_access=False,
 ) -> None:
     """
     Using all cases in a given cohort,
@@ -473,6 +523,7 @@ def update_all_kpi_agg_models(
             abstraction_level=ABSTRACTION_LEVEL,
             kpi_value_counts=kpi_value_counts,
             cohort=cohort,
+            open_access=open_access,
         )
 
 
@@ -480,6 +531,7 @@ def get_all_kpi_aggregation_data_for_view(
     organisation,
     cohort: int,
     kpis: "list[str] | Literal['all']" = "all",
+    open_access=False,
 ) -> dict:
     """
     Aggregates all KPI data, for each level of EnumAbstractionLevel abstraction, updates the relevant AbstractionModel and returns the KPI model as a dict.
@@ -507,13 +559,32 @@ def get_all_kpi_aggregation_data_for_view(
         # NationalKPIAggregation model does not have abstraction relation field, so handle differently to the rest and skip rest of loop
         NationalKPIAggregation = apps.get_model("epilepsy12", "NationalKPIAggregation")
         if abstraction_kpi_agg_model == NationalKPIAggregation:
+            if (
+                abstraction_kpi_agg_model.objects.filter(
+                    cohort=cohort, open_access=open_access
+                )
+                .order_by("-last_updated")
+                .first()
+                is None
+            ):
+                total_registered = 0
+            else:
+                total_registered = (
+                    abstraction_kpi_agg_model.objects.filter(
+                        cohort=cohort, open_access=open_access
+                    )
+                    .order_by("-last_updated")
+                    .first()
+                    .get_total_cases_included_in_aggregation()
+                )
+
             ALL_DATA[f"{enum_abstraction_level.name}_KPIS"] = {
-                "aggregation_model": abstraction_kpi_agg_model.objects.get(
-                    cohort=cohort
-                ),
-                "total_cases_registered": abstraction_kpi_agg_model.objects.get(
-                    cohort=cohort
-                ).get_total_cases_included_in_aggregation(),
+                "aggregation_model": abstraction_kpi_agg_model.objects.filter(
+                    cohort=cohort, open_access=open_access
+                )
+                .order_by("-last_updated")
+                .first(),
+                "total_cases_registered": total_registered,
             }
             continue
 
@@ -521,10 +592,16 @@ def get_all_kpi_aggregation_data_for_view(
         if abstraction_kpi_agg_model.objects.filter(
             abstraction_relation=abstraction_relation,
             cohort=cohort,
+            open_access=open_access,
         ).exists():
-            aggregation_model_instance = abstraction_kpi_agg_model.objects.get(
-                abstraction_relation=abstraction_relation,
-                cohort=cohort,
+            aggregation_model_instance = (
+                abstraction_kpi_agg_model.objects.filter(
+                    abstraction_relation=abstraction_relation,
+                    cohort=cohort,
+                    open_access=open_access,
+                )
+                .order_by("-last_updated")
+                .first()
             )
             ALL_DATA[f"{enum_abstraction_level.name}_KPIS"] = {
                 "aggregation_model": aggregation_model_instance,

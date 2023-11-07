@@ -40,6 +40,17 @@ class Site(TimeStampAbstractBaseClass, UserStampAbstractBaseClass):
     site_is_paediatric_neurology_centre = models.BooleanField(default=False, null=True)
     site_is_general_paediatric_centre = models.BooleanField(default=False, null=True)
 
+    active_transfer = models.BooleanField(default=False)
+    transfer_origin_organisation = models.OneToOneField(
+        to="epilepsy12.Organisation",
+        on_delete=models.PROTECT,
+        default=None,
+        null=True,
+        blank=True,
+        related_name="origin_organisation",
+    )
+    transfer_request_date = models.DateField(blank=True, null=True, default=None)
+
     history = HistoricalRecords()
 
     # relationships

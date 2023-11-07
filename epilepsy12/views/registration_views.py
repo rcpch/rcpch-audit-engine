@@ -4,9 +4,7 @@ from django.contrib.auth.decorators import permission_required
 from django.utils import timezone
 from django.contrib.gis.db.models import Q
 from django.urls import reverse
-from django.core.mail import send_mail, BadHeaderError
 from django.contrib import messages
-from django.http import HttpResponse
 from django.utils.html import strip_tags
 
 # 3rd party
@@ -32,6 +30,7 @@ from ..general_functions import (
     construct_transfer_epilepsy12_site_email,
     get_current_cohort_data,
 )
+from ..tasks import asynchronously_send_email_to_recipients
 
 
 @login_and_otp_required()
@@ -181,8 +180,8 @@ def allocate_lead_site(request, registration_id):
     Allocate site when none have been assigned
     """
     registration = Registration.objects.get(pk=registration_id)
-    new_trust_id = request.POST.get("allocate_lead_site")
-    selected_organisation = Organisation.objects.get(pk=new_trust_id)
+    organisation_id = request.POST.get("allocate_lead_site")
+    selected_organisation = Organisation.objects.get(pk=organisation_id)
 
     # test if site exists
     if Site.objects.filter(
@@ -201,6 +200,8 @@ def allocate_lead_site(request, registration_id):
             site_is_primary_centre_of_epilepsy_care=True,
             updated_at=timezone.now(),
             updated_by=request.user,
+            active_transfer=True,
+            transfer_request_date=timezone.now(),
         )
     else:
         # this site may still be associated with this registration but not actively
@@ -215,6 +216,8 @@ def allocate_lead_site(request, registration_id):
             site_is_general_paediatric_centre=True,
             created_at=timezone.now(),
             created_by=request.user,
+            active_transfer=True,
+            transfer_request_date=timezone.now(),
         )
 
     # retrieve the current active site
@@ -238,38 +241,6 @@ def allocate_lead_site(request, registration_id):
     }
 
     template_name = "epilepsy12/partials/registration/lead_site.html"
-
-    response = recalculate_form_generate_response(
-        model_instance=registration,
-        request=request,
-        context=context,
-        template=template_name,
-    )
-
-    return response
-
-
-@login_and_otp_required()
-@user_may_view_this_child()
-@permission_required("epilepsy12.can_edit_epilepsy12_lead_centre", raise_exception=True)
-def edit_lead_site(request, registration_id, site_id):
-    """
-    Edit lead centre button call back from lead_site partial
-    Does not edit the centre - returns only the template with the edit set to true
-    """
-    registration = Registration.objects.get(pk=registration_id)
-    site = Site.objects.get(pk=site_id)
-    organisation_list = Organisation.objects.order_by("name")
-
-    context = {
-        "organisation_list": organisation_list,
-        "registration": registration,
-        "site": site,
-        "edit": True,
-        "transfer": False,
-    }
-
-    template_name = "epilepsy12/partials/registration/edit_or_transfer_lead_site.html"
 
     response = recalculate_form_generate_response(
         model_instance=registration,
@@ -375,75 +346,80 @@ def update_lead_site(request, registration_id, site_id, update):
     origin_organisation = previous_lead_site.organisation
 
     if update == "transfer":
-        new_trust_id = request.POST.get("transfer_lead_site")
-        new_organisation = Organisation.objects.get(pk=new_trust_id)
+        new_organisation_id = request.POST.get("transfer_lead_site")
+        new_organisation = Organisation.objects.get(pk=new_organisation_id)
+
         # update current site record to show nolonger actively involved in care
-        Site.objects.filter(pk=site_id).update(
-            site_is_primary_centre_of_epilepsy_care=True,
-            site_is_actively_involved_in_epilepsy_care=False,
-            updated_at=timezone.now(),
-            updated_by=request.user,
-        )
-        # create new record in Site table for child against new centre
+        updated_previous_lead_site = Site.objects.filter(pk=site_id).get()
+        updated_previous_lead_site.site_is_primary_centre_of_epilepsy_care = True
+        updated_previous_lead_site.site_is_actively_involved_in_epilepsy_care = False
+        updated_previous_lead_site.save()
+
+        # create new record in Site table for child against new centre, or update existing record if
+        # organisation already involved in child's care
         if Site.objects.filter(
             organisation=new_organisation,
             case=registration.case,
-        ).exists:
+        ).exists():
             # this new site already cares for this child in some capacity, either past or present
-            Site.objects.filter(
-                organisation=new_organisation,
-                case=registration.case,
-            ).update(
-                site_is_primary_centre_of_epilepsy_care=True,
-                site_is_actively_involved_in_epilepsy_care=True,
-            )
+            new_lead_site = Site.objects.filter(
+                organisation=new_organisation, case=registration.case
+            ).get()
+            new_lead_site.site_is_primary_centre_of_epilepsy_care = True
+            new_lead_site.site_is_actively_involved_in_epilepsy_care = True
+            new_lead_site.active_transfer = True
+            new_lead_site.transfer_origin_organisation = origin_organisation
+            new_lead_site.transfer_request_date = timezone.now()
+            new_lead_site.save()
         else:
-            Site.objects.create(
+            # this new organisation does not care for this child. Create a new site associated with this organisation
+            new_lead_site = Site.objects.create(
                 organisation=new_organisation,
                 site_is_primary_centre_of_epilepsy_care=True,
                 site_is_actively_involved_in_epilepsy_care=True,
+                active_transfer=True,
+                transfer_origin_organisation=origin_organisation,
+                transfer_request_date=timezone.now(),
                 updated_at=timezone.now(),
                 updated_by=request.user,
                 case=registration.case,
             )
+
+        """
+        Update complete
+        Send emails to lead clinicians +/- E12
+        """
+
         # find clinical lead of organisation to which child transfered
         if Epilepsy12User.objects.filter(
             organisation_employer=new_organisation
         ).exists():
-            # send to all RCPCH audit team and clinical lead of new organisation
-            recipients = Epilepsy12User.objects.filter(
-                (
-                    Q(organisation_employer=new_organisation)
-                    & Q(is_active=True)
-                    & Q(role=1)  # Audit Centre Lead Clinician
-                )
-                | (Q(is_active=True) & Q(is_rcpch_audit_team_member=True))
-            ).all()
-        else:
-            # there is no allocated clinical lead. Send to all RCPCH staff
-            recipients = Epilepsy12User.objects.filter(
-                Q(is_active=True) & Q(is_rcpch_audit_team_member=True)
-            ).all()
-
-        subject = "Epilepsy12 Lead Site Transfer"
-        for recipient in recipients:
-            email = construct_transfer_epilepsy12_site_email(
-                request=request,
-                user=recipient,
-                target_organisation=new_organisation,
-                origin_organisation=origin_organisation,
+            # send to all Clinical Leads of new organisation
+            recipients = list(
+                Epilepsy12User.objects.filter(
+                    (
+                        Q(organisation_employer=new_organisation)
+                        & Q(is_active=True)
+                        & Q(role=1)  # Audit Centre Lead Clinician
+                    )
+                    | (Q(is_active=True) & Q(is_rcpch_audit_team_member=True))
+                ).values_list("email", flat=True)
             )
-            try:
-                send_mail(
-                    subject=subject,
-                    recipient_list=[recipient.email],
-                    message=strip_tags(email),
-                    html_message=email,
-                    from_email="admin@epilepsy12.rcpch.tech",
-                    fail_silently=False,
-                )
-            except BadHeaderError:
-                return HttpResponse("Invalid header found.")
+            subject = "Epilepsy12 Lead Site Transfer"
+        else:
+            # there is no allocated clinical lead. Send to epilepsy12@rcpch.ac.uk
+            recipients = ["epilepsy12@rcpch.ac.uk"]
+            subject = "Epilepsy12 Lead Site Transfer - NO LEAD CLINICIAN"
+
+        email = construct_transfer_epilepsy12_site_email(
+            request=request,
+            target_organisation=new_organisation,
+            origin_organisation=origin_organisation,
+        )
+
+        asynchronously_send_email_to_recipients.delay(
+            recipients=recipients, subject=subject, message=email
+        )
 
         if new_organisation.country.boundary_identifier == "W92000004":
             parent_trust = new_organisation.local_health_board.name
@@ -452,7 +428,7 @@ def update_lead_site(request, registration_id, site_id, update):
 
         messages.success(
             request,
-            f"{registration.case} has been successfully transferred to {parent_trust}. Email notifications have been sent to RCPCH and the lead clinicians.",
+            f"{registration.case} has been successfully transferred to {parent_trust}. Email notifications have been sent to the lead clinician(s) for {parent_trust}.",
         )
 
     return HttpResponseClientRedirect(
@@ -616,9 +592,7 @@ def registration_status(request, registration_id):
 
     context = {"case_id": case.pk, "registration": registration}
 
-    template_name = (
-        "epilepsy12/partials/registration/registration_dates.html"
-    )
+    template_name = "epilepsy12/partials/registration/registration_dates.html"
 
     response = recalculate_form_generate_response(
         model_instance=registration,

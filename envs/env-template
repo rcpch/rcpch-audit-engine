@@ -3,6 +3,9 @@
 # SECTIONS IN ALPHABETICAL ORDER ASCENDING
 # VARIABLES WITHIN SECTIONS IN ALPHABETICAL ORDER ASCENDING
 
+# *** ALL NEW ENV VARS NEED TO BE ADDED TO GITHUB SECRETS ***
+# *** ALL NEW ENV VARS NEED TO BE ADDED TO .github/workflows/run-docker-compose-test-on-pr.yml ***
+
 # CADDY (WEB SERVER & HTTPS)
 SITE_DOMAIN="example.com" # the domain the site is being served from - this configures Caddy. This should also be in DJANGO_ALLOWED_HOSTS and DJANGO_CSRF_TRUSTED_ORIGINS
 LETSENCRYPT_EMAIL_ADDRESS="letsencrypt@example.com" # the email address to send LetsEncrypt notifications to

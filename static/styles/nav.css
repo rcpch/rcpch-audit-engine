@@ -9,6 +9,18 @@
 
 /*  SIGNIN*/
 
+/* logged in name and icon */
+.rcpch_logged_in h5{
+  color: var(--rcpch_dark_grey);
+  margin-top: 10px;
+  margin-right: 5px;
+}
+
+.rcpch_logged_in i{
+  color: var(--rcpch_dark_grey);
+}
+
+/* top nav bar with git branch */
 .ui.text.menu.signin {
   background-color: #eee;
   margin: 0px;
@@ -17,13 +29,38 @@
 
 .ui.text.menu .right.menu {
   font-family: Montserrat-Regular;
+}
+
+/* logout buttons with settings button in dropdown */
+.ui.text.menu .right.menu .ui.buttons .ui.button {
   background-color: var(--rcpch_light_blue);
-  margin-right: 4em;
-  padding: 1em;
+  border-radius: 0%;
+}
+
+.ui.text.menu .right.menu .ui.buttons .ui.button:hover {
+  background-color: var(--rcpch_dark_blue);
+  color: var(--rcpch_white);
+  border-radius: 0%;
+}
+
+.ui.text.menu .right.menu .ui.buttons i:hover {
+  color: var(--rcpch_white);
+}
+
+/* dropdown box */
+.menu.left.transition.visible {
+  background-color: var(--rcpch_light_blue);
+  border-radius: 0%;
+  border-color: var(--rcpch_light_blue);
 }
 
 .signin_text {
   font-weight: 700;
+}
+
+/* login icon on hover */
+.ui.rcpch_light_blue.button i:hover{
+  color: var(--rcpch_white);
 }
 
 /* NAV */
