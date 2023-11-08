@@ -1,12 +1,10 @@
 version: "3.10"
 
 x-global-environment: &global
-    env_file:
-      - envs/.env # env file - NOT committed to Git
-
+  env_file:
+    - envs/.env # env file - NOT committed to Git
 
 services:
-
   # Caddy reverse proxy - web-facing SSL server
   caddy:
     <<: *global # this will inherit all the envs from x-global-environment
@@ -36,7 +34,8 @@ services:
       sh -c "python manage.py collectstatic --noinput &&
         python manage.py migrate &&
         python manage.py seed --mode=seed_groups_and_permissions &&
-        gunicorn --bind=0.0.0.0:8000 --timeout 600 rcpch-audit-engine.wsgi"
+        python manage.py runserver 0.0.0.0:8000"
+        # gunicorn --bind=0.0.0.0:8000 --timeout 600 rcpch-audit-engine.wsgi
     restart: always
 
   # PostgreSQL with PostGIS extension
