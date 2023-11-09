@@ -285,6 +285,7 @@
                 </div>
                 {% endif %}
                 
+                {% if selected_organisation.city != "LONDON" %}
                 <div class="ui rcpch_light_blue card">
                     <div class="content">
                         <h3>
@@ -295,6 +296,7 @@
                         {% include 'epilepsy12/partials/charts/map.html' with abstraction_level='country' abstraction_level_border_colour='#66cc33' abstraction_level_data=country_tiles selected_organisation=selected_organisation hospital_region_name=selected_organisation.country.name %}
                     </div>
                 </div>
+                {% endif %}
 
             </div>
         </div>
