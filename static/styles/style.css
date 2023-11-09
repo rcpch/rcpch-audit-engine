@@ -586,14 +586,15 @@ div.ui.card > div.content > div.organisation_address_container {
   background-color: var(--rcpch_light_grey);
   color: black;
   border-radius: 0% !important;
-  font-weight: 400;
+  font-weight: 1000;
+  padding-bottom: 10px;
 }
 
 .ui.rcpch_dark_blue.button:active {
   background-color: var(--rcpch_pink);
   color: white;
   border-radius: 0% !important;
-  font-weight: 400;
+  font-weight: 800;
 }
 
 .ui.rcpch_dark_blue.positive.button {
@@ -606,7 +607,7 @@ div.ui.card > div.content > div.organisation_address_container {
   background-color: var(--rcpch_dark_blue);
   color: white;
   border-radius: 0% !important;
-  font-weight: 400;
+  font-weight: 800;
 }
 
 .ui.rcpch_dark_blue.positive.button:hover {
@@ -1863,7 +1864,8 @@ div.rcpch_summary_stats > div.rcpch_summary_stats_row {
   display: flex;
   justify-content: space-between;
   flex-wrap: wrap;
-  gap: 5px;
+  gap: 10px;
+  padding-bottom: 12px;
 }
 
 .multiple_toggle_buttons_wrapper .rcpch_dark_blue.button {
