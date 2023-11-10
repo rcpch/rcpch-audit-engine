@@ -241,28 +241,27 @@ class CaptchaAuthenticationForm(AuthenticationForm):
     def __init__(self, request, *args, **kwargs) -> None:
         super().__init__(request, *args, **kwargs)
 
-    def clean(self) -> dict[str, Any]:
+    def clean_username(self) -> dict[str, Any]:
         email = self.cleaned_data["username"]
         if email:
             try:
-                user = Epilepsy12User.objects.get(email=email).DoesNotExist
+                user = Epilepsy12User.objects.get(email=email.lower()).DoesNotExist
             except Epilepsy12User.DoesNotExist:
                 return super().clean()
 
-            user = Epilepsy12User.objects.get(email=email)
-            
+            user = Epilepsy12User.objects.get(email=email.lower())
+
             visit_activities = VisitActivity.objects.filter(
                 epilepsy12user=user
             ).order_by("-activity_datetime")[:5]
-            
+
             failed_login_activities = [
                 activity for activity in visit_activities if activity.activity == 2
             ]
-            
+
             if failed_login_activities:
-            
                 first_activity = failed_login_activities[-1]
-                
+
                 if len(
                     failed_login_activities
                 ) >= 5 and timezone.now() <= first_activity.activity_datetime + timezone.timedelta(
@@ -271,5 +270,6 @@ class CaptchaAuthenticationForm(AuthenticationForm):
                     raise forms.ValidationError(
                         "You have failed to login 5 or more consecutive times. You have been locked out for 10 minutes"
                     )
+            return email.lower()
 
         return super().clean()
