@@ -167,13 +167,6 @@ class Epilepsy12UserAdminCreationForm(forms.ModelForm):
             if Epilepsy12User.objects.filter(email=data.lower()).exists():
                 return data.lower()
 
-            # this user is being updated
-            if data != data.lower():
-                # test to check this email does not exist
-                if Epilepsy12User.objects.filter(email=data.lower()).exists():
-                    raise forms.ValidationError(
-                        f"{data.lower()} is already associated with an account."
-                    )
         else:
             # this is a new account - check email is unique
             if Epilepsy12User.objects.filter(email=data.lower()).exists():
