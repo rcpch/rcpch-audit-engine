@@ -10,6 +10,7 @@
 
 # python imports
 import pytest
+import logging
 
 # 3rd party imports
 from django.urls import reverse
@@ -122,9 +123,10 @@ def test_unsuccessful_login_lockout(client):
                 'auth-password' : 'pw',
                 'auth-captacha_1': 'PASSED',
             }
-        )   
-    
+        )
+
+    form = login_response.context['form']
     # this is the item including errors
-    assert login_response.context[12]['errors'][0] == "You have failed to login 5 or more consecutive times. You have been locked out for 10 minutes"
+    assert form.errors['username'][0] == "You have failed to login 5 or more consecutive times. You have been locked out for 10 minutes"
 
     

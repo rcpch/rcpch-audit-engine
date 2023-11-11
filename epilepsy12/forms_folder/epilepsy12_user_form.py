@@ -235,7 +235,7 @@ class CaptchaAuthenticationForm(AuthenticationForm):
         super().__init__(request, *args, **kwargs)
 
     def clean_username(self) -> dict[str, Any]:
-        email = self.cleaned_data["username"]
+        email = super().clean()["username"]
         if email:
             try:
                 user = Epilepsy12User.objects.get(email=email.lower()).DoesNotExist
@@ -264,5 +264,3 @@ class CaptchaAuthenticationForm(AuthenticationForm):
                         "You have failed to login 5 or more consecutive times. You have been locked out for 10 minutes"
                     )
             return email.lower()
-
-        return super().clean()
