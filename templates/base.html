@@ -34,7 +34,7 @@
   {% endblock %}
 
   {% if messages %}
-  <div class='ui container'>
+  <div class='ui container' id="message">
     <div class="rcpch_padding">
       <div class="ui rcpch_info icon message">
         <i class="info icon"></i>
@@ -46,6 +46,15 @@
       </div>
     </div>
   </div>
+  <script>
+    // Auto-removes popup messages after 7000ms
+    document.addEventListener("DOMContentLoaded", function () {
+      setTimeout(function() {
+        document.getElementById("message").remove();
+      }, 7000); 
+    })
+  </script>
+
   {% endif %}
 
   <div class='ui fluid container'>

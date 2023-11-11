@@ -12,90 +12,94 @@
         </div>
         <div class="row masthead_text_row">
             <div class="masthead_text">
-                <h1 class="">National Clinical Audit of Seizures and Epilepsies for Children and Young People Data Capture Platform</h1>
+                <h2 class="">National Clinical Audit of Seizures and Epilepsies for Children and Young People Data Capture Platform</h1>
             </div>
         </div>
     </div>
 </div>
 
-<div class='ui rcpch container'>
+<div class='ui rcpch container welcome'>
 
     <div class="index_segment">
-        <h3 class="ui header">Welcome to the Epilepsy12 data platform</h3>
-        <p>
+        <h2 class="ui header">Welcome to the Epilepsy12 data platform</h2>
+        <p style="font-size:16px">
             Epilepsy12 is a national clinical audit established in 2009 and has the continued aim of helping epilepsy services, and those who commission health services, to measure and improve the quality of care for children and young people with seizures and epilepsies.
         </p>
 
-        <p>
+        <p style="font-size:16px">
             Epilepsy12 is delivered by the Royal College of Paediatrics and Child Health (RCPCH), and Round 4 is underway. The RCPCH mission is to transform child health through knowledge, innovation and expertise.
-        </p>
-
-        <p>
-            By accessing, browsing, entering data or otherwise accessing the Site, you become a ‘user’ and assert that you have read and understand and agree to be bound by the terms of Agreement. If you have any questions about this Disclaimer, please contact us.
         </p>
         
     </div>
 
 
     <div class="index_segment">
-        <div class="ui centered stackable grid">
+        <div class="ui centered stackable grid icon_container">
 
-            <div class="ui eight wide column card_container">
+            <div class="ui six wide column card_container">
                 <div class="ui fluid card card_content_wrapper">
                     <div class="center aligned image rcpch_index_card_image">
                         <i class="ui massive inverted signal icon"></i>
                     </div>
-                    <div class="rcpch_index_card_content content">
-                        <h1 class="ui header">Epilepsy12 Data Capture Platform</h1>
+                    <div class="content rcpch_index_card_content">
+                        <h1 class="ui header">Epilepsy12 Platform</h1>
                         <h3 class="ui header">Clinician access</h3>
                         <div class="description">
-                            <p>Access Epilepsy12 audit data for your organisation.</p>
+                            <p class="rcpch_index_card_content_description">Access Epilepsy12 audit data for your organisation.</p>
                         </div>
                         <div class="rcpch_icon_text_group rcpch_index_card_select">
                             <a href={% url 'selected_organisation_summary' organisation_id=organisation.pk %} class="rcpch_index_card_link">
-                                Select<i class="ui large long arrow alternate right icon rcpch_select_arrow_icon"></i>
+                            Select <i class="ui chevron circle right icon icon_white rcpch_select_arrow_icon"></i>
                             </a>
 
                         </div>
                     </div>
                 </div>
             </div>
-            <div class="ui eight wide column card_container">
+            <div class="ui six wide column card_container">
                 <div class="ui fluid card card_content_wrapper">
                     <div class="center aligned image rcpch_index_card_image">
                         <i class="ui massive inverted info circle icon"></i>
                     </div>
-                    <div class="rcpch_index_card_content content">
+                    <div class="content rcpch_index_card_content">
                         <h1 class="ui header">About the audit</h1>
                         <h3 class="ui header">Find out more!</h3>
                         <div class="description">
-                            <p>Further information, including reports, resources and methodology.</p>
+                            <p class="rcpch_index_card_content_description">Further information, including reports, resources and methodology.</p>
                         </div>
                         <div class="rcpch_icon_text_group rcpch_index_card_select">
                             <a 
                             href="https://www.rcpch.ac.uk/work-we-do/clinical-audits/epilepsy12"
                                 class="rcpch_index_card_link">Select
-                                <i class="ui large long arrow alternate right icon "></i></a>
+                                <i class="ui chevron circle right icon icon_white"></i></a>
 
                         </div>
                     </div>
                 </div>
             </div>
         </div>
+        
 
     </div>
-    <div class=" index_segement">
+    <div>
+        <div class="index_segment">
+            <p>
+                By accessing, browsing, entering data or otherwise accessing the Site, you become a ‘user’ and assert that you have read and understand and agree to be bound by the terms of Agreement. If you have any questions about this Disclaimer, please contact us.
+            </p>
+        </div>
+    </div>
+    <div>
         <h4 class="ui horizontal header divider">
             Contact the team
         </h4>
         
-        <div class="item">
+        <div class="homepage_item">
             <div class="rcpch_icon_text_group">
                 <i class="ui large icon envelope"></i>
                 <p class="rcpch_icon_text">{% include 'epilepsy12/partials/contact_email.html' %}</p>
             </div>
         </div>
-        <div class="item middle aligned rcpch_icon_text_group">
+        <div class="homepage_item middle aligned rcpch_icon_text_group">
             <i class="ui large icon phone"></i>
             <p class="rcpch_icon_text">020 7092 6157/6056</p>
         </div>
