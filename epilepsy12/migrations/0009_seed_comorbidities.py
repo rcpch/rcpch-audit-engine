@@ -29,7 +29,7 @@ def seed_comorbidities(apps, schema_editor):
         "Seeding comorbidities from paediatric neurodisability reference set...",
         "\033[33m",
     )
-    if ComorbidityList.objects.count() > 312:
+    if ComorbidityList.objects.count() >= 312:
         print(f"{ComorbidityList.objects.count()} Comorbidities already exist. Skipping...")
         return
     # ecl = '<< 35919005'
