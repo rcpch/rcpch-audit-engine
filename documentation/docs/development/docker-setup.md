@@ -46,6 +46,13 @@ For anyone else, there is a template environment file in the repository root whi
 cp envs/env-template envs/.env
 ```
 
+!!! warning "Mac Users"
+    If using Mac and Safari, to access the Epilepsy 12 engine in your development, you must change the `SITE_DOMAIN` name in .env to 'localhost', and type this into your browser once you have executed `s/docker-up` in the next step. This will load the E12 engine in your Safari browser.
+    
+    However, for simplicity, we recommend using a different browser, such as Chrome, and leaving the .env file unaltered.
+
+    
+
 ### Start the development environment for the first time using our startup script
 
 ```console
