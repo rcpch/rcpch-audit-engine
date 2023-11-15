@@ -34,7 +34,8 @@ services:
       sh -c "python manage.py collectstatic --noinput &&
         python manage.py migrate &&
         python manage.py seed --mode=seed_groups_and_permissions &&
-        '${DJANGO_STARTUP_COMMAND}'"
+        echo $$DJANGO_STARTUP_COMMAND &&
+        $$DJANGO_STARTUP_COMMAND"
     restart: always
 
   # PostgreSQL with PostGIS extension
