@@ -1,6 +1,6 @@
 ---
 title: Entering Patient Data
-reviewers:
+reviewers: Dr Marcus Baw, Danny Cowen, Dr Simon Chapman
 ---
 
 ## Entering Patient Data
@@ -23,6 +23,28 @@ You will need to provide the patient's first name, surname, date if birth, sex, 
 If you are unable to provide a postcode, click the **No postcode** button and you will be asked to indicate the reason.
 
 The NHS number is checked against the NHS number [checksum](https://www.datadictionary.nhs.uk/attributes/nhs_number.html) to confirm that it is a valid NHS number. We also use this to check if the patient has already been entered into the audit at a previous date, to avoid duplication.
+
+### Transferring a patient between centres
+
+Only the [**Lead Clinician**](../user-group-permissions/#lead-clinician) has permissions to transfer children to another centre.
+
+The steps to do this for the lead clinician in Organisation A
+
+1. Find the child to transfer in the cohort view and navigate to their audit view
+2. Select the 'transfer' button to reveal a dropdown of organisations to transfer the child to.
+3. Select the organisation to transfer the child to (Organisation B) and click 'Select Secondary Care NHS Trust Centre'
+4. Confirm the transfer by clicking 'Allocate organisation'
+5. You will be redirected back to the organisation view, where a message box will confirm a transfer email has been sent to the lead clinician of the target organisation (Organisation B). Note if there is no lead clinician currently in post, the email will be sent to the Epilepsy12 team.
+6. The child will no longer be visible to you in Cohort View for Organisation A.
+
+The steps for the lead clinician in Organisation B
+
+1. You receive an email from your colleague who leads Epilepsy12 at Organisation A, notifying you that a transfer has been made.
+2. Log in to Epilepsy12. You are greeted with a popup message informing you of the name of the child requesting transfer.
+3. Navigate to the Cohort View and identify the child - they are highlighted in the list and have 2 extra icons.
+4. Click whichever applies (accept or reject), and acknowledge the confirmation popup.
+5. You will be redirected to the organisation view where a confirmation message will acknowledge successful outcome.
+6. An email is sent to the lead of Organisation A is sent to notify the outcome. Note, if the transfer is rejected, an email also is sent to the Epilepsy12 team.
 
 ### Entering audit data
 

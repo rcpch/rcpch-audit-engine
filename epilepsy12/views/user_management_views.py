@@ -12,12 +12,9 @@ from django.http import (
     HttpResponse,
 )
 from django.core.exceptions import PermissionDenied
-from django.core.mail import send_mail, BadHeaderError
 from django.urls import reverse_lazy
 from django.contrib.auth.views import PasswordResetView
 from django.contrib.messages.views import SuccessMessageMixin
-from django.contrib.auth.forms import AuthenticationForm
-from django.forms import ValidationError
 from django.utils.html import strip_tags
 from django_htmx.http import HttpResponseClientRedirect
 
@@ -27,7 +24,7 @@ from two_factor.views import LoginView as TwoFactorLoginView
 import pandas as pd
 
 # epilepsy12
-from ..models import Epilepsy12User, Organisation, VisitActivity
+from ..models import Epilepsy12User, Organisation, VisitActivity, Site
 from epilepsy12.forms_folder.epilepsy12_user_form import (
     Epilepsy12UserAdminCreationForm,
     CaptchaAuthenticationForm,
@@ -44,6 +41,7 @@ from ..constants import (
     AUDIT_CENTRE_ROLES,
     EPILEPSY12_AUDIT_TEAM_FULL_ACCESS,
 )
+from ..tasks import asynchronously_send_email_to_recipients
 
 
 @login_and_otp_required()
@@ -249,14 +247,14 @@ def epilepsy12_user_list(request, organisation_id):
         or request.user.is_superuser
     ):
         rcpch_choices = (
-            (0, f"Organisation level ({organisation.name})"),
-            (1, f"Trust level ({parent_trust})"),
+            (0, "Organisation level"),
+            (1, "Trust level"),
             (2, "National level"),
         )
     else:
         rcpch_choices = (
-            (0, f"Organisation level ({organisation.name})"),
-            (1, f"Trust level ({parent_trust})"),
+            (0, "Organisation level"),
+            (1, "Trust level"),
         )
 
     paginator = Paginator(epilepsy12_user_list, 10)
@@ -311,33 +309,52 @@ def create_epilepsy12_user(request, organisation_id, user_type, epilepsy12_user_
         )
 
         if form.is_valid():
-            # success message - return to user list
+            # save new user and add to gropup - return to user list with success message
+            # send sign up email asynchronously
+            # If signup unsuccessful, user not saved return to list with error message. Email not sent.
             new_user = form.save(commit=False)
             new_user.set_unusable_password()
             new_user.is_active = True
             new_user.email_confirmed = False
             new_user.view_preference = 0
-            new_user.save()
+            try:
+                new_user.save()
+            except Exception as error:
+                messages.error(
+                    request,
+                    f"Error: {error}. Account not created. Please contact Epilepsy12 if this issue persists.",
+                )
+                return redirect(
+                    "epilepsy12_user_list",
+                    organisation_id=organisation_id,
+                )
 
             new_group = group_for_role(new_user.role)
-            new_user.groups.add(new_group)
+
+            try:
+                new_user.groups.add(new_group)
+            except Exception as error:
+                messages.error(
+                    request,
+                    f"Error: {error}. Account not created. Please contact Epilepsy12 if this issue persists.",
+                )
+                return redirect(
+                    "epilepsy12_user_list",
+                    organisation_id=organisation_id,
+                )
 
             # user created - send email with reset link to new user
             subject = "Password Reset Requested"
             email = construct_confirm_email(request=request, user=new_user)
-            try:
-                send_mail(
-                    subject=subject,
-                    from_email="admin@epilepsy12.rcpch.tech",
-                    recipient_list=[new_user.email],
-                    fail_silently=False,
-                    message=strip_tags(email),
-                    html_message=email,
-                )
-            except BadHeaderError:
-                return HttpResponse("Invalid header found.")
 
-            messages.success(request, f"{new_user.email} account created successfully.")
+            asynchronously_send_email_to_recipients.delay(
+                recipients=[new_user.email], subject=subject, message=email
+            )
+
+            messages.success(
+                request,
+                f"Account created successfully. Confirmation email has been sent to {new_user.email}.",
+            )
             return redirect(
                 "epilepsy12_user_list",
                 organisation_id=organisation_id,
@@ -380,11 +397,10 @@ def edit_epilepsy12_user(request, organisation_id, epilepsy12_user_id):
     elif match_in_choice_key(RCPCH_AUDIT_TEAM_ROLES, epilepsy12_user_to_edit.role):
         user_type = "rcpch-staff"
     if can_edit:
-        
         # EMAIL INPUT FIELD IS DISABLED SO WILL NOT BE INCLUDED IN REQUEST.POST -> ADD IN MANUALLY
         if request.POST:
-            request.POST = request.POST.copy() # request.POST object is immutable
-            request.POST['email'] = epilepsy12_user_to_edit.email
+            request.POST = request.POST.copy()  # request.POST object is immutable
+            request.POST["email"] = epilepsy12_user_to_edit.email
         form = Epilepsy12UserAdminCreationForm(
             user_type,
             request.POST or None,
@@ -415,21 +431,16 @@ def edit_epilepsy12_user(request, organisation_id, epilepsy12_user_id):
             email = construct_confirm_email(
                 request=request, user=epilepsy12_user_to_edit
             )
-            try:
-                send_mail(
-                    subject=subject,
-                    from_email="admin@epilepsy12.rcpch.tech",
-                    recipient_list=[epilepsy12_user_to_edit.email],
-                    fail_silently=False,
-                    message=strip_tags(email),
-                    html_message=email,
-                )
-            except BadHeaderError:
-                return HttpResponse("Invalid header found.")
+
+            asynchronously_send_email_to_recipients.delay(
+                recipients=[epilepsy12_user_to_edit.email],
+                subject=subject,
+                message=email,
+            )
 
             messages.success(
                 request,
-                f"Confirmation request sent to {epilepsy12_user_to_edit.email}.",
+                f"Confirmation and password reset request resent to {epilepsy12_user_to_edit.email}.",
             )
             redirect_url = reverse(
                 "epilepsy12_user_list",
@@ -507,7 +518,8 @@ def delete_epilepsy12_user(request, organisation_id, epilepsy12_user_id):
 
 class ResetPasswordView(SuccessMessageMixin, PasswordResetView):
     template_name = "registration/password_reset.html"
-    email_template_name = "registration/password_reset_email.html"
+    html_email_template_name = "registration/password_reset_email.html"
+    email_template_name = strip_tags("registration/password_reset_email.html")
     subject_template_name = "registration/password_reset_subject.txt"
     success_message = (
         "We've emailed you instructions for setting your password, "
@@ -543,6 +555,21 @@ class RCPCHLoginView(TwoFactorLoginView):
                 org_id = 1
             else:
                 org_id = user.organisation_employer.id
+                # check for outstanding transfers in to this organisation
+                if Site.objects.filter(
+                    active_transfer=True, organisation=user.organisation_employer
+                ).exists() and user.has_perm(
+                    "epilepsy12.can_transfer_epilepsy12_lead_centre"
+                ):
+                    # there is an outstanding request for transfer in to this user's organisation. User is a lead clinician and can act on this
+                    transfers = Site.objects.filter(
+                        active_transfer=True, organisation=user.organisation_employer
+                    )
+                    for transfer in transfers:
+                        messages.info(
+                            self.request,
+                            f"{transfer.transfer_origin_organisation} have requested transfer of {transfer.case} to {user.organisation_employer} for their Epilepsy12 care. Please find {transfer.case} in the case table to accept or decline this transfer request.",
+                        )
 
             # time since last set password
             delta = timezone.now() - user.password_last_set

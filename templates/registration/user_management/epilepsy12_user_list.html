@@ -32,7 +32,9 @@
                         <a href="{% url 'create_epilepsy12_user' organisation_id=organisation.pk user_type='rcpch-staff' epilepsy12_user_id=user.id %}"><button {% if perms.epilepsy12.add_epilepsy12user %} class="ui rcpch_primary button" {% else %} class="ui rcpch_primary disabled button"  {% endif %}>Add a new RCPCH Staff User</button></a>
                     {% endif %}
                     
-                    <a href="{% url 'selected_organisation_summary' organisation_id=organisation.pk %}"><button class="ui right floated rcpch_positive button">Return to organisation view</button></a>
+                    <a href="{% url 'selected_organisation_summary' organisation_id=organisation.pk %}"><button class="ui right floated rcpch_positive button"><i class="ui chevron circle left icon icon_white"></i> Return to organisation view
+                        
+                    </button></a>
 
                 </div>
 

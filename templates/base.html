@@ -34,7 +34,7 @@
   {% endblock %}
 
   {% if messages %}
-  <div class='ui container'>
+  <div class='ui container' id="message">
     <div class="rcpch_padding">
       <div class="ui rcpch_info icon message">
         <i class="info icon"></i>
@@ -46,15 +46,21 @@
       </div>
     </div>
   </div>
+  <script>
+    // Auto-removes popup messages after 7000ms
+    document.addEventListener("DOMContentLoaded", function () {
+      setTimeout(function() {
+        document.getElementById("message").remove();
+      }, 7000); 
+    })
+  </script>
+
   {% endif %}
 
   <div class='ui fluid container'>
     {% block content %}{% endblock %}
   </div>
   
-  <div class="ui fluid rcpch container">
-    <div class="ui rcpch_warning message">This site is currently under development.</div>
-  </div>
   <div class='ui fluid container footer_container'>{% include 'epilepsy12/footer.html' %}</div>
   
   <!-- ADDS AUTO LOGOUT REDIRECT TO LOGIN PAGE SCRIPT -->
@@ -74,9 +80,8 @@
   <script src="https://cdnjs.cloudflare.com/ajax/libs/chartjs-plugin-annotation/2.2.1/chartjs-plugin-annotation.min.js" integrity="sha512-qF3T5CaMgSRNrxzu69V3ZrYGnrbRMIqrkE+OrE01DDsYDNo8R1VrtYL8pk+fqhKxUBXQ2z+yV/irk+AbbHtBAg==" crossorigin="anonymous" referrerpolicy="no-referrer"></script>
   <script src="https://cdn.jsdelivr.net/npm/chartjs-plugin-datalabels@2.0.0"></script>
    
-  <!-- <script type="text/javascript" src="{% static 'leaflet.ajax.js'%}"></script> -->
   <script>
-    // $('#id_nhs_number').mask('0000 000 000');
+
     $('.message .close').on('click', function () {
       $(this)
         .closest('.message')

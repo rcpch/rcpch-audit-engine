@@ -3,18 +3,16 @@
 # third party libraries
 from django.shortcuts import render
 from django.urls import reverse
+from django.utils import timezone
 from django_htmx.http import HttpResponseClientRedirect
-from django.http import HttpResponseForbidden, HttpResponse
+from dateutil.relativedelta import relativedelta
 
 # E12 imports
 from ..decorator import user_may_view_this_organisation, login_and_otp_required
 from epilepsy12.constants import (
     INDIVIDUAL_KPI_MEASURES,
 )
-from epilepsy12.models import (
-    Organisation,
-    KPI,
-)
+from epilepsy12.models import Organisation, KPI, Site
 from ..common_view_functions import (
     cases_aggregated_by_sex,
     cases_aggregated_by_ethnicity,
@@ -22,13 +20,33 @@ from ..common_view_functions import (
     all_registered_cases_for_cohort_and_abstraction_level,
     return_tile_for_region,
     get_all_kpi_aggregation_data_for_view,
-    update_all_kpi_agg_models,
+    logged_in_user_may_access_this_organisation,
 )
 from epilepsy12.common_view_functions.render_charts import update_all_data_with_charts
 from ..general_functions import (
     get_current_cohort_data,
     value_from_key,
 )
+from ..tasks import (
+    asynchronously_aggregate_kpis_and_update_models_for_cohort_and_abstraction_level,
+)
+
+
+def selected_organisation_summary_select(request):
+    """
+    callback from organisation select in selected_organisation_summary
+    redirects to new organisation url
+    """
+    # if request.POST.get("selected_organisation_summary") is not None:
+    selected_organisation = Organisation.objects.get(
+        pk=request.POST.get("selected_organisation_summary_select")
+    )
+
+    response = reverse(
+        "selected_organisation_summary",
+        kwargs={"organisation_id": selected_organisation.pk},
+    )
+    return HttpResponseClientRedirect(response)
 
 
 @login_and_otp_required()
@@ -47,15 +65,8 @@ def selected_organisation_summary(request, organisation_id):
     icb_tiles = return_tile_for_region("icb")
     country_tiles = return_tile_for_region("country")
 
-    if request.POST.get("selected_organisation_summary") is not None:
-        selected_organisation = Organisation.objects.get(
-            pk=request.POST.get("selected_organisation_summary")
-        )
-        template_name = "epilepsy12/partials/selected_organisation_summary.html"
-    else:
-        # selected_organisation = return_selected_organisation(user=request.user)
-        selected_organisation = Organisation.objects.get(pk=organisation_id)
-        template_name = "epilepsy12/organisation.html"
+    selected_organisation = Organisation.objects.get(pk=organisation_id)
+    template_name = "epilepsy12/organisation.html"
 
     lhb_tiles = None
 
@@ -167,29 +178,58 @@ def selected_organisation_summary(request, organisation_id):
     )
 
 
-@login_and_otp_required()
-@user_may_view_this_organisation()
-def selected_trust_kpis(request, organisation_id):
+def selected_trust_kpis(request, organisation_id, access):
     """
     HTMX get request returning kpis.html 'Real-time Key Performance Indicator (KPI) Metrics' table.
 
-    This aggregates all KPI measures at different levels of abstraction related to the selected organisation
+    This aggregates all KPI measures asynchronously at different levels of abstraction related to the selected organisation
     Organisation level, Trust level, ICB level, NHS Region, OPEN UK level, country level and national level.
 
     It then presents each abstraction level's KPIAggregation model.
+
+    It is called by htmx get request from the kpi table, either on page load, or on click of the
+    refresh or publish buttons in the header. If the publish button is pressed, aggregations are run and the
+    open_access flag is set to true, making that data viewable to the general public
+    Otherwise, aggregations are run updating existing data but without setting the open_access flag to True
+
+    Params:
+    organisation_id: the primary key for the organisation viewed
+    access: string, one of ["open", "private"]
+
+    This endpoint can be called from the public dashboard so protection happens within the view
     """
 
     # Get all relevant data for this cohort
     cohort = get_current_cohort_data()["cohort"]
     organisation = Organisation.objects.get(pk=organisation_id)
 
-    # perform aggregations and update all the KPIAggregation models
-    update_all_kpi_agg_models(cohort=cohort)
+    if logged_in_user_may_access_this_organisation(request.user, organisation):
+        # user is logged in and allowed to access this organisation
 
-    # Gather relevant data specific for this view
-    all_data = get_all_kpi_aggregation_data_for_view(
-        organisation=organisation, cohort=cohort
-    )
+        if access == "private":
+            # aggregation can only occur if logged in AND not in the open_access template
+
+            open_access = False  # aggregation flag: set to true if publishing this data for public view
+
+            if request.htmx.trigger_name == "publish" and request.user:
+                open_access = True
+
+            # perform aggregations and update all the KPIAggregation models only for clinicians
+            asynchronously_aggregate_kpis_and_update_models_for_cohort_and_abstraction_level.delay(
+                cohort=cohort, open_access=open_access
+            )
+
+        # Gather relevant data specific for this view - still show only published data if this is public view
+        all_data = get_all_kpi_aggregation_data_for_view(
+            organisation=organisation, cohort=cohort, open_access=access == "open"
+        )
+
+    else:
+        # User is not logged in and not eligible to run aggregations
+        # Gather relevant open access data specific for this view
+        all_data = get_all_kpi_aggregation_data_for_view(
+            organisation=organisation, cohort=cohort, open_access=True
+        )
 
     # Instance of KPI to access field name help text attributes for KPI "Indicator" row values in table
     kpi_instance = KPI(organisation=organisation)
@@ -200,7 +240,10 @@ def selected_trust_kpis(request, organisation_id):
         "all_data": all_data,
         "kpis": kpi_instance,
         "kpi_names_list": kpi_names_list,
-        "open_access": False,
+        "open": access == "open",
+        "organisation_list": Organisation.objects.all().order_by(
+            "name"
+        ),  # for public view dropdown
     }
 
     return render(
@@ -210,8 +253,18 @@ def selected_trust_kpis(request, organisation_id):
     )
 
 
-@login_and_otp_required()
-@user_may_view_this_organisation()
+def selected_trust_open_select(request, organisation_id):
+    """
+    POST callback on change of RCPCH organisations dropdown in open access view
+    Selects new hospital and redirects to open_access endpoint returning table with new organisation
+    """
+    url = reverse(
+        "open_access",
+        kwargs={"organisation_id": request.POST.get("selected_trust_open_select")},
+    )
+    return HttpResponseClientRedirect(url)
+
+
 def selected_trust_select_kpi(request, organisation_id):
     """
     POST request from dropdown in selected_organisation_summary.html returning the individual kpis data and visualisations.
@@ -268,8 +321,7 @@ def selected_trust_select_kpi(request, organisation_id):
     cohort = get_current_cohort_data()["cohort"]
 
     all_data = get_all_kpi_aggregation_data_for_view(
-        organisation=organisation,
-        cohort=cohort,
+        organisation=organisation, cohort=cohort, open_access=False
     )
 
     all_data = update_all_data_with_charts(
@@ -290,62 +342,6 @@ def selected_trust_select_kpi(request, organisation_id):
     template_name = "epilepsy12/partials/organisation/metric.html"
 
     return render(request=request, template_name=template_name, context=context)
-
-
-@login_and_otp_required()
-def aggregate_and_update_all_kpi_agg_models(request):
-    """Aggregates and update all kpi aggregation models.
-
-    Used by temp 'Aggregate and update' button and in future, async calls
-    """
-
-    # Only superusers allowed
-    if not request.user.is_superuser:
-        return HttpResponseForbidden
-
-    # Gather constants
-    cohort = get_current_cohort_data()["cohort"]
-
-    # Run agg fun
-    update_all_kpi_agg_models(cohort=cohort)
-
-    return HttpResponse(
-        status=204
-    )  # 204 to signify to HTMX that nothing returned, just running server-side code
-
-
-def selected_trust_kpis_open(request, organisation_id):
-    """
-    Open access endpoint for KPIs table
-    """
-
-    organisation = Organisation.objects.get(pk=organisation_id)
-
-    # run the aggregations TODO This will need ultimately throttling to run only periodically
-
-    # get aggregated KPIs for level of abstraction from KPIAggregation
-
-    # create an empty instance of KPI model to access the labels - this is a bit of a hack but works and
-    # and has very little overhead
-
-    kpis = KPI.objects.create(
-        organisation=organisation,
-    )
-
-    template_name = "epilepsy12/partials/kpis/kpis.html"
-    context = {
-        "organisation": organisation,
-        "kpis": kpis,
-        "organisation_list": Organisation.objects.all().order_by("name"),
-        "open_access": True,
-    }
-
-    # remove the temporary instance as otherwise would contribute to totals
-    kpis.delete()
-
-    response = render(request=request, template_name=template_name, context=context)
-
-    return response
 
 
 @login_and_otp_required()

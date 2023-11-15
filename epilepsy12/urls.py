@@ -163,6 +163,11 @@ user_patterns = [
         epilepsy12_user_list,
         name="sort_epilepsy12_users_by_organisation_employer_down",
     ),
+    path(
+        "organisation/<int:organisation_id>/case/<int:case_id>/transfer-request/<str:organisation_response>",
+        transfer_response,
+        name="transfer_response",
+    ),
 ]
 
 redirect_patterns = [
@@ -313,24 +318,24 @@ organisation_patterns = [
         name="selected_organisation_summary",
     ),
     path(
-        "selected_trust/<int:organisation_id>/kpis",
+        "organisation/summary-select",
+        view=selected_organisation_summary_select,
+        name="selected_organisation_summary_select",
+    ),
+    path(
+        "selected_trust/<int:organisation_id>/kpis/<str:access>",
         view=selected_trust_kpis,
         name="selected_trust_kpis",
     ),
     path(
-        "selected_trust/<int:organisation_id>/kpis/open",
-        view=selected_trust_kpis_open,
-        name="selected_trust_kpis_open",
+        "selected_trust/<int:organisation_id>/open_select",
+        view=selected_trust_open_select,
+        name="selected_trust_open_select",
     ),
     path(
         "selected_trust_kpis/<int:organisation_id>/select_kpi",
         view=selected_trust_select_kpi,
         name="selected_trust_select_kpi",
-    ),
-    path(
-        "update_all_kpi_aggregation_models",
-        view=aggregate_and_update_all_kpi_agg_models,
-        name="aggregate_and_update_all_kpi_agg_models",
     ),
     path(
         "organisation/<int:organisation_id>/case_statistics",

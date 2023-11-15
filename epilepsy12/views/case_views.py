@@ -10,13 +10,14 @@ from django.contrib.auth.decorators import permission_required
 from django.contrib.gis.db.models import Q
 from django.contrib import messages
 from django.core.paginator import Paginator
+from django.db import DatabaseError
 
 # third party imports
 from django_htmx.http import trigger_client_event, HttpResponseClientRedirect
 
 # RCPCH imports
 from epilepsy12.forms import CaseForm
-from epilepsy12.models import Organisation, Site, Case, AuditProgress
+from epilepsy12.models import Organisation, Site, Case, AuditProgress, Epilepsy12User
 from ..constants import (
     UNKNOWN_POSTCODES_NO_SPACES,
 )
@@ -25,6 +26,9 @@ from ..decorator import (
     user_may_view_this_child,
     login_and_otp_required,
 )
+
+from ..general_functions import construct_transfer_epilepsy12_site_outcome_email
+from ..tasks import asynchronously_send_email_to_recipients
 
 
 @login_and_otp_required()
@@ -243,6 +247,8 @@ def case_list(request, organisation_id):
         & Q(site__site_is_actively_involved_in_epilepsy_care=True)
     ).all()
 
+    cases_in_transfer = registered_cases.filter(site__active_transfer=True)
+
     paginator = Paginator(all_cases, 10)
     page_number = request.GET.get("page", 1)
     case_list = paginator.page(page_number)
@@ -261,14 +267,14 @@ def case_list(request, organisation_id):
         or request.user.is_superuser
     ):
         rcpch_choices = (
-            (0, f"Organisation level ({organisation.name})"),
-            (1, f"Trust level ({parent_trust})"),
+            (0, "Organisation level"),
+            (1, "Trust level"),
             (2, "National level"),
         )
     else:
         rcpch_choices = (
-            (0, f"Organisation level ({organisation.name})"),
-            (1, f"Trust level ({parent_trust})"),
+            (0, "Organisation level"),
+            (1, "Trust level"),
         )
 
     context = {
@@ -280,6 +286,7 @@ def case_list(request, organisation_id):
         "organisation_children": organisation_children,
         "rcpch_choices": rcpch_choices,
         "organisation_id": organisation_id,
+        "cases_in_transfer": cases_in_transfer,
     }
     if request.htmx:
         return render(
@@ -332,6 +339,76 @@ def case_statistics(request, organisation_id):
     )
 
     return response
+
+
+@login_and_otp_required()
+@user_may_view_this_child()
+@permission_required(
+    "epilepsy12.can_transfer_epilepsy12_lead_centre", raise_exception=True
+)
+def transfer_response(request, organisation_id, case_id, organisation_response):
+    """
+    POST callback from case table on click of accept/reject buttons against transfer request
+    Updates associated Site instance and redirects back to case table
+    """
+
+    case = Case.objects.get(pk=case_id)
+    site = Site.objects.get(case=case, active_transfer=True)
+    # prepare email response to requesting organisation clinical lead
+    email = construct_transfer_epilepsy12_site_outcome_email(
+        request=request,
+        target_organisation=Organisation.objects.get(pk=organisation_id),
+        outcome=f"{organisation_response}ed",
+    )
+    origin_organisation = site.transfer_origin_organisation
+    if organisation_response == "reject":
+        # reset the child back to the orgin organisation
+        site.active_transfer = False
+        site.organisation = site.transfer_origin_organisation
+        site.transfer_origin_organisation = None
+        site.transfer_request_date = None
+    elif organisation_response == "accept":
+        site.active_transfer = False
+        site.transfer_origin_organisation = None
+        site.transfer_request_date = None
+    else:
+        raise Exception("No organisation response supplied")
+
+    try:
+        site.save()
+    except:
+        raise DatabaseError
+
+    # send email asynchronously to lead clinician(s) of origin organisation notifying them of outcome
+    outcome = f"{organisation_response.upper()}ED"
+    if Epilepsy12User.objects.filter(
+        (
+            Q(organisation_employer=origin_organisation)
+            & Q(is_active=True)
+            & Q(role=1)  # Audit Centre Lead Clinician
+        )
+    ).exists():
+        recipients = list(
+            Epilepsy12User.objects.filter(
+                (
+                    Q(organisation_employer=origin_organisation)
+                    & Q(is_active=True)
+                    & Q(role=1)  # Audit Centre Lead Clinician
+                )
+            ).values_list("email", flat=True)
+        )
+        subject = f"Epilepsy12 Lead Site Transfer {outcome}"
+    else:
+        recipients = ["epilepsy12@rcpch.ac.uk"]
+        subject = f"Epilepsy12 Lead Site Transfer {outcome}  - NO LEAD CLINICIAN"
+
+    asynchronously_send_email_to_recipients.delay(
+        recipients=recipients, subject=subject, message=email
+    )
+
+    return HttpResponseClientRedirect(
+        reverse("cases", kwargs={"organisation_id": organisation_id})
+    )
 
 
 @login_and_otp_required()
@@ -465,6 +542,7 @@ def update_case(request, organisation_id, case_id):
     """
     Django function based view. Receives POST request to update view or delete
     """
+    print("I at least pass through here...")
     case = get_object_or_404(Case, pk=case_id)
     form = CaseForm(instance=case)
 

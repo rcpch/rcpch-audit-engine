@@ -3,6 +3,9 @@
 # SECTIONS IN ALPHABETICAL ORDER ASCENDING
 # VARIABLES WITHIN SECTIONS IN ALPHABETICAL ORDER ASCENDING
 
+# *** ALL NEW ENV VARS NEED TO BE ADDED TO GITHUB SECRETS ***
+# *** ALL NEW ENV VARS NEED TO BE ADDED TO .github/workflows/run-docker-compose-test-on-pr.yml ***
+
 # CADDY (WEB SERVER & HTTPS)
 SITE_DOMAIN="example.com" # the domain the site is being served from - this configures Caddy. This should also be in DJANGO_ALLOWED_HOSTS and DJANGO_CSRF_TRUSTED_ORIGINS
 LETSENCRYPT_EMAIL_ADDRESS="letsencrypt@example.com" # the email address to send LetsEncrypt notifications to
@@ -19,8 +22,10 @@ RCPCH_CENSUS_PLATFORM_URL="https://api.rcpch.ac.uk/deprivation/v1"
 
 # DJANGO
 DEBUG="True" # Set DEBUG=True for Local dev and Development, not Staging or Live
-DJANGO_ALLOWED_HOSTS= # this should contain the hosts which you are serving the site from
-DJANGO_CSRF_TRUSTED_ORIGINS= # this should contain the https:// domains which you are serving the site from
+DJANGO_ALLOWED_HOSTS="${SITE_DOMAIN}"
+DJANGO_CSRF_TRUSTED_ORIGINS="https://${SITE_DOMAIN}"
+DJANGO_STARTUP_COMMAND="python manage.py runserver 0.0.0.0:8000" # for local development with auto-reload
+# DJANGO_STARTUP_COMMAND="gunicorn --bind=0.0.0.0:8000 --timeout 600 rcpch-audit-engine.wsgi" # for live deployment
 E12_SECRET_KEY= # secret key for Django
 
 # DJANGO POSTGRES DATABASE CONNECTION
@@ -31,7 +36,7 @@ E12_POSTGRES_DB_PORT="5432"
 E12_POSTGRES_DB_USER="epilepsy12user"
 
 # EMAIL
-EMAIL_DEFAULT_FROM_EMAIL="admin-email@example.com"
+EMAIL_DEFAULT_FROM_EMAIL="fromemail@example.com"
 EMAIL_HOST_PASSWORD= # password for SMTP service
 EMAIL_HOST_PORT= # port of SMTP service
 EMAIL_HOST_SERVER= # hostname of SMTP service
@@ -40,7 +45,9 @@ EMAIL_HOST_USER= # username for SMTP service
 SMTP_EMAIL_ENABLED=True # To output emails to console, set SMTP_EMAIL_ENABLED=False
 
 # FLOWER
+FLOWER_PASSWORD="SET_ME"
 FLOWER_PORT=8888
+FLOWER_USER="flower@example.com"
 
 # HERMES (SNOMED CT)
 RCPCH_HERMES_SERVER_URL= # SNOMED server API URL

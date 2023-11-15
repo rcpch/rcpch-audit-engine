@@ -31,15 +31,23 @@
           {% endwith %}
 
       {% else %}
-        <p class=" ui rcpch_warning message">
-          {% blocktrans trimmed %}Two-factor authentication is not enabled for your
-          account. You must enable this to use the Epilepsy12 platform.{% endblocktrans %}
-        </p>
-        <p>
-          <a href="{% url 'two_factor:setup' %}" class="rcpch_blue_link">
-            {% trans "Enable Two-Factor Authentication" %}
-          </a>
-        </p>
+        <div class="ui icon rcpch_important message">
+          <i class="key icon"></i>
+          <div class="content">
+            <div class="header">
+              Enable two factor authentication
+            </div>
+            <p>
+            {% blocktrans trimmed %}Two-factor authentication is not enabled for your
+            account. You must enable this to use the Epilepsy12 platform.{% endblocktrans %}
+            </p>
+            <p>
+              <a href="{% url 'two_factor:setup' %}" class="rcpch_blue_link">
+                {% trans "Enable Two-Factor Authentication" %}
+              </a>
+            </p>
+          </div>
+        </div>
       {% endif %}
     </div>
   </div>

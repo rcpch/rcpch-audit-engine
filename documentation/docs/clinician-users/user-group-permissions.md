@@ -1,25 +1,25 @@
 ---
 title: User Groups
-reviewers:
+reviewers: Dr Marcus Baw, Danny Cowen, Dr Simon Chapman
 ---
 
 ## User Groups
 
 There are three user groups for staff working in Trusts/Health Boards, with varying permissions.
 
-1. Lead Clinician
+### Lead Clinician
 
 - Can create, edit and delete users within their Trust/Health Board
 - Can create, edit, and delete patients within their Trust/Health Board
 - Can create, edit, and delete patient audit records
 
-1. Clinician
+### Clinician
 
 - Can view users within their Trust/Health Board
 - Can create, edit and delete patients within their Trust/Health Boards
 - Can create, edit and delete patient audit records
 
-1. Administrator
+### Administrator
 
 - Can view users within their Trust/Health Board
 - Can create and edit patients within their Trust/Health Board
