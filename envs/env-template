@@ -24,6 +24,8 @@ RCPCH_CENSUS_PLATFORM_URL="https://api.rcpch.ac.uk/deprivation/v1"
 DEBUG="True" # Set DEBUG=True for Local dev and Development, not Staging or Live
 DJANGO_ALLOWED_HOSTS="${SITE_DOMAIN}"
 DJANGO_CSRF_TRUSTED_ORIGINS="https://${SITE_DOMAIN}"
+DJANGO_STARTUP_COMMAND="python manage.py runserver 0.0.0.0:8000" # for local development with auto-reload
+# DJANGO_STARTUP_COMMAND="gunicorn --bind=0.0.0.0:8000 --timeout 600 rcpch-audit-engine.wsgi" # for live deployment
 E12_SECRET_KEY= # secret key for Django
 
 # DJANGO POSTGRES DATABASE CONNECTION
@@ -34,7 +36,7 @@ E12_POSTGRES_DB_PORT="5432"
 E12_POSTGRES_DB_USER="epilepsy12user"
 
 # EMAIL
-EMAIL_DEFAULT_FROM_EMAIL="admin-email@example.com"
+EMAIL_DEFAULT_FROM_EMAIL="fromemail@example.com"
 EMAIL_HOST_PASSWORD= # password for SMTP service
 EMAIL_HOST_PORT= # port of SMTP service
 EMAIL_HOST_SERVER= # hostname of SMTP service
@@ -43,7 +45,9 @@ EMAIL_HOST_USER= # username for SMTP service
 SMTP_EMAIL_ENABLED=True # To output emails to console, set SMTP_EMAIL_ENABLED=False
 
 # FLOWER
+FLOWER_PASSWORD="SET_ME"
 FLOWER_PORT=8888
+FLOWER_USER="flower@example.com"
 
 # HERMES (SNOMED CT)
 RCPCH_HERMES_SERVER_URL= # SNOMED server API URL

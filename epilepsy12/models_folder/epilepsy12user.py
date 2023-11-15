@@ -103,7 +103,7 @@ class Epilepsy12UserManager(BaseUserManager):
             raise ValueError(_("Superuser must have is_staff=True."))
         if extra_fields.get("is_superuser") is not True:
             raise ValueError(_("Superuser must have is_superuser=True."))
-        
+
         if extra_fields.get("role") not in [1,2,3,4]:
             raise ValueError(
                 "--role must be an integer between 1 and 4")
@@ -178,7 +178,7 @@ class Epilepsy12User(AbstractUser, PermissionsMixin):
         null=False,
     )
     date_joined = models.DateTimeField(default=timezone.now)
-    role = models.PositiveSmallIntegerField(choices=ROLES, blank=True, null=True, help_text=_("Enter your role: 1 - Clinical Lead, 2 - Clinician, 3 - E12 Site Administrator, 4 - RCPCH Audit Team ."),)
+    role = models.PositiveSmallIntegerField(choices=ROLES, blank=True, null=True)
     email_confirmed = models.BooleanField(default=False)
     password_last_set = models.DateTimeField(default=timezone.now)
 
