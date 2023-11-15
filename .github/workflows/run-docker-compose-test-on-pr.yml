@@ -5,7 +5,12 @@ name: Run Pytest via Docker Compose on all PRs
 on:
     pull_request:
       branches:
-          - "*"
+        - "*"
+    push:
+      branches:
+        - development
+        - staging
+        - live
 
 jobs:
   build-and-run-pytest-suite-in-docker-compose:
@@ -28,7 +33,8 @@ jobs:
           echo "RCPCH_CENSUS_PLATFORM_URL=${{ secrets.RCPCH_CENSUS_PLATFORM_URL }}" >> envs/.env
           echo "DEBUG=${{ secrets.DEBUG }}" >> envs/.env
           echo "DJANGO_ALLOWED_HOSTS=${{ secrets.DJANGO_ALLOWED_HOSTS }}" >> envs/.env
-          echo "DJANGO_CSRF_TRUSTED_ORIGINS=https://${{ secrets.DJANGO_CSRF_TRUSTED_ORIGINS }}" >> envs/.env
+          echo "DJANGO_CSRF_TRUSTED_ORIGINS=${{ secrets.DJANGO_CSRF_TRUSTED_ORIGINS }}" >> envs/.env
+          echo "DJANGO_STARTUP_COMMAND=${{ secrets.DJANGO_STARTUP_COMMAND }}" >> envs/.env
           echo "E12_SECRET_KEY=${{ secrets.E12_SECRET_KEY }}" >> envs/.env
           echo "E12_POSTGRES_DB_HOST=${{ secrets.E12_POSTGRES_DB_HOST }}" >> envs/.env
           echo "E12_POSTGRES_DB_NAME=${{ secrets.E12_POSTGRES_DB_NAME }}" >> envs/.env
@@ -47,7 +53,7 @@ jobs:
           echo "RCPCH_HERMES_SERVER_URL=${{ secrets.RCPCH_HERMES_SERVER_URL }}" >> envs/.env
           echo "ENABLE_GIT_COMMITTERS=${{ secrets.ENABLE_GIT_COMMITTERS }}" >> envs/.env
           echo "ENABLE_PDF_EXPORT=${{ secrets.ENABLE_PDF_EXPORT }}" >> envs/.env
-          echo "DOCS_URL=https://${{ secrets.SITE_DOMAIN }}/docs/" >> envs/.env
+          echo "DOCS_URL=${{ secrets.DOCS_URL }}" >> envs/.env
           echo "NHS_ODS_API_URL=${{ secrets.NHS_ODS_API_URL }}" >> envs/.env
           echo "POSTCODE_API_BASE_URL=${{ secrets.POSTCODE_API_BASE_URL }}" >> envs/.env
           echo "POSTGRES_DB=${{ secrets.POSTGRES_DB }}" >> envs/.env
