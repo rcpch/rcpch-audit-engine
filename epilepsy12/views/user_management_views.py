@@ -247,14 +247,14 @@ def epilepsy12_user_list(request, organisation_id):
         or request.user.is_superuser
     ):
         rcpch_choices = (
-            (0, f"Organisation level ({organisation.name})"),
-            (1, f"Trust level ({parent_trust})"),
+            (0, "Organisation level"),
+            (1, "Trust level"),
             (2, "National level"),
         )
     else:
         rcpch_choices = (
-            (0, f"Organisation level ({organisation.name})"),
-            (1, f"Trust level ({parent_trust})"),
+            (0, "Organisation level"),
+            (1, "Trust level"),
         )
 
     paginator = Paginator(epilepsy12_user_list, 10)

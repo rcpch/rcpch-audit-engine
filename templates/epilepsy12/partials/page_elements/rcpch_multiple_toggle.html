@@ -33,6 +33,7 @@
                                     {% else %}
                                         class="ui  rcpch_dark_blue disabled button"
                                     {% endif %}
+                                    {% if }
                                     hx-target="{{hx_target}}"
                                     hx-post="{{hx_post}}"
                                     hx-swap="{{hx_swap}}"
@@ -51,10 +52,15 @@
                         {% for choice in choices %}
                                 {% match_two_values test_positive choice.0 as match %}
                                 {% if match %}
-                           
                                         <button
                                             class="ui  positive rcpch_dark_blue button"
+                                            {% if choice.1 == "Organisation level"  %}
+                                                data-tooltip="{{organisation.name}}"
+                                            {% elif choice.1 == "Trust level"  %}
+                                                data-tooltip="{{organisation.trust.name}}"
+                                            {% endif %}
                                         >{{choice.1}}</button>
+
                                     
                                 {% else %}
 
@@ -63,6 +69,11 @@
                                                     class="ui  rcpch_dark_blue button"
                                                 {% else %}
                                                     class="ui  disabled rcpch_dark_blue button"
+                                                {% endif %}
+                                                {% if choice.1 == "Organisation level"  %}
+                                                 data-tooltip="{{organisation.name}}"
+                                                {% elif choice.1 == "Trust level"  %}
+                                                    data-tooltip="{{organisation.trust.name}}"
                                                 {% endif %}
                                                 hx-target="{{hx_target}}"
                                                 hx-post="{{hx_post}}"

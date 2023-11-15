@@ -158,11 +158,15 @@ ul {
 }
 
 .ui.fluid.rcpch.container {
-  padding: 2rem;
+  padding: 0rem;
 }
 
 .ui.rcpch.container {
   padding: 2rem;
+}
+
+.ui.rcpch.container.welcome {
+  /* Test padding here */
 }
 
 @media only screen and (min-width: 1200px) {
@@ -240,13 +244,13 @@ ul {
 /*  INDEX  */
 
 .index_segment {
-  padding-bottom: 5em;
+  padding-bottom: 2.5em;
+  
 }
 
 div.center.aligned.image.rcpch_index_card_image {
-  padding: 5em;
-  background: linear-gradient(rgba(0, 0, 0, 0.5), rgba(0, 0, 0, 0.5)),
-    url("images/masthead-bg.png");
+  padding: 7.5em;
+  background: url("images/masthead-bg.png");
   background-repeat: no-repeat;
   background-size: cover;
   background-attachment: fixed;
@@ -256,22 +260,29 @@ div.center.aligned.image.rcpch_index_card_image {
   padding: 1.5rem;
   display: flex;
   flex-direction: column;
+  background-color: var(--rcpch_dark_blue);
+  color: white;
+  
 }
 
 .rcpch_index_card_content.content > h1.ui.header {
-  color: var(--rcpch_charcoal);
+  color: white;
+  height: 36px;
 }
 
 .ui.card > .content.rcpch_index_card_content > h3.ui.header {
   margin-top: 1em;
+  color: white;
 }
 
-.ui.card > .content.rcpch_index_card_content > div.description {
-  margin-top: 3em;
+.rcpch_index_card_content_description {
+  margin-top: 0.5em;
+  margin-bottom: 0.25em;
+  color: white
 }
 
 .rcpch_icon_text_group.rcpch_index_card_select {
-  margin-top: 3em;
+  margin-top: 1em;
   margin-bottom: 1em;
 }
 
@@ -280,13 +291,29 @@ div.center.aligned.image.rcpch_index_card_image {
 }
 
 .rcpch_icon_text_group.rcpch_index_card_select > a {
-  margin-top: 4em;
+  margin-top: 2em;
 }
 
-a.rcpch_index_card_link {
+a.rcpch_index_card_link{
   font-weight: 900;
   font-size: 1.4em;
   margin-right: 0.2em;
+  color: white;
+  font-weight: bolder;
+}
+
+a.rcpch_index_card_link:hover{
+  color: var(--rcpch_light_blue);
+}
+
+.rcpch_index_card_select:hover .icon,
+.rcpch_index_card_select:hover > a {
+  color: var(--rcpch_light_blue);
+}
+
+.icon_container {
+  display: flex !important;
+  justify-content: space-evenly !important;
 }
 
 .rcpch.container .index_segment .card_container {
@@ -296,6 +323,7 @@ a.rcpch_index_card_link {
 
 .card_container > .card_content_wrapper {
   flex-grow: 1;
+  max-width: 50%;
 }
 
 /* links */
@@ -375,6 +403,10 @@ div.ui.card > div.content > div.organisation_address_container {
 .organisation_details > .organisation_address > div.item > p {
   margin-bottom: 0em;
   /* text-align: center; */
+}
+
+.homepage_item {
+  margin-bottom: 1rem;
 }
 
 .ui.rcpch_dark_blue.card {
@@ -554,27 +586,30 @@ div.ui.card > div.content > div.organisation_address_container {
   background-color: var(--rcpch_light_grey);
   color: black;
   border-radius: 0% !important;
-  font-weight: 400;
+  font-weight: 1000;
+  padding-bottom: 10px;
+  font-family: Montserrat-Bold !important;
 }
 
 .ui.rcpch_dark_blue.button:active {
   background-color: var(--rcpch_pink);
   color: white;
   border-radius: 0% !important;
-  font-weight: 400;
+  font-weight: 800;
 }
 
 .ui.rcpch_dark_blue.positive.button {
   background-color: var(--rcpch_light_blue);
   color: white;
   border-radius: 0% !important;
+  font-family: Montserrat-Bold !important;
+  font-weight: 900;
 }
 
 .ui.rcpch_dark_blue.button:hover {
   background-color: var(--rcpch_dark_blue);
   color: white;
   border-radius: 0% !important;
-  font-weight: 400;
 }
 
 .ui.rcpch_dark_blue.positive.button:hover {
@@ -585,6 +620,10 @@ div.ui.card > div.content > div.organisation_address_container {
 
 .icon {
   color: var(--rcpch_black);
+}
+
+.icon_white {
+  color: white;
 }
 
 .rcpch_pink.icon {
@@ -1539,6 +1578,8 @@ a.ui.button {
 
 .ui.top.attached.rcpch_dark_blue.clearing.segment > h5 {
   color: white;
+  font-size: large;
+  font-family: Montserrat-Bold;
 }
 
 .ui.top.attached.rcpch_purple.clearing.segment {
@@ -1733,6 +1774,7 @@ img.ui.image.rcpch_member_image {
 }
 
 .rcpch_td_data_indicator_wrapper p {
+  font-family: Montserrat-Bold !important;
   font-weight: 900;
 }
 
@@ -1827,7 +1869,8 @@ div.rcpch_summary_stats > div.rcpch_summary_stats_row {
   display: flex;
   justify-content: space-between;
   flex-wrap: wrap;
-  gap: 5px;
+  gap: 10px;
+  padding-bottom: 12px;
 }
 
 .multiple_toggle_buttons_wrapper .rcpch_dark_blue.button {
