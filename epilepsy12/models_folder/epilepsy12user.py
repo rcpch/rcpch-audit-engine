@@ -1,11 +1,12 @@
 # django
-from django.contrib.auth.models import AbstractUser, PermissionsMixin, Group
+from django.contrib.auth.models import AbstractUser, PermissionsMixin
 from django.contrib.auth.base_user import BaseUserManager
 from django.utils import timezone
 from django.utils.translation import gettext_lazy as _
 from django.contrib.gis.db import models
 from django.db.models.functions import Lower
 from django.contrib.gis.db.models import UniqueConstraint
+from django.apps import apps
 
 # 3rd party
 from simple_history.models import HistoricalRecords
@@ -84,16 +85,17 @@ class Epilepsy12UserManager(BaseUserManager):
         """
         Create and save a SuperUser with the given email and password.
         """
+        Organisation = apps.get_model("epilepsy12", "Organisation")
 
         extra_fields.setdefault("is_superuser", True)
         extra_fields.setdefault("is_active", True)
         extra_fields.setdefault("is_staff", True)
         extra_fields.setdefault("is_rcpch_audit_team_member", True)
-        extra_fields.setdefault("is_rcpch_staff", True)
+        extra_fields.setdefault("is_rcpch_staff", False)
         extra_fields.setdefault("email_confirmed", True)
         extra_fields.setdefault("password_last_set", timezone.now())
-        # National level preference
-        extra_fields.setdefault("view_preference", 2)
+        # Organisation level preference
+        extra_fields.setdefault("view_preference", 0)
 
         if extra_fields.get("is_active") is not True:
             raise ValueError(_("Superuser must have is_active=True."))
@@ -101,8 +103,20 @@ class Epilepsy12UserManager(BaseUserManager):
             raise ValueError(_("Superuser must have is_staff=True."))
         if extra_fields.get("is_superuser") is not True:
             raise ValueError(_("Superuser must have is_superuser=True."))
+        
+        if extra_fields.get("role") not in [1,2,3,4]:
+            raise ValueError(
+                "--role must be an integer between 1 and 4")
+        else:
+            if extra_fields.get("role") == 4:
+                extra_fields.setdefault("is_rcpch_staff", True)
+                extra_fields.setdefault("view_preference", 2) # national scope
+                extra_fields.setdefault("organisation_employer", None)
+            else:
+                organisation_employer = Organisation.objects.get(ods_code="RJZ01") # clinicians added to KCH by default
+                extra_fields.setdefault("organisation_employer", organisation_employer)
 
-        logged_in_user = self.create_user(email, password, **extra_fields)
+        logged_in_user = self.create_user(email.lower(), password, **extra_fields)
 
         """
         Allocate Roles
@@ -149,7 +163,7 @@ class Epilepsy12User(AbstractUser, PermissionsMixin):
     )
     is_rcpch_staff = models.BooleanField(
         # reflects if user is an RCPCH employee
-        # must be affiliated with an organisation
+        # Any non-RCPCH staff must be affiliated with an organisation
         default=False
     )
     is_patient_or_carer = models.BooleanField(
@@ -164,7 +178,7 @@ class Epilepsy12User(AbstractUser, PermissionsMixin):
         null=False,
     )
     date_joined = models.DateTimeField(default=timezone.now)
-    role = models.PositiveSmallIntegerField(choices=ROLES, blank=True, null=True)
+    role = models.PositiveSmallIntegerField(choices=ROLES, blank=True, null=True, help_text=_("Enter your role: 1 - Clinical Lead, 2 - Clinician, 3 - E12 Site Administrator, 4 - RCPCH Audit Team ."),)
     email_confirmed = models.BooleanField(default=False)
     password_last_set = models.DateTimeField(default=timezone.now)
 

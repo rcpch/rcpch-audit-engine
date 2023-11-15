@@ -161,27 +161,22 @@ class Epilepsy12UserAdminCreationForm(forms.ModelForm):
         )
 
     def clean_email(self):
-        data = self.cleaned_data["email"]
+        cleaned_email = self.cleaned_data["email"].lower()
 
-        if data is not None:
-            if Epilepsy12User.objects.filter(email=data.lower()).exists():
-                return data.lower()
+        if cleaned_email is not None:
+            if Epilepsy12User.objects.filter(email=cleaned_email).exists():
+                return cleaned_email
+            # if editing email addresses is re-enabled in the UI then there needs to be
+            # logic in here to prevent changing a user's email to an existing email address.
 
-            # this user is being updated
-            if data != data.lower():
-                # test to check this email does not exist
-                if Epilepsy12User.objects.filter(email=data.lower()).exists():
-                    raise forms.ValidationError(
-                        f"{data.lower()} is already associated with an account."
-                    )
         else:
             # this is a new account - check email is unique
-            if Epilepsy12User.objects.filter(email=data.lower()).exists():
+            if Epilepsy12User.objects.filter(email=cleaned_email).exists():
                 raise forms.ValidationError(
                     "The email is already associated with an account."
                 )
 
-        return data.lower()
+        return cleaned_email
 
     def clean_is_rcpch_audit_team_member(self):
         """
@@ -241,28 +236,27 @@ class CaptchaAuthenticationForm(AuthenticationForm):
     def __init__(self, request, *args, **kwargs) -> None:
         super().__init__(request, *args, **kwargs)
 
-    def clean(self) -> dict[str, Any]:
-        email = self.cleaned_data["username"]
+    def clean_username(self) -> dict[str, Any]:
+        email = super().clean()["username"]
         if email:
             try:
-                user = Epilepsy12User.objects.get(email=email).DoesNotExist
+                user = Epilepsy12User.objects.get(email=email.lower()).DoesNotExist
             except Epilepsy12User.DoesNotExist:
                 return super().clean()
 
-            user = Epilepsy12User.objects.get(email=email)
-            
+            user = Epilepsy12User.objects.get(email=email.lower())
+
             visit_activities = VisitActivity.objects.filter(
                 epilepsy12user=user
             ).order_by("-activity_datetime")[:5]
-            
+
             failed_login_activities = [
                 activity for activity in visit_activities if activity.activity == 2
             ]
-            
+
             if failed_login_activities:
-            
                 first_activity = failed_login_activities[-1]
-                
+
                 if len(
                     failed_login_activities
                 ) >= 5 and timezone.now() <= first_activity.activity_datetime + timezone.timedelta(
@@ -271,5 +265,4 @@ class CaptchaAuthenticationForm(AuthenticationForm):
                     raise forms.ValidationError(
                         "You have failed to login 5 or more consecutive times. You have been locked out for 10 minutes"
                     )
-
-        return super().clean()
+            return email.lower()
