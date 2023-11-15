@@ -22,8 +22,8 @@ RCPCH_CENSUS_PLATFORM_URL="https://api.rcpch.ac.uk/deprivation/v1"
 
 # DJANGO
 DEBUG="True" # Set DEBUG=True for Local dev and Development, not Staging or Live
-DJANGO_ALLOWED_HOSTS= # this should contain the hosts which you are serving the site from
-DJANGO_CSRF_TRUSTED_ORIGINS= # this should contain the https:// domains which you are serving the site from
+DJANGO_ALLOWED_HOSTS="${SITE_DOMAIN}"
+DJANGO_CSRF_TRUSTED_ORIGINS="https://${SITE_DOMAIN}"
 E12_SECRET_KEY= # secret key for Django
 
 # DJANGO POSTGRES DATABASE CONNECTION
