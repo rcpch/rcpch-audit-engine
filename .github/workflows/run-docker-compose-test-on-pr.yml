@@ -3,9 +3,9 @@
 name: Run Pytest via Docker Compose on all PRs
 
 on:
-    pull_request:
-      branches:
-          - "*"
+  pull_request:
+    branches:
+        - "*"
 
 jobs:
   build-and-run-pytest-suite-in-docker-compose:
