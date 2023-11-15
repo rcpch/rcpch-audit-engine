@@ -161,20 +161,22 @@ class Epilepsy12UserAdminCreationForm(forms.ModelForm):
         )
 
     def clean_email(self):
-        data = self.cleaned_data["email"]
+        cleaned_email = self.cleaned_data["email"].lower()
 
-        if data is not None:
-            if Epilepsy12User.objects.filter(email=data.lower()).exists():
-                return data.lower()
+        if cleaned_email is not None:
+            if Epilepsy12User.objects.filter(email=cleaned_email).exists():
+                return cleaned_email
+            # if editing email addresses is re-enabled in the UI then there needs to be
+            # logic in here to prevent changing a user's email to an existing email address.
 
         else:
             # this is a new account - check email is unique
-            if Epilepsy12User.objects.filter(email=data.lower()).exists():
+            if Epilepsy12User.objects.filter(email=cleaned_email).exists():
                 raise forms.ValidationError(
                     "The email is already associated with an account."
                 )
 
-        return data.lower()
+        return cleaned_email
 
     def clean_is_rcpch_audit_team_member(self):
         """
