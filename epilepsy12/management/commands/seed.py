@@ -195,6 +195,7 @@ def insert_old_pt_data():
         )
 
         try:
+            # only supplied parent Organisation, so find the first Organisation belonging to that Parent, and assign it as the default_organisation
             if record_ods_code in lhb_ods_codes:
                 record_parent_org = LocalHealthBoard.objects.get(
                     ods_code=record_ods_code
