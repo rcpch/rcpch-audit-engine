@@ -178,7 +178,6 @@ def insert_old_pt_data():
         "\033[33m",
     )
 
-    # get the Trust / LHB from `SiteCode`
     for record in data_for_db:
         # Validation steps
         if not nhs_number.is_valid(record["nhs_number"]):
