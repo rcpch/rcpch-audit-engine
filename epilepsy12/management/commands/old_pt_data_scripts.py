@@ -59,14 +59,14 @@ def map_merged_trusts(df):
         "North Cumbria Integrated Care NHS Foundation Trust": "RNN",
         "Cumbria Partnership NHS Foundation Trust": "RNN",
     }
-    
+
     # Updating SiteCode based on SiteName. Ugly, but works.
     for hospital, new_code in merged_trust_map.items():
         df.loc[df['SiteName'] == hospital, 'SiteCode'] = new_code
-    
+
     return df['SiteCode']
-    
-    
+
+
 
 
 def clean_nhs_number(nhs_num_series):
@@ -75,8 +75,11 @@ def clean_nhs_number(nhs_num_series):
 
 def load_and_prep_data(csv_path: str) -> list[dict]:
     """Takes in .csv of old patient data, cleans and maps to E12 data model, returns list of dictionaries, where each dictionary is a patient row, keys are column names, values are values."""
+    print(pd.read_csv(csv_path).dtypes)
+
     df = (
         pd.read_csv(csv_path)
+        .astype({"s01nhschinumber": "string"})
         .assign(
             nhs_number=lambda _df: clean_nhs_number(_df["s01nhschinumber"]),
             ethnicity=lambda _df: map_ethnicities(_df["s01ethnicity"]),

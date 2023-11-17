@@ -167,6 +167,9 @@ def complete_registrations(verbose=True):
 
 
 def insert_old_pt_data():
+
+    COHORT_NUMBER = 6
+
     print(
         "\033[33m",
         "Running clean and conversion of old patient data...",
@@ -181,34 +184,42 @@ def insert_old_pt_data():
         "\033[33m",
     )
 
+    seeding_error_report = []
+
     for record in data_for_db:
         # Validation steps
         if not nhs_number.is_valid(record["nhs_number"]):
-            print(f'{record["nhs_number"]} is invalid. Skipping insertion...')
+            reason = "Invalid NHS number"
+            print(f'Record: {record["nhs_number"]} - { reason } - Skipping insertion...')
+            seeding_error_report += [ reason, record ]
             continue
 
         if not is_valid_postcode(record["postcode"]):
-            print(
-                f"({record['nhs_number']=}) {record['postcode']} is invalid. Skipping"
-            )
+            reason = "Invalid postcode"
+            print(f'Record: {record["nhs_number"]} - { reason } - Skipping insertion...')
+            seeding_error_report += [ reason, record ]
 
-        # NOTE TODO: remove TEMP!!!
+
         if Case.objects.filter(nhs_number=record["nhs_number"]).exists():
             print(
-                f'{Case.objects.get(nhs_number=record["nhs_number"]).nhs_number} already exists. Deleting for debug...'
+                f'{Case.objects.get(nhs_number=record["nhs_number"]).nhs_number} already exists.'
             )
-            Case.objects.get(nhs_number=record["nhs_number"]).delete()
+            existing_case = Case.objects.get(nhs_number=record["nhs_number"])
+            print(existing_case)
+            # compare inserted_case with existing_case
+            # if identical, do nothing
+            # if different, update in place
 
-        inserted_patient = Case.objects.create(
-            locked=False,
-            nhs_number=record["nhs_number"],
-            first_name=record["first_name"],
-            surname=record["surname"],
-            sex=record["sex"],
-            date_of_birth=record["date_of_birth"],
-            postcode=record["postcode"],
-            ethnicity=record["ethnicity"],
-        )
+            # inserted_case = Case.objects.create(
+            #     locked=False,
+            #     nhs_number=record["nhs_number"],
+            #     first_name=record["first_name"],
+            #     surname=record["surname"],
+            #     sex=record["sex"],
+            #     date_of_birth=record["date_of_birth"],
+            #     postcode=record["postcode"],
+            #     ethnicity=record["ethnicity"],
+            # )
 
         # NOTE TODO: remove TEMP!!!
         if Site.objects.filter(case=inserted_patient).exists():
@@ -237,6 +248,7 @@ def insert_old_pt_data():
             f"Successfully inserted {inserted_patient.first_name} {inserted_patient.surname}"
         )
 
+    print(seeding_error_report)
 
 def image():
     return """
