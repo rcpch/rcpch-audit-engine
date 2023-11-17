@@ -19,10 +19,13 @@ from ...models import (
     Case,
     Site,
     Registration,
+    Trust,
+    LocalHealthBoard,
 )
 from .create_groups import groups_seeder
 from .create_e12_records import create_epilepsy12_record, create_registrations
 from epilepsy12.tests.factories import E12CaseFactory
+from .old_pt_data_scripts import load_and_prep_data
 
 
 class Command(BaseCommand):
@@ -60,13 +63,16 @@ class Command(BaseCommand):
             self.stdout.write("deleting all groups/permissions and reallocating...")
         elif options["mode"] == "add_existing_medicines_as_foreign_keys":
             self.stdout.write("replacing medicines with medicine entity...")
+        elif options["mode"] == "upload_old_patient_data":
+            self.stdout.write("Uploading old patient data.")
+            insert_old_pt_data()
 
         else:
             self.stdout.write("No options supplied...")
-        print("\033[38;2;17;167;142m")
-        self.stdout.write(image())
-        print("\033[38;2;17;167;107m")
-        self.stdout.write("done.")
+        # print("\033[38;2;17;167;142m")
+        # self.stdout.write(image())
+        # print("\033[38;2;17;167;107m")
+        # self.stdout.write("done.")
 
 
 def run_dummy_cases_seed(verbose=True, cases=50):
@@ -105,7 +111,9 @@ def run_dummy_cases_seed(verbose=True, cases=50):
         seed_female = True if sex == 2 else False
         random_ethnicity = randint(0, len(choice(ETHNICITIES)))
         ethnicity = ETHNICITIES[random_ethnicity][0]
-        postcode = return_random_postcode(country_boundary_identifier=org.country.boundary_identifier)
+        postcode = return_random_postcode(
+            country_boundary_identifier=org.country.boundary_identifier
+        )
 
         E12CaseFactory.create_batch(
             num_cases_to_seed_in_org,
@@ -158,6 +166,57 @@ def complete_registrations(verbose=True):
         registration.save()
 
         create_epilepsy12_record(registration_instance=registration, verbose=verbose)
+
+
+def insert_old_pt_data():
+    print(
+        "\033[33m",
+        "Running clean and conversion of old patient data...",
+        "\033[33m",
+    )
+
+    data_for_db = load_and_prep_data(csv_path="epilepsy12/management/commands/data.csv")
+
+    print(
+        "\033[33m",
+        "Success! Inserting records into db...",
+        "\033[33m",
+    )
+
+    # get the Trust / LHB from `SiteCode`
+    for record in data_for_db:
+        record_ods_code = record["SiteCode"]
+
+        # Get LHB ODS Codes for lookup differentiation
+        lhb_ods_codes = set(
+            LocalHealthBoard.objects.all().values_list("ods_code", flat=True).distinct()
+        )
+
+        try:
+            if record_ods_code in lhb_ods_codes:
+                record_parent_org = LocalHealthBoard.objects.get(
+                    ods_code=record_ods_code
+                )
+                default_organisation = Organisation.objects.filter(
+                    local_health_board=record_parent_org
+                ).first()
+
+            else:
+                record_parent_org = Trust.objects.get(ods_code=record_ods_code)
+                default_organisation = Organisation.objects.filter(
+                    trust=record_parent_org
+                ).first()
+
+        except Exception as e:
+            print(
+                f"Error getting Trust for {record_ods_code=}: {e}. Skipping insertion of {record}"
+            )
+
+        if not default_organisation:
+                    print(
+                        f"cant find any registered Organisations inside Parent Organisation {record_parent_org} ({record_ods_code=}) for {record['nhs_number']=}. Skipping..."
+                    )
+        # print(default_organisation)
 
 
 def image():
