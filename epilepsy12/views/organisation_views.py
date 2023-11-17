@@ -3,16 +3,14 @@
 # third party libraries
 from django.shortcuts import render
 from django.urls import reverse
-from django.utils import timezone
 from django_htmx.http import HttpResponseClientRedirect
-from dateutil.relativedelta import relativedelta
 
 # E12 imports
 from ..decorator import user_may_view_this_organisation, login_and_otp_required
 from epilepsy12.constants import (
     INDIVIDUAL_KPI_MEASURES,
 )
-from epilepsy12.models import Organisation, KPI, Site
+from epilepsy12.models import Organisation, KPI, OrganisationKPIAggregation
 from ..common_view_functions import (
     cases_aggregated_by_sex,
     cases_aggregated_by_ethnicity,
@@ -235,6 +233,13 @@ def selected_trust_kpis(request, organisation_id, access):
     kpi_instance = KPI(organisation=organisation)
     kpi_names_list = list(kpi_instance.get_kpis().keys())
 
+    # Last publication date
+    last_published_kpi_aggregation = OrganisationKPIAggregation.objects.filter(abstraction_relation=organisation, open_access=True).order_by("-last_updated").first()
+    if last_published_kpi_aggregation:
+        last_published_date = last_published_kpi_aggregation.last_updated
+    else:
+        last_published_date = None
+
     context = {
         "organisation": organisation,
         "all_data": all_data,
@@ -244,6 +249,7 @@ def selected_trust_kpis(request, organisation_id, access):
         "organisation_list": Organisation.objects.all().order_by(
             "name"
         ),  # for public view dropdown
+        "last_published_date": last_published_date
     }
 
     return render(

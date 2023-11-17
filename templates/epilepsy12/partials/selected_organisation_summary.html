@@ -16,18 +16,47 @@
                 </div>
             </div>
         {% endif %}
+
             
-            <div class="fluid row stackable org_view_all_buttons_wrapper">
-                <div class="eight wide column">
-                    <a class="ui rcpch_grey fluid button" href="{% url 'epilepsy12_user_list' organisation_id=selected_organisation.pk %}">
-                        View All {{selected_organisation.name}} Epilepsy12 Staff
-                </a>
-            </div>
-            <div class="eight wide  column">
-                <a class="ui rcpch_primary fluid button" href="{% url 'cases' organisation_id=selected_organisation.pk %}">
-                    View All {{selected_organisation.name}} Children
-                    </a>
-            </div>
+            <div class="fluid row stackable org_view_all_buttons_wrapper three column grid">
+                {% if user.is_rcpch_audit_team_member or user.is_superuser %}
+                        <!-- Only RCPCH Audit team members and superusers can publish aggregations to the open access page -->
+                    <div class="column">
+                        <a class="ui rcpch_grey fluid button" href="{% url 'epilepsy12_user_list' organisation_id=selected_organisation.pk %}">
+                            View All {{selected_organisation.name}} Epilepsy12 Staff
+                        </a>
+                    </div>
+                    <div class="column">
+                        <a class="ui rcpch_primary fluid button" href="{% url 'cases' organisation_id=selected_organisation.pk %}">
+                            View All {{selected_organisation.name}} Children
+                        </a>
+                    </div>
+                    <div class="column">
+                        <button 
+                            class='ui fluid rcpch_danger button'
+                            hx-get="{% url 'selected_trust_kpis' organisation_id=selected_organisation.pk access='private' %}"
+                            name="publish"
+                            hx-trigger="click">
+                            <!-- TODO needs implementing POST call back to update KPIAggregation model open_access=True -->
+                            Publish
+                            <i class="htmx-indicator spinner loading icon"></i>
+                        </button>
+                    </div>
+            
+                {% else %}
+
+                    <div class="eight wide column">
+                        <a class="ui rcpch_grey fluid button" href="{% url 'epilepsy12_user_list' organisation_id=selected_organisation.pk %}">
+                            View All {{selected_organisation.name}} Epilepsy12 Staff
+                        </a>
+                    </div>
+                    <div class="eight wide  column">
+                        <a class="ui rcpch_primary fluid button" href="{% url 'cases' organisation_id=selected_organisation.pk %}">
+                            View All {{selected_organisation.name}} Children
+                        </a>
+                    </div>
+
+                {% endif %}
         </div>
 
         <div class='sixteen wide fluid column'>
