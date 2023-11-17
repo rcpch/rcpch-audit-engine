@@ -109,6 +109,9 @@ def run_dummy_cases_seed(verbose=True, cases=50):
         postcode = return_random_postcode(
             country_boundary_identifier=org.country.boundary_identifier
         )
+        postcode = return_random_postcode(
+            country_boundary_identifier=org.country.boundary_identifier
+        )
 
         E12CaseFactory.create_batch(
             num_cases_to_seed_in_org,
