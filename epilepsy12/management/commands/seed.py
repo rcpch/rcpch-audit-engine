@@ -219,10 +219,10 @@ def insert_old_pt_data():
 
         # Get organisation
         try:
-            organisation = Organisation.objects.get(ods_code=record["organisationcode"])
+            organisation = Organisation.objects.get(ods_code=record["OrganisationCode"])
         except Exception as e:
             print(
-                f'Couldn\'t find organisation for {record["organisationcode"]}. Skipping {record["nhs_number"]}'
+                f'Couldn\'t find organisation for {record["OrganisationCode"]}. Skipping {record["nhs_number"]}'
             )
 
         # allocate the child to the organisation supplied as primary E12 centre

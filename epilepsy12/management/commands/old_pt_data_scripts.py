@@ -78,29 +78,28 @@ def load_and_prep_data(csv_path: str) -> list[dict]:
     df = (
         pd.read_csv(csv_path)
         .assign(
-            nhs_number=lambda _df: clean_nhs_number(_df["S01NHSCHINumber"]),
-            ethnicity=lambda _df: map_ethnicities(_df["S01Ethnicity"]),
+            nhs_number=lambda _df: clean_nhs_number(_df["s01nhschinumber"]),
+            ethnicity=lambda _df: map_ethnicities(_df["s01ethnicity"]),
             postcode=lambda _df: (
-                _df["S02HomePostcodeOut"] + _df["S02HomePostcodeIn"]
+                _df["s02homepostcodeout"] + _df["s02homepostcodein"]
             ).str.replace(" ", ""),
-            date_of_birth=lambda _df: map_date(_df["S01DOBDateOnly"]),
-            sex=lambda _df: map_sex(_df["S01Gender"]),
-            first_name=lambda _df: _df["S01FirstName"].str.strip(),
-            surname=lambda _df: _df["S01SurName"].str.strip(),
-            SiteCode = lambda _df: map_merged_trusts(_df),
+            date_of_birth=lambda _df: map_date(_df["s01dobdateonly"]),
+            sex=lambda _df: map_sex(_df["s01gender"]),
+            first_name=lambda _df: _df["s01firstname"].str.strip(),
+            surname=lambda _df: _df["s01surname"].str.strip(),
         )
         .drop(
             columns=[
-                "S02HomePostcodeOut",  # mapped to `postcode`
-                "S02HomePostcodeIn",  # mapped to `postcode`
-                "S01NHSCHINumber",  # mapped to `nhs_number`
-                "S01Ethnicity",  # mapped to `ethnicity`
-                "S01Gender",  # mapped to `sex`
-                "S01DOBDateOnly",  # mapped to `date_of_birth`
-                "S01EthnicityOtherSpecify",
-                "S01ReferringHospital",
-                "S01FirstName",  # mapped to `first_name`
-                "S01SurName",  # mapped to `surname`
+                "s02homepostcodeout",  # mapped to `postcode`
+                "s02homepostcodein",  # mapped to `postcode`
+                "s01nhschinumber",  # mapped to `nhs_number`
+                "s01ethnicity",  # mapped to `ethnicity`
+                "s01gender",  # mapped to `sex`
+                "s01dobdateonly",  # mapped to `date_of_birth`
+                "s01ethnicityotherspecify",
+                "s01referringhospital",
+                "s01firstname",  # mapped to `first_name`
+                "s01surname",  # mapped to `surname`
             ]
         )
         .astype({"sex": "int8"})
