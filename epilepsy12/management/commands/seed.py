@@ -20,6 +20,8 @@ from ...models import (
     Case,
     Site,
     Registration,
+    Trust,
+    LocalHealthBoard,
 )
 from .create_groups import groups_seeder
 from .create_e12_records import create_epilepsy12_record, create_registrations
@@ -185,11 +187,6 @@ def insert_old_pt_data():
 
     # get the Trust / LHB from `SiteCode`
     for record in data_for_db:
-        (
-            default_organisation,
-            record_ods_code,
-            record_parent_org,
-        ) = get_default_org_from_record(record=record)
         record_ods_code = record["SiteCode"]
 
         # Get LHB ODS Codes for lookup differentiation
@@ -198,7 +195,6 @@ def insert_old_pt_data():
         )
 
         try:
-            # only supplied parent Organisation, so find the first Organisation belonging to that Parent, and assign it as the default_organisation
             if record_ods_code in lhb_ods_codes:
                 record_parent_org = LocalHealthBoard.objects.get(
                     ods_code=record_ods_code
