@@ -38,18 +38,6 @@ def map_ethnicities(ethnicities_series):
 
     return ethnicities_series.map(ethnicity_mapping)
 
-
-def from_excel_ordinal(ordinal: float, _epoch0=datetime(1899, 12, 31)) -> date:
-    """Thanks to Martijn Pieters: https://stackoverflow.com/questions/29387137/how-to-convert-a-given-ordinal-number-from-excel-to-a-date/29387450#29387450."""
-    if ordinal >= 60:
-        ordinal -= 1  # Excel leap year bug, 1900 is not a leap year!
-    return (_epoch0 + timedelta(days=ordinal)).replace(microsecond=0).date()
-
-
-def map_dob(dob_series):
-    return dob_series.apply(from_excel_ordinal)
-
-
 def map_sex(sex_series):
     return sex_series.map(
         {
