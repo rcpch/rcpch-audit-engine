@@ -1,7 +1,17 @@
+"""
+These scripts clean old patient data csv and convert into records which can be seeded into E12 db.
+"""
+
 from datetime import date, datetime, timedelta
 
 import numpy as np
 import pandas as pd
+
+from epilepsy12.models import (
+    LocalHealthBoard,
+    Organisation,
+    Trust,
+)
 
 
 def map_ethnicities(ethnicities_series):
@@ -50,24 +60,16 @@ def map_sex(sex_series):
     )
 
 
-def clean_and_validate_nhs_number(nhs_num_series):
-    # TODO: validate nhs nums
+def clean_nhs_number(nhs_num_series):
     return nhs_num_series.str.replace(" ", "")
 
 
-def validate_postcodes():
-    # TODO: validate postcodes
-    pass
-
-
-def load_and_prep_data(csv_path:str) -> list[dict]:
+def load_and_prep_data(csv_path: str) -> list[dict]:
     """Takes in .csv of old patient data, cleans and maps to E12 data model, returns list of dictionaries, where each dictionary is a patient row, keys are column names, values are values."""
     df = (
         pd.read_csv(csv_path)
         .assign(
-            nhs_number=lambda _df: clean_and_validate_nhs_number(
-                _df["S01NHSCHINumber"]
-            ),
+            nhs_number=lambda _df: clean_nhs_number(_df["S01NHSCHINumber"]),
             ethnicity=lambda _df: map_ethnicities(_df["S01Ethnicity"]),
             postcode=lambda _df: (
                 _df["S02HomePostcodeOut"] + _df["S02HomePostcodeIn"]
@@ -99,3 +101,33 @@ def load_and_prep_data(csv_path:str) -> list[dict]:
     print(df.head())
 
     return df.to_dict(orient="records")
+
+
+def get_default_org_from_record(record):
+    record_ods_code = record["SiteCode"]
+
+    # Get LHB ODS Codes for lookup differentiation
+    lhb_ods_codes = set(
+        LocalHealthBoard.objects.all().values_list("ods_code", flat=True).distinct()
+    )
+
+    try:
+        # only supplied parent Organisation, so find the first Organisation belonging to that Parent, and assign it as the default_organisation
+        if record_ods_code in lhb_ods_codes:
+            record_parent_org = LocalHealthBoard.objects.get(ods_code=record_ods_code)
+            default_organisation = Organisation.objects.filter(
+                local_health_board=record_parent_org
+            ).first()
+
+        else:
+            record_parent_org = Trust.objects.get(ods_code=record_ods_code)
+            default_organisation = Organisation.objects.filter(
+                trust=record_parent_org
+            ).first()
+
+    except Exception as e:
+        print(
+            f"Error getting Trust for {record_ods_code=}: {e}. Skipping insertion of {record}"
+        )
+
+    return default_organisation,record_ods_code,record_parent_org
