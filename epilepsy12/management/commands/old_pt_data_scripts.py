@@ -38,6 +38,7 @@ def map_ethnicities(ethnicities_series):
 
     return ethnicities_series.map(ethnicity_mapping)
 
+
 def map_sex(sex_series):
     return sex_series.map(
         {
@@ -47,8 +48,26 @@ def map_sex(sex_series):
         }
     )
 
+
 def map_date(date_series):
-    return pd.to_datetime(date_series, format='%d/%m/%Y').dt.date
+    return pd.to_datetime(date_series, format="%d/%m/%Y").dt.date
+
+def map_merged_trusts(df):
+    merged_trust_map = {
+        "City Hospitals Sunderland NHS Foundation Trust": "R0B",
+        "South Tyneside NHS Foundation Trust": "R0B",
+        "North Cumbria Integrated Care NHS Foundation Trust": "RNN",
+        "Cumbria Partnership NHS Foundation Trust": "RNN",
+    }
+    
+    # Updating SiteCode based on SiteName. Ugly, but works.
+    for hospital, new_code in merged_trust_map.items():
+        df.loc[df['SiteName'] == hospital, 'SiteCode'] = new_code
+    
+    return df['SiteCode']
+    
+    
+
 
 def clean_nhs_number(nhs_num_series):
     return nhs_num_series.str.replace(" ", "")
@@ -59,9 +78,7 @@ def load_and_prep_data(csv_path: str) -> list[dict]:
     df = (
         pd.read_csv(csv_path)
         .assign(
-            nhs_number=lambda _df: clean_nhs_number(
-                _df["S01NHSCHINumber"]
-            ),
+            nhs_number=lambda _df: clean_nhs_number(_df["S01NHSCHINumber"]),
             ethnicity=lambda _df: map_ethnicities(_df["S01Ethnicity"]),
             postcode=lambda _df: (
                 _df["S02HomePostcodeOut"] + _df["S02HomePostcodeIn"]
@@ -70,6 +87,7 @@ def load_and_prep_data(csv_path: str) -> list[dict]:
             sex=lambda _df: map_sex(_df["S01Gender"]),
             first_name=lambda _df: _df["S01FirstName"].str.strip(),
             surname=lambda _df: _df["S01SurName"].str.strip(),
+            SiteCode = lambda _df: map_merged_trusts(_df),
         )
         .drop(
             columns=[
@@ -122,4 +140,4 @@ def get_default_org_from_record(record):
             f"Error getting Trust for {record_ods_code=}: {e}. Skipping insertion of {record}"
         )
 
-    return default_organisation,record_ods_code,record_parent_org
+    return default_organisation, record_ods_code, record_parent_org
