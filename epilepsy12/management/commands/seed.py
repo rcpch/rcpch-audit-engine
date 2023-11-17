@@ -183,45 +183,6 @@ def insert_old_pt_data():
 
     # get the Trust / LHB from `SiteCode`
     for record in data_for_db:
-        (
-            default_organisation,
-            record_ods_code,
-            record_parent_org,
-        ) = get_default_org_from_record(record=record)
-        record_ods_code = record["SiteCode"]
-
-        # Get LHB ODS Codes for lookup differentiation
-        lhb_ods_codes = set(
-            LocalHealthBoard.objects.all().values_list("ods_code", flat=True).distinct()
-        )
-
-        try:
-            # only supplied parent Organisation, so find the first Organisation belonging to that Parent, and assign it as the default_organisation
-            if record_ods_code in lhb_ods_codes:
-                record_parent_org = LocalHealthBoard.objects.get(
-                    ods_code=record_ods_code
-                )
-                default_organisation = Organisation.objects.filter(
-                    local_health_board=record_parent_org
-                ).first()
-
-            else:
-                record_parent_org = Trust.objects.get(ods_code=record_ods_code)
-                default_organisation = Organisation.objects.filter(
-                    trust=record_parent_org
-                ).first()
-
-        except Exception as e:
-            print(
-                f"Error getting Trust for {record_ods_code=}: {e}. Skipping insertion of {record}"
-            )
-
-        if not default_organisation:
-            print(
-                f"cant find any registered Organisations inside Parent Organisation {record_parent_org} ({record_ods_code=}) for {record['nhs_number']=}. Skipping..."
-            )
-            continue
-
         # Validation steps
         if not nhs_number.is_valid(record["nhs_number"]):
             print(f'{record["nhs_number"]} is invalid. Skipping insertion...')
@@ -257,11 +218,19 @@ def insert_old_pt_data():
             )
             Site.objects.get(case=inserted_patient).delete()
 
+        # Get organisation
+        try:
+            organisation = Organisation.objects.get(ods_code=record["organisationcode"])
+        except Exception as e:
+            print(
+                f'Couldn\'t find organisation for {record["organisationcode"]}. Skipping {record["nhs_number"]}'
+            )
+
         # allocate the child to the organisation supplied as primary E12 centre
         Site.objects.create(
             site_is_actively_involved_in_epilepsy_care=True,
             site_is_primary_centre_of_epilepsy_care=True,
-            organisation=default_organisation,
+            organisation=organisation,
             case=inserted_patient,
         )
 
