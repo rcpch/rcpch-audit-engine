@@ -20,6 +20,8 @@ from ...models import (
     Case,
     Site,
     Registration,
+    Trust,
+    LocalHealthBoard,
 )
 from .create_groups import groups_seeder
 from .create_e12_records import create_epilepsy12_record, create_registrations

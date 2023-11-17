@@ -93,33 +93,3 @@ def load_and_prep_data(csv_path: str) -> list[dict]:
     print(df.head())
 
     return df.to_dict(orient="records")
-
-
-def get_default_org_from_record(record):
-    record_ods_code = record["SiteCode"]
-
-    # Get LHB ODS Codes for lookup differentiation
-    lhb_ods_codes = set(
-        LocalHealthBoard.objects.all().values_list("ods_code", flat=True).distinct()
-    )
-
-    try:
-        # only supplied parent Organisation, so find the first Organisation belonging to that Parent, and assign it as the default_organisation
-        if record_ods_code in lhb_ods_codes:
-            record_parent_org = LocalHealthBoard.objects.get(ods_code=record_ods_code)
-            default_organisation = Organisation.objects.filter(
-                local_health_board=record_parent_org
-            ).first()
-
-        else:
-            record_parent_org = Trust.objects.get(ods_code=record_ods_code)
-            default_organisation = Organisation.objects.filter(
-                trust=record_parent_org
-            ).first()
-
-    except Exception as e:
-        print(
-            f"Error getting Trust for {record_ods_code=}: {e}. Skipping insertion of {record}"
-        )
-
-    return default_organisation,record_ods_code,record_parent_org
