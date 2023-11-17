@@ -15,12 +15,7 @@ from ...general_functions import (
 from ...constants import (
     ETHNICITIES,
 )
-from ...models import (
-    Organisation,
-    Case,
-    Site,
-    Registration,
-)
+from ...models import Organisation, Case, Site, Registration, LocalHealthBoard, Trust
 from .create_groups import groups_seeder
 from .create_e12_records import create_epilepsy12_record, create_registrations
 from epilepsy12.tests.factories import E12CaseFactory
