@@ -38,6 +38,18 @@ def map_ethnicities(ethnicities_series):
 
     return ethnicities_series.map(ethnicity_mapping)
 
+
+def from_excel_ordinal(ordinal: float, _epoch0=datetime(1899, 12, 31)) -> date:
+    """Thanks to Martijn Pieters: https://stackoverflow.com/questions/29387137/how-to-convert-a-given-ordinal-number-from-excel-to-a-date/29387450#29387450."""
+    if ordinal >= 60:
+        ordinal -= 1  # Excel leap year bug, 1900 is not a leap year!
+    return (_epoch0 + timedelta(days=ordinal)).replace(microsecond=0).date()
+
+
+def map_dob(dob_series):
+    return dob_series.apply(from_excel_ordinal)
+
+
 def map_sex(sex_series):
     return sex_series.map(
         {
@@ -59,12 +71,14 @@ def load_and_prep_data(csv_path: str) -> list[dict]:
     df = (
         pd.read_csv(csv_path)
         .assign(
-            nhs_number=lambda _df: clean_nhs_number(_df["S01NHSCHINumber"]),
+            nhs_number=lambda _df: clean_nhs_number(
+                _df["S01NHSCHINumber"]
+            ),
             ethnicity=lambda _df: map_ethnicities(_df["S01Ethnicity"]),
             postcode=lambda _df: (
                 _df["S02HomePostcodeOut"] + _df["S02HomePostcodeIn"]
             ).str.replace(" ", ""),
-            date_of_birth=lambda _df: map_date(_df["S01DOBDateOnly"]),
+            date_of_birth=lambda _df: map_dob(_df["S01DOBDateOnly"]),
             sex=lambda _df: map_sex(_df["S01Gender"]),
             first_name=lambda _df: _df["S01FirstName"].str.strip(),
             surname=lambda _df: _df["S01SurName"].str.strip(),
