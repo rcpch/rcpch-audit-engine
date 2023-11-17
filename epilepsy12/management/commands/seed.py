@@ -180,18 +180,6 @@ def insert_old_pt_data():
 
     # get the Trust / LHB from `SiteCode`
     for record in data_for_db:
-        (
-            default_organisation,
-            record_ods_code,
-            record_parent_org,
-        ) = get_default_org_from_record(record=record)
-
-        if not default_organisation:
-            print(
-                f"cant find any registered Organisations inside Parent Organisation {record_parent_org} ({record_ods_code=}) for {record['nhs_number']=}. Skipping..."
-            )
-            continue
-
         # Validation steps
         if not nhs_number.is_valid(record["nhs_number"]):
             print(f'{record["nhs_number"]} is invalid. Skipping insertion...')
@@ -227,11 +215,19 @@ def insert_old_pt_data():
             )
             Site.objects.get(case=inserted_patient).delete()
 
+        # Get organisation
+        try:
+            organisation = Organisation.objects.get(ods_code=record["organisationcode"])
+        except Exception as e:
+            print(
+                f'Couldn\'t find organisation for {record["organisationcode"]}. Skipping {record["nhs_number"]}'
+            )
+
         # allocate the child to the organisation supplied as primary E12 centre
         Site.objects.create(
             site_is_actively_involved_in_epilepsy_care=True,
             site_is_primary_centre_of_epilepsy_care=True,
-            organisation=default_organisation,
+            organisation=organisation,
             case=inserted_patient,
         )
 
