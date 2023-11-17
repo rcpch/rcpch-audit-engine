@@ -1,8 +1,9 @@
 # python
 from random import randint, choice
 from datetime import date
-from dateutil.relativedelta import relativedelta
 from random import randint
+
+import nhs_number
 
 from django.core.management.base import BaseCommand
 
@@ -19,13 +20,12 @@ from ...models import (
     Case,
     Site,
     Registration,
-    Trust,
-    LocalHealthBoard,
 )
 from .create_groups import groups_seeder
 from .create_e12_records import create_epilepsy12_record, create_registrations
 from epilepsy12.tests.factories import E12CaseFactory
-from .old_pt_data_scripts import load_and_prep_data
+from .old_pt_data_scripts import load_and_prep_data, get_default_org_from_record
+from epilepsy12.general_functions.postcode import is_valid_postcode
 
 
 class Command(BaseCommand):
@@ -185,61 +185,53 @@ def insert_old_pt_data():
 
     # get the Trust / LHB from `SiteCode`
     for record in data_for_db:
-        record_ods_code = record["SiteCode"]
-
-        # Get LHB ODS Codes for lookup differentiation
-        lhb_ods_codes = set(
-            LocalHealthBoard.objects.all().values_list("ods_code", flat=True).distinct()
-        )
-
-        try:
-            # only supplied parent Organisation, so find the first Organisation belonging to that Parent, and assign it as the default_organisation
-            if record_ods_code in lhb_ods_codes:
-                record_parent_org = LocalHealthBoard.objects.get(
-                    ods_code=record_ods_code
-                )
-                default_organisation = Organisation.objects.filter(
-                    local_health_board=record_parent_org
-                ).first()
-
-            else:
-                record_parent_org = Trust.objects.get(ods_code=record_ods_code)
-                default_organisation = Organisation.objects.filter(
-                    trust=record_parent_org
-                ).first()
-
-        except Exception as e:
-            print(
-                f"Error getting Trust for {record_ods_code=}: {e}. Skipping insertion of {record}"
-            )
+        (
+            default_organisation,
+            record_ods_code,
+            record_parent_org,
+        ) = get_default_org_from_record(record=record)
 
         if not default_organisation:
             print(
                 f"cant find any registered Organisations inside Parent Organisation {record_parent_org} ({record_ods_code=}) for {record['nhs_number']=}. Skipping..."
             )
             continue
-        
+
+        # Validation steps
+        if not nhs_number.is_valid(record["nhs_number"]):
+            print(f'{record["nhs_number"]} is invalid. Skipping insertion...')
+            continue
+
+        if not is_valid_postcode(record["postcode"]):
+            print(
+                f"({record['nhs_number']=}) {record['postcode']} is invalid. Skipping"
+            )
+
         # NOTE TODO: remove TEMP!!!
-        if Case.objects.filter(nhs_number=record['nhs_number']).exists():
-            print(f'{Case.objects.get(nhs_number=record["nhs_number"]).nhs_number} already exists. Deleting for debug...')
-            Case.objects.get(nhs_number=record['nhs_number']).delete()
-        
+        if Case.objects.filter(nhs_number=record["nhs_number"]).exists():
+            print(
+                f'{Case.objects.get(nhs_number=record["nhs_number"]).nhs_number} already exists. Deleting for debug...'
+            )
+            Case.objects.get(nhs_number=record["nhs_number"]).delete()
+
         inserted_patient = Case.objects.create(
             locked=False,
-            nhs_number=record['nhs_number'],
-            first_name=record['first_name'],
-            surname=record['surname'],
+            nhs_number=record["nhs_number"],
+            first_name=record["first_name"],
+            surname=record["surname"],
             sex=record["sex"],
             date_of_birth=record["date_of_birth"],
             postcode=record["postcode"],
             ethnicity=record["ethnicity"],
         )
-        
+
         # NOTE TODO: remove TEMP!!!
         if Site.objects.filter(case=inserted_patient).exists():
-            print(f'{Site.objects.get(case=inserted_patient)} already exists. Deleting for debug...')
+            print(
+                f"{Site.objects.get(case=inserted_patient)} already exists. Deleting for debug..."
+            )
             Site.objects.get(case=inserted_patient).delete()
-        
+
         # allocate the child to the organisation supplied as primary E12 centre
         Site.objects.create(
             site_is_actively_involved_in_epilepsy_care=True,
@@ -248,7 +240,9 @@ def insert_old_pt_data():
             case=inserted_patient,
         )
 
-        print(f'Successfully inserted {inserted_patient.first_name} {inserted_patient.surname}')
+        print(
+            f"Successfully inserted {inserted_patient.first_name} {inserted_patient.surname}"
+        )
 
 
 def image():
