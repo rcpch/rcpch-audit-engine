@@ -287,8 +287,9 @@ def insert_old_pt_data(csv_path="data.csv"):
     
     # .bulk_create() does not call Case.save() which calculates and saves the index_of_multiple_deprivation_quintile. So do it manually
     print("Saving all Cases to calculate IMD...")
-    for case_to_save in Case.objects.all():
-        print(f'Saving {case_to_save.id}...')
+    total_cases_to_save = Case.objects.all().count()
+    for ix, case_to_save in enumerate(Case.objects.all()):
+        print(f'Saving Case {ix+1} of {total_cases_to_save}...')
         case_to_save.save()
 
     print("ALL ERRORS: ")
