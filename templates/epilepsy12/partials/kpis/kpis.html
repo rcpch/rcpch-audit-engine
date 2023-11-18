@@ -36,20 +36,13 @@ will be persisted and run as a cron job once a day.
                         Refresh
                         <i class="htmx-indicator spinner loading icon"></i>
                     </button>
-                        {% if user.is_rcpch_audit_team_member or user.is_superuser %}
-                        <!-- Only RCPCH Audit team members and superusers can publish aggregations to the open access page -->
-                            <button 
-                                class='ui right floated rcpch_danger button'
-                                hx-get="{% url 'selected_trust_kpis' organisation_id=organisation.pk access='private' %}"
-                                name="publish"
-                                hx-trigger="click">
-                                <!-- TODO needs implementing POST call back to update KPIAggregation model open_access=True -->
-                                Publish
-                                <i class="htmx-indicator spinner loading icon"></i>
-                            </button>
-                        {% endif %}
                 {% endif %}
             </div>
+            {% if last_published_date %}
+                <label><small>Published on {{last_published_date}}</small></label>
+            {% else %}
+                <label><small>Data for {{organisation}} has never been published</small></label>
+            {% endif %}
         </div>
 
         {% if all_data.ORGANISATION_KPIS.aggregation_model is not None %}
