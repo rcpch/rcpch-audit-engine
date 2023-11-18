@@ -2,9 +2,7 @@
 from random import randint, choice
 from datetime import date
 from random import randint
-from pprint import pprint
 
-import nhs_number
 
 from django.core.management.base import BaseCommand
 
@@ -16,12 +14,10 @@ from ...general_functions import (
 from ...constants import (
     ETHNICITIES,
 )
-from ...models import Organisation, Case, Site, Registration, LocalHealthBoard, Trust
+from ...models import Organisation, Case, Registration
 from .create_groups import groups_seeder
 from .create_e12_records import create_epilepsy12_record, create_registrations
 from epilepsy12.tests.factories import E12CaseFactory
-from .old_pt_data_scripts import load_and_prep_data, get_default_org_from_record
-from epilepsy12.general_functions.postcode import is_valid_postcode
 from epilepsy12.tasks import insert_old_pt_data, async_insert_old_pt_data
 
 
@@ -169,7 +165,7 @@ def complete_registrations(verbose=True):
         registration.save()
 
         create_epilepsy12_record(registration_instance=registration, verbose=verbose)
-    
+
 
 def image():
     return """
