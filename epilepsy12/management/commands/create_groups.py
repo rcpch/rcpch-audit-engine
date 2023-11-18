@@ -22,6 +22,7 @@ from epilepsy12.constants.user_types import (
     CAN_LOCK_CHILD_CASE_DATA_FROM_EDITING,
     CAN_UNLOCK_CHILD_CASE_DATA_FROM_EDITING,
     CAN_OPT_OUT_CHILD_FROM_INCLUSION_IN_AUDIT,
+    CAN_PUBLISH_EPILEPSY12_DATA
 )
 from epilepsy12.models import (
     AntiEpilepsyMedicine,
@@ -41,6 +42,7 @@ from epilepsy12.models import (
     Keyword,
     Site,
     Epilepsy12User,
+    BaseKPIAggregation
 )
 
 
@@ -70,6 +72,7 @@ def groups_seeder(
     keywordContentType = ContentType.objects.get_for_model(Keyword)
     auditprogressContentType = ContentType.objects.get_for_model(AuditProgress)
     epilepsy12userContentType = ContentType.objects.get_for_model(Epilepsy12User)
+    baseKPIAggregationContentType = ContentType.objects.get_for_model(BaseKPIAggregation)
 
     """
     Note view permissions include viewing users, but not creating, updating or deleting them
@@ -219,7 +222,7 @@ def groups_seeder(
             "codename": "delete_investigations",
             "content_type": investigationsContentType,
         },
-        # mnaagement
+        # management
         {"codename": "change_management", "content_type": managementContentType},
         {"codename": "add_management", "content_type": managementContentType},
         {"codename": "delete_management", "content_type": managementContentType},
@@ -283,6 +286,7 @@ def groups_seeder(
     - opt children out of Epilepsy12
     - allocate, update and delete Epilepsy12 lead site status
     - create, update and delete the look up lists for Keyword and Organisation
+    - publish Epilepsy12 data to the public site
     
     NOTE RCPCH team are able to access all users and all children nationally.
     """
@@ -314,6 +318,10 @@ def groups_seeder(
         {
             "codename": CAN_ALLOCATE_EPILEPSY12_LEAD_CENTRE[0],
             "content_type": siteContentType,
+        },
+        {
+            "codename": CAN_PUBLISH_EPILEPSY12_DATA[0],
+            "content_type":baseKPIAggregationContentType,
         },
         {"codename": "change_organisation", "content_type": organisationContentType},
         {"codename": "add_organisation", "content_type": organisationContentType},
