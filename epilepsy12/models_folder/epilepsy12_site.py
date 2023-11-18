@@ -89,4 +89,4 @@ class Site(TimeStampAbstractBaseClass, UserStampAbstractBaseClass):
         ]
 
     def __str__(self) -> str:
-        return self.organisation.trust.name
+        return self.organisation.trust.name if self.organisation.trust else self.organisation.local_health_board.name # Welsh orgs have no Trust
