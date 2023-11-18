@@ -706,6 +706,16 @@ div.ui.card > div.content > div.organisation_address_container {
   border-color: var(--rcpch_light_blue);
   font-weight: 400;
 }
+.ui.rcpch_info.button {
+  border-radius: 0% !important;
+  color: black;
+  background-color: var(--rcpch_light_blue_tint3);
+  border-color: var(--rcpch_light_blue_tint3);
+  font-weight: 400;
+  height: 100%;
+  width: 100%;
+  justify-content: center;
+}
 
 .ui.rcpch_purple.button {
   border-radius: 0% !important;

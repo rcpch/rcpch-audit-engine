@@ -195,7 +195,7 @@ def publish_kpis(request, organisation_id):
     return render(
         request=request,
         template_name="epilepsy12/partials/organisation/publish_button.html",
-        context={"selected_organisation": Organisation.objects.get(pk=organisation_id)},
+        context={"selected_organisation": Organisation.objects.get(pk=organisation_id), "publish_success": True},
     )
 
 
@@ -265,6 +265,7 @@ def selected_trust_kpis(request, organisation_id, access):
             "name"
         ),  # for public view dropdown
         "last_published_date": last_published_date,
+        "publish_success": False
     }
 
     return render(
