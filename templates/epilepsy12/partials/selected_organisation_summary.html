@@ -31,16 +31,8 @@
                             View All {{selected_organisation.name}} Children
                         </a>
                     </div>
-                    <div class="column">
-                        <button 
-                            class='ui fluid rcpch_danger button'
-                            hx-get="{% url 'selected_trust_kpis' organisation_id=selected_organisation.pk access='private' %}"
-                            name="publish"
-                            hx-trigger="click">
-                            <!-- TODO needs implementing POST call back to update KPIAggregation model open_access=True -->
-                            Publish
-                            <i class="htmx-indicator spinner loading icon"></i>
-                        </button>
+                    <div class="column" id="publish_button">
+                        {% include './organisation/publish_button.html' with selected_organisation=selected_organisation %}
                     </div>
             
                 {% else %}

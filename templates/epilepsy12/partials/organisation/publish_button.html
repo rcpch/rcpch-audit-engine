@@ -1,0 +1,12 @@
+<button 
+    class='ui fluid rcpch_danger button'
+    hx-get="{% url 'publish_kpis' organisation_id=selected_organisation.pk %}"
+    name="publish"
+    hx-target="#publish_button"
+    hx-trigger="click"
+    _="on htmx:afterRequest put 'Hello' into me"
+>
+    Publish
+    <i class="htmx-indicator spinner loading icon"></i>
+</button>
+<div id="publishedResult" class="ui rcpch_pink fluid label">Published!</div>
