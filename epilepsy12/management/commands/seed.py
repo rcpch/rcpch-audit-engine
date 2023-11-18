@@ -2,6 +2,7 @@
 from random import randint, choice
 from datetime import date
 from random import randint
+from pprint import pprint
 
 import nhs_number
 
@@ -166,9 +167,8 @@ def complete_registrations(verbose=True):
         create_epilepsy12_record(registration_instance=registration, verbose=verbose)
 
 
-def insert_old_pt_data():
-
-    COHORT_NUMBER = 6
+def insert_old_pt_data(csv_path="data.csv"):
+    """Seed function to read in Netsolving patient data and insert those Cases inside Epilepsy12."""
 
     print(
         "\033[33m",
@@ -176,7 +176,7 @@ def insert_old_pt_data():
         "\033[33m",
     )
 
-    data_for_db = load_and_prep_data(csv_path="epilepsy12/management/commands/data.csv")
+    data_for_db = load_and_prep_data(csv_path=csv_path)
 
     print(
         "\033[33m",
@@ -184,71 +184,96 @@ def insert_old_pt_data():
         "\033[33m",
     )
 
-    seeding_error_report = []
-
-    for record in data_for_db:
+    seeding_error_report = {}
+    total_records = len(data_for_db)
+    for ix, record in enumerate(data_for_db):
+        print("-" * 10, f"On Record {ix} / {total_records}", "-" * 10)
         # Validation steps
         if not nhs_number.is_valid(record["nhs_number"]):
             reason = "Invalid NHS number"
-            print(f'Record: {record["nhs_number"]} - { reason } - Skipping insertion...')
-            seeding_error_report += [ reason, record ]
+            print(
+                f'Record: {record["nhs_number"]} - { reason } - Skipping insertion...'
+            )
+            seeding_error_report[f"{ix}-ERROR"] = {
+                "reason": reason,
+                "record": record,
+            }
             continue
 
         if not is_valid_postcode(record["postcode"]):
             reason = "Invalid postcode"
-            print(f'Record: {record["nhs_number"]} - { reason } - Skipping insertion...')
-            seeding_error_report += [ reason, record ]
-
-
-        if Case.objects.filter(nhs_number=record["nhs_number"]).exists():
             print(
-                f'{Case.objects.get(nhs_number=record["nhs_number"]).nhs_number} already exists.'
+                f'Record: {record["nhs_number"]} - { reason } - Skipping insertion...'
             )
-            existing_case = Case.objects.get(nhs_number=record["nhs_number"])
-            print(existing_case)
-            # compare inserted_case with existing_case
-            # if identical, do nothing
-            # if different, update in place
+            seeding_error_report[f"{ix}-ERROR"] = {
+                "reason": reason,
+                "record": record,
+            }
+            continue
 
-            # inserted_case = Case.objects.create(
-            #     locked=False,
-            #     nhs_number=record["nhs_number"],
-            #     first_name=record["first_name"],
-            #     surname=record["surname"],
-            #     sex=record["sex"],
-            #     date_of_birth=record["date_of_birth"],
-            #     postcode=record["postcode"],
-            #     ethnicity=record["ethnicity"],
-            # )
+        # If the Case already exists, we delete as we later re-insert the most recent record
+        duplicate_case = Case.objects.filter(nhs_number=record["nhs_number"])
+        if duplicate_case.exists():
+            print("found duplicate case")
+            found_duplicate_case = duplicate_case.first()
+            print(f"{found_duplicate_case.nhs_number} already exists. Deleting...")
+            seeding_error_report[f"{ix}-INFO-Case"] = {
+                "reason": f"{found_duplicate_case.nhs_number} Record already exists. Deleted and re-inserted.",
+                "record": record,
+            }
 
-        # NOTE TODO: remove TEMP!!!
-        if Site.objects.filter(case=inserted_patient).exists():
-            print(
-                f"{Site.objects.get(case=inserted_patient)} already exists. Deleting for debug..."
-            )
-            Site.objects.get(case=inserted_patient).delete()
+            # This Case will also have the Site. If associated Site already exists, we delete as we later create a fresh one
+            duplicate_site = Site.objects.filter(case=found_duplicate_case)
+            if duplicate_site.exists():
+                found_duplicate_site = duplicate_site.first()
+                print(f"{found_duplicate_site} already exists. Deleting...")
+                seeding_error_report[f"{ix}-INFO-Site"] = {
+                    "reason": f"{found_duplicate_site} already exists. Deleted and re-inserted.",
+                    "record": record,
+                }
+
+                found_duplicate_site.delete()
+
+            # Delete this last as required for the Site deletion
+            found_duplicate_case.delete()
+
+        inserted_case = Case.objects.create(
+            locked=False,
+            nhs_number=record["nhs_number"],
+            first_name=record["first_name"],
+            surname=record["surname"],
+            sex=record["sex"],
+            date_of_birth=record["date_of_birth"],
+            postcode=record["postcode"],
+            ethnicity=record["ethnicity"],
+        )
 
         # Get organisation
         try:
             organisation = Organisation.objects.get(ods_code=record["OrganisationCode"])
         except Exception as e:
             print(
-                f'Couldn\'t find organisation for {record["OrganisationCode"]}. Skipping {record["nhs_number"]}'
+                f'Couldn\'t find organisation for {record["OrganisationCode"]}. Skipping {record["nhs_number"]}. Error: {e}'
             )
+            seeding_error_report[f"{ix}-ERROR"] = {
+                "reason": f"Organisation {record['OrganisationCode']} could not be found. Related Site for {inserted_case.nhs_number} was not created.",
+                "record": record,
+            }
+            continue
 
         # allocate the child to the organisation supplied as primary E12 centre
         Site.objects.create(
             site_is_actively_involved_in_epilepsy_care=True,
             site_is_primary_centre_of_epilepsy_care=True,
             organisation=organisation,
-            case=inserted_patient,
+            case=inserted_case,
         )
 
-        print(
-            f"Successfully inserted {inserted_patient.first_name} {inserted_patient.surname}"
-        )
+        print(f"Successfully inserted {inserted_case.nhs_number} into Epilepsy12.")
 
-    print(seeding_error_report)
+    print("ALL ERRORS: ")
+    pprint(seeding_error_report)
+
 
 def image():
     return """

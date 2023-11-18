@@ -52,6 +52,7 @@ def map_sex(sex_series):
 def map_date(date_series):
     return pd.to_datetime(date_series, format="%d/%m/%Y").dt.date
 
+
 def map_merged_trusts(df):
     merged_trust_map = {
         "City Hospitals Sunderland NHS Foundation Trust": "R0B",
@@ -62,11 +63,9 @@ def map_merged_trusts(df):
 
     # Updating SiteCode based on SiteName. Ugly, but works.
     for hospital, new_code in merged_trust_map.items():
-        df.loc[df['SiteName'] == hospital, 'SiteCode'] = new_code
+        df.loc[df["SiteName"] == hospital, "SiteCode"] = new_code
 
-    return df['SiteCode']
-
-
+    return df["SiteCode"]
 
 
 def clean_nhs_number(nhs_num_series):
@@ -75,7 +74,6 @@ def clean_nhs_number(nhs_num_series):
 
 def load_and_prep_data(csv_path: str) -> list[dict]:
     """Takes in .csv of old patient data, cleans and maps to E12 data model, returns list of dictionaries, where each dictionary is a patient row, keys are column names, values are values."""
-    print(pd.read_csv(csv_path).dtypes)
 
     df = (
         pd.read_csv(csv_path)
@@ -84,7 +82,7 @@ def load_and_prep_data(csv_path: str) -> list[dict]:
             nhs_number=lambda _df: clean_nhs_number(_df["s01nhschinumber"]),
             ethnicity=lambda _df: map_ethnicities(_df["s01ethnicity"]),
             postcode=lambda _df: (
-                _df["s02homepostcodeout"] + _df["s02homepostcodein"]
+                _df["s02homepostcodeout"].str.strip() + _df["s02homepostcodein"].str.strip()
             ).str.replace(" ", ""),
             date_of_birth=lambda _df: map_date(_df["s01dobdateonly"]),
             sex=lambda _df: map_sex(_df["s01gender"]),
@@ -108,11 +106,14 @@ def load_and_prep_data(csv_path: str) -> list[dict]:
         .astype({"sex": "int8"})
     )
 
+    # ORGCODE TYPO FIX
+    df["OrganisationCode"] = df["OrganisationCode"].replace({"C0X3P":"COX3P"})
+
     print("Cleaned data:")
     print(df.dtypes)
     print(df.head())
 
-    return df.to_dict(orient="records")
+    return df.iloc[90:100].to_dict(orient="records")
 
 
 def get_default_org_from_record(record):
