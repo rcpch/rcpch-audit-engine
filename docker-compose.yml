@@ -21,6 +21,7 @@ services:
       - ./Caddyfile:/etc/caddy/Caddyfile
       - ./staticdocs:/srv/staticdocs
 
+
   # Django web application
   django: &django
     <<: *global # this will inherit all the envs from x-global-environment
@@ -30,6 +31,7 @@ services:
       - redis
     volumes:
       - .:/app/
+      - ../data.csv:/app/data.csv # patient data file is stored in directory 1 higher than this git-tracked one for safety. This pulls it inside container.
     command: >
       sh -c "python manage.py collectstatic --noinput &&
         python manage.py migrate &&
