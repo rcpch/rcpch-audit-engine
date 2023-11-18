@@ -5,8 +5,7 @@ from django.utils.translation import gettext_lazy as _
 from .help_text_mixin import HelpTextMixin
 
 # RCPCH imports
-from epilepsy12.constants import EnumAbstractionLevel
-from django.apps import apps
+from epilepsy12.constants import EnumAbstractionLevel, CAN_PUBLISH_EPILEPSY12_DATA
 
 
 class BaseKPIMetrics(models.Model):
@@ -499,6 +498,10 @@ class BaseKPIAggregation(BaseKPIMetrics, HelpTextMixin):
         abstract = True
         verbose_name = _("Base KPI Aggregation Model")
         verbose_name_plural = _("Base KPI Aggregation Models")
+        # custom permissions for KPIAggregation class
+        permissions = [
+            CAN_PUBLISH_EPILEPSY12_DATA
+        ]
 
     def get_pct_passed_kpi(self, kpi_name: str) -> float:
         passed = getattr(self, f"{kpi_name}_passed")

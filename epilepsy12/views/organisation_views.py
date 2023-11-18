@@ -3,8 +3,8 @@
 # third party libraries
 from django.shortcuts import render
 from django.urls import reverse
+from django.contrib.auth.decorators import permission_required
 from django_htmx.http import HttpResponseClientRedirect
-from django.contrib import messages
 
 # E12 imports
 from ..decorator import user_may_view_this_organisation, login_and_otp_required
@@ -179,6 +179,7 @@ def selected_organisation_summary(request, organisation_id):
 
 @login_and_otp_required()
 @user_may_view_this_organisation()
+@permission_required("epilepsy12.can_publish_epilepsy12_data", raise_exception=True)
 def publish_kpis(request, organisation_id):
     """
     call back from selected_organisation_summary page on click of publish button
