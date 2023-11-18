@@ -113,7 +113,7 @@ def load_and_prep_data(csv_path: str) -> list[dict]:
     print(df.dtypes)
     print(df.head())
 
-    return df.iloc[90:100].to_dict(orient="records")
+    return df.to_dict(orient="records")
 
 
 def get_default_org_from_record(record):
