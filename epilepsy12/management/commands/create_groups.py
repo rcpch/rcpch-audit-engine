@@ -252,6 +252,14 @@ def groups_seeder(
             "codename": CAN_APPROVE_ELIGIBILITY[0],
             "content_type": registrationContentType,
         },
+        {
+            "codename": CAN_LOCK_CHILD_CASE_DATA_FROM_EDITING[0],
+            "content_type": caseContentType,
+        },
+        {
+            "codename": CAN_UNLOCK_CHILD_CASE_DATA_FROM_EDITING[0],
+            "content_type": caseContentType,
+        },
     ]
 
     """
