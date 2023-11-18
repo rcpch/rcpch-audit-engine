@@ -93,7 +93,7 @@ CAN_APPROVE_ELIGIBILITY = (
 
 CAN_REGISTER_CHILD_IN_EPILEPSY12 = (
     "can_register_child_in_epilepsy12",
-    "Can register child in Epilepsy12. (A cohort number is automatically allocaeted)",
+    "Can register child in Epilepsy12. (A cohort number is automatically allocated)",
 )
 # TODO #512 unregistering a child in Epilepsy12 is currently not implemented
 CAN_UNREGISTER_CHILD_IN_EPILEPSY12 = (

@@ -498,10 +498,6 @@ class BaseKPIAggregation(BaseKPIMetrics, HelpTextMixin):
         abstract = True
         verbose_name = _("Base KPI Aggregation Model")
         verbose_name_plural = _("Base KPI Aggregation Models")
-        # custom permissions for KPIAggregation class
-        permissions = [
-            CAN_PUBLISH_EPILEPSY12_DATA
-        ]
 
     def get_pct_passed_kpi(self, kpi_name: str) -> float:
         passed = getattr(self, f"{kpi_name}_passed")
@@ -570,6 +566,10 @@ class OrganisationKPIAggregation(BaseKPIAggregation):
         verbose_name_plural = _("Organisation KPI Aggregation Models")
         ordering = [
             Upper("abstraction_name"),
+        ]
+        # custom permissions for KPIAggregation class
+        permissions = [
+            CAN_PUBLISH_EPILEPSY12_DATA
         ]
 
     def get_abstraction_level(self) -> str:

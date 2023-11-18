@@ -42,7 +42,7 @@ from epilepsy12.models import (
     Keyword,
     Site,
     Epilepsy12User,
-    BaseKPIAggregation
+    OrganisationKPIAggregation
 )
 
 
@@ -72,7 +72,7 @@ def groups_seeder(
     keywordContentType = ContentType.objects.get_for_model(Keyword)
     auditprogressContentType = ContentType.objects.get_for_model(AuditProgress)
     epilepsy12userContentType = ContentType.objects.get_for_model(Epilepsy12User)
-    baseKPIAggregationContentType = ContentType.objects.get_for_model(BaseKPIAggregation)
+    organisationKPIAggregationContentType = ContentType.objects.get_for_model(OrganisationKPIAggregation)
 
     """
     Note view permissions include viewing users, but not creating, updating or deleting them
@@ -245,12 +245,16 @@ def groups_seeder(
         {"codename": "delete_site", "content_type": siteContentType},
         # custom
         {
-            "codename": "can_register_child_in_epilepsy12",
+            "codename": CAN_REGISTER_CHILD_IN_EPILEPSY12[0],
             "content_type": registrationContentType,
         },
         {
             "codename": CAN_APPROVE_ELIGIBILITY[0],
             "content_type": registrationContentType,
+        },
+        {
+            "codename": CAN_OPT_OUT_CHILD_FROM_INCLUSION_IN_AUDIT[0],
+            "content_type": caseContentType,
         },
         {
             "codename": CAN_LOCK_CHILD_CASE_DATA_FROM_EDITING[0],
@@ -259,6 +263,10 @@ def groups_seeder(
         {
             "codename": CAN_UNLOCK_CHILD_CASE_DATA_FROM_EDITING[0],
             "content_type": caseContentType,
+        },
+        {
+            "codename": CAN_ALLOCATE_EPILEPSY12_LEAD_CENTRE[0],
+            "content_type": siteContentType,
         },
     ]
 
@@ -283,8 +291,20 @@ def groups_seeder(
             "content_type": epilepsy12userContentType,
         },
         {
+            "codename": CAN_DELETE_EPILEPSY12_LEAD_CENTRE[0],
+            "content_type": siteContentType,
+        },
+        {
+            "codename": CAN_EDIT_EPILEPSY12_LEAD_CENTRE[0],
+            "content_type": siteContentType,
+        },
+        {
             "codename": CAN_TRANSFER_EPILEPSY12_LEAD_CENTRE[0],
             "content_type": siteContentType,
+        },
+        {
+            "codename": CAN_UNREGISTER_CHILD_IN_EPILEPSY12[0],
+            "content_type": registrationContentType,
         },
     ]
 
@@ -300,36 +320,8 @@ def groups_seeder(
     """
     EPILEPSY12_AUDIT_TEAM_ACCESS_PERMISSIONS = [
         {
-            "codename": "can_unregister_child_in_epilepsy12",
-            "content_type": registrationContentType,
-        },
-        {
-            "codename": CAN_LOCK_CHILD_CASE_DATA_FROM_EDITING[0],
-            "content_type": caseContentType,
-        },
-        {
-            "codename": CAN_UNLOCK_CHILD_CASE_DATA_FROM_EDITING[0],
-            "content_type": caseContentType,
-        },
-        {
-            "codename": CAN_OPT_OUT_CHILD_FROM_INCLUSION_IN_AUDIT[0],
-            "content_type": caseContentType,
-        },
-        {
-            "codename": CAN_DELETE_EPILEPSY12_LEAD_CENTRE[0],
-            "content_type": siteContentType,
-        },
-        {
-            "codename": CAN_EDIT_EPILEPSY12_LEAD_CENTRE[0],
-            "content_type": siteContentType,
-        },
-        {
-            "codename": CAN_ALLOCATE_EPILEPSY12_LEAD_CENTRE[0],
-            "content_type": siteContentType,
-        },
-        {
             "codename": CAN_PUBLISH_EPILEPSY12_DATA[0],
-            "content_type":baseKPIAggregationContentType,
+            "content_type": organisationKPIAggregationContentType,
         },
         {"codename": "change_organisation", "content_type": organisationContentType},
         {"codename": "add_organisation", "content_type": organisationContentType},
