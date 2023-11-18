@@ -184,10 +184,15 @@ def insert_old_pt_data(csv_path="data.csv"):
         "\033[33m",
     )
 
+    cases_to_create = []
+    sites_to_create = []
+
+    current_nhs_numbers = set(Case.objects.all().values_list("nhs_number", flat=True))
+
     seeding_error_report = {}
     total_records = len(data_for_db)
     for ix, record in enumerate(data_for_db):
-        print("-" * 10, f"On Record {ix} / {total_records}", "-" * 10)
+        print("-" * 10, f"On Record {ix} / {total_records-1}", "-" * 10)
         # Validation steps
         if not nhs_number.is_valid(record["nhs_number"]):
             reason = "Invalid NHS number"
@@ -212,17 +217,17 @@ def insert_old_pt_data(csv_path="data.csv"):
             continue
 
         # If the Case already exists, we delete as we later re-insert the most recent record
-        duplicate_case = Case.objects.filter(nhs_number=record["nhs_number"])
-        if duplicate_case.exists():
-            print("found duplicate case")
-            found_duplicate_case = duplicate_case.first()
+        if record["nhs_number"] in current_nhs_numbers:
+            found_duplicate_case = Case.objects.filter(
+                nhs_number=record["nhs_number"]
+            ).first()
             print(f"{found_duplicate_case.nhs_number} already exists. Deleting...")
             seeding_error_report[f"{ix}-INFO-Case"] = {
                 "reason": f"{found_duplicate_case.nhs_number} Record already exists. Deleted and re-inserted.",
                 "record": record,
             }
 
-            # This Case will also have the Site. If associated Site already exists, we delete as we later create a fresh one
+            # This Case should also have the Site. If associated Site already exists, we delete as we later create a fresh one
             duplicate_site = Site.objects.filter(case=found_duplicate_case)
             if duplicate_site.exists():
                 found_duplicate_site = duplicate_site.first()
@@ -237,7 +242,7 @@ def insert_old_pt_data(csv_path="data.csv"):
             # Delete this last as required for the Site deletion
             found_duplicate_case.delete()
 
-        inserted_case = Case.objects.create(
+        inserted_case = Case(
             locked=False,
             nhs_number=record["nhs_number"],
             first_name=record["first_name"],
@@ -247,6 +252,8 @@ def insert_old_pt_data(csv_path="data.csv"):
             postcode=record["postcode"],
             ethnicity=record["ethnicity"],
         )
+
+        cases_to_create.append(inserted_case)
 
         # Get organisation
         try:
@@ -262,14 +269,27 @@ def insert_old_pt_data(csv_path="data.csv"):
             continue
 
         # allocate the child to the organisation supplied as primary E12 centre
-        Site.objects.create(
+        inserted_site = Site(
             site_is_actively_involved_in_epilepsy_care=True,
             site_is_primary_centre_of_epilepsy_care=True,
             organisation=organisation,
             case=inserted_case,
         )
 
-        print(f"Successfully inserted {inserted_case.nhs_number} into Epilepsy12.")
+        sites_to_create.append(inserted_site)
+
+        print(f"Added {inserted_case.nhs_number} for creation in db.")
+
+    print(f"Creating {len(cases_to_create)} Cases...")
+    Case.objects.bulk_create(cases_to_create)
+    print(f"Creating {len(sites_to_create)} Sites...")
+    Site.objects.bulk_create(sites_to_create)
+    
+    # .bulk_create() does not call Case.save() which calculates and saves the index_of_multiple_deprivation_quintile. So do it manually
+    print("Saving all Cases to calculate IMD...")
+    for case_to_save in Case.objects.all():
+        print(f'Saving {case_to_save.id}...')
+        case_to_save.save()
 
     print("ALL ERRORS: ")
     pprint(seeding_error_report)
