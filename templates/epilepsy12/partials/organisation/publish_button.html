@@ -1,0 +1,33 @@
+{% if publish_success %}
+    <div id="publishedResult" class="ui fluid rcpch_info disabled button">Published just now...</div>
+{%else%}
+    <button 
+        {% if perms.epilepsy12.can_publish_epilepsy12_data %}
+            class='ui fluid rcpch_danger button'
+        {% else %}
+            class='ui fluid disabled rcpch_danger button'
+        {% endif %}
+        style="height: 100%;"
+        hx-get="{% url 'publish_kpis' organisation_id=selected_organisation.pk %}"
+        name="publish"
+        hx-target="#publish_button"
+        hx-trigger="click"
+        _= "on htmx:confirm(issueRequest)
+                halt the event
+                call Swal.fire({
+                  title: 'Confirmation Required',
+                  text: 'This will all data for this Epilepsy12 cohort to the public facing website.',
+                  icon: 'warning',
+                  iconColor: '#e00087',
+                  showCancelButton: true,
+                  confirmButtonColor: '#11a7f2',
+                  cancelButtonColor: '#e60700',
+                  confirmButtonText: 'Publish'
+                })
+                if result.isConfirmed issueRequest()
+                end
+                      ">
+        Publish
+        <i class="htmx-indicator spinner loading icon"></i>
+    </button>
+{% endif %}

@@ -165,10 +165,6 @@ ul {
   padding: 2rem;
 }
 
-.ui.rcpch.container.welcome {
-  /* Test padding here */
-}
-
 @media only screen and (min-width: 1200px) {
   .ui.container.rcpch.main_content {
     width: 1400px;
@@ -705,6 +701,16 @@ div.ui.card > div.content > div.organisation_address_container {
   background-color: var(--rcpch_light_blue);
   border-color: var(--rcpch_light_blue);
   font-weight: 400;
+}
+.ui.rcpch_info.button {
+  border-radius: 0% !important;
+  color: black;
+  background-color: var(--rcpch_light_blue_tint3);
+  border-color: var(--rcpch_light_blue_tint3);
+  font-weight: 400;
+  height: 100%;
+  width: 100%;
+  justify-content: center;
 }
 
 .ui.rcpch_purple.button {
@@ -2197,4 +2203,17 @@ div.sixteen.wide.column.search_field_wrapper > .ui.rcpch.icon.input {
 
 .active_transfer{
   background-color: var(--rcpch_purple_light_tint2);
+}
+
+.image403{
+  border: 10px solid var(--rcpch_light_blue);
+  border-radius: 5%;
+  width: fit-content;
+  height: auto;
+}
+
+.ui.rcpch_403.segment {
+  border-bottom: 0 none !important;
+  box-shadow: none;
+  border: 0px;
 }

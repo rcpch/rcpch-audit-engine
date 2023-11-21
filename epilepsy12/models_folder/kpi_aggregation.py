@@ -5,8 +5,7 @@ from django.utils.translation import gettext_lazy as _
 from .help_text_mixin import HelpTextMixin
 
 # RCPCH imports
-from epilepsy12.constants import EnumAbstractionLevel
-from django.apps import apps
+from epilepsy12.constants import EnumAbstractionLevel, CAN_PUBLISH_EPILEPSY12_DATA
 
 
 class BaseKPIMetrics(models.Model):
@@ -567,6 +566,10 @@ class OrganisationKPIAggregation(BaseKPIAggregation):
         verbose_name_plural = _("Organisation KPI Aggregation Models")
         ordering = [
             Upper("abstraction_name"),
+        ]
+        # custom permissions for KPIAggregation class
+        permissions = [
+            CAN_PUBLISH_EPILEPSY12_DATA
         ]
 
     def get_abstraction_level(self) -> str:
