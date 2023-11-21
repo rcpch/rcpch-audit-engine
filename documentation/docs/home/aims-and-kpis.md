@@ -8,14 +8,14 @@ author: Dr Marcus Baw
 1. Paediatrician with expertise in epilepsies
 2. Epilepsy specialist nurse
 3. a. Tertiary input
-3. b. Epilepsy surgery referral
+   b. Epilepsy surgery referral
 4. ECG
 5. MRI brain
 6. Assessment of mental health issues
 7. Mental health support
 8. Sodium valproate
-9. a. Care planning agreement
-9. b. Care planning content
+9. a.  Care planning agreement
+   b. Care planning content
 10. School individual health care plan
 
 ## Quality Improvement
