@@ -276,4 +276,4 @@ def insert_old_pt_data(csv_path: str = "data.csv"):
         case_to_save.save()
 
     print("ALL ERRORS: ")
-    pprint(seeding_error_report)
+    print(seeding_error_report)
