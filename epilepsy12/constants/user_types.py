@@ -93,7 +93,7 @@ CAN_APPROVE_ELIGIBILITY = (
 
 CAN_REGISTER_CHILD_IN_EPILEPSY12 = (
     "can_register_child_in_epilepsy12",
-    "Can register child in Epilepsy12. (A cohort number is automatically allocaeted)",
+    "Can register child in Epilepsy12. (A cohort number is automatically allocated)",
 )
 # TODO #512 unregistering a child in Epilepsy12 is currently not implemented
 CAN_UNREGISTER_CHILD_IN_EPILEPSY12 = (
@@ -121,6 +121,12 @@ CAN_DELETE_EPILEPSY12_LEAD_CENTRE = (
     "Can delete Epilepsy12 lead centre.",
 )
 
+# Organisation
+CAN_PUBLISH_EPILEPSY12_DATA = (
+    "can_publish_epilepsy12_data",
+    "Can publish epilepsy12 data to public facing site.",
+)
+
 CAN_CONSENT_TO_AUDIT_PARTICIPATION = (
     "can_consent_to_audit_participation",
     "Can consent to participating in Epilepsy12.",
@@ -138,4 +144,5 @@ PERMISSIONS = (
     CAN_TRANSFER_EPILEPSY12_LEAD_CENTRE,
     CAN_DELETE_EPILEPSY12_LEAD_CENTRE,
     CAN_CONSENT_TO_AUDIT_PARTICIPATION,
+    CAN_PUBLISH_EPILEPSY12_DATA
 )

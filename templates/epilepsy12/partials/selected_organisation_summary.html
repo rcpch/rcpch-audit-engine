@@ -16,18 +16,39 @@
                 </div>
             </div>
         {% endif %}
+
             
-            <div class="fluid row stackable org_view_all_buttons_wrapper">
-                <div class="eight wide column">
-                    <a class="ui rcpch_grey fluid button" href="{% url 'epilepsy12_user_list' organisation_id=selected_organisation.pk %}">
-                        View All {{selected_organisation.name}} Epilepsy12 Staff
-                </a>
-            </div>
-            <div class="eight wide  column">
-                <a class="ui rcpch_primary fluid button" href="{% url 'cases' organisation_id=selected_organisation.pk %}">
-                    View All {{selected_organisation.name}} Children
-                    </a>
-            </div>
+            <div class="fluid row stackable org_view_all_buttons_wrapper three column grid">
+                {% if user.is_rcpch_audit_team_member or user.is_superuser %}
+                        <!-- Only RCPCH Audit team members and superusers can publish aggregations to the open access page -->
+                    <div class="column">
+                        <a class="ui rcpch_grey fluid button" href="{% url 'epilepsy12_user_list' organisation_id=selected_organisation.pk %}">
+                            View All {{selected_organisation.name}} Epilepsy12 Staff
+                        </a>
+                    </div>
+                    <div class="column">
+                        <a class="ui rcpch_primary fluid button" href="{% url 'cases' organisation_id=selected_organisation.pk %}">
+                            View All {{selected_organisation.name}} Children
+                        </a>
+                    </div>
+                    <div class="column" id="publish_button">
+                        {% include './organisation/publish_button.html' with selected_organisation=selected_organisation publish_success=publish_success %}
+                    </div>
+            
+                {% else %}
+
+                    <div class="eight wide column">
+                        <a class="ui rcpch_grey fluid button" href="{% url 'epilepsy12_user_list' organisation_id=selected_organisation.pk %}">
+                            View All {{selected_organisation.name}} Epilepsy12 Staff
+                        </a>
+                    </div>
+                    <div class="eight wide  column">
+                        <a class="ui rcpch_primary fluid button" href="{% url 'cases' organisation_id=selected_organisation.pk %}">
+                            View All {{selected_organisation.name}} Children
+                        </a>
+                    </div>
+
+                {% endif %}
         </div>
 
         <div class='sixteen wide fluid column'>
