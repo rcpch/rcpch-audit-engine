@@ -23,7 +23,7 @@ class Site(TimeStampAbstractBaseClass, UserStampAbstractBaseClass):
     site_is_actively_involved_in_epilepsy_care as True will have a unique organisation trust, which can
     have more than one role (eg can be neurology and surgery lead together)
     It is possible for a registration to have two sites each with the same organisation, however,
-    if one of those organisation trusts is nolonger actively involved in the care.
+    if one of those organisation trusts is no longer actively involved in the care.
 
     Each site can have more than one role
     """
@@ -89,4 +89,4 @@ class Site(TimeStampAbstractBaseClass, UserStampAbstractBaseClass):
         ]
 
     def __str__(self) -> str:
-        return self.organisation.trust.name
+        return self.organisation.trust.name if self.organisation.trust else self.organisation.local_health_board.name # Welsh orgs have no Trust

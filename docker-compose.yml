@@ -21,6 +21,7 @@ services:
       - ./Caddyfile:/etc/caddy/Caddyfile
       - ./staticdocs:/srv/staticdocs
 
+
   # Django web application
   django: &django
     <<: *global # this will inherit all the envs from x-global-environment

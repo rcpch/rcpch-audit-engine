@@ -141,6 +141,7 @@ celerybeat-schedule
 staticdocs
 
 data/*
+data.csv
 
 # exclude github actions local testing secret file
 .secrets
