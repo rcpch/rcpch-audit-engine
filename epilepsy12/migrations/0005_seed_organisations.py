@@ -34,7 +34,7 @@ def seed_organisations(apps, schema_editor):
     england = Country.objects.get(boundary_identifier="E92000001")
     wales = Country.objects.get(boundary_identifier="W92000004")
 
-    if Organisation.objects.all().count() == 329:
+    if Organisation.objects.all().count() >= 330:
         print(
             "\033[31m",
             "329 RCPCH organisations already seeded. Skipping...",

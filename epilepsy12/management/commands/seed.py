@@ -1,8 +1,8 @@
 # python
 from random import randint, choice
 from datetime import date
-from dateutil.relativedelta import relativedelta
 from random import randint
+
 
 from django.core.management.base import BaseCommand
 
@@ -14,15 +14,11 @@ from ...general_functions import (
 from ...constants import (
     ETHNICITIES,
 )
-from ...models import (
-    Organisation,
-    Case,
-    Site,
-    Registration,
-)
+from ...models import Organisation, Case, Registration
 from .create_groups import groups_seeder
 from .create_e12_records import create_epilepsy12_record, create_registrations
 from epilepsy12.tests.factories import E12CaseFactory
+from epilepsy12.tasks import insert_old_pt_data, async_insert_old_pt_data
 
 
 class Command(BaseCommand):
@@ -60,13 +56,19 @@ class Command(BaseCommand):
             self.stdout.write("deleting all groups/permissions and reallocating...")
         elif options["mode"] == "add_existing_medicines_as_foreign_keys":
             self.stdout.write("replacing medicines with medicine entity...")
+        elif options["mode"] == "upload_old_patient_data":
+            self.stdout.write("Uploading old patient data.")
+            insert_old_pt_data()
+        elif options["mode"] == "async_upload_old_patient_data":
+            self.stdout.write("CELERY: uploading old patient data.")
+            async_insert_old_pt_data.delay()
 
         else:
             self.stdout.write("No options supplied...")
-        print("\033[38;2;17;167;142m")
-        self.stdout.write(image())
-        print("\033[38;2;17;167;107m")
-        self.stdout.write("done.")
+        # print("\033[38;2;17;167;142m")
+        # self.stdout.write(image())
+        # print("\033[38;2;17;167;107m")
+        # self.stdout.write("done.")
 
 
 def run_dummy_cases_seed(verbose=True, cases=50):
@@ -105,7 +107,12 @@ def run_dummy_cases_seed(verbose=True, cases=50):
         seed_female = True if sex == 2 else False
         random_ethnicity = randint(0, len(choice(ETHNICITIES)))
         ethnicity = ETHNICITIES[random_ethnicity][0]
-        postcode = return_random_postcode(country_boundary_identifier=org.country.boundary_identifier)
+        postcode = return_random_postcode(
+            country_boundary_identifier=org.country.boundary_identifier
+        )
+        postcode = return_random_postcode(
+            country_boundary_identifier=org.country.boundary_identifier
+        )
 
         E12CaseFactory.create_batch(
             num_cases_to_seed_in_org,

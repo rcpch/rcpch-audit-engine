@@ -3,16 +3,15 @@
 # third party libraries
 from django.shortcuts import render
 from django.urls import reverse
-from django.utils import timezone
+from django.contrib.auth.decorators import permission_required
 from django_htmx.http import HttpResponseClientRedirect
-from dateutil.relativedelta import relativedelta
 
 # E12 imports
 from ..decorator import user_may_view_this_organisation, login_and_otp_required
 from epilepsy12.constants import (
     INDIVIDUAL_KPI_MEASURES,
 )
-from epilepsy12.models import Organisation, KPI, Site
+from epilepsy12.models import Organisation, KPI, OrganisationKPIAggregation
 from ..common_view_functions import (
     cases_aggregated_by_sex,
     cases_aggregated_by_ethnicity,
@@ -37,7 +36,7 @@ def selected_organisation_summary_select(request):
     callback from organisation select in selected_organisation_summary
     redirects to new organisation url
     """
-    # if request.POST.get("selected_organisation_summary") is not None:
+
     selected_organisation = Organisation.objects.get(
         pk=request.POST.get("selected_organisation_summary_select")
     )
@@ -178,6 +177,29 @@ def selected_organisation_summary(request, organisation_id):
     )
 
 
+@login_and_otp_required()
+@user_may_view_this_organisation()
+@permission_required("epilepsy12.can_publish_epilepsy12_data", raise_exception=True)
+def publish_kpis(request, organisation_id):
+    """
+    call back from selected_organisation_summary page on click of publish button
+    Publishes all data held for current cohort publicly
+    Returns the publish button partial + success message
+    """
+
+    cohort_data = get_current_cohort_data()
+    # perform aggregations and update all the KPIAggregation models only for clinicians
+    asynchronously_aggregate_kpis_and_update_models_for_cohort_and_abstraction_level.delay(
+        cohort=cohort_data["cohort"], open_access=True
+    )
+
+    return render(
+        request=request,
+        template_name="epilepsy12/partials/organisation/publish_button.html",
+        context={"selected_organisation": Organisation.objects.get(pk=organisation_id), "publish_success": True},
+    )
+
+
 def selected_trust_kpis(request, organisation_id, access):
     """
     HTMX get request returning kpis.html 'Real-time Key Performance Indicator (KPI) Metrics' table.
@@ -188,13 +210,12 @@ def selected_trust_kpis(request, organisation_id, access):
     It then presents each abstraction level's KPIAggregation model.
 
     It is called by htmx get request from the kpi table, either on page load, or on click of the
-    refresh or publish buttons in the header. If the publish button is pressed, aggregations are run and the
-    open_access flag is set to true, making that data viewable to the general public
-    Otherwise, aggregations are run updating existing data but without setting the open_access flag to True
+    refresh button in the header.
 
     Params:
     organisation_id: the primary key for the organisation viewed
-    access: string, one of ["open", "private"]
+    access: string, one of ['open', 'private'] - ensure if refresh is called from public view, even if by someone logged in, only
+    public view data is seen
 
     This endpoint can be called from the public dashboard so protection happens within the view
     """
@@ -205,19 +226,6 @@ def selected_trust_kpis(request, organisation_id, access):
 
     if logged_in_user_may_access_this_organisation(request.user, organisation):
         # user is logged in and allowed to access this organisation
-
-        if access == "private":
-            # aggregation can only occur if logged in AND not in the open_access template
-
-            open_access = False  # aggregation flag: set to true if publishing this data for public view
-
-            if request.htmx.trigger_name == "publish" and request.user:
-                open_access = True
-
-            # perform aggregations and update all the KPIAggregation models only for clinicians
-            asynchronously_aggregate_kpis_and_update_models_for_cohort_and_abstraction_level.delay(
-                cohort=cohort, open_access=open_access
-            )
 
         # Gather relevant data specific for this view - still show only published data if this is public view
         all_data = get_all_kpi_aggregation_data_for_view(
@@ -235,6 +243,19 @@ def selected_trust_kpis(request, organisation_id, access):
     kpi_instance = KPI(organisation=organisation)
     kpi_names_list = list(kpi_instance.get_kpis().keys())
 
+    # Last publication date
+    last_published_kpi_aggregation = (
+        OrganisationKPIAggregation.objects.filter(
+            abstraction_relation=organisation, open_access=True
+        )
+        .order_by("-last_updated")
+        .first()
+    )
+    if last_published_kpi_aggregation:
+        last_published_date = last_published_kpi_aggregation.last_updated
+    else:
+        last_published_date = None
+
     context = {
         "organisation": organisation,
         "all_data": all_data,
@@ -244,6 +265,8 @@ def selected_trust_kpis(request, organisation_id, access):
         "organisation_list": Organisation.objects.all().order_by(
             "name"
         ),  # for public view dropdown
+        "last_published_date": last_published_date,
+        "publish_success": False
     }
 
     return render(
