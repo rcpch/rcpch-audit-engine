@@ -4,6 +4,7 @@ from typing import Literal, Union
 # Django Imports
 from django.utils.html import strip_tags
 from django.core.mail import send_mail, BadHeaderError
+from django.conf import settings
 
 # Third party imports
 from celery import shared_task, Celery
@@ -48,7 +49,7 @@ def asynchronously_send_email_to_recipients(
     try:
         send_mail(
             subject=subject,
-            from_email="admin@epilepsy12.rcpch.tech",
+            from_email=settings.DEFAULT_FROM_EMAIL,
             recipient_list=recipients,
             fail_silently=False,
             message=strip_tags(message),
