@@ -1614,10 +1614,13 @@ a.ui.button {
   border-radius: 0%;
   border-width: medium;
   border-color: var(--rcpch_purple);
+  display: flex;
+  justify-content: flex-end;
 }
 
 .ui.top.attached.rcpch_purple.clearing.segment > h5 {
   color: white;
+  font-size: large;
 }
 
 .ui.raised.attached.segment {
