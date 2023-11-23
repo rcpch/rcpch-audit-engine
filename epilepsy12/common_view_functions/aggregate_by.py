@@ -1,5 +1,5 @@
 from typing import Literal, Union
-
+from datetime import date
 
 # Django imports
 from django.apps import apps
@@ -268,8 +268,8 @@ def calculate_kpi_value_counts_queryset(
         # Filter out Welsh Cases from the value count
         kpi_value_counts = kpi_value_counts.exclude(
             registration__id__in=welsh_cases.values_list("registration")
-        ) 
-    
+        )
+
     # England HAS NO Local Health Boards
     if abstraction_level is EnumAbstractionLevel.LOCAL_HEALTH_BOARD:
         Case = apps.get_model("epilepsy12", "Case")
@@ -623,7 +623,10 @@ def get_all_kpi_aggregation_data_for_view(
 
 
 def _seed_all_aggregation_models() -> None:
-    from epilepsy12.general_functions import get_current_cohort_data
+    from epilepsy12.general_functions import (
+        dates_for_cohort,
+        cohort_number_from_first_paediatric_assessment_date,
+    )
 
     Organisation = apps.get_model("epilepsy12", "Organisation")
     OrganisationKPIAggregation = apps.get_model(
@@ -654,7 +657,7 @@ def _seed_all_aggregation_models() -> None:
 
     NationalKPIAggregation = apps.get_model("epilepsy12", "NationalKPIAggregation")
 
-    current_cohort = get_current_cohort_data()["cohort"]
+    current_cohort = cohort_number_from_first_paediatric_assessment_date(date.today())
 
     all_orgs = Organisation.objects.all().distinct()
     all_trusts = Trust.objects.all().distinct()

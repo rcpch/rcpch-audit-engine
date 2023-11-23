@@ -7,7 +7,8 @@ from random import randint
 from django.core.management.base import BaseCommand
 
 from ...general_functions import (
-    get_current_cohort_data,
+    cohort_number_from_first_paediatric_assessment_date,
+    dates_for_cohort,
     return_random_postcode,
     random_date,
 )
@@ -156,10 +157,11 @@ def complete_registrations(verbose=True):
             "Completing all the Epilepsy12 fields for the fictional cases...",
             "\033[33m",
         )
-    current_cohort = get_current_cohort_data()
+    current_cohort = cohort_number_from_first_paediatric_assessment_date(date.today())
+    current_cohort_data = dates_for_cohort(current_cohort)
     for registration in Registration.objects.all():
         registration.first_paediatric_assessment_date = random_date(
-            start=current_cohort["cohort_start_date"], end=date.today()
+            start=current_cohort_data["cohort_start_date"], end=date.today()
         )
         registration.eligibility_criteria_met = True
         registration.save()

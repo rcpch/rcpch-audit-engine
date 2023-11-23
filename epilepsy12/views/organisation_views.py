@@ -351,7 +351,7 @@ def selected_trust_select_kpi(request, organisation_id):
         # on page load there may be no kpi_name - default to paediatrician_with_experise_in_epilepsy
         kpi_name = INDIVIDUAL_KPI_MEASURES[0][0]
     kpi_name_title_case = value_from_key(key=kpi_name, choices=INDIVIDUAL_KPI_MEASURES)
-    cohort = get_current_cohort_data()["cohort"]
+    cohort = cohort_number_from_first_paediatric_assessment_date(date.today())
 
     all_data = get_all_kpi_aggregation_data_for_view(
         organisation=organisation, cohort=cohort, open_access=False
