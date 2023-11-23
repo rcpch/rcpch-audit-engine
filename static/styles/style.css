@@ -1635,6 +1635,11 @@ a.ui.button {
   color: var(--rcpch_white);
 }
 
+.all-kpis-header {
+  display: flex;
+  justify-content: flex-end;
+}
+
 .ui.bottom.attached.rcpch_footer.message {
   /* margin-top: -1em; */
   border-radius: 0%;
