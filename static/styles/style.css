@@ -906,14 +906,15 @@ a.ui.button {
 
 .ui.rcpch_light_blue.label {
   border-radius: 0% !important;
-  color: white;
-  background-color: var(--rcpch_light_blue);
+  color: black;
+  background-color: white;
   margin: 5px;
+  font-family: 'Montserrat-Bold';
+  font-size: large;
 }
 
 .topbar > .ui.rcpch_light_blue.label {
   margin:0%;
-  font-size: medium;
 }
 
 .ui.rcpch_purple.label {
