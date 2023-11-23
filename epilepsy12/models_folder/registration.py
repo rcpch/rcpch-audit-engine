@@ -50,16 +50,6 @@ class Registration(
         null=True,
     )
 
-    # this should deprecate
-    registration_close_date = models.DateField(
-        help_text={
-            "label": "First paediatric assessment closing date",
-            "reference": "Date on which the registration is due to close",
-        },
-        default=None,
-        null=True,
-    )
-
     # this should deprecate as can be calculated from cohort
     audit_submission_date = models.DateField(
         help_text={
@@ -125,8 +115,6 @@ class Registration(
             self.completed_first_year_of_care_date = (
                 self.first_paediatric_assessment_date + relativedelta(years=1)
             )
-            # these will deprecated
-            self.registration_close_date = cohort_data["cohort_end_date"]
             self.audit_submission_date = cohort_data["submission_date"]
 
         return super().save(*args, **kwargs)

@@ -392,7 +392,6 @@ def avoid_fields(model_instance):
             "registration",
             "epilepsycontext",
             "firstpaediatricassessment",
-            "registration_close_date",
             "completed_first_year_of_care_date",
             "audit_submission_date",
             "cohort",
