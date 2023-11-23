@@ -702,6 +702,20 @@ div.ui.card > div.content > div.organisation_address_container {
   border-color: var(--rcpch_light_blue);
   font-weight: 400;
 }
+
+.ui.rcpch_primary.button.jump {
+  margin: 5px;
+  width: 130.23px;
+  height: 25.98px;
+  font-size: .85714286rem;
+  white-space: normal;
+}
+
+.topbar {
+  display: flex !important;
+  justify-content: space-between;
+}
+
 .ui.rcpch_info.button {
   border-radius: 0% !important;
   color: black;
@@ -895,6 +909,11 @@ a.ui.button {
   color: white;
   background-color: var(--rcpch_light_blue);
   margin: 5px;
+}
+
+.topbar > .ui.rcpch_light_blue.label {
+  margin:0%;
+  font-size: medium;
 }
 
 .ui.rcpch_purple.label {
