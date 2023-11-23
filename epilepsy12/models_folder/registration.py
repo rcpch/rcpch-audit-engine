@@ -91,8 +91,11 @@ class Registration(
     def days_remaining_before_submission(self) -> int:
         """Returns remaining days between current datetime and submission datetime, minimum value 0."""
         if self.audit_submission_date:
-            remaining_dateime = self.audit_submission_date - self.get_current_date()
-            return remaining_dateime.days if remaining_dateime.days > 0 else 0
+            remaining_datetime = self.audit_submission_date - self.get_current_date()
+            if remaining_datetime.days is None or remaining_datetime.days < 0:
+                return 0
+            else:
+                return remaining_datetime.days
 
     # relationships
     case = models.OneToOneField("epilepsy12.Case", on_delete=models.PROTECT, null=True)
@@ -120,7 +123,7 @@ class Registration(
             )
             cohort_data = dates_for_cohort(self.cohort)
             self.completed_first_year_of_care_date = (
-                self.first_paediatric_assessment_date + relativedelta(year=1)
+                self.first_paediatric_assessment_date + relativedelta(years=1)
             )
             # these will deprecated
             self.registration_close_date = cohort_data["cohort_end_date"]

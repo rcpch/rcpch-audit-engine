@@ -78,7 +78,9 @@ def test_registration_custom_method_first_paediatric_assessment_date_one_year_on
             registration__first_paediatric_assessment_date=expected_input_output[0]
         ).registration
 
-        assert registration.registration_close_date == expected_input_output[1]
+        assert (
+            registration.completed_first_year_of_care_date == expected_input_output[1]
+        )
 
 
 @pytest.mark.django_db
@@ -132,13 +134,13 @@ def test_registration_days_remaining_before_submission(
     NOTE: if `audit_submission_date` is before today, returns 0.
     """
 
-    # submission date = 14/1/25, today = 30/11/22 776 days after today
+    # submission date = 9/1/24, today = 30/11/22 405 days after today (30/11/22)
     registration = e12_case_factory(
         registration__first_paediatric_assessment_date=date(
             2022, 1, 10
-        )  # cohort 6, submission date 14/1/25
+        )  # cohort 5, submission date 9/1/24
     ).registration
-    assert registration.days_remaining_before_submission == 776
+    assert registration.days_remaining_before_submission == 405
 
     # submission date = 2023-01-10, 41 days after today
     registration = e12_case_factory(
@@ -146,7 +148,7 @@ def test_registration_days_remaining_before_submission(
             2021, 1, 1
         )  # cohort 4, submission 10/1/2023
     ).registration
-    assert registration.days_remaining_before_submission == 0
+    assert registration.days_remaining_before_submission == 41
 
 
 @pytest.mark.xfail

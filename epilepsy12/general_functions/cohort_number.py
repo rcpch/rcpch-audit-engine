@@ -122,6 +122,10 @@ def cohort_number_from_first_paediatric_assessment_date(
     Returns the cohort number from the first paediatric assessment date
     """
 
+    if first_paediatric_assessment_date < date(year=2020, month=12, day=1):
+        # dates before start of cohort 5 inadmissable
+        return None
+
     if first_paediatric_assessment_date >= date(
         year=first_paediatric_assessment_date.year, month=12, day=1
     ):
@@ -134,6 +138,15 @@ def dates_for_cohort(cohort: int):
     """
     Return all dates for cohort numbers
     """
+
+    if cohort is None or cohort < 4:
+        return {
+            "cohort": None,
+            "cohort_start_date": None,
+            "cohort_end_date": None,
+            "submission_date": None,
+            "days_remaining": None,
+        }
 
     cohort_start_date = date(year=2016 + cohort, month=12, day=1)
     cohort_end_date = date(year=2016 + cohort + 1, month=11, day=30)
