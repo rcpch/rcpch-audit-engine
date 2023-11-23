@@ -1600,6 +1600,8 @@ a.ui.button {
   border-radius: 0%;
   border-width: medium;
   border-color: var(--rcpch_dark_blue);
+  display: flex;
+  justify-content: flex-end;
 }
 
 .ui.top.attached.rcpch_dark_blue.clearing.segment > h5 {
