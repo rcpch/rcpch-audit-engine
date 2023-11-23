@@ -5,7 +5,9 @@ from datetime import date
 # Third party imports
 
 # RCPCH imports
-from epilepsy12.general_functions import cohort_number_from_enrolment_date
+from epilepsy12.general_functions import (
+    cohort_number_from_first_paediatric_assessment_date,
+)
 
 
 def test_cohort_number_from_enrolment_date_returns_correct_num(e12_case_factory):

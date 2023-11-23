@@ -1,4 +1,5 @@
 # Python imports
+from datetime import date
 
 # third party libraries
 from django.shortcuts import render
@@ -23,7 +24,8 @@ from ..common_view_functions import (
 )
 from epilepsy12.common_view_functions.render_charts import update_all_data_with_charts
 from ..general_functions import (
-    get_current_cohort_data,
+    cohort_number_from_first_paediatric_assessment_date,
+    dates_for_cohort,
     value_from_key,
 )
 from ..tasks import (
@@ -80,7 +82,9 @@ def selected_organisation_summary(request, organisation_id):
     if selected_organisation.city == "LONDON":
         london_borough_tiles = return_tile_for_region("london_borough")
 
-    cohort_data = get_current_cohort_data()
+    # get latest cohort - in future will be selectable
+    cohort = cohort_number_from_first_paediatric_assessment_date(date.today())
+    cohort_data = dates_for_cohort(cohort)
 
     # query to return all completed E12 cases in the current cohort in this organisation
     count_of_current_cohort_registered_completed_cases_in_this_organisation = (
@@ -187,7 +191,10 @@ def publish_kpis(request, organisation_id):
     Returns the publish button partial + success message
     """
 
-    cohort_data = get_current_cohort_data()
+    # get latest cohort - in future will be selectable
+    cohort = cohort_number_from_first_paediatric_assessment_date(date.today())
+    cohort_data = dates_for_cohort(cohort)
+
     # perform aggregations and update all the KPIAggregation models only for clinicians
     asynchronously_aggregate_kpis_and_update_models_for_cohort_and_abstraction_level.delay(
         cohort=cohort_data["cohort"], open_access=True
@@ -196,7 +203,10 @@ def publish_kpis(request, organisation_id):
     return render(
         request=request,
         template_name="epilepsy12/partials/organisation/publish_button.html",
-        context={"selected_organisation": Organisation.objects.get(pk=organisation_id), "publish_success": True},
+        context={
+            "selected_organisation": Organisation.objects.get(pk=organisation_id),
+            "publish_success": True,
+        },
     )
 
 
@@ -221,7 +231,7 @@ def selected_trust_kpis(request, organisation_id, access):
     """
 
     # Get all relevant data for this cohort
-    cohort = get_current_cohort_data()["cohort"]
+    cohort = cohort_number_from_first_paediatric_assessment_date(date.today())
     organisation = Organisation.objects.get(pk=organisation_id)
 
     if logged_in_user_may_access_this_organisation(request.user, organisation):
@@ -266,7 +276,7 @@ def selected_trust_kpis(request, organisation_id, access):
             "name"
         ),  # for public view dropdown
         "last_published_date": last_published_date,
-        "publish_success": False
+        "publish_success": False,
     }
 
     return render(
