@@ -39,11 +39,11 @@ def test_registration_custom_method_audit_submission_date_calculation(
 
     first_paediatric_assessment_dates = [
         # (registration date, expected audit submission date)
-        (date(2022, 11, 1), date(2024, 1, 9)),
-        (date(2022, 12, 31), date(2024, 1, 9)),
-        (date(2022, 1, 9), date(2023, 1, 10)),
-        (date(2022, 1, 10), date(2023, 1, 10)),
-        (date(2022, 1, 11), date(2024, 1, 9)),
+        (date(2022, 11, 1), date(2024, 1, 9)),  # cohort 5
+        (date(2022, 12, 31), date(2025, 1, 14)),  # cohort 6
+        (date(2022, 1, 9), date(2024, 1, 9)),  # cohort 5
+        (date(2022, 1, 10), date(2024, 1, 9)),  # cohort 5
+        (date(2022, 1, 11), date(2024, 1, 9)),  # cohort 5
     ]
 
     for expected_input_output in first_paediatric_assessment_dates:
@@ -65,12 +65,12 @@ def test_registration_custom_method_first_paediatric_assessment_date_one_year_on
     """
 
     expected_inputs_outputs = [
-        # (registration date, expected audit close date)
-        (date(2022, 11, 1), date(2023, 11, 1)),
-        (date(2022, 12, 31), date(2023, 12, 31)),
-        (date(2022, 1, 9), date(2023, 1, 9)),
-        (date(2022, 1, 10), date(2023, 1, 10)),
-        (date(2022, 1, 11), date(2023, 1, 11)),
+        # (registration date, one year on date)
+        (date(2022, 11, 1), date(2023, 11, 1)),  # cohort 5
+        (date(2022, 12, 31), date(2023, 12, 31)),  # cohort 6
+        (date(2022, 1, 9), date(2023, 1, 9)),  # cohort 5
+        (date(2022, 1, 10), date(2023, 1, 10)),  # cohort 5
+        (date(2022, 1, 11), date(2023, 1, 11)),  # cohort 5
     ]
 
     for expected_input_output in expected_inputs_outputs:
@@ -132,15 +132,19 @@ def test_registration_days_remaining_before_submission(
     NOTE: if `audit_submission_date` is before today, returns 0.
     """
 
-    # submission date = 2023-01-10, 41 days after today
+    # submission date = 14/1/25, today = 30/11/22 776 days after today
     registration = e12_case_factory(
-        registration__first_paediatric_assessment_date=date(2022, 1, 10)
+        registration__first_paediatric_assessment_date=date(
+            2022, 1, 10
+        )  # cohort 6, submission date 14/1/25
     ).registration
-    assert registration.days_remaining_before_submission == 41
+    assert registration.days_remaining_before_submission == 776
 
     # submission date = 2023-01-10, 41 days after today
     registration = e12_case_factory(
-        registration__first_paediatric_assessment_date=date(2021, 1, 1)
+        registration__first_paediatric_assessment_date=date(
+            2021, 1, 1
+        )  # cohort 4, submission 10/1/2023
     ).registration
     assert registration.days_remaining_before_submission == 0
 

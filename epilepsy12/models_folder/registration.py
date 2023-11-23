@@ -1,6 +1,6 @@
 # python
-from dateutil.relativedelta import relativedelta
 from datetime import datetime
+from dateutil.relativedelta import relativedelta
 
 # django
 from django.contrib.gis.db import models
@@ -17,7 +17,10 @@ from ..constants import (
     CAN_CONSENT_TO_AUDIT_PARTICIPATION,
 )
 from .time_and_user_abstract_base_classes import *
-from ..general_functions import nth_tuesday_of_year, cohort_number_from_enrolment_date
+from ..general_functions import (
+    dates_for_cohort,
+    cohort_number_from_first_paediatric_assessment_date,
+)
 from ..validators import not_in_the_future_validator
 
 
@@ -38,6 +41,16 @@ class Registration(
         validators=[not_in_the_future_validator],
     )
 
+    completed_first_year_of_care_date = models.DateField(
+        help_text={
+            "label": "First year of care completion date",
+            "reference": "Date which completes first year of epilepsy care",
+        },
+        default=None,
+        null=True,
+    )
+
+    # this should deprecate
     registration_close_date = models.DateField(
         help_text={
             "label": "First paediatric assessment closing date",
@@ -47,6 +60,7 @@ class Registration(
         null=True,
     )
 
+    # this should deprecate as can be calculated from cohort
     audit_submission_date = models.DateField(
         help_text={
             "label": "Epilepsy12 submission date",
@@ -55,34 +69,6 @@ class Registration(
         default=None,
         null=True,
     )
-
-    def audit_submission_date_calculation(self) -> datetime.date:
-        """Returns audit submission date.
-
-        Defined as registration date + 1 year, and then the first occurring 2nd Tuesday of Jan.
-
-        Returns:
-            datetime.date: audit submission date.
-        """
-        if self.first_paediatric_assessment_date:
-            registration_plus_one_year = (
-                self.first_paediatric_assessment_date + relativedelta(years=1)
-            )
-
-            second_tuesday_next_year = nth_tuesday_of_year(
-                registration_plus_one_year.year, n=2
-            )
-
-            second_tuesday_two_years = nth_tuesday_of_year(
-                registration_plus_one_year.year + 1, n=2
-            )
-
-            if registration_plus_one_year <= second_tuesday_next_year:
-                return second_tuesday_next_year
-            else:
-                return second_tuesday_two_years
-        else:
-            return None
 
     eligibility_criteria_met = models.BooleanField(default=None, null=True)
 
@@ -129,13 +115,17 @@ class Registration(
 
     def save(self, *args, **kwargs) -> None:
         if self.first_paediatric_assessment_date is not None:
-            self.registration_close_date = (
-                self.first_paediatric_assessment_date + relativedelta(years=1)
-            )
-            self.audit_submission_date = self.audit_submission_date_calculation()
-            self.cohort = cohort_number_from_enrolment_date(
+            self.cohort = cohort_number_from_first_paediatric_assessment_date(
                 self.first_paediatric_assessment_date
             )
+            cohort_data = dates_for_cohort(self.cohort)
+            self.completed_first_year_of_care_date = (
+                self.first_paediatric_assessment_date + relativedelta(year=1)
+            )
+            # these will deprecated
+            self.registration_close_date = cohort_data["cohort_end_date"]
+            self.audit_submission_date = cohort_data["submission_date"]
+
         return super().save(*args, **kwargs)
 
     def __str__(self) -> str:

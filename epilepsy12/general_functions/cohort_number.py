@@ -17,15 +17,17 @@ def cohort_number_from_enrolment_date(enrolment_date: date) -> int:
 
     * Cohort Number is used to identify the groups in the audit by year.
 
-    * Cohorts are defined between 1st December year and 30th November in the subsequent year.
+    * Cohorts are defined between 1st December year and 30th November in the subsequent year. Note, the final submission date
+    is the second Tuesday in January after the closing date 1 YEAR ON. So if the cohort closes on 30 Nov 22, the submission date is
+    the second Tuesday after 30/11/23, which is 9 Jan 24
 
     * Time zone is not explicity supplied. Since this is a UK audit, time zone is assumed always to be UK.
 
     #### Examples of cohort numbers:
-    Cohort 4: 1 December 2020 - 30 November 2021
-    Cohort 5: 1 December 2021 - 30 November 2022
-    Cohort 6: 1 December 2022 - 30 November 2023
-    Cohort 7: 1 December 2023 - 30 November 2024
+    Cohort 4: 1 December 2020 - 30 November 2021: submission 10 January 2023
+    Cohort 5: 1 December 2021 - 30 November 2022: submission 9 January 2024
+    Cohort 6: 1 December 2022 - 30 November 2023: submission 14 January 2025
+    Cohort 7: 1 December 2023 - 30 November 2024: submission 13 January 2026
     """
 
     # reject dates which are too early with a return value of None
@@ -83,7 +85,9 @@ def get_current_cohort_data(
     'submission_date'
     'days_remaining'
     """
-    current_cohort = cohort_number_from_enrolment_date(current_cohort_start_date(current_date))
+    current_cohort = cohort_number_from_enrolment_date(
+        current_cohort_start_date(current_date)
+    )
 
     cohort_start_date = cohort_start_date_from_cohort_number(current_cohort)
     cohort_end_date = date(current_cohort_start_date().year + 1, 11, 30)
@@ -106,6 +110,44 @@ def get_current_cohort_data(
         "submission_date": submission_date,
         "days_remaining": days_remaining_until_end_of_active_recruitment,
         "days_remaining_until_latest_submission": days_remaining_until_submission,
+    }
+
+    return cohort_data
+
+
+def cohort_number_from_first_paediatric_assessment_date(
+    first_paediatric_assessment_date: date,
+):
+    """
+    Returns the cohort number from the first paediatric assessment date
+    """
+
+    if first_paediatric_assessment_date >= date(
+        year=first_paediatric_assessment_date.year, month=12, day=1
+    ):
+        return first_paediatric_assessment_date.year - 2016
+    else:
+        return (first_paediatric_assessment_date.year - 1) - 2016
+
+
+def dates_for_cohort(cohort: int):
+    """
+    Return all dates for cohort numbers
+    """
+
+    cohort_start_date = date(year=2016 + cohort, month=12, day=1)
+    cohort_end_date = date(year=2016 + cohort + 1, month=11, day=30)
+    submission_date = nth_tuesday_of_year(cohort_end_date.year + 2, n=2)
+    days_remaining_til_submission = days_remaining_before_submission(
+        audit_submission_date=submission_date
+    )
+
+    cohort_data = {
+        "cohort": cohort,
+        "cohort_start_date": cohort_start_date,
+        "cohort_end_date": cohort_end_date,
+        "submission_date": submission_date,
+        "days_remaining": days_remaining_til_submission,
     }
 
     return cohort_data
