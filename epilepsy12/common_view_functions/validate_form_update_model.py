@@ -10,7 +10,9 @@ from django.apps import apps
 from psycopg2 import DatabaseError
 
 # RCPCH imports
-from ..general_functions import current_cohort_start_date, first_tuesday_in_january
+from ..general_functions import (
+    dates_for_cohort,
+)
 from ..validators import epilepsy12_date_validator
 
 
@@ -140,15 +142,13 @@ def validate_and_update_model(
             errors = f"The date you chose ({field_value.strftime('%d %B %Y')}) cannot not be before {registration.case}'s date of birth."
             raise ValueError(errors)
 
-        # the registration date cannot be before the current cohort
-        current_cohort_end_date = first_tuesday_in_january(
-            current_cohort_start_date().year + 2
-        ) + relativedelta(days=7)
-        if field_value < current_cohort_start_date():
-            errors = f'The date you entered cannot be before the current cohort start date ({current_cohort_start_date().strftime("%d %B %Y")})'
+        # the registration date cannot be before the child's cohort
+        child_cohort_data = dates_for_cohort(registration.cohort)
+        if field_value < child_cohort_data["cohort_start_date"]:
+            errors = f'The date you entered cannot be before the cohort {{registration.cohort}} start date ({child_cohort_data["cohort_start_date"].strftime("%d %B %Y")})'
             raise ValueError(errors)
-        elif field_value > current_cohort_end_date:
-            errors = f'The date you entered cannot be after the current cohort end date ({current_cohort_end_date.strftime("%d %B %Y")})'
+        elif field_value > child_cohort_data["cohort_end_date"]:
+            errors = f'The date you entered cannot be after the current cohort end date ({child_cohort_data["cohort_end_date"].strftime("%d %B %Y")})'
             raise ValueError(errors)
 
         else:
