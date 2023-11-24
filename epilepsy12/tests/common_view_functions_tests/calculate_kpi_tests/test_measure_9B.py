@@ -15,7 +15,7 @@ Number of children and young people diagnosed with epilepsy at first year
     AND service contact details 
     AND SUDEP
 
-[ ] - 9B `comprehensive_care_planning_content` - Percentage of children diagnosed with epilepsy with documented evidence of communication regarding core elements of care planning.
+[x] - 9B `comprehensive_care_planning_content` - Percentage of children diagnosed with epilepsy with documented evidence of communication regarding core elements of care planning.
 
 Number of children and young people diagnosed with epilepsy at first year 
     AND NO evidence of written prolonged seizures plan AND NO prescribed rescue medication 
