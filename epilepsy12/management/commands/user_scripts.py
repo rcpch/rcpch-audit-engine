@@ -3,17 +3,11 @@ These scripts clean user data csv and convert into records which can be seeded i
 """
 import datetime
 
-import nhs_number
 import pandas as pd
 from django.utils import timezone
 
 from epilepsy12.models import (
-    LocalHealthBoard,
     Organisation,
-    Trust,
-    Organisation,
-    Case,
-    Site,
     Epilepsy12User,
 )
 from epilepsy12.tests.factories.E12UserFactory import E12UserFactory
@@ -65,9 +59,11 @@ def clean_user_data(csv_path: str = "data.csv") -> list[dict]:
             * len(_df),  # FORCES THEM TO CHANGE PASSWORD
         )
     )
-    
+
     # ORGCODE TYPO FIX
-    df["organisation_employer_ods_code"] = df["organisation_employer_ods_code"].replace({"C0X3P": "COX3P"})
+    df["organisation_employer_ods_code"] = df["organisation_employer_ods_code"].replace(
+        {"C0X3P": "COX3P"}
+    )
 
     print(f"CLEANED DATA:")
     print(df.head())
@@ -123,7 +119,7 @@ def insert_user_data(csv_path: str = "data.csv"):
             email=record["email"],
             surname=record["surname"],
             role=record["role"],
-            is_active=True, # So they can reset their password
+            is_active=True,  # So they can reset their password
             is_staff=False,
             is_rcpch_audit_team_member=False,
             is_rcpch_staff=False,
@@ -135,13 +131,13 @@ def insert_user_data(csv_path: str = "data.csv"):
             organisation_employer=organisation_employer,
             groups=[group_for_role(record["role"])],
         )
-        
+
         users_to_create.append(new_user)
         print(f"Done!")
 
     # Gathered all users, now bulk create
     Epilepsy12User.objects.bulk_create(users_to_create)
-    
+
     # Save all users just to ensure any save methods run
     print(f"{'-'*10}\nSaving all Users to ensure any save methods run\n{'-'*10}")
     total_users_to_save = Epilepsy12User.objects.all().count()
