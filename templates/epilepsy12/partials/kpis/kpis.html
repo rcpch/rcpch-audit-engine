@@ -25,18 +25,21 @@ will be persisted and run as a cron job once a day.
                     </p>
                     
                 </div>
-                {% if not open %}
-                    <!-- anyone can refresh and rerun aggregations that is not a member of the public  -->
-                    <button 
-                        class='ui right floated rcpch_primary button'
-                        hx-get="{% url 'selected_trust_kpis' organisation_id=organisation.pk access='private' %}"
-                        name="refresh" 
-                        hx-trigger="click"
-                        >
-                        Refresh
-                        <i class="htmx-indicator spinner loading icon"></i>
-                    </button>
-                {% endif %}
+                <div class="all-kpis-header">
+                    <button class='ui right floated rcpch_primary button' _="on click go to the top of #selected_trust_select_kpi_marker">Jump to Individual Measures</button>
+                    {% if not open %}
+                        <!-- anyone can refresh and rerun aggregations that is not a member of the public  -->
+                        <button 
+                            class='ui right floated rcpch_primary button'
+                            hx-get="{% url 'selected_trust_kpis' organisation_id=organisation.pk access='private' %}"
+                            name="refresh" 
+                            hx-trigger="click"
+                            >
+                            Refresh
+                            <i class="htmx-indicator spinner loading icon"></i>
+                        </button>
+                    {% endif %}
+                </div>
             </div>
             {% if last_published_date %}
                 <label><small>Published on {{last_published_date}}</small></label>
