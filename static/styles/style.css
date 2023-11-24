@@ -654,6 +654,15 @@ div.ui.card > div.content > div.organisation_address_container {
   color: var(--rcpch_white);
 }
 
+.episode-date {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  position: absolute;
+  width: 37.3906px;
+  height: 32px;
+}
+
 /* buttons */
 
 .ui.rcpch_light_blue.buttons {
