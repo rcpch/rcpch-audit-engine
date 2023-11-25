@@ -151,9 +151,7 @@ def score_kpi_9B(registration_instance) -> int:
         return KPI_SCORE["NOT_SCORED"]
 
     # score kpi
-    pass_criteria = [
-        (management.has_rescue_medication_been_prescribed is True),
-        (management.individualised_care_plan_parental_prolonged_seizure_care is True),
+    base_pass_criteria = [
         (management.individualised_care_plan_include_first_aid is True),
         (management.individualised_care_plan_addresses_water_safety is True),
         (management.individualised_care_plan_includes_service_contact_details is True),
@@ -164,7 +162,14 @@ def score_kpi_9B(registration_instance) -> int:
         (management.individualised_care_plan_addresses_sudep is True),
     ]
 
-    if all(pass_criteria):
+    pass_1_criteria = [
+        (management.has_rescue_medication_been_prescribed is False),
+    ] + base_pass_criteria
+        
+    pass_2_criteria = [(management.has_rescue_medication_been_prescribed is True),
+        (management.individualised_care_plan_parental_prolonged_seizure_care is True)] + base_pass_criteria
+
+    if all(pass_1_criteria) or all(pass_2_criteria):
         return KPI_SCORE["PASS"]
     else:
         return KPI_SCORE["FAIL"]

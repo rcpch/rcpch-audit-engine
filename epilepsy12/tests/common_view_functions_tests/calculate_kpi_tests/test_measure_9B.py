@@ -15,6 +15,17 @@ Number of children and young people diagnosed with epilepsy at first year
     AND service contact details 
     AND SUDEP
 
+[x] - 9B `comprehensive_care_planning_content` - Percentage of children diagnosed with epilepsy with documented evidence of communication regarding core elements of care planning.
+
+Number of children and young people diagnosed with epilepsy at first year 
+    AND NO evidence of written prolonged seizures plan AND NO prescribed rescue medication 
+    AND evidence of discussion regarding water safety 
+    AND first aid 
+    AND participation 
+    and risk 
+    AND service contact details 
+    AND SUDEP
+
 
 [x] - 9Bi. `parental_prolonged_seizures_care_plan` - Number of children and young people diagnosed with epilepsy at first year AND prescribed rescue medication AND evidence of a written prolonged seizures plan
 
@@ -43,7 +54,7 @@ Number of children and young people diagnosed with epilepsy at first year
 
 [x] - 9Bv. `service_contact_details` - Number of children and young people diagnosed with epilepsy at first year AND with evidence of discussion of been given service contact details
 
-Number of children and young people diagnosed with epilepsy at first year 
+Number of children and you ng people diagnosed with epilepsy at first year 
     AND individualised_care_plan_includes_service_contact_details
 
 
@@ -140,6 +151,78 @@ def test_measure_9B_comprehensive_care_planning_content(
     assert kpi_score == expected_score, assertion_message
 
 
+@pytest.mark.parametrize(
+    "has_rescue_medication_been_prescribed,individualised_care_plan_parental_prolonged_seizure_care,individualised_care_plan_include_first_aid,individualised_care_plan_addresses_water_safety,individualised_care_plan_includes_service_contact_details,individualised_care_plan_includes_general_participation_risk,individualised_care_plan_addresses_sudep, expected_score",
+    [
+        (False, False, True, True, True, True, True, KPI_SCORE["PASS"]),
+        (True, False, True, True, True, True, True, KPI_SCORE["FAIL"]),
+        (True, True, False, True, True, True, True, KPI_SCORE["FAIL"]),
+        (True, True, True, False, True, True, True, KPI_SCORE["FAIL"]),
+        (True, True, True, True, False, True, True, KPI_SCORE["FAIL"]),
+        (True, True, True, True, True, False, True, KPI_SCORE["FAIL"]),
+        (True, True, True, True, True, True, False, KPI_SCORE["FAIL"]),
+    ],
+)
+@pytest.mark.django_db
+def test_measure_9B_comprehensive_care_planning_content_no_rescue(
+    e12_case_factory,
+    has_rescue_medication_been_prescribed,
+    individualised_care_plan_parental_prolonged_seizure_care,
+    individualised_care_plan_include_first_aid,
+    individualised_care_plan_addresses_water_safety,
+    individualised_care_plan_includes_service_contact_details,
+    individualised_care_plan_includes_general_participation_risk,
+    individualised_care_plan_addresses_sudep,
+    expected_score,
+):
+    """
+    *PASS*
+    1) ALL True
+    *FAIL*
+    1) ANY False
+    """
+
+    # create case
+    case = e12_case_factory(
+        registration__management__has_rescue_medication_been_prescribed=has_rescue_medication_been_prescribed,
+        registration__management__individualised_care_plan_parental_prolonged_seizure_care=individualised_care_plan_parental_prolonged_seizure_care,
+        registration__management__individualised_care_plan_include_first_aid=individualised_care_plan_include_first_aid,
+        registration__management__individualised_care_plan_addresses_water_safety=individualised_care_plan_addresses_water_safety,
+        registration__management__individualised_care_plan_includes_service_contact_details=individualised_care_plan_includes_service_contact_details,
+        registration__management__individualised_care_plan_includes_general_participation_risk=individualised_care_plan_includes_general_participation_risk,
+        registration__management__individualised_care_plan_addresses_sudep=individualised_care_plan_addresses_sudep,
+    )
+
+    # get registration for the saved case model
+    registration = Registration.objects.get(case=case)
+
+    calculate_kpis(registration_instance=registration)
+
+    # get KPI score
+    kpi_score = KPI.objects.get(
+        pk=registration.kpi.pk
+    ).comprehensive_care_planning_content
+
+    # get KPI incorrectly not failing
+    if expected_score == KPI_SCORE["PASS"]:
+        assertion_message = f"has_individualised_care_plan_been_updated_in_the_last_year is True in place but not passing"
+
+    elif expected_score == KPI_SCORE["FAIL"]:
+        assessed_measures = [
+            "has_rescue_medication_been_prescribed",
+            "individualised_care_plan_parental_prolonged_seizure_care",
+            "individualised_care_plan_include_first_aid",
+            "individualised_care_plan_addresses_water_safety",
+            "individualised_care_plan_includes_service_contact_details",
+            "individualised_care_plan_includes_general_participation_risk",
+            "individualised_care_plan_addresses_sudep",
+        ]
+        for key, val in vars(registration.management).items():
+            if (key in assessed_measures) and not val:
+                assertion_message = f"{key} is False but not failing"
+                break
+
+    assert kpi_score == expected_score, assertion_message
 
 
 @pytest.mark.parametrize(
@@ -159,7 +242,7 @@ def test_measure_9Bi_parental_prolonged_seizures_care_plan(
 ):
     """
     *PASS*
-    1) individualised_care_plan_parental_prolonged_seizure_care =True 
+    1) individualised_care_plan_parental_prolonged_seizure_care =True
     *FAIL*
     1) individualised_care_plan_parental_prolonged_seizure_care = False
     *INELIGIBLE*
@@ -189,7 +272,9 @@ def test_measure_9Bi_parental_prolonged_seizures_care_plan(
     elif expected_score == KPI_SCORE["FAIL"]:
         assertion_message = f"individualised_care_plan_parental_prolonged_seizure_care is False but not failing"
     else:
-        assertion_message = f"not on rescue medicine, but not being scored as ineligible"
+        assertion_message = (
+            f"not on rescue medicine, but not being scored as ineligible"
+        )
 
     assert kpi_score == expected_score, assertion_message
 
@@ -209,7 +294,7 @@ def test_measure_9Bii_water_safety(
 ):
     """
     *PASS*
-    1) individualised_care_plan_addresses_water_safety =True 
+    1) individualised_care_plan_addresses_water_safety =True
     *FAIL*
     1) individualised_care_plan_addresses_water_safety = False
     """
@@ -225,16 +310,18 @@ def test_measure_9Bii_water_safety(
     calculate_kpis(registration_instance=registration)
 
     # get KPI score
-    kpi_score = KPI.objects.get(
-        pk=registration.kpi.pk
-    ).water_safety
+    kpi_score = KPI.objects.get(pk=registration.kpi.pk).water_safety
 
     # get KPI incorrectly not failing
     if expected_score == KPI_SCORE["PASS"]:
-        assertion_message = f"individualised_care_plan_addresses_water_safety is True but not passing"
+        assertion_message = (
+            f"individualised_care_plan_addresses_water_safety is True but not passing"
+        )
 
     elif expected_score == KPI_SCORE["FAIL"]:
-        assertion_message = f"individualised_care_plan_addresses_water_safety is False but not failing"
+        assertion_message = (
+            f"individualised_care_plan_addresses_water_safety is False but not failing"
+        )
 
     assert kpi_score == expected_score, assertion_message
 
@@ -254,7 +341,7 @@ def test_measure_9Biii_first_aid(
 ):
     """
     *PASS*
-    1) individualised_care_plan_include_first_aid =True 
+    1) individualised_care_plan_include_first_aid =True
     *FAIL*
     1) individualised_care_plan_include_first_aid = False
     """
@@ -270,16 +357,18 @@ def test_measure_9Biii_first_aid(
     calculate_kpis(registration_instance=registration)
 
     # get KPI score
-    kpi_score = KPI.objects.get(
-        pk=registration.kpi.pk
-    ).first_aid
+    kpi_score = KPI.objects.get(pk=registration.kpi.pk).first_aid
 
     # get KPI incorrectly not failing
     if expected_score == KPI_SCORE["PASS"]:
-        assertion_message = f"individualised_care_plan_include_first_aid is True but not passing"
+        assertion_message = (
+            f"individualised_care_plan_include_first_aid is True but not passing"
+        )
 
     elif expected_score == KPI_SCORE["FAIL"]:
-        assertion_message = f"individualised_care_plan_include_first_aid is False but not failing"
+        assertion_message = (
+            f"individualised_care_plan_include_first_aid is False but not failing"
+        )
 
     assert kpi_score == expected_score, assertion_message
 
@@ -299,7 +388,7 @@ def test_measure_9Biv_general_participation_and_risk(
 ):
     """
     *PASS*
-    1) individualised_care_plan_includes_general_participation_risk =True 
+    1) individualised_care_plan_includes_general_participation_risk =True
     *FAIL*
     1) individualised_care_plan_includes_general_participation_risk = False
     """
@@ -315,9 +404,7 @@ def test_measure_9Biv_general_participation_and_risk(
     calculate_kpis(registration_instance=registration)
 
     # get KPI score
-    kpi_score = KPI.objects.get(
-        pk=registration.kpi.pk
-    ).general_participation_and_risk
+    kpi_score = KPI.objects.get(pk=registration.kpi.pk).general_participation_and_risk
 
     # get KPI incorrectly not failing
     if expected_score == KPI_SCORE["PASS"]:
@@ -344,7 +431,7 @@ def test_measure_9Bv_service_contact_details(
 ):
     """
     *PASS*
-    1) individualised_care_plan_includes_service_contact_details =True 
+    1) individualised_care_plan_includes_service_contact_details =True
     *FAIL*
     1) individualised_care_plan_includes_service_contact_details = False
     """
@@ -360,9 +447,7 @@ def test_measure_9Bv_service_contact_details(
     calculate_kpis(registration_instance=registration)
 
     # get KPI score
-    kpi_score = KPI.objects.get(
-        pk=registration.kpi.pk
-    ).service_contact_details
+    kpi_score = KPI.objects.get(pk=registration.kpi.pk).service_contact_details
 
     # get KPI incorrectly not failing
     if expected_score == KPI_SCORE["PASS"]:
@@ -391,7 +476,7 @@ def test_measure_9Bvi_sudep(
 ):
     """
     *PASS*
-    1) BOTH True 
+    1) BOTH True
     *FAIL*
     1) Either False
     """
@@ -408,16 +493,18 @@ def test_measure_9Bvi_sudep(
     calculate_kpis(registration_instance=registration)
 
     # get KPI score
-    kpi_score = KPI.objects.get(
-        pk=registration.kpi.pk
-    ).sudep
+    kpi_score = KPI.objects.get(pk=registration.kpi.pk).sudep
 
     # get KPI incorrectly not failing
     if expected_score == KPI_SCORE["PASS"]:
         assertion_message = f"BOTH \nindividualised_care_plan_parental_prolonged_seizure_care\nindividualised_care_plan_addresses_sudep are True but not passing"
 
     elif expected_score == KPI_SCORE["FAIL"]:
-        reason = 'individualised_care_plan_parental_prolonged_seizure_care' if not individualised_care_plan_parental_prolonged_seizure_care else 'individualised_care_plan_addresses_sudep'
+        reason = (
+            "individualised_care_plan_parental_prolonged_seizure_care"
+            if not individualised_care_plan_parental_prolonged_seizure_care
+            else "individualised_care_plan_addresses_sudep"
+        )
         assertion_message = f"{reason} is False but not failing"
 
     assert kpi_score == expected_score, assertion_message
