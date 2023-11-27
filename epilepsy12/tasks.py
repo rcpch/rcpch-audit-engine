@@ -15,6 +15,7 @@ from .general_functions import cohort_number_from_first_paediatric_assessment_da
 from epilepsy12.constants import EnumAbstractionLevel
 from epilepsy12.common_view_functions.aggregate_by import update_all_kpi_agg_models
 from epilepsy12.management.commands.old_pt_data_scripts import insert_old_pt_data
+from epilepsy12.management.commands.user_scripts import insert_user_data
 
 
 @shared_task
@@ -60,6 +61,10 @@ def asynchronously_send_email_to_recipients(
 def async_insert_old_pt_data(csv_path: str = "data.csv"):
     insert_old_pt_data(csv_path=csv_path)
 
+
+@shared_task
+def async_insert_user_data(csv_path: str = "data.csv"):
+    insert_user_data(csv_path=csv_path)
 
 @shared_task
 def hello():
