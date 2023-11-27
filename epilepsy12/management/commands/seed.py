@@ -7,7 +7,8 @@ from random import randint
 from django.core.management.base import BaseCommand
 
 from ...general_functions import (
-    get_current_cohort_data,
+    cohort_number_from_first_paediatric_assessment_date,
+    dates_for_cohort,
     return_random_postcode,
     random_date,
 )
@@ -18,7 +19,12 @@ from ...models import Organisation, Case, Registration
 from .create_groups import groups_seeder
 from .create_e12_records import create_epilepsy12_record, create_registrations
 from epilepsy12.tests.factories import E12CaseFactory
-from epilepsy12.tasks import insert_old_pt_data, async_insert_old_pt_data
+from epilepsy12.tasks import (
+    insert_old_pt_data,
+    async_insert_old_pt_data,
+    async_insert_user_data,
+)
+from epilepsy12.management.commands.user_scripts import insert_user_data
 
 
 class Command(BaseCommand):
@@ -62,6 +68,12 @@ class Command(BaseCommand):
         elif options["mode"] == "async_upload_old_patient_data":
             self.stdout.write("CELERY: uploading old patient data.")
             async_insert_old_pt_data.delay()
+        elif options["mode"] == "upload_user_data":
+            self.stdout.write("Uploading user data.")
+            insert_user_data()
+        elif options["mode"] == "async_upload_user_data":
+            self.stdout.write("CELERY: uploading user data.")
+            async_insert_user_data.delay()
 
         else:
             self.stdout.write("No options supplied...")
@@ -156,10 +168,11 @@ def complete_registrations(verbose=True):
             "Completing all the Epilepsy12 fields for the fictional cases...",
             "\033[33m",
         )
-    current_cohort = get_current_cohort_data()
+    current_cohort = cohort_number_from_first_paediatric_assessment_date(date.today())
+    current_cohort_data = dates_for_cohort(current_cohort)
     for registration in Registration.objects.all():
         registration.first_paediatric_assessment_date = random_date(
-            start=current_cohort["cohort_start_date"], end=date.today()
+            start=current_cohort_data["cohort_start_date"], end=date.today()
         )
         registration.eligibility_criteria_met = True
         registration.save()

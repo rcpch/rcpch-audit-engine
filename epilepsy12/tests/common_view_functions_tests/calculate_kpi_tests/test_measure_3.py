@@ -179,7 +179,7 @@ def test_measure_3_3AEMs_seen(
     aems_count = AntiEpilepsyMedicine.objects.filter(
         management=registration.management,
         is_rescue_medicine=False,
-        antiepilepsy_medicine_start_date__lt=registration.registration_close_date,
+        antiepilepsy_medicine_start_date__lt=registration.completed_first_year_of_care_date,
     ).count()
 
     calculate_kpis(registration_instance=registration)

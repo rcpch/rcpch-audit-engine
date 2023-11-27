@@ -1,5 +1,6 @@
 # Python Imports
 from typing import Literal, Union
+from datetime import date
 
 # Django Imports
 from django.utils.html import strip_tags
@@ -7,17 +8,14 @@ from django.core.mail import send_mail, BadHeaderError
 from django.conf import settings
 
 # Third party imports
-from celery import shared_task, Celery
+from celery import shared_task
 
 # E12 Imports
-from .general_functions import (
-    get_current_cohort_data,
-)
+from .general_functions import cohort_number_from_first_paediatric_assessment_date
 from epilepsy12.constants import EnumAbstractionLevel
 from epilepsy12.common_view_functions.aggregate_by import update_all_kpi_agg_models
 from epilepsy12.management.commands.old_pt_data_scripts import insert_old_pt_data
-
-
+from epilepsy12.management.commands.user_scripts import insert_user_data
 
 
 @shared_task
@@ -31,7 +29,7 @@ def asynchronously_aggregate_kpis_and_update_models_for_cohort_and_abstraction_l
     """
     # If no cohort supplied, automatically get cohort from current datetime
     if cohort is None:
-        cohort = get_current_cohort_data()["cohort"]
+        cohort = cohort_number_from_first_paediatric_assessment_date(date.today())
 
     # By default, this will update all KPIAggregation models for all levels of abstraction
     update_all_kpi_agg_models(
@@ -62,6 +60,11 @@ def asynchronously_send_email_to_recipients(
 @shared_task
 def async_insert_old_pt_data(csv_path: str = "data.csv"):
     insert_old_pt_data(csv_path=csv_path)
+
+
+@shared_task
+def async_insert_user_data(csv_path: str = "data.csv"):
+    insert_user_data(csv_path=csv_path)
 
 @shared_task
 def hello():

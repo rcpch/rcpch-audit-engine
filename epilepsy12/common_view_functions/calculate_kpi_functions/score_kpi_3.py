@@ -31,7 +31,7 @@ def score_kpi_3(registration_instance, age_at_first_paediatric_assessment) -> in
     aems_count = AntiEpilepsyMedicine.objects.filter(
         management=registration_instance.management,
         is_rescue_medicine=False,
-        antiepilepsy_medicine_start_date__lt=registration_instance.registration_close_date,
+        antiepilepsy_medicine_start_date__lt=registration_instance.completed_first_year_of_care_date,
     ).count()
     has_myoclonic_epilepsy_episode = Episode.objects.filter(
         Q(multiaxial_diagnosis=registration_instance.multiaxialdiagnosis)

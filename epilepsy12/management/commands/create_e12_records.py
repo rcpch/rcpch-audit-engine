@@ -54,8 +54,6 @@ from ...constants import (
 )
 from ...general_functions import (
     random_date,
-    current_cohort_start_date,
-    first_tuesday_in_january,
     fetch_ecl,
     fetch_paediatric_neurodisability_outpatient_diagnosis_simple_reference_set,
 )

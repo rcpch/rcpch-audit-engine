@@ -59,14 +59,16 @@
                     hx-post="{{hx_post}}" 
                     hx-target="{{hx_target}}" 
                     hx-trigger="{{hx_trigger}}"
-                    value="{{date_value|date:'Y-m-d'}}"/>
+                    value="{{date_value|date:'Y-m-d'}}">
+                    {% if date_value is None or error_message %}
+                        <span class="episode-date" data-tooltip="This field is mandatory" data-inverted="" data-position="top left">
+                            <i class="rcpch_light_blue dot circle outline icon" ></i>
+                        </span>
+                    {% else %}
+                        <i class="rcpch_pink check circle outline icon"></i>
+                    {% endif %}
+                </input>
                 <i class="htmx-indicator spinner loading icon" id="spinner"></i>
-
-                {% if date_value is None or error_message %}
-                    <i class="rcpch_light_blue dot circle outline icon"></i>
-                {% else %}
-                    <i class="rcpch_pink check circle outline icon"></i>
-                {% endif %}
             </div>
             
             {% if error_message %}

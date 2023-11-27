@@ -28,7 +28,7 @@ from ..common_view_functions import (
 from ..decorator import user_may_view_this_child, login_and_otp_required
 from ..general_functions import (
     construct_transfer_epilepsy12_site_email,
-    get_current_cohort_data,
+    dates_for_cohort,
 )
 from ..tasks import asynchronously_send_email_to_recipients
 
@@ -629,7 +629,9 @@ def first_paediatric_assessment_date(request, case_id):
             Registration,
             field_name="first_paediatric_assessment_date",
             page_element="date_field",
-            earliest_allowable_date=get_current_cohort_data()["cohort_start_date"],
+            earliest_allowable_date=dates_for_cohort(registration.cohort)[
+                "cohort_start_date"
+            ],
         )
 
     except ValueError as error:
