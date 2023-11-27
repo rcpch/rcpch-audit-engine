@@ -2,6 +2,8 @@
 title: Introduction
 author: Dr Marcus Baw
 ---
+!!! info "Guidance for Clinicians"
+    Go to the Clinician Guide above for guidance on entering patient data. 
 
 ## Epilepsy12
 
