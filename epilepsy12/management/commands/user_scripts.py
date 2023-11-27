@@ -11,12 +11,7 @@ import pandas as pd
 
 # rcpch imports
 from epilepsy12.models import (
-    LocalHealthBoard,
     Organisation,
-    Trust,
-    Organisation,
-    Case,
-    Site,
     Epilepsy12User,
 )
 from epilepsy12.tests.factories.E12UserFactory import E12UserFactory
@@ -70,7 +65,9 @@ def clean_user_data(csv_path: str = "data.csv") -> list[dict]:
     )
 
     # ORGCODE TYPO FIX
-    df["organisation_employer_ods_code"] = df["organisation_employer_ods_code"].replace({"C0X3P": "COX3P"})
+    df["organisation_employer_ods_code"] = df["organisation_employer_ods_code"].replace(
+        {"C0X3P": "COX3P"}
+    )
 
     print("CLEANED DATA:")
     print(df.head())
