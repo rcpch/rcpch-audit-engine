@@ -654,6 +654,15 @@ div.ui.card > div.content > div.organisation_address_container {
   color: var(--rcpch_white);
 }
 
+.episode-date {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  position: absolute;
+  width: 37.3906px;
+  height: 32px;
+}
+
 /* buttons */
 
 .ui.rcpch_light_blue.buttons {
@@ -702,6 +711,20 @@ div.ui.card > div.content > div.organisation_address_container {
   border-color: var(--rcpch_light_blue);
   font-weight: 400;
 }
+
+.ui.rcpch_primary.button.jump {
+  margin: 5px;
+  width: 130.23px;
+  height: 25.98px;
+  font-size: .85714286rem;
+  white-space: normal;
+}
+
+.topbar {
+  display: flex !important;
+  justify-content: space-between;
+}
+
 .ui.rcpch_info.button {
   border-radius: 0% !important;
   color: black;
@@ -892,9 +915,15 @@ a.ui.button {
 
 .ui.rcpch_light_blue.label {
   border-radius: 0% !important;
-  color: white;
-  background-color: var(--rcpch_light_blue);
+  color: black;
+  background-color: white;
   margin: 5px;
+  font-family: 'Montserrat-Bold';
+  font-size: large;
+}
+
+.topbar > .ui.rcpch_light_blue.label {
+  margin:0%;
 }
 
 .ui.rcpch_purple.label {
@@ -1580,6 +1609,8 @@ a.ui.button {
   border-radius: 0%;
   border-width: medium;
   border-color: var(--rcpch_dark_blue);
+  display: flex;
+  justify-content: flex-end;
 }
 
 .ui.top.attached.rcpch_dark_blue.clearing.segment > h5 {
@@ -1594,10 +1625,13 @@ a.ui.button {
   border-radius: 0%;
   border-width: medium;
   border-color: var(--rcpch_purple);
+  display: flex;
+  justify-content: flex-end;
 }
 
 .ui.top.attached.rcpch_purple.clearing.segment > h5 {
   color: white;
+  font-size: large;
 }
 
 .ui.raised.attached.segment {
@@ -1608,6 +1642,11 @@ a.ui.button {
 
 .ui.header > div.content.kpi_header > p {
   color: var(--rcpch_white);
+}
+
+.all-kpis-header {
+  display: flex;
+  justify-content: flex-end;
 }
 
 .ui.bottom.attached.rcpch_footer.message {

@@ -59,7 +59,7 @@ class Episode(TimeStampAbstractBaseClass, UserStampAbstractBaseClass, HelpTextMi
     seizure_onset_date_confidence = models.CharField(
         help_text={
             "label": "Confidence in reported date of episode",
-            "reference": "How accurate is the date of this episode?",
+            "reference": "How accurate is the date of this episode? Even if date 'Not known', please enter a date above",
         },
         max_length=3,
         choices=DATE_ACCURACY,

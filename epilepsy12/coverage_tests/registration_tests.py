@@ -46,7 +46,7 @@ class RegistrationTests(TestCase):
 
         self.assertEqual(r.eligibility_criteria_met, None)
 
-        self.assertEqual(r.registration_close_date, None)
+        self.assertEqual(r.completed_first_year_of_care_date, None)
 
         self.assertEqual(r.first_paediatric_assessment_date, None)
 

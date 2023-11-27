@@ -657,23 +657,7 @@ def all_epilepsy12_users_list(request, organisation_id):
     ):
         raise PermissionDenied()
 
-    all_users = Epilepsy12User.objects.all().values(
-        "id",
-        "last_login",
-        "first_name",
-        "last_name",
-        "email",
-        "organisation_employer",
-        "is_active",
-        "is_staff",
-        "is_superuser",
-        "is_rcpch_audit_team_member",
-        "is_rcpch_staff",
-        "is_patient_or_carer",
-        "date_joined",
-        "role",
-        "email_confirmed",
-    )
+    all_users = Epilepsy12User.objects.all().values()
 
     df = pd.DataFrame(all_users)
 

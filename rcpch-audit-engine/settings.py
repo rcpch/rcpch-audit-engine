@@ -246,7 +246,7 @@ OTP_EMAIL_TOKEN_VALIDITY = 60 * 5  # default N(seconds) email token valid for
 # EMAIL SETTINGS (SMTP)
 DEFAULT_FROM_EMAIL = os.environ.get("EMAIL_DEFAULT_FROM_EMAIL")
 SMTP_EMAIL_ENABLED = os.getenv("SMTP_EMAIL_ENABLED", "False") == "True"
-logger.info("SMTP_EMAIL_ENABLED: ", SMTP_EMAIL_ENABLED)
+logger.info("SMTP_EMAIL_ENABLED: %s", SMTP_EMAIL_ENABLED)
 if SMTP_EMAIL_ENABLED is True:
     EMAIL_BACKEND = "django.core.mail.backends.smtp.EmailBackend"
     EMAIL_HOST = os.environ.get("EMAIL_HOST_SERVER")
@@ -257,7 +257,7 @@ if SMTP_EMAIL_ENABLED is True:
     EMAIL_TIMEOUT = 10
 else:
     EMAIL_BACKEND = "django.core.mail.backends.console.EmailBackend"
-logger.info("EMAIL_BACKEND: ", EMAIL_BACKEND)
+logger.info("EMAIL_BACKEND: %s", EMAIL_BACKEND)
 
 PASSWORD_RESET_TIMEOUT = 259200  # Default: 259200 (3 days, in seconds)
 
