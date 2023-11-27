@@ -23,6 +23,22 @@ Click the ‘Sign in’ button on the home page to log in.
 
 ![Sign in button](../_assets/_images/sign-in-button.png)
 
+The first time you log in, you will need to set up 2 factor authentication. This is an additional security measure to prevent unauthorised access to patient data. You will have the choice to either set up an email token or an authenticator app. 
+
+#### Email token
+
+If you select email token, you will receive a six digit code to your inbox. You will need to enter that code to log in. 
+
+#### Authenticator app
+
+If you select authenticator app, you will need to download the Microsoft Authenticator app on a smartphone or tablet. 
+Once you have downloaded and logged into the app, you will need to follow the instructions provided to set up the authenticator app.
+
+Each time you log in, you will need to access your authenticator app and enter your one-time password to log in. This password will be a six digit code that resets every 30 seconds. 
+
+If you lose access to your authenticator app, please contact the Epilepsy12 team. 
+
+### Reset password
 If you have forgotten your password, click ‘Reset Password’ and a link to create a new password will be sent to your email address, and this will remain active for 72 hours.
 
 ![Sign in page](../_assets/_images/sign-in-page.png)
