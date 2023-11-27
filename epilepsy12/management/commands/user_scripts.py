@@ -1,12 +1,15 @@
 """
 These scripts clean user data csv and convert into records which can be seeded into E12 db.
 """
+# standard imports
 import datetime
 
+# 3rd party
+from django.utils import timezone
 import nhs_number
 import pandas as pd
-from django.utils import timezone
 
+# rcpch imports
 from epilepsy12.models import (
     LocalHealthBoard,
     Organisation,
@@ -65,11 +68,11 @@ def clean_user_data(csv_path: str = "data.csv") -> list[dict]:
             * len(_df),  # FORCES THEM TO CHANGE PASSWORD
         )
     )
-    
+
     # ORGCODE TYPO FIX
     df["organisation_employer_ods_code"] = df["organisation_employer_ods_code"].replace({"C0X3P": "COX3P"})
 
-    print(f"CLEANED DATA:")
+    print("CLEANED DATA:")
     print(df.head())
     return df.to_dict(orient="records")
 
@@ -77,7 +80,7 @@ def clean_user_data(csv_path: str = "data.csv") -> list[dict]:
 def insert_user_data(csv_path: str = "data.csv"):
     cleaned_records = clean_user_data(csv_path=csv_path)
 
-    ALREADY_EXISTING_EMAILS = set(
+    already_existing_emails = set(
         Epilepsy12User.objects.all().values_list("email", flat=True)
     )
 
@@ -88,16 +91,15 @@ def insert_user_data(csv_path: str = "data.csv"):
         print("-" * 10, f"On Record {ix} / {total_records-1}", "-" * 10)
 
         # Duplication check
-        if record["email"] in ALREADY_EXISTING_EMAILS:
+        if record["email"] in already_existing_emails:
             reason = "Email already exists"
-            print(f'Record: {record["email"]} - { reason } - Deleting...')
-
-            Epilepsy12User.objects.get(email=record["email"]).delete()
+            print(f'Record: {record["email"]} - { reason } - Skipping...')
 
             seeding_error_report[f"{ix}-INFO-User"] = {
-                "reason": f"{record['email']} Record already exists. Deleted and re-inserted.",
+                "reason": f"{record['email']} Record already exists. Skipped.",
                 "record": record,
             }
+            continue
 
         # Change to timezone aware datetimes
         password_last_set = timezone.make_aware(record["password_last_set"])
@@ -124,24 +126,24 @@ def insert_user_data(csv_path: str = "data.csv"):
             surname=record["surname"],
             role=record["role"],
             is_active=True, # So they can reset their password
-            is_staff=False,
+            is_staff=False, # django admin
             is_rcpch_audit_team_member=False,
             is_rcpch_staff=False,
             is_patient_or_carer=False,
-            view_preference=VIEW_PREFERENCES[0][0],
+            view_preference=VIEW_PREFERENCES[1][0],
             date_joined=date_joined,
             email_confirmed=True,
             password_last_set=password_last_set,
             organisation_employer=organisation_employer,
             groups=[group_for_role(record["role"])],
         )
-        
+
         users_to_create.append(new_user)
-        print(f"Done!")
+        print("Done!")
 
     # Gathered all users, now bulk create
     Epilepsy12User.objects.bulk_create(users_to_create)
-    
+
     # Save all users just to ensure any save methods run
     print(f"{'-'*10}\nSaving all Users to ensure any save methods run\n{'-'*10}")
     total_users_to_save = Epilepsy12User.objects.all().count()
