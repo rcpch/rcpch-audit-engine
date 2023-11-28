@@ -47,42 +47,37 @@
 
 
                 
-                    <div class="ui top attached rcpch_403 segment">
+                    <!-- <div class="ui top attached rcpch_403 segment">
                         
                         <div class="ui header">
                             <img src='{% static "images/epilepsy12-logo-1.png" %}'>
                             <div class="content">
-                                <h2>You need additional privileges in order to go any further</h2>
                             </div>
                         </div>
                         
-                    </div>
-                
-
-                    <div class="ui rcpch_403 segment">
+                    </div> -->
+                    
+                    
+                    <!-- <div class="ui rcpch_403 segment"> -->
                         
-                        <div class="ui two column grid">
+                        <div class="ui centered grid">
                             
-                            <div class="row">
-                                
-                                    <div class="right aligned column">
-                                        <img class="image403" src="{% static 'styles/images/children_epilepsy12.png' %}"/>
-                                    </div>
-    
-                                    <div class="column">
-                                        
-                                        <h2 class='header'>
-                                            You are seeing this message because you are trying to access a page where you are not logged in or you don't have the right permissions.
-                                            If this persists, please contact your local Epilepsy12 administrator or the RCPCH at {% include 'epilepsy12/partials/contact_email.html' %}.
-                                        </h2>
-    
-                                    </div>
+                            <div class="column">
+                                <div class="ui sizer vertical segment">
+                                    <h2 class="ui left aligned header">You need additional privileges in order to go any further</h2>
+                                    <h5 class="ui subheader">
+                                        You are seeing this message because you are trying to access a page where you are not logged in or you don't have the right permissions.
+                                        If this persists, please contact your local Epilepsy12 administrator or the RCPCH at {% include 'epilepsy12/partials/contact_email.html' %}.
+                                    </h5>
+                                    <img class="ui fluid image" src="{% static 'styles/images/RCPCH_Epilepsy12_2018_Illustrations_R522.png' %}"/>
                                 </div>
+                                    
+                                
                             </div>
                             
                         </div>
     
-                     </div>
+                     <!-- </div> -->
 
                     
                 {% endif %}
