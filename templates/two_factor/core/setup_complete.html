@@ -9,9 +9,14 @@
 
       <p>{% blocktrans trimmed %}Congratulations, you've successfully enabled two-factor
         authentication.{% endblocktrans %}</p>
-
-      <p><a href="{% url 'two_factor:profile' %}" class="ui rcpch_primary button">{% trans "Back to Account Settings" %}</a></p>
-
+        
+      {% if request.user.organisation_employer.pk is not None %}
+        <p><a href="{% url 'selected_organisation_summary' organisation_id=request.user.organisation_employer.pk  %}" class="ui rcpch_primary button">{% trans "Go to Organisation View" %}</a></p>
+      {% else %}
+        <p><a href="{% url 'selected_organisation_summary' organisation_id=1  %}" class="ui rcpch_primary button">{% trans "Go to Organisation View" %}</a></p>
+      {% endif %}
+      
+      
     </div>
   </div>
 </div>
