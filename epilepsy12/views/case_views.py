@@ -11,15 +11,19 @@ from django.contrib.gis.db.models import Q
 from django.contrib import messages
 from django.core.paginator import Paginator
 from django.db import DatabaseError
+from django.http import HttpResponse
 
 # third party imports
 from django_htmx.http import trigger_client_event, HttpResponseClientRedirect
+
+import pandas as pd
 
 # RCPCH imports
 from epilepsy12.forms import CaseForm
 from epilepsy12.models import Organisation, Site, Case, AuditProgress, Epilepsy12User
 from ..constants import (
     UNKNOWN_POSTCODES_NO_SPACES,
+    EPILEPSY12_AUDIT_TEAM_FULL_ACCESS,
 )
 from ..decorator import (
     user_may_view_this_organisation,
@@ -772,5 +776,30 @@ def consent_confirmation(request, case_id, consent_type):
     trigger_client_event(
         response=response, name="registration_active", params={}
     )  # reloads the form to show the active steps
+
+    return response
+
+@login_and_otp_required()
+def all_epilepsy12_cases_list(request, organisation_id):
+    allowed_groups = [EPILEPSY12_AUDIT_TEAM_FULL_ACCESS]
+
+    if not( 
+        request.user.is_superuser or request.user.groups.filter(name__in=allowed_groups)):
+            raise PermissionDenied()
+    all_cases = Case.objects.all().values(
+        'first_name',
+        'surname',
+        'sex',
+        'date_of_birth',
+        'postcode',
+    )
+
+    df = pd.DataFrame(all_cases)
+
+    csv_data =  df.to_csv(index=False)
+
+    response = HttpResponse(csv_data, content_type="text/csv")
+
+    response['Content-Disposition'] = 'attachment; filename="epilepsy12cases.csv'
 
     return response

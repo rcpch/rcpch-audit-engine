@@ -299,6 +299,11 @@ case_patterns = [
         case_list,
         name="sort_by_days_remaining_before_submission_down",
     ),
+    path(
+        "organisation/<int:organisation_id>/cases/full_case_list",
+        view=all_epilepsy12_cases_list,
+        name="download_all_cases"
+    ),
 ]
 
 organisation_patterns = [
