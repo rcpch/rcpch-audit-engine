@@ -1,9 +1,9 @@
 ---
 title: Introduction
-author: Dr Marcus Baw
+author: Dr Marcus Baw, Amani Krayem
 ---
 !!! info "Guidance for Clinicians"
-    Go to the Clinician Guide above for guidance on entering patient data. 
+    Go to the Clinician Guide above for guidance on entering patient data.
 
 ## Epilepsy12
 
