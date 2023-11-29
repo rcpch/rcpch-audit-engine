@@ -261,6 +261,8 @@ logger.info("EMAIL_BACKEND: ", EMAIL_BACKEND)
 
 PASSWORD_RESET_TIMEOUT = 259200  # Default: 259200 (3 days, in seconds)
 
+SITE_CONTACT_EMAIL = os.environ.get("SITE_CONTACT_EMAIL")
+
 
 # Internationalization
 # https://docs.djangoproject.com/en/3.2/topics/i18n/

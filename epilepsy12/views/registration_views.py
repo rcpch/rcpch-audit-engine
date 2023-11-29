@@ -5,7 +5,7 @@ from django.utils import timezone
 from django.contrib.gis.db.models import Q
 from django.urls import reverse
 from django.contrib import messages
-from django.utils.html import strip_tags
+from django.conf import settings
 
 # 3rd party
 from django_htmx.http import trigger_client_event
@@ -408,7 +408,7 @@ def update_lead_site(request, registration_id, site_id, update):
             subject = "Epilepsy12 Lead Site Transfer"
         else:
             # there is no allocated clinical lead. Send to epilepsy12@rcpch.ac.uk
-            recipients = ["epilepsy12@rcpch.ac.uk"]
+            recipients = [settings.SITE_CONTACT_EMAIL]
             subject = "Epilepsy12 Lead Site Transfer - NO LEAD CLINICIAN"
 
         email = construct_transfer_epilepsy12_site_email(
