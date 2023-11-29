@@ -198,58 +198,6 @@
                 <i class="cloud upload icon"></i></button>
               {% endif %}
 
-              {% if case in cases_in_transfer %}
-                {% url 'transfer_response' organisation_id=organisation_id case_id=case.id organisation_response="accept" as hx_post_transfer_accept %}
-                <button
-                  hx-headers='{"X-CSRFToken": "{{ csrf_token }}"}'
-                  class="ui rcpch_primary icon button" 
-                  tabindexed="1" 
-                  hx-post="{{hx_post_transfer_accept}}"
-                  hx_trigger='click' 
-                  hx-target="#case_table"
-                  {% if not perms.epilepsy12.can_transfer_epilepsy12_lead_centre %}disabled{% endif %}
-                    _="on htmx:confirm(issueRequest)
-                        halt the event
-                        call Swal.fire({
-                            title: 'Confirmation Required',
-                            text: 'Please confirm you are happy to accept {{case}} onto your Epilepsy12 caseload.',
-                            icon: 'warning',
-                            iconColor: '#e00087',
-                            showCancelButton: true,
-                            confirmButtonColor: '#11a7f2',
-                            cancelButtonColor: '#e60700',
-                            confirmButtonText: 'I accept'
-                          })
-                        if result.isConfirmed issueRequest()"
-                  >
-                  <span data-tooltip="Accept transfer request"><i class="handshake outline icon"></i></span>
-                </button>
-                {% url 'transfer_response' organisation_id=organisation_id case_id=case.id organisation_response="reject" as hx_post_transfer_reject %}
-                <button
-                  hx-headers='{"X-CSRFToken": "{{ csrf_token }}"}'
-                  class="ui rcpch_primary icon button" 
-                  tabindexed="1" 
-                  hx-post="{{hx_post_transfer_reject}}"
-                  hx_trigger='click' 
-                  hx-target="#case_table"
-                  {% if not perms.epilepsy12.can_transfer_epilepsy12_lead_centre %}disabled{% endif %}
-                    _="on htmx:confirm(issueRequest)
-                        halt the event
-                        call Swal.fire({
-                            title: 'Confirmation Required',
-                            text: 'Please confirm you are rejecting the request to transfer {{case}} onto your Epilepsy12 caseload.',
-                            icon: 'warning',
-                            iconColor: '#e00087',
-                            showCancelButton: true,
-                            confirmButtonColor: '#11a7f2',
-                            cancelButtonColor: '#e60700',
-                            confirmButtonText: 'I accept'
-                          })
-                        if result.isConfirmed issueRequest()"
-                  >
-                  <span data-tooltip="Reject transfer request"><i class="hand paper outline icon"></i></span>
-                </button>
-              {% endif %}
             </td>
           {% else %}
             <td>
@@ -260,19 +208,74 @@
           {% endif %}
             
             <td>
-            {% if case.registration.days_remaining_before_submission > 7 and case.registration.audit_progress.audit_complete %}
-              {% if case.locked %}
-                <span data-tooltip="Data complete and uploaded. {{case}}'s record can still be unlocked and edited up until {{case.registration.audit_submission_date|date:'D j M Y'}}"><i class="rcpch_pink check circle outline icon"></i></span>
+              {% if case in cases_in_transfer %}
+                <div class="ui buttons">
+                  {% url 'transfer_response' organisation_id=organisation_id case_id=case.id organisation_response="accept" as hx_post_transfer_accept %}
+                  <button
+                    hx-headers='{"X-CSRFToken": "{{ csrf_token }}"}'
+                    class="ui rcpch_primary tiny icon button" 
+                    tabindexed="1" 
+                    hx-post="{{hx_post_transfer_accept}}"
+                    hx_trigger='click' 
+                    hx-target="#case_table"
+                    {% if not perms.epilepsy12.can_transfer_epilepsy12_lead_centre %}disabled{% endif %}
+                      _="on htmx:confirm(issueRequest)
+                          halt the event
+                          call Swal.fire({
+                              title: 'Confirmation Required',
+                              text: 'Please confirm you are happy to accept {{case}} onto your Epilepsy12 caseload.',
+                              icon: 'warning',
+                              iconColor: '#e00087',
+                              showCancelButton: true,
+                              confirmButtonColor: '#11a7f2',
+                              cancelButtonColor: '#e60700',
+                              confirmButtonText: 'I accept'
+                            })
+                          if result.isConfirmed issueRequest()"
+                    >
+                    <span data-tooltip="Accept transfer request"><i class="handshake outline icon"></i></span>
+                  </button>
+                  {% url 'transfer_response' organisation_id=organisation_id case_id=case.id organisation_response="reject" as hx_post_transfer_reject %}
+                  <button
+                    hx-headers='{"X-CSRFToken": "{{ csrf_token }}"}'
+                    class="ui rcpch_primary tiny icon button" 
+                    tabindexed="1" 
+                    hx-post="{{hx_post_transfer_reject}}"
+                    hx_trigger='click' 
+                    hx-target="#case_table"
+                    {% if not perms.epilepsy12.can_transfer_epilepsy12_lead_centre %}disabled{% endif %}
+                      _="on htmx:confirm(issueRequest)
+                          halt the event
+                          call Swal.fire({
+                              title: 'Confirmation Required',
+                              text: 'Please confirm you are rejecting the request to transfer {{case}} onto your Epilepsy12 caseload.',
+                              icon: 'warning',
+                              iconColor: '#e00087',
+                              showCancelButton: true,
+                              confirmButtonColor: '#11a7f2',
+                              cancelButtonColor: '#e60700',
+                              confirmButtonText: 'I accept'
+                            })
+                          if result.isConfirmed issueRequest()"
+                    >
+                    <span data-tooltip="Reject transfer request"><i class="hand paper outline icon"></i></span>
+                  </button>
+                </div>
               {% else %}
-                <span data-tooltip="Data complete. Ready for upload by {{case.registration.audit_submission_date|date:'D j M Y'}}"><i class="rcpch_pink check circle outline icon"></i></span>
+                {% if case.registration.days_remaining_before_submission > 7 and case.registration.audit_progress.audit_complete %}
+                  {% if case.locked %}
+                    <span data-tooltip="Data complete and uploaded. {{case}}'s record can still be unlocked and edited up until {{case.registration.audit_submission_date|date:'D j M Y'}}"><i class="rcpch_pink check circle outline icon"></i></span>
+                  {% else %}
+                    <span data-tooltip="Data complete. Ready for upload by {{case.registration.audit_submission_date|date:'D j M Y'}}"><i class="rcpch_pink check circle outline icon"></i></span>
+                  {% endif %}
+                {% elif case.registration.days_remaining_before_submission <= 7 and case.registration.days_remaining_before_submission > 0 and case.registration.audit_progress.audit_complete %}
+                  <span data-tooltip="Data complete. Ready imminently for upload before {{case.registration.audit_submission_date|date:'D j M Y'}}"><i class="rcpch_orange check circle outline icon"></i></span>
+                {% elif case.registration.days_remaining_before_submission == 0 %}
+                  <span data-tooltip="Data complete and submission date has passed. No further editing of {{case}}'s record is possible."><i class="rcpch_pink check circle outline icon"></i></span>
+                {% else %}
+                  <span data-tooltip="Data incomplete."><i class="rcpch_light_blue dot circle outline icon"></i></span>
+                {% endif %}
               {% endif %}
-            {% elif case.registration.days_remaining_before_submission <= 7 and case.registration.days_remaining_before_submission > 0 and case.registration.audit_progress.audit_complete %}
-              <span data-tooltip="Data complete. Ready imminently for upload before {{case.registration.audit_submission_date|date:'D j M Y'}}"><i class="rcpch_orange check circle outline icon"></i></span>
-            {% elif case.registration.days_remaining_before_submission == 0 %}
-              <span data-tooltip="Data complete and submission date has passed. No further editing of {{case}}'s record is possible."><i class="rcpch_pink check circle outline icon"></i></span>
-            {% else %}
-              <span data-tooltip="Data incomplete."><i class="rcpch_light_blue dot circle outline icon"></i></span>
-            {% endif %}
             </td>
         </tr>
 
