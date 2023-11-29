@@ -2,7 +2,7 @@
 from datetime import datetime
 
 # django imports
-from django.core.exceptions import PermissionDenied
+from django.core.exceptions import PermissionDenied, ObjectDoesNotExist
 from django.utils import timezone
 from django.shortcuts import get_object_or_404, redirect, render
 from django.urls import reverse
@@ -31,7 +31,7 @@ from ..decorator import (
     login_and_otp_required,
 )
 
-from ..general_functions import construct_transfer_epilepsy12_site_outcome_email, imd_for_postcode
+from ..general_functions import construct_transfer_epilepsy12_site_outcome_email, imd_for_postcode, rcpch_requested_time_elapsed
 from ..tasks import asynchronously_send_email_to_recipients
 
 
@@ -787,27 +787,40 @@ def all_epilepsy12_cases_list(request, organisation_id):
         request.user.is_superuser or request.user.groups.filter(name__in=allowed_groups)):
             raise PermissionDenied()
     all_cases = Case.objects.all().values(
-        'first_name',
-        'surname',
         'sex',
-        'date_of_birth',
         'postcode',
     )
 
     df = pd.DataFrame(all_cases)
 
-
-
-
-    df['first_name'] = df['first_name'].str[:2]
-    df['surname'] = df['surname'].str[:2]
-
     df['postcode'] = df['postcode'].apply(imd_for_postcode)
-
     df.rename(columns={'postcode': 'depriv_quintile'}, inplace=True)
 
-    # Need to add age at first assessment which will be added to the case in the audit
-    # Need to make a call to imd_for_postcode in index_multiple_deprivation to calculate postcode 
+    ages_at_first_assessment_dates = []
+    first_assessment_dates = []
+
+    for case in Case.objects.all():
+        try:
+            if case.registration.first_paediatric_assessment_date:
+                assessment_date = case.registration.first_paediatric_assessment_date # stored as DD/MM/YYYY
+                dob = case.date_of_birth
+
+                # age at first assessment = assessment date - date of birth
+                age_at_assessment = rcpch_requested_time_elapsed(dob, assessment_date)
+                ages_at_first_assessment_dates.append(age_at_assessment)
+                first_assessment_dates.append(assessment_date)
+            else:
+                ages_at_first_assessment_dates.append(0)
+                first_assessment_dates.append(0)
+                print("No assessment date submitted")
+        
+        except ObjectDoesNotExist as error:
+            ages_at_first_assessment_dates.append(0)
+            first_assessment_dates.append(0)
+            print(error)
+
+    df['first_assessment_age'] = ages_at_first_assessment_dates
+    df['first_assessment_date'] = first_assessment_dates
 
     csv_data =  df.to_csv(index=False)
 

@@ -45,3 +45,36 @@ def stringify_time_elapsed(start_date, end_date):
 
     else:
         raise ValueError("Both start and end dates must be provided")
+
+def rcpch_requested_time_elapsed(start_date, end_date):
+    """
+    Calculated field. Returns time elapsed between two dates.
+
+    If less than 2 years of difference, time elapsed is returned in months
+    
+    If greater than 2 years of difference, time elapseed is returned in years
+
+    Note - elapsed.months cannot be larger than 12, as this value then moves over to elapsed.years + 1
+    """
+    if end_date and start_date:
+        elapsed = relativedelta(end_date, start_date)
+        string_delta = ""
+
+        # <= 2 years return months
+        if elapsed.years <= 2:
+            if elapsed.years == 1:
+                # Adds 12 to elapsed.months to represent a year in months
+                # Returns data in months
+
+                string_delta += handle_interval(elapsed.months+12, "month")
+                return string_delta 
+            else:
+                string_delta += handle_interval(elapsed.months, "month")
+                return string_delta
+
+        else:
+            # Returns data in years
+            string_delta += handle_interval(elapsed.years, "year")
+            return string_delta
+    else:
+        raise ValueError("Both start and end dates must be provided")
