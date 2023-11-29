@@ -31,7 +31,7 @@ from ..decorator import (
     login_and_otp_required,
 )
 
-from ..general_functions import construct_transfer_epilepsy12_site_outcome_email
+from ..general_functions import construct_transfer_epilepsy12_site_outcome_email, imd_for_postcode
 from ..tasks import asynchronously_send_email_to_recipients
 
 
@@ -742,7 +742,7 @@ def consent_confirmation(request, case_id, consent_type):
     has_error = False
 
     if consent_type == "consent":
-        AuditProgress.objects.filter(pk=case.registration.audit_progress.pk).update(
+        AuditProgress.objects.filter(pk=case.registration.audit_progress.pk).up(
             consent_patient_confirmed=True
         )
         case = Case.objects.get(pk=case_id)
@@ -795,6 +795,19 @@ def all_epilepsy12_cases_list(request, organisation_id):
     )
 
     df = pd.DataFrame(all_cases)
+
+
+
+
+    df['first_name'] = df['first_name'].str[:2]
+    df['surname'] = df['surname'].str[:2]
+
+    df['postcode'] = df['postcode'].apply(imd_for_postcode)
+
+    df.rename(columns={'postcode': 'depriv_quintile'}, inplace=True)
+
+    # Need to add age at first assessment which will be added to the case in the audit
+    # Need to make a call to imd_for_postcode in index_multiple_deprivation to calculate postcode 
 
     csv_data =  df.to_csv(index=False)
 

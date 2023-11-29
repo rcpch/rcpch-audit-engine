@@ -1620,6 +1620,13 @@ a.ui.button {
   /* margin-top: -1em; */
   border-radius: 0%;
   box-shadow: 0em 0em 0em 1px rgba(113, 89, 170, 0.15) inset;
+  display: flex;
+  align-items: center;
+}
+
+.download-users {
+  display:flex;
+  justify-content: space-between;
 }
 
 .list-unstyled {

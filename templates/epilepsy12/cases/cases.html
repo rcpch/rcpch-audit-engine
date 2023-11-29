@@ -47,15 +47,19 @@
 
       
     </div>
-    <div class="ui bottom attached rcpch_purple_footer message">
-      <i class="warning info circle icon"></i>
-      These are all the children and young people registered in all audits since 2022.
-      {% if request.user|has_group:'epilepsy12_audit_team_full_access' or user.is_superuser %}
-        <button 
-        class="ui rcpch_positive download button">
-          <a href="{% url 'download_all_cases' organisation_id=organisation.pk %}">Download all E12 Cases list</a>
-        </button>
-      {% endif %}
+    <div class="ui bottom attached rcpch_purple_footer message download-users">
+      <div class="message">
+        <i class="warning info circle icon"></i>
+        These are all the children and young people registered in all audits since 2022.
+      </div>
+      <div>
+        {% if request.user|has_group:'epilepsy12_audit_team_full_access' or user.is_superuser %}
+          <button 
+          class="ui rcpch_positive download button">
+            <a href="{% url 'download_all_cases' organisation_id=organisation.pk %}">Download all E12 Cases list</a>
+          </button>
+        {% endif %}
+      </div>
     </div>
 
   </div>
