@@ -7,6 +7,8 @@ You can find more information about the Epilepsy12 audit, including previous rep
 
 ## Overview
 
+The Epilepsy12 audit is delivered by the Royal College of Paediatric and Child Health (RCPCH), who have been commissioned by the Healthcare Quality Improvement Partnership (HQIP), as part of the National Clinical Audit and Patient Outcomes Programme (NCAPOP). Round 4 is underway and is being delivered from 1 April 2022 to 31 March 2025.
+
 Patients are grouped into cohorts based on the date of their first paediatric assessment. We collect the data on the first year of care of each patient following the first assessment.
 
 | Cohort | Date of first paediatric assessment | First year of care data entry timeframe | Data entry deadline |
