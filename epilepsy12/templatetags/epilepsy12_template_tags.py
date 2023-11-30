@@ -312,7 +312,7 @@ def icon_for_score(score):
         return
     if score < 1:
         return mark_safe(
-            """<i 
+            """<i
                     class='rcpch_light_blue exclamation triangle icon'
                     data-title="Not achieved"
                     data-content="This measure has not been achieved for this child."
@@ -323,7 +323,7 @@ def icon_for_score(score):
         )
     elif score > 1:
         return mark_safe(
-            """<i 
+            """<i
                     class='rcpch_light_grey ban icon'
                     data-title="Not applicable"
                     data-content="This measure does not apply to this child."
@@ -333,7 +333,7 @@ def icon_for_score(score):
         )
     elif score == 1:
         return mark_safe(
-            """<i 
+            """<i
                 class='check circle outline rcpch_pink icon'
                 data-title="Achieved"
                 data-content="This child's care has met the Epilepsy12 standard for this measure."
@@ -344,7 +344,7 @@ def icon_for_score(score):
         )
     else:
         return mark_safe(
-            """<i 
+            """<i
                 class='rcpch dot circle icon'
                 data-title="Unscored"
                 data-content="This measure has not yet been scored."
@@ -406,7 +406,7 @@ def get_total_counts_passed(aggregation_model, kpi: str):
 
     return mark_safe(
         f"""{passed_count} passed out of {total_eligible_count} total eligible children.
-        
+
         Ineligible: {ineligible_count} children.
         Incomplete: {incomplete_count} children
         """
@@ -485,5 +485,5 @@ def get_org_id_from_user(user):
 
 
 @register.simple_tag
-def email_address():
+def site_contact_email():
     return settings.SITE_CONTACT_EMAIL

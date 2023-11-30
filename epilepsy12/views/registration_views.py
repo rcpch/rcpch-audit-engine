@@ -407,7 +407,7 @@ def update_lead_site(request, registration_id, site_id, update):
             )
             subject = "Epilepsy12 Lead Site Transfer"
         else:
-            # there is no allocated clinical lead. Send to epilepsy12@rcpch.ac.uk
+            # there is no allocated clinical lead. Send to SITE_CONTACT_EMAIL
             recipients = [settings.SITE_CONTACT_EMAIL]
             subject = "Epilepsy12 Lead Site Transfer - NO LEAD CLINICIAN"
 
