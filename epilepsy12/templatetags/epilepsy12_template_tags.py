@@ -3,6 +3,7 @@ import math
 
 from django import template
 from django.utils.safestring import mark_safe
+from django.conf import settings
 
 register = template.Library()
 
@@ -481,3 +482,8 @@ def get_org_id_from_user(user):
         return 1
 
     return user.organisation_employer.id
+
+
+@register.simple_tag
+def email_address():
+    return settings.SITE_CONTACT_EMAIL
