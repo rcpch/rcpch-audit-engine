@@ -587,6 +587,12 @@ div.ui.card > div.content > div.organisation_address_container {
   font-family: Montserrat-Bold !important;
 }
 
+.ui.rcpch_dark_blue.lighter_font.button{
+  background-color: var(--rcpch_light_grey);
+  font-weight: 800;
+  font-family: var(--rcpch_standard_font) !important;
+}
+
 .ui.rcpch_dark_blue.button:active {
   background-color: var(--rcpch_pink);
   color: white;
