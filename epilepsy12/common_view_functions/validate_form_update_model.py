@@ -12,6 +12,7 @@ from psycopg2 import DatabaseError
 # RCPCH imports
 from ..general_functions import (
     dates_for_cohort,
+    cohort_number_from_first_paediatric_assessment_date,
 )
 from ..validators import epilepsy12_date_validator
 
@@ -61,7 +62,7 @@ def validate_and_update_model(
             field_value = False
         else:
             # an error has occurred
-            print("Error has occurred")
+            raise Exception("Neither true or false supplied on toggle button click.")
 
     elif (
         page_element == "multiple_choice_multiple_toggle_button"
@@ -143,7 +144,11 @@ def validate_and_update_model(
             raise ValueError(errors)
 
         # the registration date cannot be before the child's cohort
-        child_cohort_data = dates_for_cohort(registration.cohort)
+        # To get cohort, we require Registration.first_paediatric_assessment_date. Of course this is not yet set. Therefore, get Cohort based on current field value
+        current_cohort = cohort_number_from_first_paediatric_assessment_date(
+            first_paediatric_assessment_date=field_value
+        )
+        child_cohort_data = dates_for_cohort(current_cohort)
         if field_value < child_cohort_data["cohort_start_date"]:
             errors = f'The date you entered cannot be before the cohort {{registration.cohort}} start date ({child_cohort_data["cohort_start_date"].strftime("%d %B %Y")})'
             raise ValueError(errors)
