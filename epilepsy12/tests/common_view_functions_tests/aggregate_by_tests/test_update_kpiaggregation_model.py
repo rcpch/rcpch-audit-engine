@@ -180,8 +180,6 @@ def test_update_kpi_aggregation_model_all_levels(
                     cohort=6
                 )
             )
-            
-            print(kpi_aggregation_model_instance)
 
             output = kpi_aggregation_model_instance.get_value_counts_for_kpis(
                 kpis_tested
