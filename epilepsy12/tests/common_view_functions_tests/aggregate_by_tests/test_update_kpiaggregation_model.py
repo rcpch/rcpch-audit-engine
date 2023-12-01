@@ -176,9 +176,12 @@ def test_update_kpi_aggregation_model_all_levels(
 
             kpi_aggregation_model_instance = (
                 abstraction_kpi_aggregation_model.objects.get(
-                    abstraction_relation=abstraction_relation_instance
+                    abstraction_relation=abstraction_relation_instance,
+                    cohort=6
                 )
             )
+            
+            print(kpi_aggregation_model_instance)
 
             output = kpi_aggregation_model_instance.get_value_counts_for_kpis(
                 kpis_tested
