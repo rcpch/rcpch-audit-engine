@@ -1314,8 +1314,9 @@ def syndrome_present(request, multiaxial_diagnosis_id):
         if Syndrome.objects.filter(multiaxial_diagnosis=multiaxial_diagnosis).exists():
             Syndrome.objects.filter(multiaxial_diagnosis=multiaxial_diagnosis).delete()
     else:
-        print("Some mistake happened")
-        # TODO need to handle this
+        raise Exception(
+            "No button click parameter supplied for syndrome_present measure."
+        )
 
     syndromes = Syndrome.objects.filter(
         multiaxial_diagnosis=multiaxial_diagnosis
@@ -1495,10 +1496,9 @@ def relevant_impairments_behavioural_educational(request, multiaxial_diagnosis_i
             ).delete()
         multiaxial_diagnosis.save()
     else:
-        print(
-            "Some kind of error - this will need to be raised and returned to template"
+        return HttpResponse(
+            "Error: toggle button for relevant impairments (behavioural/educational) return neither true or false on click."
         )
-        return HttpResponse("Error")
 
     context = {
         "multiaxial_diagnosis": multiaxial_diagnosis,
@@ -1536,7 +1536,9 @@ def add_comorbidity(request, multiaxial_diagnosis_id):
 
     # get a list of comorbidityentities for select, excluding that already chosen
     multiaxial_diagnosis = comorbidity.multiaxial_diagnosis
-    comorbidity_choices = get_comorbidity_choices(multiaxial_diagnosis=multiaxial_diagnosis)
+    comorbidity_choices = get_comorbidity_choices(
+        multiaxial_diagnosis=multiaxial_diagnosis
+    )
 
     context = {"comorbidity": comorbidity, "comorbidity_choices": comorbidity_choices}
 
@@ -1560,7 +1562,9 @@ def edit_comorbidity(request, comorbidity_id):
     # get a list of comorbidityentities for select, excluding those already chosen
     comorbidity = Comorbidity.objects.get(pk=comorbidity_id)
     multiaxial_diagnosis = comorbidity.multiaxial_diagnosis
-    comorbidity_choices = get_comorbidity_choices(multiaxial_diagnosis=multiaxial_diagnosis, comorbidity_id=comorbidity_id)
+    comorbidity_choices = get_comorbidity_choices(
+        multiaxial_diagnosis=multiaxial_diagnosis, comorbidity_id=comorbidity_id
+    )
     context = {"comorbidity": comorbidity, "comorbidity_choices": comorbidity_choices}
 
     response = recalculate_form_generate_response(
@@ -1665,7 +1669,9 @@ def comorbidity_diagnosis_date(request, comorbidity_id):
     # except current comorbidity selection
     comorbidity = Comorbidity.objects.get(pk=comorbidity_id)
     multiaxial_diagnosis = comorbidity.multiaxial_diagnosis
-    comorbidity_choices = get_comorbidity_choices(multiaxial_diagnosis=multiaxial_diagnosis, comorbidity_id=comorbidity_id)
+    comorbidity_choices = get_comorbidity_choices(
+        multiaxial_diagnosis=multiaxial_diagnosis, comorbidity_id=comorbidity_id
+    )
 
     context = {"comorbidity": comorbidity, "comorbidity_choices": comorbidity_choices}
 
@@ -1707,8 +1713,10 @@ def comorbidity_diagnosis(request, comorbidity_id):
     # except current comorbidity selection
     comorbidity = Comorbidity.objects.get(pk=comorbidity_id)
     multiaxial_diagnosis = comorbidity.multiaxial_diagnosis
-    
-    comorbidity_choices = get_comorbidity_choices(multiaxial_diagnosis=multiaxial_diagnosis, comorbidity_id=comorbidity_id)
+
+    comorbidity_choices = get_comorbidity_choices(
+        multiaxial_diagnosis=multiaxial_diagnosis, comorbidity_id=comorbidity_id
+    )
 
     context = {
         "comorbidity_choices": comorbidity_choices,

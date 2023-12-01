@@ -542,7 +542,6 @@ def update_case(request, organisation_id, case_id):
     """
     Django function based view. Receives POST request to update view or delete
     """
-    print("I at least pass through here...")
     case = get_object_or_404(Case, pk=case_id)
     form = CaseForm(instance=case)
 
