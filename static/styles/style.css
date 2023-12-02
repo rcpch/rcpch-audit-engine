@@ -112,6 +112,8 @@
   --rcpch_bold_font: Montserrat-Bold;
 }
 
+
+/* base elements */
 body {
   color: black;
   font-family: var(--rcpch_standard_font);
@@ -151,14 +153,12 @@ ul {
   font-weight: 400;
 }
 
+
+/* only used once - could be refactored: styling of the login hyperlink in the password reset complete template */
 .rcpch_link {
   font-family: var(--rcpch_standard_font);
   color: black;
   font-weight: 400;
-}
-
-.ui.fluid.rcpch.container {
-  padding: 0rem;
 }
 
 .ui.rcpch.container {
