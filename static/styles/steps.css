@@ -1,0 +1,85 @@
+/* Steps */
+.step {
+    border-radius: 0%;
+  }
+  
+  .ui.vertical.ordered.mini.top.attached.rcpch.steps .title {
+    font-family: var(--rcpch_standard_font);
+    font-weight: 400;
+    color: var(--rcpch_black);
+  }
+  
+  .ui.vertical.ordered.mini.top.attached.rcpch.steps .description {
+    font-family: var(--rcpch_standard_font);
+    font-weight: 400;
+    color: var(--rcpch_charcoal);
+  }
+  
+  .ui.vertical.ordered.mini.top.attached.rcpch.steps .step:hover {
+    background-color: var(--rcpch_light_blue);
+    color: white;
+  }
+  
+  .ui.vertical.ordered.mini.top.attached.rcpch.steps .rcpch_summary.step:hover {
+    background-color: var(--rcpch_dark_blue);
+    color: white;
+  }
+  
+  .ui.vertical.ordered.mini.top.attached.rcpch.steps .step:hover .description {
+    color: white;
+  }
+  
+  .ui.vertical.ordered.mini.top.attached.rcpch.steps .step:hover .title {
+    color: white;
+  }
+  
+  .ui.vertical.ordered.mini.top.attached.rcpch.steps .active.step {
+    background-color: var(--rcpch_dark_blue);
+    color: white;
+  }
+  
+  .ui.vertical.ordered.mini.top.attached.rcpch.steps .active.step .title {
+    color: white;
+  }
+  
+  .ui.vertical.ordered.mini.top.attached.rcpch.steps .active.step .description {
+    color: white;
+  }
+  
+  .ui.vertical.ordered.mini.top.attached.rcpch.steps .active.step:before {
+    color: white;
+  }
+  
+  .ui.vertical.ordered.mini.top.attached.rcpch.steps .active.step::after {
+    color: white;
+    background-color: var(--rcpch_dark_blue);
+  }
+  
+  .ui.vertical.ordered.mini.top.attached.rcpch.steps .completed.step {
+    color: white;
+    background-color: var(--rcpch_pink);
+  }
+  
+  .ui.vertical.ordered.mini.top.attached.rcpch.steps .completed.step::after {
+    background-color: var(--rcpch_pink);
+  }
+  
+  .ui.vertical.ordered.mini.top.attached.rcpch.steps .completed.step .title {
+    color: white;
+  }
+  
+  .ui.vertical.ordered.mini.top.attached.rcpch.steps
+    .completed.step
+    .description {
+    color: white;
+  }
+  
+  .ui.vertical.ordered.mini.top.attached.rcpch.steps .completed.step::before {
+    color: white;
+    margin-bottom: 0.5em;
+    border-radius: 0%;
+  }
+  
+  .rcpch_steps_wrapper a {
+    flex-wrap: nowrap !important;
+  }

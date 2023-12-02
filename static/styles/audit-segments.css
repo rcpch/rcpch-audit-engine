@@ -1,0 +1,22 @@
+/* this are set as ids rather than classes as are already put of a class */
+
+#audit_top_attached_segment {
+    border-radius: 0%;
+    background-color: #3366cc;
+    color: white;
+    font-family: var(--rcpch_standard_font);
+    font-weight: 400;
+  }
+  
+  #audit_top_attached_segment > h5 {
+    margin: 0em 0em;
+    padding: 1em 0em;
+  }
+  
+  #audit_body_segment {
+    border-radius: 0%;
+    background-color: white;
+    font-family: var(--rcpch_standard_font);
+    font-weight: 400;
+    padding-bottom: 2em;
+  }

@@ -1,0 +1,117 @@
+/* rcpch table */
+
+@media only screen and (min-width: 768px) and (max-width: 1199px) {
+    table.ui.rcpch.table {
+      table-layout: fixed;
+      word-break: break-word;
+      font-size: smaller;
+    }
+  
+    .ui.grid.container.selected_organisation_container {
+      width: 65rem !important;
+    }
+    .ui.container {
+      width: 100% !important;
+    }
+  }
+  
+  @media only screen and (max-width: 767px) {
+    .ui.fluid.container {
+      margin: 0em !important;
+    }
+    .ui.grid.container.selected_organisation_container {
+      width: 100% !important;
+      margin: 0rem !important;
+    }
+  }
+  
+  .ui.rcpch.table {
+    border-radius: 0%;
+    border-color: var(--rcpch_light_blue);
+    border-width: medium;
+    margin-bottom: 10px;
+    margin-top: 10px;
+  }
+  
+  .ui.table thead tr:first-child > th:last-child {
+    border-radius: 0rem 0rem 0rem 0rem;
+  }
+  
+  .ui.table thead tr:first-child > th:first-child {
+    border-radius: 0rem 0em 0em 0em;
+  }
+  
+  .ui.table thead tr:first-child > th:only-child {
+    border-radius: 0rem 0rem 0em 0em;
+  }
+  
+  .ui.rcpch.table th {
+    background-color: var(--rcpch_light_blue);
+    color: var(--rcpch_black);
+    font-family: var(--rcpch_standard_font);
+    font-weight: 400;
+  }
+  
+  .ui.rcpch.table tr:first-child() .ui.rcpch.table td {
+    /* border-color: white; */
+    vertical-align: top;
+  }
+  
+  .ui.rcpch.table > tfoot > tr > th {
+    background-color: white;
+    border-top: white;
+  }
+  
+  .ui.rcpch.table .subcategory-header {
+    background-color: var(--rcpch_light_blue_tint2);
+    font-family: var(--rcpch_bold_font);
+    font-weight: 900;
+  }
+  
+  .ui.rcpch.table .subcategory-row {
+    background-color: var(--rcpch_light_blue_tint3);
+  }
+  
+  /* purple table */
+  
+  .ui.rcpch.purple.table th {
+    background-color: var(--rcpch_purple_dark_tint);
+    color: white;
+    font-family: 400;
+    border-radius: 0%;
+  }
+  
+  .ui.rcpch.purple.table {
+    border-radius: 0%;
+    border-color: var(--rcpch_purple_dark_tint);
+    border-width: medium;
+    margin-bottom: 10px;
+  }
+  
+  .ui.rcpch.purple.table tfoot tr:first-child > th:first-child {
+    border-radius: 0%;
+  }
+  
+  .ui.rcpch.purple.table tfoot tr:first-child > th:last-child {
+    border-radius: 0%;
+  }
+  
+  .ui.rcpch.purple.table tfoot tr:first-child > th:only-child {
+    border-radius: 0%;
+  }
+
+  table.ui.rcpch.table.user_table thead {
+    vertical-align: top;
+  }
+  
+  table.ui.rcpch.table.user_table tbody {
+    vertical-align: middle;
+  }
+  
+  table.ui.rcpch.table.cases_table thead {
+    vertical-align: top;
+  }
+  
+  table.ui.rcpch.table.cases_table tbody {
+    vertical-align: middle;
+  }

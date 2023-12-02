@@ -1,0 +1,103 @@
+/* pie chart segments */
+
+.ui.rcpch_chart_container.segment {
+    border-radius: 0%;
+    height: 200px;
+    width: auto;
+    /* background-color: var(--rcpch_light_grey); */
+  }
+  
+  /* SUMMARY STATS CARDS - ethnicity / imd etc */
+  
+  .ui.rcpch_light_blue.card {
+    background-color: var(--rcpch_strong_blue);
+    border-radius: 0%;
+    font-family: var(--rcpch_standard_font);
+    color: black;
+    text-align: center;
+    font-weight: 400;
+  }
+  
+  .ui.rcpch_light_blue.card > .ui.header {
+    padding: 0.5em 0.5em;
+    margin-bottom: 0em;
+    margin-top: 0em;
+  }
+  
+  .ui.rcpch_light_blue.card .content .description {
+    font-family: var(--rcpch_standard_font);
+    color: black;
+    font-weight: 400;
+  }
+  
+  .ui.rcpch_light_blue.card div.content > h3 {
+    color: var(--rcpch_white);
+  }
+  
+  .ui.rcpch_light_blue.card .content {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+  }
+  
+  div.ui.card > div.content > div.organisation_address_container {
+    margin: 1em auto;
+  }
+
+  /* .ui.rcpch_dark_blue.card {
+    background-color: var(--rcpch_dark_blue);
+    border-radius: 0%;
+    font-family: var(--rcpch_standard_font);
+    font-weight: 400;
+    color: white;
+    width: auto;
+  }
+  
+  .ui.rcpch_dark_blue.card .content .header {
+    background-color: var(--rcpch_dark_blue);
+    border-radius: 0%;
+    font-family: var(--rcpch_standard_font);
+    font-weight: 400;
+    color: white;
+  } */
+  
+  /* .ui.rcpch_dark_blue.card .content i {
+    color: white;
+  }
+  
+  .ui.rcpch_dark_blue.card .category {
+    background-color: var(--rcpch_dark_blue);
+    border-radius: 0%;
+    font-family: var(--rcpch_standard_font);
+    font-weight: 400;
+    color: white;
+  }
+  
+  .ui.white.card {
+    border-radius: 0%;
+    font-family: var(--rcpch_standard_font);
+    font-weight: 400;
+  } */
+
+  /* cards for organisation details */
+.organisation_details {
+    padding: 0.5em 0.5em;
+    margin: 0em auto;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+  }
+  
+  .ui.rcpch.organisation.icon {
+    margin-right: 0.5em;
+  }
+  
+  .organisation_details > .organisation_address > div.item {
+    text-align: center;
+  }
+  
+  .organisation_details > .organisation_address > div.item > p {
+    margin-bottom: 0em;
+    /* text-align: center; */
+  }

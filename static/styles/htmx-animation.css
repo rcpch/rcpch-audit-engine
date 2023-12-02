@@ -1,0 +1,13 @@
+/* spinner */
+
+.htmx-indicator.spinner.loading.icon {
+    display: none;
+  }
+  
+  .htmx-request .htmx-indicator.spinner.loading.icon {
+    display: inline;
+  }
+  
+  .htmx-request.htmx-indicator.spinner.loading.icon {
+    display: inline;
+  }
