@@ -237,6 +237,12 @@ def selected_trust_kpis(request, organisation_id, access):
     if logged_in_user_may_access_this_organisation(request.user, organisation):
         # user is logged in and allowed to access this organisation
 
+        if access == "private":
+            # perform aggregations and update all the KPIAggregation models only for clinicians
+            asynchronously_aggregate_kpis_and_update_models_for_cohort_and_abstraction_level.delay(
+                cohort=cohort, open_access=False
+            )
+
         # Gather relevant data specific for this view - still show only published data if this is public view
         all_data = get_all_kpi_aggregation_data_for_view(
             organisation=organisation, cohort=cohort, open_access=access == "open"
