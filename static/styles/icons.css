@@ -1,0 +1,36 @@
+.rcpch.question.circle.icon {
+    color: var(--rcpch_light_blue);
+}
+
+/* used in landing page and selected organisation summary */
+.rcpch_icon_text_group {
+    display: inline-flex;
+}
+
+.rcpch_icon_text_group > p.rcpch_icon_text {
+    margin: auto;
+    word-break: break-all;
+}
+
+/* icons in epilepsy12 users */
+.rcpch_team_member_image_wrapper {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    height: 5em;
+  }
+
+.rcpch_team_member_image_wrapper > * {
+    margin: 0 2px;
+}
+
+img.ui.image.rcpch_member_image {
+    border-color: var(--rcpch_pink);
+    border-width: 2px;
+    background-color: var(--rcpch_pink);
+    border-style: solid;
+}
+
+.star.outline.icon {
+    color: var(--rcpch_pink);
+}

@@ -93,3 +93,7 @@
   color: var(--rcpch_light_blue);
   background: var(--rcpch_light_blue);
 }
+
+.ui.form.field > label {
+  font-weight: 400;
+}

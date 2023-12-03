@@ -115,3 +115,63 @@
   table.ui.rcpch.table.cases_table tbody {
     vertical-align: middle;
   }
+
+  /* kpi table */
+  .kpi_unscored {
+    color: var(--rcpch_mid_grey);
+  }
+  
+  .kpi_header_wrapper {
+    display: flex;
+    flex-direction: column;
+  }
+
+  .rcpch_td_data_indicator_wrapper {
+    display: flex;
+    justify-content: space-between;
+  }
+  
+  .ui.rcpch.purple.table.cases_table .rcpch_td_data_indicator_wrapper > * {
+    color: var(--rcpch_white);
+  }
+  
+  .ui.rcpch.purple.table.cases_table .rcpch_td_data_indicator_wrapper:hover > * {
+    color: var(--rcpch_pink_light_tint3);
+  }
+  
+  @media only screen and (max-width: 1119px) {
+    .rcpch_td_data_indicator_wrapper {
+      flex-direction: column;
+    }
+  }
+  
+  .rcpch_td_data_indicator_wrapper i {
+    padding-left: 1em;
+  }
+  
+  .rcpch_td_data_indicator_wrapper p {
+    font-family: Montserrat-Bold !important;
+    font-weight: 900;
+  }
+  
+  .rcpch_td_data_indicator_wrapper i:hover {
+    color: #e00087;
+  }
+
+  tbody {
+    vertical-align: top;
+  }
+  
+  tr {
+    transition: background-color 0.25s;
+  }
+  
+  tr:hover {
+      background-color: var(--rcpch_light_grey);
+  }
+
+  /* highlight child in transfer */
+  .active_transfer{
+    background-color: var(--rcpch_purple_light_tint3);
+  }
+  
