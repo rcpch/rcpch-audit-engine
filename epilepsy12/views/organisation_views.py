@@ -234,7 +234,9 @@ def selected_trust_kpis(request, organisation_id, access):
     """
 
     # Get all relevant data for this cohort
-    cohort = cohort_number_from_first_paediatric_assessment_date(date.today())
+    # cohort = cohort_number_from_first_paediatric_assessment_date(date.today())
+    # Get all relevant data for submission cohort
+    cohort_data = cohorts_and_dates(first_paediatric_assessment_date=date.today())
     organisation = Organisation.objects.get(pk=organisation_id)
 
     if logged_in_user_may_access_this_organisation(request.user, organisation):
@@ -243,19 +245,23 @@ def selected_trust_kpis(request, organisation_id, access):
         if access == "private":
             # perform aggregations and update all the KPIAggregation models only for clinicians
             asynchronously_aggregate_kpis_and_update_models_for_cohort_and_abstraction_level.delay(
-                cohort=cohort, open_access=False
+                cohort=cohort_data["submitting_cohort"], open_access=False
             )
 
         # Gather relevant data specific for this view - still show only published data if this is public view
         all_data = get_all_kpi_aggregation_data_for_view(
-            organisation=organisation, cohort=cohort, open_access=access == "open"
+            organisation=organisation,
+            cohort=cohort_data["submitting_cohort"],
+            open_access=access == "open",
         )
 
     else:
         # User is not logged in and not eligible to run aggregations
         # Gather relevant open access data specific for this view
         all_data = get_all_kpi_aggregation_data_for_view(
-            organisation=organisation, cohort=cohort, open_access=True
+            organisation=organisation,
+            cohort=cohort_data["submitting_cohort"],
+            open_access=True,
         )
 
     # Instance of KPI to access field name help text attributes for KPI "Indicator" row values in table
@@ -286,6 +292,7 @@ def selected_trust_kpis(request, organisation_id, access):
         ),  # for public view dropdown
         "last_published_date": last_published_date,
         "publish_success": False,
+        "cohort_data": cohort_data,
     }
 
     return render(
