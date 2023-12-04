@@ -80,3 +80,48 @@ def dates_for_cohort(cohort: int):
     }
 
     return cohort_data
+
+
+def cohorts_and_dates(first_paediatric_assessment_date: date):
+    """
+    Returns:
+    * currently-recruiting cohort and dates
+    * submitting-cohort and dates
+    """
+
+    today = date.today()
+    currently_recruiting_cohort_number = (
+        cohort_number_from_first_paediatric_assessment_date(
+            first_paediatric_assessment_date=first_paediatric_assessment_date
+        )
+    )
+    if today < date(year=today.year, month=12, day=1):
+        submitting_cohort_number = currently_recruiting_cohort_number
+    else:
+        submitting_cohort_number = currently_recruiting_cohort_number - 1
+
+    currently_recruiting_cohort = dates_for_cohort(
+        cohort=currently_recruiting_cohort_number
+    )
+    submitting_cohort = dates_for_cohort(cohort=submitting_cohort_number)
+
+    return {
+        "currently_recruiting_cohort": currently_recruiting_cohort_number,
+        "currently_recruiting_cohort_start_date": currently_recruiting_cohort[
+            "cohort_start_date"
+        ],
+        "currently_recruiting_cohort_end_date": currently_recruiting_cohort[
+            "cohort_end_date"
+        ],
+        "currently_recruiting_cohort_submission_date": currently_recruiting_cohort[
+            "submission_date"
+        ],
+        "currently_recruiting_cohort_days_remaining": currently_recruiting_cohort[
+            "days_remaining"
+        ],
+        "submitting_cohort": submitting_cohort_number,
+        "submitting_cohort_start_date": submitting_cohort["cohort_start_date"],
+        "submitting_cohort_end_date": submitting_cohort["cohort_end_date"],
+        "submitting_cohort_submission_date": submitting_cohort["submission_date"],
+        "submitting_cohort_days_remaining": submitting_cohort["days_remaining"],
+    }

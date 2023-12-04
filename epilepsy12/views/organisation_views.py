@@ -27,6 +27,7 @@ from ..general_functions import (
     cohort_number_from_first_paediatric_assessment_date,
     dates_for_cohort,
     value_from_key,
+    cohorts_and_dates,
 )
 from ..tasks import (
     asynchronously_aggregate_kpis_and_update_models_for_cohort_and_abstraction_level,
@@ -83,14 +84,16 @@ def selected_organisation_summary(request, organisation_id):
         london_borough_tiles = return_tile_for_region("london_borough")
 
     # get latest cohort - in future will be selectable
-    cohort = cohort_number_from_first_paediatric_assessment_date(date.today())
-    cohort_data = dates_for_cohort(cohort)
+    # cohort = cohort_number_from_first_paediatric_assessment_date(date.today())
+    # cohort_data = dates_for_cohort(cohort)
+    # get submitting_cohort number
+    cohort_data = cohorts_and_dates(first_paediatric_assessment_date=date.today())
 
     # query to return all completed E12 cases in the current cohort in this organisation
     count_of_current_cohort_registered_completed_cases_in_this_organisation = (
         all_registered_cases_for_cohort_and_abstraction_level(
             organisation_instance=selected_organisation,
-            cohort=cohort_data["cohort"],
+            cohort=cohort_data["submitting_cohort"],
             case_complete=True,
             abstraction_level="organisation",
         ).count()
@@ -99,7 +102,7 @@ def selected_organisation_summary(request, organisation_id):
     count_of_current_cohort_registered_completed_cases_in_this_trust = (
         all_registered_cases_for_cohort_and_abstraction_level(
             organisation_instance=selected_organisation,
-            cohort=cohort_data["cohort"],
+            cohort=cohort_data["submitting_cohort"],
             case_complete=True,
             abstraction_level=abstraction_level,
         ).count()
@@ -108,7 +111,7 @@ def selected_organisation_summary(request, organisation_id):
     count_of_all_current_cohort_registered_cases_in_this_organisation = (
         all_registered_cases_for_cohort_and_abstraction_level(
             organisation_instance=selected_organisation,
-            cohort=cohort_data["cohort"],
+            cohort=cohort_data["submitting_cohort"],
             case_complete=False,
             abstraction_level="organisation",
         ).count()
@@ -117,7 +120,7 @@ def selected_organisation_summary(request, organisation_id):
     count_of_all_current_cohort_registered_cases_in_this_trust = (
         all_registered_cases_for_cohort_and_abstraction_level(
             organisation_instance=selected_organisation,
-            cohort=cohort_data["cohort"],
+            cohort=cohort_data["submitting_cohort"],
             case_complete=False,
             abstraction_level=abstraction_level,
         ).count()
