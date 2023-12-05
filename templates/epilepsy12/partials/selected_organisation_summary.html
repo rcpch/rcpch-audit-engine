@@ -1,6 +1,6 @@
 {% load static %}
 {% load epilepsy12_template_tags %}
-{% csrf_token %} 
+{% csrf_token %}
 
 <div class="ui grid container selected_organisation_container">
 
@@ -8,7 +8,7 @@
             <button class="ui rcpch_positive button jump" _="on click go to top of #kpis">Jump to All KPI Metrics</button>
             <div class="ui rcpch_light_blue label">Organisation View</div>
         </div>
-    
+
         {% if request.user.is_rcpch_audit_team_member or request.user.is_rcpch_staff or request.user.is_superuser %}
             <div class='sixteen wide column'>
                 <div class="field" hx-headers='{"X-CSRFToken": "{{ csrf_token }}"}'>
@@ -18,7 +18,7 @@
             </div>
         {% endif %}
 
-            
+
             <div class="fluid row stackable org_view_all_buttons_wrapper three column grid">
                 {% if user.is_rcpch_audit_team_member or user.is_superuser %}
                         <!-- Only RCPCH Audit team members and superusers can publish aggregations to the open access page -->
@@ -35,7 +35,7 @@
                     <div class="column" id="publish_button">
                         {% include './organisation/publish_button.html' with selected_organisation=selected_organisation publish_success=publish_success %}
                     </div>
-            
+
                 {% else %}
 
                     <div class="eight wide column">
@@ -54,13 +54,12 @@
 
         <div class='sixteen wide fluid column'>
 
-            
+
             <div class="ui three stackable cards">
-                
+
                 <div class="ui card">
                     <div class="content">
-                        <div class="organisation_address_container">
-                            <div class="ui centered header organisation_address">
+                            <div class="ui centered header">
                                 <h3>{{ selected_organisation.name }}</h3>
                             </div>
                             <h4 class="ui horizontal divider">
@@ -107,38 +106,40 @@
                                     </div>
                                 </div>
                         </div>
-                    </div>
                 </div>
 
-                
+
                 <div class="ui card">
-                    <div class="content">                      
+                    <div class="content">
                         <div class="rcpch_summary_stats">
-                            
-                            
+
+                            <div class="ui centered header">
+                                <h3>Currently Submitting Cohort</h3>
+                            </div>
+
                                 <div class="rcpch_summary_stats_row">
-                                    <h1 class="">{{cohort_data.cohort}}</h1>
-                                    <h2>Current Cohort</h2>
+                                    <h1>{{cohort_data.submitting_cohort}}</h1>
                                     <h3>
-                                        {% if cohort_data.days_remaining > 0 %}
-                                            Actively recruiting
+                                        {% if cohort_data.end_date > today %}
+                                            Actively recruiting and submitting data
                                         {% else %}
-                                            Recruitment closed
+                                            Recruitment closed, submitting data only
                                         {% endif %}
                                     </h3>
-                                    <h4>{{cohort_data.cohort_start_date}}-{{cohort_data.cohort_end_date}}</h4>
+                                    <h4>Recruitment dates for Cohort {{cohort_data.submitting_cohort}}: {{cohort_data.submitting_cohort_start_date}} - {{cohort_data.submitting_cohort_end_date}}</h4>
                                 </div>
 
                                 <div class="rcpch_summary_stats_row">
-                                    <h1>{{cohort_data.days_remaining_until_latest_submission}}</h1>
+                                    <h1>{{cohort_data.submitting_cohort_days_remaining}}</h1>
                                     <h2>Days remaining</h2>
                                     <h3>until latest submission date</h3>
-                                    <h4>({{cohort_data.submission_date}})</h4>
+                                    <h4>({{cohort_data.submitting_cohort_submission_date}})</h4>
                                 </div>
+
                         </div>
                     </div>
                 </div>
-                
+
 
                 <div class="ui  card">
                     <div class="content">
@@ -146,16 +147,16 @@
                             <h3>Completed Patient Records</h3>
                         </div>
                         <div class="">
-    
+
                                 <div class="column">
-                                    
+
                                     <div class="four wide stackable column">
                                         {% include 'epilepsy12/partials/charts/progress.html' with percentage=percent_completed_organisation numerator=count_of_current_cohort_registered_completed_cases_in_this_organisation denominator=count_of_all_current_cohort_registered_cases_in_this_organisation title="Completed Patient Records - Organisation" pie_size='med' %}
                                         <div class='rcpch_centred_text'>
                                             <p><small>{{selected_organisation.name}}</small></p>
                                         </div>
                                     </div>
-            
+
                                 </div>
                                 <div class="column">
                                     <div class="four wide stackable column">
@@ -168,32 +169,32 @@
                                             {% endif %}
                                         </div>
                                     </div>
-                                    
+
                                 </div>
-    
+
                         </div>
                     </div>
                 </div>
 
-                
-                
+
+
 
             </div>
-    
+
         </div>
 
-        
-        
+
+
         <div class='sixteen wide fluid column'>
 
-            
+
             <div class="ui three stackable cards">
-                               
+
                 <div class="ui rcpch_light_blue card">
                     <div class="content">
-                        
+
                         <h3 >Distribution by Ethnicity</h3>
-                        
+
                     </div>
 
                         <div class="">
@@ -204,15 +205,15 @@
                                     <h5>No data yet!<h5>
                                 {% endif %}
                             </div>
-                        
+
                     </div>
                 </div>
-                
+
                 <div class="ui rcpch_light_blue card">
                     <div class="content">
-                        
+
                             <h3>Distribution by Sex</h3>
-                        
+
                     </div>
                     <div class="">
                         <div class='description'>
@@ -229,10 +230,10 @@
 
                 <div class="ui rcpch_light_blue card">
                     <div class="content">
-                        
+
                             <h3>
                                 Distribution by Index of Multiple Deprivation
-                                <i 
+                                <i
                                     class="info circle icon"
                                     id='deprivation_help'
                                     data-title='Epilepsy12 Index of Multiple Deprivation'
@@ -241,7 +242,7 @@
                                     _="init js $('#deprivation_help').popup(); end"
                                 ></i>
                             </h3>
-                        
+
                     </div>
                     <div class="">
                         <div class='description'>
@@ -256,16 +257,16 @@
                     </div>
                 </div>
 
-                
-                
+
+
 
             </div>
-    
+
         </div>
-        
+
         <div class="sixteen wide right fluid column">
             <div class="ui three stackable cards">
-                               
+
                 <div class="ui rcpch_light_blue card">
                     <div class="content">
                         <!-- ENGLISH ORG -->
@@ -306,7 +307,7 @@
                     </div>
                 </div>
                 {% endif %}
-                
+
                 {% if selected_organisation.city != "LONDON" %}
                 <div class="ui rcpch_light_blue card">
                     <div class="content">
@@ -323,8 +324,8 @@
             </div>
         </div>
 
-        
-            
+
+
         <div class="sixteen wide column">
             <div
                 class="sixteen wide rcpch segment"
@@ -335,17 +336,17 @@
                 <div id='kpis'>
                     <div class="ui active centered inline loader"></div>
                 </div>
-            
+
             </div>
         </div>
-        
-        {% include 'epilepsy12/partials/organisation/individual_metrics.html' with organisation_id=selected_organisation.pk %}
-            
-        </div>
-                
-            
-            
 
-    
+        {% include 'epilepsy12/partials/organisation/individual_metrics.html' with organisation_id=selected_organisation.pk cohort=cohort_data.submitting_cohort %}
+
+        </div>
+
+
+
+
+
 </div>
 <script src="https://cdn.jsdelivr.net/npm/chart.js@3.8.0/dist/chart.min.js" integrity="sha256-cHVO4dqZfamRhWD7s4iXyaXWVK10odD+qp4xidFzqTI=" crossorigin="anonymous"></script>
