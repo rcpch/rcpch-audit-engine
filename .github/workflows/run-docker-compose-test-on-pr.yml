@@ -47,6 +47,7 @@ jobs:
           echo "EMAIL_HOST_SERVER=${{ secrets.EMAIL_HOST_SERVER }}" >> envs/.env
           echo "EMAIL_HOST_USER=${{ secrets.EMAIL_HOST_USER }}" >> envs/.env
           echo "SMTP_EMAIL_ENABLED=${{ secrets.SMTP_EMAIL_ENABLED }}" >> envs/.env
+          echo "SITE_CONTACT_EMAIL=${{ secrets.SITE_CONTACT_EMAIL }}" >> envs/.env
           echo "FLOWER_PASSWORD=${{ secrets.FLOWER_PASSWORD }}" >> envs/.env
           echo "FLOWER_PORT=${{ secrets.FLOWER_PORT }}" >> envs/.env
           echo "FLOWER_USER=${{ secrets.FLOWER_USER }}" >> envs/.env
