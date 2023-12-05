@@ -89,16 +89,14 @@ def cohorts_and_dates(first_paediatric_assessment_date: date):
     * submitting-cohort and dates
     """
 
-    today = date.today()
     currently_recruiting_cohort_number = (
         cohort_number_from_first_paediatric_assessment_date(
             first_paediatric_assessment_date=first_paediatric_assessment_date
         )
     )
-    if today < date(year=today.year, month=12, day=1):
-        submitting_cohort_number = currently_recruiting_cohort_number
-    else:
-        submitting_cohort_number = currently_recruiting_cohort_number - 1
+
+    # submitting_cohort_number is always 1 less than currently_recruiting_cohort_number
+    submitting_cohort_number = currently_recruiting_cohort_number - 1
 
     currently_recruiting_cohort = dates_for_cohort(
         cohort=currently_recruiting_cohort_number
