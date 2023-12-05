@@ -1,7 +1,7 @@
 {% load epilepsy12_template_tags %}
 {% csrf_token %}
 {% comment %}
-This template is the kpis table and is called from selected_trust_kpis, that latter for 
+This template is the kpis table and is called from selected_trust_kpis, that latter for
 open access. The open_access flag passed in from both endpoints denotes this.
 Currently the aggregation queries are run with every page load, but in future, the open_access results
 will be persisted and run as a cron job once a day.
@@ -11,10 +11,9 @@ will be persisted and run as a cron job once a day.
         <div class="ui top attached inverted clearing segment" id="audit_top_attached_segment">
             <div class='ui header'>
                 <div class='content kpi_header'>
-                    <p>Real-time Key Performance Indicator (KPI) Metrics for cohort {{cohort_data.submitting_cohort}}</p>
-                    
-                    
-                    <p>{{organisation.name}} 
+                    <p>Real-time Key Performance Indicator (KPI) Metrics for Cohort {{cohort_data.submitting_cohort}}</p>
+
+                    <p>{{organisation.name}}
                         (
                             {% if organisation.trust %}
                                 {{ organisation.trust.name }}
@@ -23,16 +22,16 @@ will be persisted and run as a cron job once a day.
                             {% endif %}
                         )
                     </p>
-                    
+
                 </div>
                 <div class="all-kpis-header">
                     <button class='ui right floated rcpch_primary button' _="on click go to the top of #selected_trust_select_kpi_marker">Jump to Individual Measures</button>
                     {% if not open %}
                         <!-- anyone can refresh and rerun aggregations that is not a member of the public  -->
-                        <button 
+                        <button
                             class='ui right floated rcpch_primary button'
                             hx-get="{% url 'selected_trust_kpis' organisation_id=organisation.pk access='private' %}"
-                            name="refresh" 
+                            name="refresh"
                             hx-trigger="click"
                             >
                             Refresh
@@ -49,25 +48,25 @@ will be persisted and run as a cron job once a day.
         </div>
 
         {% if all_data.ORGANISATION_KPIS.aggregation_model is not None %}
-        
+
             <div class="ui raised attached inverted rcpch_dark_blue segment" id="audit_body_segment">
 
                     <h3>Clinical Team</h3>
                     <table class='ui rcpch stackable small table kpi_table'>
                         {% include './kpi_table_head.html' with kpi_head_id=1 %}
                         <tbody>
-                        {% comment %} 
+                        {% comment %}
                         [
-                        'paediatrician_with_expertise_in_epilepsies', 
-                        'epilepsy_specialist_nurse', 
-                        ] 
+                        'paediatrician_with_expertise_in_epilepsies',
+                        'epilepsy_specialist_nurse',
+                        ]
                         {% endcomment %}
                         {% for kpi_name in kpi_names_list|slice:":2" %}
                             <tr>
                                 <td>
                                     <div class="rcpch_td_data_indicator_wrapper">
                                     <p>{% get_help_label_text_for_kpi kpi_name kpis %}</p>
-                                    <i 
+                                    <i
                                         class="rcpch question circle icon"
                                         id='{{ kpi_name }}'
                                         data-title='{% render_title_kpi_name kpi_name|title %}'
@@ -77,15 +76,15 @@ will be persisted and run as a cron job once a day.
                                     </i>
                                     </div>
                                 </td>
-                                
+
                                 {% for abstraction, data in all_data.items %}
                                 {% if data.aggregation_model %}
 
-                                    
+
                                     <td class='right aligned'>
                                         {% get_pct_passed_and_total_eligible data.aggregation_model kpi_name as kpi_data %}
                                         {% if kpi_data == -1 %}
-                                            <i 
+                                            <i
                                                 class="rcpch clock icon"
                                                 id='_{{abstraction}}_{{kpi_name}}'
                                                 data-title='No aggregation data'
@@ -94,8 +93,8 @@ will be persisted and run as a cron job once a day.
                                                 _="init js $('#_{{abstraction}}_{{kpi_name}}').popup(); end">
                                             </i>
                                         {% elif kpi_data == 0 %}
-                                        
-                                            <i 
+
+                                            <i
                                                 class="rcpch exclamation circle icon"
                                                 id='{{ kpi_name }}_none_eligible_model_icon_{{abstraction}}'
                                                 data-title='None eligible'
@@ -119,14 +118,14 @@ will be persisted and run as a cron job once a day.
                                 {% endfor %}
                             </tr>
                         {% endfor %}
-                        
+
                         {% comment %} tertiary input {% endcomment %}
-                        <tr class="subcategory-header"> 
+                        <tr class="subcategory-header">
                             {% with kpi_name='tertiary_input' %}
                             <td>
                                 <div class="rcpch_td_data_indicator_wrapper">
                                     <p>{% get_help_label_text_for_kpi kpi_name kpis %}</p>
-                                    <i 
+                                    <i
                                         class="rcpch question circle icon"
                                         id='{{ kpi_name }}'
                                         data-title='{% render_title_kpi_name kpi_name|title %}'
@@ -135,14 +134,14 @@ will be persisted and run as a cron job once a day.
                                         _="init js $('#{{ kpi_name }}').popup(); end">
                                     </i>
                                 </div>
-                            
+
                             </td>
                             {% for abstraction, data in all_data.items %}
                             {% if data.aggregation_model %}
                                 {% get_pct_passed_and_total_eligible data.aggregation_model kpi_name as kpi_data %}
                                     <td class='right aligned'>
                                         {% if kpi_data == -1 %}
-                                            <i 
+                                            <i
                                                 class="rcpch clock icon"
                                                 id='_{{abstraction}}_{{kpi_name}}'
                                                 data-title='No aggregation data'
@@ -151,7 +150,7 @@ will be persisted and run as a cron job once a day.
                                                 _="init js $('#_{{abstraction}}_{{kpi_name}}').popup(); end">
                                             </i>
                                         {% elif kpi_data == 0 %}
-                                            <i 
+                                            <i
                                                 class="rcpch exclamation circle icon"
                                                 id='{{ kpi_name }}_none_eligible_model_icon_{{abstraction}}'
                                                 data-title='None eligible'
@@ -173,7 +172,7 @@ will be persisted and run as a cron job once a day.
                                     </td>
                                 {% endif %}
                                 {% endfor %}
-                            {% endwith %} 
+                            {% endwith %}
                         </tr>
 
                         {% comment %} 'epilepsy surgery referral', {% endcomment %}
@@ -182,7 +181,7 @@ will be persisted and run as a cron job once a day.
                             <td>
                                 <div class="rcpch_td_data_indicator_wrapper">
                                 <p>{% get_help_label_text_for_kpi kpi_name kpis %}</p>
-                                <i 
+                                <i
                                     class="rcpch question circle icon"
                                     id='{{ kpi_name }}'
                                     data-title='{% render_title_kpi_name kpi_name|title %}'
@@ -197,7 +196,7 @@ will be persisted and run as a cron job once a day.
                                 <td class='right aligned'>
                                     {% get_pct_passed_and_total_eligible data.aggregation_model kpi_name as kpi_data %}
                                     {% if kpi_data == -1 %}
-                                        <i 
+                                        <i
                                             class="rcpch clock icon"
                                             id='_{{abstraction}}_{{kpi_name}}'
                                             data-title='No aggregation data'
@@ -206,7 +205,7 @@ will be persisted and run as a cron job once a day.
                                             _="init js $('#_{{abstraction}}_{{kpi_name}}').popup(); end">
                                         </i>
                                     {% elif kpi_data == 0 %}
-                                        <i 
+                                        <i
                                             class="rcpch exclamation circle icon"
                                             id='{{ kpi_name }}_none_eligible_model_icon_{{abstraction}}'
                                             data-title='None eligible'
@@ -238,13 +237,13 @@ will be persisted and run as a cron job once a day.
                     <table class='ui rcpch small table'>
                         {% include './kpi_table_head.html' with kpi_head_id=2  %}
                         <tbody>
-                        
+
                         {% for kpi_name in kpi_names_list|slice:"4:6" %}
                             <tr>
                                 <td>
                                     <div class="rcpch_td_data_indicator_wrapper">
                                     <p>{% get_help_label_text_for_kpi kpi_name kpis %}</p>
-                                    <i 
+                                    <i
                                         class="rcpch question circle icon"
                                         id='{{ kpi_name }}'
                                         data-title='{% render_title_kpi_name kpi_name|title %}'
@@ -259,7 +258,7 @@ will be persisted and run as a cron job once a day.
                                     <td class='right aligned'>
                                         {% get_pct_passed_and_total_eligible data.aggregation_model kpi_name as kpi_data %}
                                         {% if kpi_data == -1 %}
-                                            <i 
+                                            <i
                                                 class="rcpch clock icon"
                                                 id='_{{abstraction}}_{{kpi_name}}'
                                                 data-title='No aggregation data'
@@ -268,7 +267,7 @@ will be persisted and run as a cron job once a day.
                                                 _="init js $('#_{{abstraction}}_{{kpi_name}}').popup(); end">
                                             </i>
                                         {% elif kpi_data == 0 %}
-                                            <i 
+                                            <i
                                                 class="rcpch exclamation circle icon"
                                                 id='{{ kpi_name }}_none_eligible_model_icon_{{abstraction}}'
                                                 data-title='None eligible'
@@ -300,13 +299,13 @@ will be persisted and run as a cron job once a day.
                     <table class='ui rcpch small table'>
                         {% include './kpi_table_head.html' with kpi_head_id=3  %}
                         <tbody>
-                        
+
                         {% for kpi_name in kpi_names_list|slice:"6:8" %}
                             <tr>
                                 <td>
                                     <div class="rcpch_td_data_indicator_wrapper">
                                     <p>{% get_help_label_text_for_kpi kpi_name kpis %}</p>
-                                    <i 
+                                    <i
                                         class="rcpch question circle icon"
                                         id='{{ kpi_name }}'
                                         data-title='{% render_title_kpi_name kpi_name|title %}'
@@ -321,7 +320,7 @@ will be persisted and run as a cron job once a day.
                                     <td class='right aligned'>
                                         {% get_pct_passed_and_total_eligible data.aggregation_model kpi_name as kpi_data %}
                                         {% if kpi_data == -1 %}
-                                            <i 
+                                            <i
                                                 class="rcpch clock icon"
                                                 id='_{{abstraction}}_{{kpi_name}}'
                                                 data-title='No aggregation data'
@@ -330,7 +329,7 @@ will be persisted and run as a cron job once a day.
                                                 _="init js $('#_{{abstraction}}_{{kpi_name}}').popup(); end">
                                             </i>
                                         {% elif kpi_data == 0 %}
-                                            <i 
+                                            <i
                                                 class="rcpch exclamation circle icon"
                                                 id='{{ kpi_name }}_none_eligible_model_icon_{{abstraction}}'
                                                 data-title='None eligible'
@@ -356,7 +355,7 @@ will be persisted and run as a cron job once a day.
                         {% endfor %}
                         </tbody>
                     </table>
-                    
+
                     <h3>Medication</h3>
                     {% comment %} [Sodium valproate] {% endcomment %}
                     <table class='ui rcpch small table'>
@@ -368,7 +367,7 @@ will be persisted and run as a cron job once a day.
                                 <td>
                                     <div class="rcpch_td_data_indicator_wrapper">
                                     <p>{% get_help_label_text_for_kpi kpi_name kpis %}</p>
-                                    <i 
+                                    <i
                                         class="rcpch question circle icon"
                                         id='{{ kpi_name }}'
                                         data-title='{% render_title_kpi_name kpi_name|title %}'
@@ -383,7 +382,7 @@ will be persisted and run as a cron job once a day.
                                     <td class='right aligned'>
                                         {% get_pct_passed_and_total_eligible data.aggregation_model kpi_name as kpi_data %}
                                         {% if kpi_data == -1 %}
-                                            <i 
+                                            <i
                                                 class="rcpch clock icon"
                                                 id='_{{abstraction}}_{{kpi_name}}'
                                                 data-title='No aggregation data'
@@ -392,7 +391,7 @@ will be persisted and run as a cron job once a day.
                                                 _="init js $('#_{{abstraction}}_{{kpi_name}}').popup(); end">
                                             </i>
                                         {% elif kpi_data == 0 %}
-                                            <i 
+                                            <i
                                                 class="rcpch exclamation circle icon"
                                                 id='{{ kpi_name }}_none_eligible_model_icon_{{abstraction}}'
                                                 data-title='None eligible'
@@ -425,12 +424,12 @@ will be persisted and run as a cron job once a day.
                         {% include './kpi_table_head.html' with kpi_head_id=5 %}
                         <tbody>
                             {% comment %} comprehensive_care_planning_agreement {% endcomment %}
-                            <tr class="subcategory-header"> 
+                            <tr class="subcategory-header">
                                 {% with kpi_name='comprehensive_care_planning_agreement' %}
                                 <td>
                                     <div class="rcpch_td_data_indicator_wrapper">
                                         <p>{% get_help_label_text_for_kpi kpi_name kpis %}</p>
-                                        <i 
+                                        <i
                                             class="rcpch question circle icon"
                                             id='{{ kpi_name }}'
                                             data-title='{% render_title_kpi_name kpi_name|title %}'
@@ -439,14 +438,14 @@ will be persisted and run as a cron job once a day.
                                             _="init js $('#{{ kpi_name }}').popup(); end">
                                         </i>
                                     </div>
-                                
+
                                 </td>
                                 {% for abstraction, data in all_data.items %}
                                 {% if data.aggregation_model %}
                                     {% get_pct_passed_and_total_eligible data.aggregation_model kpi_name as kpi_data %}
                                         <td class='right aligned'>
                                             {% if kpi_data == -1 %}
-                                                <i 
+                                                <i
                                                     class="rcpch clock icon"
                                                     id='_{{abstraction}}_{{kpi_name}}'
                                                     data-title='No aggregation data'
@@ -455,7 +454,7 @@ will be persisted and run as a cron job once a day.
                                                     _="init js $('#_{{abstraction}}_{{kpi_name}}').popup(); end">
                                                 </i>
                                             {% elif kpi_data == 0 %}
-                                                <i 
+                                                <i
                                                     class="rcpch exclamation circle icon"
                                                     id='{{ kpi_name }}_none_eligible_model_icon_{{abstraction}}'
                                                     data-title='None eligible'
@@ -477,7 +476,7 @@ will be persisted and run as a cron job once a day.
                                         </td>
                                     {% endif %}
                                     {% endfor %}
-                                {% endwith %} 
+                                {% endwith %}
                             </tr>
 
                             {% comment %} 'patient_held_individualised_epilepsy_document', 'patient_carer_parent_agreement_to_the_care_planning', 'care_planning_has_been_updated_when_necessary', {% endcomment %}
@@ -486,7 +485,7 @@ will be persisted and run as a cron job once a day.
                                 <td>
                                     <div class="rcpch_td_data_indicator_wrapper">
                                     <p>{% get_help_label_text_for_kpi kpi_name kpis %}</p>
-                                    <i 
+                                    <i
                                         class="rcpch question circle icon"
                                         id='{{ kpi_name }}'
                                         data-title='{% render_title_kpi_name kpi_name|title %}'
@@ -501,7 +500,7 @@ will be persisted and run as a cron job once a day.
                                     <td class='right aligned'>
                                         {% get_pct_passed_and_total_eligible data.aggregation_model kpi_name as kpi_data %}
                                         {% if kpi_data == -1 %}
-                                            <i 
+                                            <i
                                                 class="rcpch clock icon"
                                                 id='_{{abstraction}}_{{kpi_name}}'
                                                 data-title='No aggregation data'
@@ -510,7 +509,7 @@ will be persisted and run as a cron job once a day.
                                                 _="init js $('#_{{abstraction}}_{{kpi_name}}').popup(); end">
                                             </i>
                                         {% elif kpi_data == 0 %}
-                                            <i 
+                                            <i
                                                 class="rcpch exclamation circle icon"
                                                 id='{{ kpi_name }}_none_eligible_model_icon_{{abstraction}}'
                                                 data-title='None eligible'
@@ -536,12 +535,12 @@ will be persisted and run as a cron job once a day.
                             {% endfor %}
 
                             {% comment %} comprehensive_care_planning_content {% endcomment %}
-                            <tr class="subcategory-header"> 
+                            <tr class="subcategory-header">
                                 {% with kpi_name='comprehensive_care_planning_content' %}
                                 <td>
                                     <div class="rcpch_td_data_indicator_wrapper">
                                         <p>{% get_help_label_text_for_kpi kpi_name kpis %}</p>
-                                        <i 
+                                        <i
                                             class="rcpch question circle icon"
                                             id='{{ kpi_name }}'
                                             data-title='{% render_title_kpi_name kpi_name|title %}'
@@ -550,14 +549,14 @@ will be persisted and run as a cron job once a day.
                                             _="init js $('#{{ kpi_name }}').popup(); end">
                                         </i>
                                     </div>
-                                
+
                                 </td>
                                 {% for abstraction, data in all_data.items %}
                                 {% if data.aggregation_model %}
                                     {% get_pct_passed_and_total_eligible data.aggregation_model kpi_name as kpi_data %}
                                         <td class='right aligned'>
                                             {% if kpi_data == -1 %}
-                                                <i 
+                                                <i
                                                     class="rcpch clock icon"
                                                     id='_{{abstraction}}_{{kpi_name}}'
                                                     data-title='No aggregation data'
@@ -566,7 +565,7 @@ will be persisted and run as a cron job once a day.
                                                     _="init js $('#_{{abstraction}}_{{kpi_name}}').popup(); end">
                                                 </i>
                                             {% elif kpi_data == 0 %}
-                                                <i 
+                                                <i
                                                     class="rcpch exclamation circle icon"
                                                     id='{{ kpi_name }}_none_eligible_model_icon_{{abstraction}}'
                                                     data-title='None eligible'
@@ -588,7 +587,7 @@ will be persisted and run as a cron job once a day.
                                         </td>
                                     {% endif %}
                                     {% endfor %}
-                                {% endwith %} 
+                                {% endwith %}
                             </tr>
 
                             {% comment %} 'parental_prolonged_seizures_care_plan', 'water_safety', 'first_aid', 'general_participation_and_risk', 'sudep', 'service_contact_details' {% endcomment %}
@@ -597,7 +596,7 @@ will be persisted and run as a cron job once a day.
                                 <td>
                                     <div class="rcpch_td_data_indicator_wrapper">
                                     <p>{% get_help_label_text_for_kpi kpi_name kpis %}</p>
-                                    <i 
+                                    <i
                                         class="rcpch question circle icon"
                                         id='{{ kpi_name }}'
                                         data-title='{% render_title_kpi_name kpi_name|title %}'
@@ -612,7 +611,7 @@ will be persisted and run as a cron job once a day.
                                     <td class='right aligned'>
                                         {% get_pct_passed_and_total_eligible data.aggregation_model kpi_name as kpi_data %}
                                         {% if kpi_data == -1 %}
-                                            <i 
+                                            <i
                                                 class="rcpch clock icon"
                                                 id='_{{abstraction}}_{{kpi_name}}'
                                                 data-title='No aggregation data'
@@ -621,7 +620,7 @@ will be persisted and run as a cron job once a day.
                                                 _="init js $('#_{{abstraction}}_{{kpi_name}}').popup(); end">
                                             </i>
                                         {% elif kpi_data == 0 %}
-                                            <i 
+                                            <i
                                                 class="rcpch exclamation circle icon"
                                                 id='{{ kpi_name }}_none_eligible_model_icon_{{abstraction}}'
                                                 data-title='None eligible'
@@ -652,7 +651,7 @@ will be persisted and run as a cron job once a day.
                                 <td>
                                     <div class="rcpch_td_data_indicator_wrapper">
                                     <p>{% get_help_label_text_for_kpi kpi_name kpis %}</p>
-                                    <i 
+                                    <i
                                         class="rcpch question circle icon"
                                         id='{{ kpi_name }}'
                                         data-title='{% render_title_kpi_name kpi_name|title %}'
@@ -667,7 +666,7 @@ will be persisted and run as a cron job once a day.
                                     <td class='right aligned'>
                                         {% get_pct_passed_and_total_eligible data.aggregation_model kpi_name as kpi_data %}
                                         {% if kpi_data == -1 %}
-                                            <i 
+                                            <i
                                                 class="rcpch clock icon"
                                                 id='_{{abstraction}}_{{kpi_name}}'
                                                 data-title='No aggregation data'
@@ -676,7 +675,7 @@ will be persisted and run as a cron job once a day.
                                                 _="init js $('#_{{abstraction}}_{{kpi_name}}').popup(); end">
                                             </i>
                                         {% elif kpi_data == 0 %}
-                                            <i 
+                                            <i
                                                 class="rcpch exclamation circle icon"
                                                 id='{{ kpi_name }}_none_eligible_model_icon_{{abstraction}}'
                                                 data-title='None eligible'
@@ -706,9 +705,9 @@ will be persisted and run as a cron job once a day.
 
             <div class="ui bottom attached rcpch_footer info icon message">
                 <i class="info circle icon"></i>
-                These are key indicators for your Organisation, alongside aggregate higher-level data related to your Organisation. Please note that these data are provisional, and may be subject to change before the annual report publication.  
+                These are key indicators for your Organisation, alongside aggregate higher-level data related to your Organisation. Please note that these data are provisional, and may be subject to change before the annual report publication.
             </div>
-         
+
         {% else %}
             <div class="ui rcpch_info icon message">
                 <i class='exclamation circle icon'></i>
@@ -720,6 +719,6 @@ will be persisted and run as a cron job once a day.
                 </div>
             </div>
         {% endif %}
-    
+
     </div>
 
