@@ -10,11 +10,8 @@ from django.apps import apps
 from psycopg2 import DatabaseError
 
 # RCPCH imports
-from ..general_functions import (
-    # dates_for_cohort,
-    # cohort_number_from_first_paediatric_assessment_date,
-    cohorts_and_dates,
-)
+from ..general_functions import cohorts_and_dates
+
 from ..validators import epilepsy12_date_validator
 
 
