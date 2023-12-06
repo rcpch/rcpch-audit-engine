@@ -10,10 +10,8 @@ from django.apps import apps
 from psycopg2 import DatabaseError
 
 # RCPCH imports
-from ..general_functions import (
-    dates_for_cohort,
-    cohort_number_from_first_paediatric_assessment_date,
-)
+from ..general_functions import cohorts_and_dates
+
 from ..validators import epilepsy12_date_validator
 
 
@@ -145,15 +143,26 @@ def validate_and_update_model(
 
         # the registration date cannot be before the child's cohort
         # To get cohort, we require Registration.first_paediatric_assessment_date. Of course this is not yet set. Therefore, get Cohort based on current field value
-        current_cohort = cohort_number_from_first_paediatric_assessment_date(
+        child_cohort_data = cohorts_and_dates(
             first_paediatric_assessment_date=field_value
         )
-        child_cohort_data = dates_for_cohort(current_cohort)
-        if field_value < child_cohort_data["cohort_start_date"]:
-            errors = f'The date you entered cannot be before the cohort {{registration.cohort}} start date ({child_cohort_data["cohort_start_date"].strftime("%d %B %Y")})'
+        if (
+            child_cohort_data.get("currently_recruiting_cohort_start_date", None)
+            is None
+        ):
+            # NoneType returned - cohort does not exist / before cohort 4
+            errors = f"You cannot enter a date before cohort 4 start date."
             raise ValueError(errors)
-        elif field_value > child_cohort_data["cohort_end_date"]:
-            errors = f'The date you entered cannot be after the current cohort end date ({child_cohort_data["cohort_end_date"].strftime("%d %B %Y")})'
+
+        if (
+            field_value < child_cohort_data["currently_recruiting_cohort_start_date"]
+        ):  # represents the cohort that was actively recruiting at the time of first paediatric assessment
+            errors = f'The date you entered cannot be before the cohort {{registration.cohort}} start date ({child_cohort_data["currently_recruiting_cohort_start_date"].strftime("%d %B %Y")})'
+            raise ValueError(errors)
+        elif (
+            field_value > child_cohort_data["currently_recruiting_cohort_end_date"]
+        ):  # represents the cohort that was closing at the time of first paediatric assessment
+            errors = f'The date you entered cannot be after the current cohort end date ({child_cohort_data["currently_recruiting_cohort_end_date"].strftime("%d %B %Y")})'
             raise ValueError(errors)
 
         else:
