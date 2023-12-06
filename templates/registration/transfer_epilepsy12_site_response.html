@@ -1,3 +1,4 @@
+{% load epilepsy12_template_tags %}
 {% load static %}
 {% autoescape off %}
 <div class="indent" style="display: relative; width: 80%; margin: auto;">
@@ -10,7 +11,7 @@
     the rest of the Epilepsy12 audit year has been {{ outcome }}.</p>
   <p style="font-family: 'Montserrat', sans-serif;">No further action is required.</p>
   <p style="font-family: 'Montserrat', sans-serif;">If this outcome was not expected or you have any questions, please
-    <a href="mailto:epilepsy12@rcpch.ac.uk">contact the RCPCH Epilepsy12 team.</a>
+    <a href="mailto:{% site_contact_email %}">contact the RCPCH Epilepsy12 team.</a>
   </p>
   <br />
   <p style="font-family: 'Montserrat', sans-serif;">The RCPCH Epilepsy12 team</p>
