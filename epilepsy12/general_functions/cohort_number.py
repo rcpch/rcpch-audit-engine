@@ -95,31 +95,42 @@ def cohorts_and_dates(first_paediatric_assessment_date: date):
         )
     )
 
-    # submitting_cohort_number is always 1 less than currently_recruiting_cohort_number
-    submitting_cohort_number = currently_recruiting_cohort_number - 1
+    if currently_recruiting_cohort_number is not None:
+        # submitting_cohort_number is always 1 less than currently_recruiting_cohort_number
+        submitting_cohort_number = currently_recruiting_cohort_number - 1
 
-    currently_recruiting_cohort = dates_for_cohort(
-        cohort=currently_recruiting_cohort_number
-    )
-    submitting_cohort = dates_for_cohort(cohort=submitting_cohort_number)
+        currently_recruiting_cohort = dates_for_cohort(
+            cohort=currently_recruiting_cohort_number
+        )
+        submitting_cohort = dates_for_cohort(cohort=submitting_cohort_number)
+    else:
+        currently_recruiting_cohort = {}
+        submitting_cohort_number = None
+        submitting_cohort = {}
 
     return {
         "currently_recruiting_cohort": currently_recruiting_cohort_number,
-        "currently_recruiting_cohort_start_date": currently_recruiting_cohort[
-            "cohort_start_date"
-        ],
-        "currently_recruiting_cohort_end_date": currently_recruiting_cohort[
-            "cohort_end_date"
-        ],
-        "currently_recruiting_cohort_submission_date": currently_recruiting_cohort[
-            "submission_date"
-        ],
-        "currently_recruiting_cohort_days_remaining": currently_recruiting_cohort[
-            "days_remaining"
-        ],
+        "currently_recruiting_cohort_start_date": currently_recruiting_cohort.get(
+            "cohort_start_date", None
+        ),
+        "currently_recruiting_cohort_end_date": currently_recruiting_cohort.get(
+            "cohort_end_date", None
+        ),
+        "currently_recruiting_cohort_submission_date": currently_recruiting_cohort.get(
+            "submission_date", None
+        ),
+        "currently_recruiting_cohort_days_remaining": currently_recruiting_cohort.get(
+            "days_remaining", None
+        ),
         "submitting_cohort": submitting_cohort_number,
-        "submitting_cohort_start_date": submitting_cohort["cohort_start_date"],
-        "submitting_cohort_end_date": submitting_cohort["cohort_end_date"],
-        "submitting_cohort_submission_date": submitting_cohort["submission_date"],
-        "submitting_cohort_days_remaining": submitting_cohort["days_remaining"],
+        "submitting_cohort_start_date": submitting_cohort.get(
+            "cohort_start_date", None
+        ),
+        "submitting_cohort_end_date": submitting_cohort.get("cohort_end_date", None),
+        "submitting_cohort_submission_date": submitting_cohort.get(
+            "submission_date", None
+        ),
+        "submitting_cohort_days_remaining": submitting_cohort.get(
+            "days_remaining", None
+        ),
     }

@@ -1,6 +1,7 @@
 ---
 title: Epilepsy12 audit forms
 reviewers: Dr Simon Chapman
+ignore_macros: true
 ---
 
 The Epilepsy12 platform has a reactive user interface with RCPCH colours and design elements. Each audit form relates to an aspect of the child's epilepsy journey to be captured in the audit process. The elements are customised and a deliberate decision was to favour toggle buttons (either single or multichoice) that could be selected easily, were unambiguous and provided structured data easy for analysis.
