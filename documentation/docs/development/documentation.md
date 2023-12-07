@@ -5,7 +5,7 @@ reviewers: Dr Marcus Baw
 
 ## Introduction
 
-The RCPCH Audit Engine / Epilepsy12 documentation site is made with [Material for MkDocs](https://squidfunk.github.io/mkdocs-material/), which is a framework, separate from Django, which takes Markdown source files from `docs` and compiles them into a static HTML site. These static files are then served from our hosting resources.
+The RCPCH Audit Engine / Epilepsy12 documentation site is made with [Material for MkDocs](https://squidfunk.github.io/mkdocs-material/), which is a framework, separate from Django, which takes Markdown source files from `documentation/docs` within the project and compiles them into a static HTML site. These static files are then served from our hosting resources.
 
 ## Docker development setup
 
@@ -13,14 +13,20 @@ As part of our standard Docker and Docker Compose development setup, we have a `
 
 By default this image is running in a container at `localhost:8001` when you run the Docker dev setup using `s/docker-up` and it will auto-reload when you make changes to the source files in `documentation/docs`.
 
+!!! warning "IMPORTANT"
+    There are two ways to view the documentation site:
+
+    <https://localhost:8001> is served from the `mkdocs serve` command and **has auto-reload**, so is much more convenient for local development, you can instantly see changes made to the Markdown files in `documentation/docs`.
+
+    <https://e12.localhost/docs> is the built static HTML files, served through Caddy. This reflects how the documentation site works in the VPS environments. **There is no auto-reload**, so you have to manually run `docker compose restart mkdocs` to rebuild the static HTML files after making changes to the Markdown files in `documentation/docs`.
+
 ## How to edit content
 
-* Check out a **new local branch** on which to make the changes, with a **descriptive name**.
+* Generally any significant changes will need to be on a new Git branch, which by convention we name according to the 'slugified' title of the Issue that the changes resolve. Occasionally we will make small changes directly on the `development` branch, but this is not recommended.
 * Make changes to the Markdown files in the `documentation/docs` folder.
-* Ensure any new or renamed files are listed in the `nav` element within `mkdocs.yml` or they won't show up.
-* Save and the changes.
-* The auto-reloaded site will show the changes.
-* Commit the changes. Try to keep commits tidy and 'atomic' - in that ideally a single commit should be one new or edited piece of content, not a whole raft of changes. This allows us to easily select which commits to include.
+* Ensure any new or renamed files are listed in the `nav` data structure within `mkdocs.yml` or they won't show up in the navigation.
+* Save and review the auto-reloaded site on <https://localhost:8001>.
+* Commit the changes. Try to keep commits tidy and 'atomic' - in that ideally a single commit should be one new or edited piece of content, not a whole raft of changes. This allows us to easily select which commits to include, and makes reviewing PRs easier.
 
 ## Reference guides
 
@@ -30,13 +36,13 @@ By default this image is running in a container at `localhost:8001` when you run
 
 Fundamental to the way the documentation works is the use of a simple set of text annotations called '[Markdown](https://daringfireball.net/projects/markdown/)', which are easily readable and editable as text files but can be compiled into HTML for web viewing. Markdown is hugely popular across the web for rapid entry of web-native formatted text, being the basis of much of GitHub, StackOverflow, and Discourse's functionality.
 
-Markdown uses characters like asterisks (`*`), hashes (`#`) and others, to effect its formatting. For example: `**bold**` to denote **bold** text. It's simple to get used to and, once you're used to it, very productive too. One advantage is that formatted text stays where it's been put, unlike with some word processors in which the GUI formatting tools can have you chansing formatting changes all over a document.
+Markdown uses characters like asterisks (`*`), hashes (`#`) and others, to effect its formatting. For example: `**bold**` to denote **bold** text. It's simple to get used to and, once you're used to it, very productive too. One advantage is that formatted text *stays where it's been put*, unlike with some word processors in which the GUI formatting tools can have you chasing unpredictable and cascading formatting changes all over a document.
 
 #### Online editing of Markdown
 
-If you are new to Markdown editing, you can use GitHub's interface itself to edit online, by clicking the 'pencil' edit icon in the top right corner of any source code page. There are also external tools like [Prose.io](http://prose.io/) and [StackEdit](https://stackedit.io/) which give you a nice interface for editing Markdown online, and will sync the changes with GitHub for you.
+If you are new to Markdown editing, you can use GitHub's interface itself to edit in-browser, by clicking the 'pencil' edit icon in the top right corner of any source code page. There are also external tools like [Prose.io](http://prose.io/) and [StackEdit](https://stackedit.io/) which give you a nice interface for editing Markdown in a browser, and will sync the changes with GitHub for you.
 
-If Markdown seems daunting then another option is simply to edit the content in the word processor of your choice and then ask one of the RCPCH Incubator team to convert it to Markdown and add it to the documentation.
+If Markdown seems daunting then another option is simply to edit the content in the word processor of your choice and then ask one of the RCPCH Developer team to convert it to Markdown and add it to the documentation.
 
 ### Material for MkDocs
 
@@ -54,20 +60,16 @@ Some of the features such as [Keys](https://squidfunk.github.io/mkdocs-material/
 
 ## Pull requests (no commit rights)
 
-If you are not a member of the RCPCH Incubator team, you many not have commit rights to the documentation repository, so to publish your changes you will need to submit a pull request. This is a standard GitHub process, but if you are not familiar with it, here are the steps:
+If you are not a member of the RCPCH Developer team, you many not have commit rights to the documentation repository, so to publish your changes you will need to submit a pull request. This is a standard GitHub process, but if you are not familiar with it, here are the steps:
 
 * Push your changes to a branch on **your** fork of the repository.
 * The branch should ideally be name according to the feature or fix it includes.
 * Go to your fork of the repository on GitHub and click the 'Pull Request' button.
 * Submit a pull request from your fork to the **`development`** branch of the main repository.
 
-## Deployment (for RCPCH Incubator team)
+## Deployment (for RCPCH Developer team)
 
-When a push is made to either the `prerelease` or `live` branches, or a pull request is made against `prerelease`, the site is built and deployed to Azure automatically. (Builds are not triggered for PRs against `live` as this branch is often used by RCPCH staff making small PRs to update the documentation, and the build errors due to lack of GitHub access token were causing unnecessary confusion)
-
-* Prerelease URL <https://witty-bush-03ee83f03-prerelease.westeurope.1.azurestaticapps.net>
-* Live URL <https://epilepsy12docs.rcpch.tech>
-* URLs for PRs against `prerelease` are added to the PR comments automatically by Azure
+See [Deployment](./deployment.md) for details of how the documentation site is deployed.
 
 ## NOT RECOMMENDED: Setting up a Python and Pyenv development environment for the E12 documentation site
 
@@ -109,6 +111,7 @@ export ENABLE_PDF_EXPORT=0;mkdocs serve  --config-file documentation/mkdocs.yml
 ```
 
 `ENABLE_PDF_EXPORT=0 disables the generation of the PDF version of the documentation, which is slow and not needed in development.
+
 `--config-file documentation/mkdocs.yml` tells MkDocs to use the `mkdocs.yml` file in the `documentation` folder. This assumes that you are running the command from the root of the project.
 
 If you want the automatic PDF generation to happen in development locally, then run
