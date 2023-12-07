@@ -1,0 +1,74 @@
+/* selects */
+
+.ui.rcpch_light_blue.selection.dropdown {
+    border-radius: 0%;
+    margin-top: 10px;
+    margin-bottom: 5px;
+  }
+  
+  .ui.rcpch_light_blue.dropdown .item:hover {
+    background-color: var(--rcpch_light_blue);
+    color: white;
+  }
+  
+  .ui.--rcpch_pink_light_tint2.search.selection.fluid.dropdown {
+    border: 3px solid var(--rcpch_pink) !important;
+    -webkit-box-shadow: 0px 0px 0px 100px var(--rcpch_white) inset !important;
+    box-shadow: 0px 0px 0px 100px var(--rcpch_white) inset !important;
+    border-radius: 0%;
+  }
+  
+  .ui.--rcpch_pink_light_tint2.dropdown .item:hover {
+    background-color: var(--rcpch_pink_light_tint2);
+    color: white;
+  }
+
+  .ui.rcpch.dropdown {
+    font-size: small;
+    border: 3px solid rgba(17, 167, 242, 1) !important;
+    -webkit-box-shadow: 0px 0px 0px 100px var(--rcpch_white) inset !important;
+    box-shadow: 0px 0px 0px 100px var(--rcpch_white) inset !important;
+    border-radius: 0%;
+  }
+  
+  .ui.rcpch.dropdown .menu .item:hover {
+    background: var(--rcpch_light_blue);
+  }
+  
+  .ui.rcpch.dropdown .menu .selected.item {
+    background: var(--rcpch_dark_blue);
+    color: var(--rcpch_white);
+  }
+  
+  .menu.transition.visible {
+    border-radius: 0;
+    border-width: 0.1em;
+    border-color: var(--rcpch_dark_blue);
+    background-color: var(--rcpch_white);
+  }
+  
+  .ui.rcpch.selection.active.dropdown .menu {
+    border-radius: 0%;
+    border: 3px solid rgba(17, 167, 242, 1) !important;
+    border-top: 3px solid transparent !important;
+  }
+  
+  .ui.rcpch.selection.active.dropdown ::-webkit-scrollbar {
+    background-color: var(--rcpch_light_blue_tint2);
+  }
+  
+  .ui.rcpch.selection.active.dropdown ::-webkit-scrollbar-thumb {
+    background: var(--rcpch_light_blue);
+    border-radius: 0%;
+  }
+  
+  /* .ui.rcpch_light_blue.selection.active.dropdown {
+    background: var(--rcpch_pink);
+    border-radius: 0%;
+    color: white;
+  } */
+  
+  .ui.rcpch_light_blue.fluid.search.selection.dropdown ::-webkit-scrollbar-thumb {
+    border-radius: 0%;
+    background: var(--rcpch_light_blue);
+  }

@@ -1,0 +1,8 @@
+.episode-date {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    position: absolute;
+    width: 37.3906px;
+    height: 32px;
+}
