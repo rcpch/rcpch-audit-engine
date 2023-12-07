@@ -9,11 +9,11 @@ This means you don't need to worry about conflicts of Python versions, Python li
 
 ## Setup for development using Docker Compose
 
-### Install Docker on your development machine.
+### Install Docker on your development machine
 
 Instructions for all platforms are at [:fontawesome-brands-docker: get-docker](https://docs.docker.com/get-docker)
 
-### Clone the Audit Engine repository to your code folder:
+### Clone the Audit Engine repository to your code folder
 
 ```console
 git clone https://github.com/rcpch/rcpch-audit-engine.git
@@ -34,7 +34,7 @@ cd rcpch-audit-engine
 git checkout development
 ```
 
-### Obtain a `.env` file containing the required environment files.
+### Obtain a `.env` file containing the required environment files
 
 These files contain credentials and secrets and therefore the `.env` files themselves are **never** committed to version control. All `*.env` files are `.gitignore`'d, as is the entire contents of the `envs/` folder except the env_template file.
 
@@ -48,10 +48,8 @@ cp envs/env-template envs/.env
 
 !!! warning "Mac Users"
     If using Mac and Safari, to access the Epilepsy 12 engine in your development, you must change the `SITE_DOMAIN` name in .env to 'localhost', and type this into your browser once you have executed `s/docker-up` in the next step. This will load the E12 engine in your Safari browser.
-    
-    However, for simplicity, we recommend using a different browser, such as Chrome, and leaving the .env file unaltered.
 
-    
+    However, for simplicity, we recommend using a different browser, such as Chrome, and leaving the .env file unaltered.
 
 ### Start the development environment for the first time using our startup script
 
@@ -103,6 +101,11 @@ Changes you make in your development folder are automatically synced to inside t
 
 This Docker setup is quite new so please do open an issue if there is anything that doesn't seem to work properly. Suggestions and feature requests welcome.
 
+!!! warning "Terminal is now occupied"
+    If you have successfully run the Docker Compose deployment, your terminal will be showing the combined and colour-coded logging output for all the containers and will no longer show an interactive prompt, which is means you can not run any more commands in that terminal. To resolve this, simply **open another Terminal window** in the same working directory, in which you can run commands.
+
+    If opening another terminal is impractical or impossible, then in most Shell environments you can press ++ctrl+Z++ to suspend the current process, and then `bg` to resume it in the background. This will return you to an interactive prompt. Once you've executed your further commands, you can then use `fg` to bring the console logging output back to the foreground again.
+
 ## Executing commands in the context of the `django` container
 
 You can run commands in the context of any of the containers using Docker Compose.
@@ -118,9 +121,6 @@ For example, to create a superuser
 ```console
 sudo docker compose exec django python manage.py createsuperuser
 ```
-
-!!! warning "Terminal is now occupied"
-    If you have successfully run the Docker Compose deployment, your terminal will be showing the logging output for all the containers and will no longer show an interactive prompt, which is means you can not run any more commands in that terminal. To resolve this, simply **open another Terminal window** in the same working directory, in which you can run commands.
 
 ## Running the test suite
 
@@ -152,8 +152,18 @@ To go even further and **delete all the data of the application**, including the
 s/docker-delete-local-data
 ```
 
-For obvious reasons this is something that should ONLY be done in local development environments.
+For obvious reasons this is something that should **ONLY** be done in local development environments.
 
 ## Tips and Tricks, Gotchas and Caveats
 
-* Although the Docker Compose setup is very convenient, and it installs all the runtime development dependencies _inside_ the `django` container, one thing it can't do is install any _local_ Python packages which are required for text editing, linting, and similar utilities _outside_ the container. Examples are `pylint`, `pylint_django`, etc. You will still need to install these locally, ideally in a virtual environment using `pyenv`.
+### External dependencies
+
+Although the Docker Compose setup is very convenient, and it installs all the runtime development dependencies _inside_ the `django` container, one thing it can't do is install any _local_ Python packages which are required for text editing, linting, and similar utilities _outside_ the container. Examples are `pylint`, `pylint_django`, etc. You will still need to install these locally, ideally in a virtual environment using `pyenv`.
+
+### Docker Compose and Virtual Private Networks
+
+If you experience persistent problems with Docker's internal connectivity, make sure you are not using a system-wide Virtual Private Network, or some other tool which might block Docker's internal network traffic. We experienced this problem using **Mullvad** VPN on Linux Mint, on one of our developer team's machines. Docker compose ran fine, and each container appeared to work independently, but each container was unable to 'see' the others, resulting in crashes and errors. The solution was to disable the VPN.
+
+### Docker build cache errors on VPS deployments
+
+On some occasions we have encountered errors when trying to run `s/docker-up` on a VPS, where the Docker build cache is corrupted. This can be resolved by running `docker builder prune` and then `s/docker-up` again. This clears the Docker build cache and forces it to rebuild the images from scratch. Importantly for Live, it does not affect Docker Volumes, so the database and other data is not lost.

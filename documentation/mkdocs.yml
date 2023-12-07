@@ -58,6 +58,7 @@ plugins:
       enabled: !ENV [ENABLE_GIT_COMMITTERS, false] # makes Git Committers optional
   # - git-revision-date-localized:
   #     enable_creation_date: true
+  - macros
   - search
   - with-pdf:
       back_cover: false
@@ -122,6 +123,7 @@ extra:
       link: https://twitter.com/rcpchtweets
     - icon: fontawesome/brands/github
       link: https://github.com/rcpch
+  site_contact_email: !ENV SITE_CONTACT_EMAIL
 
 nav:
   - Home:
@@ -139,7 +141,6 @@ nav:
     - 'clinician-users/entering-patient-data.md'
     - 'clinician-users/audit-dataset.md'
     - 'clinician-users/organisational-audit.md'
-    - 'clinician-users/contact-us.md'
   - Administrator Guide:
     - 'admin-users/admin-user-guide.md'
     - 'admin-users/download.md'

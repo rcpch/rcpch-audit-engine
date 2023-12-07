@@ -27,6 +27,8 @@ from ..decorator import (
     login_and_otp_required,
 )
 
+from django.conf import settings
+
 from ..general_functions import construct_transfer_epilepsy12_site_outcome_email
 from ..tasks import asynchronously_send_email_to_recipients
 
@@ -399,7 +401,7 @@ def transfer_response(request, organisation_id, case_id, organisation_response):
         )
         subject = f"Epilepsy12 Lead Site Transfer {outcome}"
     else:
-        recipients = ["epilepsy12@rcpch.ac.uk"]
+        recipients = [settings.SITE_CONTACT_EMAIL]
         subject = f"Epilepsy12 Lead Site Transfer {outcome}  - NO LEAD CLINICIAN"
 
     asynchronously_send_email_to_recipients.delay(
