@@ -101,6 +101,11 @@ Changes you make in your development folder are automatically synced to inside t
 
 This Docker setup is quite new so please do open an issue if there is anything that doesn't seem to work properly. Suggestions and feature requests welcome.
 
+!!! warning "Terminal is now occupied"
+    If you have successfully run the Docker Compose deployment, your terminal will be showing the combined and colour-coded logging output for all the containers and will no longer show an interactive prompt, which is means you can not run any more commands in that terminal. To resolve this, simply **open another Terminal window** in the same working directory, in which you can run commands.
+
+    If opening another terminal is impractical or impossible, then in most Shell environments you can press ++ctrl+Z++ to suspend the current process, and then `bg` to resume it in the background. This will return you to an interactive prompt. Once you've executed your further commands, you can then use `fg` to bring the console logging output back to the foreground again.
+
 ## Executing commands in the context of the `django` container
 
 You can run commands in the context of any of the containers using Docker Compose.
@@ -116,9 +121,6 @@ For example, to create a superuser
 ```console
 sudo docker compose exec django python manage.py createsuperuser
 ```
-
-!!! warning "Terminal is now occupied"
-    If you have successfully run the Docker Compose deployment, your terminal will be showing the logging output for all the containers and will no longer show an interactive prompt, which is means you can not run any more commands in that terminal. To resolve this, simply **open another Terminal window** in the same working directory, in which you can run commands.
 
 ## Running the test suite
 
@@ -150,7 +152,7 @@ To go even further and **delete all the data of the application**, including the
 s/docker-delete-local-data
 ```
 
-For obvious reasons this is something that should ONLY be done in local development environments.
+For obvious reasons this is something that should **ONLY** be done in local development environments.
 
 ## Tips and Tricks, Gotchas and Caveats
 
@@ -161,3 +163,7 @@ Although the Docker Compose setup is very convenient, and it installs all the ru
 ### Docker Compose and Virtual Private Networks
 
 If you experience persistent problems with Docker's internal connectivity, make sure you are not using a system-wide Virtual Private Network, or some other tool which might block Docker's internal network traffic. We experienced this problem using **Mullvad** VPN on Linux Mint, on one of our developer team's machines. Docker compose ran fine, and each container appeared to work independently, but each container was unable to 'see' the others, resulting in crashes and errors. The solution was to disable the VPN.
+
+### Docker build cache errors on VPS deployments
+
+On some occasions we have encountered errors when trying to run `s/docker-up` on a VPS, where the Docker build cache is corrupted. This can be resolved by running `docker builder prune` and then `s/docker-up` again. This clears the Docker build cache and forces it to rebuild the images from scratch. Importantly for Live, it does not affect Docker Volumes, so the database and other data is not lost.
