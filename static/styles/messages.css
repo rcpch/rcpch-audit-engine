@@ -1,0 +1,113 @@
+/* message styling */
+
+.ui.rcpch_dark_blue.message {
+    background-color: var(--rcpch_dark_blue);
+    color: #fff;
+  }
+  
+  .info.circle.icon {
+    color: #fff;
+  }
+  
+  .ui.rcpch_lightest_blue.message {
+    background-color: var(--rcpch_light_blue_tint2);
+    color: var(--rcpch_black);
+  }
+  
+  .ui.rcpch_light_blue.message {
+    background-color: var(--rcpch_light_blue);
+    color: #fff;
+  }
+  
+  .ui.rcpch_light_grey.message {
+    background-color: var(--rcpch_light_grey);
+  }
+  
+  .ui.rcpch_lightest_grey.message {
+    background-color: var(--rcpch_lightest_grey);
+  }
+
+  /* rcpch message */
+
+.ui.rcpch_info.message {
+  border-radius: 0%;
+  color: var(--rcpch_dark_blue);
+  background-color: var(--rcpch_light_blue_tint3);
+  -webkit-box-shadow: 0px 0px 0px 1px rgba(51, 102, 204, 0.22) inset,
+    0px 0px 0px 0px rgba(0, 0, 0, 0);
+  box-shadow: 0px 0px 0px 1px rgba(51, 102, 204, 0.22) inset,
+    0px 0px 0px 0px rgba(0, 0, 0, 0);
+}
+
+.ui.rcpch_info.message p {
+  color: var(--rcpch_dark_blue);
+}
+
+.ui.rcpch_info.icon.message .icon {
+  color: var(--rcpch_dark_blue);
+}
+
+.ui.rcpch_important.message {
+  border-radius: 0%;
+  color: var(--rcpch_black);
+  background-color: var(--rcpch_light_blue_tint3);
+  -webkit-box-shadow: 0px 0px 0px 1px rgba(51, 102, 204, 0.22) inset,
+    0px 0px 0px 0px rgba(0, 0, 0, 0);
+  box-shadow: 0px 0px 0px 1px rgba(51, 102, 204, 0.22) inset,
+    0px 0px 0px 0px rgba(0, 0, 0, 0);
+  margin-bottom: 10px;
+  margin-top: 10px;
+}
+
+.ui.rcpch_important.message p {
+  color: var(--rcpch_black);
+}
+
+/* .ui.rcpch_important.message .icon{
+  color: var(--rcpch_black);
+} */
+
+.ui.rcpch_warning.message {
+  border-radius: 0%;
+  color: var(--rcpch_red);
+  background-color: var(--rcpch_red_light_tint3);
+  -webkit-box-shadow: 0px 0px 0px 1px rgba(90, 3, 0, 0.22) inset,
+    0px 0px 0px 0px rgba(0, 0, 0, 0);
+  box-shadow: 0px 0px 0px 1px rgba(90, 3, 0, 0.22) inset,
+    0px 0px 0px 0px rgba(0, 0, 0, 0);
+  margin-top: 10px;
+  margin-bottom: 10px;
+}
+
+.ui.rcpch.pink.message {
+  border-radius: 0%;
+}
+
+.ui.rcpch_footer.message {
+  color: var(--rcpch_white);
+  background-color: var(--rcpch_dark_blue);
+}
+
+/* used in E12 users table */
+.ui.message .e12_users_footer_text > p {
+  margin-top: 0.4em;
+  color: var(--rcpch_white);
+}
+
+/* cohort view */
+.ui.rcpch_purple_footer.message {
+  color: var(--rcpch_white);
+  background-color: var(--rcpch_purple);
+}
+
+.ui.bottom.attached.rcpch_footer.message {
+  /* margin-top: -1em; */
+  border-radius: 0%;
+  box-shadow: 0em 0em 0em 1px rgba(34, 36, 38, 0.15) inset;
+}
+
+.ui.bottom.attached.rcpch_purple_footer.message {
+  /* margin-top: -1em; */
+  border-radius: 0%;
+  box-shadow: 0em 0em 0em 1px rgba(113, 89, 170, 0.15) inset;
+}

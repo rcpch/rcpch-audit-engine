@@ -1,0 +1,91 @@
+/* Covers override of the core html elements */
+
+/* base elements */
+body {
+    color: black;
+    font-family: var(--rcpch_standard_font);
+    font-weight: 400;
+  }
+  
+  h1,
+  h2,
+  h3,
+  h4,
+  h5,
+  h6 {
+    font-family: var(--rcpch_standard_font);
+    color: black;
+    font-weight: 400;
+  }
+  
+  p,
+  a,
+  button,
+  th {
+    font-family: var(--rcpch_standard_font) !important;
+    color: black;
+    font-weight: 400;
+  }
+  
+  textarea {
+    font-family: var(--rcpch_standard_font);
+    color: var(--rcpch_black);
+    font-weight: 400;
+  }
+  
+  ul {
+    list-style-type: square;
+    font-family: var(--rcpch_standard_font);
+    color: var(--rcpch_charcoal);
+    font-weight: 400;
+  }
+
+  /* used in selected organisation summary */
+.rcpch_centred_text {
+  text-align: center;
+}
+
+/* only used once - could be refactored: styling of the login hyperlink in the password reset complete template */
+.rcpch_link {
+  font-family: var(--rcpch_standard_font);
+  color: black;
+  font-weight: 400;
+}
+
+/* desscribe letters */
+.desscribe_letters {
+  padding-right: 10px;
+}
+
+/* used in episode description */
+.ui.rcpch.textarea {
+  border-radius: 0%;
+}
+
+p:has(+ i:hover) {
+  color: #e00087;
+}
+
+/* used in login, SFA, redirect and 403 templates */
+.rcpch_blue_link {
+  color: var(--rcpch_light_blue);
+}
+
+.captcha {
+  height: 3em;
+}
+
+
+.image403{
+  border: 10px solid var(--rcpch_light_blue);
+  border-radius: 5%;
+  width: fit-content;
+  height: auto;
+}
+
+.ui.rcpch_403.segment {
+  border-bottom: 0 none !important;
+  box-shadow: none;
+  border: 0px;
+}
+

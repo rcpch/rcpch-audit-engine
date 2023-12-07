@@ -1,3 +1,4 @@
+{% load epilepsy12_template_tags %}
 {% load static %}
 {% autoescape off %}
 <div class="indent" style="display: relative; width: 80%; margin: auto;">
@@ -6,7 +7,7 @@
   </div>
   <p style="font-family: 'Montserrat', sans-serif;">Your one-time login code is: <b> {{ token }} </b></p>
   <p style="font-family: 'Montserrat', sans-serif;">If you have any questions, please <a
-      href="mailto:epilepsy12@rcpch.ac.uk">contact the RCPCH Epilepsy12 team.</a></p>
+      href="mailto:{% site_contact_email %}">contact the RCPCH Epilepsy12 team.</a></p>
   <br />
   <p style="font-family: 'Montserrat', sans-serif;">The RCPCH Epilepsy12 team</p>
 </div>

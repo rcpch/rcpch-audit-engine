@@ -1,0 +1,82 @@
+/* base segment */
+
+.ui.segment {
+    border-radius: 0%;
+  }
+
+/* E12 user segment footer */
+.e12_users_footer_wrapper {
+    display: flex;
+    justify-content: space-between;
+}
+
+.e12_users_footer_wrapper > .e12_users_footer_text {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+/* used in logs table and epilepsy12 users table */
+.ui.top.attached.rcpch_dark_blue.clearing.segment {
+    color: var(--rcpch_white);
+    background-color: var(--rcpch_dark_blue);
+    border-radius: 0%;
+    border-width: medium;
+    border-color: var(--rcpch_dark_blue);
+    display: flex;
+    justify-content: flex-end;
+}
+
+.ui.top.attached.rcpch_dark_blue.clearing.segment > h5 {
+    color: white;
+    font-size: large;
+    font-family: Montserrat-Bold;
+}
+
+.ui.top.attached.rcpch_purple.clearing.segment {
+    color: var(--rcpch_white);
+    background-color: var(--rcpch_purple);
+    border-radius: 0%;
+    border-width: medium;
+    border-color: var(--rcpch_purple);
+    display: flex;
+    justify-content: flex-end;
+}
+
+.ui.top.attached.rcpch_purple.clearing.segment > h5 {
+    color: white;
+    font-size: large;
+}
+
+.ui.raised.attached.segment {
+    border-radius: 0%;
+    border-width: medium;
+    border-color: var(--rcpch_dark_blue);
+}
+
+/* kpi table segment */
+
+.ui.header > div.content.kpi_header > p {
+    color: var(--rcpch_white);
+  }
+  
+.all-kpis-header {
+display: flex;
+justify-content: flex-end;
+}
+
+/* individual measures */
+.individual_measures_pies_wrapper .ui.rcpch_chart_container.segment {
+    padding: 0em;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+  }
+
+  /* multiaxial diagnosis form, antiepilepsy medicine, episode, syndrome */
+  .ui.rcpch_pink.segment {
+    border-top-color: var(--rcpch_pink);
+  }
+  
+  

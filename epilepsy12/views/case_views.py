@@ -27,6 +27,8 @@ from ..decorator import (
     login_and_otp_required,
 )
 
+from django.conf import settings
+
 from ..general_functions import construct_transfer_epilepsy12_site_outcome_email
 from ..tasks import asynchronously_send_email_to_recipients
 
@@ -399,7 +401,7 @@ def transfer_response(request, organisation_id, case_id, organisation_response):
         )
         subject = f"Epilepsy12 Lead Site Transfer {outcome}"
     else:
-        recipients = ["epilepsy12@rcpch.ac.uk"]
+        recipients = [settings.SITE_CONTACT_EMAIL]
         subject = f"Epilepsy12 Lead Site Transfer {outcome}  - NO LEAD CLINICIAN"
 
     asynchronously_send_email_to_recipients.delay(
@@ -542,7 +544,6 @@ def update_case(request, organisation_id, case_id):
     """
     Django function based view. Receives POST request to update view or delete
     """
-    print("I at least pass through here...")
     case = get_object_or_404(Case, pk=case_id)
     form = CaseForm(instance=case)
 

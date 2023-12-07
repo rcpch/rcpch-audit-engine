@@ -1,0 +1,117 @@
+.ui.rcpch.container {
+    padding: 2rem;
+  }
+  
+  @media only screen and (min-width: 1200px) {
+    .ui.container.rcpch.main_content {
+      width: 1400px;
+      margin-left: auto !important;
+      margin-right: auto !important;
+    }
+    .ui.grid.container.selected_organisation_container {
+      width: calc(1400px + 2rem) !important;
+    }
+  }
+  
+  @media only screen and (max-width: 767px) {
+    .ui.rcpch.container {
+      padding: 0rem;
+      margin: 0rem !important;
+    }
+  }
+
+  /* .padded_column {
+    margin-left: 20px;
+    padding-bottom: 10px;
+  } */
+  
+  /* used in log table, case table and e12 user table */
+  .padded_container {
+    padding: 1rem;
+  }
+  
+  .image-container {
+    position: absolute;
+    min-height: 100%;
+    width: 100%;
+    overflow: hidden;
+  }
+
+  /* in create user and base.html */
+.rcpch_padding {
+  margin-top: 10px;
+  margin-bottom: 10px;
+}
+
+/* kpi graphs - js */
+.rcpch_padded {
+  margin-top: 50px;
+}
+
+/* .centred {
+  margin-left: auto;
+  margin-right: auto;
+  width: 8em;
+  text-align: center;
+} */
+
+/* metric.html */
+.bar_charts_wrapper {
+  margin: 1em 0em;
+}
+
+.unpadded {
+  padding-bottom: 0px !important;
+  padding-top: 0px !important;
+}
+
+.notupperpadded {
+  padding-top: 0 !important;
+}
+
+/* 
+.padded.field {
+  padding-top: 33px;
+} */
+
+.padded_form {
+  margin-top: 13px !important;
+}
+
+/* eeg_information, mri_brain_information, antiepilepsy_medicine */
+.padded_field {
+  padding-top: 20px;
+}
+
+.region_map {
+  height: 500px;
+}
+
+.region_tooltip {
+  border-radius: 0% !important;
+}
+
+/* used in metric.html */
+.individual_measures_pies_wrapper .chart {
+  border-top: none !important;
+}
+
+/* .twelve.wide.column.add_search_return_wrapper {
+  display: flex;
+  justify-content: space-between;
+  flex-wrap: wrap;
+}
+
+div.sixteen.wide.column.add_search_return_wrapper {
+  display: flex;
+  justify-content: space-between;
+  flex-wrap: wrap;
+} */
+
+/* div.sixteen.wide.column.add_search_return_wrapper > #case_statistics {
+  flex-grow: 2;
+}
+
+div.sixteen.wide.column.search_field_wrapper > .ui.rcpch.icon.input {
+  width: 100%;
+} */
