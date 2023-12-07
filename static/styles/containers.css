@@ -1,0 +1,21 @@
+.ui.rcpch.container {
+    padding: 2rem;
+  }
+  
+  @media only screen and (min-width: 1200px) {
+    .ui.container.rcpch.main_content {
+      width: 1400px;
+      margin-left: auto !important;
+      margin-right: auto !important;
+    }
+    .ui.grid.container.selected_organisation_container {
+      width: calc(1400px + 2rem) !important;
+    }
+  }
+  
+  @media only screen and (max-width: 767px) {
+    .ui.rcpch.container {
+      padding: 0rem;
+      margin: 0rem !important;
+    }
+  }

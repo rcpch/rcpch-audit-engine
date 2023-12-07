@@ -1,0 +1,98 @@
+/* radial progress */
+
+/* (thanks to Keith Clark on codepen for the ideas behind this implementation: https://codepen.io/keithclark/pen/aEbEoo */
+
+.pie {
+    position: relative;
+    display: inline-block;
+    background-image: conic-gradient(
+      rgba(0, 0, 0, 1) calc(3.6deg * var(--percent)),
+      rgba(0, 0, 0, 0) calc(3.6deg * var(--percent))
+    );
+    background-blend-mode: overlay;
+    background-position: 50% 50%;
+    background-size: 150%;
+    /* oversize bg image to prevent "underdraw" */
+    width: 3.75em;
+    height: 3.75em;
+    border-radius: 50%;
+  }
+  
+  /* show the percentage (thanks to Ana Tudor for the counter() trick) */
+  
+  .pie--value::after {
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    counter-reset: percent var(--percent);
+    content: counter(percent) "%";
+    color: var(--rcpch_dark_blue);
+    font-weight: 900;
+  }
+  
+  .pie--disc::before {
+    content: "";
+    position: absolute;
+    top: 0.5em;
+    left: 0.5em;
+    right: 0.5em;
+    bottom: 0.5em;
+    border-radius: 50%;
+    background: #fff;
+  }
+  
+  .pie--disc::after {
+    color: #000;
+    text-shadow: none;
+  }
+  
+  /* demo styles
+  ----------------------------------------------------- */
+  
+  .pie-box {
+    text-align: center;
+  }
+  
+  .pie {
+    margin: 0.75rem;
+  }
+  
+  .pie:nth-child(1) {
+    background-color: var(--rcpch_light_grey);
+  }
+  
+  .big {
+    font-size: 200%;
+    font-weight: bold;
+  }
+  
+  .med {
+    font-size: 150%;
+    font-weight: bold;
+  }
+  
+  .sml {
+    font-size: 100%;
+    font-weight: bold;
+  }
+  
+  .tiny {
+    font-size: 50%;
+    font-weight: bold;
+  }
+  
+  .rcpch_pie_title {
+    color: var(--rcpch_charcoal);
+    font-family: Arial, Helvetica, sans-serif;
+    font-weight: bold;
+    padding-top: 10px;
+  }
+  
+  .rcpch_pie_label {
+    color: var(--rcpch_dark_grey);
+    font-family: var(--rcpch_standard_font);
+    font-weight: bold;
+    font-size: small;
+    padding: 5px;
+  }

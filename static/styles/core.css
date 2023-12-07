@@ -1,0 +1,39 @@
+/* base elements */
+body {
+    color: black;
+    font-family: var(--rcpch_standard_font);
+    font-weight: 400;
+  }
+  
+  h1,
+  h2,
+  h3,
+  h4,
+  h5,
+  h6 {
+    font-family: var(--rcpch_standard_font);
+    color: black;
+    font-weight: 400;
+  }
+  
+  p,
+  a,
+  button,
+  th {
+    font-family: var(--rcpch_standard_font) !important;
+    color: black;
+    font-weight: 400;
+  }
+  
+  textarea {
+    font-family: var(--rcpch_standard_font);
+    color: var(--rcpch_black);
+    font-weight: 400;
+  }
+  
+  ul {
+    list-style-type: square;
+    font-family: var(--rcpch_standard_font);
+    color: var(--rcpch_charcoal);
+    font-weight: 400;
+  }

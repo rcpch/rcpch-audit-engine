@@ -1,0 +1,127 @@
+/* 
+Styling relating to the index page
+ */
+
+/* hero */
+
+.ui.center.aligned.segment.rcpch_masthead {
+    padding: 4em 0em;
+    background: linear-gradient(rgba(0, 0, 0, 0.5), rgba(0, 0, 0, 0.5)),
+      url("images/masthead-bg.png");
+    background-repeat: no-repeat;
+    background-size: cover;
+    background-attachment: fixed;
+  }
+  
+  .rcpch_masthead > .rcpch.container > div.row > div > img.epilepsy12_logo {
+    max-width: 50%;
+    margin-left: auto;
+    margin-right: auto;
+  }
+  
+  .masthead_text_row {
+    padding-top: 1em;
+  }
+  
+  .masthead_text_row > div.masthead_text > * {
+    color: var(--rcpch_white);
+    font-family: var(--rcpch_standard_font);
+    font-weight: 900;
+  }
+  
+  .masthead_text_row > div > h1 {
+    font-size: 3em;
+  }
+  
+  .masthead_text_row > div > h2 {
+    font-size: 1.5em;
+  }
+  
+  /*  INDEX  */
+  
+  .index_segment {
+    padding-bottom: 2.5em;
+    
+  }
+  
+  div.center.aligned.image.rcpch_index_card_image {
+    padding: 7.5em;
+    background: url("images/masthead-bg.png");
+    background-repeat: no-repeat;
+    background-size: cover;
+    background-attachment: fixed;
+  }
+  
+  .ui.card > .content.rcpch_index_card_content {
+    padding: 1.5rem;
+    display: flex;
+    flex-direction: column;
+    background-color: var(--rcpch_dark_blue);
+    color: white;
+    
+  }
+  
+  .rcpch_index_card_content.content > h1.ui.header {
+    color: white;
+    height: 36px;
+  }
+  
+  .ui.card > .content.rcpch_index_card_content > h3.ui.header {
+    margin-top: 1em;
+    color: white;
+  }
+  
+  .rcpch_index_card_content_description {
+    margin-top: 0.5em;
+    margin-bottom: 0.25em;
+    color: white
+  }
+  
+  .rcpch_icon_text_group.rcpch_index_card_select {
+    margin-top: 1em;
+    margin-bottom: 1em;
+  }
+  
+  .rcpch_index_card_content .rcpch_icon_text_group.rcpch_index_card_select {
+    margin-top: auto;
+  }
+  
+  .rcpch_icon_text_group.rcpch_index_card_select > a {
+    margin-top: 2em;
+  }
+  
+  a.rcpch_index_card_link{
+    font-weight: 900;
+    font-size: 1.4em;
+    margin-right: 0.2em;
+    color: white;
+    font-weight: bolder;
+  }
+  
+  a.rcpch_index_card_link:hover{
+    color: var(--rcpch_light_blue);
+  }
+  
+  .rcpch_index_card_select:hover .icon,
+  .rcpch_index_card_select:hover > a {
+    color: var(--rcpch_light_blue);
+  }
+  
+  .icon_container {
+    display: flex !important;
+    justify-content: space-evenly !important;
+  }
+  
+  .rcpch.container .index_segment .card_container {
+    display: flex;
+    flex-direction: column;
+  }
+  
+  .card_container > .card_content_wrapper {
+    flex-grow: 1;
+    max-width: 50%;
+  }
+
+.homepage_item {
+  margin-bottom: 1rem;
+}
