@@ -63,6 +63,6 @@ There are several other top level folders and files
 ### Folders
 
 - ```s```: This is an RCPCH incubator standard. Shortcuts related to running the project or migrating or seeding the database are here. The commands follow the example: ```s/migrate```. Any custom functions are found in the ```manage``` folder.
-- ```static```: contains all static files. The RCPCH Incubator recommend any css files be persisted here, rather than using CDNs to protect from situations where data signals are not available. This has a small latency cost, and involves regular review of dependencies to ensure they are up to date.
+- ```static```: contains all static files. The RCPCH Incubator recommend any css files be persisted here, rather than using CDNs to protect from situations where data signals are not available. This has a small latency cost, and involves regular review of dependencies to ensure they are up to date. All styles overriding the basic semantic ui base classes are broken into individual files.
 - ```tables```: This has no function and is listed for deprecation. It contains olds excel sheets of database models in the previous version of Epilepsy12
 - ```templates```: All templates are found here.
