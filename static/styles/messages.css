@@ -87,3 +87,27 @@
   color: var(--rcpch_white);
   background-color: var(--rcpch_dark_blue);
 }
+
+/* used in E12 users table */
+.ui.message .e12_users_footer_text > p {
+  margin-top: 0.4em;
+  color: var(--rcpch_white);
+}
+
+/* cohort view */
+.ui.rcpch_purple_footer.message {
+  color: var(--rcpch_white);
+  background-color: var(--rcpch_purple);
+}
+
+.ui.bottom.attached.rcpch_footer.message {
+  /* margin-top: -1em; */
+  border-radius: 0%;
+  box-shadow: 0em 0em 0em 1px rgba(34, 36, 38, 0.15) inset;
+}
+
+.ui.bottom.attached.rcpch_purple_footer.message {
+  /* margin-top: -1em; */
+  border-radius: 0%;
+  box-shadow: 0em 0em 0em 1px rgba(113, 89, 170, 0.15) inset;
+}

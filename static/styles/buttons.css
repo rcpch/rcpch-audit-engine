@@ -1,4 +1,4 @@
-/* buttons / toggle buttons / date_field input */
+/* buttons / icon buttons / toggle buttons / date_field input */
 
 .toggle_button_label {
     padding-bottom: 10px;
@@ -305,3 +305,56 @@
     background-color: var(--rcpch_dark_red);
     color: var(--rcpch_white);
   }
+
+
+  /* download button */
+  .ui.rcpch_positive.download.button a {
+    color: white;
+  }
+  
+  .ui.rcpch_positive.download.button:hover {
+    background-color: var(--rcpch_pink);
+  }
+
+  /* cancel button in popup for allocate organisation in registration */
+  .ui.buttons .ui.rcpch_cancel.button {
+    border-radius: 0%;
+  }
+
+  .multiple_toggle_buttons_wrapper {
+    display: flex;
+    justify-content: space-between;
+    flex-wrap: wrap;
+    gap: 10px;
+    padding-bottom: 12px;
+  }
+  
+  .multiple_toggle_buttons_wrapper .rcpch_dark_blue.button {
+    flex-grow: 1;
+  }
+  
+  .add_user_button:hover a {
+    color: var(--rcpch_white);
+  }
+
+  .org_view_all_buttons_wrapper a.ui.button {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    height: 100%;
+  }
+
+  .case_create_buttons_wrapper {
+    display: flex;
+  }
+
+  .rcpch_signin_buttons_wrapper {
+    display: flex;
+    margin-bottom: 1em;
+  }
+  
+  .rcpch_signin_buttons_wrapper>.reset_pass_button {
+    display: block;
+  }
+  
+  

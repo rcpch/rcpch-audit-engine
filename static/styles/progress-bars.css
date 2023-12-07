@@ -1,0 +1,7 @@
+.ui.bottom.attached.tiny.rcpch.progress {
+    background-color: var(--rcpch_light_grey);
+}
+
+.ui.bottom.attached.tiny.rcpch.progress .bar {
+    background-color: var(--rcpch_light_blue);
+}
