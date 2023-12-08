@@ -1,11 +1,11 @@
 # main site metadata and titles
 site_name: RCPCH Epilepsy12 - Documentation
-site_description: RCPCH Epilepsy12 - Documentation Site
+site_description: RCPCH Epilepsy12 - Documentation
 site_author: The Royal College of Paediatrics and Child Health
 site_url: !ENV DOCS_URL
 
 # copyright information which is shown in the footer
-copyright: Copyright &copy; 2022-23 Royal College of Paediatrics and Child Health (RCPCH)
+copyright: Copyright &copy; 2021-24 The Royal College of Paediatrics and Child Health (RCPCH)
 
 # these lines configure the 'GitHub repo' widget on the top right
 repo_url: https://github.com/rcpch/rcpch-audit-engine
@@ -91,6 +91,7 @@ markdown_extensions:
   - abbr
   - admonition
   - attr_list
+  - pymdownx.details
   - pymdownx.highlight
   - pymdownx.emoji:
       emoji_index: !!python/name:material.extensions.emoji.twemoji
@@ -182,7 +183,11 @@ nav:
   - Contact:
     - 'contact/contact-rcpch.md'
   - Legal:
-    - 'legal/legal.md'
+    - 'legal/intellectual-property.md'
     - 'legal/license.md'
-    - 'legal/privacy.md'
+    - 'legal/clinical-safety.md'
+    - 'legal/privacy-overview.md'
+    - 'legal/privacy-notice.md'
+    - 'legal/privacy-impact-assessment.md'
+    - 'legal/section-251.md'
     - 'legal/terms-of-service.md'
