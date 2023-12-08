@@ -60,8 +60,17 @@ def epilepsy12_user_list(request, organisation_id):
 
     filter_term = request.GET.get("filtered_epilepsy12_user_list")
 
-    # get all organisations which are in the same parent trust
-    organisation_children = Organisation.objects.filter(trust=organisation.trust).all()
+    # get trust or health board
+    if organisation.country.boundary_identifier == "W92000004":
+        parent_trust = organisation.local_health_board
+        # Wales - get all organisations which are in the same local health board
+        organisation_children = Organisation.objects.filter(
+            local_health_board=parent_trust
+        ).all()
+    else:
+        parent_trust = organisation.trust
+        # England - get all organisations which are in the same parent trust
+        organisation_children = Organisation.objects.filter(trust=parent_trust).all()
 
     if filter_term:
         filter_term_Q = (
@@ -246,16 +255,29 @@ def epilepsy12_user_list(request, organisation_id):
         or request.user.is_rcpch_staff
         or request.user.is_superuser
     ):
-        rcpch_choices = (
-            (0, "Organisation level"),
-            (1, "Trust level"),
-            (2, "National level"),
-        )
+        if organisation.country.boundary_identifier == "W92000004":
+            rcpch_choices = (
+                (0, "Organisation level"),
+                (1, "Local Health Board level"),
+                (2, "National level"),
+            )
+        else:
+            rcpch_choices = (
+                (0, "Organisation level"),
+                (1, "Trust level"),
+                (2, "National level"),
+            )
     else:
-        rcpch_choices = (
-            (0, "Organisation level"),
-            (1, "Trust level"),
-        )
+        if organisation.country.boundary_identifier == "W92000004":
+            rcpch_choices = (
+                (0, "Organisation level"),
+                (1, "Local Health Board level"),
+            )
+        else:
+            rcpch_choices = (
+                (0, "Organisation level"),
+                (1, "Trust level"),
+            )
 
     paginator = Paginator(epilepsy12_user_list, 10)
     page_number = request.GET.get("page", 1)
