@@ -237,8 +237,8 @@ AUTH_PASSWORD_VALIDATORS = [
 
 AUTH_USER_MODEL = "epilepsy12.Epilepsy12User"
 
-# Two Factor Authentication / One Time Password Settings (2FA / OTP)
-OTP_EMAIL_SUBJECT = "Epilepsy12 OTP Code"
+# Two Factor Authentication / One Time Password Settings (2FA / one-time login codes)
+OTP_EMAIL_SUBJECT = "Your Epilepsy12 one-time login code"
 OTP_EMAIL_BODY_TEMPLATE_PATH = "../templates/two_factor/email_token.txt"
 OTP_EMAIL_BODY_HTML_TEMPLATE_PATH = "../templates/two_factor/email_token.html"
 OTP_EMAIL_TOKEN_VALIDITY = 60 * 5  # default N(seconds) email token valid for
