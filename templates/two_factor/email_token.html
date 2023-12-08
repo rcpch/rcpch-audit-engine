@@ -1,17 +1,20 @@
 {% load epilepsy12_template_tags %}
 {% load static %}
 {% autoescape off %}
-<div class="indent" style="display: relative; width: 80%; margin: auto;">
-  <div class="centered" style="width: 50%; margin: auto;">
-    <img alt="RCPCH Epilepsy12 Logo" src='{{ protocol }}://{{ domain }}{% static "images/epilepsy12-logo-1.png" %}'>
+  <div class="indent" style="display: relative; width: 80%; margin: auto;">
+    <div class="centered" style="width: 50%; margin: auto;">
+      <img alt="RCPCH Epilepsy12 Logo"
+           src="https://e12.rcpch.ac.uk/static/images/epilepsy12-logo-1.png">
+    </div>
+    <p style="font-family: 'Montserrat', sans-serif;">
+      Your one-time login code is: <b> {{ token }} </b>
+    </p>
+    <p style="font-family: 'Montserrat', sans-serif;">
+      If you have any questions, please <a href="mailto:{% site_contact_email %}">contact the RCPCH Epilepsy12 team.</a>
+    </p>
+    <p style="font-family: 'Montserrat', sans-serif;">The RCPCH Epilepsy12 team</p>
   </div>
-  <p style="font-family: 'Montserrat', sans-serif;">Your one-time login code is: <b> {{ token }} </b></p>
-  <p style="font-family: 'Montserrat', sans-serif;">If you have any questions, please <a
-      href="mailto:{% site_contact_email %}">contact the RCPCH Epilepsy12 team.</a></p>
-  <br />
-  <p style="font-family: 'Montserrat', sans-serif;">The RCPCH Epilepsy12 team</p>
-</div>
-<style>
+  <style>
   @font-face {
     font-family: 'Montserrat';
     font-style: normal;
@@ -20,5 +23,5 @@
     src: url(https://fonts.gstatic.com/s/montserrat/v25/JTUHjIg1_i6t8kCHKm4532VJOt5-QNFgpCtr6Hw5aXx-p7K4KLg.woff) format('woff');
     unicode-range: U+0000-00FF, U+0131, U+0152-0153, U+02BB-02BC, U+02C6, U+02DA, U+02DC, U+2000-206F, U+2074, U+20AC, U+2122, U+2191, U+2193, U+2212, U+2215, U+FEFF, U+FFFD;
   }
-</style>
+  </style>
 {% endautoescape %}
