@@ -1,34 +1,34 @@
 {% csrf_token %}
 <div class="sixteen wide column">
-
-    <div class="ui top attached inverted clearing segment" id="audit_top_attached_segment">
-        <div class='ui header'>
-            <div class='content kpi_header'>
-                <p>Real-time Individual Key Performance Indicator (KPI) Metrics for Cohort {{ cohort }}</p>
-                {% if selected_organisation.trust %}
-                  <p>{{selected_organisation.name}} ({{ selected_organisation.trust.name }})</p>
-                {% else %}
-                  <p>{{selected_organisation.name}} ({{ selected_organisation.local_health_board.name }})</p>
-                {% endif %}
-            </div>
-
-            <div class="all-kpis-header">
-              <button class="ui right floated rcpch_primary button" _="on click go to top of #kpis">Jump to All KPI Metrics</button>
-              <button
-                  class='ui right floated rcpch_primary button'
-                  hx-headers='{"X-CSRFToken": "{{ csrf_token }}"}'
-                  hx-post="{% url 'selected_trust_select_kpi' organisation_id=selected_organisation.pk %}"
-                  hx-trigger="click" hx-swap='innerHTML'
-                  hx_indicator='#selected_trust_select_kpi'
-                  hx-target="#selected_trust_select_kpi">
-                  Refresh
-                  <i class="htmx-indicator spinner loading icon" id="spinner"></i>
-              </button>
-            </div>
-
-        </div>
-
+  <div class="ui top attached inverted clearing segment" id="audit_top_attached_segment">
+    <div class='ui header'>
+      <div class='content kpi_header'>
+        <p>Real-time Individual Key Performance Indicator (KPI) Metrics for Cohort {{ cohort }}</p>
+        {% if selected_organisation.trust %}
+        <p>{{selected_organisation.name}} ({{ selected_organisation.trust.name }})</p>
+        {% else %}
+        <p>{{selected_organisation.name}} ({{ selected_organisation.local_health_board.name }})</p>
+        {% endif %}
       </div>
+      
+      <div class="all-kpis-header">
+        <button class="ui right floated rcpch_primary button" _="on click go to top of #kpis">Jump to All KPI Metrics</button>
+        <button
+          class='ui right floated rcpch_primary button'
+          hx-headers='{"X-CSRFToken": "{{ csrf_token }}"}'
+          hx-post="{% url 'selected_trust_select_kpi' organisation_id=selected_organisation.pk %}"
+          hx-trigger="click" hx-swap='innerHTML'
+          hx_indicator='#selected_trust_select_kpi'
+          hx-target="#selected_trust_select_kpi">
+          Refresh
+          <i class="htmx-indicator spinner loading icon" id="spinner"></i>
+        </button>
+      </div>
+    
+    </div>
+  
+  </div>
+
 
       <div class="ui raised attached rcpch_dark_blue segment" id="selected_trust_select_kpi_marker">
 
