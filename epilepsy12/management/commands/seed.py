@@ -67,10 +67,6 @@ class Command(BaseCommand):
         elif options["mode"] == "add_permissions_to_existing_groups":
             self.stdout.write("adding permissions to groups...")
             groups_seeder(add_permissions_to_existing_groups=True)
-        elif options["mode"] == "delete_all_groups_and_recreate":
-            self.stdout.write("deleting all groups/permissions and reallocating...")
-        elif options["mode"] == "add_existing_medicines_as_foreign_keys":
-            self.stdout.write("replacing medicines with medicine entity...")
         elif options["mode"] == "upload_old_patient_data":
             self.stdout.write("Uploading old patient data.")
             insert_old_pt_data()
@@ -86,10 +82,6 @@ class Command(BaseCommand):
 
         else:
             self.stdout.write("No options supplied...")
-        # print("\033[38;2;17;167;142m")
-        # self.stdout.write(image())
-        # print("\033[38;2;17;167;107m")
-        # self.stdout.write("done.")
 
 
 def run_dummy_cases_seed(verbose=True, cases=50):
