@@ -2,7 +2,7 @@
 {% load epilepsy12_template_tags %}
 {% csrf_token %}
 
-{% if all_data.ORGANISATION_KPIS.aggregation_model is not None %}
+
     {% with 'eligible children and young people diagnosed with epilepsy' as CYP_TEXT %}
     <div class="individual_measures_pies_wrapper">
 
@@ -274,4 +274,3 @@
 
     </div>
     {% endwith %}
-{% endif %}

@@ -324,23 +324,37 @@
             </div>
         </div>
 
+        {% if count_of_current_cohort_registered_completed_cases_in_this_organisation > 0 %}
 
+            <div class="sixteen wide column">
+                <div
+                    class="sixteen wide rcpch segment"
+                    hx-get="{% url 'selected_trust_kpis' organisation_id=selected_organisation.pk access='private' %}"
+                    hx-trigger="load" hx-swap='innerHTML'
+                    hx-indicator='#kpis'
+                    hx-target="#kpis">
+                    <div id='kpis'>
+                        <div class="ui active centered inline loader"></div>
+                    </div>
 
-        <div class="sixteen wide column">
-            <div
-                class="sixteen wide rcpch segment"
-                hx-get="{% url 'selected_trust_kpis' organisation_id=selected_organisation.pk access='private' %}"
-                hx-trigger="load" hx-swap='innerHTML'
-                hx-indicator='#kpis'
-                hx-target="#kpis">
-                <div id='kpis'>
-                    <div class="ui active centered inline loader"></div>
                 </div>
-
             </div>
-        </div>
 
-        {% include 'epilepsy12/partials/organisation/individual_metrics.html' with organisation_id=selected_organisation.pk cohort=cohort_data.submitting_cohort %}
+            {% include 'epilepsy12/partials/organisation/individual_metrics.html' with organisation_id=selected_organisation.pk cohort=cohort_data.submitting_cohort %}
+
+        {% else %}
+        
+            <div class="ui rcpch_info icon message">
+                <i class='exclamation circle icon'></i>
+                <div class="content">
+                    <div class="header">
+                        No data
+                    </div>
+                    <p>There is no data for cohort {{cohort_data.submitting_cohort}} at {{selected_organisation.name}}. For further information on publication dates, please check <a href="www.epilepsy12.rcpch.ac.uk">our Epilepsy12 website</a></p>
+                </div>
+            </div>
+
+        {% endif  %}
 
         </div>
 
