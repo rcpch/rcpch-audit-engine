@@ -40,6 +40,14 @@ class Command(BaseCommand):
             help="Indicates the number of children to be created",
             default=50,
         )
+        parser.add_argument(
+            "-ct",
+            "--cohort",
+            nargs="?",
+            type=int,
+            help="Indicates the cohort to create children for. Note cannot be less than 4.",
+            default=7,
+        )
 
     def handle(self, *args, **options):
         if options["mode"] == "cases":
@@ -51,7 +59,8 @@ class Command(BaseCommand):
             self.stdout.write(
                 "register cases in audit and complete all fields with random answers..."
             )
-            run_registrations()
+            cohort = options["cohort"]
+            run_registrations(cohort=cohort)
         elif options["mode"] == "seed_groups_and_permissions":
             self.stdout.write("setting up groups and permissions...")
             groups_seeder(run_create_groups=True)
@@ -141,7 +150,7 @@ def run_dummy_cases_seed(verbose=True, cases=50):
         )
 
 
-def run_registrations(verbose=True):
+def run_registrations(verbose=True, cohort=7):
     """
     Calling function to register all cases in Epilepsy12 and complete all fields with random answers
     """
@@ -150,7 +159,7 @@ def run_registrations(verbose=True):
 
     create_registrations(verbose=verbose)
 
-    complete_registrations(verbose=verbose)
+    complete_registrations(verbose=verbose, cohort=cohort)
 
     if not verbose:
         print(
@@ -158,7 +167,7 @@ def run_registrations(verbose=True):
         )
 
 
-def complete_registrations(verbose=True):
+def complete_registrations(verbose=True, cohort=None):
     """
     Loop through the registrations and score all fields
     """
@@ -168,8 +177,15 @@ def complete_registrations(verbose=True):
             "Completing all the Epilepsy12 fields for the fictional cases...",
             "\033[33m",
         )
-    current_cohort = cohort_number_from_first_paediatric_assessment_date(date.today())
-    current_cohort_data = dates_for_cohort(current_cohort)
+
+    if cohort is None:
+        current_cohort = cohort_number_from_first_paediatric_assessment_date(
+            date.today()
+        )
+        current_cohort_data = dates_for_cohort(current_cohort)
+    else:
+        current_cohort_data = dates_for_cohort(cohort=cohort)
+
     for registration in Registration.objects.all():
         registration.first_paediatric_assessment_date = random_date(
             start=current_cohort_data["cohort_start_date"], end=date.today()
