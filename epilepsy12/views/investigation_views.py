@@ -135,7 +135,7 @@ def eeg_request_date(request, investigations_id):
             page_element="date_field",
             comparison_date_field_name="eeg_performed_date",
             is_earliest_date=True,
-            earliest_allowable_date=investigations.registration.first_paediatric_assessment_date,
+            earliest_allowable_date=None,
         )
 
     except ValueError as error:
@@ -186,7 +186,7 @@ def eeg_performed_date(request, investigations_id):
             page_element="date_field",
             comparison_date_field_name="eeg_request_date",
             is_earliest_date=False,
-            earliest_allowable_date=investigations.registration.first_paediatric_assessment_date,
+            earliest_allowable_date=investigations.registration.investigations.eeg_request_date,
         )
 
     except ValueError as errors:
