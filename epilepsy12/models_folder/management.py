@@ -121,8 +121,8 @@ class Management(TimeStampAbstractBaseClass, UserStampAbstractBaseClass, HelpTex
     )
     individualised_care_plan_includes_ehcp = models.BooleanField(
         help_text={
-            "label": "An educational health care plan (EHCP)",
-            "reference": "Does the individualised care plan include an educational health care plan (EHCP)?",
+            "label": "A School Individual Health Care Plan",
+            "reference": "Does the individualised care plan include a School Individual Health Care Plan?",
         },
         default=None,
         null=True,
