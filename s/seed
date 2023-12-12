@@ -1,0 +1,12 @@
+#!/bin/bash
+
+# scripts may need to be made executable on some platforms before they can be run
+# chmod +x <filename> is the command to do this on unixy systems
+
+# seeds cases and registrations in the Django container
+# *** The project's containers MUST BE RUNNING to seed data inside it! ***
+
+# all arguments passed to this script are passed to the seed command
+
+docker compose exec django python manage.py seed --mode=cases --cases 200 $*
+docker compose exec django python manage.py seed --mode=seed_registrations $*

@@ -4,6 +4,8 @@
 # chmod +x <filename> is the command to do this on unixy systems
 
 # copies the Caddy root CA file into a local trust store
+# This is needed so that you can have a HTTPS connection to your local development environment
+# On some browsers you also need to manually import the root CA file into the browser's trust store
 # See https://caddyserver.com/docs/running#local-https-with-docker
 
 # Select OS

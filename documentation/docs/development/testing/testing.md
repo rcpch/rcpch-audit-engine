@@ -8,7 +8,7 @@ Tests for the Epilepsy12-specific parts of the platform are organised in an `epi
 !!! warning "Active Docker Container"
     Please ensure that your Docker container is still built and active. The previous command in the 'Docker setup' page was to illustrate how to close the Docker container. To reopen it, run:
     ```console
-    s/docker-up
+    s/up
     ```
 
 ## Running `pytest`
@@ -24,5 +24,5 @@ When running tests, it is important to understand that they will only run **insi
 === "Using s/docker scripts "
     Run the following command in your normal system terminal:
     ```console
-    s/docker-test
+    s/test
     ```

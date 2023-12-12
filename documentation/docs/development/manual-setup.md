@@ -122,7 +122,7 @@ In development, it is often necessary to have some seeded children across multip
 python manage.py seed --mode=seed_cases
 ```
 
-This accepts the ```-c``` or ```cases``` attribute followed by the number of children requested. It defaults to 200. Children are given random dates of birth, NHS numbers and postcodes which are all valid.
+This accepts the `-c` or `cases` attribute followed by the number of children requested. It defaults to 200. Children are given random dates of birth, NHS numbers and postcodes which are all valid.
 
 Once the children have been seeded, they can be scored at random:
 
@@ -130,9 +130,9 @@ Once the children have been seeded, they can be scored at random:
 python manage.py seed --mode seed_registrations
 ```
 
-This accepts the ```-ct``` or ```cohort``` attribute followed by the cohort number requested. Note that it is not possible to seed with patients below cohort 4. It defaults to the current actively recruiting cohort.
+This accepts the `-ct` or `--cohort` attribute followed by the cohort number requested. Note that it is not possible to seed with patients below cohort 4. It defaults to the current actively recruiting cohort.
 
-Both functions accept the ```--verbose``` flag also to have a more granular output to the console of the seeding process for debugging purposes.
+Both functions accept the `--verbose` flag also to have a more granular output to the console of the seeding process for debugging purposes.
 
 There are some other functions here also, but these are likely soon to be deprecated:
 
@@ -145,7 +145,7 @@ There are some other functions here also, but these are likely soon to be deprec
 If you want to seed with all these, there is a short cut in the start folder:
 
 ```console
-s/docker-seed
+s/seed
 ```
 
 This will seed with the defaults documented above.

@@ -1,6 +1,6 @@
 ---
-title: (Windows) Setup for development using Docker Compose
-reviewers: Dr Anchit Chandran
+title: Windows Docker Setup
+reviewers: Dr Anchit Chandran, Dr Marcus Baw
 ---
 
 You should have already [downloaded Docker](https://docs.docker.com/get-docker/) and cloned the repository.
@@ -28,7 +28,7 @@ cd rcpch-audit-engine/
 Finally, you should be able to run the setup script by typing:
 
 ```console
-sh s/docker-up
+sh s/up
 ```
 
 !!! info "Setup errors"
@@ -38,7 +38,7 @@ sh s/docker-up
 
 Though WSL is required for the Docker setup, a few additional steps are needed related to [Caddy Certificates](https://caddyserver.com/docs/running#local-https-with-docker).
 
-First, ensure all the Docker containers are running by running `sh s/docker-up` inside a WSL2 terminal, as described in the previous step.
+First, ensure all the Docker containers are running by running `sh s/up` inside a WSL2 terminal, as described in the previous step.
 
 To get the Caddy Certificate, open a Powershell terminal in the same directory. Powershell is required because the steps to install the Certificate are OS-specific, and we need the Windows installation.
 
