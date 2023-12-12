@@ -55,8 +55,16 @@ def case_list(request, organisation_id):
     # get currently selected organisation
     organisation = Organisation.objects.get(pk=organisation_id)
 
-    # get all organisations which are in the same parent trust
-    organisation_children = Organisation.objects.filter(trust=organisation.trust).all()
+    # get trust or health board
+    if organisation.country.boundary_identifier == "W92000004":
+        parent_trust = organisation.local_health_board
+        organisation_children = Organisation.objects.filter(
+            local_health_board=parent_trust
+        ).all()
+    else:
+        parent_trust = organisation.trust
+        # get all organisations which are in the same parent trust
+        organisation_children = Organisation.objects.filter(trust=parent_trust).all()
 
     if filter_term:
         # filter_term is called if filtering by search box
@@ -78,11 +86,20 @@ def case_list(request, organisation_id):
             )
         elif request.user.view_preference == 1:
             # user has requested trust level view
+            if organisation.country.boundary_identifier == "W92000004":
+                # in Wales filter by health board
+                trust_filter = Q(
+                    site__organisation__local_health_board__ods_code__contains=organisation.local_health_board.ods_code
+                )
+            else:
+                # England filter by Trust
+                trust_filter = Q(
+                    site__organisation__trust__ods_code__contains=organisation.trust.ods_code
+                )
+
             all_cases = (
                 Case.objects.filter(
-                    Q(
-                        site__organisation__trust__ods_code__contains=organisation.trust__ods_code
-                    )
+                    trust_filter
                     & Q(site__site_is_primary_centre_of_epilepsy_care=True)
                     & Q(site__site_is_actively_involved_in_epilepsy_care=True)
                     & (
@@ -122,11 +139,21 @@ def case_list(request, organisation_id):
             filtered_cases = Case.objects.all()
         elif request.user.view_preference == 1:
             # filters all primary Trust level centres, irrespective of if active or inactive
-            filtered_cases = Case.objects.filter(
-                organisations__trust__name__contains=organisation.trust.name,
-                site__site_is_primary_centre_of_epilepsy_care=True,
-                site__site_is_actively_involved_in_epilepsy_care=True,
-            )
+            if organisation.country.boundary_identifier == "W92000004":
+                # welsh - select health boards
+                filtered_cases = Case.objects.filter(
+                    organisations__local_health_board__name__contains=parent_trust.name,
+                    site__site_is_primary_centre_of_epilepsy_care=True,
+                    site__site_is_actively_involved_in_epilepsy_care=True,
+                )
+            else:
+                # England - select trusts
+                filtered_cases = Case.objects.filter(
+                    organisations__trust__name__contains=parent_trust.name,
+                    site__site_is_primary_centre_of_epilepsy_care=True,
+                    site__site_is_actively_involved_in_epilepsy_care=True,
+                )
+
         else:
             # filters all primary centres at organisation level, irrespective of if active or inactive
             filtered_cases = Case.objects.filter(
@@ -258,21 +285,23 @@ def case_list(request, organisation_id):
     case_count = all_cases.count()
     registered_count = registered_cases.count()
 
-    if organisation.country.boundary_identifier == "W92000004":
-        parent_trust = organisation.local_health_board.name
-    else:
-        parent_trust = organisation.trust.name
-
     if (
         request.user.is_rcpch_audit_team_member
         or request.user.is_rcpch_staff
         or request.user.is_superuser
     ):
-        rcpch_choices = (
-            (0, "Organisation level"),
-            (1, "Trust level"),
-            (2, "National level"),
-        )
+        if organisation.country.boundary_identifier == "W92000004":
+            rcpch_choices = (
+                (0, "Organisation level"),
+                (1, "Local Health Board level"),
+                (2, "National level"),
+            )
+        else:
+            rcpch_choices = (
+                (0, "Organisation level"),
+                (1, "Trust level"),
+                (2, "National level"),
+            )
     else:
         rcpch_choices = (
             (0, "Organisation level"),
