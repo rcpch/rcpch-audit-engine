@@ -233,8 +233,6 @@ def selected_trust_kpis(request, organisation_id, access):
     This endpoint can be called from the public dashboard so protection happens within the view
     """
 
-    # Get all relevant data for this cohort
-    # cohort = cohort_number_from_first_paediatric_assessment_date(date.today())
     # Get all relevant data for submission cohort
     cohort_data = cohorts_and_dates(first_paediatric_assessment_date=date.today())
     organisation = Organisation.objects.get(pk=organisation_id)

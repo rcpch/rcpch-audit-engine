@@ -47,8 +47,6 @@ will be persisted and run as a cron job once a day.
             {% endif %}
         </div>
 
-        {% if all_data.ORGANISATION_KPIS.aggregation_model is not None %}
-
             <div class="ui raised attached inverted rcpch_dark_blue segment" id="audit_body_segment">
 
                     <h3>Clinical Team</h3>
@@ -707,18 +705,6 @@ will be persisted and run as a cron job once a day.
                 <i class="info circle icon"></i>
                 These are key indicators for your Organisation, alongside aggregate higher-level data related to your Organisation. Please note that these data are provisional, and may be subject to change before the annual report publication.
             </div>
-
-        {% else %}
-            <div class="ui rcpch_info icon message">
-                <i class='exclamation circle icon'></i>
-                <div class="content">
-                    <div class="Header">
-                        No data
-                    </div>
-                    <p>There is no data for this cohort. For further information on publication dates, please check <a href="www.epilepsy12.rcpch.ac.uk">our Epilepsy12 website</a></p>
-                </div>
-            </div>
-        {% endif %}
 
     </div>
 
