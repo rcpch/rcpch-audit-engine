@@ -47,27 +47,31 @@ cp envs/env-template envs/.env
 ```
 
 !!! warning "Mac Users"
-    If using Mac and Safari, to access the Epilepsy 12 engine in your development, you must change the `SITE_DOMAIN` name in .env to 'localhost', and type this into your browser once you have executed `s/docker-up` in the next step. This will load the E12 engine in your Safari browser.
+    If using Mac and Safari, to access the Epilepsy 12 engine in your development, you must change the `SITE_DOMAIN` name in .env to 'localhost', and type this into your browser once you have executed `s/up` in the next step. This will load the E12 engine in your Safari browser.
 
     However, for simplicity, we recommend using a different browser, such as Chrome, and leaving the .env file unaltered.
 
 ### Start the development environment for the first time using our startup script
 
 ```console
-s/docker-up
+s/up
 ```
 
 This script automates all the setup steps including upgrading `pip`, installing all development dependencies with `pip install`, migrating the database and seeding the database with some essential data.
 
 ### Trust the Caddy root CA certificate
 
-To get a HTTPS connection through the Caddy server to work on `e12.localhost`, you need to trust the Caddy root CA certificate. This is only necessary once.
+To get a HTTPS connection through the Caddy server to work on `e12.localhost`, you need to trust the Caddy root CA certificate. This is only necessary once. We have a script to automate this.
 
-Instructions for this are in the [Caddy documentation](https://caddyserver.com/docs/running#local-https-with-docker)
+```console
+s/trust-caddy-root-ca
+```
 
-With some browsers you may need to manually add the certificate in the Security settings, see the above link for details. Restart the browser after trusting the certificate.
+If you encounter problems, further instructions for this are in the [Caddy documentation](https://caddyserver.com/docs/running#local-https-with-docker). With some browsers you may need to manually add the certificate in the Security settings, see the above link for details. Restart the browser after trusting the certificate.
 
-`s/docker-up` will build the necessary Docker images, create the containers, and start them up. There will be a lot of output in the terminal, but it should create a number of containers and network them together. If you hit errors, please do open an issue.
+### Startup
+
+`s/up` will build the necessary Docker images, create the containers, and start them up. There will be a lot of output in the terminal, but it should create a number of containers and network them together. If you hit errors, please do open an issue.
 
 At the very end of the terminal output, which could take several minutes, you should see something like this:
 
@@ -80,11 +84,11 @@ rcpch-audit-engine-web-1          | Quit the server with CONTROL-C.
 !!! warning "<https://e12.localhost>, not <http://localhost:8000>"
     **IMPORTANT: Because we are using the Caddy web server as a reverse proxy, the application should be accessed at <https://e12.localhost>, not <http://localhost:8000>, even though Django will still report that is the hostname and port it 'thinks' it is listening on.**
 
-Changes you make in your development folder are **automatically synced to inside the Docker container**, and will show up in the application right away.
+Changes you make in your development folder are **automatically synced to inside the Docker container**, and will show up in the application right away, as long as your .env file is configured with `DJANGO_STARTUP_COMMAND="python manage.py runserver 0.0.0.0:8000"`. (We have other startup commands we use in production environments which don't have auto-reload)
 
-This Docker setup is quite new so please do open an issue if there is anything that doesn't seem to work properly. Suggestions and feature requests welcome.
+Please do open an issue if there is anything that doesn't seem to work properly. Suggestions and feature requests welcome.
 
-### What does `s/docker-up` do?
+### What does `s/up` do?
 
 This script automates all the setup steps including:
 
@@ -104,11 +108,37 @@ This Docker setup is quite new so please do open an issue if there is anything t
 !!! warning "Terminal is now occupied"
     If you have successfully run the Docker Compose deployment, your terminal will be showing the combined and colour-coded logging output for all the containers and will no longer show an interactive prompt, which is means you can not run any more commands in that terminal. To resolve this, simply **open another Terminal window** in the same working directory, in which you can run commands.
 
-    If opening another terminal is impractical or impossible, then in most Shell environments you can press ++ctrl+Z++ to suspend the current process, and then `bg` to resume it in the background. This will return you to an interactive prompt. Once you've executed your further commands, you can then use `fg` to bring the console logging output back to the foreground again.
+    If opening another terminal is impractical or impossible, then in most Shell environments you can press `Ctrl`+`Z` to suspend the current process, and then `bg` to resume it in the background. This will return you to an interactive prompt. Once you've executed your further commands, you can then use `fg` to bring the console logging output back to the foreground again.
 
-## Executing commands in the context of the `django` container
+### Creating a superuser
 
-You can run commands in the context of any of the containers using Docker Compose.
+You can use our convenience script to create a superuser in the context of the `django` container.
+
+```console
+s/create-superuser
+```
+The script will prompt you for required user attributes:
+
+```console
+Email address: myexampleemail@example.com
+Role: 1
+First name: Test
+Surname: User
+Is rcpch audit team member: True
+Password:
+Password (again):
+Superuser created successfully.
+```
+
+#### Notes on superuser creation:
+
+- `Role` - this is an enum which comes from `epilepsy12.constants.user_types.ROLES` and is an integer between 1 and 5
+- `Is rcpch audit team member` - this is a boolean value, either `True` or `False`
+- `Password` - for superusers in local development it is possible to bypass the minimum password strength requirements, but this is not possible in production environments.
+
+### Executing commands in the context of the `django` container
+
+You can run arbitrary commands in the context of any of the containers using Docker Compose.
 
 The below command will execute `<command>` inside the `django` container.
 
@@ -116,49 +146,79 @@ The below command will execute `<command>` inside the `django` container.
 docker compose exec django <command>
 ```
 
-For example, to create a superuser
+For example, to send a test email
 
 ```console
-sudo docker compose exec django python manage.py createsuperuser
+sudo docker compose exec django python manage.py sendtestemail myexampleemail@example.com
 ```
 
-## Running the test suite
+### Running the test suite
 
 ```console
-s/docker-test
+s/test
 ```
 
 This will execute our suite of Pytest tests inside the `django` container, and the output should be displayed in the console for you.
 
-## Shutting down the Docker Compose environment
+### Shutting down the Docker Compose environment
 
-++ctrl+c++ will shut down the containers but will leave them built. This means you can restart them rapidly with `s/docker-up`.
+++ctrl+c++ will shut down the containers but will leave them built. This means you can restart them rapidly with `s/up`.
 
 To shut down all containers use
 
 ```console
-s/docker-down
+s/down
 ```
 
 To shut down **and destroy the containers and the images** they are built from, use
 
 ```console
-s/docker-down-rm-containers-images
+s/down-rm-containers-images
 ```
 
 To go even further and **delete all the data of the application**, including the database, use
 
 ```console
-s/docker-delete-local-data
+s/DELETE-LOCAL-DATA
 ```
 
-For obvious reasons this is something that should **ONLY** be done in local development environments.
+For obvious reasons this is something that should **ONLY** be done in local development environments and never on Live! It is named with a different pattern to all the other scripts in order to prevent it accidentally being run.
+
+### Restarting and rebuilding the containers
+
+For convenience and speed we have created some scripts to restart and rebuild the containers.
+
+```console
+s/restart
+```
+
+is the equivalent of running `s/down` followed by `s/up`.
+
+```console
+s/rebuild
+```
+
+is the equivalent of running `s/down-rm-containers-images` followed by `s/up`.
+
+### Seeding with dummy data
+
+For testing of the UI it is often useful to have some dummy data in the database. We have a script to seed the database with some dummy data.
+
+```console
+s/seed
+```
+
+See the [Seeding the Database](../manual-setup/#seeding-the-database) section for more details on the usage of this script, for example setting a non-default Cohort Number.
 
 ## Tips and Tricks, Gotchas and Caveats
 
-### External dependencies
+### Reconnecting to containers which are already running
 
-Although the Docker Compose setup is very convenient, and it installs all the runtime development dependencies _inside_ the `django` container, one thing it can't do is install any _local_ Python packages which are required for text editing, linting, and similar utilities _outside_ the container. Examples are `pylint`, `pylint_django`, etc. You will still need to install these locally, ideally in a virtual environment using `pyenv`.
+If you run `docker ps` and it lists the full suite of running E12 containers, and you just want to reconnect to the scrolling log output in the current terminal window, you can just type `s/up` which will not restart anything if they are already running, it will just reconnect to the outputs of those containers so you can see the logs.
+
+### Even with Docker, there are a few external local dependencies
+
+Although the Docker Compose setup is very convenient, and it installs all the runtime development dependencies _inside_ the `django` container, one thing it can't do is install any _local_ Python packages which are required for code editing, linting, and similar utilities _outside_ the container. Examples are `pylint`, `pylint_django`, etc. You will still need to install these locally, ideally in a virtual environment using `pyenv`. The versions of these dependencies are much less likely to conflict across projects, so you could probably get away with installing them in your system Python if you wished.
 
 ### Docker Compose and Virtual Private Networks
 
@@ -166,4 +226,4 @@ If you experience persistent problems with Docker's internal connectivity, make 
 
 ### Docker build cache errors on VPS deployments
 
-On some occasions we have encountered errors when trying to run `s/docker-up` on a VPS, where the Docker build cache is corrupted. This can be resolved by running `docker builder prune` and then `s/docker-up` again. This clears the Docker build cache and forces it to rebuild the images from scratch. Importantly for Live, it does not affect Docker Volumes, so the database and other data is not lost.
+On some occasions we have encountered errors when trying to run `s/up` on a VPS, where the Docker build cache is corrupted. This can be resolved by running `docker builder prune` and then `s/up` again. This clears the Docker build cache and forces it to rebuild the images from scratch. Importantly for Live, it does not affect Docker Volumes, so the database and other data is not lost.
