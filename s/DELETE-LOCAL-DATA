@@ -3,13 +3,13 @@
 # scripts may need to be made executable on some platforms before they can be run
 # chmod +x <filename> is the command to do this on unixy systems
 
-#!/bin/bash
-
-echo "WARNING: This will delete all Epilepsy12 data in Docker volumes."
-echo "Are you sure you want to continue? (yes/no)"
+# deletes all the data in Docker volumes
+echo "WARNING: This will delete all the data in Docker volumes."
+echo "This is irreversible and must NEVER be done on Live or Production systems."
+echo "Are you sure you want to continue? Type 'delete' to continue."
 read -r response
 
-if [[ "$response" =~ ^([yY][eE][sS]|[yY])$ ]]; then
+if [[ "$response" = "delete"; then
     echo "Deleting local data..."
     # shuts down the Docker Compose setup and remove containers and images
     docker compose down -v --rmi local # removes the volumes, container and local images

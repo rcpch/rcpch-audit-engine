@@ -6,5 +6,6 @@
 # runs tests in the context of the django development server
 # by default the --verbose flag is passed to pytest for more detailed output
 # all arguments passed to this script are passed to pytest
-# (The Django container must be running ro execute tests inside it)
+
+# *** The project's containers MUST BE RUNNING to execute tests inside it! ***
 docker compose exec django pytest -v $*

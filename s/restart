@@ -3,7 +3,8 @@
 # scripts may need to be made executable on some platforms before they can be run
 # chmod +x <filename> is the command to do this on unixy systems
 
-# starts the postgres and application containers
-# migrates db, seeds db, creates superuser, runs server
+# shuts down the Docker Compose setup but does not destroy containers or images
+s/down
 
-docker compose up # starts everything up again
+# starts all docker compose services
+s/up
