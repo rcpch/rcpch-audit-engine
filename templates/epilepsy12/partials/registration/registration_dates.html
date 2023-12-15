@@ -32,7 +32,11 @@
                     <div class="four wide field">
                         <label>Cohort</label>
                         <div class='ui rcpch input'>
-                            <input type="text" readonly="" placeholder="{{registration.cohort}}"/>
+                            {% if registration.cohort %}
+                                <input type="text" readonly="" placeholder="{{ registration.cohort }}"/>
+                            {% else %}
+                                <input type="text" readonly="" placeholder=""/>
+                            {% endif %}
                         </div>
                     </div>
 
@@ -46,14 +50,22 @@
                     <div class="field">
                         <label>Completed First Year</label>
                         <div class='ui rcpch input'>
-                            <input type="text" readonly="" placeholder="{{registration.completed_first_year_of_care_date}}"/>
+                            {% if registration.completed_first_year_of_care_date %}
+                                <input type="text" readonly="" placeholder="{{ registration.completed_first_year_of_care_date }}"/>
+                            {% else %}
+                                <input type="text" readonly="" placeholder=""/>
+                            {% endif %}
                         </div>
                     </div>
 
                     <div class="field">
                         <label>Submission Deadline</label>
                         <div class='ui rcpch input'>
-                            <input type="text" readonly="" placeholder="{{registration.audit_submission_date}}"/>
+                            {% if registration.audit_submission_date %}
+                                <input type="text" readonly="" placeholder="{{registration.audit_submission_date }}"/>
+                            {% else %}
+                                <input type="text" readonly="" placeholder=""/>
+                            {% endif %}
                         </div>
                     </div>
 
