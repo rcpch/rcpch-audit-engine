@@ -318,9 +318,9 @@ REST_FRAMEWORK = {
 }
 
 # LOGGING
-CONSOLE_LOG_LEVEL = os.getenv("CONSOLE_LOG_LEVEL", "INFO")
+CONSOLE_LOG_LEVEL = os.getenv("CONSOLE_LOG_LEVEL", "INFO") # For e12 specific logs
+CONSOLE_DJANGO_LOG_LEVEL = os.getenv("CONSOLE_DJANGO_LOG_LEVEL", "INFO") # For django logs
 FILE_LOG_LEVEL = os.getenv("FILE_LOG_LEVEL", "INFO")
-CONSOLE_DJANGO_LOG_LEVEL = os.getenv("CONSOLE_DJANGO_LOG_LEVEL", "INFO")
 
 
 # Define the default django logger settings
