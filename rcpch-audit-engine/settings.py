@@ -318,7 +318,8 @@ REST_FRAMEWORK = {
     "DEFAULT_FILTER_BACKENDS": ("django_filters.rest_framework.DjangoFilterBackend",),
 }
 
-# Optional Logging for Debugging Purposes (esp with DEBUG=False)
+CONSOLE_LOG_LEVEL = os.getenv("CONSOLE_LOG_LEVEL", "INFO")
+FILE_LOG_LEVEL = os.getenv("FILE_LOG_LEVEL", "INFO")
 
 LOGGING = {
     "version": 1,
@@ -329,22 +330,39 @@ LOGGING = {
             "()": "django.utils.log.ServerFormatter",
             "format": "[{server_time}] {message}",
             "style": "{",
-        }
+        },
+        "verbose": {
+            "format": "[%(asctime)s] %(levelname)s [%(name)s:%(lineno)s] %(message)s",
+            "datefmt": "%d/%b/%Y %H:%M:%S",
+        },
+        "simple": {"format": "%(levelname)s %(message)s"},
     },
     "handlers": {
         "console": {
-            "level": "INFO",
+            "level": CONSOLE_LOG_LEVEL,
             "class": "logging.StreamHandler",
-        }
+            "formatter": "simple",
+            "filters": [],
+        },
+        "file": {
+            "level": FILE_LOG_LEVEL,
+            "class": "logging.FileHandler",
+            "filename": "logs/general.log",
+            "formatter": "verbose",
+        },
     },
     "loggers": {
-        "two_factor": {
+        "django": {
             "handlers": ["console"],
-            "level": "INFO",
+            "propagate": True,
         },
         "epilepsy12": {
-            "handlers": ["console"],
-            "level": "INFO",
+            "handlers": ["console", "file"],
+            "level": CONSOLE_LOG_LEVEL,
+        },
+        "two_factor": {
+            "handlers": ["console", "file"],
+            "level": CONSOLE_LOG_LEVEL,
         },
     },
 }
