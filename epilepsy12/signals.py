@@ -1,3 +1,6 @@
+# python imports
+import logging
+
 # django imports
 from django.contrib.auth.signals import (
     user_logged_in,
@@ -9,10 +12,12 @@ from django.dispatch import receiver
 # RCPCH
 from .models import VisitActivity, Epilepsy12User
 
+# Logging setup
+logger = logging.getLogger(__name__)
 
 @receiver(user_logged_in)
 def log_user_login(sender, request, user, **kwargs):
-    print(f"{user} ({user.email}) logged in from {get_client_ip(request)}.")
+    logger.info(f"{user} ({user.email}) logged in from {get_client_ip(request)}.")
     VisitActivity.objects.create(
         activity=1, ip_address=get_client_ip(request), epilepsy12user=user
     )
