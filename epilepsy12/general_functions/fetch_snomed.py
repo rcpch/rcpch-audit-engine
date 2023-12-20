@@ -1,4 +1,5 @@
 # standard imports
+import logging
 import requests
 
 # third party imports
@@ -7,6 +8,8 @@ from django.conf import settings
 # RCPCH imports
 from ..constants import BENZODIAZEPINE_TYPES, ANTIEPILEPSY_MEDICINE_TYPES
 
+# Logging setup
+logger = logging.getLogger(__name__)
 
 def fetch_ecl(ecl):
     """
@@ -16,7 +19,7 @@ def fetch_ecl(ecl):
     response = requests.get(search_url)
 
     if response.status_code == 404:
-        print("Could not get SNOMED data from server...")
+        logging.warning("Could not get SNOMED data from server...")
         return None
 
     serialised = response.json()
@@ -33,7 +36,7 @@ def fetch_concept(concept_id):
     response = requests.get(search_url)
 
     if response.status_code == 404:
-        print("Could not get SNOMED data from server...")
+        logging.warning("Could not get SNOMED data from server...")
         return None
 
     serialised = response.json()
@@ -49,7 +52,7 @@ def fetch_paediatric_neurodisability_outpatient_diagnosis_simple_reference_set()
     response = requests.get(search_url)
 
     if response.status_code == 404:
-        print("Could not get SNOMED data from server...")
+        logging.warning("Could not get SNOMED data from server...")
         return None
 
     # filters out Autism-related entries
