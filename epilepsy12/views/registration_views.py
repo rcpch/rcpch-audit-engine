@@ -402,7 +402,6 @@ def update_lead_site(request, registration_id, site_id, update):
                         & Q(is_active=True)
                         & Q(role=1)  # Audit Centre Lead Clinician
                     )
-                    | (Q(is_active=True) & Q(is_rcpch_audit_team_member=True))
                 ).values_list("email", flat=True)
             )
             subject = "Epilepsy12 Lead Site Transfer"
@@ -410,6 +409,8 @@ def update_lead_site(request, registration_id, site_id, update):
             # there is no allocated clinical lead. Send to SITE_CONTACT_EMAIL
             recipients = [settings.SITE_CONTACT_EMAIL]
             subject = "Epilepsy12 Lead Site Transfer - NO LEAD CLINICIAN"
+
+        print(recipients)
 
         email = construct_transfer_epilepsy12_site_email(
             request=request,

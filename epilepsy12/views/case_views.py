@@ -10,7 +10,6 @@ from django.contrib.auth.decorators import permission_required
 from django.contrib.gis.db.models import Q
 from django.contrib import messages
 from django.core.paginator import Paginator
-from django.db import DatabaseError
 
 # third party imports
 from django_htmx.http import trigger_client_event, HttpResponseClientRedirect
@@ -393,22 +392,38 @@ def transfer_response(request, organisation_id, case_id, organisation_response):
     )
     origin_organisation = site.transfer_origin_organisation
     if organisation_response == "reject":
-        # reset the child back to the orgin organisation
-        site.active_transfer = False
-        site.organisation = site.transfer_origin_organisation
-        site.transfer_origin_organisation = None
-        site.transfer_request_date = None
+        # reset the child back to the origin organisation
+        if Site.objects.filter(
+            organisation=origin_organisation,
+            site_is_primary_centre_of_epilepsy_care=True,
+            site_is_actively_involved_in_epilepsy_care=False,
+        ).exists():
+            # old record exist - reactivate
+            old_site = Site.objects.filter(
+                organisation=origin_organisation,
+                site_is_primary_centre_of_epilepsy_care=True,
+                site_is_actively_involved_in_epilepsy_care=False,
+            ).get()
+            old_site.site_is_actively_involved_in_epilepsy_care = True
+            old_site.save()
+            # delete this record
+            site.delete()
+        else:
+            # no previous record to reanimate
+            # continue with this record
+            # no longer in active transfer
+            site.active_transfer = False
+            site.organisation = site.transfer_origin_organisation
+            site.transfer_origin_organisation = None
+            site.transfer_request_date = None
+            site.save()
     elif organisation_response == "accept":
         site.active_transfer = False
         site.transfer_origin_organisation = None
         site.transfer_request_date = None
+        site.save()
     else:
         raise Exception("No organisation response supplied")
-
-    try:
-        site.save()
-    except:
-        raise DatabaseError
 
     # send email asynchronously to lead clinician(s) of origin organisation notifying them of outcome
     outcome = f"{organisation_response.upper()}ED"
