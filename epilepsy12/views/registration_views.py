@@ -266,7 +266,12 @@ def transfer_lead_site(request, registration_id, site_id):
     registration = Registration.objects.get(pk=registration_id)
     site = Site.objects.get(pk=site_id)
 
-    organisation_list = Organisation.objects.order_by("name").all()
+    organisation_list = (
+        Organisation.objects.all()
+        .exclude(pk__in=site.organisation.pk)
+        .order_by("name")
+        .all()
+    )
 
     context = {
         "organisation_list": organisation_list,
