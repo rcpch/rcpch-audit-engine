@@ -1,4 +1,5 @@
 # python
+import logging
 from datetime import date
 from dateutil.relativedelta import relativedelta
 
@@ -24,7 +25,8 @@ from ..constants import (
 from ..general_functions import imd_for_postcode, stringify_time_elapsed
 from .time_and_user_abstract_base_classes import *
 
-
+# Logging setup
+logger = logging.getLogger(__name__)
 class Case(TimeStampAbstractBaseClass, UserStampAbstractBaseClass, HelpTextMixin):
     """
     This class holds information about each child or young person
@@ -152,7 +154,7 @@ class Case(TimeStampAbstractBaseClass, UserStampAbstractBaseClass, HelpTextMixin
                 except Exception as error:
                     # Deprivation score not persisted if deprivation score server down
                     self.index_of_multiple_deprivation_quintile = None
-                    print(
+                    logger.exception(
                         f"Cannot calculate deprivation score for {self.postcode}: {error}"
                     )
                     pass
