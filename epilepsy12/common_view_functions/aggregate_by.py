@@ -371,7 +371,7 @@ def update_kpi_aggregation_model(
                     "open_access": open_access,
                 },
             )
-            logging.debug(f"created {new_obj}")
+            logger.debug(f"created {new_obj}")
 
         else:
             new_obj, created = NationalKPIAggregation.objects.update_or_create(
@@ -385,9 +385,9 @@ def update_kpi_aggregation_model(
             )
 
             if created:
-                logging.debug(f"created {new_obj}")
+                logger.debug(f"created {new_obj}")
             else:
-                logging.debug(f"updated {new_obj}")
+                logger.debug(f"updated {new_obj}")
 
         return None
 
@@ -414,9 +414,9 @@ def update_kpi_aggregation_model(
             value_count["open_access"] = open_access
             try:
                 new_obj = AbstractionKPIAggregationModel.objects.create(**value_count)
-                logging.debug(f"created {new_obj}")
+                logger.debug(f"created {new_obj}")
             except Exception as error:
-                logging.exception(
+                logger.exception(
                     f"Can't save new KPIAggregations for {abstraction_level} for {abstraction_relation_instance}: {error}"
                 )
                 return
@@ -438,15 +438,15 @@ def update_kpi_aggregation_model(
                     open_access=open_access,
                 )
             except Exception as error:
-                logging.exception(
+                logger.exception(
                     f"CLOSED VIEW: Can't update/save KPIAggregations for {abstraction_level} for {abstraction_relation_instance}: {error}"
                 )
                 return
 
             if created:
-                logging.debug(f"created {new_obj}")
+                logger.debug(f"created {new_obj}")
             else:
-                logging.debug(f"updated {new_obj}")
+                logger.debug(f"updated {new_obj}")
 
 
 def aggregate_kpis_update_models_all_abstractions_for_organisation(
@@ -690,7 +690,7 @@ def _seed_all_aggregation_models() -> None:
     ]
 
     if len(all_entities) + 1 != len(all_agg_models):
-        logging.error(
+        logger.error(
             f"Incorrect lengths for entities. KPIAggregations not seeded. {len(all_entities)+1=}{len(all_agg_models)=}"
         )
         return

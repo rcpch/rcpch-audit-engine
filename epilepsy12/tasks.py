@@ -75,4 +75,4 @@ def hello():
     THIS IS A SCHEDULED TASK THAT IS CALLED AT 06:00 EVERY DAY
     THE CRON DATE/FREQUENCY IS SET IN SETTING.PY
     """
-    logging.debug("Hello Epilepsy12!")
+    logger.debug("Hello Epilepsy12!")

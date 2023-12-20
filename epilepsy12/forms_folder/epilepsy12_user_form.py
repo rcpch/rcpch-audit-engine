@@ -50,7 +50,7 @@ class Epilepsy12UserUpdatePasswordForm(SetPasswordForm):
         user = super().save(*args, commit=False, **kwargs)
         user.password_last_set = timezone.now()
         if commit:
-            logging.debug(f"Updating password_last_set to {timezone.now()}")
+            logger.debug(f"Updating password_last_set to {timezone.now()}")
             user.save()
         return user
 
