@@ -1,5 +1,6 @@
 # python imports
 from datetime import datetime
+import logging
 
 # django imports
 from django.core.exceptions import PermissionDenied
@@ -32,6 +33,8 @@ from django.conf import settings
 from ..general_functions import construct_transfer_epilepsy12_site_outcome_email
 from ..tasks import asynchronously_send_email_to_recipients
 
+# Logging setup
+logger = logging.getLogger(__name__)
 
 @login_and_otp_required()
 @user_may_view_this_organisation()
@@ -552,8 +555,7 @@ def create_case(request, organisation_id):
             messages.error(
                 request=request, message="It was not possible to save the case"
             )
-            print("Invalid data")
-            print(form.errors)
+            logging.info(f"Invalid data provided to case form: {form.errors}")
 
     context = {
         "organisation_id": organisation_id,
