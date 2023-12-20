@@ -410,8 +410,6 @@ def update_lead_site(request, registration_id, site_id, update):
             recipients = [settings.SITE_CONTACT_EMAIL]
             subject = "Epilepsy12 Lead Site Transfer - NO LEAD CLINICIAN"
 
-        print(recipients)
-
         email = construct_transfer_epilepsy12_site_email(
             request=request,
             target_organisation=new_organisation,
