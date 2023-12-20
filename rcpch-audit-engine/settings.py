@@ -325,7 +325,7 @@ FILE_LOG_LEVEL = os.getenv("FILE_LOG_LEVEL", "INFO")
 django_loggers = {
     logger_name: {
         "handlers": ["console"],
-        "level": "DEBUG",
+        "level": CONSOLE_LOG_LEVEL,
         "propagate": False,
         "formatter": "simple",
     }
@@ -349,11 +349,34 @@ LOGGING = {
             "format": "[{server_time}] {message}",
             "style": "{",
         },
-        "verbose": {
+        # Same as verbose, but no color formatting
+        "file": {
             "format": "[%(asctime)s] %(levelname)s [%(name)s:%(lineno)s] %(message)s",
             "datefmt": "%d/%b/%Y %H:%M:%S",
         },
-        "simple": {"format": "%(levelname)s [%(name)s] %(message)s"},
+        "verbose": {
+            "()": "colorlog.ColoredFormatter",
+            "format": "%(log_color)s[%(asctime)s] %(levelname)s [%(name)s:%(lineno)s] %(bold_white)s%(message)s",
+            "datefmt": "%d/%b/%Y %H:%M:%S",
+            "log_colors": {
+                "DEBUG": "bold_black",
+                "INFO": "white",
+                "WARNING": "yellow",
+                "ERROR": "red",
+                "CRITICAL": "bold_red",
+            },
+        },
+        "simple": {
+            "()": "colorlog.ColoredFormatter",
+            "format": "%(log_color)s%(levelname)s [%(name)s] %(bold_white)s%(message)s",
+            "log_colors": {
+                "DEBUG": "bold_black",
+                "INFO": "white",
+                "WARNING": "yellow",
+                "ERROR": "red",
+                "CRITICAL": "bold_red",
+            },
+        },
     },
     "handlers": {
         "console": {
@@ -366,28 +389,28 @@ LOGGING = {
             "level": FILE_LOG_LEVEL,
             "class": "logging.FileHandler",
             "filename": "logs/general.log",
-            "formatter": "verbose",
+            "formatter": "file",
         },
         # e12 file logger, each file is 15MB max, with 10 historic versions when filled
         "epilepsy12_logs": {
-            "level": "DEBUG",
+            "level": FILE_LOG_LEVEL,
             "class": "logging.handlers.RotatingFileHandler",
             "filename": "logs/epilepsy12.log",
             "maxBytes": 15728640,  # 1024 * 1024 * 15B = 15MB
             "backupCount": 10,
-            "formatter": "verbose",
+            "formatter": "file",
         },
     },
     "loggers": {
         "django": {
             "handlers": ["console", "epilepsy12_logs"],
             "propagate": True,
-            "level": "DEBUG",
+            "level": CONSOLE_LOG_LEVEL,
         },
         **django_loggers,  # this injects the default django logger settings defined above
         "epilepsy12": {
             "handlers": ["console", "epilepsy12_logs"],
-            "level": "DEBUG",
+            "level": CONSOLE_LOG_LEVEL,
             "propagate": True,
         },
         "two_factor": {
@@ -396,38 +419,3 @@ LOGGING = {
         },
     },
 }
-
-# Optional Logging for Debugging Purposes (esp with DEBUG=False)
-
-# LOGGING = {
-#     'version': 1,
-#     'disable_existing_loggers': False,
-#     'formatters': {
-#         'verbose': {
-#             'format': "[%(asctime)s] %(levelname)s [%(name)s:%(lineno)s] %(message)s",
-#             'datefmt': "%d/%b/%Y %H:%M:%S"
-#         },
-#         'simple': {
-#             'format': '%(levelname)s %(message)s'
-#         },
-#     },
-#     'handlers': {
-#         'file': {
-#             'level': 'DEBUG',
-#             'class': 'logging.FileHandler',
-#             'filename': 'auditengine.log',
-#             'formatter': 'verbose'
-#         },
-#     },
-#     'loggers': {
-#         'django': {
-#             'handlers': ['file'],
-#             'propagate': True,
-#             'level': 'DEBUG',
-#         },
-#         'rcpch-audit-engine': {
-#             'handlers': ['file'],
-#             'level': 'DEBUG',
-#         },
-#     }
-# }

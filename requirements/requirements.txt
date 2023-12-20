@@ -63,3 +63,6 @@ mkdocs-git-committers-plugin-2 # displays authors at the bottom of the page
 mkdocs-git-revision-date-localized-plugin # displays last edit date at the bottom of the page
 mkdocs-macros-plugin # enables 'foldable' admonition text (used for large code blocks)
 mkdocs-with-pdf # PDF export feature
+
+# for colored logs
+colorlog
