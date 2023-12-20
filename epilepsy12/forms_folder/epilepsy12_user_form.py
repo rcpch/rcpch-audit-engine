@@ -1,4 +1,6 @@
 from typing import Any
+import logging
+
 from django import forms
 from django.conf import settings
 from django.core import validators
@@ -15,6 +17,8 @@ from epilepsy12.constants.user_types import (
 )
 from ..models import Epilepsy12User, Organisation, VisitActivity
 
+# Logging setup
+logger = logging.getLogger(__name__)
 
 class Epilepsy12UserUpdatePasswordForm(SetPasswordForm):
     # form show when setting or resetting password
@@ -46,7 +50,7 @@ class Epilepsy12UserUpdatePasswordForm(SetPasswordForm):
         user = super().save(*args, commit=False, **kwargs)
         user.password_last_set = timezone.now()
         if commit:
-            print(f"Updating password_last_set to {timezone.now()}")
+            logging.debug(f"Updating password_last_set to {timezone.now()}")
             user.save()
         return user
 
