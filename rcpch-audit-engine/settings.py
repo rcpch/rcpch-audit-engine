@@ -318,15 +318,16 @@ REST_FRAMEWORK = {
 }
 
 # LOGGING
-
 CONSOLE_LOG_LEVEL = os.getenv("CONSOLE_LOG_LEVEL", "INFO")
 FILE_LOG_LEVEL = os.getenv("FILE_LOG_LEVEL", "INFO")
+CONSOLE_DJANGO_LOG_LEVEL = os.getenv("CONSOLE_DJANGO_LOG_LEVEL", "INFO")
 
-# Define some default django logger settings
+
+# Define the default django logger settings
 django_loggers = {
     logger_name: {
         "handlers": ["django_console"],
-        "level": CONSOLE_LOG_LEVEL,
+        "level": CONSOLE_DJANGO_LOG_LEVEL,
         "propagate": False,
         "formatter": "simple_django",
     }
@@ -399,18 +400,19 @@ LOGGING = {
             "filters": [],
         },
         "django_console": {
-            "level": CONSOLE_LOG_LEVEL,
+            "level": CONSOLE_DJANGO_LOG_LEVEL,
             "class": "logging.StreamHandler",
             "formatter": "simple_django",
             "filters": [],
         },
+        # Optional separate file logger if required
         "general_file": {
             "level": FILE_LOG_LEVEL,
             "class": "logging.FileHandler",
             "filename": "logs/general.log",
             "formatter": "file",
         },
-        # e12 file logger, each file is 15MB max, with 10 historic versions when filled
+        # e12 file logger, each file is 15MB max, with 10 historic versions when filled, post-fixed with .1, .2, ..., .10 
         "epilepsy12_logs": {
             "level": FILE_LOG_LEVEL,
             "class": "logging.handlers.RotatingFileHandler",
@@ -424,17 +426,14 @@ LOGGING = {
         "django": {
             "handlers": ["django_console", "epilepsy12_logs"],
             "propagate": True,
-            "level": CONSOLE_LOG_LEVEL,
         },
         **django_loggers,  # this injects the default django logger settings defined above
         "epilepsy12": {
             "handlers": ["epilepsy12_console", "epilepsy12_logs"],
-            "level": CONSOLE_LOG_LEVEL,
-            "propagate": True,
+            "propagate": False,
         },
         "two_factor": {
             "handlers": ["epilepsy12_console", "epilepsy12_logs"],
-            "level": CONSOLE_LOG_LEVEL,
         },
     },
 }
