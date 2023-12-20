@@ -2,6 +2,7 @@
 
 # Python
 from operator import itemgetter
+import logging
 
 # Third-party Imports
 from django.db import migrations
@@ -10,6 +11,8 @@ from django.db import migrations
 from ..constants import SYNDROMES
 from ..models import SyndromeList
 
+# Logging setup
+logger = logging.getLogger(__name__)
 
 def seed_syndromes(apps, schema_editor):
     """
@@ -24,10 +27,10 @@ def seed_syndromes(apps, schema_editor):
         None
     """
     added = 0
-    print("\033[33m", "Seeding all the syndromes...", "\033[33m")
+    logger.debug("\033[33m", "Seeding all the syndromes...", "\033[33m")
     for syndrome in sorted(SYNDROMES, key=itemgetter(1)):
         if SyndromeList.objects.filter(syndrome_name=syndrome[1]).exists():
-            print("Syndromes already exist. Skipping this step...")
+            logger.debug("Syndromes already exist. Skipping this step...")
             return
         new_syndrome = SyndromeList(
             syndrome_name=syndrome[1],
@@ -35,10 +38,10 @@ def seed_syndromes(apps, schema_editor):
         try:
             new_syndrome.save()
         except Exception as e:
-            print(f"Error at {syndrome[1]}: error: {e}")
+            logger.debug(f"Error at {syndrome[1]}: error: {e}")
         added += 1
-        print(f"added {syndrome[1]}")
-    print(f"Syndromes added...{added}")
+        logger.debug(f"added {syndrome[1]}")
+    logger.debug(f"Syndromes added...{added}")
 
 
 class Migration(migrations.Migration):
