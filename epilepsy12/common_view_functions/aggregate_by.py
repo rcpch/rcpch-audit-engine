@@ -696,13 +696,13 @@ def _seed_all_aggregation_models() -> None:
         return
 
     for entities, AggregationModel in zip(all_entities, all_agg_models):
-        logging.info(f"Creating aggregations for {AggregationModel}")
+        logger.info(f"Creating aggregations for {AggregationModel}")
         for entity in entities:
             if AggregationModel.objects.filter(
                 abstraction_relation=entity,
                 cohort=current_cohort,
             ).exists():
-                logging.info(f"AggregationModel for {entity} already exists. Skipping...")
+                logger.info(f"AggregationModel for {entity} already exists. Skipping...")
                 continue
 
             new_agg_model = AggregationModel.objects.create(
@@ -710,18 +710,18 @@ def _seed_all_aggregation_models() -> None:
                 cohort=current_cohort,
             )
 
-            logging.info(f"Created {new_agg_model}")
+            logger.info(f"Created {new_agg_model}")
 
     # National handled separately as it has no abstraction relation field
     if NationalKPIAggregation.objects.filter(
         cohort=current_cohort,
     ).exists():
-        logging.info(f"NationalKPIAggregation for {entity} already exists. Skipping...")
+        logger.info(f"NationalKPIAggregation for {entity} already exists. Skipping...")
     else:
         new_agg_model = NationalKPIAggregation.objects.create(
             cohort=current_cohort,
         )
-        logging.info(f"Created {new_agg_model} (Cohort {current_cohort})")
+        logger.info(f"Created {new_agg_model} (Cohort {current_cohort})")
 
 
 def ___delete_and_recreate_all_kpi_aggregation_models():

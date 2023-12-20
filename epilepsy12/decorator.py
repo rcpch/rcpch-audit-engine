@@ -409,7 +409,7 @@ def login_and_otp_required():
             user = request.user
             
             if not user.is_verified():
-                logging.info(f"{user=} is unverified. Tried accessing {view}")
+                logger.info(f"{user=} is unverified. Tried accessing {view}")
                 raise PermissionDenied()
             
             return view(request, *args, **kwargs)
