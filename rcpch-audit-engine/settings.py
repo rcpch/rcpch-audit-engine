@@ -23,7 +23,6 @@ from django.core.management.utils import get_random_secret_key
 
 # RCPCH imports
 
-# Logging setup
 logger = logging.getLogger(__name__)
 
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
@@ -318,16 +317,18 @@ REST_FRAMEWORK = {
     "DEFAULT_FILTER_BACKENDS": ("django_filters.rest_framework.DjangoFilterBackend",),
 }
 
+# LOGGING
+
 CONSOLE_LOG_LEVEL = os.getenv("CONSOLE_LOG_LEVEL", "INFO")
 FILE_LOG_LEVEL = os.getenv("FILE_LOG_LEVEL", "INFO")
 
 # Define some default django logger settings
 django_loggers = {
     logger_name: {
-        "handlers": ["console"],
+        "handlers": ["django_console"],
         "level": CONSOLE_LOG_LEVEL,
         "propagate": False,
-        "formatter": "simple",
+        "formatter": "simple_django",
     }
     for logger_name in (
         "django.request",
@@ -368,6 +369,18 @@ LOGGING = {
         },
         "simple": {
             "()": "colorlog.ColoredFormatter",
+            "format": "%(log_color)s%(levelname)s [%(name)s:%(lineno)s] %(bold_white)s%(message)s",
+            "log_colors": {
+                "DEBUG": "bold_black",
+                "INFO": "white",
+                "WARNING": "yellow",
+                "ERROR": "red",
+                "CRITICAL": "bold_red",
+            },
+        },
+        # Don't need line numbers for default django loggers
+        "simple_django": {
+            "()": "colorlog.ColoredFormatter",
             "format": "%(log_color)s%(levelname)s [%(name)s] %(bold_white)s%(message)s",
             "log_colors": {
                 "DEBUG": "bold_black",
@@ -379,10 +392,16 @@ LOGGING = {
         },
     },
     "handlers": {
-        "console": {
+        "epilepsy12_console": {
             "level": CONSOLE_LOG_LEVEL,
             "class": "logging.StreamHandler",
             "formatter": "simple",
+            "filters": [],
+        },
+        "django_console": {
+            "level": CONSOLE_LOG_LEVEL,
+            "class": "logging.StreamHandler",
+            "formatter": "simple_django",
             "filters": [],
         },
         "general_file": {
@@ -403,18 +422,18 @@ LOGGING = {
     },
     "loggers": {
         "django": {
-            "handlers": ["console", "epilepsy12_logs"],
+            "handlers": ["django_console", "epilepsy12_logs"],
             "propagate": True,
             "level": CONSOLE_LOG_LEVEL,
         },
         **django_loggers,  # this injects the default django logger settings defined above
         "epilepsy12": {
-            "handlers": ["console", "epilepsy12_logs"],
+            "handlers": ["epilepsy12_console", "epilepsy12_logs"],
             "level": CONSOLE_LOG_LEVEL,
             "propagate": True,
         },
         "two_factor": {
-            "handlers": ["console", "epilepsy12_logs"],
+            "handlers": ["epilepsy12_console", "epilepsy12_logs"],
             "level": CONSOLE_LOG_LEVEL,
         },
     },
