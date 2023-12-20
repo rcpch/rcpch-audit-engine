@@ -321,6 +321,24 @@ REST_FRAMEWORK = {
 CONSOLE_LOG_LEVEL = os.getenv("CONSOLE_LOG_LEVEL", "INFO")
 FILE_LOG_LEVEL = os.getenv("FILE_LOG_LEVEL", "INFO")
 
+# Define some default django logger settings
+django_loggers = {
+    logger_name: {
+        "handlers": ["console"],
+        "level": "DEBUG",
+        "propagate": False,
+        "formatter": "simple",
+    }
+    for logger_name in (
+        "django.request",
+        "django.utils",  # The django.utils logger logs events from Django and other miscellaneous log events e.g. autoreload
+        "django.security",
+        "django.db.backends",  # The django.db.backends logger logs SQL queries. Set the level to DEBUG or higher to log SQL queries.
+        "django.template",
+        "django.server",  # The django.server logger logs events from the runserver command.
+    )
+}
+
 LOGGING = {
     "version": 1,
     "disable_existing_loggers": False,
@@ -335,7 +353,7 @@ LOGGING = {
             "format": "[%(asctime)s] %(levelname)s [%(name)s:%(lineno)s] %(message)s",
             "datefmt": "%d/%b/%Y %H:%M:%S",
         },
-        "simple": {"format": "%(levelname)s %(message)s"},
+        "simple": {"format": "%(levelname)s [%(name)s] %(message)s"},
     },
     "handlers": {
         "console": {
@@ -344,24 +362,36 @@ LOGGING = {
             "formatter": "simple",
             "filters": [],
         },
-        "file": {
+        "general_file": {
             "level": FILE_LOG_LEVEL,
             "class": "logging.FileHandler",
             "filename": "logs/general.log",
             "formatter": "verbose",
         },
+        # e12 file logger, each file is 15MB max, with 10 historic versions when filled
+        "epilepsy12_logs": {
+            "level": "DEBUG",
+            "class": "logging.handlers.RotatingFileHandler",
+            "filename": "logs/epilepsy12.log",
+            "maxBytes": 15728640,  # 1024 * 1024 * 15B = 15MB
+            "backupCount": 10,
+            "formatter": "verbose",
+        },
     },
     "loggers": {
         "django": {
-            "handlers": ["console"],
+            "handlers": ["console", "epilepsy12_logs"],
+            "propagate": True,
+            "level": "DEBUG",
+        },
+        **django_loggers,  # this injects the default django logger settings defined above
+        "epilepsy12": {
+            "handlers": ["console", "epilepsy12_logs"],
+            "level": "DEBUG",
             "propagate": True,
         },
-        "epilepsy12": {
-            "handlers": ["console", "file"],
-            "level": CONSOLE_LOG_LEVEL,
-        },
         "two_factor": {
-            "handlers": ["console", "file"],
+            "handlers": ["console", "epilepsy12_logs"],
             "level": CONSOLE_LOG_LEVEL,
         },
     },
