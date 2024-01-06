@@ -383,7 +383,9 @@ def transfer_response(request, organisation_id, case_id, organisation_response):
     """
 
     case = Case.objects.get(pk=case_id)
-    site = Site.objects.get(case=case, active_transfer=True)
+    site = Site.objects.get(
+        case=case, active_transfer=True, site_is_primary_centre_of_epilepsy_care=True
+    )
     # prepare email response to requesting organisation clinical lead
     email = construct_transfer_epilepsy12_site_outcome_email(
         request=request,
@@ -400,12 +402,40 @@ def transfer_response(request, organisation_id, case_id, organisation_response):
         ).exists():
             # old record exist - reactivate
             old_site = Site.objects.filter(
+                case=case,
                 organisation=origin_organisation,
                 site_is_primary_centre_of_epilepsy_care=True,
                 site_is_actively_involved_in_epilepsy_care=False,
             ).get()
             old_site.site_is_actively_involved_in_epilepsy_care = True
             old_site.save()
+            # if the old site had other responsibilities that were retained, need to reallocate them back
+            # and delete any records that stored them
+            if Site.objects.filter(
+                (
+                    Q(site_is_childrens_epilepsy_surgery_centre=True)
+                    | Q(site_is_paediatric_neurology_centre=True)
+                    | Q(site_is_general_paediatric_centre=True)
+                ),
+                case=case,
+                organisation=origin_organisation,
+                active_transfer=True,
+                site_is_primary_centre_of_epilepsy_care=False,
+                site_is_actively_involved_in_epilepsy_care=True,
+            ).exists():
+                old_site_additional_responsibilities = Site.objects.filter(
+                    (
+                        Q(site_is_childrens_epilepsy_surgery_centre=True)
+                        | Q(site_is_paediatric_neurology_centre=True)
+                        | Q(site_is_general_paediatric_centre=True)
+                    ),
+                    case=case,
+                    organisation=origin_organisation,
+                    active_transfer=True,
+                    site_is_primary_centre_of_epilepsy_care=False,
+                    site_is_actively_involved_in_epilepsy_care=True,
+                ).first()
+                old_site_additional_responsibilities.delete()
             # delete this record
             site.delete()
         else:
@@ -422,6 +452,14 @@ def transfer_response(request, organisation_id, case_id, organisation_response):
         site.transfer_origin_organisation = None
         site.transfer_request_date = None
         site.save()
+        # if the original organisation has ongoing other responsibilities and a new record had to be created
+        # to track these, find those records and set the active_transfer flag to False
+        Site.objects.filter(
+            case=case,
+            organisation=origin_organisation,
+            active_transfer=True,
+            site_is_actively_involved_in_epilepsy_care=True,
+        ).update(active_transfer=False)
     else:
         raise Exception("No organisation response supplied")
 

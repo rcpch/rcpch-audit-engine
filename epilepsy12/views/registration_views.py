@@ -356,11 +356,35 @@ def update_lead_site(request, registration_id, site_id, update):
         new_organisation_id = request.POST.get("transfer_lead_site")
         new_organisation = Organisation.objects.get(pk=new_organisation_id)
 
-        # update current site record to show nolonger actively involved in care
-        updated_previous_lead_site = Site.objects.filter(pk=site_id).get()
-        updated_previous_lead_site.site_is_primary_centre_of_epilepsy_care = True
-        updated_previous_lead_site.site_is_actively_involved_in_epilepsy_care = False
-        updated_previous_lead_site.save()
+        if (
+            previous_lead_site.site_is_childrens_epilepsy_surgery_centre
+            or previous_lead_site.site_is_paediatric_neurology_centre
+            or previous_lead_site.site_is_general_paediatric_centre
+        ):
+            # the old site retains responsibility for one/all of neuro/gen paeds/surgery
+            # but is not the lead site anymore
+            # To allow us to track the fact that this site was once the lead site for this child,
+            # we must create a new record to track the fact that this site is still involved in the care
+            Site.objects.create(
+                case=registration.case,
+                organisation=origin_organisation,
+                site_is_primary_centre_of_epilepsy_care=False,
+                site_is_actively_involved_in_epilepsy_care=True,
+                site_is_childrens_epilepsy_surgery_centre=previous_lead_site.site_is_childrens_epilepsy_surgery_centre,
+                site_is_paediatric_neurology_centre=previous_lead_site.site_is_paediatric_neurology_centre,
+                site_is_general_paediatric_centre=previous_lead_site.site_is_general_paediatric_centre,
+                active_transfer=True,  # this flag will be set to false if transfer accepted or used to delete record if transfer ultimately refused
+            )
+
+        # update current site record to show nolonger actively involved in care as primary centre
+        previous_lead_site.site_is_primary_centre_of_epilepsy_care = True
+        previous_lead_site.site_is_actively_involved_in_epilepsy_care = False
+        previous_lead_site.save(
+            update_fields=[
+                "site_is_primary_centre_of_epilepsy_care",
+                "site_is_actively_involved_in_epilepsy_care",
+            ]
+        )
 
         # create new record in Site table for child against new centre, or update existing record if
         # organisation already involved in child's care
