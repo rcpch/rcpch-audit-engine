@@ -408,7 +408,7 @@ def transfer_response(request, organisation_id, case_id, organisation_response):
                 site_is_actively_involved_in_epilepsy_care=False,
             ).get()
             old_site.site_is_actively_involved_in_epilepsy_care = True
-            old_site.save()
+            old_site.save(update_fields=["site_is_actively_involved_in_epilepsy_care"])
             # if the old site had other responsibilities that were retained, need to reallocate them back
             # and delete any records that stored them
             if Site.objects.filter(

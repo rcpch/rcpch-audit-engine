@@ -9,6 +9,135 @@ from ..common_view_functions import (
 from ..decorator import user_may_view_this_child, login_and_otp_required
 
 
+def update_site_model(
+    centre_role: str, selected_organisation, case, user, site_id=None
+):
+    """
+    Helper function to update sites model with attributes describing role of site
+    (general paediatric, neurology, surgical centre)
+    This is complicated because historical records of lead centre status are persisted
+    whereas historical records of other roles are not.
+
+    If the organisation is the lead site for this child, and also the neurology/surgery
+    or general paediatric centre, all this information can be stored in one record.
+
+    If the organisation used to be the lead site for this child, and now is actively
+    the neurology/surgery or general paediatric centre, two records are stored: one where
+    site_is_actively_involved_in_epilepsy_care is False and site_is_primary_centre_of_epilepsy_care is True,
+    the other where site_is_actively_involved_in_epilepsy_care is True and one/some of the other attributes
+    is True. site_is_primary_centre_of_epilepsy_care here is False.
+    """
+
+    if centre_role == "general_paediatric_centre":
+        update_field = {"site_is_general_paediatric_centre": True}
+        update_fields = {
+            "site_is_general_paediatric_centre": True,
+            "site_is_paediatric_neurology_centre": False,
+            "site_is_childrens_epilepsy_surgery_centre": False,
+        }
+    elif centre_role == "paediatric_neurology_centre":
+        update_field = {"site_is_paediatric_neurology_centre": True}
+        update_fields = {
+            "site_is_general_paediatric_centre": False,
+            "site_is_paediatric_neurology_centre": True,
+            "site_is_childrens_epilepsy_surgery_centre": False,
+        }
+    elif centre_role == "epilepsy_surgery_centre":
+        update_field = {"site_is_childrens_epilepsy_surgery_centre": True}
+        update_fields = {
+            "site_is_general_paediatric_centre": False,
+            "site_is_paediatric_neurology_centre": False,
+            "site_is_childrens_epilepsy_surgery_centre": True,
+        }
+
+    # selected_organisation has never been involved in child's care
+    if not Site.objects.filter(
+        case=case,
+        organisation=selected_organisation,
+    ).exists():
+        Site.objects.create(
+            case=case,
+            organisation=selected_organisation,
+            site_is_primary_centre_of_epilepsy_care=False,
+            updated_at=timezone.now(),
+            updated_by=user,
+            site_is_actively_involved_in_epilepsy_care=True,
+            **update_fields
+        )
+    else:
+        # selected_organisation is active lead centre
+        if Site.objects.filter(
+            case=case,
+            organisation=selected_organisation,
+            site_is_primary_centre_of_epilepsy_care=True,
+            site_is_actively_involved_in_epilepsy_care=True,
+        ).exists():
+            # there can be only one of these
+
+            Site.objects.filter(
+                case=case,
+                organisation=selected_organisation,
+                site_is_primary_centre_of_epilepsy_care=True,
+                site_is_actively_involved_in_epilepsy_care=True,
+            ).update(**update_field)
+
+        # selected_organisation was previously lead centre
+        elif Site.objects.filter(
+            case=case,
+            organisation=selected_organisation,
+            site_is_primary_centre_of_epilepsy_care=True,
+            site_is_actively_involved_in_epilepsy_care=False,
+        ).exists():
+            # create a new centre to be actively involved in care but
+            # not be primary centre. This allows historical lead centres to be recorded
+
+            Site.objects.create(
+                case=case,
+                organisation=selected_organisation,
+                site_is_actively_involved_in_epilepsy_care=True,
+                site_is_primary_centre_of_epilepsy_care=False,
+                **update_fields
+            )
+
+        # selected_organisation was previously actively involved in care but not as primary centre
+        elif Site.objects.filter(
+            case=case,
+            organisation=selected_organisation,
+            site_is_primary_centre_of_epilepsy_care=False,
+            site_is_actively_involved_in_epilepsy_care=False,
+        ).exists():
+            # reactivate record and update for new role
+
+            Site.objects.filter(
+                case=case,
+                organisation=selected_organisation,
+                site_is_primary_centre_of_epilepsy_care=False,
+                site_is_actively_involved_in_epilepsy_care=False,
+            ).update(site_is_actively_involved_in_epilepsy_care=True, **update_fields)
+
+        # selected_organisation is actively involved in care but not as primary centre
+        elif Site.objects.filter(
+            case=case,
+            organisation=selected_organisation,
+            site_is_primary_centre_of_epilepsy_care=False,
+            site_is_actively_involved_in_epilepsy_care=True,
+        ).exists():
+            # update role
+
+            Site.objects.filter(
+                case=case,
+                organisation=selected_organisation,
+                site_is_primary_centre_of_epilepsy_care=False,
+                site_is_actively_involved_in_epilepsy_care=True,
+            ).update(**update_field)
+
+    if site_id is not None:
+        # must delete the old record if this is an edit
+        old_site = Site.objects.get(pk=site_id)
+        if old_site.site_is_primary_centre_of_epilepsy_care == False:
+            old_site.delete()
+
+
 @login_and_otp_required()
 @permission_required("epilepsy12.change_assessment", raise_exception=True)
 @user_may_view_this_child()
@@ -43,17 +172,31 @@ def consultant_paediatrician_referral_made(request, assessment_id):
         # refresh all objects and return
         assessment = Assessment.objects.get(pk=assessment_id)
 
-        # if any allocated sites make them historical
+        # if any allocated sites remove them
         if Site.objects.filter(
             case=assessment.registration.case,
-            site_is_actively_involved_in_epilepsy_care=True,
             site_is_general_paediatric_centre=True,
         ).exists():
-            Site.objects.filter(
+            # loop through these and delete any site where the organisation
+            # is not used elsewhere for this child actively for any other attribute (surgery or neurology)
+            # or is not a historical or active lead site. If it is, set site_is_general_paediatric_centre to False
+            updated_general_paediatric_status_sites = Site.objects.filter(
                 case=assessment.registration.case,
-                site_is_actively_involved_in_epilepsy_care=True,
                 site_is_general_paediatric_centre=True,
-            ).update(site_is_actively_involved_in_epilepsy_care=False)
+            )
+            for site in updated_general_paediatric_status_sites:
+                if (
+                    site.site_is_primary_centre_of_epilepsy_care == True
+                    or (
+                        site.site_is_paediatric_neurology_centre
+                        or site.site_is_childrens_epilepsy_surgery_centre
+                    )
+                    and site.site_is_general_paediatric_centre
+                ):
+                    site.site_is_general_paediatric_centre = False
+                    site.save(update_fields=["site_is_general_paediatric_centre"])
+                else:
+                    site.delete()
 
     # filter list to include only NHS organisations
     organisation_list = Organisation.objects.order_by("name")
@@ -212,30 +355,36 @@ def general_paediatric_centre(request, assessment_id):
     # if this registration already has a record in sites
     #  associated with this organisation,
     # update it include general paediatrics, else create a new record
-    if Site.objects.filter(
+    # if Site.objects.filter(
+    #     case=assessment.registration.case,
+    #     organisation=general_paediatric_centre,
+    #     site_is_actively_involved_in_epilepsy_care=True,
+    # ).exists():
+    #     Site.objects.filter(
+    #         case=assessment.registration.case, organisation=general_paediatric_centre
+    #     ).update(
+    #         site_is_general_paediatric_centre=True,
+    #         site_is_actively_involved_in_epilepsy_care=True,
+    #         updated_at=timezone.now(),
+    #         updated_by=request.user,
+    #     )
+    # else:
+    #     site = Site.objects.create(
+    #         case=assessment.registration.case,
+    #         organisation=general_paediatric_centre,
+    #         site_is_primary_centre_of_epilepsy_care=False,
+    #         site_is_childrens_epilepsy_surgery_centre=False,
+    #         site_is_actively_involved_in_epilepsy_care=True,
+    #         site_is_paediatric_neurology_centre=False,
+    #         site_is_general_paediatric_centre=True,
+    #     )
+    #     site.save()
+    update_site_model(
+        centre_role="general_paediatric_centre",
+        selected_organisation=general_paediatric_centre,
         case=assessment.registration.case,
-        organisation=general_paediatric_centre,
-        site_is_actively_involved_in_epilepsy_care=True,
-    ).exists():
-        Site.objects.filter(
-            case=assessment.registration.case, organisation=general_paediatric_centre
-        ).update(
-            site_is_general_paediatric_centre=True,
-            site_is_actively_involved_in_epilepsy_care=True,
-            updated_at=timezone.now(),
-            updated_by=request.user,
-        )
-    else:
-        site = Site.objects.create(
-            case=assessment.registration.case,
-            organisation=general_paediatric_centre,
-            site_is_primary_centre_of_epilepsy_care=False,
-            site_is_childrens_epilepsy_surgery_centre=False,
-            site_is_actively_involved_in_epilepsy_care=True,
-            site_is_paediatric_neurology_centre=False,
-            site_is_general_paediatric_centre=True,
-        )
-        site.save()
+        user=request.user,
+    )
 
     # filter list to include only NHS organisations
     organisation_list = Organisation.objects.order_by("name")
@@ -276,44 +425,51 @@ def edit_general_paediatric_centre(request, assessment_id, site_id):
         "edit_general_paediatric_centre"
     )
 
-    new_organisation = Organisation.objects.get(
+    general_paediatric_centre = Organisation.objects.get(
         pk=selected_general_paediatric_centre_id
     )
 
     assessment = Assessment.objects.get(pk=assessment_id)
 
-    if Site.objects.filter(
+    # if Site.objects.filter(
+    #     case=assessment.registration.case,
+    #     organisation=new_organisation,
+    #     site_is_actively_involved_in_epilepsy_care=True,
+    # ).exists():
+    #     # this organisation trust already exists as an active site for this registration
+    #     # update that record, update this to show
+
+    #     site = Site.objects.filter(
+    #         case=assessment.registration.case,
+    #         organisation=new_organisation,
+    #         site_is_actively_involved_in_epilepsy_care=True,
+    #     ).get()
+    #     site.site_is_general_paediatric_centre = True
+    #     site.updated_at = (timezone.now(),)
+    #     site.updated_by = request.user
+    #     site.save()
+
+    #     # update the old site to become historical
+    #     old_site = Site.objects.get(pk=site_id)
+    #     old_site.site_is_general_paediatric_centre = False
+    #     old_site.save()
+
+    # else:
+    #     # this change is a new organisation
+    #     Site.objects.filter(pk=site_id).update(
+    #         organisation=new_organisation,
+    #         site_is_general_paediatric_centre=True,
+    #         site_is_actively_involved_in_epilepsy_care=True,
+    #         updated_at=timezone.now(),
+    #         updated_by=request.user,
+    #     )
+    update_site_model(
+        centre_role="general_paediatric_centre",
+        selected_organisation=general_paediatric_centre,
         case=assessment.registration.case,
-        organisation=new_organisation,
-        site_is_actively_involved_in_epilepsy_care=True,
-    ).exists():
-        # this organisation trust already exists as an active site for this registration
-        # update that record, update this to show
-
-        site = Site.objects.filter(
-            case=assessment.registration.case,
-            organisation=new_organisation,
-            site_is_actively_involved_in_epilepsy_care=True,
-        ).get()
-        site.site_is_general_paediatric_centre = True
-        site.updated_at = (timezone.now(),)
-        site.updated_by = request.user
-        site.save()
-
-        # update the old site to become historical
-        old_site = Site.objects.get(pk=site_id)
-        old_site.site_is_general_paediatric_centre = False
-        old_site.save()
-
-    else:
-        # this change is a new organisation
-        Site.objects.filter(pk=site_id).update(
-            organisation=new_organisation,
-            site_is_general_paediatric_centre=True,
-            site_is_actively_involved_in_epilepsy_care=True,
-            updated_at=timezone.now(),
-            updated_by=request.user,
-        )
+        user=request.user,
+        site_id=site_id,
+    )
 
     # filter list to include only NHS organisations
     organisation_list = Organisation.objects.order_by("name")
@@ -491,17 +647,39 @@ def paediatric_neurologist_referral_made(request, assessment_id):
         # get new instance of Assessment
         assessment = Assessment.objects.get(pk=assessment_id)
 
-        # if any allocated sites make them historical
+        #     # if any allocated sites make them historical
+        #     if Site.objects.filter(
+        #         case=assessment.registration.case,
+        #         site_is_paediatric_neurology_centre=True,
+        #     ).exists():
+        #         Site.objects.filter(
+        #             case=assessment.registration.case,
+        #             site_is_paediatric_neurology_centre=True,
+        #         ).update(site_is_actively_involved_in_epilepsy_care=False)
+        # if any allocated sites remove them
         if Site.objects.filter(
-            case=assessment.registration.case,
-            site_is_actively_involved_in_epilepsy_care=True,
-            site_is_paediatric_neurology_centre=True,
+            case=assessment.registration.case, site_is_paediatric_neurology_centre=True
         ).exists():
-            Site.objects.filter(
+            # loop through these and delete any site where the organisation
+            # is not used elsewhere for this child actively for any other attribute (surgery or neurology)
+            # or is not a historical or active lead site. If it is, set site_is_paediatric_neurology_centre to False
+            updated_neurology_status_sites = Site.objects.filter(
                 case=assessment.registration.case,
-                site_is_actively_involved_in_epilepsy_care=True,
                 site_is_paediatric_neurology_centre=True,
-            ).update(site_is_actively_involved_in_epilepsy_care=False)
+            )
+            for site in updated_neurology_status_sites:
+                if (
+                    site.site_is_primary_centre_of_epilepsy_care == True
+                    or (
+                        site.site_is_general_paediatric_centre
+                        or site.site_is_childrens_epilepsy_surgery_centre
+                    )
+                    and site.site_is_general_paediatric_centre
+                ):
+                    site.site_is_paediatric_neurology_centre = False
+                    site.save(update_fields=["site_is_paediatric_neurology_centre"])
+                else:
+                    site.delete()
 
     # filter list to include only NHS organisations
     organisation_list = Organisation.objects.order_by("name")
@@ -665,28 +843,34 @@ def paediatric_neurology_centre(request, assessment_id):
     # if this registration already has a record in sites
     #  associated with this organisation,
     # update it include paediatric neurology, else create a new record
-    if Site.objects.filter(
-        case=assessment.registration.case, organisation=paediatric_neurology_centre
-    ).exists():
-        Site.objects.filter(
-            case=assessment.registration.case, organisation=paediatric_neurology_centre
-        ).update(
-            site_is_actively_involved_in_epilepsy_care=True,
-            site_is_paediatric_neurology_centre=True,
-            updated_at=timezone.now(),
-            updated_by=request.user,
-        )
-    else:
-        site = Site.objects.create(
-            case=assessment.registration.case,
-            organisation=paediatric_neurology_centre,
-            site_is_primary_centre_of_epilepsy_care=False,
-            site_is_childrens_epilepsy_surgery_centre=False,
-            site_is_actively_involved_in_epilepsy_care=True,
-            site_is_paediatric_neurology_centre=True,
-            site_is_general_paediatric_centre=False,
-        )
-        site.save()
+    # if Site.objects.filter(
+    #     case=assessment.registration.case, organisation=paediatric_neurology_centre
+    # ).exists():
+    #     Site.objects.filter(
+    #         case=assessment.registration.case, organisation=paediatric_neurology_centre
+    #     ).update(
+    #         site_is_actively_involved_in_epilepsy_care=True,
+    #         site_is_paediatric_neurology_centre=True,
+    #         updated_at=timezone.now(),
+    #         updated_by=request.user,
+    #     )
+    # else:
+    #     site = Site.objects.create(
+    #         case=assessment.registration.case,
+    #         organisation=paediatric_neurology_centre,
+    #         site_is_primary_centre_of_epilepsy_care=False,
+    #         site_is_childrens_epilepsy_surgery_centre=False,
+    #         site_is_actively_involved_in_epilepsy_care=True,
+    #         site_is_paediatric_neurology_centre=True,
+    #         site_is_general_paediatric_centre=False,
+    #     )
+    #     site.save()
+    update_site_model(
+        centre_role="paediatric_neurology_centre",
+        selected_organisation=paediatric_neurology_centre,
+        case=assessment.registration.case,
+        user=request.user,
+    )
 
     # filter list to include only NHS organisations
     organisation_list = Organisation.objects.order_by("name")
@@ -728,32 +912,39 @@ def edit_paediatric_neurology_centre(request, assessment_id, site_id):
 
     assessment = Assessment.objects.get(pk=assessment_id)
 
-    if Site.objects.filter(
+    # if Site.objects.filter(
+    #     case=assessment.registration.case,
+    #     organisation=paediatric_neurology_centre,
+    #     site_is_actively_involved_in_epilepsy_care=True,
+    # ).exists():
+    #     # this organisation trust already exists for this registration
+    #     # update that record, delete this
+
+    #     site = Site.objects.filter(
+    #         case=assessment.registration.case,
+    #         organisation=paediatric_neurology_centre,
+    #         site_is_actively_involved_in_epilepsy_care=True,
+    #     ).get()
+    #     site.site_is_paediatric_neurology_centre = True
+    #     site.save()
+    #     Site.objects.get(pk=site_id).delete()
+
+    # else:
+    #     # this change is a new organisation
+    #     Site.objects.filter(pk=site_id).update(
+    #         organisation=paediatric_neurology_centre,
+    #         site_is_paediatric_neurology_centre=True,
+    #         site_is_actively_involved_in_epilepsy_care=True,
+    #         updated_at=timezone.now(),
+    #         updated_by=request.user,
+    #     )
+    update_site_model(
+        centre_role="paediatric_neurology_centre",
+        selected_organisation=paediatric_neurology_centre,
         case=assessment.registration.case,
-        organisation=paediatric_neurology_centre,
-        site_is_actively_involved_in_epilepsy_care=True,
-    ).exists():
-        # this organisation trust already exists for this registration
-        # update that record, delete this
-
-        site = Site.objects.filter(
-            case=assessment.registration.case,
-            organisation=paediatric_neurology_centre,
-            site_is_actively_involved_in_epilepsy_care=True,
-        ).get()
-        site.site_is_paediatric_neurology_centre = True
-        site.save()
-        Site.objects.get(pk=site_id).delete()
-
-    else:
-        # this change is a new organisation
-        Site.objects.filter(pk=site_id).update(
-            organisation=paediatric_neurology_centre,
-            site_is_paediatric_neurology_centre=True,
-            site_is_actively_involved_in_epilepsy_care=True,
-            updated_at=timezone.now(),
-            updated_by=request.user,
-        )
+        user=request.user,
+        site_id=site_id,
+    )
 
     # filter list to include only NHS organisations
     organisation_list = Organisation.objects.order_by("name")
@@ -844,14 +1035,14 @@ def delete_paediatric_neurology_centre(request, assessment_id, site_id):
 
     if (
         associated_site.site_is_primary_centre_of_epilepsy_care
-        or associated_site.site_is_childrens_epilepsy_surgery_centre
         or associated_site.site_is_general_paediatric_centre
+        or associated_site.site_is_childrens_epilepsy_surgery_centre
     ):
         # this site also delivers (or has delivered) surgical or general paediatric care
-        # update to remove neurology
-
-        associated_site.site_is_paediatric_neurology_centre = False
-        associated_site.save()
+        # update to remove general paeds
+        Site.objects.filter(pk=associated_site.pk).update(
+            site_is_paediatric_neurology_centre=False
+        )
 
     else:
         # there are no other associated centres with this record: can delete
@@ -976,17 +1167,41 @@ def childrens_epilepsy_surgical_service_referral_made(request, assessment_id):
         # get new instance of Assessment
         assessment = Assessment.objects.get(pk=assessment_id)
 
-        # if any allocated sites make them historical
+        # # if any allocated sites deallocate surgery
+        # if Site.objects.filter(
+        #     case=assessment.registration.case,
+        #     site_is_childrens_epilepsy_surgery_centre=True,
+        # ).exists():
+        #     Site.objects.filter(
+        #         case=assessment.registration.case,
+        #         site_is_childrens_epilepsy_surgery_centre=True,
+        #     ).update(site_is_actively_involved_in_epilepsy_care=False)
         if Site.objects.filter(
             case=assessment.registration.case,
-            site_is_actively_involved_in_epilepsy_care=True,
             site_is_childrens_epilepsy_surgery_centre=True,
         ).exists():
-            Site.objects.filter(
+            # loop through these and delete any site where the organisation
+            # is not used elsewhere for this child actively for any other attribute (general paediatric or neurology)
+            # or is not a historical or active lead site. If it is, set site_is_childrens_epilepsy_surgery_centre to False
+            updated_surgery_status_sites = Site.objects.filter(
                 case=assessment.registration.case,
-                site_is_actively_involved_in_epilepsy_care=True,
                 site_is_childrens_epilepsy_surgery_centre=True,
-            ).update(site_is_actively_involved_in_epilepsy_care=False)
+            )
+            for site in updated_surgery_status_sites:
+                if (
+                    site.site_is_primary_centre_of_epilepsy_care == True
+                    or (
+                        site.site_is_general_paediatric_centre
+                        or site.site_is_paediatric_neurology_centre
+                    )
+                    and site.site_is_general_paediatric_centre
+                ):
+                    site.site_is_childrens_epilepsy_surgery_centre = False
+                    site.save(
+                        update_fields=["site_is_childrens_epilepsy_surgery_centre"]
+                    )
+                else:
+                    site.delete()
 
     # filter list to include only NHS organisations
     organisation_list = Organisation.objects.order_by("name")
@@ -1205,28 +1420,34 @@ def epilepsy_surgery_centre(request, assessment_id):
     # if this registration already has a record in sites
     #  associated with this organisation,
     # update it to include epilepsy surgery, else create a new record
-    if Site.objects.filter(
-        case=assessment.registration.case, organisation=epilepsy_surgery_centre
-    ).exists():
-        Site.objects.filter(
-            case=assessment.registration.case, organisation=epilepsy_surgery_centre
-        ).update(
-            site_is_actively_involved_in_epilepsy_care=True,
-            site_is_childrens_epilepsy_surgery_centre=True,
-            updated_at=timezone.now(),
-            updated_by=request.user,
-        )
-    else:
-        site = Site.objects.create(
-            case=assessment.registration.case,
-            organisation=epilepsy_surgery_centre,
-            site_is_primary_centre_of_epilepsy_care=False,
-            site_is_childrens_epilepsy_surgery_centre=True,
-            site_is_actively_involved_in_epilepsy_care=True,
-            site_is_paediatric_neurology_centre=False,
-            site_is_general_paediatric_centre=False,
-        )
-        site.save()
+    # if Site.objects.filter(
+    #     case=assessment.registration.case, organisation=epilepsy_surgery_centre
+    # ).exists():
+    #     Site.objects.filter(
+    #         case=assessment.registration.case, organisation=epilepsy_surgery_centre
+    #     ).update(
+    #         site_is_actively_involved_in_epilepsy_care=True,
+    #         site_is_childrens_epilepsy_surgery_centre=True,
+    #         updated_at=timezone.now(),
+    #         updated_by=request.user,
+    #     )
+    # else:
+    #     site = Site.objects.create(
+    #         case=assessment.registration.case,
+    #         organisation=epilepsy_surgery_centre,
+    #         site_is_primary_centre_of_epilepsy_care=False,
+    #         site_is_childrens_epilepsy_surgery_centre=True,
+    #         site_is_actively_involved_in_epilepsy_care=True,
+    #         site_is_paediatric_neurology_centre=False,
+    #         site_is_general_paediatric_centre=False,
+    #     )
+    #     site.save()
+    update_site_model(
+        centre_role="epilepsy_surgery_centre",
+        selected_organisation=epilepsy_surgery_centre,
+        case=assessment.registration.case,
+        user=request.user,
+    )
 
     # filter list to include only NHS organisations
     organisation_list = Organisation.objects.order_by("name")
@@ -1267,38 +1488,45 @@ def edit_epilepsy_surgery_centre(request, assessment_id, site_id):
     It updates the Site object with the new centre and returns
     the same partial template.
     """
-    new_organisation = Organisation.objects.get(
+    epilepsy_surgery_centre = Organisation.objects.get(
         pk=request.POST.get("edit_epilepsy_surgery_centre")
     )
 
     assessment = Assessment.objects.get(pk=assessment_id)
 
-    if Site.objects.filter(
+    # if Site.objects.filter(
+    #     case=assessment.registration.case,
+    #     organisation=new_organisation,
+    #     site_is_actively_involved_in_epilepsy_care=True,
+    # ).exists():
+    #     # this organisation trust already exists for this registration
+    #     # update that record, delete this
+
+    #     site = Site.objects.filter(
+    #         case=assessment.registration.case,
+    #         organisation=new_organisation,
+    #         site_is_actively_involved_in_epilepsy_care=True,
+    #     ).get()
+    #     site.site_is_childrens_epilepsy_surgery_centre = True
+    #     site.save()
+    #     Site.objects.get(pk=site_id).delete()
+
+    # else:
+    #     # this change is a new organisation
+    #     Site.objects.filter(pk=site_id).update(
+    #         organisation=new_organisation,
+    #         site_is_childrens_epilepsy_surgery_centre=True,
+    #         site_is_actively_involved_in_epilepsy_care=True,
+    #         updated_at=timezone.now(),
+    #         updated_by=request.user,
+    #     )
+    update_site_model(
+        centre_role="epilepsy_surgery_centre",
+        selected_organisation=epilepsy_surgery_centre,
         case=assessment.registration.case,
-        organisation=new_organisation,
-        site_is_actively_involved_in_epilepsy_care=True,
-    ).exists():
-        # this organisation trust already exists for this registration
-        # update that record, delete this
-
-        site = Site.objects.filter(
-            case=assessment.registration.case,
-            organisation=new_organisation,
-            site_is_actively_involved_in_epilepsy_care=True,
-        ).get()
-        site.site_is_childrens_epilepsy_surgery_centre = True
-        site.save()
-        Site.objects.get(pk=site_id).delete()
-
-    else:
-        # this change is a new organisation
-        Site.objects.filter(pk=site_id).update(
-            organisation=new_organisation,
-            site_is_childrens_epilepsy_surgery_centre=True,
-            site_is_actively_involved_in_epilepsy_care=True,
-            updated_at=timezone.now(),
-            updated_by=request.user,
-        )
+        user=request.user,
+        site_id=site_id,
+    )
 
     # filter list to include only NHS organisations
     organisation_list = Organisation.objects.order_by("name")
@@ -1393,14 +1621,14 @@ def delete_epilepsy_surgery_centre(request, assessment_id, site_id):
 
     if (
         associated_site.site_is_primary_centre_of_epilepsy_care
-        or associated_site.site_is_paediatric_neurology_centre
         or associated_site.site_is_general_paediatric_centre
+        or associated_site.site_is_paediatric_neurology_centre
     ):
-        # this site also delivers (or has delivered) paediatric or general paediatric care
+        # this site also delivers (or has delivered) neurology or general paediatric care
         # update to remove surgery
-
-        associated_site.site_is_childrens_epilepsy_surgery_centre = False
-        associated_site.save()
+        Site.objects.filter(pk=associated_site.pk).update(
+            site_is_childrens_epilepsy_surgery_centre=False
+        )
 
     else:
         # there are no other associated centres with this record: can delete
