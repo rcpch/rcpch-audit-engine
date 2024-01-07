@@ -356,6 +356,48 @@ def update_lead_site(request, registration_id, site_id, update):
         new_organisation_id = request.POST.get("transfer_lead_site")
         new_organisation = Organisation.objects.get(pk=new_organisation_id)
 
+        # create new record in Site table for child against new centre, or update existing record if
+        # organisation already involved in child's care
+        if Site.objects.filter(
+            organisation=new_organisation,
+            case=registration.case,
+            site_is_actively_involved_in_epilepsy_care=True,
+        ).exists():
+            # this new site already cares actively for this child in some capacity
+            new_lead_site = Site.objects.filter(
+                organisation=new_organisation,
+                case=registration.case,
+                site_is_actively_involved_in_epilepsy_care=True,
+            ).get()
+            new_lead_site.site_is_primary_centre_of_epilepsy_care = True
+            new_lead_site.site_is_actively_involved_in_epilepsy_care = True
+            new_lead_site.active_transfer = True
+            new_lead_site.transfer_origin_organisation = origin_organisation
+            new_lead_site.transfer_request_date = timezone.now()
+            new_lead_site.save(
+                update_fields=[
+                    "site_is_primary_centre_of_epilepsy_care",
+                    "site_is_actively_involved_in_epilepsy_care",
+                    "active_transfer",
+                    "transfer_origin_organisation",
+                    "transfer_request_date",
+                ]
+            )
+
+        else:
+            # this new organisation does not care for this child. Create a new site associated with this organisation
+            new_lead_site = Site.objects.create(
+                organisation=new_organisation,
+                site_is_primary_centre_of_epilepsy_care=True,
+                site_is_actively_involved_in_epilepsy_care=True,
+                active_transfer=True,
+                transfer_origin_organisation=origin_organisation,
+                transfer_request_date=timezone.now(),
+                updated_at=timezone.now(),
+                updated_by=request.user,
+                case=registration.case,
+            )
+
         if (
             previous_lead_site.site_is_childrens_epilepsy_surgery_centre
             or previous_lead_site.site_is_paediatric_neurology_centre
@@ -365,6 +407,7 @@ def update_lead_site(request, registration_id, site_id, update):
             # but is not the lead site anymore
             # To allow us to track the fact that this site was once the lead site for this child,
             # we must create a new record to track the fact that this site is still involved in the care
+
             Site.objects.create(
                 case=registration.case,
                 organisation=origin_organisation,
@@ -385,36 +428,6 @@ def update_lead_site(request, registration_id, site_id, update):
                 "site_is_actively_involved_in_epilepsy_care",
             ]
         )
-
-        # create new record in Site table for child against new centre, or update existing record if
-        # organisation already involved in child's care
-        if Site.objects.filter(
-            organisation=new_organisation,
-            case=registration.case,
-        ).exists():
-            # this new site already cares for this child in some capacity, either past or present
-            new_lead_site = Site.objects.filter(
-                organisation=new_organisation, case=registration.case
-            ).get()
-            new_lead_site.site_is_primary_centre_of_epilepsy_care = True
-            new_lead_site.site_is_actively_involved_in_epilepsy_care = True
-            new_lead_site.active_transfer = True
-            new_lead_site.transfer_origin_organisation = origin_organisation
-            new_lead_site.transfer_request_date = timezone.now()
-            new_lead_site.save()
-        else:
-            # this new organisation does not care for this child. Create a new site associated with this organisation
-            new_lead_site = Site.objects.create(
-                organisation=new_organisation,
-                site_is_primary_centre_of_epilepsy_care=True,
-                site_is_actively_involved_in_epilepsy_care=True,
-                active_transfer=True,
-                transfer_origin_organisation=origin_organisation,
-                transfer_request_date=timezone.now(),
-                updated_at=timezone.now(),
-                updated_by=request.user,
-                case=registration.case,
-            )
 
         """
         Update complete

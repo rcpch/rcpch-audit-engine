@@ -34,6 +34,9 @@ def update_site_model(
             "site_is_general_paediatric_centre": True,
             "site_is_paediatric_neurology_centre": False,
             "site_is_childrens_epilepsy_surgery_centre": False,
+            "active_transfer": False,
+            "transfer_origin_organisation": None,
+            "transfer_request_date": None,
         }
     elif centre_role == "paediatric_neurology_centre":
         update_field = {"site_is_paediatric_neurology_centre": True}
@@ -41,6 +44,9 @@ def update_site_model(
             "site_is_general_paediatric_centre": False,
             "site_is_paediatric_neurology_centre": True,
             "site_is_childrens_epilepsy_surgery_centre": False,
+            "active_transfer": False,
+            "transfer_origin_organisation": None,
+            "transfer_request_date": None,
         }
     elif centre_role == "epilepsy_surgery_centre":
         update_field = {"site_is_childrens_epilepsy_surgery_centre": True}
@@ -48,6 +54,9 @@ def update_site_model(
             "site_is_general_paediatric_centre": False,
             "site_is_paediatric_neurology_centre": False,
             "site_is_childrens_epilepsy_surgery_centre": True,
+            "active_transfer": False,
+            "transfer_request_date": None,
+            "transfer_origin_organisation": None,
         }
 
     # selected_organisation has never been involved in child's care
@@ -79,7 +88,9 @@ def update_site_model(
                 organisation=selected_organisation,
                 site_is_primary_centre_of_epilepsy_care=True,
                 site_is_actively_involved_in_epilepsy_care=True,
-            ).update(**update_field)
+            ).update(
+                **update_field
+            )  # update only the status requested
 
         # selected_organisation was previously lead centre
         elif Site.objects.filter(
