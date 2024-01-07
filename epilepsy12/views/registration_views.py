@@ -416,7 +416,6 @@ def update_lead_site(request, registration_id, site_id, update):
                 site_is_childrens_epilepsy_surgery_centre=previous_lead_site.site_is_childrens_epilepsy_surgery_centre,
                 site_is_paediatric_neurology_centre=previous_lead_site.site_is_paediatric_neurology_centre,
                 site_is_general_paediatric_centre=previous_lead_site.site_is_general_paediatric_centre,
-                active_transfer=True,  # this flag will be set to false if transfer accepted or used to delete record if transfer ultimately refused
             )
 
         # update current site record to show nolonger actively involved in care as primary centre

@@ -133,7 +133,11 @@
         Cancel
       </a>
       {% if perms.epilepsy12.change_case or perms.epilepsy12.add_case %}
-        <button type="submit" class="ui rcpch_primary button" name="update">
+        <button 
+        type="submit" 
+        class="ui rcpch_primary button" 
+        name="update" 
+        _="on click toggle .disabled on me">
           Save
         </button>
     
