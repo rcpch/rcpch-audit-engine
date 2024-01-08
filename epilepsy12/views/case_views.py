@@ -555,7 +555,7 @@ def create_case(request, organisation_id):
             messages.error(
                 request=request, message="It was not possible to save the case"
             )
-            logging.info(f"Invalid data provided to case form: {form.errors}")
+            logger.info(f"Invalid data provided to case form: {form.errors}")
 
     context = {
         "organisation_id": organisation_id,
