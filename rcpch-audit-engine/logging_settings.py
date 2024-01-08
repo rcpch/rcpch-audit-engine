@@ -42,12 +42,10 @@ LOGGING = {
         # Same as verbose, but no color formatting
         "file": {
             "format": "[%(asctime)s] %(levelname)s [%(name)s:%(lineno)s] %(message)s",
-            "datefmt": "%d/%b/%Y %H:%M:%S",
         },
         "verbose": {
             "()": "colorlog.ColoredFormatter",
             "format": "%(log_color)s[%(asctime)s] %(levelname)s [%(name)s:%(lineno)s] %(bold_white)s%(message)s",
-            "datefmt": "%d/%b/%Y %H:%M:%S",
             "log_colors": {
                 "DEBUG": "bold_black",
                 "INFO": "white",
@@ -107,7 +105,7 @@ LOGGING = {
         "django": {
             "handlers": ["django_console", "epilepsy12_logfile"],
             "level": CONSOLE_DJANGO_LOG_LEVEL,
-            
+
         },
         **django_loggers,  # this injects the default django logger settings defined above
         "epilepsy12": {
