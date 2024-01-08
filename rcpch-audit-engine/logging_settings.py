@@ -3,11 +3,13 @@
 # Python imports
 import os
 
+# LOGGING ENV VARS
 CONSOLE_LOG_LEVEL = os.getenv("CONSOLE_LOG_LEVEL", "DEBUG")  # For e12 specific logs
 CONSOLE_DJANGO_LOG_LEVEL = os.getenv(
     "CONSOLE_DJANGO_LOG_LEVEL", "DEBUG"
 )  # For django logs
 FILE_LOG_LEVEL = os.getenv("FILE_LOG_LEVEL", "DEBUG")
+
 
 # Define the default django logger settings
 django_loggers = {
@@ -104,12 +106,14 @@ LOGGING = {
     "loggers": {
         "django": {
             "handlers": ["django_console", "epilepsy12_logfile"],
-            "propagate": True,
+            "level": CONSOLE_DJANGO_LOG_LEVEL,
+            
         },
         **django_loggers,  # this injects the default django logger settings defined above
         "epilepsy12": {
             "handlers": ["epilepsy12_console", "epilepsy12_logfile"],
-            "propagate": True,
+            "propagate": False,
+            "level": CONSOLE_LOG_LEVEL,
         },
         "two_factor": {
             "handlers": ["epilepsy12_console", "epilepsy12_logfile"],
