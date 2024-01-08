@@ -3,10 +3,9 @@
 # Python imports
 import os
 
-CONSOLE_LOG_LEVEL = os.getenv("CONSOLE_LOG_LEVEL", "INFO") # For e12 specific logs
-CONSOLE_DJANGO_LOG_LEVEL = os.getenv("CONSOLE_DJANGO_LOG_LEVEL", "INFO") # For django logs
-FILE_LOG_LEVEL = os.getenv("FILE_LOG_LEVEL", "INFO")
-
+CONSOLE_LOG_LEVEL = os.getenv("CONSOLE_LOG_LEVEL", "DEBUG") # For e12 specific logs
+CONSOLE_DJANGO_LOG_LEVEL = os.getenv("CONSOLE_DJANGO_LOG_LEVEL", "DEBUG") # For django logs
+FILE_LOG_LEVEL = os.getenv("FILE_LOG_LEVEL", "DEBUG")
 
 # Define the default django logger settings
 django_loggers = {
@@ -97,7 +96,7 @@ LOGGING = {
             "filename": "logs/general.log",
             "formatter": "file",
         },
-        # e12 file logger, each file is 15MB max, with 10 historic versions when filled, post-fixed with .1, .2, ..., .10 
+        # e12 file logger, each file is 15MB max, with 10 historic versions when filled, post-fixed with .1, .2, ..., .10
         "epilepsy12_logs": {
             "level": FILE_LOG_LEVEL,
             "class": "logging.handlers.RotatingFileHandler",
