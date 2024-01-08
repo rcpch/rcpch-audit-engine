@@ -266,7 +266,14 @@ def transfer_lead_site(request, registration_id, site_id):
     registration = Registration.objects.get(pk=registration_id)
     site = Site.objects.get(pk=site_id)
 
-    organisation_list = Organisation.objects.order_by("name").all()
+    # remove the currently selected organisation from the list - should not be able to
+    # transfer to the current organisation
+    organisation_list = (
+        Organisation.objects.filter()
+        .exclude(pk=site.organisation.pk)
+        .order_by("name")
+        .all()
+    )
 
     context = {
         "organisation_list": organisation_list,
@@ -349,28 +356,34 @@ def update_lead_site(request, registration_id, site_id, update):
         new_organisation_id = request.POST.get("transfer_lead_site")
         new_organisation = Organisation.objects.get(pk=new_organisation_id)
 
-        # update current site record to show nolonger actively involved in care
-        updated_previous_lead_site = Site.objects.filter(pk=site_id).get()
-        updated_previous_lead_site.site_is_primary_centre_of_epilepsy_care = True
-        updated_previous_lead_site.site_is_actively_involved_in_epilepsy_care = False
-        updated_previous_lead_site.save()
-
         # create new record in Site table for child against new centre, or update existing record if
         # organisation already involved in child's care
         if Site.objects.filter(
             organisation=new_organisation,
             case=registration.case,
+            site_is_actively_involved_in_epilepsy_care=True,
         ).exists():
-            # this new site already cares for this child in some capacity, either past or present
+            # this new site already cares actively for this child in some capacity
             new_lead_site = Site.objects.filter(
-                organisation=new_organisation, case=registration.case
+                organisation=new_organisation,
+                case=registration.case,
+                site_is_actively_involved_in_epilepsy_care=True,
             ).get()
             new_lead_site.site_is_primary_centre_of_epilepsy_care = True
             new_lead_site.site_is_actively_involved_in_epilepsy_care = True
             new_lead_site.active_transfer = True
             new_lead_site.transfer_origin_organisation = origin_organisation
             new_lead_site.transfer_request_date = timezone.now()
-            new_lead_site.save()
+            new_lead_site.save(
+                update_fields=[
+                    "site_is_primary_centre_of_epilepsy_care",
+                    "site_is_actively_involved_in_epilepsy_care",
+                    "active_transfer",
+                    "transfer_origin_organisation",
+                    "transfer_request_date",
+                ]
+            )
+
         else:
             # this new organisation does not care for this child. Create a new site associated with this organisation
             new_lead_site = Site.objects.create(
@@ -384,6 +397,36 @@ def update_lead_site(request, registration_id, site_id, update):
                 updated_by=request.user,
                 case=registration.case,
             )
+
+        if (
+            previous_lead_site.site_is_childrens_epilepsy_surgery_centre
+            or previous_lead_site.site_is_paediatric_neurology_centre
+            or previous_lead_site.site_is_general_paediatric_centre
+        ):
+            # the old site retains responsibility for one/all of neuro/gen paeds/surgery
+            # but is not the lead site anymore
+            # To allow us to track the fact that this site was once the lead site for this child,
+            # we must create a new record to track the fact that this site is still involved in the care
+
+            Site.objects.create(
+                case=registration.case,
+                organisation=origin_organisation,
+                site_is_primary_centre_of_epilepsy_care=False,
+                site_is_actively_involved_in_epilepsy_care=True,
+                site_is_childrens_epilepsy_surgery_centre=previous_lead_site.site_is_childrens_epilepsy_surgery_centre,
+                site_is_paediatric_neurology_centre=previous_lead_site.site_is_paediatric_neurology_centre,
+                site_is_general_paediatric_centre=previous_lead_site.site_is_general_paediatric_centre,
+            )
+
+        # update current site record to show nolonger actively involved in care as primary centre
+        previous_lead_site.site_is_primary_centre_of_epilepsy_care = True
+        previous_lead_site.site_is_actively_involved_in_epilepsy_care = False
+        previous_lead_site.save(
+            update_fields=[
+                "site_is_primary_centre_of_epilepsy_care",
+                "site_is_actively_involved_in_epilepsy_care",
+            ]
+        )
 
         """
         Update complete
@@ -402,7 +445,6 @@ def update_lead_site(request, registration_id, site_id, update):
                         & Q(is_active=True)
                         & Q(role=1)  # Audit Centre Lead Clinician
                     )
-                    | (Q(is_active=True) & Q(is_rcpch_audit_team_member=True))
                 ).values_list("email", flat=True)
             )
             subject = "Epilepsy12 Lead Site Transfer"

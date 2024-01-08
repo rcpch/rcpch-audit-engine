@@ -141,10 +141,14 @@ def epilepsy12_user_list(request, organisation_id):
             # filters all primary Trust level centres, irrespective of if active or inactive
             if organisation.country.boundary_identifier == "W92000004":
                 parent_trust = organisation.local_health_board.name
+                basic_filter = Q(
+                    organisation_employer__local_health_board__name__contains=parent_trust
+                )
             else:
                 parent_trust = organisation.trust.name
-
-            basic_filter = Q(organisation_employer__trust__name__contains=parent_trust)
+                basic_filter = Q(
+                    organisation_employer__trust__name__contains=parent_trust
+                )
 
         elif request.user.view_preference == 0:
             # filters all primary centres at organisation level, irrespective of if active or inactive
