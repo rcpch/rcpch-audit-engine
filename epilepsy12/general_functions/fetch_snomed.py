@@ -11,6 +11,7 @@ from ..constants import BENZODIAZEPINE_TYPES, ANTIEPILEPSY_MEDICINE_TYPES
 # Logging setup
 logger = logging.getLogger(__name__)
 
+
 def fetch_ecl(ecl):
     """
     accepts a SNOMED ECL and returns a concept
@@ -19,7 +20,7 @@ def fetch_ecl(ecl):
     response = requests.get(search_url)
 
     if response.status_code == 404:
-        logging.warning("Could not get SNOMED data from server...")
+        logger.warning("Could not get SNOMED data from server...")
         return None
 
     serialised = response.json()
@@ -36,7 +37,7 @@ def fetch_concept(concept_id):
     response = requests.get(search_url)
 
     if response.status_code == 404:
-        logging.warning("Could not get SNOMED data from server...")
+        logger.warning("Could not get SNOMED data from server...")
         return None
 
     serialised = response.json()
@@ -52,7 +53,7 @@ def fetch_paediatric_neurodisability_outpatient_diagnosis_simple_reference_set()
     response = requests.get(search_url)
 
     if response.status_code == 404:
-        logging.warning("Could not get SNOMED data from server...")
+        logger.warning("Could not get SNOMED data from server...")
         return None
 
     # filters out Autism-related entries
