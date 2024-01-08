@@ -19,11 +19,6 @@ def index(request):
     return render(request=request, template_name=template_name, context=context)
 
 
-def database(request):
-    template_name = "epilepsy12/database.html"
-    return render(request, template_name, {})
-
-
 def open_access(request, organisation_id):
     """
     Landing page for children and families - takes an organisation_id to present

@@ -103,7 +103,7 @@ A security requirement was the ability to track user activity. This is done in a
 ```python
 @receiver(user_logged_in)
 def log_user_login(sender, request, user, **kwargs):
-    print(f'{user} ({user.email}) logged in from {get_client_ip(request)}.')
+    logger.info(f'{user} ({user.email}) logged in from {get_client_ip(request)}.')
     VisitActivity.objects.create(
         activity=1,
         ip_address=get_client_ip(request),

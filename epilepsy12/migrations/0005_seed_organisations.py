@@ -1,5 +1,5 @@
 # standard library imports
-from datetime import datetime
+import logging
 
 # Django imports
 from django.contrib.gis.geos import Point
@@ -13,6 +13,8 @@ from ..constants import (
     OPEN_UK_NETWORKS_TRUSTS,
 )
 
+# Logging setup
+logger = logging.getLogger(__name__)
 
 def seed_organisations(apps, schema_editor):
     """
@@ -35,13 +37,13 @@ def seed_organisations(apps, schema_editor):
     wales = Country.objects.get(boundary_identifier="W92000004")
 
     if Organisation.objects.all().count() >= 330:
-        print(
+        logger.debug(
             "\033[31m",
             "329 RCPCH organisations already seeded. Skipping...",
             "\033[31m",
         )
     else:
-        print("\033[31m", "Adding new RCPCH organisations...", "\033[31m")
+        logger.debug("\033[31m", "Adding new RCPCH organisations...", "\033[31m")
 
         for added, rcpch_organisation in enumerate(RCPCH_ORGANISATIONS):
             # Apply longitude and latitude data, if exists
@@ -116,21 +118,21 @@ def seed_organisations(apps, schema_editor):
                         )
                         organisation.london_borough = london_borough
                     except Exception as e:
-                        print(
+                        logger.debug(
                             f"Unable to save London Borough {rcpch_organisation['LocalAuthority']}"
                         )
                         pass
 
                 organisation.save()
-                print(f"{added+1}: {rcpch_organisation['OrganisationName']}")
+                logger.debug(f"{added+1}: {rcpch_organisation['OrganisationName']}")
             except Exception as error:
-                print(
+                logger.debug(
                     f"Unable to save {rcpch_organisation['OrganisationName']}: {error}"
                 )
 
-        print(f"{added+1} organisations added.")
+        logger.debug(f"{added+1} organisations added.")
 
-    print(
+    logger.debug(
         "\033[31m",
         "Updating RCPCH organisations with ICB, NHS England relationships...",
         "\033[31m",
@@ -140,14 +142,14 @@ def seed_organisations(apps, schema_editor):
         try:
             icb = IntegratedCareBoard.objects.get(ods_code=icb_trust["ODS ICB Code"])
         except Exception as error:
-            print(
+            logger.debug(
                 f"Could not match ICB ODS Code {icb_trust['ODS ICB Code']} with that in Trust table."
             )
 
         try:
             trust = Trust.objects.get(ods_code=icb_trust["ODS Trust Code"])
         except Exception as error:
-            print(
+            logger.debug(
                 f"Could not match Trust ODS Code {icb_trust['ODS Trust Code']} with that in Trust table."
             )
 
@@ -156,7 +158,7 @@ def seed_organisations(apps, schema_editor):
                 region_code=icb_trust["NHS England Region Code"]
             )
         except Exception as error:
-            print(
+            logger.debug(
                 f"Could not match NHS Region GSS Code {icb_trust['NHS England Region Code']} with that in the NHS England Region table."
             )
 
@@ -169,16 +171,16 @@ def seed_organisations(apps, schema_editor):
         try:
             Organisation.objects.filter(trust=trust).update(**update_fields)
         except Exception as error:
-            print(
+            logger.debug(
                 f"Unable to find {icb_trust['ODS Trust Code']} when updating {icb_trust['ODS ICB Code']} ICB and {icb_trust['NHS England Region Code']} NHS England Region!"
             )
-    print(
+    logger.debug(
         "\033[31m",
         f"Updated {added+1} RCPCH organisations with ICB, NHS England relationships...",
         "\033[31m",
     )
 
-    print(
+    logger.debug(
         "\033[31m",
         "Updating all RCPCH organisations with OPEN UK network relationships...",
         "\033[31m",
@@ -208,7 +210,7 @@ def seed_organisations(apps, schema_editor):
         )
         # upoate the OPENUK netowork for all the Organisations in this trust
         Organisation.objects.filter(query_term).update(openuk_network=openuk_network)
-    print(
+    logger.debug(
         "\033[31m",
         f"Updated {added+1} RCPCH organisations with OPENUK relationships...",
         "\033[31m",

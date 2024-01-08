@@ -1,4 +1,5 @@
 # python imports
+import logging
 import requests
 from requests.exceptions import HTTPError
 
@@ -7,6 +8,8 @@ from django.conf import settings
 from django.utils import timezone, dateformat
 from django.apps import apps
 
+# Logging setup
+logger = logging.getLogger(__name__)
 
 def fetch_updated_organisations(time_frame: int = 30):
     """
@@ -37,7 +40,7 @@ def fetch_updated_organisations(time_frame: int = 30):
         )
         response.raise_for_status()
     except HTTPError as e:
-        print(e.response.text)
+        logger.exception(e.response.text)
 
     return response.json()["Organisations"]
 
@@ -51,7 +54,7 @@ def get_organisation(org_link):
         response = requests.get(url=org_link, timeout=10)
         response.raise_for_status()
     except HTTPError as e:
-        print(e.response.text)
+        logger.exception(e.response.text)
 
     return response.json()["Organisation"]
 
@@ -108,37 +111,37 @@ def update_organisation_model_with_ORD_changes():
         ods_code = extract_ods_code(org_link=org_link["OrgLink"])
         organisation = match_organisation(ods_code=ods_code)
         if organisation:
-            print(
+            logger.info(
                 f"{index}. {ods_code} has a match with {organisation} in the E12 database"
             )
             ord_organisation_update = get_organisation(org_link["OrgLink"])
-            print(ord_organisation_update["Name"])
-            print(ord_organisation_update["GeoLoc"]["Location"]["AddrLn1"])
-            print(ord_organisation_update["GeoLoc"]["Location"]["AddrLn2"])
-            print(ord_organisation_update["GeoLoc"]["Location"]["Town"])
-            print(ord_organisation_update["GeoLoc"]["Location"]["PostCode"])
-            print(ord_organisation_update["GeoLoc"]["Location"]["Country"])
-            print(ord_organisation_update["Contacts"]["Contact"]["value"])
+            logger.info(ord_organisation_update["Name"])
+            logger.info(ord_organisation_update["GeoLoc"]["Location"]["AddrLn1"])
+            logger.info(ord_organisation_update["GeoLoc"]["Location"]["AddrLn2"])
+            logger.info(ord_organisation_update["GeoLoc"]["Location"]["Town"])
+            logger.info(ord_organisation_update["GeoLoc"]["Location"]["PostCode"])
+            logger.info(ord_organisation_update["GeoLoc"]["Location"]["Country"])
+            logger.info(ord_organisation_update["Contacts"]["Contact"]["value"])
         else:
             trust = match_trust(ods_code=ods_code)
             if trust:
-                print(
+                logger.info(
                     f"{index}. {ods_code} has a match with {trust} in the E12 database"
                 )
                 ord_trust_update = get_organisation(org_link["OrgLink"])
-                print(ord_trust_update["Name"])
-                print(ord_trust_update["GeoLoc"]["Location"]["AddrLn1"])
+                logger.info(ord_trust_update["Name"])
+                logger.info(ord_trust_update["GeoLoc"]["Location"]["AddrLn1"])
                 try:
                     line_two = ord_trust_update["GeoLoc"]["Location"]["AddrLn2"]
-                    print(line_two)
+                    logger.info(line_two)
                 except Exception:
                     pass
 
-                print(ord_trust_update["GeoLoc"]["Location"]["Town"])
-                print(ord_trust_update["GeoLoc"]["Location"]["PostCode"])
-                print(ord_trust_update["GeoLoc"]["Location"]["Country"])
+                logger.info(ord_trust_update["GeoLoc"]["Location"]["Town"])
+                logger.info(ord_trust_update["GeoLoc"]["Location"]["PostCode"])
+                logger.info(ord_trust_update["GeoLoc"]["Location"]["Country"])
                 for i in ord_trust_update["Contacts"]["Contact"]:
                     if i["type"] == "http":
-                        print(f'website: {i["value"]}')
+                        logger.info(f'website: {i["value"]}')
                     else:
-                        print(f'telephone: {i["value"]}')
+                        logger.info(f'telephone: {i["value"]}')

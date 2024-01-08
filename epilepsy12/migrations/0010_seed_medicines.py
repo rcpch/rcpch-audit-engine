@@ -1,4 +1,5 @@
 # Python
+import logging
 
 # Third-party Imports
 from django.db import migrations
@@ -7,6 +8,8 @@ from django.db import migrations
 from ..constants import SNOMED_BENZODIAZEPINE_TYPES, SNOMED_ANTIEPILEPSY_MEDICINE_TYPES
 from ..general_functions import fetch_ecl
 
+# Logging setup
+logger = logging.getLogger(__name__)
 
 def seed_medicines(apps, schema_editor):
     """
@@ -20,7 +23,7 @@ def seed_medicines(apps, schema_editor):
     None
     """
     Medicine = apps.get_model("epilepsy12", "Medicine")
-    print(
+    logger.debug(
         "\033[33m",
         "Seeding all the medicines from SNOMED and local Epilepsy12 list...",
         "\033[33m",
@@ -49,7 +52,7 @@ def seed_medicines(apps, schema_editor):
                 )
                 new_drug.save()
         else:
-            print(f"{benzo[1]} exists. Skipping...")
+            logger.debug(f"{benzo[1]} exists. Skipping...")
     for aem in SNOMED_ANTIEPILEPSY_MEDICINE_TYPES:
         if not Medicine.objects.filter(medicine_name=aem[1], is_rescue=False).exists():
             # if the drug is not in the database already
@@ -73,8 +76,8 @@ def seed_medicines(apps, schema_editor):
                 )
                 aem_drug.save()
         else:
-            print(f"{aem_drug[1]} exists. Skipping...")
-    print("All medicines added.")
+            logger.debug(f"{aem_drug[1]} exists. Skipping...")
+    logger.debug("All medicines added.")
 
 
 class Migration(migrations.Migration):
