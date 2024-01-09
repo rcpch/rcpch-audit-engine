@@ -1,7 +1,11 @@
 import requests
+import logging
+
 from django.conf import settings
 from ..constants import UNKNOWN_POSTCODES_NO_SPACES
 
+# Logging setup
+logger = logging.getLogger(__name__)
 
 def is_valid_postcode(postcode: str) -> bool:
     """
@@ -23,7 +27,7 @@ def is_valid_postcode(postcode: str) -> bool:
         return True
 
     # Only other possibility should be 404, but handle any other status code
-    print(
+    logger.error(
         f"Postcode validation failure. Could not validate postcode at {url}. {response.status_code=}"
     )
     return False
@@ -36,7 +40,7 @@ def return_random_postcode(country_boundary_identifier: str):
     response = requests.get(url=url)
 
     if response.status_code == 404:
-        print("Postcode generation failure. Could not get random postcode.")
+        logger.error("Postcode generation failure. Could not get random postcode.")
         return None
 
     return response.json()["data"]["relationships"]["example_postcodes"]["data"][0][

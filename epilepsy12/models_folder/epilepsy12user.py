@@ -1,3 +1,5 @@
+import logging
+
 # django
 from django.contrib.auth.models import AbstractUser, PermissionsMixin
 from django.contrib.auth.base_user import BaseUserManager
@@ -20,6 +22,7 @@ from epilepsy12.constants.user_types import (
     VIEW_PREFERENCES,
 )
 
+logger = logging.getLogger(__name__)
 
 class Epilepsy12UserManager(BaseUserManager):
     """
@@ -69,7 +72,7 @@ class Epilepsy12UserManager(BaseUserManager):
         user.email_confirmed = False
         # set time password has been updated
         user.password_last_set = timezone.now()
-        print(f"{user} password updated")
+        logger.info(f"{user} password updated")
         user.save()
 
         """

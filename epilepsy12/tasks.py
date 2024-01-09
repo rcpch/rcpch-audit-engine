@@ -1,6 +1,7 @@
 # Python Imports
 from typing import Literal, Union
 from datetime import date
+import logging
 
 # Django Imports
 from django.utils.html import strip_tags
@@ -17,6 +18,8 @@ from epilepsy12.common_view_functions.aggregate_by import update_all_kpi_agg_mod
 from epilepsy12.management.commands.old_pt_data_scripts import insert_old_pt_data
 from epilepsy12.management.commands.user_scripts import insert_user_data
 
+# Logging setup
+logger = logging.getLogger(__name__)
 
 @shared_task
 def asynchronously_aggregate_kpis_and_update_models_for_cohort_and_abstraction_level(
@@ -72,4 +75,4 @@ def hello():
     THIS IS A SCHEDULED TASK THAT IS CALLED AT 06:00 EVERY DAY
     THE CRON DATE/FREQUENCY IS SET IN SETTING.PY
     """
-    print("Hello Epilepsy12!")
+    logger.debug("0600 cron check task ran successfully")

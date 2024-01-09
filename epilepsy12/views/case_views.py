@@ -1,5 +1,6 @@
 # python imports
 from datetime import datetime
+import logging
 
 # django imports
 from django.core.exceptions import PermissionDenied
@@ -10,7 +11,6 @@ from django.contrib.auth.decorators import permission_required
 from django.contrib.gis.db.models import Q
 from django.contrib import messages
 from django.core.paginator import Paginator
-from django.db import DatabaseError
 
 # third party imports
 from django_htmx.http import trigger_client_event, HttpResponseClientRedirect
@@ -32,6 +32,8 @@ from django.conf import settings
 from ..general_functions import construct_transfer_epilepsy12_site_outcome_email
 from ..tasks import asynchronously_send_email_to_recipients
 
+# Logging setup
+logger = logging.getLogger(__name__)
 
 @login_and_otp_required()
 @user_may_view_this_organisation()
@@ -383,32 +385,89 @@ def transfer_response(request, organisation_id, case_id, organisation_response):
     Updates associated Site instance and redirects back to case table
     """
 
+    target_organisation = Organisation.objects.get(pk=organisation_id)
     case = Case.objects.get(pk=case_id)
-    site = Site.objects.get(case=case, active_transfer=True)
+    site = Site.objects.get(
+        case=case,
+        active_transfer=True,
+        site_is_primary_centre_of_epilepsy_care=True,
+        organisation=target_organisation,
+    )
+
     # prepare email response to requesting organisation clinical lead
     email = construct_transfer_epilepsy12_site_outcome_email(
         request=request,
-        target_organisation=Organisation.objects.get(pk=organisation_id),
+        target_organisation=target_organisation,
         outcome=f"{organisation_response}ed",
     )
     origin_organisation = site.transfer_origin_organisation
     if organisation_response == "reject":
-        # reset the child back to the orgin organisation
+        # Any additional responsibilities that were previously maintained before
+        # transfer by the target organisation must be handed back by creating new record
+        if (
+            site.site_is_childrens_epilepsy_surgery_centre
+            or site.site_is_paediatric_neurology_centre
+            or site.site_is_general_paediatric_centre
+        ):
+            Site.objects.create(
+                site_is_childrens_epilepsy_surgery_centre=site.site_is_childrens_epilepsy_surgery_centre,
+                site_is_paediatric_neurology_centre=site.site_is_paediatric_neurology_centre,
+                site_is_general_paediatric_centre=site.site_is_general_paediatric_centre,
+                site_is_primary_centre_of_epilepsy_care=False,
+                site_is_actively_involved_in_epilepsy_care=True,
+                case=case,
+                organisation=target_organisation,
+            )
+        # Reset the site back to original organisation
+        site.site_is_childrens_epilepsy_surgery_centre = False
+        site.site_is_paediatric_neurology_centre = False
+        site.site_is_general_paediatric_centre = False
         site.active_transfer = False
         site.organisation = site.transfer_origin_organisation
         site.transfer_origin_organisation = None
         site.transfer_request_date = None
+        site.site_is_primary_centre_of_epilepsy_care = True
+        site.site_is_actively_involved_in_epilepsy_care = True
+
+        site.save(
+            update_fields=[
+                "site_is_childrens_epilepsy_surgery_centre",
+                "site_is_paediatric_neurology_centre",
+                "site_is_general_paediatric_centre",
+                "active_transfer",
+                "organisation",
+                "transfer_origin_organisation",
+                "transfer_request_date",
+                "site_is_primary_centre_of_epilepsy_care",
+                "site_is_actively_involved_in_epilepsy_care",
+            ]
+        )
+
+        # if the origin lead site had other responsibilities prior to transfer, a new record
+        # would have been created in the transfer process to hold these. This record
+        # now needs deleting
+
+        Site.objects.filter(
+            case=case,
+            organisation=site.organisation,  # this is the origin organisation
+            site_is_actively_involved_in_epilepsy_care=False,
+        ).delete()
+
     elif organisation_response == "accept":
         site.active_transfer = False
         site.transfer_origin_organisation = None
         site.transfer_request_date = None
+        site.save()
+        # if the original organisation has ongoing other responsibilities and a new record had to be created
+        # to track these, find those records and set the active_transfer flag to False
+        Site.objects.filter(
+            case=case,
+            organisation=origin_organisation,
+            active_transfer=True,
+            site_is_actively_involved_in_epilepsy_care=True,
+        ).update(active_transfer=False)
     else:
         raise Exception("No organisation response supplied")
-
-    try:
-        site.save()
-    except:
-        raise DatabaseError
 
     # send email asynchronously to lead clinician(s) of origin organisation notifying them of outcome
     outcome = f"{organisation_response.upper()}ED"
@@ -552,8 +611,7 @@ def create_case(request, organisation_id):
             messages.error(
                 request=request, message="It was not possible to save the case"
             )
-            print("Invalid data")
-            print(form.errors)
+            logger.info(f"Invalid data provided to case form: {form.errors}")
 
     context = {
         "organisation_id": organisation_id,

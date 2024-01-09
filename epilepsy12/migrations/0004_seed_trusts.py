@@ -1,8 +1,12 @@
+import logging
+
 # Django imports
 from django.db import migrations
 
 from ..constants import TRUSTS
 
+# Logging setup
+logger = logging.getLogger(__name__)
 
 def seed_trusts(apps, schema_editor):
     """
@@ -17,9 +21,9 @@ def seed_trusts(apps, schema_editor):
     Trust = apps.get_model("epilepsy12", "Trust")
 
     if Trust.objects.all().count == 242:
-        print("\033[31m", "242 Trusts already seeded. Skipping...", "\033[31m")
+        logger.debug("\033[31m", "242 Trusts already seeded. Skipping...", "\033[31m")
     else:
-        print("\033[31m", "Adding new Trusts...", "\033[31m")
+        logger.debug("\033[31m", "Adding new Trusts...", "\033[31m")
 
         for added, trust in enumerate(TRUSTS):
             try:
@@ -32,11 +36,11 @@ def seed_trusts(apps, schema_editor):
                     postcode=trust["postcode"],
                     country=trust["country"],
                 ).save()
-                print(f"{added+1}: {trust['trust_name']}")
+                logger.debug(f"{added+1}: {trust['trust_name']}")
             except Exception as error:
-                print(f"Unable to save {trust['trust_name']}: {error}")
+                logger.debug(f"Unable to save {trust['trust_name']}: {error}")
 
-        print(f"{added+1} trusts added.")
+        logger.debug(f"{added+1} trusts added.")
 
 
 class Migration(migrations.Migration):

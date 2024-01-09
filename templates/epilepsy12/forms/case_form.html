@@ -65,15 +65,12 @@
 
   </div>
 
-  
-  {% if request.user|has_group:"trust_audit_team_full_access, trust_audit_team_edit_access, epilepsy12_audit_team_edit_access, epilepsy12_audit_team_full_access" %}
   <div class="field">
     <label>NHS Number</label>
     {{form.nhs_number}} {% if form.nhs_number.errors %}
     <div class="ui pointing red basic label">{{form.nhs_number.errors}}</div>
     {% endif %}
   </div>
-  {% endif %}
 
   <div class="field">
     <label>Ethnicity</label>
@@ -115,7 +112,7 @@
         <div class="header">Organisation</div>
         <p>
           <b>{% if organisation.trust %}
-              {{organisation.name}}({{organisation.trust.name}}) ({{form.id}})
+              {{organisation.name}}({{organisation.trust.name}})
               {% else %}
               {{organisation.name}}({{organisation.local_health_board.name}})
               {% endif %}
@@ -136,7 +133,11 @@
         Cancel
       </a>
       {% if perms.epilepsy12.change_case or perms.epilepsy12.add_case %}
-        <button type="submit" class="ui rcpch_primary button" name="update">
+        <button 
+        type="submit" 
+        class="ui rcpch_primary button" 
+        name="update" 
+        _="on click toggle .disabled on me">
           Save
         </button>
     

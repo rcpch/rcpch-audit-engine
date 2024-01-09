@@ -1,3 +1,6 @@
+# python imports
+import logging
+
 from django.core.exceptions import PermissionDenied
 from django.contrib.auth.decorators import login_required
 from .models import (
@@ -18,6 +21,8 @@ from .models import (
     Epilepsy12User,
 )
 
+# Logging setup
+logger = logging.getLogger(__name__)
 
 model_primary_keys = [
     {"id": "case_id", "model": "Case"},
@@ -404,7 +409,7 @@ def login_and_otp_required():
             user = request.user
             
             if not user.is_verified():
-                print(f"{user=} is unverified. Tried accessing {view}")
+                logger.info(f"{user=} is unverified. Tried accessing {view}")
                 raise PermissionDenied()
             
             return view(request, *args, **kwargs)

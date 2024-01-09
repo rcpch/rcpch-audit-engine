@@ -1,5 +1,6 @@
 from typing import Literal, Union
 from datetime import date
+import logging
 
 # Django imports
 from django.apps import apps
@@ -16,11 +17,12 @@ from django.contrib.gis.db.models import (
 # E12 imports
 from epilepsy12.constants import ETHNICITIES, SEX_TYPE, EnumAbstractionLevel
 
+# Logging setup
+logger = logging.getLogger(__name__)
+
 """
 Reporting
 """
-
-
 def cases_aggregated_by_sex(selected_organisation):
     # aggregate queries on trust level cases
 
@@ -369,7 +371,7 @@ def update_kpi_aggregation_model(
                     "open_access": open_access,
                 },
             )
-            print(f"created {new_obj}")
+            logger.debug(f"created {new_obj}")
 
         else:
             new_obj, created = NationalKPIAggregation.objects.update_or_create(
@@ -383,9 +385,9 @@ def update_kpi_aggregation_model(
             )
 
             if created:
-                print(f"created {new_obj}")
+                logger.debug(f"created {new_obj}")
             else:
-                print(f"updated {new_obj}")
+                logger.debug(f"updated {new_obj}")
 
         return None
 
@@ -412,10 +414,10 @@ def update_kpi_aggregation_model(
             value_count["open_access"] = open_access
             try:
                 new_obj = AbstractionKPIAggregationModel.objects.create(**value_count)
-                print(f"created {new_obj}")
+                logger.debug(f"created {new_obj}")
             except Exception as error:
-                print(
-                    f"PUBLIC VIEW: Can't save new KPIAggregations for {abstraction_level} for {abstraction_relation_instance}: {error}"
+                logger.exception(
+                    f"Can't save new KPIAggregations for {abstraction_level} for {abstraction_relation_instance}: {error}"
                 )
                 return
 
@@ -436,15 +438,15 @@ def update_kpi_aggregation_model(
                     open_access=open_access,
                 )
             except Exception as error:
-                print(
+                logger.exception(
                     f"CLOSED VIEW: Can't update/save KPIAggregations for {abstraction_level} for {abstraction_relation_instance}: {error}"
                 )
                 return
 
             if created:
-                print(f"created {new_obj}")
+                logger.debug(f"created {new_obj}")
             else:
-                print(f"updated {new_obj}")
+                logger.debug(f"updated {new_obj}")
 
 
 def aggregate_kpis_update_models_all_abstractions_for_organisation(
@@ -688,19 +690,19 @@ def _seed_all_aggregation_models() -> None:
     ]
 
     if len(all_entities) + 1 != len(all_agg_models):
-        print(
+        logger.error(
             f"Incorrect lengths for entities. KPIAggregations not seeded. {len(all_entities)+1=}{len(all_agg_models)=}"
         )
         return
 
     for entities, AggregationModel in zip(all_entities, all_agg_models):
-        print(f"Creating aggregations for {AggregationModel}")
+        logger.info(f"Creating aggregations for {AggregationModel}")
         for entity in entities:
             if AggregationModel.objects.filter(
                 abstraction_relation=entity,
                 cohort=current_cohort,
             ).exists():
-                print(f"AggregationModel for {entity} already exists. Skipping...")
+                logger.info(f"AggregationModel for {entity} already exists. Skipping...")
                 continue
 
             new_agg_model = AggregationModel.objects.create(
@@ -708,18 +710,18 @@ def _seed_all_aggregation_models() -> None:
                 cohort=current_cohort,
             )
 
-            print(f"Created {new_agg_model}")
+            logger.info(f"Created {new_agg_model}")
 
     # National handled separately as it has no abstraction relation field
     if NationalKPIAggregation.objects.filter(
         cohort=current_cohort,
     ).exists():
-        print(f"NationalKPIAggregation for {entity} already exists. Skipping...")
+        logger.info(f"NationalKPIAggregation for {entity} already exists. Skipping...")
     else:
         new_agg_model = NationalKPIAggregation.objects.create(
             cohort=current_cohort,
         )
-        print(f"Created {new_agg_model} (Cohort {current_cohort})")
+        logger.info(f"Created {new_agg_model} (Cohort {current_cohort})")
 
 
 def ___delete_and_recreate_all_kpi_aggregation_models():
