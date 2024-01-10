@@ -32,7 +32,13 @@
                     <div class="four wide field">
                         <label>Cohort</label>
                         <div class='ui rcpch input'>
-                            <input type="text" readonly="" placeholder="{{registration.cohort}}"/>
+                            <input type="text" readonly="" placeholder=
+                            {% if registration.cohort %}
+                                "{{registration.cohort}}"
+                            {% else %}
+                                "No cohort"
+                            {% endif %}
+                            />
                         </div>
                     </div>
 
@@ -46,14 +52,26 @@
                     <div class="field">
                         <label>Completed First Year</label>
                         <div class='ui rcpch input'>
-                            <input type="text" readonly="" placeholder="{{registration.completed_first_year_of_care_date}}"/>
+                            <input type="text" readonly="" placeholder=
+                            {% if registration.completed_first_year_of_care_date %}
+                                "{{registration.completed_first_year_of_care_date}}"
+                            {% else %}
+                                "No date entered"
+                            {% endif %}
+                            />
                         </div>
                     </div>
 
                     <div class="field">
                         <label>Submission Deadline</label>
                         <div class='ui rcpch input'>
-                            <input type="text" readonly="" placeholder="{{registration.audit_submission_date}}"/>
+                            <input type="text" readonly="" placeholder=
+                            {% if registration.audit_submission_date %}
+                                "{{registration.audit_submission_date}}"
+                            {% else %}
+                                "No deadline entered"
+                            {% endif %}
+                            />
                         </div>
                     </div>
 
