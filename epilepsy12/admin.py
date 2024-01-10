@@ -123,10 +123,14 @@ class Epilepsy12UserAdmin(UserAdmin, SimpleHistoryAdmin):
         return form
 
 
+class CaseAdmin(admin.ModelAdmin):
+    search_fields = ["first_name", "surname", "nhs_number", "date_of_birth"]
+
+
 admin.site.register(Epilepsy12User, Epilepsy12UserAdmin)
 admin.site.register(AntiEpilepsyMedicine, SimpleHistoryAdmin)
 admin.site.register(Assessment, SimpleHistoryAdmin)
-admin.site.register(Case, SimpleHistoryAdmin)
+admin.site.register(Case, CaseAdmin)
 admin.site.register(Comorbidity, SimpleHistoryAdmin)
 admin.site.register(EpilepsyContext, SimpleHistoryAdmin)
 admin.site.register(Investigations, SimpleHistoryAdmin)

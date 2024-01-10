@@ -27,6 +27,8 @@ from .time_and_user_abstract_base_classes import *
 
 # Logging setup
 logger = logging.getLogger(__name__)
+
+
 class Case(TimeStampAbstractBaseClass, UserStampAbstractBaseClass, HelpTextMixin):
     """
     This class holds information about each child or young person
@@ -58,12 +60,8 @@ class Case(TimeStampAbstractBaseClass, UserStampAbstractBaseClass, HelpTextMixin
         blank=True,
     )
     nhs_number = models.CharField(  # the NHS number for England and Wales
-        "NHS Number",
-        unique=True,
-        blank=True,
-        null=True,
-        max_length=10
-    ) 
+        "NHS Number", unique=True, blank=True, null=True, max_length=10
+    )
     first_name = CharField(
         "First name",
         max_length=100,
@@ -178,6 +176,7 @@ class Case(TimeStampAbstractBaseClass, UserStampAbstractBaseClass, HelpTextMixin
             CAN_OPT_OUT_CHILD_FROM_INCLUSION_IN_AUDIT,
             CAN_CONSENT_TO_AUDIT_PARTICIPATION,
         ]
+        ordering = ["surname"]
 
     def __str__(self) -> str:
         return f"{self.first_name} {self.surname}"
