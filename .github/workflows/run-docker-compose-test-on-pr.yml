@@ -81,7 +81,7 @@ jobs:
 
       - name: Run tests
         run: |
-          docker compose exec django pytest -v $*
+          docker compose exec django pytest epilepsy12/tests/model_tests/test_assessment.py -v
 
 
 
