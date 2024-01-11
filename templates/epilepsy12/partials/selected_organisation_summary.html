@@ -80,24 +80,24 @@
                                     <i class="ui rcpch small address book icon "></i>Details
                                 </h4>
                                 <div class="organisation_details ">
-                                    {%if selected_organisation.telephone%}
+                                    {% if selected_organisation.telephone %}
                                         <div class="item middle aligned rcpch_icon_text_group">
                                             <i class="ui icon phone"></i>
                                             <p class="rcpch_icon_text">{{ selected_organisation.telephone }}</p>
                                         </div>
-                                    {%endif%}
-                                    {%if selected_organisation.email%}
+                                    {% endif %}
+                                    {% if selected_organisation.email %}
                                         <div class="item middle aligned rcpch_icon_text_group">
                                             <i class="ui icon envelope"></i>
                                             <p class="rcpch_icon_text">{{ selected_organisation.email }}</p>
                                         </div>
-                                    {%endif%}
-                                    {%if selected_organisation.website%}
+                                    {% endif %}
+                                    {% if selected_organisation.website %}
                                         <div class="item middle aligned rcpch_icon_text_group">
                                             <i class="ui icon linkify"></i>
                                             <p class="rcpch_icon_text">{{ selected_organisation.website }}</p>
                                         </div>
-                                    {%endif%}
+                                    {% endif %}
                                 </div>
                         </div>
                 </div>
