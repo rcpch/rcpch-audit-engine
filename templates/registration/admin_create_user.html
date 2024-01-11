@@ -177,9 +177,15 @@
 
         </form>
         {% if form.errors %}
-            <div class="alert alert-danger">
-                {{ form.errors }}
-            </div>
+          <ul class="errorlist">
+            {% for key, value in form.errors.items %}
+              {% if key != '__all__' %} 
+                <li>
+                    {{ key }}{{ value }}
+                </li>
+              {% endif %}
+            {% endfor %}
+          </ul>
         {% endif %}
       </div>
 
