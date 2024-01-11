@@ -84,6 +84,12 @@
     background-color: var(--rcpch_dark_blue);
     border-color: transparent;
   }
+
+  .ui.rcpch_dark_blue.lighter_font.button{
+    background-color: var(--rcpch_light_grey);
+    font-weight: 800;
+    font-family: var(--rcpch_standard_font) !important;
+  }
   
   /* individual buttons */
   
