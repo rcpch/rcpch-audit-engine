@@ -16,6 +16,7 @@ from ..constants import (
 # Logging setup
 logger = logging.getLogger(__name__)
 
+
 def seed_organisations(apps, schema_editor):
     """
     Seed function which populates the Organisation table from JSON.
@@ -72,7 +73,6 @@ def seed_organisations(apps, schema_editor):
                     address2=rcpch_organisation["Address2"],
                     address3=rcpch_organisation["Address3"],
                     city=rcpch_organisation["City"],
-                    email=rcpch_organisation["Email"],
                     county=rcpch_organisation["County"],
                     latitude=latitude,
                     longitude=longitude,
