@@ -27,7 +27,7 @@ def seed_syndromes(apps, schema_editor):
         None
     """
     added = 0
-    logger.debug("\033[33m", "Seeding all the syndromes...", "\033[33m")
+    logger.debug("\033[33m Seeding all the syndromes... \033[33m")
     for syndrome in sorted(SYNDROMES, key=itemgetter(1)):
         if SyndromeList.objects.filter(syndrome_name=syndrome[1]).exists():
             logger.debug("Syndromes already exist. Skipping this step...")

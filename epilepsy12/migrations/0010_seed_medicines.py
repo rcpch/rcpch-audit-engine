@@ -24,9 +24,7 @@ def seed_medicines(apps, schema_editor):
     """
     Medicine = apps.get_model("epilepsy12", "Medicine")
     logger.debug(
-        "\033[33m",
-        "Seeding all the medicines from SNOMED and local Epilepsy12 list...",
-        "\033[33m",
+        "\033[33m Seeding all the medicines from SNOMED and local Epilepsy12 list... \033[33m",
     )
     for benzo in SNOMED_BENZODIAZEPINE_TYPES:
         if not Medicine.objects.filter(medicine_name=benzo[1]).exists():
