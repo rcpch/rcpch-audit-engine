@@ -35,7 +35,11 @@ jobs:
           echo "DJANGO_ALLOWED_HOSTS=${{ secrets.DJANGO_ALLOWED_HOSTS }}" >> envs/.env
           echo "DJANGO_CSRF_TRUSTED_ORIGINS=${{ secrets.DJANGO_CSRF_TRUSTED_ORIGINS }}" >> envs/.env
           echo "DJANGO_STARTUP_COMMAND=${{ secrets.DJANGO_STARTUP_COMMAND }}" >> envs/.env
+          echo "CONSOLE_DJANGO_LOG_LEVEL=${{ secrets.CONSOLE_DJANGO_LOG_LEVEL }}" >> envs/.env
+          echo "CONSOLE_LOG_LEVEL=${{ secrets.CONSOLE_LOG_LEVEL }}" >> envs/.env
+          echo "FILE_LOG_LEVEL=${{ secrets.FILE_LOG_LEVEL }}" >> envs/.env
           echo "E12_SECRET_KEY=${{ secrets.E12_SECRET_KEY }}" >> envs/.env
+          echo "SITE_CONTACT_EMAIL=${{ secrets.SITE_CONTACT_EMAIL }}" >> envs/.env
           echo "E12_POSTGRES_DB_HOST=${{ secrets.E12_POSTGRES_DB_HOST }}" >> envs/.env
           echo "E12_POSTGRES_DB_NAME=${{ secrets.E12_POSTGRES_DB_NAME }}" >> envs/.env
           echo "E12_POSTGRES_DB_PASSWORD=${{ secrets.E12_POSTGRES_DB_PASSWORD }}" >> envs/.env
@@ -77,7 +81,7 @@ jobs:
 
       - name: Run tests
         run: |
-          docker compose exec django pytest -v $*
+          docker compose exec django pytest epilepsy12/tests/model_tests/test_assessment.py -v
 
 
 

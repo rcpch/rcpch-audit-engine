@@ -4,10 +4,11 @@ from django.db import migrations
 
 from epilepsy12.common_view_functions import _seed_all_aggregation_models
 
+
 def seed_kpi_aggregations(apps, schema_editor):
-    
-    _seed_all_aggregation_models()
-    
+    # _seed_all_aggregation_models()
+    pass
+
 
 class Migration(migrations.Migration):
     dependencies = [
