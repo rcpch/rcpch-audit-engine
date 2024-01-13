@@ -15,7 +15,7 @@
         <div class="three fields">
             
             {% url 'mri_brain_requested_date' investigations_id=investigations.pk as hx_post %}
-            {% include 'epilepsy12/partials/page_elements/date_field.html' with hx_post=hx_post hx_target="#mri_brain_information" hx_trigger="change delay:1s" hx_swap="innerHTML" date_value=investigations.mri_brain_requested_date label=investigations.get_mri_brain_requested_date_help_label_text reference=investigations.get_mri_brain_requested_date_help_reference_text data_position="top left" input_date_field_name='mri_brain_requested_date' error_messages=error_messages enabled=perms.epilepsy12.change_investigations has_permission=perms.epilepsy12.change_investigations %}
+            {% include 'epilepsy12/partials/page_elements/date_field.html' with hx_post=hx_post hx_target="#mri_brain_information" hx_trigger="change delay:300ms" hx_swap="innerHTML" date_value=investigations.mri_brain_requested_date label=investigations.get_mri_brain_requested_date_help_label_text reference=investigations.get_mri_brain_requested_date_help_reference_text data_position="top left" input_date_field_name='mri_brain_requested_date' error_messages=error_messages enabled=perms.epilepsy12.change_investigations has_permission=perms.epilepsy12.change_investigations %}
 
             {% if mri_brain_declined %}
                 <div class="field">
@@ -48,7 +48,7 @@
             {% else %}
 
                 {% url 'mri_brain_reported_date' investigations_id=investigations.pk as hx_post %}
-                {% include 'epilepsy12/partials/page_elements/date_field.html' with hx_post=hx_post hx_target="#mri_brain_information" hx_trigger="change delay:1s" hx_swap="innerHTML" date_value=investigations.mri_brain_reported_date label=investigations.get_mri_brain_reported_date_help_label_text reference=investigations.get_mri_brain_reported_date_help_reference_text data_position="top left" input_date_field_name='mri_brain_reported_date' error_messages=error_messages enabled=perms.epilepsy12.change_investigations has_permission=perms.epilepsy12.change_investigations %}
+                {% include 'epilepsy12/partials/page_elements/date_field.html' with hx_post=hx_post hx_target="#mri_brain_information" hx_trigger="change delay:300ms" hx_swap="innerHTML" date_value=investigations.mri_brain_reported_date label=investigations.get_mri_brain_reported_date_help_label_text reference=investigations.get_mri_brain_reported_date_help_reference_text data_position="top left" input_date_field_name='mri_brain_reported_date' error_messages=error_messages enabled=perms.epilepsy12.change_investigations has_permission=perms.epilepsy12.change_investigations %}
             
                 {% if investigations.mri_brain_requested_date and investigations.mri_brain_reported_date %}
                     <div class="field">
