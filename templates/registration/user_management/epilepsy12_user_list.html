@@ -25,7 +25,7 @@
                     
                     <button 
                     class="ui rcpch_primary button add_user_button {% if not perms.epilepsy12.add_epilepsy12user %}disabled{% endif %}">
-                    <a href="{% url 'create_epilepsy12_user' organisation_id=organisation.pk user_type='organisation-staff' epilepsy12_user_id=user.id %}">Add a new User to {{organisation.name}}</a>
+                    <a href="{% url 'create_epilepsy12_user' organisation_id=organisation.pk user_type='organisation-staff' epilepsy12_user_id=user.id %}">Add a new User to {{organisation.name|title}}</a>
                 </button>
                     
                     {% if user.is_rcpch_staff or user.is_rcpch_team_member or user.is_superuser %}
