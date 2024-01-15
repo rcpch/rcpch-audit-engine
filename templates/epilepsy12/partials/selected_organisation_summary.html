@@ -3,10 +3,11 @@
 {% csrf_token %}
 
 <div class="ui grid container selected_organisation_container">
-
-        <div class="sixteen wide unpadded fluid column topbar">
-            <button class="ui rcpch_positive button jump" _="on click go to top of #kpis">Jump to All KPI Metrics</button>
-            <div class="ui rcpch_view label">Organisation View</div>
+        <div class="view_label_container tables">
+            <div class='back link'>
+                <button class="ui rcpch_positive button jump" _="on click go to top of #kpis">Jump to All KPI Metrics</button>
+            </div>
+            <div class="ui rcpch_view label view_title">Organisation View</div>
         </div>
 
         {% if request.user.is_rcpch_audit_team_member or request.user.is_rcpch_staff or request.user.is_superuser %}

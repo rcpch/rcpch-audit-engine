@@ -76,8 +76,8 @@ a label {
   .view_label_container.tables {
     display: grid;
     grid-template-columns: repeat(3, 1fr);
-    grid-gap: 10px;
     padding-bottom: 1em;
+    width: 100%;
   }
 
   .ui.rcpch_view.label.view_title {
