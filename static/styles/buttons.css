@@ -222,10 +222,9 @@
     background-color: var(--rcpch_strong_blue);
     font-weight: 400;
   }
-  
-  a.ui.button {
+
+  .back.link {
     display: flex;
-    justify-content: center;
     align-items: center;
   }
   

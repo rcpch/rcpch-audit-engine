@@ -71,7 +71,21 @@ a label {
     color: var(--rcpch_dark_grey);
     border-radius: 0%;
   }
-  
+
+  /* ADDS SPACING FOR HEADERS ON TABLE VIEWS USERLIST/CASES */
+  .view_label_container.tables {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    grid-gap: 10px;
+    padding-bottom: 1em;
+  }
+
+  .ui.rcpch_view.label.view_title {
+    font-size: 25px;
+    text-align: center;
+    margin-left: 30px ;
+  }
+
   .ui.rcpch_secret.label > i {
     color: var(--rcpch_pink);
   }
