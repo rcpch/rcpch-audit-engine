@@ -1,14 +1,18 @@
 {% extends "base.html" %}  
 {% block content %}
+<div class="ui rcpch container main_content">
 
-<div class="ui rcpch container">
-
-    <div class='ui top attached rcpch_purple clearing segment'> 
-            <h5 class="ui left floated header">
-                Cohort View
-              </h5>
-    </div>
-    <div class="ui raised attached segment">
+  <div class="view_label_container tables">
+    <div class='back link'>
+      <a href="{% url 'selected_organisation_summary' organisation_id=organisation.pk %}">
+          <button class="ui rcpch_positive button back">
+            <i class="ui chevron circle left icon icon_white"></i>
+            Return to organisation dashboard
+          </button>
+      </a>
+  </div>
+    <div class="ui rcpch_view label view_title">Audit Submissions</div>
+  </div>
       <div class="ui grid">
           
         <div class="sixteen wide fluid column">
@@ -18,8 +22,6 @@
         </div>
           
         <div class="twelve wide notupperpadded column">
-            
-              <a href="{% url 'selected_organisation_summary' organisation_id %}"><button class="ui rcpch_dark_purple button"><i class="ui chevron circle left icon icon_white"></i> Return to organisation view</button></a>
               
               <a href="{% url 'create_case' organisation_id %}"><button class="ui rcpch_purple button">Add a new Child/Young Person</button></a>
               
@@ -45,7 +47,6 @@
       </div>
 
       
-    </div>
     <div class="ui bottom attached rcpch_purple_footer message">
       <i class="warning info circle icon"></i>
       These are all the children and young people registered in all audits since 2022.
