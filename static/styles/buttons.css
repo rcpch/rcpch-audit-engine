@@ -100,6 +100,10 @@
     border-color: var(--rcpch_light_blue);
     font-weight: 400;
   }
+
+  .ui.rcpch_primary.button.bold {
+    font-family: 'Montserrat-Bold' !important;
+  }
   
   .ui.rcpch_primary.button.jump {
     margin: 5px;
@@ -163,6 +167,10 @@
     background-color: var(--rcpch_dark_blue);
     transition-duration: 0.4s;
     font-weight: 400;
+  }
+
+  .ui.rcpch_grey.button.bold {
+    font-family: 'Montserrat-Bold' !important;
   }
   
   #first_paediatric_assessment_date_button {
@@ -263,6 +271,10 @@
     background-color: #8a0400;
     transition-duration: 0.4s;
     font-weight: 400;
+  }
+
+  .ui.rcpch_danger.button.bold {
+    font-family: 'Montserrat-Bold' !important;
   }
 
   /* icons and icon buttons */

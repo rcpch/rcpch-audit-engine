@@ -24,12 +24,12 @@
                 {% if user.is_rcpch_audit_team_member or user.is_superuser %}
                         <!-- Only RCPCH Audit team members and superusers can publish aggregations to the open access page -->
                     <div class="column">
-                        <a class="ui rcpch_grey fluid button" href="{% url 'epilepsy12_user_list' organisation_id=selected_organisation.pk %}">
+                        <a class="ui rcpch_grey button bold fluid" href="{% url 'epilepsy12_user_list' organisation_id=selected_organisation.pk %}">
                             View All {{selected_organisation.name}} Epilepsy12 Staff
                         </a>
                     </div>
                     <div class="column">
-                        <a class="ui rcpch_primary fluid button" href="{% url 'cases' organisation_id=selected_organisation.pk %}">
+                        <a class="ui rcpch_primary button bold fluid " href="{% url 'cases' organisation_id=selected_organisation.pk %}">
                             View All {{selected_organisation.name}} Children
                         </a>
                     </div>
@@ -40,12 +40,12 @@
                 {% else %}
 
                     <div class="eight wide column">
-                        <a class="ui rcpch_grey fluid button" href="{% url 'epilepsy12_user_list' organisation_id=selected_organisation.pk %}">
+                        <a class="ui rcpch_grey button bold fluid" href="{% url 'epilepsy12_user_list' organisation_id=selected_organisation.pk %}">
                             View All {{selected_organisation.name}} Epilepsy12 Staff
                         </a>
                     </div>
                     <div class="eight wide  column">
-                        <a class="ui rcpch_primary fluid button" href="{% url 'cases' organisation_id=selected_organisation.pk %}">
+                        <a class="ui rcpch_primary button bold fluid" href="{% url 'cases' organisation_id=selected_organisation.pk %}">
                             View All {{selected_organisation.name}} Children
                         </a>
                     </div>
