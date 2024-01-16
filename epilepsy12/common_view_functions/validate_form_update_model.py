@@ -45,7 +45,7 @@ def validate_and_update_model(
     """
 
     # initialize models
-    Syndrome = apps.get_model("epilepsy12", "Syndrome")
+    SyndromeList = apps.get_model("epilepsy12", "SyndromeList")
     EpilepsyCause = apps.get_model("epilepsy12", "EpilepsyCause")
     Medicine = apps.get_model("epilepsy12", "Medicine")
     Registration = apps.get_model("epilepsy12", "Registration")
@@ -71,7 +71,7 @@ def validate_and_update_model(
 
     elif page_element == "select" or page_element == "snomed_select":
         if request.htmx.trigger_name == "syndrome_name":
-            syndrome_entity = Syndrome.objects.get(
+            syndrome_entity = SyndromeList.objects.get(
                 pk=request.POST.get(request.htmx.trigger_name)
             )
             field_value = syndrome_entity  # note field name here is syndrome
