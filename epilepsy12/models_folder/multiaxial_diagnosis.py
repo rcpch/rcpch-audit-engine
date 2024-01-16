@@ -161,6 +161,7 @@ class MultiaxialDiagnosis(
     class Meta:
         verbose_name = "Multiaxial Diagnosis"
         verbose_name_plural = "Multiaxial diagnosis assessments"
+        ordering = ["registration__case"]
 
     def __str__(self) -> str:
         return f"Multaxial diagnosis for {self.registration.case}"
