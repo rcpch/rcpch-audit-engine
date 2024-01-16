@@ -62,6 +62,7 @@ class Comorbidity(
     class Meta:
         verbose_name = "Comorbidity"
         verbose_name_plural = "Comorbidities"
+        ordering = ["multiaxial_diagnosis__registration__case", "comorbidityentity"]
 
     def __str__(self) -> str:
-        return self.comorbidityentity.preferredTerm
+        return f"{self.comorbidityentity.preferredTerm} - {self.multiaxial_diagnosis.registration.case}"
