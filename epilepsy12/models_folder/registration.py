@@ -99,6 +99,7 @@ class Registration(
     class Meta:
         verbose_name = "Registration"
         verbose_name_plural = "Registrations"
+        ordering = ["case"]
         permissions = [
             CAN_APPROVE_ELIGIBILITY,
             CAN_REGISTER_CHILD_IN_EPILEPSY12,
