@@ -8,6 +8,7 @@ from ..constants import TRUSTS
 # Logging setup
 logger = logging.getLogger(__name__)
 
+
 def seed_trusts(apps, schema_editor):
     """
     Seed function which populates the Trust table from JSON and links to BoundaryEntity table.
@@ -21,9 +22,9 @@ def seed_trusts(apps, schema_editor):
     Trust = apps.get_model("epilepsy12", "Trust")
 
     if Trust.objects.all().count == 242:
-        logger.debug("\033[31m", "242 Trusts already seeded. Skipping...", "\033[31m")
+        logger.debug("\033[31m 242 Trusts already seeded. Skipping... \033[31m")
     else:
-        logger.debug("\033[31m", "Adding new Trusts...", "\033[31m")
+        logger.debug("\033[31m Adding new Trusts... \033[31m")
 
         for added, trust in enumerate(TRUSTS):
             try:

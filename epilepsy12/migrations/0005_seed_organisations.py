@@ -16,6 +16,7 @@ from ..constants import (
 # Logging setup
 logger = logging.getLogger(__name__)
 
+
 def seed_organisations(apps, schema_editor):
     """
     Seed function which populates the Organisation table from JSON.
@@ -37,13 +38,9 @@ def seed_organisations(apps, schema_editor):
     wales = Country.objects.get(boundary_identifier="W92000004")
 
     if Organisation.objects.all().count() >= 330:
-        logger.debug(
-            "\033[31m",
-            "329 RCPCH organisations already seeded. Skipping...",
-            "\033[31m",
-        )
+        logger.debug("\033[31m 329 RCPCH organisations already seeded. Skipping...")
     else:
-        logger.debug("\033[31m", "Adding new RCPCH organisations...", "\033[31m")
+        logger.debug("\033[31m Adding new RCPCH organisations... \033[31m")
 
         for added, rcpch_organisation in enumerate(RCPCH_ORGANISATIONS):
             # Apply longitude and latitude data, if exists
@@ -133,9 +130,7 @@ def seed_organisations(apps, schema_editor):
         logger.debug(f"{added+1} organisations added.")
 
     logger.debug(
-        "\033[31m",
-        "Updating RCPCH organisations with ICB, NHS England relationships...",
-        "\033[31m",
+        "\033[31m Updating RCPCH organisations with ICB, NHS England relationships..."
     )
     # add integrated care boards and NHS regions to organisations
     for added, icb_trust in enumerate(INTEGRATED_CARE_BOARDS_LOCAL_AUTHORITIES):
@@ -175,15 +170,11 @@ def seed_organisations(apps, schema_editor):
                 f"Unable to find {icb_trust['ODS Trust Code']} when updating {icb_trust['ODS ICB Code']} ICB and {icb_trust['NHS England Region Code']} NHS England Region!"
             )
     logger.debug(
-        "\033[31m",
-        f"Updated {added+1} RCPCH organisations with ICB, NHS England relationships...",
-        "\033[31m",
+        f"\033[31m Updated {added+1} RCPCH organisations with ICB, NHS England relationships... \033[31m"
     )
 
     logger.debug(
-        "\033[31m",
-        "Updating all RCPCH organisations with OPEN UK network relationships...",
-        "\033[31m",
+        "\033[31m Updating all RCPCH organisations with OPEN UK network relationships... \033[31m"
     )
     # openuk_network
     for added, trust_openuk_network in enumerate(OPEN_UK_NETWORKS_TRUSTS):
@@ -211,9 +202,7 @@ def seed_organisations(apps, schema_editor):
         # upoate the OPENUK netowork for all the Organisations in this trust
         Organisation.objects.filter(query_term).update(openuk_network=openuk_network)
     logger.debug(
-        "\033[31m",
-        f"Updated {added+1} RCPCH organisations with OPENUK relationships...",
-        "\033[31m",
+        f"\033[31m Updated {added+1} RCPCH organisations with OPENUK relationships..."
     )
 
 

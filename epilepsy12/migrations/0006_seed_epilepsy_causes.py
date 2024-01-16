@@ -8,6 +8,7 @@ from ..general_functions import fetch_ecl
 # Logging setup
 logger = logging.getLogger(__name__)
 
+
 def seed_epilepsy_causes(apps, schema_editor):
     """
     This returns all the snomed ct definitions and codes for epilepsy causes.
@@ -17,7 +18,7 @@ def seed_epilepsy_causes(apps, schema_editor):
     # Get models
     EpilepsyCause = apps.get_model("epilepsy12", "EpilepsyCause")
 
-    logger.debug("\033[33m", "Seeding all the epilepsy causes from SNOMED...", "\033[33m")
+    logger.debug("\033[33m Seeding all the epilepsy causes from SNOMED... \033[33m")
     if EpilepsyCause.objects.count() > 150:
         logger.debug("Causes already exist. Skipping this step...")
         return
@@ -26,7 +27,7 @@ def seed_epilepsy_causes(apps, schema_editor):
     # calls the rcpch deprivare server for a list of causes using ECL query language
     epilepsy_causes = fetch_ecl(ecl)
     for cause in epilepsy_causes:
-        if EpilepsyCause.objects.filter(conceptId=cause['conceptId']).exists():
+        if EpilepsyCause.objects.filter(conceptId=cause["conceptId"]).exists():
             # duplicate conceptId
             pass
         else:
