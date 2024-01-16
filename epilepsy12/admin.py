@@ -1,3 +1,4 @@
+from typing import Any
 from django.contrib import admin
 from django.contrib.auth.admin import UserAdmin
 from simple_history.admin import SimpleHistoryAdmin
@@ -14,19 +15,6 @@ class Epilepsy12UserAdmin(UserAdmin, SimpleHistoryAdmin):
         "surname",
         "role",
         "is_active",
-    )
-    list_display = (
-        "id",
-        "email",
-        "title",
-        "first_name",
-        "surname",
-        "is_active",
-        "role",
-        "organisation_employer",
-        "is_superuser",
-        "is_rcpch_audit_team_member",
-        "email_confirmed",
     )
     list_filter = (
         "is_active",
@@ -123,7 +111,7 @@ class Epilepsy12UserAdmin(UserAdmin, SimpleHistoryAdmin):
         return form
 
 
-class CaseAdmin(admin.ModelAdmin):
+class CaseAdmin(SimpleHistoryAdmin):
     search_fields = ["first_name", "surname", "nhs_number", "date_of_birth"]
 
 
