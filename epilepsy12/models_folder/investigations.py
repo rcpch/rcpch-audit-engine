@@ -134,6 +134,7 @@ class Investigations(
     class Meta:
         verbose_name = "Investigations"
         verbose_name_plural = "Investigations"
+        ordering = ["registration__case"]
 
     def __str__(self) -> str:
         return f"Investigations for {self.registration.case}"
