@@ -61,7 +61,7 @@ class Syndrome(TimeStampAbstractBaseClass, UserStampAbstractBaseClass, HelpTextM
 
     def __str__(self) -> str:
         return (
-            f"{self.syndrome.syndrome_name} on {self.syndrome_diagnosis_date}"
+            f"{self.syndrome.syndrome_name} on {self.syndrome_diagnosis_date} for {self.multiaxial_diagnosis.registration.case}"
             if self.syndrome
             else f"Empty syndrome"
         )
@@ -69,3 +69,4 @@ class Syndrome(TimeStampAbstractBaseClass, UserStampAbstractBaseClass, HelpTextM
     class Meta:
         verbose_name = "Syndrome"
         verbose_name_plural = "Syndromes"
+        ordering = ["multiaxial_diagnosis__registration__case"]
