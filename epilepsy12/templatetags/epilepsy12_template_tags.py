@@ -475,6 +475,19 @@ def no_eligible_cases(aggregation_model, kpi_name: str):
     )
 
 
+# A filter which fully capitalises specific words in the organisation name, the list of which found in 'capitalised_words' below
+@register.filter
+def capitalise_org_names(organisation_name):
+    capitalised_words = ['Ii', 'Rbh', 'Nhs', 'Cdc', '(Hq)', '(Epma)', '(Epact)', 'Gstt', 'Qmc', 'Ctr']
+    organisation_name = organisation_name.split()
+    for i in range(len(organisation_name)):
+        for j in range(len(capitalised_words)):
+            if capitalised_words[j] == organisation_name[i]:
+                organisation_name[i] = organisation_name[i].upper()
+    organisation_name = ' '.join(organisation_name)
+    return mark_safe(organisation_name)
+
+
 # TWO FACTOR TAGS
 @register.filter
 def get_org_id_from_user(user):
