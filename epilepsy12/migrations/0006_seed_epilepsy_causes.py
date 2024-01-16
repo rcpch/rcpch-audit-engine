@@ -18,9 +18,9 @@ def seed_epilepsy_causes(apps, schema_editor):
     # Get models
     EpilepsyCause = apps.get_model("epilepsy12", "EpilepsyCause")
 
-    logger.debug("\033[33m Seeding all the epilepsy causes from SNOMED... \033[33m")
+    logger.info("\033[33m Seeding all the epilepsy causes from SNOMED... \033[33m")
     if EpilepsyCause.objects.count() > 150:
-        logger.debug("Causes already exist. Skipping this step...")
+        logger.info("Causes already exist. Skipping this step...")
         return
     index = 0
     ecl = "<< 363235000"
@@ -40,8 +40,8 @@ def seed_epilepsy_causes(apps, schema_editor):
                 new_cause.save()
                 index += 1
             except Exception as e:
-                logger.debug(f"Epilepsy cause {cause['preferredTerm']} not added. {e}")
-    logger.debug(f"{index} epilepsy causes added")
+                logger.info(f"Epilepsy cause {cause['preferredTerm']} not added. {e}")
+    logger.info(f"{index} epilepsy causes added")
 
 
 class Migration(migrations.Migration):
