@@ -7,15 +7,12 @@
             <h5 class="ui header">
                 <div class='content'>
                     When
-                    <div class='sub header'>
-                        When did the first episode of this type happen?
-                    </div>
                 </div>
             </h5>
     
         <div class="field">
             {% url 'seizure_onset_date' episode_id=episode.pk as hx_post %}
-            {% include 'epilepsy12/partials/page_elements/date_field.html' with hx_post=hx_post hx_target='#episodes' hx_trigger='change delay:1s' hx_swap="innerHTML" date_value=episode.seizure_onset_date label=episode.get_seizure_onset_date_help_label_text reference=episode.get_seizure_onset_date_help_reference_text input_date_field_name='seizure_onset_date' enabled=perms.epilepsy12.change_episode has_permission=perms.epilepsy12.change_episode %}
+            {% include 'epilepsy12/partials/page_elements/date_field.html' with hx_post=hx_post hx_target='#episodes' hx_trigger='change delay:300ms' hx_swap="innerHTML" date_value=episode.seizure_onset_date label=episode.get_seizure_onset_date_help_label_text reference=episode.get_seizure_onset_date_help_reference_text input_date_field_name='seizure_onset_date' enabled=perms.epilepsy12.change_episode has_permission=perms.epilepsy12.change_episode %}
         </div>
         {% if error_message %}
             <div class='ui rcpch_warning message'>
@@ -43,9 +40,6 @@
             </span>
             <div class='content'>
                     Description
-                <div class='sub header'>
-                Describes the event(s)
-                </div>
             </div>
         </h5>
 
@@ -71,10 +65,7 @@
                 <div class="ui rcpch_pink circular label">E</div>
             </span>
             <div class='content'>
-                    Epilepsy
-                <div class='sub header'>
-                Is this episode(s) epileptic?
-                </div>
+                Epilepsy
             </div>
         </h5>
 

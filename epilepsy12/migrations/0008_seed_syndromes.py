@@ -27,10 +27,10 @@ def seed_syndromes(apps, schema_editor):
         None
     """
     added = 0
-    logger.debug("\033[33m", "Seeding all the syndromes...", "\033[33m")
+    logger.info("\033[33m Seeding all the syndromes... \033[33m")
     for syndrome in sorted(SYNDROMES, key=itemgetter(1)):
         if SyndromeList.objects.filter(syndrome_name=syndrome[1]).exists():
-            logger.debug("Syndromes already exist. Skipping this step...")
+            logger.info("Syndromes already exist. Skipping this step...")
             return
         new_syndrome = SyndromeList(
             syndrome_name=syndrome[1],
@@ -38,10 +38,10 @@ def seed_syndromes(apps, schema_editor):
         try:
             new_syndrome.save()
         except Exception as e:
-            logger.debug(f"Error at {syndrome[1]}: error: {e}")
+            logger.error(f"Error at {syndrome[1]}: error: {e}")
         added += 1
-        logger.debug(f"added {syndrome[1]}")
-    logger.debug(f"Syndromes added...{added}")
+        logger.info(f"added {syndrome[1]}")
+    logger.info(f"Syndromes added...{added}")
 
 
 class Migration(migrations.Migration):

@@ -1,5 +1,5 @@
 {% load epilepsy12_template_tags %}
-<div class="ui form" 
+<div class="ui form"
     hx-headers='{"X-CSRFToken": "{{ csrf_token }}"}'
     hx-get="{% url 'registration_status' registration_id=registration.pk %}"
     hx-swap="outerHTML"
@@ -8,31 +8,30 @@
     <h5>First paediatric assessment date</h5>
     <div class="two fields" >
 
-            <div class='field'>
-        
-                <div class='two fields'>
+            <div class="field">
 
+                <div class="two fields">
 
                     {% if registration.first_paediatric_assessment_date %}
-                    
+
                             <div class="twelve wide field">
                                 <label>{{registration.get_first_paediatric_assessment_date_help_label_text}}</label>
-                                <button class="ui rcpch_primary disabled fluid button" id='first_paediatric_assessment_date_button'>{{registration.first_paediatric_assessment_date}}</button>
+                                <button class="ui rcpch_primary disabled fluid button" id="first_paediatric_assessment_date_button">{{registration.first_paediatric_assessment_date}}</button>
                             </div>
 
                     {% else %}
 
-                        <div class='twelve wide field'>
+                        <div class="twelve wide field">
                             {% url 'first_paediatric_assessment_date' case_id=case_id as hx_post %}
-                            {% include 'epilepsy12/partials/page_elements/date_field.html' with hx_post=hx_post hx_target='#first_paediatric_assessment_date_results' hx_trigger='change delay:1s' hx_swap='innerHTML' label=registration.get_first_paediatric_assessment_date_help_label_text reference=registration.get_first_paediatric_assessment_date_help_reference_text date_value=registration.first_paediatric_assessment_date data_position='top right' input_date_field_name='first_paediatric_assessment_date' enabled=registration.eligibility_criteria_met error_message=error_message hx_confirm="Please confirm this is the correct date. This step cannot be undone." has_permission=perms.epilepsy12.can_register_child_in_epilepsy12 %}
+                            {% include 'epilepsy12/partials/page_elements/date_field.html' with hx_post=hx_post hx_target='#first_paediatric_assessment_date_results' hx_trigger='change delay:300ms' hx_swap='innerHTML' label=registration.get_first_paediatric_assessment_date_help_label_text reference=registration.get_first_paediatric_assessment_date_help_reference_text date_value=registration.first_paediatric_assessment_date data_position='top right' input_date_field_name='first_paediatric_assessment_date' enabled=registration.eligibility_criteria_met error_message=error_message hx_confirm="Please confirm this is the correct date. This step cannot be undone." has_permission=perms.epilepsy12.can_register_child_in_epilepsy12 %}
                         </div>
 
                     {% endif %}
 
                     <div class="four wide field">
                         <label>Cohort</label>
-                        <div class='ui rcpch input'>
-                            <input type="text" readonly="" placeholder="{{registration.cohort}}"/>
+                        <div class="ui rcpch input">
+                            <input type="text" readonly="" placeholder="{% if registration.cohort %}{{registration.cohort}}{% else %}-{% endif %}" />
                         </div>
                     </div>
 
@@ -40,20 +39,20 @@
 
             </div>
 
-            <div class='field'>
-                <div class='two fields'>
+            <div class="field">
+                <div class="two fields">
 
                     <div class="field">
                         <label>Completed First Year</label>
-                        <div class='ui rcpch input'>
-                            <input type="text" readonly="" placeholder="{{registration.completed_first_year_of_care_date}}"/>
+                        <div class="ui rcpch input">
+                            <input type="text" readonly="" placeholder="{% if registration.completed_first_year_of_care_date %}{{registration.completed_first_year_of_care_date}}{% else %}No date entered{% endif %}" />
                         </div>
                     </div>
 
                     <div class="field">
                         <label>Submission Deadline</label>
-                        <div class='ui rcpch input'>
-                            <input type="text" readonly="" placeholder="{{registration.audit_submission_date}}"/>
+                        <div class="ui rcpch input">
+                            <input type="text" readonly="" placeholder="{% if registration.audit_submission_date %}{{registration.audit_submission_date}}{% else %}No deadline entered{% endif %}" />
                         </div>
                     </div>
 
@@ -62,7 +61,7 @@
 
     </div>
     {% if error_message %}
-        <div class='ui rcpch_warning message'>
+        <div class="ui rcpch_warning message">
             {{ error_message }}
         </div>
     {% endif %}

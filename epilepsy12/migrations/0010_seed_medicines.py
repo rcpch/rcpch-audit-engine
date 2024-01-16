@@ -23,10 +23,8 @@ def seed_medicines(apps, schema_editor):
     None
     """
     Medicine = apps.get_model("epilepsy12", "Medicine")
-    logger.debug(
-        "\033[33m",
-        "Seeding all the medicines from SNOMED and local Epilepsy12 list...",
-        "\033[33m",
+    logger.info(
+        "\033[33m Seeding all the medicines from SNOMED and local Epilepsy12 list... \033[33m",
     )
     for benzo in SNOMED_BENZODIAZEPINE_TYPES:
         if not Medicine.objects.filter(medicine_name=benzo[1]).exists():
@@ -52,7 +50,7 @@ def seed_medicines(apps, schema_editor):
                 )
                 new_drug.save()
         else:
-            logger.debug(f"{benzo[1]} exists. Skipping...")
+            logger.info(f"{benzo[1]} exists. Skipping...")
     for aem in SNOMED_ANTIEPILEPSY_MEDICINE_TYPES:
         if not Medicine.objects.filter(medicine_name=aem[1], is_rescue=False).exists():
             # if the drug is not in the database already
@@ -76,8 +74,8 @@ def seed_medicines(apps, schema_editor):
                 )
                 aem_drug.save()
         else:
-            logger.debug(f"{aem_drug[1]} exists. Skipping...")
-    logger.debug("All medicines added.")
+            logger.info(f"{aem_drug[1]} exists. Skipping...")
+    logger.info("All medicines added.")
 
 
 class Migration(migrations.Migration):

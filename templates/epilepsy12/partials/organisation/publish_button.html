@@ -3,9 +3,9 @@
 {%else%}
     <button 
         {% if perms.epilepsy12.can_publish_epilepsy12_data %}
-            class='ui fluid rcpch_danger button'
+            class='ui fluid rcpch_danger button bold'
         {% else %}
-            class='ui fluid disabled rcpch_danger button'
+            class='ui fluid disabled rcpch_danger button bold'
         {% endif %}
         style="height: 100%;"
         hx-get="{% url 'publish_kpis' organisation_id=selected_organisation.pk %}"

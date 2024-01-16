@@ -15,7 +15,7 @@
         <div class="three fields">
             
             {% url 'eeg_request_date' investigations_id=investigations.pk as hx_post %}
-            {% include 'epilepsy12/partials/page_elements/date_field.html' with hx_post=hx_post hx_target="#eeg_information" hx_trigger="change delay:1s" hx_swap="innerHTML" date_value=investigations.eeg_request_date label=investigations.get_eeg_request_date_help_label_text reference=investigations.get_eeg_request_date_help_reference_text data_position="top left" input_date_field_name='eeg_request_date' enabled=perms.epilepsy12.change_investigations has_permission=perms.epilepsy12.change_investigations %}
+            {% include 'epilepsy12/partials/page_elements/date_field.html' with hx_post=hx_post hx_target="#eeg_information" hx_trigger="change delay:300ms" hx_swap="innerHTML" date_value=investigations.eeg_request_date label=investigations.get_eeg_request_date_help_label_text reference=investigations.get_eeg_request_date_help_reference_text data_position="top left" input_date_field_name='eeg_request_date' enabled=perms.epilepsy12.change_investigations has_permission=perms.epilepsy12.change_investigations %}
 
             {% if eeg_declined %}
                 <div class="field">
@@ -48,7 +48,7 @@
             {% else %}
 
                 {% url 'eeg_performed_date' investigations_id=investigations.pk as hx_post %}
-                {% include 'epilepsy12/partials/page_elements/date_field.html' with hx_post=hx_post hx_target="#eeg_information" hx_trigger="change delay:1s" hx_swap="innerHTML" date_value=investigations.eeg_performed_date label=investigations.get_eeg_performed_date_help_label_text reference=investigations.get_eeg_performed_date_help_reference_text data_position="top left" input_date_field_name='eeg_performed_date' enabled=perms.epilepsy12.change_investigations has_permission=perms.epilepsy12.change_investigations %}
+                {% include 'epilepsy12/partials/page_elements/date_field.html' with hx_post=hx_post hx_target="#eeg_information" hx_trigger="change delay:300ms" hx_swap="innerHTML" date_value=investigations.eeg_performed_date label=investigations.get_eeg_performed_date_help_label_text reference=investigations.get_eeg_performed_date_help_reference_text data_position="top left" input_date_field_name='eeg_performed_date' enabled=perms.epilepsy12.change_investigations has_permission=perms.epilepsy12.change_investigations %}
             
                 {% if investigations.eeg_request_date and investigations.eeg_performed_date %}
                     <div class="field">

@@ -81,7 +81,7 @@ jobs:
 
       - name: Run tests
         run: |
-          docker compose exec django pytest -v $*
+          docker compose exec django pytest -v
 
 
 
