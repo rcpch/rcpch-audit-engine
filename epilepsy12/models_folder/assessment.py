@@ -220,6 +220,7 @@ class Assessment(TimeStampAbstractBaseClass, UserStampAbstractBaseClass, HelpTex
     class Meta:
         verbose_name = "Assessment"
         verbose_name_plural = "Assessment"
+        ordering = ["registration__case"]
 
     def __str__(self) -> str:
         return f"Assessment Milestones for {self.registration.case}"
