@@ -123,6 +123,7 @@ class AntiEpilepsyMedicine(
     class Meta:
         verbose_name = "Antiepilepsy Medicine"
         verbose_name_plural = "Antiepilepsy Medicines"
+        ordering = ["management__registration__case"]
 
     @property
     def length_of_treatment(self):
@@ -150,6 +151,6 @@ class AntiEpilepsyMedicine(
 
     def __str__(self) -> str:
         if self.medicine_entity is not None:
-            return self.medicine_entity.medicine_name
+            return f"{self.medicine_entity.medicine_name} for {self.management.registration.case}"
         else:
             return "No medicine supplied"
