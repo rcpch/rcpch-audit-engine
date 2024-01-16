@@ -177,6 +177,7 @@ class Management(TimeStampAbstractBaseClass, UserStampAbstractBaseClass, HelpTex
     class Meta:
         verbose_name = "Management"
         verbose_name_plural = "Management Plans"
+        ordering = ["registration__case"]
 
     def __str__(self) -> str:
         return f"Management Plans for {self.registration.case}"
