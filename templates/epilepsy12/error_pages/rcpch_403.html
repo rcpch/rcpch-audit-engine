@@ -37,18 +37,25 @@
         <div class="ui centered grid">
             <div class="column">
                 <div class="ui sizer vertical segment">
-                    <h2 class="ui left aligned header">You need additional privileges in order to go any further</h2>
+                    <h2 class="ui left aligned header">You may need to sign in again to go further</h2>
                     <h5 class="ui subheader">
                         You are seeing this message because you are trying to access a page where you are not logged in or you don't have the right permissions.
                         If this persists, please contact your local Epilepsy12 administrator or the RCPCH at
                         {% include 'epilepsy12/partials/contact_email.html' %}
                         .
                     </h5>
-                    <img class="ui fluid image"
-                         src="{% static 'styles/images/RCPCH_Epilepsy12_2018_Illustrations_R522.png' %}" />
                 </div>
             </div>
+        </div> 
+        <div class='centered_button_container'>
+            <a class="ui rcpch_light_blue button re_sign_in" href="{% url 'login' %}">
+                Sign In Again
+            </a>
         </div>
+        <div>
+            <img class="ui fluid image"
+                    src="{% static 'styles/images/RCPCH_Epilepsy12_2018_Illustrations_R522.png' %}" />
+        </div> 
     {% endif %}
-</div>
-{% endblock %}
+    {% endblock %}
+    
