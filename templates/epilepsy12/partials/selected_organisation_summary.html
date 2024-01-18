@@ -25,12 +25,18 @@
                         <!-- Only RCPCH Audit team members and superusers can publish aggregations to the open access page -->
                     <div class="column">
                         <a class="ui rcpch_grey button bold fluid" href="{% url 'epilepsy12_user_list' organisation_id=selected_organisation.pk %}">
-                            View All Epilepsy12 Staff of {{selected_organisation.name|title}} 
+                            View All Epilepsy12 Staff of 
+                            {% with organisation_name=selected_organisation.name|title %}
+                            {{ organisation_name|capitalise_org_names }} 
+                            {% endwith %}
                         </a>
                     </div>
                     <div class="column">
                         <a class="ui rcpch_primary button bold fluid " href="{% url 'cases' organisation_id=selected_organisation.pk %}">
-                            View All Children of {{selected_organisation.name|title}} 
+                            View All Children of
+                            {% with organisation_name=selected_organisation.name|title %}
+                            {{ organisation_name|capitalise_org_names }} 
+                            {% endwith %}
                         </a>
                     </div>
                     <div class="column" id="publish_button">
@@ -41,12 +47,18 @@
 
                     <div class="eight wide column">
                         <a class="ui rcpch_grey button bold fluid" href="{% url 'epilepsy12_user_list' organisation_id=selected_organisation.pk %}">
-                            View All Epilepsy12 Staff of {{selected_organisation.name|title}}
+                            View All Epilepsy12 Staff of
+                            {% with organisation_name=selected_organisation.name|title %}
+                            {{ organisation_name|capitalise_org_names }} 
+                            {% endwith %}
                         </a>
                     </div>
                     <div class="eight wide  column">
                         <a class="ui rcpch_primary button bold fluid" href="{% url 'cases' organisation_id=selected_organisation.pk %}">
-                            View All Children of {{selected_organisation.name|title}} 
+                            View All Children of 
+                            {% with organisation_name=selected_organisation.name|title %}
+                            {{ organisation_name|capitalise_org_names }} 
+                            {% endwith %}
                         </a>
                     </div>
 
