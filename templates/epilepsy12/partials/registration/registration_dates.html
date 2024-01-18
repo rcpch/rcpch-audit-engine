@@ -14,16 +14,28 @@
 
                     {% if registration.first_paediatric_assessment_date %}
 
-                            <div class="twelve wide field">
-                                <label>{{registration.get_first_paediatric_assessment_date_help_label_text}}</label>
-                                <button class="ui rcpch_primary disabled fluid button" id="first_paediatric_assessment_date_button">{{registration.first_paediatric_assessment_date}}</button>
-                            </div>
+                        <div class="twelve wide field">
+                            {% if user.is_rcpch_audit_team_member or user.is_superuser %}
+                                {% url 'first_paediatric_assessment_date' case_id=case_id as hx_post %}
+                                {% include 'epilepsy12/partials/page_elements/date_field.html' with hx_post=hx_post hx_target='#first_paediatric_assessment_date_results' hx_trigger='change delay:1s' hx_swap='innerHTML' label=registration.get_first_paediatric_assessment_date_help_label_text                             reference=registration.get_first_paediatric_assessment_date_help_reference_text date_value=registration.first_paediatric_assessment_date data_position='top right' input_date_field_name='first_paediatric_assessment_date' enabled=registration.eligibility_criteria_met error_message=error_message hx_confirm="Please confirm this is the correct date. This step can only be undone by Epilepsy12 staff." has_permission=perms.epilepsy12.can_register_child_in_epilepsy12 %}
+                            {% else %}
+                                <label>{{registration.get_first_paediatric_assessment_date_help_label_text}}
+                                <span class="field" id="first_paediatric_assessment_date_tooltip" data-title="Reference" data-content="{{registration.get_first_paediatric_assessment_date_help_reference_text}}"
+                                    data-position="top right" data-variation="basic" _="init js $('#first_paediatric_assessment_date_tooltip').popup(); end">
+                                <i class="rcpch question circle icon"></i>
+                                </span>
+                                </label>
+                                <button class="ui rcpch_primary disabled fluid button" id="first_paediatric_assessment_date_button">
+                                    {{registration.first_paediatric_assessment_date}}
+                                </button>
+                            {% endif %}
+                        </div>
 
                     {% else %}
 
                         <div class="twelve wide field">
                             {% url 'first_paediatric_assessment_date' case_id=case_id as hx_post %}
-                            {% include 'epilepsy12/partials/page_elements/date_field.html' with hx_post=hx_post hx_target='#first_paediatric_assessment_date_results' hx_trigger='change delay:1s' hx_swap='innerHTML' label=registration.get_first_paediatric_assessment_date_help_label_text reference=registration.get_first_paediatric_assessment_date_help_reference_text date_value=registration.first_paediatric_assessment_date data_position='top right' input_date_field_name='first_paediatric_assessment_date' enabled=registration.eligibility_criteria_met error_message=error_message hx_confirm="Please confirm this is the correct date. This step cannot be undone." has_permission=perms.epilepsy12.can_register_child_in_epilepsy12 %}
+                            {% include 'epilepsy12/partials/page_elements/date_field.html' with hx_post=hx_post hx_target='#first_paediatric_assessment_date_results' hx_trigger='change delay:1s' hx_swap='innerHTML' label=registration.get_first_paediatric_assessment_date_help_label_text reference=registration.get_first_paediatric_assessment_date_help_reference_text date_value=registration.first_paediatric_assessment_date data_position='top right' input_date_field_name='first_paediatric_assessment_date' enabled=registration.eligibility_criteria_met error_message=error_message hx_confirm="Please confirm this is the correct date. This step can only be undone by Epilepsy12 staff." has_permission=perms.epilepsy12.can_register_child_in_epilepsy12 %}
                         </div>
 
                     {% endif %}

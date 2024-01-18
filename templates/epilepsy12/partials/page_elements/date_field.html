@@ -12,15 +12,15 @@
         enabled
         hx_confirm
         tooltip_id: this is the name of the field to update
-        has_permission: boolean 
+        has_permission: boolean
     NOTE - in the view, the value of the date can be retrieved by request.POST.get(FIELD_NAME_AS_A_STRING)
 {% endcomment %}
 
     <div class="field">
-        
-        <h5>
+
+        <h5 style="margin-bottom:7px;">
             {{label}}&nbsp;
-            <span 
+            <span
                 id="{{input_date_field_name}}"
                 data-title="Reference"
                 data-content="{{reference}}"
@@ -35,7 +35,7 @@
             <div class='field error'>
         {% endif %}
             <div class='ui left icon input'>
-                <input 
+                <input
                     {% if not enabled %}disabled{% endif %}
                     {% if hx_confirm %}
                     _="on htmx:confirm(issueRequest)
@@ -56,8 +56,8 @@
                     hx-headers='{"X-CSRFToken": "{{ csrf_token }}"}'
                     hx-swap="{{hx_swap}}"
                     name="{{input_date_field_name}}"
-                    hx-post="{{hx_post}}" 
-                    hx-target="{{hx_target}}" 
+                    hx-post="{{hx_post}}"
+                    hx-target="{{hx_target}}"
                     hx-trigger="{{hx_trigger}}"
                     value="{{date_value|date:'Y-m-d'}}">
                     {% if date_value is None or error_message %}
@@ -70,19 +70,19 @@
                 </input>
                 <i class="htmx-indicator spinner loading icon" id="spinner"></i>
             </div>
-            
+
             {% if error_message %}
             <i>{{error_message}}</i>
         </div>
         {% endif %}
-        
+
         {% if not has_permission %}
             <small class='rcpch_warning_label'>You do not have permission to update this field</small>
         {% endif %}
-        
+
     </div>
-    
-    
+
+
     <div class="ui mini modal">
         <div class="header">Confirmation Required</div>
         <div class="content">
