@@ -14,7 +14,7 @@
 
     <div class="field">
       {% url 'syndrome_diagnosis_date' syndrome_id=syndrome.pk as hx_post %} 
-      {% include 'epilepsy12/partials/page_elements/date_field.html' with hx_post=hx_post hx_target="#syndrome" hx_trigger='change delay:300ms' hx_swap="outerHTML" hx_name='syndrome_diagnosis_date' date_value=syndrome.syndrome_diagnosis_date label=syndrome.get_syndrome_diagnosis_date_help_label_text reference=syndrome.get_syndrome_diagnosis_date_help_reference_text input_date_field_name='syndrome_diagnosis_date' data_position='top left' enabled=perms.epilepsy12.change_syndrome has_permission=perms.epilepsy12.change_syndrome %}
+      {% include 'epilepsy12/partials/page_elements/date_field.html' with hx_post=hx_post hx_target="#syndrome" hx_trigger='change delay:300ms' hx_swap="outerHTML" hx_name='syndrome_diagnosis_date' date_value=syndrome.syndrome_diagnosis_date label=syndrome.get_syndrome_diagnosis_date_help_label_text reference=syndrome.get_syndrome_diagnosis_date_help_reference_text input_date_field_name='syndrome_diagnosis_date' data_position='top left' enabled=perms.epilepsy12.change_syndrome has_permission=perms.epilepsy12.change_syndrome error_message=error_message %}
     </div>
 
     <div class="field">
