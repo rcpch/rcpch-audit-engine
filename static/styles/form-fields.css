@@ -97,3 +97,7 @@
 .ui.form.field > label {
   font-weight: 400;
 }
+
+h5.header {
+  font-family: Montserrat-Bold !important;
+}

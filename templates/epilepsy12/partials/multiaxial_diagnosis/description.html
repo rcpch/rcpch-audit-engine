@@ -13,17 +13,6 @@
     hx-trigger="keyup"
   >
     <div class="ui left icon input">
-      {% if episode.description|length > 0 %}
-      <i class="rcpch_pink check circle outline icon"></i>
-      {% else %}
-      <span
-        data-tooltip="Incomplete field. This must be scored to complete the record."
-        data-inverted=""
-        data-position="{{data_position}}"
-      >
-        <i class="rcpch_light_blue dot circle outline icon"></i>
-      </span>
-      {% endif %}
 
       <textarea
         {% if not perms.epilepsy12.change_multiaxialdiagnosis %}

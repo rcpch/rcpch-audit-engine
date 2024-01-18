@@ -22,9 +22,9 @@ def seed_trusts(apps, schema_editor):
     Trust = apps.get_model("epilepsy12", "Trust")
 
     if Trust.objects.all().count == 242:
-        logger.debug("\033[31m 242 Trusts already seeded. Skipping... \033[31m")
+        logger.info("\033[31m 242 Trusts already seeded. Skipping... \033[31m")
     else:
-        logger.debug("\033[31m Adding new Trusts... \033[31m")
+        logger.info("\033[31m Adding new Trusts... \033[31m")
 
         for added, trust in enumerate(TRUSTS):
             try:
@@ -37,11 +37,11 @@ def seed_trusts(apps, schema_editor):
                     postcode=trust["postcode"],
                     country=trust["country"],
                 ).save()
-                logger.debug(f"{added+1}: {trust['trust_name']}")
+                logger.info(f"{added+1}: {trust['trust_name']}")
             except Exception as error:
-                logger.debug(f"Unable to save {trust['trust_name']}: {error}")
+                logger.error(f"Unable to save {trust['trust_name']}: {error}")
 
-        logger.debug(f"{added+1} trusts added.")
+        logger.info(f"{added+1} trusts added.")
 
 
 class Migration(migrations.Migration):

@@ -62,7 +62,7 @@
                 {% url 'individualised_care_plan_addresses_water_safety' management_id=management.pk as hx_post %}
                 {% include 'epilepsy12/partials/page_elements/toggle_button.html' with test_positive=management.individualised_care_plan_addresses_water_safety hx_post=hx_post hx_target="#individualised_care_plan" hx_swap="innerHTML" hx_trigger="click" tooltip_id='individualised_care_plan_addresses_water_safety_tooltip' label=management.get_individualised_care_plan_addresses_water_safety_help_label_text reference=management.get_individualised_care_plan_addresses_water_safety_help_reference_text data_position="top left" enabled=perms.epilepsy12.change_management %}
             </div>
-        
+
         </div>
 
 
@@ -77,7 +77,7 @@
                 {% url 'individualised_care_plan_includes_ehcp' management_id=management.pk as hx_post %}
                 {% include 'epilepsy12/partials/page_elements/toggle_button.html' with test_positive=management.individualised_care_plan_includes_ehcp hx_post=hx_post hx_target="#individualised_care_plan" hx_swap="innerHTML" hx_trigger="click" tooltip_id='individualised_care_plan_includes_ehcp_tooltip' label=management.get_individualised_care_plan_includes_ehcp_help_label_text reference=management.get_individualised_care_plan_includes_ehcp_help_reference_text data_position="top left" enabled=perms.epilepsy12.change_management %}
             </div>
-        
+
         </div>
 
         <div class="field">

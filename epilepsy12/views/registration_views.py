@@ -663,6 +663,13 @@ def first_paediatric_assessment_date(request, case_id):
     case = Case.objects.get(pk=case_id)
     registration = Registration.objects.filter(case=case).get()
 
+    if request.user.is_superuser or request.user.is_rcpch_audit_team_member:
+        earliest_allowable_date = case.date_of_birth
+    else:
+        earliest_allowable_date = dates_for_cohort(registration.cohort)[
+            "cohort_start_date"
+        ]
+
     try:
         error_message = None
         validate_and_update_model(
@@ -671,9 +678,7 @@ def first_paediatric_assessment_date(request, case_id):
             Registration,
             field_name="first_paediatric_assessment_date",
             page_element="date_field",
-            earliest_allowable_date=dates_for_cohort(registration.cohort)[
-                "cohort_start_date"
-            ],
+            earliest_allowable_date=earliest_allowable_date,
         )
 
     except ValueError as error:

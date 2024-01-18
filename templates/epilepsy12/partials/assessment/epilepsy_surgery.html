@@ -2,7 +2,7 @@
 <div class="ui segment">
 
     <div class="ui rcpch_info message">
-    
+
       <div class="header">
         <i class="circle info icon"></i>Criteria for referral to a children's epilepsy surgery service:
       </div>
@@ -20,18 +20,18 @@
         {% include 'epilepsy12/partials/page_elements/toggle_button.html' with test_positive=assessment.childrens_epilepsy_surgical_service_referral_criteria_met hx_post=hx_post hx_swap="innerHTML" hx_target="#childrens_epilepsy_surgical_service" hx_trigger="click" tooltip_id='childrens_epilepsy_surgical_service_referral_criteria_met_tooltip' label=assessment.get_childrens_epilepsy_surgical_service_referral_criteria_met_help_label_text reference=assessment.get_childrens_epilepsy_surgical_service_referral_criteria_met_help_reference_text data_position="top left" enabled=perms.epilepsy12.change_assessment %}
 
   </div>
-    
-    
+
+
         {% url 'childrens_epilepsy_surgical_service_referral_made' assessment_id=assessment.pk as hx_post %}
         {% include 'epilepsy12/partials/page_elements/toggle_button.html' with test_positive=assessment.childrens_epilepsy_surgical_service_referral_made hx_post=hx_post hx_swap="innerHTML" hx_target="#childrens_epilepsy_surgical_service" hx_trigger="click" tooltip_id='childrens_epilepsy_surgical_service_tooltip' label=assessment.get_childrens_epilepsy_surgical_service_referral_made_help_label_text reference=assessment.get_childrens_epilepsy_surgical_service_referral_made_help_reference_text data_position="top left" enabled=perms.epilepsy12.change_assessment %}
 
         {% if assessment.childrens_epilepsy_surgical_service_referral_made %}
 
             <div class="ui rcpch_important message">
-                
+
                 {% url 'childrens_epilepsy_surgical_service_referral_date' assessment_id=assessment.pk as hx_post %}
                 {% include 'epilepsy12/partials/page_elements/date_field.html' with hx_post=hx_post hx_swap="innerHTML" hx_target="#childrens_epilepsy_surgical_service" hx_trigger="change delay:1s" label=assessment.get_childrens_epilepsy_surgical_service_referral_date_help_label_text reference=assessment.get_childrens_epilepsy_surgical_service_referral_date_help_reference_text date_value=assessment.childrens_epilepsy_surgical_service_referral_date input_date_field_name="childrens_epilepsy_surgical_service_referral_date" error_message=error_message enabled=perms.epilepsy12.change_assessment has_permission=perms.epilepsy12.change_assessment %}
-                
+
                 {% if show_input_date %}
                     <div class="two fields">
                         <div class="ten wide field">
@@ -44,7 +44,7 @@
                         </div>
                     </div>
                     <div class="field">
-                        <div 
+                        <div
                             {% if perms.epilepsy12.change_assessment %}
                                 class="ui rcpch_primary button"
                             {% else %}
@@ -59,7 +59,7 @@
                     </div>
                 {% else %}
                     <div class="inline field">
-                        <div 
+                        <div
                             class="ui rcpch_primary button"
                             hx-post={% url 'childrens_epilepsy_surgical_service_review_date_status' assessment_id=assessment.pk status="known" %}
                             hx-trigger="click"
@@ -88,10 +88,10 @@
                                     <input disabled value="{{active_surgical_site.organisation.name}} ({{active_surgical_site.organisation.local_health_board.name}})">
                                 {% endif %}
                                 <div class="ui buttons">
-                                
+
                                     {% if not surgery_edit_active %}
-                                        
-                                        <button 
+
+                                        <button
                                             {% if perms.epilepsy12.change_assessment %}
                                                 class="ui rcpch_primary button"
                                             {% else %}
@@ -103,7 +103,7 @@
                                             hx-trigger="click"
                                         >Edit</button>
 
-                                        <button 
+                                        <button
                                             {% if perms.epilepsy12.delete_site %}
                                                 class="ui rcpch_danger button"
                                             {% else %}
@@ -117,14 +117,14 @@
                                         >Delete</button>
 
                                     {% endif %}
-                                </div>    
-                                
+                                </div>
+
                             </div>
                         </span>
-                    
-                    </div>  
+
+                    </div>
                     {% if surgery_edit_active %}
-                    
+
                         <div class="field" id="allocate_surgical_centre">
                             {% url 'edit_epilepsy_surgery_centre' assessment_id=assessment.pk site_id=active_surgical_site.pk as hx_post %}
                             {% url 'update_epilepsy_surgery_centre_pressed' assessment_id=assessment.pk site_id=active_surgical_site.pk action='cancel' as hx_cancel %}
@@ -132,7 +132,7 @@
                         </div>
 
                     {% endif %}
-                    
+
                 {% else %}
 
                     <div class="field" id="allocate_surgical_centre">
@@ -141,12 +141,12 @@
                         {% url 'update_epilepsy_surgery_centre_pressed' assessment_id=assessment.pk site_id=active_surgical_site.pk action='cancel' as hx_cancel %}
                         {% include 'epilepsy12/partials/page_elements/organisations_select.html' with organisation_list=organisation_list hx_post=hx_post hx_target="#childrens_epilepsy_surgical_service" hx_trigger="click" hx_swap="innerHTML" hx_name="epilepsy_surgery_centre" test_positive=None label="Allocate Children's Surgical Centre" hx_default_text="Search children's surgical centres..." data_position="top left" enabled=perms.epilepsy12.change_assessment has_permission=perms.epilepsy12.change_assessment %}
                     </div>
-                    
+
                 {% endif %}
 
             </div>
 
         {% endif %}
-    
-    
+
+
 </div>

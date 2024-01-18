@@ -1,0 +1,30 @@
+<div class="ui card">
+    <div class="content">
+        <div class="rcpch_summary_stats">
+
+            <div class="ui centered header">
+                <h3>Currently Submitting Cohort</h3>
+            </div>
+
+                <div class="rcpch_summary_stats_row">
+                    <h1>{{cohort_data.submitting_cohort}}</h1>
+                    <h3>
+                        {% if cohort_data.end_date > today %}
+                            Actively recruiting and submitting data
+                        {% else %}
+                            Recruitment closed, submitting data only
+                        {% endif %}
+                    </h3>
+                    <h4>Recruitment dates for Cohort {{cohort_data.submitting_cohort}}: {{cohort_data.submitting_cohort_start_date}} - {{cohort_data.submitting_cohort_end_date}}</h4>
+                </div>
+
+                <div class="rcpch_summary_stats_row">
+                    <h1>{{cohort_data.submitting_cohort_days_remaining}}</h1>
+                    <h2>Days remaining</h2>
+                    <h3>until latest submission date</h3>
+                    <h4>({{cohort_data.submitting_cohort_submission_date}})</h4>
+                </div>
+
+        </div>
+    </div>
+</div>

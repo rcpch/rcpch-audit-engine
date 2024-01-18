@@ -134,7 +134,7 @@ ROOT_URLCONF = "rcpch-audit-engine.urls"
 
 # AUTO LOGOUT SESSION EXPIRATION
 AUTO_LOGOUT = {
-    "IDLE_TIME": datetime.timedelta(minutes=30),
+    "IDLE_TIME": datetime.timedelta(minutes=1),
     "REDIRECT_TO_LOGIN_IMMEDIATELY": True,
     "MESSAGE": "You have been automatically logged out as there was no activity for 30 minutes. Please login again to continue.",
 }
@@ -181,7 +181,7 @@ TEMPLATES = [
                 "django.template.context_processors.request",
                 "django.contrib.auth.context_processors.auth",
                 "django.contrib.messages.context_processors.messages",
-                "django_auto_logout.context_processors.auto_logout_client",
+                "django_auto_logout.context_processors.auto_logout_client",  # auto logout
                 "rcpch-audit-engine.git_context_processor.get_active_branch_and_commit",
             ]
         },

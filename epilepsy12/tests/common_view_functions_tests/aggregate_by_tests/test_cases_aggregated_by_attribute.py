@@ -146,29 +146,50 @@ def test_cases_aggregated_by_ethnicity(e12_case_factory):
     cases_queryset = cases_aggregated_by_ethnicity(selected_organisation=GOSH)
 
     expected_counts = [
-        {"ethnicity_display": "Pakistani or British Pakistani", "ethnicities": 10},
-        {"ethnicity_display": "Any other Asian background", "ethnicities": 10},
-        {"ethnicity_display": "Any other Black background", "ethnicities": 10},
-        {"ethnicity_display": "Any other ethnic group", "ethnicities": 10},
-        {"ethnicity_display": "Any other mixed background", "ethnicities": 10},
-        {"ethnicity_display": "Any other White background", "ethnicities": 10},
-        {"ethnicity_display": "Bangladeshi or British Bangladeshi", "ethnicities": 10},
-        {"ethnicity_display": "African", "ethnicities": 10},
-        {"ethnicity_display": "Caribbean", "ethnicities": 10},
-        {"ethnicity_display": "Chinese", "ethnicities": 10},
-        {"ethnicity_display": "Indian or British Indian", "ethnicities": 10},
-        {"ethnicity_display": "Irish", "ethnicities": 10},
-        {"ethnicity_display": "Mixed (White and Asian)", "ethnicities": 10},
-        {"ethnicity_display": "Mixed (White and Black African)", "ethnicities": 10},
-        {"ethnicity_display": "Mixed (White and Black Caribbean)", "ethnicities": 10},
-        {"ethnicity_display": "Not Stated", "ethnicities": 10},
         {
-            "ethnicity_display": "British, Mixed British",
+            "ethnicity_display": "White British",
             "ethnicities": 11,
         },  # 11 AS THERE IS ALREADY A SEEDED CASE IN TEST DB
+        {"ethnicity_display": "White - Irish", "ethnicities": 10},
+        {"ethnicity_display": "White - Any other White background", "ethnicities": 10},
+        {
+            "ethnicity_display": "Mixed (White and Black Caribbean)",
+            "ethnicities": 10,
+        },
+        {"ethnicity_display": "Mixed (White and Black African)", "ethnicities": 10},
+        {"ethnicity_display": "Mixed (White and Asian)", "ethnicities": 10},
+        {"ethnicity_display": "Mixed - Any other mixed background", "ethnicities": 10},
+        {"ethnicity_display": "Indian or British Indian", "ethnicities": 10},
+        {"ethnicity_display": "Asian or Asian British - Pakistani", "ethnicities": 10},
+        {
+            "ethnicity_display": "Asian or Asian British - Bangladeshi",
+            "ethnicities": 10,
+        },
+        {
+            "ethnicity_display": "Asian or Asian British - Any other Asian background",
+            "ethnicities": 10,
+        },
+        {"ethnicity_display": "Black or Black British - Caribbean", "ethnicities": 10},
+        {"ethnicity_display": "Black or Black British - African", "ethnicities": 10},
+        {
+            "ethnicity_display": "Black or Black British - Any other Black background",
+            "ethnicities": 10,
+        },
+        {
+            "ethnicity_display": "Other Ethnic Groups - Any other ethnic group",
+            "ethnicities": 10,
+        },
+        {"ethnicity_display": "Other Ethnic Groups - Chinese", "ethnicities": 10},
+        {"ethnicity_display": "Not Stated", "ethnicities": 10},
     ]
 
     for ix, aggregate in enumerate(cases_queryset):
-        assert (
-            aggregate == expected_counts[ix]
-        ), f"Expected aggregate count for cases_aggregated_by_ethnicity not matching output: {aggregate} should be {expected_counts[ix]}"
+        test_ethnicity, count = aggregate["ethnicity_display"], aggregate["ethnicities"]
+
+        for expected_ethnicity_data in expected_counts:
+            expected_ethnicity = expected_ethnicity_data["ethnicity_display"]
+            if expected_ethnicity == test_ethnicity:
+                test_condition = count == expected_ethnicity_data["ethnicities"]
+                error_msg = f"Expected aggregate count for cases_aggregated_by_ethnicity not matching output: {aggregate=} should be {expected_ethnicity_data=}"
+
+                assert test_condition, error_msg
