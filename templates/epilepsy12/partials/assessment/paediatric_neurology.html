@@ -1,6 +1,6 @@
 {% load epilepsy12_template_tags %}
 <div class="ui segment">
-    
+
     {% url 'paediatric_neurologist_referral_made' assessment_id=assessment.pk as hx_post %}
     {% include 'epilepsy12/partials/page_elements/toggle_button.html' with test_positive=assessment.paediatric_neurologist_referral_made hx_post=hx_post hx_swap="innerHTML" hx_target="#paediatric_neurology" hx_trigger="click" tooltip_id='paediatric_neurologist_referral_made_tooltip' label=assessment.get_paediatric_neurologist_referral_made_help_label_text reference=assessment.get_paediatric_neurologist_referral_made_help_reference_text data_position="top left" enabled=perms.epilepsy12.change_assessment %}
 
@@ -9,10 +9,10 @@
         <div class="ui rcpch_important message">
 
             {% url 'paediatric_neurologist_referral_date' assessment_id=assessment.pk as hx_post %}
-            {% include 'epilepsy12/partials/page_elements/date_field.html' with hx_post=hx_post hx_swap="innerHTML" hx_target="#paediatric_neurology" hx_trigger="change delay:300ms" label=assessment.get_paediatric_neurologist_referral_date_help_label_text reference=assessment.get_paediatric_neurologist_referral_date_help_reference_text date_value=assessment.paediatric_neurologist_referral_date input_date_field_name="paediatric_neurologist_referral_date" error_message=error_message enabled=perms.epilepsy12.change_assessment has_permission=perms.epilepsy12.change_assessment %}
-            
+            {% include 'epilepsy12/partials/page_elements/date_field.html' with hx_post=hx_post hx_swap="innerHTML" hx_target="#paediatric_neurology" hx_trigger="change delay:1s" label=assessment.get_paediatric_neurologist_referral_date_help_label_text reference=assessment.get_paediatric_neurologist_referral_date_help_reference_text date_value=assessment.paediatric_neurologist_referral_date input_date_field_name="paediatric_neurologist_referral_date" error_message=error_message enabled=perms.epilepsy12.change_assessment has_permission=perms.epilepsy12.change_assessment %}
+
             {% url 'paediatric_neurologist_input_date' assessment_id=assessment.pk as hx_post %}
-            {% include 'epilepsy12/partials/page_elements/date_field.html' with hx_post=hx_post hx_swap="innerHTML" hx_target="#paediatric_neurology" hx_trigger="change delay:300ms" label=assessment.get_paediatric_neurologist_input_date_help_label_text reference=assessment.get_paediatric_neurologist_input_date_help_reference_text date_value=assessment.paediatric_neurologist_input_date input_date_field_name="paediatric_neurologist_input_date" error_message=error_message enabled=perms.epilepsy12.change_assessment has_permission=perms.epilepsy12.change_assessment %}
+            {% include 'epilepsy12/partials/page_elements/date_field.html' with hx_post=hx_post hx_swap="innerHTML" hx_target="#paediatric_neurology" hx_trigger="change delay:1s" label=assessment.get_paediatric_neurologist_input_date_help_label_text reference=assessment.get_paediatric_neurologist_input_date_help_reference_text date_value=assessment.paediatric_neurologist_input_date input_date_field_name="paediatric_neurologist_input_date" error_message=error_message enabled=perms.epilepsy12.change_assessment has_permission=perms.epilepsy12.change_assessment %}
 
             <div class="inline field">
                 <label class='toggle_button_label'>Time to Review</label>
@@ -25,7 +25,7 @@
                 </div>
             {% endif %}
 
-            
+
 
             {% if active_neurology_site %}
 
@@ -44,7 +44,7 @@
 
                                             <div class="ui buttons">
 
-                                                    <button 
+                                                    <button
                                                         {% if perms.epilepsy12.delete_assessment %}
                                                             class="ui rcpch_danger button"
                                                         {% else %}
@@ -57,7 +57,7 @@
                                                         hx-trigger="click"
                                                     >Delete</button>
 
-                                                    <button 
+                                                    <button
                                                         {% if perms.epilepsy12.change_assessment %}
                                                             class="ui rcpch_primary button"
                                                         {% else %}
@@ -68,17 +68,17 @@
                                                         hx-swap="innerHTML"
                                                         hx-trigger="click"
                                                     >Edit</button>
-                                                
+
                                             </div>
 
                                         {% endif %}
-                                        
+
                                     </div>
                                 </span>
-                            
+
                             </div>
                             {% if neurology_edit_active %}
-                            
+
                                 <div class="field" id="allocate_paediatric_neurology_centre">
                                     {% url 'update_paediatric_neurology_centre_pressed' assessment_id=assessment.pk site_id=active_neurology_site.pk action='cancel' as hx_cancel %}
                                     {% url 'edit_paediatric_neurology_centre' assessment_id=assessment.pk site_id=active_neurology_site.pk as hx_post %}
@@ -86,7 +86,7 @@
                                 </div>
 
                             {% endif %}
-                            
+
             {% else %}
 
                 <div class="field" id="allocate_paediatric_neurology_centre">
@@ -101,5 +101,5 @@
         </div>
 
     {% endif %}
-    
+
 </div>

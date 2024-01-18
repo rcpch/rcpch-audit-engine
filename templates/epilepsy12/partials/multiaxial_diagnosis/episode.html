@@ -9,10 +9,10 @@
                     When
                 </div>
             </h5>
-    
+
         <div class="field">
             {% url 'seizure_onset_date' episode_id=episode.pk as hx_post %}
-            {% include 'epilepsy12/partials/page_elements/date_field.html' with hx_post=hx_post hx_target='#episodes' hx_trigger='change delay:300ms' hx_swap="innerHTML" date_value=episode.seizure_onset_date label=episode.get_seizure_onset_date_help_label_text reference=episode.get_seizure_onset_date_help_reference_text input_date_field_name='seizure_onset_date' enabled=perms.epilepsy12.change_episode has_permission=perms.epilepsy12.change_episode %}
+            {% include 'epilepsy12/partials/page_elements/date_field.html' with hx_post=hx_post hx_target='#episodes' hx_trigger='change delay:1s' hx_swap="innerHTML" date_value=episode.seizure_onset_date label=episode.get_seizure_onset_date_help_label_text reference=episode.get_seizure_onset_date_help_reference_text input_date_field_name='seizure_onset_date' enabled=perms.epilepsy12.change_episode has_permission=perms.epilepsy12.change_episode %}
         </div>
         {% if error_message %}
             <div class='ui rcpch_warning message'>
@@ -24,16 +24,16 @@
             {% url 'seizure_onset_date_confidence' episode_id=episode.pk as hx_post %}
             {% include 'epilepsy12/partials/page_elements/single_choice_multiple_toggle_button.html' with choices=seizure_onset_date_confidence_selection hx_post=hx_post hx_target='#episodes' hx_trigger='click' hx_swap='innerHTML' test_positive=episode.seizure_onset_date_confidence tooltip_id='seizure_onset_date_confidence_tooltip' label=episode.get_seizure_onset_date_confidence_help_label_text reference=episode.get_seizure_onset_date_confidence_help_reference_text data_position='top left' enabled=perms.epilepsy12.change_episode %}
         </div>
-        
+
         <div class='field'>
             {% url 'episode_definition' episode_id=episode.pk as hx_post %}
             {% include 'epilepsy12/partials/page_elements/select.html' with hx_post=hx_post hx_target='#episodes' hx_swap='innerHTML' hx_trigger='change' choices=episode_definition_selection test_positive=episode.episode_definition data_position='top left' label=episode.get_episode_definition_help_label_text reference=episode.get_episode_definition_help_reference_text hx_default_text='Select an episode definition...' hx_name='episode_definition' enabled=perms.epilepsy12.change_episode %}
         </div>
-    
+
     </div>
-    
+
     <div class="ui rcpch_pink segment">
-    
+
         <h5 class="ui header">
             <span class='desscribe_letters'>
                 <div class="ui rcpch_pink circular label">D</div>
@@ -76,7 +76,7 @@
     </div>
 
     <div class='field'>
-        <div 
+        <div
             class='ui rcpch_primary button'
             hx-post='{% url "close_episode" episode_id=episode.pk %}'
             hx-target='#episodes'

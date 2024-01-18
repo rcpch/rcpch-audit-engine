@@ -1,26 +1,26 @@
 {% load epilepsy12_template_tags %}
 <div class="ui form" hx-headers='{"X-CSRFToken": "{{ csrf_token }}"}'>
-    
+
     <div class="ui segment">
 
         <div class="field">
 
             {% url 'mri_indicated' investigations_id=investigations.pk as hx_post %}
-            {% include 'epilepsy12/partials/page_elements/toggle_button.html' with hx_post=hx_post hx_target="#mri_brain_information" hx_trigger="click" hx_swap="innerHTML" test_positive=investigations.mri_indicated tooltip_id='mri_indicated_tooltip' label=investigations.get_mri_indicated_help_label_text reference=investigations.get_mri_indicated_help_reference_text data_position="top left" enabled=perms.epilepsy12.change_investigations %}   
+            {% include 'epilepsy12/partials/page_elements/toggle_button.html' with hx_post=hx_post hx_target="#mri_brain_information" hx_trigger="click" hx_swap="innerHTML" test_positive=investigations.mri_indicated tooltip_id='mri_indicated_tooltip' label=investigations.get_mri_indicated_help_label_text reference=investigations.get_mri_indicated_help_reference_text data_position="top left" enabled=perms.epilepsy12.change_investigations %}
 
         </div>
 
         {% if investigations.mri_indicated %}
 
         <div class="three fields">
-            
+
             {% url 'mri_brain_requested_date' investigations_id=investigations.pk as hx_post %}
-            {% include 'epilepsy12/partials/page_elements/date_field.html' with hx_post=hx_post hx_target="#mri_brain_information" hx_trigger="change delay:300ms" hx_swap="innerHTML" date_value=investigations.mri_brain_requested_date label=investigations.get_mri_brain_requested_date_help_label_text reference=investigations.get_mri_brain_requested_date_help_reference_text data_position="top left" input_date_field_name='mri_brain_requested_date' error_messages=error_messages enabled=perms.epilepsy12.change_investigations has_permission=perms.epilepsy12.change_investigations %}
+            {% include 'epilepsy12/partials/page_elements/date_field.html' with hx_post=hx_post hx_target="#mri_brain_information" hx_trigger="change delay:1s" hx_swap="innerHTML" date_value=investigations.mri_brain_requested_date label=investigations.get_mri_brain_requested_date_help_label_text reference=investigations.get_mri_brain_requested_date_help_reference_text data_position="top left" input_date_field_name='mri_brain_requested_date' error_messages=error_messages enabled=perms.epilepsy12.change_investigations has_permission=perms.epilepsy12.change_investigations %}
 
             {% if mri_brain_declined %}
                 <div class="field">
                     <label>{{investigations.get_mri_brain_reported_date_help_label_text}}
-                        <span 
+                        <span
                             id="mri_brain_declined"
                             data-title="Reference"
                             data-content="MRI Brain could not be performed."
@@ -35,9 +35,9 @@
                 </div>
                 <div class="padded_field field">
                     {% url 'mri_brain_declined' investigations_id=investigations.pk confirm='edit' as hx_post %}
-                    <div 
+                    <div
                         class="ui rcpch_primary fluid padded_form button"
-                        hx-headers='{"X-CSRFToken": "{{ csrf_token }}"}' 
+                        hx-headers='{"X-CSRFToken": "{{ csrf_token }}"}'
                         name="edit_mri_brain_declined"
                         hx-post="{{hx_post}}"
                         hx-trigger="click"
@@ -48,8 +48,8 @@
             {% else %}
 
                 {% url 'mri_brain_reported_date' investigations_id=investigations.pk as hx_post %}
-                {% include 'epilepsy12/partials/page_elements/date_field.html' with hx_post=hx_post hx_target="#mri_brain_information" hx_trigger="change delay:300ms" hx_swap="innerHTML" date_value=investigations.mri_brain_reported_date label=investigations.get_mri_brain_reported_date_help_label_text reference=investigations.get_mri_brain_reported_date_help_reference_text data_position="top left" input_date_field_name='mri_brain_reported_date' error_messages=error_messages enabled=perms.epilepsy12.change_investigations has_permission=perms.epilepsy12.change_investigations %}
-            
+                {% include 'epilepsy12/partials/page_elements/date_field.html' with hx_post=hx_post hx_target="#mri_brain_information" hx_trigger="change delay:1s" hx_swap="innerHTML" date_value=investigations.mri_brain_reported_date label=investigations.get_mri_brain_reported_date_help_label_text reference=investigations.get_mri_brain_reported_date_help_reference_text data_position="top left" input_date_field_name='mri_brain_reported_date' error_messages=error_messages enabled=perms.epilepsy12.change_investigations has_permission=perms.epilepsy12.change_investigations %}
+
                 {% if investigations.mri_brain_requested_date and investigations.mri_brain_reported_date %}
                     <div class="field">
                         <label>Time to MRI Brain</label>
@@ -62,13 +62,13 @@
                     {% comment %}
                     Only show the MRI declined button if the mri_brain_reported date has neither been declined already
                     nor has already been set
-                    {% endcomment %} 
+                    {% endcomment %}
 
                     <div class="padded field">
                         {% url 'mri_brain_declined' investigations_id=investigations.pk confirm='decline' as hx_post %}
-                        <div 
+                        <div
                             class="ui rcpch_primary button"
-                            hx-headers='{"X-CSRFToken": "{{ csrf_token }}"}' 
+                            hx-headers='{"X-CSRFToken": "{{ csrf_token }}"}'
                             name="mri_brain_requested_date"
                             hx-post="{{hx_post}}"
                             hx-trigger="click"
@@ -81,9 +81,9 @@
 
             {% endif %}
 
-   
+
         </div>
-        
+
         {% if error_message %}
             <div class='ui rcpch_warning message'>
                 {{ error_message }}
