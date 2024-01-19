@@ -2,7 +2,7 @@
 
     {% url 'epilepsy_or_nonepilepsy_status' episode_id=episode.pk as hx_post %}
     {% include 'epilepsy12/partials/page_elements/single_choice_multiple_toggle_button.html' with choices=epilepsy_or_nonepilepsy_status_choices hx_post=hx_post hx_target="#epilepsy_or_nonepilepsy_status" hx_trigger="click" hx_swap="innerHTML" test_positive=episode.epilepsy_or_nonepilepsy_status tooltip_id='epilepsy_or_nonepilepsy_status_tooltip' label=episode.get_epilepsy_or_nonepilepsy_status_help_label_text reference=episode.get_epilepsy_or_nonepilepsy_status_help_reference_text data_position="top left" enabled=perms.epilepsy12.change_multiaxialdiagnosis %}
-    
+
 </div>
 
 {% if episode.epilepsy_or_nonepilepsy_status is not None %}
@@ -10,32 +10,28 @@
     {% if episode.epilepsy_or_nonepilepsy_status == 'E' or episode.epilepsy_or_nonepilepsy_status == 'NE' %}
 
         <h5 class="ui header">
-            <span class='desscribe_letters'>
+            <span class="desscribe_letters">
                 <div class="ui rcpch_pink circular label">S</div>
             </span>
-            <div class='content'>
+            <div class="content">
                     Seizure Type
-                <div class='sub header'>
-                Describe the type of seizure(s)
-                </div>
             </div>
         </h5>
 
     {% endif %}
 
-
     {% if episode.epilepsy_or_nonepilepsy_status == 'E' %}
         <div id="epilepsy" class="field">
             {% include 'epilepsy12/partials/multiaxial_diagnosis/epilepsy.html' with episode=episode epileptic_seizure_onset_types=epileptic_seizure_onset_types epilepsy_generalised_onset_types=epilepsy_generalised_onset_types FOCAL_EPILEPSY_MOTOR_MANIFESTATIONS=FOCAL_EPILEPSY_MOTOR_MANIFESTATIONS FOCAL_EPILEPSY_NONMOTOR_MANIFESTATIONS=FOCAL_EPILEPSY_NONMOTOR_MANIFESTATIONS FOCAL_EPILEPSY_EEG_MANIFESTATIONS=FOCAL_EPILEPSY_EEG_MANIFESTATIONS GENERALISED_SEIZURE_TYPE=GENERALISED_SEIZURE_TYPE %}
         </div>
-        <div class='ui rcpch_info message'>
+        <div class="ui rcpch_info message">
             This completes all the information for this episode. Continue below to complete the remaining elements of DESSCRIBE.
         </div>
     {% elif episode.epilepsy_or_nonepilepsy_status == 'NE'%}
         <div id="nonepilepsy" class="field">
             {% include 'epilepsy12/partials/multiaxial_diagnosis/nonepilepsy.html' with episode=episode nonepilepsy_onset_types=nonepilepsy_onset_types nonepilepsy_types=nonepilepsy_types syncopes=syncopes behavioural=behavioural sleep=sleep paroxyms=paroxyms migraines=migraines nonepilepsy_miscellaneous=nonepilepsy_miscellaneous %}
         </div>
-        <div class='ui rcpch_info message'>
+        <div class="ui rcpch_info message">
             This completes all the information for this episode. Continue below to complete the remaining elements of DESSCRIBE.
         </div>
     {% endif %}

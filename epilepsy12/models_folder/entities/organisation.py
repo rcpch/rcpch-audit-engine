@@ -18,13 +18,16 @@ class Organisation(TimeStampAbstractBaseClass):
     It represents a list of organisations that can be looked up
     """
 
-    ods_code = CharField(max_length=100, null=True, blank=True, default=None)
+    ods_code = CharField(
+        max_length=100, null=True, blank=True, default=None, unique=True
+    )
     name = CharField(max_length=100, null=True, blank=True, default=None)
     website = CharField(max_length=100, null=True, blank=True, default=None)
     address1 = CharField(max_length=100, null=True, blank=True, default=None)
     address2 = CharField(max_length=100, null=True, blank=True, default=None)
     address3 = CharField(max_length=100, null=True, blank=True, default=None)
     telephone = CharField(max_length=100, null=True, blank=True, default=None)
+    email = CharField(max_length=200, null=True, blank=True, default=None)
     city = CharField(max_length=100, null=True, blank=True, default=None)
     county = CharField(max_length=100, null=True, blank=True, default=None)
     latitude = FloatField(max_length=100, null=True, blank=True, default=None)

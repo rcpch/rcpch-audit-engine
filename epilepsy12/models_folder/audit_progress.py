@@ -134,6 +134,10 @@ class AuditProgress(models.Model, HelpTextMixin):
         else:
             return False
 
+    def __str__(self):
+        return f"Audit progress for {self.registration.case}"
+
     class Meta:
         verbose_name = "Audit Progress"
         verbose_name_plural = "Audit Progresses"
+        ordering = ["registration__case"]

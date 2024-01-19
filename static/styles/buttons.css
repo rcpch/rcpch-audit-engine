@@ -84,6 +84,12 @@
     background-color: var(--rcpch_dark_blue);
     border-color: transparent;
   }
+
+  .ui.rcpch_dark_blue.lighter_font.button{
+    background-color: var(--rcpch_light_grey);
+    font-weight: 800;
+    font-family: var(--rcpch_standard_font) !important;
+  }
   
   /* individual buttons */
   
@@ -93,6 +99,10 @@
     background-color: var(--rcpch_light_blue);
     border-color: var(--rcpch_light_blue);
     font-weight: 400;
+  }
+
+  .ui.rcpch_primary.button.bold {
+    font-family: 'Montserrat-Bold' !important;
   }
   
   .ui.rcpch_primary.button.jump {
@@ -158,6 +168,10 @@
     transition-duration: 0.4s;
     font-weight: 400;
   }
+
+  .ui.rcpch_grey.button.bold {
+    font-family: 'Montserrat-Bold' !important;
+  }
   
   #first_paediatric_assessment_date_button {
     border-style: solid;
@@ -216,10 +230,9 @@
     background-color: var(--rcpch_strong_blue);
     font-weight: 400;
   }
-  
-  a.ui.button {
+
+  .back.link {
     display: flex;
-    justify-content: center;
     align-items: center;
   }
   
@@ -258,6 +271,10 @@
     background-color: #8a0400;
     transition-duration: 0.4s;
     font-weight: 400;
+  }
+
+  .ui.rcpch_danger.button.bold {
+    font-family: 'Montserrat-Bold' !important;
   }
 
   /* icons and icon buttons */

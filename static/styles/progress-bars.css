@@ -1,7 +1,10 @@
+/* this is the progress bar background (unfilled/incomplete) area */
 .ui.bottom.attached.tiny.rcpch.progress {
     background-color: var(--rcpch_light_grey);
+    width: 122.27px /* this is a hard-coded width as a workaround for now */
 }
 
+/* this is the progress bar foreground (filled/completed) area */
 .ui.bottom.attached.tiny.rcpch.progress .bar {
     background-color: var(--rcpch_light_blue);
 }

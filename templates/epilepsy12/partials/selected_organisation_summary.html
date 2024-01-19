@@ -3,10 +3,11 @@
 {% csrf_token %}
 
 <div class="ui grid container selected_organisation_container">
-
-        <div class="sixteen wide unpadded fluid column topbar">
-            <button class="ui rcpch_positive button jump" _="on click go to top of #kpis">Jump to All KPI Metrics</button>
-            <div class="ui rcpch_view label">Organisation View</div>
+        <div class="view_label_container tables">
+            <div class='back link'>
+                <button class="ui rcpch_positive button jump" _="on click go to top of #kpis">Jump to All KPI Metrics</button>
+            </div>
+            <div class="ui rcpch_view label view_title">Organisation Dashboard</div>
         </div>
 
         {% if request.user.is_rcpch_audit_team_member or request.user.is_rcpch_staff or request.user.is_superuser %}
@@ -23,13 +24,19 @@
                 {% if user.is_rcpch_audit_team_member or user.is_superuser %}
                         <!-- Only RCPCH Audit team members and superusers can publish aggregations to the open access page -->
                     <div class="column">
-                        <a class="ui rcpch_grey fluid button" href="{% url 'epilepsy12_user_list' organisation_id=selected_organisation.pk %}">
-                            View All {{selected_organisation.name}} Epilepsy12 Staff
+                        <a class="ui rcpch_grey button bold fluid" href="{% url 'epilepsy12_user_list' organisation_id=selected_organisation.pk %}">
+                            View All Epilepsy12 Staff of 
+                            {% with organisation_name=selected_organisation.name|title %}
+                            {{ organisation_name|capitalise_org_names }} 
+                            {% endwith %}
                         </a>
                     </div>
                     <div class="column">
-                        <a class="ui rcpch_primary fluid button" href="{% url 'cases' organisation_id=selected_organisation.pk %}">
-                            View All {{selected_organisation.name}} Children
+                        <a class="ui rcpch_primary button bold fluid " href="{% url 'cases' organisation_id=selected_organisation.pk %}">
+                            View All Children of
+                            {% with organisation_name=selected_organisation.name|title %}
+                            {{ organisation_name|capitalise_org_names }} 
+                            {% endwith %}
                         </a>
                     </div>
                     <div class="column" id="publish_button">
@@ -39,13 +46,19 @@
                 {% else %}
 
                     <div class="eight wide column">
-                        <a class="ui rcpch_grey fluid button" href="{% url 'epilepsy12_user_list' organisation_id=selected_organisation.pk %}">
-                            View All {{selected_organisation.name}} Epilepsy12 Staff
+                        <a class="ui rcpch_grey button bold fluid" href="{% url 'epilepsy12_user_list' organisation_id=selected_organisation.pk %}">
+                            View All Epilepsy12 Staff of
+                            {% with organisation_name=selected_organisation.name|title %}
+                            {{ organisation_name|capitalise_org_names }} 
+                            {% endwith %}
                         </a>
                     </div>
                     <div class="eight wide  column">
-                        <a class="ui rcpch_primary fluid button" href="{% url 'cases' organisation_id=selected_organisation.pk %}">
-                            View All {{selected_organisation.name}} Children
+                        <a class="ui rcpch_primary button bold fluid" href="{% url 'cases' organisation_id=selected_organisation.pk %}">
+                            View All Children of 
+                            {% with organisation_name=selected_organisation.name|title %}
+                            {{ organisation_name|capitalise_org_names }} 
+                            {% endwith %}
                         </a>
                     </div>
 
@@ -80,65 +93,30 @@
                                     <i class="ui rcpch small address book icon "></i>Details
                                 </h4>
                                 <div class="organisation_details ">
-                                    <div class="item middle aligned rcpch_icon_text_group">
-                                        <i class="ui icon phone"></i>
-                                        {%if selected_organisation.Phone%}
-                                        <p class="rcpch_icon_text">{{ selected_organisation.phone }}</p>
-                                        {%else%}
-                                        <p class="rcpch_icon_text">Can't find phone number</p>
-                                        {%endif%}
-                                    </div>
-                                    <div class="item middle aligned rcpch_icon_text_group">
-                                        <i class="ui icon envelope"></i>
-                                        {%if selected_organisation.Email%}
-                                        <p class="rcpch_icon_text">{{ selected_organisation.email }}</p>
-                                        {%else%}
-                                        <p class="rcpch_icon_text">Can't find email</p>
-                                        {%endif%}
-                                    </div>
-                                    <div class="item middle aligned rcpch_icon_text_group">
-                                        <i class="ui icon linkify"></i>
-                                        {%if selected_organisation.website%}
-                                        <p class="rcpch_icon_text">{{ selected_organisation.website }}</p>
-                                        {%else%}
-                                        <p class="rcpch_icon_text">Can't find website</p>
-                                        {%endif%}
-                                    </div>
+                                    {% if selected_organisation.telephone %}
+                                        <div class="item middle aligned rcpch_icon_text_group">
+                                            <i class="ui icon phone"></i>
+                                            <p class="rcpch_icon_text">{{ selected_organisation.telephone }}</p>
+                                        </div>
+                                    {% endif %}
+                                    {% if selected_organisation.email %}
+                                        <div class="item middle aligned rcpch_icon_text_group">
+                                            <i class="ui icon envelope"></i>
+                                            <p class="rcpch_icon_text">{{ selected_organisation.email }}</p>
+                                        </div>
+                                    {% endif %}
+                                    {% if selected_organisation.website %}
+                                        <div class="item middle aligned rcpch_icon_text_group">
+                                            <i class="ui icon linkify"></i>
+                                            <p class="rcpch_icon_text">{{ selected_organisation.website }}</p>
+                                        </div>
+                                    {% endif %}
                                 </div>
                         </div>
                 </div>
 
 
-                <div class="ui card">
-                    <div class="content">
-                        <div class="rcpch_summary_stats">
-
-                            <div class="ui centered header">
-                                <h3>Currently Submitting Cohort</h3>
-                            </div>
-
-                                <div class="rcpch_summary_stats_row">
-                                    <h1>{{cohort_data.submitting_cohort}}</h1>
-                                    <h3>
-                                        {% if cohort_data.end_date > today %}
-                                            Actively recruiting and submitting data
-                                        {% else %}
-                                            Recruitment closed, submitting data only
-                                        {% endif %}
-                                    </h3>
-                                    <h4>Recruitment dates for Cohort {{cohort_data.submitting_cohort}}: {{cohort_data.submitting_cohort_start_date}} - {{cohort_data.submitting_cohort_end_date}}</h4>
-                                </div>
-
-                                <div class="rcpch_summary_stats_row">
-                                    <h1>{{cohort_data.submitting_cohort_days_remaining}}</h1>
-                                    <h2>Days remaining</h2>
-                                    <h3>until latest submission date</h3>
-                                    <h4>({{cohort_data.submitting_cohort_submission_date}})</h4>
-                                </div>
-
-                        </div>
-                    </div>
-                </div>
+                {% include 'epilepsy12/partials/organisation/cohort_card.html' with cohort_data=cohort_data %}
 
 
                 <div class="ui  card">

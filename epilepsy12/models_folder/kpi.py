@@ -361,6 +361,10 @@ class KPI(models.Model, HelpTextMixin):
     class Meta:
         verbose_name = _("KPI ")
         verbose_name_plural = _("KPIs")
+        ordering = ["registration__case"]
 
     def __str__(self):
-        return f"KPI for child in {self.organisation.name}({self.organisation.trust.name})"
+        if self.organisation.trust:
+            return f"KPI for {self.registration.case} in {self.organisation.name}({self.organisation.trust.name})"
+        else:
+            return f"KPI for {self.registration.case} in {self.organisation.name}({self.organisation.local_health_board.name})"

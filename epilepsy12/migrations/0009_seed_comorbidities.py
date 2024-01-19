@@ -28,13 +28,11 @@ def seed_comorbidities(apps, schema_editor):
     Returns:
         None
     """
-    logger.debug(
-        "\033[33m",
-        "Seeding comorbidities from paediatric neurodisability reference set...",
-        "\033[33m",
+    logger.info(
+        "\033[33m Seeding comorbidities from paediatric neurodisability reference set... \033[33m",
     )
     if ComorbidityList.objects.count() >= 312:
-        logger.debug(f"{ComorbidityList.objects.count()} Comorbidities already exist. Skipping...")
+        logger.info(f"{ComorbidityList.objects.count()} Comorbidities already exist. Skipping...")
         return
     # ecl = '<< 35919005'
     # comorbidity_choices = fetch_ecl(ecl)
@@ -43,7 +41,9 @@ def seed_comorbidities(apps, schema_editor):
     )
 
     for index, comorbidity_choice in enumerate(comorbidity_choices):
-        if ComorbidityList.objects.filter(conceptId=comorbidity_choice["conceptId"]).exists():
+        if ComorbidityList.objects.filter(
+            conceptId=comorbidity_choice["conceptId"]
+        ).exists():
             # duplicate conceptId
             pass
         else:
@@ -54,20 +54,20 @@ def seed_comorbidities(apps, schema_editor):
             )
             try:
                 new_comorbidity.save()
-                logger.debug(f"{new_comorbidity.preferredTerm} added.")
+                logger.info(f"{new_comorbidity.preferredTerm} added.")
             except Exception as e:
-                logger.debug(f"Comorbidity {comorbidity_choice.preferredTerm} not added. {e}")
-    
+                logger.info(f"Comorbidity {comorbidity_choice.preferredTerm} not added. {e}")
+
     # Add 'Other' into ComorbidityList
     ComorbidityList.objects.create(
         conceptId='-1',
         term='Other',
         preferredTerm='Other'
     )
-    logger.debug(f"Added 'Other' to ComorbidityList.")
-    
+    logger.info(f"Added 'Other' to ComorbidityList.")
+
     # 'Other' adds one more to list
-    logger.debug(f"{index+1} comorbidities added")
+    logger.info(f"{index+1} comorbidities added")
 
 
 class Migration(migrations.Migration):

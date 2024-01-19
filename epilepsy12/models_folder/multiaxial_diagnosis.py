@@ -147,8 +147,8 @@ class MultiaxialDiagnosis(
         "epilepsy12.EpilepsyCause",
         on_delete=models.PROTECT,
         help_text={
-            "label": "What is the main identified cause of the epilepsy?",
-            "reference": "What is the main identified cause of the epilepsy?",
+            "label": "Please select the main identified cause of the epilepsy. If the cause is not in this list, please email the Epilepsy12 team",
+            "reference": "Please select the main identified cause of the epilepsy. If the cause is not in this list, please email the Epilepsy12 team",
         },
         max_length=250,
         default=None,
@@ -161,6 +161,7 @@ class MultiaxialDiagnosis(
     class Meta:
         verbose_name = "Multiaxial Diagnosis"
         verbose_name_plural = "Multiaxial diagnosis assessments"
+        ordering = ["registration__case"]
 
     def __str__(self) -> str:
         return f"Multaxial diagnosis for {self.registration.case}"

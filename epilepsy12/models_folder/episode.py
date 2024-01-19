@@ -295,6 +295,7 @@ class Episode(TimeStampAbstractBaseClass, UserStampAbstractBaseClass, HelpTextMi
     class Meta:
         verbose_name = "Episode"
         verbose_name_plural = "Episodes"
+        ordering = ["multiaxial_diagnosis__registration__case"]
 
     def __str__(self) -> str:
-        return f"{self.get_epilepsy_or_nonepilepsy_status_display()} type seizure for  {self.multiaxial_diagnosis.registration.case}"
+        return f"Episode for {self.multiaxial_diagnosis.registration.case}"

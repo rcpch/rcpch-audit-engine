@@ -26,7 +26,7 @@ def syndrome_diagnosis_date(request, syndrome_id):
             model_id=syndrome_id,
             field_name="syndrome_diagnosis_date",
             page_element="date_field",
-            earliest_allowable_date=syndrome.multiaxial_diagnosis.registration.first_paediatric_assessment_date,
+            # earliest_allowable_date=syndrome.multiaxial_diagnosis.registration.first_paediatric_assessment_date,
         )
     except ValueError as error:
         error_message = error

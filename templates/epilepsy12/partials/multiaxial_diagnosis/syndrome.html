@@ -7,18 +7,18 @@
       <div class="content">
         Syndrome
         <div class="sub header">
-          Does it fulfill criteria for an epilepsy syndrome?
+          Does it fulfil criteria for an epilepsy syndrome?
         </div>
       </div>
     </h5>
 
     <div class="field">
-      {% url 'syndrome_diagnosis_date' syndrome_id=syndrome.pk as hx_post %} 
-      {% include 'epilepsy12/partials/page_elements/date_field.html' with hx_post=hx_post hx_target="#syndrome" hx_trigger='change delay:1s' hx_swap="outerHTML" hx_name='syndrome_diagnosis_date' date_value=syndrome.syndrome_diagnosis_date label=syndrome.get_syndrome_diagnosis_date_help_label_text reference=syndrome.get_syndrome_diagnosis_date_help_reference_text input_date_field_name='syndrome_diagnosis_date' data_position='top left' enabled=perms.epilepsy12.change_syndrome has_permission=perms.epilepsy12.change_syndrome %}
+      {% url 'syndrome_diagnosis_date' syndrome_id=syndrome.pk as hx_post %}
+      {% include 'epilepsy12/partials/page_elements/date_field.html' with hx_post=hx_post hx_target="#syndrome" hx_trigger='change delay:1000ms' hx_swap="outerHTML" hx_name='syndrome_diagnosis_date' date_value=syndrome.syndrome_diagnosis_date label=syndrome.get_syndrome_diagnosis_date_help_label_text reference=syndrome.get_syndrome_diagnosis_date_help_reference_text input_date_field_name='syndrome_diagnosis_date' data_position='top left' enabled=perms.epilepsy12.change_syndrome has_permission=perms.epilepsy12.change_syndrome error_message=error_message %}
     </div>
 
     <div class="field">
-      {% url 'syndrome_name' syndrome_id=syndrome.pk as hx_post %} 
+      {% url 'syndrome_name' syndrome_id=syndrome.pk as hx_post %}
       {% include 'epilepsy12/partials/page_elements/select_model.html' with choices=syndrome_selection hx_post=hx_post hx_target="#syndrome" hx_trigger='change' hx_swap="outerHTML" hx_name='syndrome_name' hx_default_text="Select a syndrome..." field_name='syndrome_name' test_positive=syndrome.syndrome.pk label=syndrome.get_syndrome_help_label_text reference=syndrome.get_syndrome_help_reference_text data_position='top left' enabled=perms.epilepsy12.change_syndrome has_permission=perms.epilepsy12.change_syndrome %}
     </div>
 
@@ -30,8 +30,7 @@
         hx-swap="innerHTML swap:500ms"
         hx-trigger="click"
       >
-        Syndrome entry complete for
-        {{syndrome.multiaxial_diagnosis.registration.case}}
+        Save new Syndrome
       </div>
     </div>
   </div>

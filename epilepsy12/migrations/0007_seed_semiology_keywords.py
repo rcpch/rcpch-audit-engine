@@ -9,9 +9,10 @@ from ..models import Keyword
 # Logging setup
 logger = logging.getLogger(__name__)
 
+
 def seed_semiology_keywords(apps, schema_editor):
     added = 0
-    logger.debug("\033[33m", "Seeding all the epilepsy semiology keywords...", "\033[33m")
+    logger.debug("\033[33m Seeding all the epilepsy semiology keywords... \033[33m")
     for index, semiology_keyword in enumerate(KEYWORDS):
         if Keyword.objects.filter(keyword=semiology_keyword["title"]).exists():
             logger.debug("Keywords already exist. Skipping this step...")
