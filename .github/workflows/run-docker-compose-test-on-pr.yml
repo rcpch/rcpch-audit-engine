@@ -25,10 +25,6 @@ jobs:
           echo -e "${{ secrets.ENVIRONMENT }}" | base64 -d > envs/.env
           cat envs/.env
 
-      - name: Creates git_hash.txt file current commit hash
-        id: hash
-        run: echo "GIT_BRANCH=$(echo ${GITHUB_REF#refs/heads/}),GIT_HASH=$(git rev-parse --short "$GITHUB_SHA")" > git_hash.txt
-
       - name: Install Docker Compose
         run: |
           sudo apt-get update
