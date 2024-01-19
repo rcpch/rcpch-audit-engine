@@ -21,6 +21,7 @@ RCPCH_CENSUS_PLATFORM_TOKEN= # API key for RCPCH Census Platform (Deprivation sc
 RCPCH_CENSUS_PLATFORM_URL="https://api.rcpch.ac.uk/deprivation/v1"
 
 # DJANGO
+AUTO_LOGOUT_DELAY_MINUTES=30 # minutes
 DEBUG="True" # Set DEBUG=True for Local dev and Development, not Staging or Live
 DJANGO_ALLOWED_HOSTS="${SITE_DOMAIN}"
 DJANGO_CSRF_TRUSTED_ORIGINS="https://${SITE_DOMAIN}"
@@ -28,6 +29,11 @@ DJANGO_STARTUP_COMMAND="python manage.py runserver 0.0.0.0:8000" # for local dev
 # DJANGO_STARTUP_COMMAND="gunicorn --bind=0.0.0.0:8000 --timeout 600 rcpch-audit-engine.wsgi" # for live deployment
 E12_SECRET_KEY= # secret key for Django
 SITE_CONTACT_EMAIL="sitecontactemail@example.com" # email address for site contact
+
+# DJANGO LOGGING
+CONSOLE_DJANGO_LOG_LEVEL="WARNING" # default Django-specific console logs [DEBUG, INFO, WARNING, ERROR, CRITICAL]
+CONSOLE_LOG_LEVEL="DEBUG" # Epilepsy12 App console logs [DEBUG, INFO, WARNING, ERROR, CRITICAL]
+FILE_LOG_LEVEL="DEBUG" # All logs, but to file [DEBUG, INFO, WARNING, ERROR, CRITICAL]
 
 # DJANGO POSTGRES DATABASE CONNECTION
 E12_POSTGRES_DB_HOST="postgis"
