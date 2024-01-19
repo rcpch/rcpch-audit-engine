@@ -35,6 +35,10 @@ jobs:
           sudo apt-get update
           sudo apt-get install -y docker-compose
 
+      - name: Show Docker environment info
+        run: |
+          docker compose config
+
       - name: Build Docker images and run containers with compose
         run: |
           docker compose up -d
