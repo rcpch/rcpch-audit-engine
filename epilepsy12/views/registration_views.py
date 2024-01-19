@@ -1,3 +1,6 @@
+# python
+from datetime import date
+
 # django imports
 from django.shortcuts import render
 from django.contrib.auth.decorators import permission_required
@@ -28,7 +31,7 @@ from ..common_view_functions import (
 from ..decorator import user_may_view_this_child, login_and_otp_required
 from ..general_functions import (
     construct_transfer_epilepsy12_site_email,
-    dates_for_cohort,
+    cohorts_and_dates,
 )
 from ..tasks import asynchronously_send_email_to_recipients
 
@@ -666,9 +669,11 @@ def first_paediatric_assessment_date(request, case_id):
     if request.user.is_superuser or request.user.is_rcpch_audit_team_member:
         earliest_allowable_date = case.date_of_birth
     else:
-        earliest_allowable_date = dates_for_cohort(registration.cohort)[
-            "cohort_start_date"
-        ]
+        # registering a new child in the audit by a clinical team
+        # sets the minimum allowable date to the currently submitting cohort start date
+        earliest_allowable_date = cohorts_and_dates(
+            first_paediatric_assessment_date=date.today()
+        )["submitting_cohort_start_date"]
 
     try:
         error_message = None
