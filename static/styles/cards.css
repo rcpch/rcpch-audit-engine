@@ -79,6 +79,25 @@
     font-weight: 400;
   } */
 
+.cohorts_dates_grid{
+  display: grid;
+  grid-template-columns: 48% 4% 48%;
+}
+
+.grid_line {
+    height: 90%;
+    width: 1px;
+    border-left: 1px solid #d4d4d5;
+    grid-column: span 1 / span 1;
+    margin-right: 10px;
+    margin-left: 10px;
+    margin-top: 15px;
+}
+
+.ui.centered.header.cohort_card_header {
+  margin-top: 0;
+  margin-bottom: 0;
+}
   /* cards for organisation details */
 .organisation_details {
     padding: 0.5em 0.5em;
