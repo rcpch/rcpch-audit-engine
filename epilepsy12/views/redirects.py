@@ -22,9 +22,21 @@ def rcpch_403(request, exception):
     # the 403 template would be inserted into the target. This way the HttpReponseClientRedirect
     # from django-htmx middleware forces a redirect to the two-factor sign-in page
     if request.htmx:
-        return HttpResponseClientRedirect('two_factor:login', status=403)
+        if request.user.is_authenticated:
+            redirect_url = reverse_lazy("redirect_403")
+            return HttpResponseClientRedirect(redirect_url, status=403)
+        else: 
+            return HttpResponseClientRedirect('two_factor:login', status=403)
     else:
-        return redirect('two_factor:login')
+        if request.user.is_authenticated:
+            return render(
+            request,
+            template_name="epilepsy12/error_pages/rcpch_403.html",
+            context={},
+            status=403,
+        )
+        else:
+            return redirect('two_factor:login')
 
 
 def redirect_403(request):
