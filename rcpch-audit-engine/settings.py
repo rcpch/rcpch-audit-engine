@@ -142,7 +142,7 @@ AUTO_LOGOUT = {
 # LOGIN_URL = "/registration/login/"
 LOGIN_URL = "two_factor:login"  # change LOGIN_URL to the 2fa one
 LOGIN_REDIRECT_URL = "two_factor:profile"
-LOGOUT_REDIRECT_URL = "/"
+LOGOUT_REDIRECT_URL = "two_factor:login"
 
 # REDIS / Celery
 CELERY_BROKER_URL = os.getenv("CELERY_BROKER_URL")
