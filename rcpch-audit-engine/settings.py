@@ -22,7 +22,7 @@ from celery.schedules import crontab
 from django.core.management.utils import get_random_secret_key
 
 # RCPCH imports
-from .logging_settings import LOGGING
+from .logging_settings import LOGGING # no it is not an unused import, it pulls LOGGING into the settings file
 
 logger = logging.getLogger(__name__)
 
