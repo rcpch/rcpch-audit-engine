@@ -22,7 +22,7 @@ from celery.schedules import crontab
 from django.core.management.utils import get_random_secret_key
 
 # RCPCH imports
-from .logging_settings import LOGGING
+from .logging_settings import LOGGING # no it is not an unused import, it pulls LOGGING into the settings file
 
 logger = logging.getLogger(__name__)
 
@@ -134,7 +134,7 @@ ROOT_URLCONF = "rcpch-audit-engine.urls"
 
 # AUTO LOGOUT SESSION EXPIRATION
 AUTO_LOGOUT = {
-    "IDLE_TIME": datetime.timedelta(minutes=30),
+    "IDLE_TIME": int(os.getenv("AUTO_LOGOUT_DELAY_MINUTES")),
     "REDIRECT_TO_LOGIN_IMMEDIATELY": True,
     "MESSAGE": "You have been automatically logged out as there was no activity for 30 minutes. Please login again to continue.",
 }
