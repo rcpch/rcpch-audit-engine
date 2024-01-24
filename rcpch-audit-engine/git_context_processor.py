@@ -10,7 +10,9 @@ import logging
 logger = logging.getLogger(__name__)
 
 
-def get_active_branch_and_commit(_request):
+def get_active_branch_and_commit(
+    request,  # pylint: disable=unused-argument
+):
     """
     Gets the active branch and latest commit hash from the git repo
     """
@@ -21,17 +23,20 @@ def get_active_branch_and_commit(_request):
         "latest_git_commit": "[latest commit hash not found]",
     }
 
-    head_dir = Path(".") / ".git" / "HEAD"
-    with head_dir.open("r") as f:
-        head_branch = f.read().splitlines()
-    for line in head_branch:
-        if line[0:4] == "ref:":
-            git_data["active_git_branch"] = line.partition("refs/heads/")[2]
-    logger.info("Active git branch: %s", git_data["active_git_branch"])
+    try:
+        head_dir = Path(".") / ".git" / "HEAD"
+        with head_dir.open("r") as f:
+            head_branch = f.read().splitlines()
+        for line in head_branch:
+            if line[0:4] == "ref:":
+                git_data["active_git_branch"] = line.partition("refs/heads/")[2]
+        logger.info("Active git branch: %s", git_data["active_git_branch"])
 
-    refs_dir = Path(".") / ".git" / "refs" / "heads" / git_data["active_git_branch"]
-    with refs_dir.open("r") as f:
-        git_data["latest_git_commit"] = f.read().splitlines()[0]
-    logger.info("Latest git commit: %s", git_data["latest_git_commit"])
+        refs_dir = Path(".") / ".git" / "refs" / "heads" / git_data["active_git_branch"]
+        with refs_dir.open("r") as f:
+            git_data["latest_git_commit"] = f.read().splitlines()[0]
+        logger.info("Latest git commit: %s", git_data["latest_git_commit"])
+    except:  # pylint: disable=bare-except
+        logger.exception("Error getting git data from repository")
 
     return git_data

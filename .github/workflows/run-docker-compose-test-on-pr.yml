@@ -17,8 +17,10 @@ jobs:
     runs-on: ubuntu-latest
 
     steps:
-      - name: Checkout code
-        uses: actions/checkout@v3
+      - name: Checkout full code repo
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0 # to allow git_context_processor.py to still work
 
       - name: Create .env file from repo secrets
         run: |
