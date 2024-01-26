@@ -204,7 +204,6 @@
   .ui.rcpch_purple.button .icon:hover {
     border-radius: 0% !important;
     color: white;
-    background-color: var(--rcpch_purple_dark_tint);
     transition-duration: 0.4s;
     font-weight: 400;
   }
@@ -375,3 +374,8 @@
   }
   
   
+  .rcpch_purple.half_button {
+    border-radius: 0% !important;
+    color: white;
+    font-weight: 400;
+  }
