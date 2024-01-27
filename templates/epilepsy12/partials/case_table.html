@@ -120,15 +120,16 @@
           <td class='two wide'>
             <div class='ui buttons'>
               <button 
-                data-tooltip='Edit child details.'
+                data-tooltip='Edit or delete child.'
                 {% if case.locked or case.registration.days_remaining_before_submission == 0 %}
                   class="ui rcpch_purple icon disabled button"
                 {% else %}
                   class="ui rcpch_purple icon button"
                 {% endif %}
                 tabindexed="0" {% if case.locked or not perms.epilepsy12.change_case %}disabled{% endif %}>
-                <a href="{% url 'update_case' organisation_id=organisation_id case_id=case.id%}">
-                  <i class="edit outline icon"></i>
+                <a href="{% url 'update_case' organisation_id=organisation_id case_id=case.id%}" class="rcpch_purple half_button">
+                  <i class="edit outline icon icon_white"></i>
+                  Edit
                 </a>
               </button>
               
