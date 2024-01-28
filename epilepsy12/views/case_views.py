@@ -35,6 +35,7 @@ from ..tasks import asynchronously_send_email_to_recipients
 # Logging setup
 logger = logging.getLogger(__name__)
 
+
 @login_and_otp_required()
 @user_may_view_this_organisation()
 def case_list(request, organisation_id):
@@ -320,6 +321,7 @@ def case_list(request, organisation_id):
         "rcpch_choices": rcpch_choices,
         "organisation_id": organisation_id,
         "cases_in_transfer": cases_in_transfer,
+        "filtered_case_list": filter_term,
     }
     if request.htmx:
         return render(
