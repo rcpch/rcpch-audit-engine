@@ -1,5 +1,5 @@
 # Base Docker image Official Python 3.10
-FROM python:3.10-slim
+FROM python:3.10
 
 # Set 'build-time' environment variables
 ENV PYTHONDONTWRITEBYTECODE 1
