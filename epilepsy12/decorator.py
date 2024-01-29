@@ -1,6 +1,7 @@
 # python imports
 import logging
 
+from django.conf import settings
 from django.core.exceptions import PermissionDenied
 from django.contrib.auth.decorators import login_required
 from .models import (
@@ -408,6 +409,12 @@ def login_and_otp_required():
             # Then, ensure 2fa verified
             user = request.user
             
+            # Bypass 2fa if local dev, with warning message
+            if (settings.DEBUG and user.is_superuser):
+                logger.warning("User {} has bypassed 2FA for {} as {} and is superuser".format(user, view, settings.DEBUG))
+                return view(request, *args, **kwargs)
+            
+            # Prevent unverified users
             if not user.is_verified():
                 logger.info(f"{user=} is unverified. Tried accessing {view}")
                 raise PermissionDenied()
