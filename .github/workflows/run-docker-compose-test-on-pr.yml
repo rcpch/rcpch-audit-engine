@@ -42,7 +42,6 @@ jobs:
 
       - name: Run tests
         run: |
-          docker compose exec django pytest epilepsy12/tests/test_meta_seed_test_db.py -v 
           docker compose exec django pytest -v
 
 
