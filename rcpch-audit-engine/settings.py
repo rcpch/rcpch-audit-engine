@@ -134,7 +134,7 @@ ROOT_URLCONF = "rcpch-audit-engine.urls"
 
 # AUTO LOGOUT SESSION EXPIRATION
 AUTO_LOGOUT = {
-    "IDLE_TIME": int(os.getenv("AUTO_LOGOUT_DELAY_SECONDS")),
+    "IDLE_TIME": int(os.getenv("AUTO_LOGOUT_DELAY_SECONDS", 1800)),
     "REDIRECT_TO_LOGIN_IMMEDIATELY": True,
     "MESSAGE": "You have been automatically logged out as there was no activity for 30 minutes. Please login again to continue.",
 }
