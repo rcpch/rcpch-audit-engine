@@ -21,7 +21,7 @@ RCPCH_CENSUS_PLATFORM_TOKEN= # API key for RCPCH Census Platform (Deprivation sc
 RCPCH_CENSUS_PLATFORM_URL="https://api.rcpch.ac.uk/deprivation/v1"
 
 # DJANGO
-AUTO_LOGOUT_DELAY_MINUTES=30 # default 30 minutes
+AUTO_LOGOUT_DELAY_SECONDS=1800 # default 30 minutes
 DEBUG="True" # Set DEBUG=True for Local dev and Development, not Staging or Live
 DJANGO_ALLOWED_HOSTS="${SITE_DOMAIN}"
 DJANGO_CSRF_TRUSTED_ORIGINS="https://${SITE_DOMAIN}"

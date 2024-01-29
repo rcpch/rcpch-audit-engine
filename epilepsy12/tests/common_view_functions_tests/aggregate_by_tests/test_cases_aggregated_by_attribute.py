@@ -10,7 +10,13 @@ from epilepsy12.common_view_functions import (
     cases_aggregated_by_deprivation_score,
     cases_aggregated_by_ethnicity,
 )
+
+from epilepsy12.tests.common_view_functions_tests.aggregate_by_tests.helpers import (
+    _clean_cases_from_test_db,
+)
+
 from epilepsy12.models import (
+    Case,
     Organisation,
 )
 from epilepsy12.constants import (
@@ -28,6 +34,9 @@ def test_cases_aggregated_by_sex(e12_case_factory):
 
     Thus expected total count is 10 for each sex, except Male, which is 11.
     """
+
+    # removes some of the cases which are seeded earlier in the test db
+    _clean_cases_from_test_db()
 
     # define constants
     GOSH = Organisation.objects.get(
@@ -51,7 +60,7 @@ def test_cases_aggregated_by_sex(e12_case_factory):
         "Female": 10,
         "Not Known": 10,
         "Not Specified": 10,
-        "Male": 11,
+        "Male": 10,
     }
 
     for aggregate in cases_queryset:
@@ -127,6 +136,9 @@ def test_cases_aggregated_by_deprivation_score(e12_case_factory, e12_site_factor
 def test_cases_aggregated_by_ethnicity(e12_case_factory):
     """Tests the cases_aggregated_by_ethnicity fn returns correct count."""
 
+    # removes some of the cases which are seeded earlier in the test db
+    _clean_cases_from_test_db()
+
     # define constants
     GOSH = Organisation.objects.get(
         ods_code="RP401",
@@ -148,8 +160,8 @@ def test_cases_aggregated_by_ethnicity(e12_case_factory):
     expected_counts = [
         {
             "ethnicity_display": "White British",
-            "ethnicities": 11,
-        },  # 11 AS THERE IS ALREADY A SEEDED CASE IN TEST DB
+            "ethnicities": 10,
+        },
         {"ethnicity_display": "White - Irish", "ethnicities": 10},
         {"ethnicity_display": "White - Any other White background", "ethnicities": 10},
         {
