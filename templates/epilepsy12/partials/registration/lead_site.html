@@ -14,10 +14,9 @@
                             
                             <i class="rcpch_pink check circle outline icon"></i>
 
-                            {% if perms.epilepsy12.can_edit_epilepsy12_lead_centre or perms.epilepsy12.can_transfer_epilepsy12_lead_centre or perms.epilepsy12.can_delete_epilepsy12_lead_centre %}
+                            {% if perms.epilepsy12.can_edit_epilepsy12_lead_centre or perms.epilepsy12.can_transfer_epilepsy12_lead_centre %}
 
                                 <div class="ui buttons">
-                                        
                                         <button
                                             {% if perms.epilepsy12.can_transfer_epilepsy12_lead_centre %}
                                                 class="ui rcpch_primary button"
@@ -29,7 +28,6 @@
                                             hx-swap="innerHTML"
                                             hx-trigger="click"
                                         >Transfer</button>
-
                                 </div>    
                             
                             {% endif %}
