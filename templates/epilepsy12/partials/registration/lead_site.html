@@ -30,16 +30,6 @@
                                             hx-trigger="click"
                                         >Transfer</button>
 
-                                        {% if perms.epilepsy12.can_delete_epilepsy12_lead_centre %}
-                                            <button 
-                                                class="ui rcpch_danger button"
-                                                hx-post="{% url 'delete_lead_site' registration_id=registration.pk site_id=site.pk %}"
-                                                hx-target="#lead_site"
-                                                hx-swap="innerHTML"
-                                                hx-trigger="click"
-                                            >Delete</button>
-                                        {% endif %}
-
                                 </div>    
                             
                             {% endif %}

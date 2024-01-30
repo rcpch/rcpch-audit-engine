@@ -981,11 +981,6 @@ registration_patterns = [
         name="allocate_lead_site",
     ),
     path(
-        "registration/<int:registration_id>/site/<int:site_id>/delete",
-        delete_lead_site,
-        name="delete_lead_site",
-    ),
-    path(
         "registration/<int:registration_id>/previous_sites",
         previous_sites,
         name="previous_sites",
