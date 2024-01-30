@@ -36,12 +36,6 @@ can_register_child_in_epilepsy12
 [] Assert an Audit Centre Lead Clinician CANNOT register a child outside their own Trust in Epilepsy12
 [] Assert RCPCH Audit Team CAN register a child within any Trust in Epilepsy12
 
-can_delete_epilepsy12_lead_centre
-[] Assert an Audit Centre Administrator CANNOT 'delete_lead_site'
-[] Assert an audit centre clinician CANNOT delete_lead_site
-[] Assert an Audit Centre Lead Clinician CANNOT delete_lead_site
-[] Assert RCPCH Audit Team CAN delete_lead_site
-
 """
 # python imports
 import pytest
