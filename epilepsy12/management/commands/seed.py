@@ -2,15 +2,19 @@
 from random import randint, choice
 from datetime import date
 from random import randint
-
+import logging
 
 from django.core.management.base import BaseCommand
+
+# Logging setup
+logger = logging.getLogger(__name__)
 
 from ...general_functions import (
     cohort_number_from_first_paediatric_assessment_date,
     dates_for_cohort,
     return_random_postcode,
     random_date,
+    add_epilepsy_cause_list_by_sctid,
 )
 from ...constants import (
     ETHNICITIES,
@@ -48,6 +52,13 @@ class Command(BaseCommand):
             help="Indicates the cohort to create children for. Note cannot be less than 4.",
             default=7,
         )
+        parser.add_argument(
+            "-sctids",
+            "--snomedctids",
+            nargs="+",
+            help="List of SNOMED-CT ids to update the epilepsy causes with.",
+            type=int,
+        )
 
     def handle(self, *args, **options):
         if options["mode"] == "cases":
@@ -79,6 +90,12 @@ class Command(BaseCommand):
         elif options["mode"] == "async_upload_user_data":
             self.stdout.write("CELERY: uploading user data.")
             async_insert_user_data.delay()
+        elif options["mode"] == "add_new_epilepsy_causes":
+            extra_concept_ids = options["snomedctids"]
+            if not isinstance(extra_concept_ids, list):
+                self.stdout.write("Must provide a list of SNOMED CT ID integers.")
+                return
+            add_epilepsy_cause_list_by_sctid(extra_concept_ids=extra_concept_ids)
 
         else:
             self.stdout.write("No options supplied...")
