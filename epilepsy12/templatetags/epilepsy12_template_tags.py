@@ -479,13 +479,24 @@ def no_eligible_cases(aggregation_model, kpi_name: str):
 # the list of which can be found in 'capitalised_words' below
 @register.filter
 def capitalise_org_names(organisation_name):
-    capitalised_words = ['Ii', 'Rbh', 'Nhs', 'Cdc', '(Hq)', '(Epma)', '(Epact)', 'Gstt', 'Qmc', 'Ctr']
+    capitalised_words = [
+        "Ii",
+        "Rbh",
+        "Nhs",
+        "Cdc",
+        "(Hq)",
+        "(Epma)",
+        "(Epact)",
+        "Gstt",
+        "Qmc",
+        "Ctr",
+    ]
     organisation_name = organisation_name.split()
     organisation_name = [
         name.upper() if name in capitalised_words else name
         for name in organisation_name
     ]
-    organisation_name = ' '.join(organisation_name)
+    organisation_name = " ".join(organisation_name)
     return mark_safe(organisation_name)
 
 
