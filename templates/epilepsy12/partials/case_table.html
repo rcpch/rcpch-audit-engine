@@ -299,18 +299,22 @@
     <tfoot>
       <tr>
         <th colspan="10" class="right aligned">
-          {% if case_list %}
-            <label>page {{case_list.number}} of {{case_list.paginator.num_pages}}</label>
-          {% endif %}
           {% if case_list.has_previous %}
           <div class="ui rcpch_primary button" hx-target="#case_table"
-            hx-get="{% url 'cases' organisation_id=organisation.pk %}?page={{case_list.previous_page_number}}&filtered_case_list={{filtered_case_list}}&sort_flag={{sort_flag}}"
-            hx-swap="innerHTML">Previous 10</div>
+          hx-get="{% url 'cases' organisation_id=organisation.pk %}?page={{case_list.previous_page_number}}&filtered_case_list={{filtered_case_list}}&sort_flag={{sort_flag}}"
+          hx-swap="innerHTML">Previous 10</div>
           {% endif %}
           {% if case_list.has_next %}
           <div class="ui rcpch_primary button" name="next_button" hx-target="#case_table"
-            hx-get="{% url 'cases' organisation_id=organisation.pk  %}?page={{ case_list.next_page_number }}&filtered_case_list={{filtered_case_list}}&sort_flag={{sort_flag}}"
-            hx-swap="innerHTML">Next 10</div>
+          hx-get="{% url 'cases' organisation_id=organisation.pk  %}?page={{ case_list.next_page_number }}&filtered_case_list={{filtered_case_list}}&sort_flag={{sort_flag}}"
+          hx-swap="innerHTML">Next 10</div>
+          {% endif %}
+        </th>
+      </tr>
+      <tr>
+        <th colspan="12" class="right aligned">
+          {% if case_list %}
+            <label>Page {{case_list.number}} of {{case_list.paginator.num_pages}}</label>
           {% endif %}
         </th>
       </tr>
