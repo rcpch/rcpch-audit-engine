@@ -7,7 +7,7 @@ reviewers: Dr Simon Chapman
 
 Lists that feed either the toggle buttons or the select dropdowns are either found in the `constants` folder, or are seeded to the database in the `migrations`.
 
-**Organisation** lists are seeded from `constants` as are the levels of abstraction associated with them (trust, ICB etc.) 
+**Organisation** lists are seeded from `constants` as are the levels of abstraction associated with them (trust, ICB etc.)
 
 The **Epilepsy causes** and **comorbidities**, by contrast are a SNOMED refset seeded from the RCPCH SNOMED server in migration 0006 and 0009 into EpilepsyCause and ComorbidityList respectively.
 
@@ -28,7 +28,7 @@ Since go-live, E12 have wished on the basis of user feedback, from time to time 
 3. In the python shell to run the seed function:
 
 ```console
-python manage.py --mode=add_new_epilepsy_causes -sctids 764946008 52767006
+docker compose exec django python manage.py seed --mode=add_new_epilepsy_causes -sctids 764946008 52767006 ...
 ```
 
 Note that the function expects a list, even if only one item is supplied.
