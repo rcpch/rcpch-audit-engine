@@ -37,6 +37,30 @@
             <div class='ui left icon input'>
                 <input
                     {% if not enabled %}disabled{% endif %}
+                    _="on keyup or change if my value remove @disabled from #{{input_date_field_name}}_id"
+                    type="date"
+                    name="{{input_date_field_name}}"
+                    value="{{date_value|date:'Y-m-d'}}">
+                    {% if date_value is None or error_message %}
+                        <span class="episode-date" data-tooltip="This field is mandatory" data-inverted="" data-position="top left">
+                            <i class="rcpch_light_blue dot circle outline icon" ></i>
+                        </span>
+                    {% else %}
+                        <i class="rcpch_pink check circle outline icon"></i>
+                    {% endif %}
+                </input>
+                <i class="htmx-indicator spinner loading icon" id="spinner"></i>
+                <button 
+                    id= "{{input_date_field_name}}_id"
+                    class="ui rcpch_light_blue button"
+                    {% if not enabled or date_value is None %}disabled{% endif %}
+                    hx-headers='{"X-CSRFToken": "{{ csrf_token }}"}'
+                    hx-swap="{{hx_swap}}"
+                    name="{{input_date_field_name}}"
+                    hx-post="{{hx_post}}"
+                    hx-target="{{hx_target}}"
+                    hx-trigger="click"
+                    hx-include="[name='{{input_date_field_name}}']"
                     {% if hx_confirm %}
                     _="on htmx:confirm(issueRequest)
                         halt the event
@@ -52,23 +76,7 @@
                           })
                         if result.isConfirmed issueRequest()"
                     {% endif %}
-                    type="date"
-                    hx-headers='{"X-CSRFToken": "{{ csrf_token }}"}'
-                    hx-swap="{{hx_swap}}"
-                    name="{{input_date_field_name}}"
-                    hx-post="{{hx_post}}"
-                    hx-target="{{hx_target}}"
-                    hx-trigger="{{hx_trigger}}"
-                    value="{{date_value|date:'Y-m-d'}}">
-                    {% if date_value is None or error_message %}
-                        <span class="episode-date" data-tooltip="This field is mandatory" data-inverted="" data-position="top left">
-                            <i class="rcpch_light_blue dot circle outline icon" ></i>
-                        </span>
-                    {% else %}
-                        <i class="rcpch_pink check circle outline icon"></i>
-                    {% endif %}
-                </input>
-                <i class="htmx-indicator spinner loading icon" id="spinner"></i>
+                >Set</button>
             </div>
 
             {% if error_message %}
