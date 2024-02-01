@@ -21,11 +21,7 @@
         {{case.registration.kpi.get_paediatrician_with_expertise_in_epilepsies_help_label_text}}
       </td>
       <td class="right aligned">
-        {% if case.registration.kpi.paediatrician_with_expertise_in_epilepsies %}
-          {{case.registration.kpi.paediatrician_with_expertise_in_epilepsies|icon_for_score}}
-        {% else %}
-          Data Incomplete
-        {% endif %}
+        {{case.registration.kpi.paediatrician_with_expertise_in_epilepsies|icon_for_score}}
       </td>
     </tr>
     <tr {% if case.registration.kpi.epilepsy_specialist_nurse == 2 %} class='kpi_unscored' {% endif %}>
@@ -41,11 +37,7 @@
         {{case.registration.kpi.get_epilepsy_specialist_nurse_help_label_text}}
       </td>
       <td class="right aligned">
-        {% if case.registration.kpi.epilepsy_specialist_nurse %}
-          {{case.registration.kpi.epilepsy_specialist_nurse|icon_for_score}}
-        {% else %}
-          Data Incomplete
-        {% endif %}
+        {{case.registration.kpi.epilepsy_specialist_nurse|icon_for_score}}
       </td>
     </tr>
     <tr {% if case.registration.kpi.tertiary_input == 2 %} class='kpi_unscored' {% endif %} class="subcategory-header">
@@ -60,11 +52,7 @@
         ></i>
         {{case.registration.kpi.get_tertiary_input_help_label_text}}</td>
       <td class="right aligned">
-        {% if case.registration.kpi.tertiary_input %}
-          {{case.registration.kpi.tertiary_input|icon_for_score}}
-        {% else %}
-          Data Incomplete
-        {% endif %}
+        {{case.registration.kpi.tertiary_input|icon_for_score}}
       </td>
     </tr>
     <tr {% if case.registration.kpi.epilepsy_surgery_referral == 2 %} class='kpi_unscored' {% endif %} class="subcategory-row">
@@ -80,11 +68,7 @@
         {{case.registration.kpi.get_epilepsy_surgery_referral_help_label_text}}
       </td>
       <td class="right aligned">
-        {% if case.registration.kpi.epilepsy_surgery_referral %}
-          {{case.registration.kpi.epilepsy_surgery_referral|icon_for_score}}
-        {% else %}
-          Data Incomplete
-        {% endif %}
+        {{case.registration.kpi.epilepsy_surgery_referral|icon_for_score}}
       </td>
     </tr>
   </tbody>
@@ -111,11 +95,7 @@
         ></i>
         {{case.registration.kpi.get_ecg_help_label_text}}</td>
       <td class="right aligned">
-        {% if case.registration.kpi.ecg %}
-          {{case.registration.kpi.ecg|icon_for_score}}
-        {% else %}
-          Data Incomplete
-        {% endif %}
+        {{case.registration.kpi.ecg|icon_for_score}}
       </td>
     </tr>
     <tr {% if case.registration.kpi.mri == 2 %} class='kpi_unscored' {% endif %}>
@@ -130,11 +110,7 @@
         ></i>
         {{case.registration.kpi.get_mri_help_label_text}}</td>
       <td class="right aligned">
-        {% if case.registration.kpi.mri %}
-          {{case.registration.kpi.mri|icon_for_score}}
-        {% else %}
-          Data Incomplete
-        {% endif %}
+        {{case.registration.kpi.mri|icon_for_score}}
       </td>
     </tr>
   </tbody>
@@ -162,11 +138,7 @@
         {{case.registration.kpi.get_assessment_of_mental_health_issues_help_label_text}}
       </td>
       <td class="right aligned">
-        {% if case.registration.kpi.assessment_of_mental_health_issues %}
-          {{case.registration.kpi.assessment_of_mental_health_issues|icon_for_score}}
-        {% else %}
-          Data Incomplete
-        {% endif %}
+        {{case.registration.kpi.assessment_of_mental_health_issues|icon_for_score}}
       </td>
     </tr>
     <tr {% if case.registration.kpi.mental_health_support == 2 %} class='kpi_unscored' {% endif %}>
@@ -182,11 +154,7 @@
         {{case.registration.kpi.get_mental_health_support_help_label_text}}
       </td>
       <td class="right aligned">
-        {% if case.registration.kpi.mental_health_support %}
-          {{case.registration.kpi.mental_health_support|icon_for_score}}
-        {% else %}
-          Data Incomplete
-        {% endif %}
+        {{case.registration.kpi.mental_health_support|icon_for_score}}
       </td>
     </tr>
   </tbody>
@@ -214,11 +182,7 @@
         {{case.registration.kpi.get_sodium_valproate_help_label_text}}
       </td>
       <td class="right aligned">
-        {% if case.registration.kpi.sodium_valproate %}
-          {{case.registration.kpi.sodium_valproate|icon_for_score}}
-        {% else %}
-          Data Incomplete
-        {% endif %}
+        {{case.registration.kpi.sodium_valproate|icon_for_score}}
       </td>
     </tr>
   </tbody>
@@ -245,11 +209,7 @@
         ></i>{{case.registration.kpi.get_comprehensive_care_planning_agreement_help_label_text}}
       </td>
       <td class="right aligned">
-        {% if case.registration.kpi.comprehensive_care_planning_agreement %}
-          {{case.registration.kpi.comprehensive_care_planning_agreement|icon_for_score}}
-        {% else %}
-          Data Incomplete
-        {% endif %}
+        {{case.registration.kpi.comprehensive_care_planning_agreement|icon_for_score}}
       </td>
     </tr>
     <tr {% if case.registration.kpi.patient_held_individualised_epilepsy_document == 2 %} class='kpi_unscored' {% endif %} class="subcategory-row">
@@ -265,11 +225,7 @@
         {{case.registration.kpi.get_patient_held_individualised_epilepsy_document_help_label_text}}
       </td>
       <td class="right aligned">
-        {% if case.registration.kpi.patient_held_individualised_epilepsy_document %}
-          {{case.registration.kpi.patient_held_individualised_epilepsy_document|icon_for_score}}
-        {% else %}
-          Data Incomplete
-        {% endif %}
+        {{case.registration.kpi.patient_held_individualised_epilepsy_document|icon_for_score}}
       </td>
     </tr>
     <tr {% if case.registration.kpi.patient_carer_parent_agreement_to_the_care_planning == 2 %} class='kpi_unscored' {% endif %} class="subcategory-row">
@@ -285,11 +241,7 @@
         {{case.registration.kpi.get_patient_carer_parent_agreement_to_the_care_planning_help_label_text}}
       </td>
       <td class="right aligned">
-        {% if case.registration.kpi.patient_carer_parent_agreement_to_the_care_planning %}
-          {{case.registration.kpi.patient_carer_parent_agreement_to_the_care_planning|icon_for_score}}
-        {% else %}
-          Data Incomplete
-        {% endif %}
+        {{case.registration.kpi.patient_carer_parent_agreement_to_the_care_planning|icon_for_score}}
       </td>
     </tr>
     <tr {% if case.registration.kpi.care_planning_has_been_updated_when_necessary == 2 %} class='kpi_unscored' {% endif %} class="subcategory-row">
@@ -305,11 +257,7 @@
         {{case.registration.kpi.get_care_planning_has_been_updated_when_necessary_help_label_text}}
       </td>
       <td class="right aligned">
-        {% if case.registration.kpi.care_planning_has_been_updated_when_necessary %}
-          {{case.registration.kpi.care_planning_has_been_updated_when_necessary|icon_for_score}}
-        {% else %}
-          Data Incomplete
-        {% endif %}
+        {{case.registration.kpi.care_planning_has_been_updated_when_necessary|icon_for_score}}
       </td>
     </tr>
     <tr {% if case.registration.kpi.comprehensive_care_planning_content == 2 %} class='kpi_unscored' {% endif %} class="subcategory-header">
@@ -325,11 +273,7 @@
         {{case.registration.kpi.get_comprehensive_care_planning_content_help_label_text}}
       </td>
       <td class="right aligned">
-        {% if case.registration.kpi.comprehensive_care_planning_content %}
-          {{case.registration.kpi.comprehensive_care_planning_content|icon_for_score}}
-        {% else %}
-          Data Incomplete
-        {% endif %}
+        {{case.registration.kpi.comprehensive_care_planning_content|icon_for_score}}
       </td>
     </tr>
     <tr {% if case.registration.kpi.parental_prolonged_seizures_care_plan == 2 %} class='kpi_unscored' {% endif %} class="subcategory-row">
@@ -345,11 +289,7 @@
         {{case.registration.kpi.get_parental_prolonged_seizures_care_plan_help_label_text}}
       </td>
       <td class="right aligned">
-        {% if case.registration.kpi.parental_prolonged_seizures_care_plan %}
-          {{case.registration.kpi.parental_prolonged_seizures_care_plan|icon_for_score}}
-        {% else %}
-          Data Incomplete
-        {% endif %}
+        {{case.registration.kpi.parental_prolonged_seizures_care_plan|icon_for_score}}
       </td>
     </tr>
     <tr {% if case.registration.kpi.water_safety == 2 %} class='kpi_unscored' {% endif %} class="subcategory-row">
@@ -364,11 +304,7 @@
         ></i>
         {{case.registration.kpi.get_water_safety_help_label_text}}</td>
       <td class="right aligned">
-        {% if case.registration.kpi.water_safety %}
-          {{case.registration.kpi.water_safety|icon_for_score}}
-        {% else %}
-          Data Incomplete
-        {% endif %}
+        {{case.registration.kpi.water_safety|icon_for_score}}
       </td>
     </tr>
     <tr {% if case.registration.kpi.first_aid == 2 %} class='kpi_unscored' {% endif %} class="subcategory-row">
@@ -383,11 +319,7 @@
         ></i>
         {{case.registration.kpi.get_first_aid_help_label_text}}</td>
       <td class="right aligned">
-        {% if case.registration.kpi.first_aid %}
-          {{case.registration.kpi.first_aid|icon_for_score}}
-        {% else %}
-          Data Incomplete
-        {% endif %}
+        {{case.registration.kpi.first_aid|icon_for_score}}
       </td>
     </tr>
     <tr {% if case.registration.kpi.general_participation_and_risk == 2 %} class='kpi_unscored' {% endif %} class="subcategory-row">
@@ -403,11 +335,7 @@
         {{case.registration.kpi.get_general_participation_and_risk_help_label_text}}
       </td>
       <td class="right aligned">
-        {% if case.registration.kpi.general_participation_and_risk %}
-          {{case.registration.kpi.general_participation_and_risk|icon_for_score}}
-        {% else %}
-          Data Incomplete
-        {% endif %}
+        {{case.registration.kpi.general_participation_and_risk|icon_for_score}}
       </td>
     </tr>
     
@@ -423,11 +351,7 @@
         ></i>
         {{case.registration.kpi.get_sudep_help_label_text}}</td>
       <td class="right aligned">
-        {% if case.registration.kpi.sudep %}
-          {{case.registration.kpi.sudep|icon_for_score}}
-        {% else %}
-          Data Incomplete
-        {% endif %}
+        {{case.registration.kpi.sudep|icon_for_score}}
       </td>
     </tr>
 
@@ -444,11 +368,7 @@
         {{case.registration.kpi.get_service_contact_details_help_label_text}}
       </td>
       <td class="right aligned">
-        {% if case.registration.kpi.service_contact_details %}
-          {{case.registration.kpi.service_contact_details|icon_for_score}}
-        {% else %}
-          Data Incomplete
-        {% endif %}
+        {{case.registration.kpi.service_contact_details|icon_for_score}}
       </td>
     </tr>
 
@@ -465,11 +385,7 @@
         {{case.registration.kpi.get_school_individual_healthcare_plan_help_label_text}}
       </td>
       <td class="right aligned">
-        {% if case.registration.kpi.school_individual_healthcare_plan %}
-          {{case.registration.kpi.school_individual_healthcare_plan|icon_for_score}}
-        {% else %}
-          Data Incomplete
-        {% endif %}
+        {{case.registration.kpi.school_individual_healthcare_plan|icon_for_score}}
       </td>
     </tr>
   </tbody>
