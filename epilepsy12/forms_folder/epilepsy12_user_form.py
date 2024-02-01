@@ -20,6 +20,7 @@ from ..models import Epilepsy12User, Organisation, VisitActivity
 # Logging setup
 logger = logging.getLogger(__name__)
 
+
 class Epilepsy12UserUpdatePasswordForm(SetPasswordForm):
     # form show when setting or resetting password
     # password validation occurs here and updates the password_last_set field
