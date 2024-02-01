@@ -335,6 +335,15 @@ def create_epilepsy12_user(request, organisation_id, user_type, epilepsy12_user_
         )
 
         if form.is_valid():
+            # decorator cannot keep out users that change the organisation at this point.
+            if new_user.organisation_employer != request.user.organisation_employer:
+                raise PermissionDenied()
+            # decorator cannot keep out bad actors that change the is_rcpch_audit_team_member flag
+            if new_user.is_rcpch_audit_team_member and not (
+                request.user.is_rcpch_audit_team_member or request.user.is_superuser
+            ):
+                raise PermissionDenied()
+
             # save new user and add to gropup - return to user list with success message
             # send sign up email asynchronously
             # If signup unsuccessful, user not saved return to list with error message. Email not sent.
