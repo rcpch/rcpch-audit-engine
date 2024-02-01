@@ -3,7 +3,7 @@ import logging
 
 from django.db import migrations
 
-from ..general_functions import fetch_ecl
+from ..general_functions import fetch_ecl, add_epilepsy_cause_list_by_sctid
 
 # Logging setup
 logger = logging.getLogger(__name__)
@@ -42,6 +42,34 @@ def seed_epilepsy_causes(apps, schema_editor):
             except Exception as e:
                 logger.info(f"Epilepsy cause {cause['preferredTerm']} not added. {e}")
     logger.info(f"{index} epilepsy causes added")
+
+    """
+    These are additional causes added after go live
+    Added here now so that any development work where the database has been reseeded
+    remains in sync with what is live
+    """
+
+    # Constitutional mismatch repair deficiency syndrome (CMMRD) - 764946008
+    # Neonatal hypoglycaemia - 52767006
+    # Hypoxic ischaemic encephalopathy - 703300001
+    # Perinatal arterial ischaemic stroke - 722929005
+    # Non-accidental injury to child - 158094009
+    # Periventricular leukomalacia - 230769007
+    # Neonatal cerebral haemorrhage - 261808007
+    # Cornelia de Lange Syndrome (CdLS) - 40354009
+    # Anoxic encephalopathy - 389098007
+    extra_concept_ids = [
+        764946008,
+        52767006,
+        703300001,
+        722929005,
+        158094009,
+        230769007,
+        261808007,
+        40354009,
+        389098007,
+    ]
+    add_epilepsy_cause_list_by_sctid(extra_concept_ids=extra_concept_ids)
 
 
 class Migration(migrations.Migration):
