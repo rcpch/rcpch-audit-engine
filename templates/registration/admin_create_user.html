@@ -20,7 +20,7 @@
         <form 
           class='ui rcpch form' 
           method="POST" 
-          action="" 
+          action=""
           name='create_epilepsy12_user_form'>
           {% csrf_token %}
 
@@ -141,7 +141,7 @@
                 name="delete"
                 id="delete"
                 value="Delete"
-                  _= "on click
+                _= "on click
                   halt the event
                   call Swal.fire({
                     title: 'Confirmation Required',
@@ -153,14 +153,12 @@
                     cancelButtonColor: '#e60700',
                     confirmButtonText: 'Remove user from Epilepsy12'
                   })
-                  if result.isConfirmed then fetch {% url 'edit_epilepsy12_user' organisation_id user.pk %}
-                  {
-                    method: 'post',
-                    headers: {
-                      'X-CSRFToken': {{csrf_token}},
-                      'Accept': 'network/json',
-                      'Content-Type': 'network/json',
-                    }
+                  if result.isConfirmed then 
+                  fetch {% url 'edit_epilepsy12_user' organisation_id user.pk %} 
+                  { 
+                    method: 'POST', 
+                    headers: { 'X-CSRToken':{{csrf_token}} }, 
+                    mode:'same-origin' 
                   }
                   end
                   "
@@ -194,7 +192,6 @@
   </div>
 
 </div>
-
 {% endblock %}
 
 
