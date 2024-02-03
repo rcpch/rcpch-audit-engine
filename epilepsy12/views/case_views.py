@@ -306,10 +306,16 @@ def case_list(request, organisation_id):
                 (2, "National level"),
             )
     else:
-        rcpch_choices = (
-            (0, "Organisation level"),
-            (1, "Trust level"),
-        )
+        if organisation.country.boundary_identifier == "W92000004":
+            rcpch_choices = (
+                (0, "Organisation level"),
+                (1, "Local Health Board level"),
+            )
+        else:
+            rcpch_choices = (
+                (0, "Organisation level"),
+                (1, "Trust level"),
+            )
 
     context = {
         "case_list": case_list,
