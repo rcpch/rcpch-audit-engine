@@ -320,37 +320,24 @@ def create_epilepsy12_user(request, organisation_id, user_type, epilepsy12_user_
             "organisation_employer": organisation,
         }
         form = Epilepsy12UserAdminCreationForm(
-            rcpch_organisation=user_type, initial=prepopulated_data
+            rcpch_organisation=user_type,
+            requesting_user=request.user,
+            initial=prepopulated_data,
         )
     elif user_type == "rcpch-staff":
         admin_title = "Add RCPCH Epilepsy12 staff member"
         form = Epilepsy12UserAdminCreationForm(
-            rcpch_organisation=user_type, initial=None
+            rcpch_organisation=user_type, requesting_user=request.user, initial=None
         )
 
     if request.method == "POST":
         form = Epilepsy12UserAdminCreationForm(
             user_type,
+            request.user,
             request.POST or None,
         )
 
         if form.is_valid():
-            # decorator cannot keep out bad actors that change the organisation at this point.
-            if form.cleaned_data.get(
-                "organisation_employer"
-            ) != request.user.organisation_employer and not (
-                request.user.is_rcpch_audit_team_member or request.user.is_superuser
-            ):
-                raise PermissionDenied()
-            # decorator cannot keep out bad actors that change the is_rcpch_audit_team_member or is_superuser flag in post request
-            if (
-                form.cleaned_data.get("is_rcpch_audit_team_member")
-                or form.cleaned_data.get("is_superuser")
-            ) and not (
-                request.user.is_rcpch_audit_team_member or request.user.is_superuser
-            ):
-                raise PermissionDenied()
-
             # save new user and add to group - return to user list with success message
             # send sign up email asynchronously
             # If signup unsuccessful, user not saved return to list with error message. Email not sent.
@@ -445,6 +432,7 @@ def edit_epilepsy12_user(request, organisation_id, epilepsy12_user_id):
             request.POST["email"] = epilepsy12_user_to_edit.email
         form = Epilepsy12UserAdminCreationForm(
             user_type,
+            request.user,
             request.POST or None,
             instance=epilepsy12_user_to_edit,
         )
@@ -494,21 +482,6 @@ def edit_epilepsy12_user(request, organisation_id, epilepsy12_user_id):
 
         else:
             if form.is_valid():
-                # decorator cannot keep out bad actors that change the organisation at this point.
-                if form.cleaned_data.get(
-                    "organisation_employer"
-                ) != request.user.organisation_employer and not (
-                    request.user.is_rcpch_audit_team_member or request.user.is_superuser
-                ):
-                    raise PermissionDenied()
-                # decorator cannot keep out bad actors that change the is_rcpch_audit_team_member or is_superuser flag in post request
-                if (
-                    form.cleaned_data.get("is_rcpch_audit_team_member")
-                    or form.cleaned_data.get("is_superuser")
-                ) and not (
-                    request.user.is_rcpch_audit_team_member or request.user.is_superuser
-                ):
-                    raise PermissionDenied()
                 # this will not include the password which will be empty
                 new_user = form.save()
 
