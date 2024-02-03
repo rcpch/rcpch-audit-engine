@@ -213,9 +213,9 @@ class Epilepsy12UserAdminCreationForm(forms.ModelForm):
             self.cleaned_data["view_preference"] = 0
         return data
 
-    def clean_organisation_employer(self):
-        data = self.cleaned_data["organisation_employer"]
-        return data
+    # def clean_organisation_employer(self):
+    #     data = self.cleaned_data["organisation_employer"]
+    #     return data
 
     def clean(self):
         cleaned_data = super().clean()
