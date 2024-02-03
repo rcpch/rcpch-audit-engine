@@ -18,9 +18,9 @@
         </div>
         
         <form 
-          class='ui rcpch form' 
+          class='ui rcpch form'
+          id="rcpch_edit_user_form"
           method="POST" 
-          action=""
           name='create_epilepsy12_user_form'>
           {% csrf_token %}
 
@@ -141,11 +141,14 @@
                 name="delete"
                 id="delete"
                 value="Delete"
-                _= "on click
+                hx-post="{% url 'delete_epilepsy12_user' organisation_id=organisation_id epilepsy12_user_id=form.instance.pk %}"
+                hx-trigger='click'
+                hx-headers='{"X-CSRFToken": "{{ csrf_token }}"}'
+                _= "on htmx:confirm(issueRequest)
                   halt the event
                   call Swal.fire({
                     title: 'Confirmation Required',
-                    text: 'This will irreversibly remove {{epilepsy12_user}} and related dated from Epilepsy12.',
+                    text: 'This will irreversibly remove {{form.first_name.value}} {{form.surname.value}} and related dated from Epilepsy12.',
                     icon: 'warning',
                     iconColor: '#e00087',
                     showCancelButton: true,
@@ -153,15 +156,7 @@
                     cancelButtonColor: '#e60700',
                     confirmButtonText: 'Remove user from Epilepsy12'
                   })
-                  if result.isConfirmed then 
-                  fetch {% url 'edit_epilepsy12_user' organisation_id user.pk %} 
-                  { 
-                    method: 'POST', 
-                    headers: { 'X-CSRToken':{{csrf_token}} }, 
-                    mode:'same-origin' 
-                  }
-                  end
-                  "
+                  if result.isConfirmed issueRequest()"
               />
             
             {% endif %}
