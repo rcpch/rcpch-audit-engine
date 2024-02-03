@@ -335,7 +335,23 @@ def create_epilepsy12_user(request, organisation_id, user_type, epilepsy12_user_
         )
 
         if form.is_valid():
-            # save new user and add to gropup - return to user list with success message
+            # decorator cannot keep out bad actors that change the organisation at this point.
+            if form.cleaned_data.get(
+                "organisation_employer"
+            ) != request.user.organisation_employer and not (
+                request.user.is_rcpch_audit_team_member or request.user.is_superuser
+            ):
+                raise PermissionDenied()
+            # decorator cannot keep out bad actors that change the is_rcpch_audit_team_member or is_superuser flag in post request
+            if (
+                form.cleaned_data.get("is_rcpch_audit_team_member")
+                or form.cleaned_data.get("is_superuser")
+            ) and not (
+                request.user.is_rcpch_audit_team_member or request.user.is_superuser
+            ):
+                raise PermissionDenied()
+
+            # save new user and add to group - return to user list with success message
             # send sign up email asynchronously
             # If signup unsuccessful, user not saved return to list with error message. Email not sent.
             new_user = form.save(commit=False)
@@ -478,6 +494,21 @@ def edit_epilepsy12_user(request, organisation_id, epilepsy12_user_id):
 
         else:
             if form.is_valid():
+                # decorator cannot keep out bad actors that change the organisation at this point.
+                if form.cleaned_data.get(
+                    "organisation_employer"
+                ) != request.user.organisation_employer and not (
+                    request.user.is_rcpch_audit_team_member or request.user.is_superuser
+                ):
+                    raise PermissionDenied()
+                # decorator cannot keep out bad actors that change the is_rcpch_audit_team_member or is_superuser flag in post request
+                if (
+                    form.cleaned_data.get("is_rcpch_audit_team_member")
+                    or form.cleaned_data.get("is_superuser")
+                ) and not (
+                    request.user.is_rcpch_audit_team_member or request.user.is_superuser
+                ):
+                    raise PermissionDenied()
                 # this will not include the password which will be empty
                 new_user = form.save()
 
