@@ -133,4 +133,5 @@ def cohorts_and_dates(first_paediatric_assessment_date: date):
         "submitting_cohort_days_remaining": submitting_cohort.get(
             "days_remaining", None
         ),
+        "today": date.today(),
     }
