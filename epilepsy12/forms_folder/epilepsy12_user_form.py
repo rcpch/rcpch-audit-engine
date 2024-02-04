@@ -248,10 +248,33 @@ class Epilepsy12UserAdminCreationForm(forms.ModelForm):
                     self.requesting_user.organisation_employer
                     != cleaned_data["organisation_employer"]
                 ):
-                    self.add_error(
-                        "organisation_employer",
-                        "You do not have permission to create users in different organisations.",
+                    # nonmatching organisations might still be in the same health board or trust
+                    requested_organisation = Organisation.objects.get(
+                        name=cleaned_data["organisation_employer"]
                     )
+                    if (
+                        requested_organisation.country.boundary_identifier
+                        == "W92000004"
+                    ):
+                        requested_parent = requested_organisation.local_health_board
+                        requesting_parent = (
+                            self.requesting_user.organisation_employer.local_health_board
+                        )
+                    else:
+                        requested_parent = requested_organisation.trust
+                        requesting_parent = (
+                            self.requesting_user.organisation_employer.trust
+                        )
+
+                    if requested_parent == requesting_parent:
+                        # members of the same trust
+                        # your papers are in order...
+                        pass
+                    else:
+                        self.add_error(
+                            "organisation_employer",
+                            "You do not have permission to create users in different trusts or local health boards.",
+                        )
                 if cleaned_data["is_rcpch_audit_team_member"] == True:
                     self.add_error(
                         "is_rcpch_audit_team_member",
