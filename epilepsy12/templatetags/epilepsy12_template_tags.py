@@ -309,7 +309,10 @@ def none_percentage(field):
 @register.filter(name="icon_for_score")
 def icon_for_score(score):
     if score is None:
-        return
+        return mark_safe(
+            """Data Incomplete
+            """
+        )
     if score < 1:
         return mark_safe(
             """<i
