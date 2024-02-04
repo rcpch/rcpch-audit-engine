@@ -4,6 +4,7 @@ import logging
 from django import forms
 from django.conf import settings
 from django.core import validators
+from django.core.exceptions import ValidationError
 from django.contrib.auth.forms import AuthenticationForm, SetPasswordForm
 from django.utils.translation import gettext as _
 from django.utils import timezone
@@ -62,8 +63,9 @@ class Epilepsy12UserAdminCreationForm(forms.ModelForm):
     """
 
     rcpch_organisation = ""
+    requesting_user = ""
 
-    def __init__(self, rcpch_organisation, *args, **kwargs):
+    def __init__(self, rcpch_organisation, requesting_user, *args, **kwargs):
         super(Epilepsy12UserAdminCreationForm, self).__init__(*args, **kwargs)
         if rcpch_organisation == "organisation-staff":
             choices = AUDIT_CENTRE_ROLES
@@ -74,6 +76,7 @@ class Epilepsy12UserAdminCreationForm(forms.ModelForm):
                 "No user-type supplied to create user form. Arguments are rcpch-staff or organisation-staff."
             )
 
+        self.requesting_user = requesting_user
         self.rcpch_organisation = rcpch_organisation
         self.fields["role"].choices = choices
 
@@ -210,20 +213,60 @@ class Epilepsy12UserAdminCreationForm(forms.ModelForm):
             self.cleaned_data["view_preference"] = 0
         return data
 
-    def clean_organisation_employer(self):
-        data = self.cleaned_data["organisation_employer"]
-        return data
+    # def clean_organisation_employer(self):
+    #     data = self.cleaned_data["organisation_employer"]
+    #     return data
 
     def clean(self):
         cleaned_data = super().clean()
-
         if self.rcpch_organisation == "rcpch-staff":
             # RCPCH staff are not affiliated with any organisation
-            cleaned_data["is_staff"] = False
-            cleaned_data["is_rcpch_staff"] = True
-            cleaned_data["organisation_employer"] = None
-            cleaned_data["is_rcpch_audit_team_member"] = True
-            cleaned_data["view_preference"] = 0
+            if (
+                self.requesting_user.is_rcpch_audit_team_member
+                or self.requesting_user.is_superuser
+            ):
+                cleaned_data["is_staff"] = False
+                cleaned_data["is_rcpch_staff"] = True
+                cleaned_data["organisation_employer"] = None
+                cleaned_data["is_rcpch_audit_team_member"] = True
+                cleaned_data["view_preference"] = 0
+            else:
+                # should not have managed to get here
+                raise ValidationError(
+                    "You do not have permission to create RCPCH staff."
+                )
+        else:
+            # this new user is not RCPCH staff
+            if (
+                self.requesting_user.is_rcpch_audit_team_member
+                or self.requesting_user.is_superuser
+            ):
+                # anything goes
+                return cleaned_data
+            else:
+                if (
+                    self.requesting_user.organisation_employer
+                    != cleaned_data["organisation_employer"]
+                ):
+                    self.add_error(
+                        "organisation_employer",
+                        "You do not have permission to create users in different organisations.",
+                    )
+                if cleaned_data["is_rcpch_audit_team_member"] == True:
+                    self.add_error(
+                        "is_rcpch_audit_team_member",
+                        "You do not have permission to allocate RCPCH audit team member status.",
+                    )
+                if cleaned_data["is_rcpch_staff"] == True:
+                    self.add_error(
+                        "is_rcpch_staff",
+                        "You do not have permission to allocate RCPCH staff member status.",
+                    )
+                if cleaned_data["is_superuser"] == True:
+                    self.add_error(
+                        "is_superuser",
+                        "You do not have permission to allocate superuser status.",
+                    )
 
         return cleaned_data
 

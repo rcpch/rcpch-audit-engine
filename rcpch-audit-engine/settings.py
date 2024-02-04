@@ -22,7 +22,9 @@ from celery.schedules import crontab
 from django.core.management.utils import get_random_secret_key
 
 # RCPCH imports
-from .logging_settings import LOGGING # no it is not an unused import, it pulls LOGGING into the settings file
+from .logging_settings import (
+    LOGGING,
+)  # no it is not an unused import, it pulls LOGGING into the settings file
 
 logger = logging.getLogger(__name__)
 
@@ -128,7 +130,12 @@ SECURE_HSTS_SECONDS = 3600
 SECURE_HSTS_PRELOAD = True
 SECURE_CONTENT_TYPE_NOSNIFF = True
 X_FRAME_OPTIONS = "DENY"
-# SESSION_COOKIE_SECURE = True
+
+# Session cookies
+SESSION_COOKIE_SECURE = True  # enforces HTTPS
+CSRF_COOKIE_SECURE = True
+SESSION_COOKIE_HTTPONLY = True  # cannot access session cookie on client-side using JS
+SESSION_EXPIRE_AT_BROWSER_CLOSE = True  # session expires on browser close
 
 ROOT_URLCONF = "rcpch-audit-engine.urls"
 

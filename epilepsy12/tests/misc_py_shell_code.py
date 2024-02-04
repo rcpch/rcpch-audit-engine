@@ -65,3 +65,16 @@ E12UserFactory(
     organisation_employer=TEST_USER_ORGANISATION,
     groups=[test_user_rcpch_audit_team_data.group_name],
 )
+
+# Welsh Lead Clinician
+E12UserFactory(
+    first_name=test_user_audit_centre_lead_clinician_data.role_str,
+    role=test_user_audit_centre_lead_clinician_data.role,
+    surname="WELSH",
+    is_active=False,
+    is_staff=False,
+    is_rcpch_audit_team_member=False,
+    is_rcpch_staff=False,
+    organisation_employer=Organisation.objects.get(pk=333),
+    groups=[test_user_audit_centre_lead_clinician_data.group_name],
+)

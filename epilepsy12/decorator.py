@@ -222,9 +222,24 @@ def user_may_view_this_organisation():
                     else:
                         # regular user - not a member of RCPCH
                         if (
-                            user.organisation_employer.trust
-                            == organisation_requested.trust
+                            user.organisation_employer.country.boundary_identifier
+                            == "W92000004"
                         ):
+                            user_parent = user.organisation_employer.local_health_board
+                        else:
+                            user_parent = user.organisation_employer.trust
+
+                        if (
+                            organisation_requested.country.boundary_identifier
+                            == "W92000004"
+                        ):
+                            organisation_requested_parent = (
+                                organisation_requested.local_health_board
+                            )
+                        else:
+                            organisation_requested_parent = organisation_requested.trust
+
+                        if user_parent == organisation_requested_parent:
                             # user's employing trust is the same as the trust of the organisation requested
                             if kwargs.get("user_type") is not None:
                                 if kwargs.get("user_type") == "rcpch-staff":
@@ -395,6 +410,7 @@ def user_can_access_user():
 
     return decorator
 
+
 def login_and_otp_required():
     """
     Must have verified via 2FA
@@ -405,13 +421,17 @@ def login_and_otp_required():
         login_required(view)
 
         def wrapper(request, *args, **kwargs):
-
             # Then, ensure 2fa verified
             user = request.user
 
             # Bypass 2fa if local dev, with warning message
-            if (settings.DEBUG and user.is_superuser):
-                logger.warning("User %s has bypassed 2FA for %s as settings.DEBUG is %s and user is superuser", user, view, settings.DEBUG)
+            if settings.DEBUG and user.is_superuser:
+                logger.warning(
+                    "User %s has bypassed 2FA for %s as settings.DEBUG is %s and user is superuser",
+                    user,
+                    view,
+                    settings.DEBUG,
+                )
                 return view(request, *args, **kwargs)
 
             # Prevent unverified users
