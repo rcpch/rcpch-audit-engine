@@ -59,6 +59,7 @@ def seed_epilepsy_causes(apps, schema_editor):
     # Cornelia de Lange Syndrome (CdLS) - 40354009
     # Anoxic encephalopathy - 389098007
     # Congenital Melanocytic Naevus – 398696001
+    # Megalencephalic leukoencephalopathy with subcortical cysts - 703536004
     extra_concept_ids = [
         764946008,
         52767006,
@@ -70,6 +71,7 @@ def seed_epilepsy_causes(apps, schema_editor):
         40354009,
         389098007,
         398696001,
+        703536004,
     ]
     add_epilepsy_cause_list_by_sctid(extra_concept_ids=extra_concept_ids)
 
