@@ -75,7 +75,7 @@ def case_list(request, organisation_id):
             # user has requested organisation level view
             all_cases = (
                 Case.objects.filter(
-                    Q(site__organisation__name__contains=organisation.name)
+                    Q(site__organisation=organisation)
                     & Q(site__site_is_primary_centre_of_epilepsy_care=True)
                     & Q(site__site_is_actively_involved_in_epilepsy_care=True)
                     & (
@@ -92,13 +92,11 @@ def case_list(request, organisation_id):
             if organisation.country.boundary_identifier == "W92000004":
                 # in Wales filter by health board
                 trust_filter = Q(
-                    site__organisation__local_health_board__ods_code__contains=organisation.local_health_board.ods_code
+                    site__organisation__local_health_board=organisation.local_health_board
                 )
             else:
                 # England filter by Trust
-                trust_filter = Q(
-                    site__organisation__trust__ods_code__contains=organisation.trust.ods_code
-                )
+                trust_filter = Q(site__organisation__trust=organisation.trust)
 
             all_cases = (
                 Case.objects.filter(
@@ -145,14 +143,14 @@ def case_list(request, organisation_id):
             if organisation.country.boundary_identifier == "W92000004":
                 # welsh - select health boards
                 filtered_cases = Case.objects.filter(
-                    organisations__local_health_board__name__contains=parent_trust.name,
+                    organisations__local_health_board=parent_trust,
                     site__site_is_primary_centre_of_epilepsy_care=True,
                     site__site_is_actively_involved_in_epilepsy_care=True,
                 )
             else:
                 # England - select trusts
                 filtered_cases = Case.objects.filter(
-                    organisations__trust__name__contains=parent_trust.name,
+                    organisations__trust=parent_trust,
                     site__site_is_primary_centre_of_epilepsy_care=True,
                     site__site_is_actively_involved_in_epilepsy_care=True,
                 )
@@ -160,7 +158,7 @@ def case_list(request, organisation_id):
         else:
             # filters all primary centres at organisation level, irrespective of if active or inactive
             filtered_cases = Case.objects.filter(
-                organisations__name__contains=organisation.name,
+                organisations__name=organisation,
                 site__site_is_primary_centre_of_epilepsy_care=True,
                 site__site_is_actively_involved_in_epilepsy_care=True,
             )
