@@ -111,7 +111,11 @@
               <tr>
           {% endif %}
         
-          <td>{% none_masked case.first_name %} {% none_masked case.surname %}</td>
+          <td>
+            <span data-tooltip="Epilepsy12 unique identifier: {{case.id}}" data-position="top left">
+              <i class="rcpch question circle icon"></i>
+            </span>
+            {% none_masked case.first_name %} {% none_masked case.surname %}</td>
           <td>{% none_masked case.get_sex_display %}</td>
           <td data-mask="000 000 0000">{% none_masked case.nhs_number %}</td>
           <td>{% none_masked case.registration.audit_submission_date|date:'D j M Y' %}</td>
