@@ -60,6 +60,7 @@ def seed_epilepsy_causes(apps, schema_editor):
     # Anoxic encephalopathy - 389098007
     # Congenital Melanocytic Naevus – 398696001
     # Megalencephalic leukoencephalopathy with subcortical cysts - 703536004
+    # Cerebral ischemic stroke due to global hypoperfusion with watershed infarct - 788882003
     extra_concept_ids = [
         764946008,
         52767006,
@@ -72,6 +73,7 @@ def seed_epilepsy_causes(apps, schema_editor):
         389098007,
         398696001,
         703536004,
+        788882003,
     ]
     add_epilepsy_cause_list_by_sctid(extra_concept_ids=extra_concept_ids)
 
