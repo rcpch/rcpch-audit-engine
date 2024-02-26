@@ -54,7 +54,7 @@
                 <i class="warning info circle icon"></i><p>These are all users registered to Epilepsy12.</p>
                 
             </div>
-            {% if request.user|has_group:'epilepsy12_audit_team_full_access' or user.is_superuser %}
+            {% if request.user.epilepsy12_audit_team_full_access or user.is_superuser %}
                 <button 
                 class="ui rcpch_positive download button">
                     <a href="{% url 'download_e12_users' organisation_id=organisation.pk %}">Download full E12 Users list</a>
