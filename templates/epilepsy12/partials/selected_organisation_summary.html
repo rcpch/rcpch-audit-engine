@@ -10,7 +10,7 @@
             <div class="ui rcpch_view label view_title">Organisation Dashboard</div>
             {% if request.user.is_rcpch_audit_team_member %}
                 <div class="download link">
-                    <button class="ui rcpch_positive button jump">Download KPI metrics</button>
+                    <a class="ui rcpch_positive button jump" href="{% url 'kpi_download_page' %}">Download KPI metrics</a>
                 </div>
             {% endif %}
         </div>

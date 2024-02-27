@@ -1,0 +1,35 @@
+{% extends "base.html" %} {% load static %} {% load epilepsy12_template_tags %}
+{% csrf_token %} {% block content %}
+<div class="ui rcpch container main_content">
+  <h1>KPI downloading for E12 team</h1>
+  <p>
+    KPIs are re-aggregated everytime a user enters their organisation's summary
+    page. This ensures that the aggregations are as up to date as possible. The
+    aggregate data itself can be calculated for different levels of location -
+    from organisationally to nationally.
+  </p>
+  <h2>Structure of the KPI report</h2>
+  <p>
+    The KPI report is separated into 8 separate pages on an excel document. The
+    structure of the 8 pages is as follows:
+    <ol>
+      <li>Country Level</li>
+      <li>HBT Level</li>
+      <li>ICB Level</li>
+      <li>NHS region Level</li>
+      <li>Network Level</li>
+      <li>National Level</li>
+      <li>Reference</li>
+      <li>National Comparison</li>
+    </ol>
+  </p>
+  <div>
+    <a href="{% url 'download_kpi_report' %}">
+      <button class="ui rcpch_positive button jump">
+        Download most recent KPI report
+      </button>
+    </a>
+  </div>
+</div>
+
+{% endblock content %}

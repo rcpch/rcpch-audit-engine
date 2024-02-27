@@ -427,3 +427,22 @@ def view_preference(request, organisation_id, template_name):
     return HttpResponseClientRedirect(
         reverse(template_name, kwargs={"organisation_id": organisation.pk})
     )
+
+@login_and_otp_required()
+@permission_required("epilepsy12.can_publish_epilepsy12_data")
+def kpi_download_page(request):
+    """
+    Loads the page necessary for downloading KPIs
+
+    """
+
+    template_name='epilepsy12/partials/kpis/kpi_download_page.html'
+
+    return render(request=request, template_name=template_name)
+
+def download_kpi_report(request, context):
+    """
+    Contains logic for construction the KPI report and outputs the 8 page KPI file 
+    """
+
+    
