@@ -438,7 +438,11 @@ def edit_epilepsy12_user(request, organisation_id, epilepsy12_user_id):
 
     if request.method == "POST":
         if "delete" in request.POST:
-            epilepsy12_user_to_edit.delete()
+            # This call back from the user form, not the table.
+            # Rather than delete user, instead set is_active to False as prevents cascade delete error for any cases/registrations
+            # updated by this user (see issue #813)
+            epilepsy12_user_to_edit.is_active = False
+            epilepsy12_user_to_edit.save(update_fields=["is_active"])
             messages.success(
                 request, f"{epilepsy12_user_to_edit.email} Deleted successfully."
             )
@@ -527,7 +531,12 @@ def edit_epilepsy12_user(request, organisation_id, epilepsy12_user_id):
 @user_can_access_user()
 @permission_required("epilepsy12.delete_epilepsy12user", raise_exception=True)
 def delete_epilepsy12_user(request, organisation_id, epilepsy12_user_id):
+    """
+    HTMX callback from epilepsy12user table
+    Sets user is_active flag to False
+    """
     try:
+        # This call back from the table, not the form
         # rather than delete user, instead set is_active to False as prevents cascade delete error for any cases/registrations
         # updated by this user (see issue #813)
         Epilepsy12User.objects.filter(pk=epilepsy12_user_id).update(is_active=False)
