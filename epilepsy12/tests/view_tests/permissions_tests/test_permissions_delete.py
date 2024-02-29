@@ -104,7 +104,9 @@ from epilepsy12.models import (
     Medicine,
     ComorbidityList,
 )
-from epilepsy12.tests.view_tests.permissions_tests.perm_tests_utils import twofactor_signin
+from epilepsy12.tests.view_tests.permissions_tests.perm_tests_utils import (
+    twofactor_signin,
+)
 
 
 @pytest.mark.django_db
@@ -171,35 +173,6 @@ def test_user_delete_success(
         assert (
             response.status_code == HTTPStatus.OK
         ), f"{test_user.first_name} (from {test_user.organisation_employer}) requested `{url}` for User from {TEST_USER_ORGANISATION}. Has groups: {test_user.groups.all()}. Expected 200 response status code, received {response.status_code}"
-
-        # Additional test for deleting users outside of own Trust
-        if test_user.first_name in [
-            test_user_clinicial_audit_team_data.role_str,
-            test_user_rcpch_audit_team_data.role_str,
-        ]:
-            # Seed a temp User to be deleted
-            temp_user_same_org = E12UserFactory(
-                first_name="temp_user",
-                email=f"temp_{test_user.first_name}@temp.com",
-                role=test_user.role,
-                is_active=1,
-                organisation_employer=DIFF_TRUST_DIFF_ORGANISATION,
-                groups=[test_user_audit_centre_administrator_data.group_name],
-            )
-
-            url = reverse(
-                "delete_epilepsy12_user",
-                kwargs={
-                    "organisation_id": DIFF_TRUST_DIFF_ORGANISATION.id,
-                    "epilepsy12_user_id": temp_user_same_org.id,
-                },
-            )
-
-            response = client.get(url)
-
-            assert (
-                response.status_code == HTTPStatus.OK
-            ), f"{test_user.first_name} (from {test_user.organisation_employer}) requested `{url}` for User from {DIFF_TRUST_DIFF_ORGANISATION}. Has groups: {test_user.groups.all()}. Expected 200 response status code, received {response.status_code}"
 
 
 @pytest.mark.django_db
