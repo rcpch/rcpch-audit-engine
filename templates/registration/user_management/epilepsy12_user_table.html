@@ -222,7 +222,7 @@
                     
                     <button 
                         data-tooltip="Edit {{epilepsy12_user}}'s details."
-                        {% if perms.epilepsy12.change_epilepsy12user %}
+                        {% if perms.epilepsy12.change_epilepsy12user and epilepsy12_user.is_active %}
                             class="ui rcpch_primary icon button" 
                         {% else %}
                             class="ui rcpch_primary icon disabled button" 
@@ -235,7 +235,7 @@
                     
                     <button 
                         data-tooltip='Deactivate {{epilepsy12_user}}.' 
-                        {% if perms.epilepsy12.delete_epilepsy12user and epilepsy12_user.email != user.email %}
+                        {% if perms.epilepsy12.delete_epilepsy12user and epilepsy12_user.email != user.email  and epilepsy12_user.is_active %}
                             class="ui rcpch_danger icon button" 
                         {% else %}
                             class="ui rcpch_danger icon disabled button" 
@@ -262,7 +262,7 @@
                     </button>
                     
                     <button
-                        {% if perms.epilepsy12.view_logs %}
+                        {% if perms.epilepsy12.view_logs and epilepsy12_user.is_active %}
                             class='ui rcpch_light_blue icon right floated button'
                         {% else %}
                             class='ui rcpch_light_blue icon right floated disabled button'
