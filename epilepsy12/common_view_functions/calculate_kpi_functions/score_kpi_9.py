@@ -12,12 +12,12 @@ def score_kpi_9A(registration_instance) -> int:
     % of children and young people with epilepsy after 12 months where there is evidence of a comprehensive care plan that is agreed between the person, their family and/or carers and primary and secondary care providers, and the care plan has been updated where necessary
 
     Calculation Method
-    
+
     Numerator = Number of children and young people diagnosed with epilepsy at first year AND ALL OF:
-    1) an individualised epilepsy document or copy clinic letter that includes care planning information 
-    2) evidence of agreement 
+    1) an individualised epilepsy document or copy clinic letter that includes care planning information
+    2) evidence of agreement
     3) care plan is up to date including elements where necessary
-    
+
     Denominator = Number of children and young people diagnosed with epilepsy at first year
     """
 
@@ -52,9 +52,9 @@ def score_kpi_9Ai(registration_instance) -> int:
     % of children and young people with epilepsy after 12 months that had an individualised epilepsy document with individualised epilepsy document or a copy clinic letter that includes care planning information
 
     Calculation Method
-    
+
     Numerator = Number of children and young people diagnosed with epilepsy at first year AND( with individualised epilepsy document or copy clinic letter that includes care planning information )
-    
+
     Denominator = Number of children and young people diagnosed with epilepsy at first year
     """
 
@@ -76,11 +76,11 @@ def score_kpi_9Ai(registration_instance) -> int:
 def score_kpi_9Aii(registration_instance) -> int:
     """ii patient_carer_parent_agreement_to_the_care_planning
     % of children and young people with epilepsy after 12 months where there was evidence of agreement between the person, their family and/or carers as appropriate
-    
+
     Calculation Method
-    
+
     Numerator = Number of children and young people diagnosed with epilepsy at first year AND with evidence of agreement
-    
+
     Denominator = Number of children and young people diagnosed with epilepsy at first year
     """
 
@@ -99,11 +99,11 @@ def score_kpi_9Aii(registration_instance) -> int:
 
 def score_kpi_9Aiii(registration_instance) -> int:
     """iii. care_planning_has_been_updated_when_necessary
-    
+
     Calculation Method
-    
+
     Numerator = Number of children and young people diagnosed with epilepsy at first year AND with care plan which is updated where necessary
-    
+
     Denominator = Number of children and young people diagnosed with epilepsy at first year
     """
 
@@ -123,11 +123,11 @@ def score_kpi_9Aiii(registration_instance) -> int:
 def score_kpi_9B(registration_instance) -> int:
     """9B. comprehensive_care_planning_content
     Percentage of children diagnosed with epilepsy with documented evidence of communication regarding core elements of care planning.
-    
+
     Calculation Method
-    
+
     Numerator = Number of children and young people diagnosed with epilepsy at first year AND evidence of written prolonged seizures plan if prescribed rescue medication AND evidence of discussion regarding water safety AND first aid AND participation and risk AND service contact details AND SUDEP
-    
+
     Denominator = Number of children and young people diagnosed with epilepsy at first year
     """
 
@@ -165,9 +165,11 @@ def score_kpi_9B(registration_instance) -> int:
     pass_1_criteria = [
         (management.has_rescue_medication_been_prescribed is False),
     ] + base_pass_criteria
-        
-    pass_2_criteria = [(management.has_rescue_medication_been_prescribed is True),
-        (management.individualised_care_plan_parental_prolonged_seizure_care is True)] + base_pass_criteria
+
+    pass_2_criteria = [
+        (management.has_rescue_medication_been_prescribed is True),
+        (management.individualised_care_plan_parental_prolonged_seizure_care is True),
+    ] + base_pass_criteria
 
     if all(pass_1_criteria) or all(pass_2_criteria):
         return KPI_SCORE["PASS"]
@@ -177,11 +179,11 @@ def score_kpi_9B(registration_instance) -> int:
 
 def score_kpi_9Bi(registration_instance) -> int:
     """9Bi. parental_prolonged_seizures_care_plan
-    
+
     Calculation Method
-    
-    Numerator = Number of children and young people diagnosed with epilepsy at first year AND prescribed rescue medication AND evidence of a written prolonged seizures plan 
-    
+
+    Numerator = Number of children and young people diagnosed with epilepsy at first year AND prescribed rescue medication AND evidence of a written prolonged seizures plan
+
     Denominator = Number of children and young people diagnosed with epilepsy at first year AND prescribed rescue medication
     """
 
@@ -209,13 +211,13 @@ def score_kpi_9Bi(registration_instance) -> int:
 
 def score_kpi_9Bii(registration_instance) -> int:
     """ii. water_safety
-    
+
     Percentage of children and young people with epilepsy with evidence of discussion regarding water safety.
-    
+
     Calculation Method
-    
+
     Numerator = Number of children and young people diagnosed with epilepsy at first year AND with evidence of discussion regarding water safety
-    
+
     Denominator = Number of children and young people diagnosed with epilepsy at first year
     """
 
@@ -233,14 +235,14 @@ def score_kpi_9Bii(registration_instance) -> int:
 
 
 def score_kpi_9Biii(registration_instance) -> int:
-    """ iii. first_aid
-    
+    """iii. first_aid
+
     Percentage of children and young people with epilepsy with evidence of discussion regarding first aid.
-    
+
     Calculation Method
-    
+
     Numerator = Number of children and young people diagnosed with epilepsy at first year AND with evidence of discussion regarding first aid
-    
+
     Denominator = Number of children and young people diagnosed with epilepsy at first year
     """
 
@@ -259,13 +261,13 @@ def score_kpi_9Biii(registration_instance) -> int:
 
 def score_kpi_9Biv(registration_instance) -> int:
     """iv. general_participation_and_risk
-    
+
     Percentage of children and young people with epilepsy with evidence of discussion regarding general participation and risk.
-    
+
     Calculation Method
-    
+
     Numerator = Number of children and young people diagnosed with epilepsy at first year AND with evidence of discussion regarding general participation and risk
-    
+
     Denominator = Number of children and young people diagnosed with epilepsy at first year
     """
 
@@ -284,13 +286,13 @@ def score_kpi_9Biv(registration_instance) -> int:
 
 def score_kpi_9Bv(registration_instance) -> int:
     """v. service_contact_details
-    
+
     Percentage of children and young people with epilepsy with evidence of discussion regarding SUDEP and evidence of a prolonged seizures care plan.
-    
+
     Calculation Method
-    
+
     Numerator = Number of children and young people diagnosed with epilepsy at first year AND with evidence of discussion of been given service contact details
-    
+
     Denominator = Number of children and young people diagnosed with epilepsy at first year
     """
 
@@ -309,20 +311,19 @@ def score_kpi_9Bv(registration_instance) -> int:
 
 def score_kpi_9Bvi(registration_instance) -> int:
     """vi. sudep
-    
+
     Percentage of children and young people with epilepsy with evidence of being given service contact details.
-    
+
     Calculation Method
-    
-    Numerator = Number of children diagnosed with epilepsy AND had evidence of discussions regarding SUDEP AND evidence of a written prolonged seizures plan at first year
-    
+
+    Numerator = Number of children diagnosed with epilepsy AND had evidence of discussions regarding SUDEP
+
     Denominator = Number of children diagnosed with epilepsy at first year
     """
 
     management = registration_instance.management
 
     fields_not_filled = [
-        (management.individualised_care_plan_parental_prolonged_seizure_care is None),
         (management.individualised_care_plan_addresses_sudep is None),
     ]
 
@@ -332,7 +333,6 @@ def score_kpi_9Bvi(registration_instance) -> int:
 
     # score kpi
     pass_criteria = [
-        (management.individualised_care_plan_parental_prolonged_seizure_care is True),
         (management.individualised_care_plan_addresses_sudep is True),
     ]
 

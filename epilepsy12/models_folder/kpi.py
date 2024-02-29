@@ -50,7 +50,7 @@ class KPI(models.Model, HelpTextMixin):
                 Percentage of children and young people with epilepsy with evidence of discussion regarding general participation and risk.
 
             9e. SUDEP
-                Percentage of children and young people with epilepsy with evidence of discussion regarding SUDEP and evidence of a prolonged seizures care plan.
+                Percentage of children and young people with epilepsy with evidence of discussion regarding SUDEP.
 
             9f. Service contact details
                 Percentage of children and young people with epilepsy with evidence of being given service contact details.
@@ -289,7 +289,7 @@ class KPI(models.Model, HelpTextMixin):
     sudep = models.IntegerField(
         help_text={
             "label": "v. Sudden unexpected death in epilepsy",
-            "reference": "Percentage of children and young people with epilepsy with evidence of discussion regarding SUDEP (Sudden unexpected death in epilepsy) and evidence of a prolonged seizures care plan.",
+            "reference": "Percentage of children and young people with epilepsy with evidence of discussion regarding SUDEP (Sudden unexpected death in epilepsy).",
         },
         default=None,
         null=True,

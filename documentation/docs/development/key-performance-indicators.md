@@ -364,13 +364,13 @@ class KPI(models.Model, HelpTextMixin):
     Percentage of children and young people with epilepsy with evidence of discussion regarding SUDEP and evidence of a prolonged seizures care plan.
 
     Calculation Method
-    Numerator = Number of children diagnosed with epilepsy AND had evidence of discussions regarding SUDEP AND evidence of a written prolonged seizures plan at first year
+    Numerator = Number of children diagnosed with epilepsy AND had evidence of discussions regarding SUDEP
     Denominator = Number of children diagnosed with epilepsy at first year
     """
     sudep = models.IntegerField(
         help_text={
             "label": "v. Sudden unexpected death in epilepsy",
-            "reference": "Percentage of children and young people with epilepsy with evidence of discussion regarding SUDEP (Sudden unexpected death in epilepsy) and evidence of a prolonged seizures care plan.",
+            "reference": "Percentage of children and young people with epilepsy with evidence of discussion regarding SUDEP (Sudden unexpected death in epilepsy).",
         },
         default=None,
         null=True,
