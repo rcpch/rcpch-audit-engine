@@ -528,7 +528,9 @@ def edit_epilepsy12_user(request, organisation_id, epilepsy12_user_id):
 @permission_required("epilepsy12.delete_epilepsy12user", raise_exception=True)
 def delete_epilepsy12_user(request, organisation_id, epilepsy12_user_id):
     try:
-        Epilepsy12User.objects.get(pk=epilepsy12_user_id).delete()
+        # rather than delete user, instead set is_active to False as prevents cascade delete error for any cases/registrations
+        # updated by this user (see issue #813)
+        Epilepsy12User.objects.filter(pk=epilepsy12_user_id).update(is_active=False)
     except ValueError as error:
         messages.error(request, f"Delete User Unsuccessful: {error}")
 
