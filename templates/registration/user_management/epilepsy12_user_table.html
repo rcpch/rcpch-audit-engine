@@ -234,7 +234,7 @@
                     </button>
                     
                     <button 
-                        data-tooltip='Delete {{epilepsy12_user}}.' 
+                        data-tooltip='Deactivate {{epilepsy12_user}}.' 
                         {% if perms.epilepsy12.delete_epilepsy12user and epilepsy12_user.email != user.email %}
                             class="ui rcpch_danger icon button" 
                         {% else %}
@@ -248,13 +248,13 @@
                             halt the event
                             call Swal.fire({
                                 title: 'Confirmation Required',
-                                text: 'Are you sure you want to delete {{epilepsy12_user}}? This is an irreversible step.',
+                                text: 'Are you sure you want to deactivate {{epilepsy12_user}}?',
                                 icon: 'warning',
                                 iconColor: '#e00087',
                                 showCancelButton: true,
                                 confirmButtonColor: '#11a7f2',
                                 cancelButtonColor: '#e60700',
-                                confirmButtonText: 'Delete {{epilepsy12_user}}'
+                                confirmButtonText: 'Deactivate {{epilepsy12_user}}'
                             })
                             if result.isConfirmed issueRequest()"
                     >
