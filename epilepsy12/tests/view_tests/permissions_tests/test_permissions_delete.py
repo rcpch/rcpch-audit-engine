@@ -170,9 +170,19 @@ def test_user_deactivate_success(
 
         response = client.get(url)
 
+        # test 200 response that user correctly deactivates temp_user_same_org
         assert (
             response.status_code == HTTPStatus.OK
         ), f"{test_user.first_name} (from {test_user.organisation_employer}) requested `{url}` for User from {TEST_USER_ORGANISATION}. Has groups: {test_user.groups.all()}. Expected 200 response status code, received {response.status_code}"
+
+        # requery temp_user_same_org is_active status
+        updated_user_active_status = Epilepsy12User.objects.get(
+            pk=temp_user_same_org.pk
+        )
+        # test database reflects that user correctly deactivates temp_user_same_org
+        assert (
+            updated_user_active_status.is_active == 0
+        ), f"{updated_user_active_status.first_name} (from {updated_user_active_status.organisation_employer}) weas deactivated by User from {TEST_USER_ORGANISATION}. Has groups: {test_user.groups.all()}. Expected {temp_user_same_org.first_name}'s is_active status to be False. Received {updated_user_active_status.is_active}"
 
 
 @pytest.mark.django_db
@@ -249,6 +259,15 @@ def test_user_deactivate_forbidden(
                 response.status_code == HTTPStatus.FORBIDDEN
             ), f"{test_user.first_name} (from {test_user.organisation_employer}) requested `{url}` for User from {DIFF_TRUST_DIFF_ORGANISATION}. Has groups: {test_user.groups.all()}. Expected {HTTPStatus.FORBIDDEN} response status code, received {response.status_code}"
 
+            # requery temp_user_same_org is_active status
+            updated_user_active_status = Epilepsy12User.objects.get(
+                pk=temp_user_same_org.pk
+            )
+            # test database reflects that user fails to deactivate temp_user_same_org
+            assert (
+                updated_user_active_status.is_active == 1
+            ), f"{updated_user_active_status.first_name} (from {updated_user_active_status.organisation_employer}) was NOT deactivated by User from {TEST_USER_ORGANISATION}. Has groups: {test_user.groups.all()}. Expected {temp_user_same_org.first_name}'s is_active status to be True. Received {updated_user_active_status.is_active}"
+
         else:
             url = reverse(
                 "delete_epilepsy12_user",
@@ -263,6 +282,15 @@ def test_user_deactivate_forbidden(
             assert (
                 response.status_code == HTTPStatus.FORBIDDEN
             ), f"{test_user.first_name} (from {test_user.organisation_employer}) requested `{url}` for User from {TEST_USER_ORGANISATION}. Has groups: {test_user.groups.all()}. Expected {HTTPStatus.FORBIDDEN} response status code, received {response.status_code}"
+
+            # requery temp_user_same_org is_active status
+            updated_user_active_status = Epilepsy12User.objects.get(
+                pk=temp_user_same_org.pk
+            )
+            # test database reflects that user fails to deactivate temp_user_same_org
+            assert (
+                updated_user_active_status.is_active == 1
+            ), f"{updated_user_active_status.first_name} (from {updated_user_active_status.organisation_employer}) was NOT deactivated by User from {TEST_USER_ORGANISATION}. Has groups: {test_user.groups.all()}. Expected {temp_user_same_org.first_name}'s is_active status to be True. Received {updated_user_active_status.is_active}"
 
 
 @pytest.mark.django_db
