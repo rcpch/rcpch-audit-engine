@@ -15,7 +15,12 @@ def score_kpi_3(registration_instance, age_at_first_paediatric_assessment) -> in
 
     Calculation Method
 
-    Numerator = Number of children ([less than 3 years old at first assessment] AND [diagnosed with epilepsy] OR (number of children and young people diagnosed with epilepsy who had [3 or more maintenance AEDS] at first year) OR (Number of children less than 4 years old at first assessment with epilepsy AND myoclonic seizures)  OR (number of children and young people diagnosed with epilepsy  who met [CESS criteria] ) AND had [evidence of involvement of a paediatric neurologist] OR [evidence of referral or involvement of CESS]
+    Numerator = Number of children (
+                    [less than 3 years old at first assessment] AND [diagnosed with epilepsy]
+                     OR (number of children and young people diagnosed with epilepsy who had [3 or more maintenance AEDS] at first year) OR
+                     (Number of children less than 4 years old at first assessment with epilepsy AND (has generalised myoclonic seizures OR has focal myoclonic seizures))  OR
+                     (number of children and young people diagnosed with epilepsy  who met [CESS criteria] ) AND had
+                     [evidence of involvement of a paediatric neurologist] OR [evidence of referral or involvement of CESS]
 
     Denominator = Number of children [less than 3 years old at first assessment] AND [diagnosed with epilepsy] OR (number of children and young people diagnosed with epilepsy who had [3 or more maintenance AEDS] at first year )OR (number of children and young people diagnosed with epilepsy  who met [CESS criteria] OR (Number of children less than 4 years old at first assessment with epilepsy AND  [myoclonic seizures])
     """
@@ -36,7 +41,7 @@ def score_kpi_3(registration_instance, age_at_first_paediatric_assessment) -> in
     has_myoclonic_epilepsy_episode = Episode.objects.filter(
         Q(multiaxial_diagnosis=registration_instance.multiaxialdiagnosis)
         & Q(epilepsy_or_nonepilepsy_status="E")
-        & Q(epileptic_generalised_onset="MyC")
+        & (Q(epileptic_generalised_onset="MyC") | Q(focal_onset_myoclonic=True))
     ).exists()
 
     # List of True/False assessing if meets any of criteria
