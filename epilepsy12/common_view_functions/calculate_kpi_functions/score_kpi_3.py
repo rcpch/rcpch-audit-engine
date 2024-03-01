@@ -22,7 +22,7 @@ def score_kpi_3(registration_instance, age_at_first_paediatric_assessment) -> in
                      (number of children and young people diagnosed with epilepsy  who met [CESS criteria] ) AND had
                      [evidence of involvement of a paediatric neurologist] OR [evidence of referral or involvement of CESS]
 
-    Denominator = Number of children [less than 3 years old at first assessment] AND [diagnosed with epilepsy] OR (number of children and young people diagnosed with epilepsy who had [3 or more maintenance AEDS] at first year )OR (number of children and young people diagnosed with epilepsy  who met [CESS criteria] OR (Number of children less than 4 years old at first assessment with epilepsy AND  [myoclonic seizures])
+    Denominator = Number of children [less than 3 years old at first assessment] AND [diagnosed with epilepsy] OR (number of children and young people diagnosed with epilepsy who had [3 or more maintenance AEDS] at first year )OR (number of children and young people diagnosed with epilepsy  who met [CESS criteria] OR (Number of children less than 4 years old at first assessment with epilepsy AND  (has generalised myoclonic seizures OR has focal myoclonic seizures))
     """
 
     assessment = registration_instance.assessment
