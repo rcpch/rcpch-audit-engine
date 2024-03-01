@@ -1,27 +1,27 @@
 """
 ## Delete Tests
 
-    [x] Assert an Audit Centre Lead Clinician can delete users inside own Trust - HTTPStatus.OK
-    [x] Assert RCPCH Audit Team can delete users inside own Trust - HTTPStatus.OK
-    [x] Assert RCPCH Audit Team can delete users outside own Trust - HTTPStatus.OK
-    [x] Assert Clinical Audit Team can delete users inside own Trust - HTTPStatus.OK
-    [x] Assert Clinical Audit Team can delete users outside own Trust - HTTPStatus.OK
+    [x] Assert an Audit Centre Lead Clinician can deactivate users inside own Trust - HTTPStatus.OK
+    [x] Assert RCPCH Audit Team can deactivate users inside own Trust - HTTPStatus.OK
+    [x] Assert RCPCH Audit Team can deactivate users outside own Trust - HTTPStatus.OK
+    [x] Assert Clinical Audit Team can deactivate users inside own Trust - HTTPStatus.OK
+    [x] Assert Clinical Audit Team can deactivate users outside own Trust - HTTPStatus.OK
 
-    [x] Assert an Audit Centre Administrator CANNOT delete users - HTTPStatus.FORBIDDEN
-    [x] Assert an audit centre clinician CANNOT delete users - HTTPStatus.FORBIDDEN
-    [x] Assert an Audit Centre Lead Clinician CANNOT delete users outside own Trust - HTTPStatus.FORBIDDEN
+    [x] Assert an Audit Centre Administrator CANNOT deactivate users - HTTPStatus.FORBIDDEN
+    [x] Assert an audit centre clinician CANNOT deactivate users - HTTPStatus.FORBIDDEN
+    [x] Assert an Audit Centre Lead Clinician CANNOT deactivate users outside own Trust - HTTPStatus.FORBIDDEN
     
     
 
-    [x] Assert an Audit Centre Lead Clinician can delete patients inside own Trust - HTTPStatus.OK
-    [x] Assert RCPCH Audit Team can delete patients inside own Trust - HTTPStatus.OK
-    [x] Assert RCPCH Audit Team can delete patients outside own Trust - HTTPStatus.OK
-    [x] Assert Clinical Audit Team can delete patients inside own Trust - HTTPStatus.OK
-    [x] Assert Clinical Audit Team can delete patients outside own Trust - HTTPStatus.OK
+    [x] Assert an Audit Centre Lead Clinician can deactivate patients inside own Trust - HTTPStatus.OK
+    [x] Assert RCPCH Audit Team can deactivate patients inside own Trust - HTTPStatus.OK
+    [x] Assert RCPCH Audit Team can deactivate patients outside own Trust - HTTPStatus.OK
+    [x] Assert Clinical Audit Team can deactivate patients inside own Trust - HTTPStatus.OK
+    [x] Assert Clinical Audit Team can deactivate patients outside own Trust - HTTPStatus.OK
     
-    [x] Assert an Audit Centre Administrator CANNOT delete patients - HTTPStatus.FORBIDDEN
-    [x] Assert an audit centre clinician CANNOT delete patients outside own Trust - HTTPStatus.FORBIDDEN
-    [x] Assert an Audit Centre Lead Clinician CANNOT delete patients outside own Trust - HTTPStatus.FORBIDDEN
+    [x] Assert an Audit Centre Administrator CANNOT deactivate patients - HTTPStatus.FORBIDDEN
+    [x] Assert an audit centre clinician CANNOT deactivate patients outside own Trust - HTTPStatus.FORBIDDEN
+    [x] Assert an Audit Centre Lead Clinician CANNOT deactivate patients outside own Trust - HTTPStatus.FORBIDDEN
 
 
 # Episode
@@ -110,15 +110,15 @@ from epilepsy12.tests.view_tests.permissions_tests.perm_tests_utils import (
 
 
 @pytest.mark.django_db
-def test_user_delete_success(
+def test_user_deactivate_success(
     client,
     seed_groups_fixture,
     seed_users_fixture,
     seed_cases_fixture,
 ):
-    """Simulating different E12 users with different roles attempting to delete Users inside own trust.
+    """Simulating different E12 users with different roles attempting to deactivate inside own trust.
 
-    Additionally, RCPCH Audit Team and Clinical Audit Team roles should be able to delete user in different trust.
+    Additionally, RCPCH Audit Team and Clinical Audit Team roles should be able to deactivate user in different trust.
     """
 
     # set up constants
@@ -176,10 +176,10 @@ def test_user_delete_success(
 
 
 @pytest.mark.django_db
-def test_user_delete_forbidden(
+def test_user_deactivate_forbidden(
     client,
 ):
-    """Simulating different E12 users with different roles attempting to delete Users inside own trust.
+    """Simulating different E12 users with different roles attempting to deactivate Users inside own trust.
 
     Audit Centre Lead Clinician role CANNOT delete user in different trust.
     """
@@ -207,7 +207,7 @@ def test_user_delete_forbidden(
         user_first_names_for_test
     ), f"Incorrect queryset of test users. Requested {len(user_first_names_for_test)} users, queryset includes {len(users)}: {users}"
 
-    # Seed a temp User for attempt to delete
+    # Seed a temp User for attempt to deactivate
     temp_user_same_org = E12UserFactory(
         first_name="temp_user",
         email=f"temp_user_same_org@temp.com",
@@ -216,7 +216,7 @@ def test_user_delete_forbidden(
         organisation_employer=TEST_USER_ORGANISATION,
         groups=[test_user_audit_centre_administrator_data.group_name],
     )
-    # Seed a temp User to be deleted
+    # Seed a temp User to be deactivated
     temp_user_same_org = E12UserFactory(
         first_name="temp_user",
         email=f"temp_user_diff_org@temp.com",
