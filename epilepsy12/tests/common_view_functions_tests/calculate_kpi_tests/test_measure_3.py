@@ -198,7 +198,7 @@ def test_measure_3_3AEMs_seen(
     CASE_PARAM_VALUES,
 )
 @pytest.mark.django_db
-def test_measure_3_lt_4yo_myoclonic_seen(
+def test_measure_3_lt_4yo_generalised_myoclonic_seen(
     e12_case_factory,
     e12_episode_factory,
     PAEDIATRIC_NEUROLOGIST_INPUT_DATE,
@@ -243,6 +243,68 @@ def test_measure_3_lt_4yo_myoclonic_seen(
         multiaxial_diagnosis=registration.multiaxialdiagnosis,
         epilepsy_or_nonepilepsy_status="E",
         epileptic_generalised_onset=MYOCLONIC,
+    )
+
+    calculate_kpis(registration_instance=registration)
+
+    kpi_score = KPI.objects.get(pk=registration.kpi.pk).tertiary_input
+
+    assert kpi_score == expected_kpi_score, (
+        f"Has myoclonic episode (n = {episodes.count()}) and seen by {'neurologist' if PAEDIATRIC_NEUROLOGIST_INPUT_DATE else ''} / {'epilepsy surgery' if CHILDRENS_EPILEPSY_SURGICAL_SERVICE_REFERRAL_MADE else ''} but did not pass measure"
+        if expected_kpi_score == KPI_SCORE["PASS"]
+        else f"Has myoclonic episode (n = {episodes.count()}) and not seen by neurologist both surgery and did not fail measure"
+    )
+
+
+@pytest.mark.parametrize(
+    CASE_PARAM_NAMES,
+    CASE_PARAM_VALUES,
+)
+@pytest.mark.django_db
+def test_measure_3_lt_4yo_focal_myoclonic_seen(
+    e12_case_factory,
+    e12_episode_factory,
+    PAEDIATRIC_NEUROLOGIST_INPUT_DATE,
+    CHILDRENS_EPILEPSY_SURGICAL_SERVICE_REFERRAL_MADE,
+    expected_kpi_score,
+):
+    """
+    *PASS*
+    1) child is under 4 and has myoclonic epilepsy && ONE OF:
+        - input by BOTH neurologist
+        - CESS referral
+    *FAIL*
+    1) child is under 4 and has myoclonic epilepsy && NOT seen by (neurologist OR epilepsy surgery)
+    """
+
+    # SET UP CONSTANTS
+    DATE_OF_BIRTH = date(2021, 1, 1)
+    FIRST_PAEDIATRIC_ASSESSMENT_DATE = DATE_OF_BIRTH + relativedelta(
+        years=3, months=11
+    )  # a child who is 3y11m at first_paediatric_assessment_date (=FPA)
+
+    case = e12_case_factory(
+        date_of_birth=DATE_OF_BIRTH,
+        registration__first_paediatric_assessment_date=FIRST_PAEDIATRIC_ASSESSMENT_DATE,
+        registration__assessment__paediatric_neurologist_input_date=PAEDIATRIC_NEUROLOGIST_INPUT_DATE,
+        registration__assessment__childrens_epilepsy_surgical_service_referral_made=CHILDRENS_EPILEPSY_SURGICAL_SERVICE_REFERRAL_MADE,
+    )
+
+    # get registration for the saved case model
+    registration = Registration.objects.get(case=case)
+
+    # Assign a myoclonic episode
+    e12_episode_factory.create(
+        multiaxial_diagnosis=registration.multiaxialdiagnosis,
+        epileptic_seizure_onset_type_generalised=True,
+        focal_onset_myoclonic=True,
+    )
+
+    # count myoclonic episodes attached to confirm
+    episodes = Episode.objects.filter(
+        multiaxial_diagnosis=registration.multiaxialdiagnosis,
+        epilepsy_or_nonepilepsy_status="E",
+        focal_onset_myoclonic=True,
     )
 
     calculate_kpis(registration_instance=registration)
