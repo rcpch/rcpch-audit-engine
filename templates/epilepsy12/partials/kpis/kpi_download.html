@@ -10,31 +10,17 @@
   </p>
   <h2>Structure of the KPI report</h2>
   <p>
-    The KPI report is separated into 8 separate pages on an excel document. The
-    structure of the 8 pages is as follows:
-    <ol>
-      <li>Individual Organisation Level</li>
-      <li>Trust or Local Health Board Level</li>
-      <li>ICB Level</li>
-      <li>NHS region Level</li>
-      <li>Network Level</li>
-      <li>National Level</li>
-      <li>Reference</li>
-      <li>National Comparison</li>
-    </ol>
+    The KPI report is a single page and provides a summary of all the Key Performance Indicators for England and Wales.
   </p>
   <span class="ui buttons">
     <div id="kpi_download_button">
-        <button 
-          class="ui rcpch_positive button jump"
-          hx-post="{% url 'kpi_download' organisation_id=organisation_id %}"
-          hx-target="#kpi_download_button"
-          hx-swap="innerHTML"
-          hx-headers='{"X-CSRFToken": "{{ csrf_token }}"}'
-        >
+        <a href="{% url 'kpi_download_file' %}">
+          <button 
+            class="ui rcpch_positive button jump"
+          >
           Download most recent KPI report
         </button>
-      </a>
+        </a>
     </div>
     <div id="organisation_return" class="ui rcpch_grey button bold">
         <a href="{% url 'selected_organisation_summary' organisation_id=organisation_id %}">

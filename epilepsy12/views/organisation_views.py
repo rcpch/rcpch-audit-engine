@@ -439,37 +439,20 @@ def view_preference(request, organisation_id, template_name):
 def kpi_download(request, organisation_id):
     """
     GET: Loads the page necessary for downloading KPIs
-    POST: calculates CSV and returns label partial
     """
 
-    if request.htmx:
-        """
-        POST request on download button click
-        Returns success label
-        Triggers async task
-        """
+    context = {"organisation_id": organisation_id}
 
-        # start async task
-        csv = download_kpi_summary_as_csv(cohort=6)
+    template_name = "epilepsy12/partials/kpis/kpi_download.html"
 
-        # context = {
-        #     "message": "Downloaded",
-        #     "has_error": False,
-        #     "is_positive": False,
-        #     "organisation_id": organisation_id,
-        #     "csv": csv,
-        # }
+    return render(request=request, template_name=template_name, context=context)
 
-        # template_name = "epilepsy12/partials/registration/is_eligible_label.html"
 
-        # return render(request=request, template_name=template_name, context=context)
-        response = HttpResponse(content_type="text/csv")
-        return csv.to_csv(path_or_buf=response)
+def kpi_download_file(request):
 
-    else:
+    df = download_kpi_summary_as_csv(cohort=6)
 
-        context = {"organisation_id": organisation_id}
-
-        template_name = "epilepsy12/partials/kpis/kpi_download.html"
-
-        return render(request=request, template_name=template_name, context=context)
+    response = HttpResponse(content_type="text/csv")
+    response["Content-Disposition"] = "attachment; filename=kpi_national.csv"
+    df.to_csv(path_or_buf=response)
+    return response

@@ -8,6 +8,7 @@ from django.utils.html import strip_tags
 from django.core.mail import send_mail, BadHeaderError
 from django.conf import settings
 from django.apps import apps
+from django.db.models.aggregates import Sum
 
 # Third party imports
 from celery import shared_task
@@ -95,9 +96,91 @@ def download_kpi_summary_as_csv(cohort=6):
 
     NationalKPIAggregation = apps.get_model("epilepsy12", "NationalKPIAggregation")
 
-    national_kpi_aggregation = NationalKPIAggregation.objects.filter(cohort=cohort)
+    national_kpi_aggregation = (
+        NationalKPIAggregation.objects.filter(cohort=cohort)
+        .values(
+            "paediatrician_with_expertise_in_epilepsies_passed",
+            "paediatrician_with_expertise_in_epilepsies_total_eligible",
+            "epilepsy_specialist_nurse_passed",
+            "epilepsy_specialist_nurse_total_eligible",
+            "tertiary_input_passed",
+            "tertiary_input_total_eligible",
+            "epilepsy_surgery_referral_passed",
+            "epilepsy_surgery_referral_total_eligible",
+            "ecg_passed",
+            "ecg_total_eligible",
+            "mri_passed",
+            "mri_total_eligible",
+            "assessment_of_mental_health_issues_passed",
+            "assessment_of_mental_health_issues_total_eligible",
+            "mental_health_support_passed",
+            "mental_health_support_total_eligible",
+            "sodium_valproate_passed",
+            "sodium_valproate_total_eligible",
+            "comprehensive_care_planning_agreement_passed",
+            "comprehensive_care_planning_agreement_total_eligible",
+            "patient_held_individualised_epilepsy_document_passed",
+            "patient_held_individualised_epilepsy_document_total_eligible",
+            "patient_carer_parent_agreement_to_the_care_planning_passed",
+            "patient_carer_parent_agreement_to_the_care_planning_total_eligible",
+            "care_planning_has_been_updated_when_necessary_passed",
+            "care_planning_has_been_updated_when_necessary_total_eligible",
+            "comprehensive_care_planning_content_passed",
+            "comprehensive_care_planning_content_total_eligible",
+            "parental_prolonged_seizures_care_plan_passed",
+            "parental_prolonged_seizures_care_plan_total_eligible",
+            "water_safety_passed",
+            "water_safety_total_eligible",
+            "first_aid_passed",
+            "first_aid_total_eligible",
+            "general_participation_and_risk_passed",
+            "general_participation_and_risk_total_eligible",
+            "service_contact_details_passed",
+            "service_contact_details_total_eligible",
+            "sudep_passed",
+            "sudep_total_eligible",
+            "school_individual_healthcare_plan_passed",
+            "school_individual_healthcare_plan_total_eligible",
+        )
+        .first()
+    )
 
-    df = pd.DataFrame(list(national_kpi_aggregation.values()))
-    print(df.head(10))
+    measures = [
+        "paediatrician_with_expertise_in_epilepsies",
+        "epilepsy_specialist_nurse",
+        "tertiary_input",
+        "epilepsy_surgery_referral",
+        "ecg",
+        "mri",
+        "assessment_of_mental_health_issues",
+        "mental_health_support",
+        "sodium_valproate",
+        "comprehensive_care_planning_agreement",
+        "patient_held_individualised_epilepsy_document",
+        "patient_carer_parent_agreement_to_the_care_planning",
+        "care_planning_has_been_updated_when_necessary",
+        "comprehensive_care_planning_content",
+        "parental_prolonged_seizures_care_plan",
+        "water_safety",
+        "first_aid",
+        "general_participation_and_risk",
+        "service_contact_details",
+        "sudep",
+        "school_individual_healthcare_plan",
+    ]
+
+    final_list = []
+    for kpi in measures:
+        item = {
+            "Measure": kpi,
+            "Numerator": national_kpi_aggregation[f"{kpi}_passed"],
+            "Denominator": national_kpi_aggregation[f"{kpi}_total_eligible"],
+            "Percentage": national_kpi_aggregation[f"{kpi}_passed"]
+            / national_kpi_aggregation[f"{kpi}_total_eligible"]
+            * 100,
+        }
+        final_list.append(item)
+
+    df = pd.DataFrame.from_dict(final_list)
 
     return df

@@ -356,6 +356,11 @@ organisation_patterns = [
         view=kpi_download,
         name="kpi_download",
     ),
+    path(
+        "kpi_download_file",
+        view=kpi_download_file,
+        name="kpi_download_file",
+    ),
 ]
 
 global_htmx_trigger_patterns = [
