@@ -1,12 +1,15 @@
 # Python imports
 from datetime import date
+import asyncio
 
 # third party libraries
 from django.shortcuts import render
 from django.urls import reverse
 from django.contrib.auth.decorators import permission_required
+from django.http import HttpResponse
 
 from django_htmx.http import HttpResponseClientRedirect
+import pandas as pd
 
 # E12 imports
 from ..decorator import user_may_view_this_organisation, login_and_otp_required
@@ -32,6 +35,7 @@ from ..general_functions import (
 )
 from ..tasks import (
     asynchronously_aggregate_kpis_and_update_models_for_cohort_and_abstraction_level,
+    download_kpi_summary_as_csv,
 )
 
 
@@ -439,16 +443,28 @@ def kpi_download(request, organisation_id):
     """
 
     if request.htmx:
-        context = {
-            "message": "Downloaded",
-            "has_error": False,
-            "is_positive": False,
-            "organisation_id": organisation_id,
-        }
+        """
+        POST request on download button click
+        Returns success label
+        Triggers async task
+        """
 
-        template_name = "epilepsy12/partials/registration/is_eligible_label.html"
+        # start async task
+        csv = download_kpi_summary_as_csv(cohort=6)
 
-        return render(request=request, template_name=template_name, context=context)
+        # context = {
+        #     "message": "Downloaded",
+        #     "has_error": False,
+        #     "is_positive": False,
+        #     "organisation_id": organisation_id,
+        #     "csv": csv,
+        # }
+
+        # template_name = "epilepsy12/partials/registration/is_eligible_label.html"
+
+        # return render(request=request, template_name=template_name, context=context)
+        response = HttpResponse(content_type="text/csv")
+        return csv.to_csv(path_or_buf=response)
 
     else:
 
