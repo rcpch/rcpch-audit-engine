@@ -23,13 +23,25 @@
       <li>National Comparison</li>
     </ol>
   </p>
-  <div>
-    <a href="{% url 'download_kpi_report' %}">
-      <button class="ui rcpch_positive button jump">
-        Download most recent KPI report
-      </button>
-    </a>
-  </div>
+  <span class="ui buttons">
+    <div id="kpi_download_button">
+        <button 
+          class="ui rcpch_positive button jump"
+          hx-post="{% url 'kpi_download' organisation_id=organisation_id %}"
+          hx-target="#kpi_download_button"
+          hx-swap="innerHTML"
+          hx-headers='{"X-CSRFToken": "{{ csrf_token }}"}'
+        >
+          Download most recent KPI report
+        </button>
+      </a>
+    </div>
+    <div id="organisation_return" class="ui rcpch_grey button bold">
+        <a href="{% url 'selected_organisation_summary' organisation_id=organisation_id %}">
+          Return to Organisation View
+        </a>
+    </div>
+  </span>
 </div>
 
 {% endblock content %}

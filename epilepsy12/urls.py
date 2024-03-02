@@ -352,13 +352,10 @@ organisation_patterns = [
         name="open_access",
     ),
     path(
-        "kpi_download_page",
-        view=kpi_download_page,
-        name="kpi_download_page",
+        "organisation/<int:organisation_id>/kpi_download",
+        view=kpi_download,
+        name="kpi_download",
     ),
-    path("kpi_download/download_kpi_report",
-         view=download_kpi_report,
-         name='download_kpi_report')
 ]
 
 global_htmx_trigger_patterns = [

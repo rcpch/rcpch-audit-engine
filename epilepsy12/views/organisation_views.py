@@ -5,6 +5,7 @@ from datetime import date
 from django.shortcuts import render
 from django.urls import reverse
 from django.contrib.auth.decorators import permission_required
+
 from django_htmx.http import HttpResponseClientRedirect
 
 # E12 imports
@@ -428,21 +429,31 @@ def view_preference(request, organisation_id, template_name):
         reverse(template_name, kwargs={"organisation_id": organisation.pk})
     )
 
+
 @login_and_otp_required()
 @permission_required("epilepsy12.can_publish_epilepsy12_data")
-def kpi_download_page(request):
+def kpi_download(request, organisation_id):
     """
-    Loads the page necessary for downloading KPIs
-
-    """
-
-    template_name='epilepsy12/partials/kpis/kpi_download_page.html'
-
-    return render(request=request, template_name=template_name)
-
-def download_kpi_report(request, context):
-    """
-    Contains logic for construction the KPI report and outputs the 8 page KPI file 
+    GET: Loads the page necessary for downloading KPIs
+    POST: calculates CSV and returns label partial
     """
 
-    
+    if request.htmx:
+        context = {
+            "message": "Downloaded",
+            "has_error": False,
+            "is_positive": False,
+            "organisation_id": organisation_id,
+        }
+
+        template_name = "epilepsy12/partials/registration/is_eligible_label.html"
+
+        return render(request=request, template_name=template_name, context=context)
+
+    else:
+
+        context = {"organisation_id": organisation_id}
+
+        template_name = "epilepsy12/partials/kpis/kpi_download.html"
+
+        return render(request=request, template_name=template_name, context=context)
