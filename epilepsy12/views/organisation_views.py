@@ -448,6 +448,8 @@ def kpi_download(request, organisation_id):
     return render(request=request, template_name=template_name, context=context)
 
 
+@login_and_otp_required()
+@permission_required("epilepsy12.can_publish_epilepsy12_data")
 def kpi_download_file(request):
 
     df = download_kpi_summary_as_csv(cohort=6)
