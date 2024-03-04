@@ -1,27 +1,27 @@
 """
 ## Delete Tests
 
-    [x] Assert an Audit Centre Lead Clinician can delete users inside own Trust - HTTPStatus.OK
-    [x] Assert RCPCH Audit Team can delete users inside own Trust - HTTPStatus.OK
-    [x] Assert RCPCH Audit Team can delete users outside own Trust - HTTPStatus.OK
-    [x] Assert Clinical Audit Team can delete users inside own Trust - HTTPStatus.OK
-    [x] Assert Clinical Audit Team can delete users outside own Trust - HTTPStatus.OK
+    [x] Assert an Audit Centre Lead Clinician can deactivate users inside own Trust - HTTPStatus.OK
+    [x] Assert RCPCH Audit Team can deactivate users inside own Trust - HTTPStatus.OK
+    [x] Assert RCPCH Audit Team can deactivate users outside own Trust - HTTPStatus.OK
+    [x] Assert Clinical Audit Team can deactivate users inside own Trust - HTTPStatus.OK
+    [x] Assert Clinical Audit Team can deactivate users outside own Trust - HTTPStatus.OK
 
-    [x] Assert an Audit Centre Administrator CANNOT delete users - HTTPStatus.FORBIDDEN
-    [x] Assert an audit centre clinician CANNOT delete users - HTTPStatus.FORBIDDEN
-    [x] Assert an Audit Centre Lead Clinician CANNOT delete users outside own Trust - HTTPStatus.FORBIDDEN
+    [x] Assert an Audit Centre Administrator CANNOT deactivate users - HTTPStatus.FORBIDDEN
+    [x] Assert an audit centre clinician CANNOT deactivate users - HTTPStatus.FORBIDDEN
+    [x] Assert an Audit Centre Lead Clinician CANNOT deactivate users outside own Trust - HTTPStatus.FORBIDDEN
     
     
 
-    [x] Assert an Audit Centre Lead Clinician can delete patients inside own Trust - HTTPStatus.OK
-    [x] Assert RCPCH Audit Team can delete patients inside own Trust - HTTPStatus.OK
-    [x] Assert RCPCH Audit Team can delete patients outside own Trust - HTTPStatus.OK
-    [x] Assert Clinical Audit Team can delete patients inside own Trust - HTTPStatus.OK
-    [x] Assert Clinical Audit Team can delete patients outside own Trust - HTTPStatus.OK
+    [x] Assert an Audit Centre Lead Clinician can deactivate patients inside own Trust - HTTPStatus.OK
+    [x] Assert RCPCH Audit Team can deactivate patients inside own Trust - HTTPStatus.OK
+    [x] Assert RCPCH Audit Team can deactivate patients outside own Trust - HTTPStatus.OK
+    [x] Assert Clinical Audit Team can deactivate patients inside own Trust - HTTPStatus.OK
+    [x] Assert Clinical Audit Team can deactivate patients outside own Trust - HTTPStatus.OK
     
-    [x] Assert an Audit Centre Administrator CANNOT delete patients - HTTPStatus.FORBIDDEN
-    [x] Assert an audit centre clinician CANNOT delete patients outside own Trust - HTTPStatus.FORBIDDEN
-    [x] Assert an Audit Centre Lead Clinician CANNOT delete patients outside own Trust - HTTPStatus.FORBIDDEN
+    [x] Assert an Audit Centre Administrator CANNOT deactivate patients - HTTPStatus.FORBIDDEN
+    [x] Assert an audit centre clinician CANNOT deactivate patients outside own Trust - HTTPStatus.FORBIDDEN
+    [x] Assert an Audit Centre Lead Clinician CANNOT deactivate patients outside own Trust - HTTPStatus.FORBIDDEN
 
 
 # Episode
@@ -104,19 +104,21 @@ from epilepsy12.models import (
     Medicine,
     ComorbidityList,
 )
-from epilepsy12.tests.view_tests.permissions_tests.perm_tests_utils import twofactor_signin
+from epilepsy12.tests.view_tests.permissions_tests.perm_tests_utils import (
+    twofactor_signin,
+)
 
 
 @pytest.mark.django_db
-def test_user_delete_success(
+def test_user_deactivate_success(
     client,
     seed_groups_fixture,
     seed_users_fixture,
     seed_cases_fixture,
 ):
-    """Simulating different E12 users with different roles attempting to delete Users inside own trust.
+    """Simulating different E12 users with different roles attempting to deactivate inside own trust.
 
-    Additionally, RCPCH Audit Team and Clinical Audit Team roles should be able to delete user in different trust.
+    Additionally, RCPCH Audit Team and Clinical Audit Team roles should be able to deactivate user in different trust.
     """
 
     # set up constants
@@ -168,45 +170,26 @@ def test_user_delete_success(
 
         response = client.get(url)
 
+        # test 200 response that user correctly deactivates temp_user_same_org
         assert (
             response.status_code == HTTPStatus.OK
         ), f"{test_user.first_name} (from {test_user.organisation_employer}) requested `{url}` for User from {TEST_USER_ORGANISATION}. Has groups: {test_user.groups.all()}. Expected 200 response status code, received {response.status_code}"
 
-        # Additional test for deleting users outside of own Trust
-        if test_user.first_name in [
-            test_user_clinicial_audit_team_data.role_str,
-            test_user_rcpch_audit_team_data.role_str,
-        ]:
-            # Seed a temp User to be deleted
-            temp_user_same_org = E12UserFactory(
-                first_name="temp_user",
-                email=f"temp_{test_user.first_name}@temp.com",
-                role=test_user.role,
-                is_active=1,
-                organisation_employer=DIFF_TRUST_DIFF_ORGANISATION,
-                groups=[test_user_audit_centre_administrator_data.group_name],
-            )
-
-            url = reverse(
-                "delete_epilepsy12_user",
-                kwargs={
-                    "organisation_id": DIFF_TRUST_DIFF_ORGANISATION.id,
-                    "epilepsy12_user_id": temp_user_same_org.id,
-                },
-            )
-
-            response = client.get(url)
-
-            assert (
-                response.status_code == HTTPStatus.OK
-            ), f"{test_user.first_name} (from {test_user.organisation_employer}) requested `{url}` for User from {DIFF_TRUST_DIFF_ORGANISATION}. Has groups: {test_user.groups.all()}. Expected 200 response status code, received {response.status_code}"
+        # requery temp_user_same_org is_active status
+        updated_user_active_status = Epilepsy12User.objects.get(
+            pk=temp_user_same_org.pk
+        )
+        # test database reflects that user correctly deactivates temp_user_same_org
+        assert (
+            updated_user_active_status.is_active == 0
+        ), f"{updated_user_active_status.first_name} (from {updated_user_active_status.organisation_employer}) weas deactivated by User from {TEST_USER_ORGANISATION}. Has groups: {test_user.groups.all()}. Expected {temp_user_same_org.first_name}'s is_active status to be False. Received {updated_user_active_status.is_active}"
 
 
 @pytest.mark.django_db
-def test_user_delete_forbidden(
+def test_user_deactivate_forbidden(
     client,
 ):
-    """Simulating different E12 users with different roles attempting to delete Users inside own trust.
+    """Simulating different E12 users with different roles attempting to deactivate Users inside own trust.
 
     Audit Centre Lead Clinician role CANNOT delete user in different trust.
     """
@@ -234,7 +217,7 @@ def test_user_delete_forbidden(
         user_first_names_for_test
     ), f"Incorrect queryset of test users. Requested {len(user_first_names_for_test)} users, queryset includes {len(users)}: {users}"
 
-    # Seed a temp User for attempt to delete
+    # Seed a temp User for attempt to deactivate
     temp_user_same_org = E12UserFactory(
         first_name="temp_user",
         email=f"temp_user_same_org@temp.com",
@@ -243,7 +226,7 @@ def test_user_delete_forbidden(
         organisation_employer=TEST_USER_ORGANISATION,
         groups=[test_user_audit_centre_administrator_data.group_name],
     )
-    # Seed a temp User to be deleted
+    # Seed a temp User to be deactivated
     temp_user_same_org = E12UserFactory(
         first_name="temp_user",
         email=f"temp_user_diff_org@temp.com",
@@ -276,6 +259,15 @@ def test_user_delete_forbidden(
                 response.status_code == HTTPStatus.FORBIDDEN
             ), f"{test_user.first_name} (from {test_user.organisation_employer}) requested `{url}` for User from {DIFF_TRUST_DIFF_ORGANISATION}. Has groups: {test_user.groups.all()}. Expected {HTTPStatus.FORBIDDEN} response status code, received {response.status_code}"
 
+            # requery temp_user_same_org is_active status
+            updated_user_active_status = Epilepsy12User.objects.get(
+                pk=temp_user_same_org.pk
+            )
+            # test database reflects that user fails to deactivate temp_user_same_org
+            assert (
+                updated_user_active_status.is_active == 1
+            ), f"{updated_user_active_status.first_name} (from {updated_user_active_status.organisation_employer}) was NOT deactivated by User from {TEST_USER_ORGANISATION}. Has groups: {test_user.groups.all()}. Expected {temp_user_same_org.first_name}'s is_active status to be True. Received {updated_user_active_status.is_active}"
+
         else:
             url = reverse(
                 "delete_epilepsy12_user",
@@ -290,6 +282,15 @@ def test_user_delete_forbidden(
             assert (
                 response.status_code == HTTPStatus.FORBIDDEN
             ), f"{test_user.first_name} (from {test_user.organisation_employer}) requested `{url}` for User from {TEST_USER_ORGANISATION}. Has groups: {test_user.groups.all()}. Expected {HTTPStatus.FORBIDDEN} response status code, received {response.status_code}"
+
+            # requery temp_user_same_org is_active status
+            updated_user_active_status = Epilepsy12User.objects.get(
+                pk=temp_user_same_org.pk
+            )
+            # test database reflects that user fails to deactivate temp_user_same_org
+            assert (
+                updated_user_active_status.is_active == 1
+            ), f"{updated_user_active_status.first_name} (from {updated_user_active_status.organisation_employer}) was NOT deactivated by User from {TEST_USER_ORGANISATION}. Has groups: {test_user.groups.all()}. Expected {temp_user_same_org.first_name}'s is_active status to be True. Received {updated_user_active_status.is_active}"
 
 
 @pytest.mark.django_db

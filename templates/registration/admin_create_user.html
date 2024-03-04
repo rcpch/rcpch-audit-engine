@@ -140,7 +140,7 @@
                 {% endif %}
                 name="delete"
                 id="delete"
-                value="Delete"
+                value="Deactivate"
                 hx-post="{% url 'delete_epilepsy12_user' organisation_id=organisation_id epilepsy12_user_id=form.instance.pk %}"
                 hx-trigger='click'
                 hx-headers='{"X-CSRFToken": "{{ csrf_token }}"}'
@@ -148,13 +148,13 @@
                   halt the event
                   call Swal.fire({
                     title: 'Confirmation Required',
-                    text: 'This will irreversibly remove {{form.first_name.value}} {{form.surname.value}} and related dated from Epilepsy12.',
+                    text: 'This will deactivate the account for {{form.first_name.value}} {{form.surname.value}}.',
                     icon: 'warning',
                     iconColor: '#e00087',
                     showCancelButton: true,
                     confirmButtonColor: '#11a7f2',
                     cancelButtonColor: '#e60700',
-                    confirmButtonText: 'Remove user from Epilepsy12'
+                    confirmButtonText: 'Deactivate Epilepsy12 user account.'
                   })
                   if result.isConfirmed issueRequest()"
               />
