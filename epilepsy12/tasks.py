@@ -156,16 +156,7 @@ def download_kpi_summary_as_csv(cohort=6):
         "mental_health_support",
         "sodium_valproate",
         "comprehensive_care_planning_agreement",
-        "patient_held_individualised_epilepsy_document",
-        "patient_carer_parent_agreement_to_the_care_planning",
-        "care_planning_has_been_updated_when_necessary",
         "comprehensive_care_planning_content",
-        "parental_prolonged_seizures_care_plan",
-        "water_safety",
-        "first_aid",
-        "general_participation_and_risk",
-        "service_contact_details",
-        "sudep",
         "school_individual_healthcare_plan",
     ]
 
