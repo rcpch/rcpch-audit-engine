@@ -115,6 +115,118 @@ def download_kpi_summary_as_csv(cohort):
         "school_individual_healthcare_plan",
     ]
 
+    def create_dataframe(KPI_model1, constants_list, KPI_model2=None, constants_list2=None):
+        '''
+        Accepts names of KPI aggregation models and the constants list of the organisations/trusts/ICBs
+
+        Computes dataframe of each model, grouped by KPI and NOT by model
+
+        Returns dataframe containing KPI measures
+        '''
+
+        model_aggregation = apps.get_model("epilepsy12", KPI_model1)
+        model_aggregation_2 = None
+
+        if KPI_model2:
+            model_aggregation_2 = apps.get_model("epilepsy12", KPI_model2)
+        
+        objects = {}
+
+        for i, body in enumerate(constants_list):
+            if (constants_list == LOCAL_HEALTH_BOARDS):
+                key = body["ods_code"]
+            elif (constants_list == INTEGRATED_CARE_BOARDS):
+                key = body["name"]
+            elif (constants_list == NHS_ENGLAND_REGIONS):
+                key = body["NHS_ENGLAND_REGION_NAME"]
+            elif (constants_list == OPEN_UK_NETWORKS):
+                key = body["OPEN_UK_Network_Code"]
+            uid = i+1
+            objects[key] = model_aggregation.objects.filter(cohort=cohort, abstraction_relation=uid).values().first()
+
+        if model_aggregation_2:
+            if constants_list2 == TRUSTS:
+                for i, body in enumerate(constants_list2):
+                    key = body["ods_code"]
+                    uid = i+1
+                    objects[key] = model_aggregation_2.objects.filter(cohort=cohort, abstraction_relation=uid).values().first()
+        
+        final_list = []
+
+        if (constants_list == LOCAL_HEALTH_BOARDS):
+            title = "HBT"
+        elif (constants_list == INTEGRATED_CARE_BOARDS):
+            title = "ICB"
+        elif (constants_list == NHS_ENGLAND_REGIONS):
+            title = "NHSregion"
+        elif (constants_list == OPEN_UK_NETWORKS):
+            title = "Network"
+
+        if constants_list2 == TRUSTS:
+            for key in objects:
+                object = objects[key]
+                for kpi in measures:
+                    if object == None:
+                        item = {
+                            title: key,
+                            "Measure": kpi,
+                            "Percentage": 0,
+                            "Numerator": 0,
+                            "Denominator": 0,
+                        }
+                    elif object[f"{kpi}_total_eligible"] == 0:
+                        item = {
+                            title: key,
+                            "Measure": kpi,
+                            "Percentage": 0,
+                            "Numerator": object[f"{kpi}_passed"],
+                            "Denominator": object[f"{kpi}_total_eligible"],
+                        }
+                    else:
+                        item = {
+                            title: key,
+                            "Measure": kpi,
+                            "Percentage": object[f"{kpi}_passed"]
+                            / object[f"{kpi}_total_eligible"]
+                            * 100,
+                            "Numerator": object[f"{kpi}_passed"],
+                            "Denominator": object[f"{kpi}_total_eligible"],
+                        }
+                    final_list.append(item)  
+        else:
+            for kpi in measures:
+                for key in objects:
+                    object = objects[key]
+                    if object == None:
+                        item = {
+                            title: key,
+                            "Measure": kpi,
+                            "Percentage": 0,
+                            "Numerator": 0,
+                            "Denominator": 0,
+                        }
+                    elif object[f"{kpi}_total_eligible"] == 0:
+                        item = {
+                            title: key,
+                            "Measure": kpi,
+                            "Percentage": 0,
+                            "Numerator": object[f"{kpi}_passed"],
+                            "Denominator": object[f"{kpi}_total_eligible"],
+                        }
+                    else:
+                        item = {
+                            title: key,
+                            "Measure": kpi,
+                            "Percentage": object[f"{kpi}_passed"]
+                            / object[f"{kpi}_total_eligible"]
+                            * 100,
+                            "Numerator": object[f"{kpi}_passed"],
+                            "Denominator": object[f"{kpi}_total_eligible"],
+                        }
+                    final_list.append(item) 
+        
+        return pd.DataFrame.from_dict(final_list)
+
     # COUNTRY - SHEET 1
     # create a dataframe with a row for each measure of each country, and a column for each of ["Measure", "Percentage", "Numerator", "Denominator"]
     
@@ -173,201 +285,24 @@ def download_kpi_summary_as_csv(cohort):
 
     # HBT (Trusts & Health Boards) - SHEET 2
 
-    TrustKPIAggregation = apps.get_model("epilepsy12", "TrustKPIAggregation")
-    HealthBoardKPIAggregation = apps.get_model("epilepsy12", "LocalHealthBoardKPIAggregation")
+    trust_hb_df = create_dataframe("LocalHealthBoardKPIAggregation", LOCAL_HEALTH_BOARDS, KPI_model2="TrustKPIAggregation", constants_list2=TRUSTS)
 
-    # Create a dictionary of trust KPI aggregations for cohorts
-    trusts_and_hbs_objects = {}
+    # ICB (Integrated Care Board) - SHEET 3
 
-    for i, hb in enumerate(LOCAL_HEALTH_BOARDS):
-        hb_ods = hb["ods_code"]
-        hb_uid = i+1
-        trusts_and_hbs_objects[hb_ods] = HealthBoardKPIAggregation.objects.filter(cohort=cohort, abstraction_relation=hb_uid).values().first()
-
-    for i, trust in enumerate(TRUSTS):
-        trust_ods = trust["ods_code"]
-        trust_uid = i+1
-        trusts_and_hbs_objects[trust_ods] = TrustKPIAggregation.objects.filter(cohort=cohort, abstraction_relation=trust_uid).values().first()
-    
-    # Create dataframe for KPI aggregations for trusts
-    # Must catch NoneType errors (ie if no KPI data for a trust)
-        
-    final_list = []
-
-    for key in trusts_and_hbs_objects:
-        trust_object = trusts_and_hbs_objects[key]
-        for kpi in measures:
-            if trust_object == None:
-                item = {
-                    "HBT": key,
-                    "Measure": kpi,
-                    "Percentage": 0,
-                    "Numerator": 0,
-                    "Denominator": 0,
-                }
-            elif trust_object[f"{kpi}_total_eligible"] == 0:
-                item = {
-                    "HBT": key,
-                    "Measure": kpi,
-                    "Percentage": 0,
-                    "Numerator": trust_object[f"{kpi}_passed"],
-                    "Denominator": trust_object[f"{kpi}_total_eligible"],
-                }
-            else:
-                item = {
-                    "HBT": key,
-                    "Measure": kpi,
-                    "Percentage": trust_object[f"{kpi}_passed"]
-                    / trust_object[f"{kpi}_total_eligible"]
-                    * 100,
-                    "Numerator": trust_object[f"{kpi}_passed"],
-                    "Denominator": trust_object[f"{kpi}_total_eligible"],
-                }
-            final_list.append(item)            
-        
-    trust_hb_df = pd.DataFrame.from_dict(final_list)
-
-    # ICB (Integrated Care Board) - Sheet 3
-
-    ICBKPIAggregation = apps.get_model("epilepsy12", "ICBKPIAggregation")
-
-    icbs_objects = {}
-
-    for i, icb in enumerate(INTEGRATED_CARE_BOARDS):
-        icb_name = icb["name"]
-        icb_uid = i+1
-        icbs_objects[icb_name] = ICBKPIAggregation.objects.filter(cohort=cohort, abstraction_relation=icb_uid).values().first()
-    
-    final_list = []
-
-    for kpi in measures:
-        for key in icbs_objects:
-            icb_object = icbs_objects[key]
-            if icb_object == None:
-                item = {
-                    "ICB": key,
-                    "Measure": kpi,
-                    "Percentage": 0,
-                    "Numerator": 0,
-                    "Denominator": 0,
-                }
-            elif icb_object[f"{kpi}_total_eligible"] == 0:
-                item = {
-                    "ICB": key,
-                    "Measure": kpi,
-                    "Percentage": 0,
-                    "Numerator": icb_object[f"{kpi}_passed"],
-                    "Denominator": icb_object[f"{kpi}_total_eligible"],
-                }
-            else:
-                item = {
-                    "ICB": key,
-                    "Measure": kpi,
-                    "Percentage": icb_object[f"{kpi}_passed"]
-                    / icb_object[f"{kpi}_total_eligible"]
-                    * 100,
-                    "Numerator": icb_object[f"{kpi}_passed"],
-                    "Denominator": icb_object[f"{kpi}_total_eligible"],
-                }
-            final_list.append(item)  
-
-    icb_df = pd.DataFrame.from_dict(final_list)
+    icb_df = create_dataframe("ICBKPIAggregation", INTEGRATED_CARE_BOARDS)
 
     # NHS region level - SHEET 4
 
-    NHSEnglandRegionKPIAggregation = apps.get_model("epilepsy12", "NHSEnglandRegionKPIAggregation")
-
-    regions_objects = {}
-
-    for i, region in enumerate(NHS_ENGLAND_REGIONS):
-        region_name = region["NHS_ENGLAND_REGION_NAME"]
-        region_uid = i+1
-        regions_objects[region_name] = NHSEnglandRegionKPIAggregation.objects.filter(cohort=cohort, abstraction_relation=region_uid).values().first()
-
-    final_list = []
-
-    for kpi in measures:
-        for key in regions_objects:
-            regions_object = regions_objects[key]
-            if regions_object == None:
-                item = {
-                    "NHSregion": key,
-                    "Measure": kpi,
-                    "Percentage": 0,
-                    "Numerator": 0,
-                    "Denominator": 0
-                }
-            elif regions_object[f"{kpi}_total_eligible"] == 0:
-                item = {
-                    "NHSregion": key,
-                    "Measure": kpi,
-                    "Percentage": 0,
-                    "Numerator": regions_object[f"{kpi}_passed"],
-                    "Denominator": regions_object[f"{kpi}_total_eligible"],
-                }
-            else:
-                item = {
-                    "NHSregion": key,
-                    "Measure": kpi,
-                    "Percentage": regions_object[f"{kpi}_passed"]
-                    / regions_object[f"{kpi}_total_eligible"]
-                    * 100,
-                    "Numerator": regions_object[f"{kpi}_passed"],
-                    "Denominator": regions_object[f"{kpi}_total_eligible"],
-                }
-            final_list.append(item) 
-    
-    region_df = pd.DataFrame.from_dict(final_list)
+    region_df = create_dataframe("NHSEnglandRegionKPIAggregation", NHS_ENGLAND_REGIONS)
 
     # NETWORKS - SHEET 5
-
-    NetworkKPIAggregation = apps.get_model("epilepsy12", "OpenUKKPIAggregation")
-
-    networks_objects = {}
-
-    for i, network in enumerate(OPEN_UK_NETWORKS):
-        network_code = network["OPEN_UK_Network_Code"]
-        network_uid = i+1
-        networks_objects[network_code] = NetworkKPIAggregation.objects.filter(cohort=cohort, abstraction_relation=network_uid).values().first()
-    
-    final_list = []
-
-    for kpi in measures:
-        for key in networks_objects:
-            network_object = networks_objects[key]
-            if network_object == None:
-                item = {
-                    "Network": key,
-                    "Measure": kpi,
-                    "Percentage": 0,
-                    "Numerator": 0,
-                    "Denominator": 0,
-                }
-            elif network_object[f"{kpi}_total_eligible"] == 0:
-                item = {
-                    "Network": key,
-                    "Measure": kpi,
-                    "Percentage": 0,
-                    "Numerator": network_object[f"{kpi}_passed"],
-                    "Denominator": network_object[f"{kpi}_total_eligible"],
-                }
-            else:
-                item = {
-                    "Network": key,
-                    "Measure": kpi,
-                    "Percentage": network_object[f"{kpi}_passed"]
-                    / network_object[f"{kpi}_total_eligible"]
-                    * 100,
-                    "Numerator": network_object[f"{kpi}_passed"],
-                    "Denominator": network_object[f"{kpi}_total_eligible"],
-                }
-            final_list.append(item)  
-    
-    network_df = pd.DataFrame.from_dict(final_list)
+        
+    network_df = create_dataframe("OpenUKKPIAggregation", OPEN_UK_NETWORKS)
 
     # NATIONAL - SHEET 6
     # create a dataframe with a row for each measure, and column for each of ["Measure", "Percentage", "Numerator", "Denominator"]
     # note rows are named ["1. Paediatrician with expertise","2. Epilepsy specialist nurse","3a. Tertiary involvement","3b. Epilepsy surgery referral","4. ECG","5. MRI","6. Assessment of mental health issues","7. Mental health support","8. Sodium valproate","9a. Comprehensive care planning agreement","9b. Comprehensive care planning content","10. School Individual Health Care Plan"]
+    # Note that the function create_dataframe is not called here because there is no list of organisations to iterate through
 
     NationalKPIAggregation = apps.get_model("epilepsy12", "NationalKPIAggregation")
 
@@ -387,9 +322,10 @@ def download_kpi_summary_as_csv(cohort):
 
     national_df = pd.DataFrame.from_dict(final_list)
 
-    return network_df
     # Use ExcelWriter class from pandas to write each dataframe to its own sheet at the end of function
 
     # with pd.ExcelWriter("kpi_export.xlsx") as writer:
     #     country_df.to_excel(writer, sheet_name="Country_level")
     #     national_df.to_excel(writer, sheet_name="National_level")
+
+    return network_df
