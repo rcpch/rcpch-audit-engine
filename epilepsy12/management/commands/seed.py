@@ -114,6 +114,7 @@ def run_dummy_cases_seed(verbose=True, cases=50):
         cases = 50
 
     different_organisations = [
+        "RJZ01",
         "RGT01",
         "RBS25",
         "RQM01",
