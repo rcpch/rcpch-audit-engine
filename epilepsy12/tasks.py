@@ -16,7 +16,7 @@ import pandas as pd
 
 # E12 Imports
 from .general_functions import cohort_number_from_first_paediatric_assessment_date
-from epilepsy12.constants import EnumAbstractionLevel, TRUSTS, LOCAL_HEALTH_BOARDS, INTEGRATED_CARE_BOARDS, NHS_ENGLAND_REGIONS
+from epilepsy12.constants import EnumAbstractionLevel, TRUSTS, LOCAL_HEALTH_BOARDS, INTEGRATED_CARE_BOARDS, NHS_ENGLAND_REGIONS, OPEN_UK_NETWORKS
 from epilepsy12.common_view_functions.aggregate_by import update_all_kpi_agg_models
 from epilepsy12.management.commands.old_pt_data_scripts import insert_old_pt_data
 from epilepsy12.management.commands.user_scripts import insert_user_data
@@ -319,6 +319,52 @@ def download_kpi_summary_as_csv(cohort):
     
     region_df = pd.DataFrame.from_dict(final_list)
 
+    # NETWORKS - SHEET 5
+
+    NetworkKPIAggregation = apps.get_model("epilepsy12", "OpenUKKPIAggregation")
+
+    networks_objects = {}
+
+    for i, network in enumerate(OPEN_UK_NETWORKS):
+        network_code = network["OPEN_UK_Network_Code"]
+        network_uid = i+1
+        networks_objects[network_code] = NetworkKPIAggregation.objects.filter(cohort=cohort, abstraction_relation=network_uid).values().first()
+    
+    final_list = []
+
+    for kpi in measures:
+        for key in networks_objects:
+            network_object = networks_objects[key]
+            if network_object == None:
+                item = {
+                    "Network": key,
+                    "Measure": kpi,
+                    "Percentage": 0,
+                    "Numerator": 0,
+                    "Denominator": 0,
+                }
+            elif network_object[f"{kpi}_total_eligible"] == 0:
+                item = {
+                    "Network": key,
+                    "Measure": kpi,
+                    "Percentage": 0,
+                    "Numerator": network_object[f"{kpi}_passed"],
+                    "Denominator": network_object[f"{kpi}_total_eligible"],
+                }
+            else:
+                item = {
+                    "Network": key,
+                    "Measure": kpi,
+                    "Percentage": network_object[f"{kpi}_passed"]
+                    / network_object[f"{kpi}_total_eligible"]
+                    * 100,
+                    "Numerator": network_object[f"{kpi}_passed"],
+                    "Denominator": network_object[f"{kpi}_total_eligible"],
+                }
+            final_list.append(item)  
+    
+    network_df = pd.DataFrame.from_dict(final_list)
+
     # NATIONAL - SHEET 6
     # create a dataframe with a row for each measure, and column for each of ["Measure", "Percentage", "Numerator", "Denominator"]
     # note rows are named ["1. Paediatrician with expertise","2. Epilepsy specialist nurse","3a. Tertiary involvement","3b. Epilepsy surgery referral","4. ECG","5. MRI","6. Assessment of mental health issues","7. Mental health support","8. Sodium valproate","9a. Comprehensive care planning agreement","9b. Comprehensive care planning content","10. School Individual Health Care Plan"]
@@ -341,7 +387,7 @@ def download_kpi_summary_as_csv(cohort):
 
     national_df = pd.DataFrame.from_dict(final_list)
 
-    return region_df
+    return network_df
     # Use ExcelWriter class from pandas to write each dataframe to its own sheet at the end of function
 
     # with pd.ExcelWriter("kpi_export.xlsx") as writer:
