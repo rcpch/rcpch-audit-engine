@@ -90,7 +90,7 @@ Further users can subsequently be created in the Admin UI
 Navigate to the epilepsy12 outer folder and run the server:
 
 ```console
-python manage.py
+python manage.py runserver
 ```
 
 ## Seeding the Database
