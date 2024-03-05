@@ -179,6 +179,7 @@ nav:
       - Users: 'development/user-workflow.md'
       - Views: 'development/views.md'
     - API: 'development/api.md'
+    - Environment Variables: 'development/environment-variables.md'
     - Deployment: 'development/deployment.md'
     - Documentation: 'development/documentation.md'
   - Contact:
