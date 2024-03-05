@@ -1,5 +1,5 @@
 # python dependencies
-from random import randint, getrandbits, choice
+from random import randint, getrandbits, choice, choices
 from dateutil.relativedelta import relativedelta
 from datetime import date
 
@@ -265,18 +265,8 @@ def create_multiaxial_diagnosis(registration_instance, verbose=True):
         )
 
     if multiaxial_diagnosis.epilepsy_cause_known:
-        ecl = "<< 363235000"
-        epilepsy_causes = fetch_ecl(ecl)
-        random_cause = EpilepsyCause.objects.filter(
-            conceptId=epilepsy_causes[randint(0, len(epilepsy_causes) - 1)]["conceptId"]
-        ).first()
-
-        multiaxial_diagnosis.epilepsy_cause = random_cause
-        choices = []
-        for item in range(0, randint(1, 3)):
-            chosen_cause = choice(EPILEPSY_CAUSES)
-            choices.append(chosen_cause[0])
-        multiaxial_diagnosis.epilepsy_cause_categories = choices
+        multiaxial_diagnosis.epilepsy_cause = choice(EpilepsyCause.objects.all())
+        multiaxial_diagnosis.epilepsy_cause_categories = choices(EPILEPSY_CAUSES, k = randint(1, 3))
 
     if multiaxial_diagnosis.mental_health_issue_identified:
         multiaxial_diagnosis.mental_health_issues = [choice(NEUROPSYCHIATRIC)[0]]
