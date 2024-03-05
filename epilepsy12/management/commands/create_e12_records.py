@@ -54,8 +54,6 @@ from ...constants import (
 )
 from ...general_functions import (
     random_date,
-    fetch_ecl,
-    fetch_paediatric_neurodisability_outpatient_diagnosis_simple_reference_set,
 )
 from ...common_view_functions import update_audit_progress, calculate_kpis
 
@@ -274,14 +272,7 @@ def create_multiaxial_diagnosis(registration_instance, verbose=True):
     if multiaxial_diagnosis.relevant_impairments_behavioural_educational:
         # add upto 5 comorbidities
         for count_item in range(1, randint(2, 5)):
-            comorbidity_choices = (
-                fetch_paediatric_neurodisability_outpatient_diagnosis_simple_reference_set()
-            )
-            random_comorbidities = choice(comorbidity_choices)
-
-            random_comorbidity = ComorbidityList.objects.filter(
-                conceptId=random_comorbidities["conceptId"]
-            ).first()
+            random_comorbidity = choice(ComorbidityList.objects.all())
 
             try:
                 Comorbidity.objects.create(
