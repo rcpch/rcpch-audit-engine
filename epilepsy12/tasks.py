@@ -84,67 +84,22 @@ def hello():
 
 
 @shared_task
-def download_kpi_summary_as_csv(cohort=6):
+def download_kpi_summary_as_csv(cohort):
     """
     Asynchronous task to pull data from KPIAggregation tables and store as dataframe for export as CSV
     Accepts cohort as optional param, defaults to 6
+    Output - 8 sheets of .xlsx structured as follows:
+    - Country level
+    - HBT level
+    - ICB level
+    - NHSregion_level
+    - Network_level
+    - National_level
+    - Reference
+    - National_comparison
     """
 
-    # NATIONAL - SHEET 1
-    # create a dataframe with a row for each measure, and column for each of ["Measure", "Percentage", "Numerator", "Denominator"]
-    # note rows are named ["1. Paediatrician with expertise","2. Epilepsy specialist nurse","3a. Tertiary involvement","3b. Epilepsy surgery referral","4. ECG","5. MRI","6. Assessment of mental health issues","7. Mental health support","8. Sodium valproate","9a. Comprehensive care planning agreement","9b. Comprehensive care planning content","10. School Individual Health Care Plan"]
-
-    NationalKPIAggregation = apps.get_model("epilepsy12", "NationalKPIAggregation")
-
-    national_kpi_aggregation = (
-        NationalKPIAggregation.objects.filter(cohort=cohort)
-        .values(
-            "paediatrician_with_expertise_in_epilepsies_passed",
-            "paediatrician_with_expertise_in_epilepsies_total_eligible",
-            "epilepsy_specialist_nurse_passed",
-            "epilepsy_specialist_nurse_total_eligible",
-            "tertiary_input_passed",
-            "tertiary_input_total_eligible",
-            "epilepsy_surgery_referral_passed",
-            "epilepsy_surgery_referral_total_eligible",
-            "ecg_passed",
-            "ecg_total_eligible",
-            "mri_passed",
-            "mri_total_eligible",
-            "assessment_of_mental_health_issues_passed",
-            "assessment_of_mental_health_issues_total_eligible",
-            "mental_health_support_passed",
-            "mental_health_support_total_eligible",
-            "sodium_valproate_passed",
-            "sodium_valproate_total_eligible",
-            "comprehensive_care_planning_agreement_passed",
-            "comprehensive_care_planning_agreement_total_eligible",
-            "patient_held_individualised_epilepsy_document_passed",
-            "patient_held_individualised_epilepsy_document_total_eligible",
-            "patient_carer_parent_agreement_to_the_care_planning_passed",
-            "patient_carer_parent_agreement_to_the_care_planning_total_eligible",
-            "care_planning_has_been_updated_when_necessary_passed",
-            "care_planning_has_been_updated_when_necessary_total_eligible",
-            "comprehensive_care_planning_content_passed",
-            "comprehensive_care_planning_content_total_eligible",
-            "parental_prolonged_seizures_care_plan_passed",
-            "parental_prolonged_seizures_care_plan_total_eligible",
-            "water_safety_passed",
-            "water_safety_total_eligible",
-            "first_aid_passed",
-            "first_aid_total_eligible",
-            "general_participation_and_risk_passed",
-            "general_participation_and_risk_total_eligible",
-            "service_contact_details_passed",
-            "service_contact_details_total_eligible",
-            "sudep_passed",
-            "sudep_total_eligible",
-            "school_individual_healthcare_plan_passed",
-            "school_individual_healthcare_plan_total_eligible",
-        )
-        .first()
-    )
-
+    # Define KPI measures for extraction
     measures = [
         "paediatrician_with_expertise_in_epilepsies",
         "epilepsy_specialist_nurse",
@@ -160,6 +115,70 @@ def download_kpi_summary_as_csv(cohort=6):
         "school_individual_healthcare_plan",
     ]
 
+    # COUNTRY - SHEET 1
+    # create a dataframe with a row for each measure of each country, and a column for each of ["Measure", "Percentage", "Numerator", "Denominator"]
+    
+    CountryKPIAggregation = apps.get_model("epilepsy12", "CountryKPIAggregation")
+
+    england_kpi_aggregation = (
+        CountryKPIAggregation.objects.filter(cohort=cohort, abstraction_relation=1).values().first()
+    )
+
+    wales_kpi_aggregation = (
+        CountryKPIAggregation.objects.filter(cohort=cohort, abstraction_relation=4).values().first()
+    )
+
+    final_list = []
+    for kpi in measures:
+        if england_kpi_aggregation[f"{kpi}_total_eligible"] == 0:
+            item = {
+                "Country": "England",
+                "Measure": kpi,
+                "Numerator": england_kpi_aggregation[f"{kpi}_passed"],
+                "Denominator": england_kpi_aggregation[f"{kpi}_total_eligible"],
+                "Percentage": 0
+            }
+        else:
+            item = {
+                "Country": "England",
+                "Measure": kpi,
+                "Numerator": england_kpi_aggregation[f"{kpi}_passed"],
+                "Denominator": england_kpi_aggregation[f"{kpi}_total_eligible"],
+                "Percentage": england_kpi_aggregation[f"{kpi}_passed"]
+                / england_kpi_aggregation[f"{kpi}_total_eligible"]
+                * 100,
+            }
+        final_list.append(item)
+        if wales_kpi_aggregation[f"{kpi}_total_eligible"] == 0:
+            item = {
+            "Country": "Wales",
+            "Measure": kpi,
+            "Numerator": wales_kpi_aggregation[f"{kpi}_passed"],
+            "Denominator": wales_kpi_aggregation[f"{kpi}_total_eligible"],
+            "Percentage": 0
+            }
+        else:
+            item = {
+                "Country": "Wales",
+                "Measure": kpi,
+                "Numerator": wales_kpi_aggregation[f"{kpi}_passed"],
+                "Denominator": wales_kpi_aggregation[f"{kpi}_total_eligible"],
+                "Percentage": wales_kpi_aggregation[f"{kpi}_passed"]
+                / wales_kpi_aggregation[f"{kpi}_total_eligible"]
+                * 100,
+            }
+        final_list.append(item)
+
+    country_df = pd.DataFrame.from_dict(final_list)
+
+    # NATIONAL - SHEET 5
+    # create a dataframe with a row for each measure, and column for each of ["Measure", "Percentage", "Numerator", "Denominator"]
+    # note rows are named ["1. Paediatrician with expertise","2. Epilepsy specialist nurse","3a. Tertiary involvement","3b. Epilepsy surgery referral","4. ECG","5. MRI","6. Assessment of mental health issues","7. Mental health support","8. Sodium valproate","9a. Comprehensive care planning agreement","9b. Comprehensive care planning content","10. School Individual Health Care Plan"]
+
+    NationalKPIAggregation = apps.get_model("epilepsy12", "NationalKPIAggregation")
+
+    national_kpi_aggregation = NationalKPIAggregation.objects.filter(cohort=cohort).values().first()
+
     final_list = []
     for kpi in measures:
         item = {
@@ -172,6 +191,8 @@ def download_kpi_summary_as_csv(cohort=6):
         }
         final_list.append(item)
 
-    df = pd.DataFrame.from_dict(final_list)
+    national_df = pd.DataFrame.from_dict(final_list)
 
-    return df
+    return national_df
+
+    

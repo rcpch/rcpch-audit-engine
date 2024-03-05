@@ -17,6 +17,7 @@ django-widget-tweaks
 djangorestframework
 docutils
 pandas
+openpyxl
 phonenumbers # though not currently using phonenumbers, this is a dependency of dj-2fa
 psycopg2-binary
 whitenoise
