@@ -16,7 +16,7 @@ import pandas as pd
 
 # E12 Imports
 from .general_functions import cohort_number_from_first_paediatric_assessment_date
-from epilepsy12.constants import EnumAbstractionLevel
+from epilepsy12.constants import EnumAbstractionLevel, TRUSTS
 from epilepsy12.common_view_functions.aggregate_by import update_all_kpi_agg_models
 from epilepsy12.management.commands.old_pt_data_scripts import insert_old_pt_data
 from epilepsy12.management.commands.user_scripts import insert_user_data
@@ -171,6 +171,60 @@ def download_kpi_summary_as_csv(cohort):
 
     country_df = pd.DataFrame.from_dict(final_list)
 
+    
+    # HBT (Trusts) - SHEET 2
+
+    TrustKPIAggregation = apps.get_model("epilepsy12", "TrustKPIAggregation")
+
+    # Create a dictionary of trust KPI aggregations for cohorts
+    trusts_objects = {}
+
+    for i, trust in enumerate(TRUSTS):
+        trust_ods = trust["ods_code"]
+        trust_uid = i+1
+        trusts_objects[f"{trust_ods}"] = TrustKPIAggregation.objects.filter(cohort=cohort, abstraction_relation=trust_uid).values().first()
+    
+    print(trusts_objects)
+
+
+    # Create dataframe for KPI aggregations for trusts
+    # Must catch NoneType errors (ie if no KPI data for a trust)
+        
+    final_list = []
+
+    for key in trusts_objects:
+        trust_object = trusts_objects[key]
+        for kpi in measures:
+            if trust_object == None:
+                item = {
+                    "HBT": key,
+                    "Measure": kpi,
+                    "Numerator": 0,
+                    "Denominator": 0,
+                    "Percentage": 0
+                }
+            elif trust_object[f"{kpi}_total_eligible"] == 0:
+                item = {
+                    "HBT": key,
+                    "Measure": kpi,
+                    "Numerator": trust_object[f"{kpi}_passed"],
+                    "Denominator": trust_object[f"{kpi}_total_eligible"],
+                    "Percentage": 0
+                }
+            else:
+                item = {
+                    "HBT": key,
+                    "Measure": kpi,
+                    "Numerator": trust_object[f"{kpi}_passed"],
+                    "Denominator": trust_object[f"{kpi}_total_eligible"],
+                    "Percentage": trust_object[f"{kpi}_passed"]
+                    / trust_object[f"{kpi}_total_eligible"]
+                    * 100,
+                }
+            final_list.append(item)
+        
+    trust_df = pd.DataFrame.from_dict(final_list)
+
     # NATIONAL - SHEET 5
     # create a dataframe with a row for each measure, and column for each of ["Measure", "Percentage", "Numerator", "Denominator"]
     # note rows are named ["1. Paediatrician with expertise","2. Epilepsy specialist nurse","3a. Tertiary involvement","3b. Epilepsy surgery referral","4. ECG","5. MRI","6. Assessment of mental health issues","7. Mental health support","8. Sodium valproate","9a. Comprehensive care planning agreement","9b. Comprehensive care planning content","10. School Individual Health Care Plan"]
@@ -193,6 +247,9 @@ def download_kpi_summary_as_csv(cohort):
 
     national_df = pd.DataFrame.from_dict(final_list)
 
-    return national_df
+    return trust_df
+    # Use ExcelWriter class from pandas to write each dataframe to its own sheet at the end of function
 
-    
+    # with pd.ExcelWriter("kpi_export.xlsx") as writer:
+    #     country_df.to_excel(writer, sheet_name="Country_level")
+    #     national_df.to_excel(writer, sheet_name="National_level")
