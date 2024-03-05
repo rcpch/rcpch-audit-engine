@@ -322,10 +322,4 @@ def download_kpi_summary_as_csv(cohort):
 
     national_df = pd.DataFrame.from_dict(final_list)
 
-    # Use ExcelWriter class from pandas to write each dataframe to its own sheet at the end of function
-
-    # with pd.ExcelWriter("kpi_export.xlsx") as writer:
-    #     country_df.to_excel(writer, sheet_name="Country_level")
-    #     national_df.to_excel(writer, sheet_name="National_level")
-
-    return network_df
+    return country_df, trust_hb_df, icb_df, region_df, network_df, national_df

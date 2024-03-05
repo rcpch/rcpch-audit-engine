@@ -452,9 +452,19 @@ def kpi_download(request, organisation_id):
 @permission_required("epilepsy12.can_publish_epilepsy12_data")
 def kpi_download_file(request):
 
-    df = download_kpi_summary_as_csv(cohort=6)
+    country_df, trust_hb_df, icb_df, region_df, network_df, national_df = download_kpi_summary_as_csv(cohort=6)
 
-    response = HttpResponse(content_type="text/csv")
-    response["Content-Disposition"] = "attachment; filename=kpi_national.csv"
-    df.to_csv(path_or_buf=response)
+    with pd.ExcelWriter('kpi_export.xlsx') as writer:
+        country_df.to_excel(writer, sheet_name="Country_level")
+        trust_hb_df.to_excel(writer, sheet_name="HBT_level")
+        icb_df.to_excel(writer, sheet_name="ICB_level")
+        region_df.to_excel(writer, sheet_name="NHSregion_level")
+        network_df.to_excel(writer, sheet_name="Network_level")
+        national_df.to_excel(writer, sheet_name="National_level")
+
+    with open("kpi_export.xlsx", "rb") as file:
+        excel_data = file.read()
+
+    response = HttpResponse(excel_data, content_type="application/vnd.openxmlformats-officedocument.spreadsheetml.sheet")
+    response["Content-Disposition"] = "attachment; filename=kpi_export.xlsx"
     return response
