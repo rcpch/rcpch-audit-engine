@@ -16,7 +16,7 @@ import pandas as pd
 
 # E12 Imports
 from .general_functions import cohort_number_from_first_paediatric_assessment_date
-from epilepsy12.constants import EnumAbstractionLevel, TRUSTS, LOCAL_HEALTH_BOARDS, INTEGRATED_CARE_BOARDS
+from epilepsy12.constants import EnumAbstractionLevel, TRUSTS, LOCAL_HEALTH_BOARDS, INTEGRATED_CARE_BOARDS, NHS_ENGLAND_REGIONS
 from epilepsy12.common_view_functions.aggregate_by import update_all_kpi_agg_models
 from epilepsy12.management.commands.old_pt_data_scripts import insert_old_pt_data
 from epilepsy12.management.commands.user_scripts import insert_user_data
@@ -134,38 +134,38 @@ def download_kpi_summary_as_csv(cohort):
             item = {
                 "Country": "England",
                 "Measure": kpi,
+                "Percentage": 0,
                 "Numerator": england_kpi_aggregation[f"{kpi}_passed"],
                 "Denominator": england_kpi_aggregation[f"{kpi}_total_eligible"],
-                "Percentage": 0
             }
         else:
             item = {
                 "Country": "England",
                 "Measure": kpi,
-                "Numerator": england_kpi_aggregation[f"{kpi}_passed"],
-                "Denominator": england_kpi_aggregation[f"{kpi}_total_eligible"],
                 "Percentage": england_kpi_aggregation[f"{kpi}_passed"]
                 / england_kpi_aggregation[f"{kpi}_total_eligible"]
                 * 100,
+                "Numerator": england_kpi_aggregation[f"{kpi}_passed"],
+                "Denominator": england_kpi_aggregation[f"{kpi}_total_eligible"],
             }
         final_list.append(item)
         if wales_kpi_aggregation[f"{kpi}_total_eligible"] == 0:
             item = {
             "Country": "Wales",
             "Measure": kpi,
+            "Percentage": 0,
             "Numerator": wales_kpi_aggregation[f"{kpi}_passed"],
             "Denominator": wales_kpi_aggregation[f"{kpi}_total_eligible"],
-            "Percentage": 0
             }
         else:
             item = {
                 "Country": "Wales",
                 "Measure": kpi,
-                "Numerator": wales_kpi_aggregation[f"{kpi}_passed"],
-                "Denominator": wales_kpi_aggregation[f"{kpi}_total_eligible"],
                 "Percentage": wales_kpi_aggregation[f"{kpi}_passed"]
                 / wales_kpi_aggregation[f"{kpi}_total_eligible"]
                 * 100,
+                "Numerator": wales_kpi_aggregation[f"{kpi}_passed"],
+                "Denominator": wales_kpi_aggregation[f"{kpi}_total_eligible"],
             }
         final_list.append(item)
 
@@ -201,27 +201,27 @@ def download_kpi_summary_as_csv(cohort):
                 item = {
                     "HBT": key,
                     "Measure": kpi,
+                    "Percentage": 0,
                     "Numerator": 0,
                     "Denominator": 0,
-                    "Percentage": 0
                 }
             elif trust_object[f"{kpi}_total_eligible"] == 0:
                 item = {
                     "HBT": key,
                     "Measure": kpi,
+                    "Percentage": 0,
                     "Numerator": trust_object[f"{kpi}_passed"],
                     "Denominator": trust_object[f"{kpi}_total_eligible"],
-                    "Percentage": 0
                 }
             else:
                 item = {
                     "HBT": key,
                     "Measure": kpi,
-                    "Numerator": trust_object[f"{kpi}_passed"],
-                    "Denominator": trust_object[f"{kpi}_total_eligible"],
                     "Percentage": trust_object[f"{kpi}_passed"]
                     / trust_object[f"{kpi}_total_eligible"]
                     * 100,
+                    "Numerator": trust_object[f"{kpi}_passed"],
+                    "Denominator": trust_object[f"{kpi}_total_eligible"],
                 }
             final_list.append(item)            
         
@@ -240,8 +240,6 @@ def download_kpi_summary_as_csv(cohort):
     
     final_list = []
 
-    print(icbs_objects)
-
     for kpi in measures:
         for key in icbs_objects:
             icb_object = icbs_objects[key]
@@ -249,35 +247,79 @@ def download_kpi_summary_as_csv(cohort):
                 item = {
                     "ICB": key,
                     "Measure": kpi,
+                    "Percentage": 0,
                     "Numerator": 0,
                     "Denominator": 0,
-                    "Percentage": 0
                 }
             elif icb_object[f"{kpi}_total_eligible"] == 0:
                 item = {
                     "ICB": key,
                     "Measure": kpi,
+                    "Percentage": 0,
                     "Numerator": icb_object[f"{kpi}_passed"],
                     "Denominator": icb_object[f"{kpi}_total_eligible"],
-                    "Percentage": 0
                 }
             else:
                 item = {
                     "ICB": key,
                     "Measure": kpi,
-                    "Numerator": icb_object[f"{kpi}_passed"],
-                    "Denominator": icb_object[f"{kpi}_total_eligible"],
                     "Percentage": icb_object[f"{kpi}_passed"]
                     / icb_object[f"{kpi}_total_eligible"]
                     * 100,
+                    "Numerator": icb_object[f"{kpi}_passed"],
+                    "Denominator": icb_object[f"{kpi}_total_eligible"],
                 }
             final_list.append(item)  
 
     icb_df = pd.DataFrame.from_dict(final_list)
 
+    # NHS region level - SHEET 4
 
+    NHSEnglandRegionKPIAggregation = apps.get_model("epilepsy12", "NHSEnglandRegionKPIAggregation")
 
-    # NATIONAL - SHEET 5
+    regions_objects = {}
+
+    for i, region in enumerate(NHS_ENGLAND_REGIONS):
+        region_name = region["NHS_ENGLAND_REGION_NAME"]
+        region_uid = i+1
+        regions_objects[region_name] = NHSEnglandRegionKPIAggregation.objects.filter(cohort=cohort, abstraction_relation=region_uid).values().first()
+
+    final_list = []
+
+    for kpi in measures:
+        for key in regions_objects:
+            regions_object = regions_objects[key]
+            if regions_object == None:
+                item = {
+                    "NHSregion": key,
+                    "Measure": kpi,
+                    "Percentage": 0,
+                    "Numerator": 0,
+                    "Denominator": 0
+                }
+            elif regions_object[f"{kpi}_total_eligible"] == 0:
+                item = {
+                    "NHSregion": key,
+                    "Measure": kpi,
+                    "Percentage": 0,
+                    "Numerator": regions_object[f"{kpi}_passed"],
+                    "Denominator": regions_object[f"{kpi}_total_eligible"],
+                }
+            else:
+                item = {
+                    "NHSregion": key,
+                    "Measure": kpi,
+                    "Percentage": regions_object[f"{kpi}_passed"]
+                    / regions_object[f"{kpi}_total_eligible"]
+                    * 100,
+                    "Numerator": regions_object[f"{kpi}_passed"],
+                    "Denominator": regions_object[f"{kpi}_total_eligible"],
+                }
+            final_list.append(item) 
+    
+    region_df = pd.DataFrame.from_dict(final_list)
+
+    # NATIONAL - SHEET 6
     # create a dataframe with a row for each measure, and column for each of ["Measure", "Percentage", "Numerator", "Denominator"]
     # note rows are named ["1. Paediatrician with expertise","2. Epilepsy specialist nurse","3a. Tertiary involvement","3b. Epilepsy surgery referral","4. ECG","5. MRI","6. Assessment of mental health issues","7. Mental health support","8. Sodium valproate","9a. Comprehensive care planning agreement","9b. Comprehensive care planning content","10. School Individual Health Care Plan"]
 
@@ -289,17 +331,17 @@ def download_kpi_summary_as_csv(cohort):
     for kpi in measures:
         item = {
             "Measure": kpi,
-            "Numerator": national_kpi_aggregation[f"{kpi}_passed"],
-            "Denominator": national_kpi_aggregation[f"{kpi}_total_eligible"],
             "Percentage": national_kpi_aggregation[f"{kpi}_passed"]
             / national_kpi_aggregation[f"{kpi}_total_eligible"]
             * 100,
+            "Numerator": national_kpi_aggregation[f"{kpi}_passed"],
+            "Denominator": national_kpi_aggregation[f"{kpi}_total_eligible"],
         }
         final_list.append(item)
 
     national_df = pd.DataFrame.from_dict(final_list)
 
-    return icb_df
+    return region_df
     # Use ExcelWriter class from pandas to write each dataframe to its own sheet at the end of function
 
     # with pd.ExcelWriter("kpi_export.xlsx") as writer:
