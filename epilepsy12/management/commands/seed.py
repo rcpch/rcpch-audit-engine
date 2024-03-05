@@ -197,7 +197,8 @@ def complete_registrations(verbose=True, cohort=None):
 
     for registration in Registration.objects.all():
         registration.first_paediatric_assessment_date = random_date(
-            start=current_cohort_data["cohort_start_date"], end=date.today()
+            start=current_cohort_data["cohort_start_date"],
+            end=current_cohort_data["cohort_end_date"],
         )
         registration.eligibility_criteria_met = True
         registration.save()
