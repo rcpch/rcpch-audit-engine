@@ -140,9 +140,7 @@ def run_dummy_cases_seed(verbose=True, cases=50):
         postcode = return_random_postcode(
             country_boundary_identifier=org.country.boundary_identifier
         )
-        postcode = return_random_postcode(
-            country_boundary_identifier=org.country.boundary_identifier
-        )
+        index_of_multiple_deprivation_quintile = randint(1, 5)
 
         E12CaseFactory.create_batch(
             num_cases_to_seed_in_org,
@@ -151,6 +149,7 @@ def run_dummy_cases_seed(verbose=True, cases=50):
             date_of_birth=date_of_birth,
             postcode=postcode,
             ethnicity=ethnicity,
+            index_of_multiple_deprivation_quintile=index_of_multiple_deprivation_quintile,
             organisations__organisation=org,
             **{
                 "seed_male": seed_male,
