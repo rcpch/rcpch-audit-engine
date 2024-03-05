@@ -16,7 +16,7 @@ import pandas as pd
 
 # E12 Imports
 from .general_functions import cohort_number_from_first_paediatric_assessment_date
-from epilepsy12.constants import EnumAbstractionLevel, TRUSTS, LOCAL_HEALTH_BOARDS
+from epilepsy12.constants import EnumAbstractionLevel, TRUSTS, LOCAL_HEALTH_BOARDS, INTEGRATED_CARE_BOARDS
 from epilepsy12.common_view_functions.aggregate_by import update_all_kpi_agg_models
 from epilepsy12.management.commands.old_pt_data_scripts import insert_old_pt_data
 from epilepsy12.management.commands.user_scripts import insert_user_data
@@ -171,7 +171,6 @@ def download_kpi_summary_as_csv(cohort):
 
     country_df = pd.DataFrame.from_dict(final_list)
 
-    
     # HBT (Trusts & Health Boards) - SHEET 2
 
     TrustKPIAggregation = apps.get_model("epilepsy12", "TrustKPIAggregation")
@@ -183,15 +182,13 @@ def download_kpi_summary_as_csv(cohort):
     for i, hb in enumerate(LOCAL_HEALTH_BOARDS):
         hb_ods = hb["ods_code"]
         hb_uid = i+1
-        trusts_and_hbs_objects[f"{hb_ods}"] = HealthBoardKPIAggregation.objects.filter(cohort=cohort, abstraction_relation=hb_uid).values().first()
+        trusts_and_hbs_objects[hb_ods] = HealthBoardKPIAggregation.objects.filter(cohort=cohort, abstraction_relation=hb_uid).values().first()
 
     for i, trust in enumerate(TRUSTS):
         trust_ods = trust["ods_code"]
         trust_uid = i+1
-        trusts_and_hbs_objects[f"{trust_ods}"] = TrustKPIAggregation.objects.filter(cohort=cohort, abstraction_relation=trust_uid).values().first()
+        trusts_and_hbs_objects[trust_ods] = TrustKPIAggregation.objects.filter(cohort=cohort, abstraction_relation=trust_uid).values().first()
     
-
-
     # Create dataframe for KPI aggregations for trusts
     # Must catch NoneType errors (ie if no KPI data for a trust)
         
@@ -232,6 +229,52 @@ def download_kpi_summary_as_csv(cohort):
 
     # ICB (Integrated Care Board) - Sheet 3
 
+    ICBKPIAggregation = apps.get_model("epilepsy12", "ICBKPIAggregation")
+
+    icbs_objects = {}
+
+    for i, icb in enumerate(INTEGRATED_CARE_BOARDS):
+        icb_name = icb["name"]
+        icb_uid = i+1
+        icbs_objects[icb_name] = ICBKPIAggregation.objects.filter(cohort=cohort, abstraction_relation=icb_uid).values().first()
+    
+    final_list = []
+
+    print(icbs_objects)
+
+    for kpi in measures:
+        for key in icbs_objects:
+            icb_object = icbs_objects[key]
+            if icb_object == None:
+                item = {
+                    "ICB": key,
+                    "Measure": kpi,
+                    "Numerator": 0,
+                    "Denominator": 0,
+                    "Percentage": 0
+                }
+            elif icb_object[f"{kpi}_total_eligible"] == 0:
+                item = {
+                    "ICB": key,
+                    "Measure": kpi,
+                    "Numerator": icb_object[f"{kpi}_passed"],
+                    "Denominator": icb_object[f"{kpi}_total_eligible"],
+                    "Percentage": 0
+                }
+            else:
+                item = {
+                    "ICB": key,
+                    "Measure": kpi,
+                    "Numerator": icb_object[f"{kpi}_passed"],
+                    "Denominator": icb_object[f"{kpi}_total_eligible"],
+                    "Percentage": icb_object[f"{kpi}_passed"]
+                    / icb_object[f"{kpi}_total_eligible"]
+                    * 100,
+                }
+            final_list.append(item)  
+
+    icb_df = pd.DataFrame.from_dict(final_list)
+
 
 
     # NATIONAL - SHEET 5
@@ -256,7 +299,7 @@ def download_kpi_summary_as_csv(cohort):
 
     national_df = pd.DataFrame.from_dict(final_list)
 
-    return trust_hb_df
+    return icb_df
     # Use ExcelWriter class from pandas to write each dataframe to its own sheet at the end of function
 
     # with pd.ExcelWriter("kpi_export.xlsx") as writer:
