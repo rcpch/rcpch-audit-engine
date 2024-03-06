@@ -130,43 +130,27 @@ def download_kpi_summary_as_csv(cohort):
 
     final_list = []
     for kpi in measures:
-        if england_kpi_aggregation[f"{kpi}_total_eligible"] == 0:
-            item = {
-                "Country": "England",
-                "Measure": kpi,
-                "Percentage": 0,
-                "Numerator": england_kpi_aggregation[f"{kpi}_passed"],
-                "Denominator": england_kpi_aggregation[f"{kpi}_total_eligible"],
-            }
-        else:
-            item = {
-                "Country": "England",
-                "Measure": kpi,
-                "Percentage": england_kpi_aggregation[f"{kpi}_passed"]
+        item = {
+            "Country": "England",
+            "Measure": kpi,
+            "Percentage": 0 if england_kpi_aggregation[f"{kpi}_total_eligible"] == 0 else
+                england_kpi_aggregation[f"{kpi}_passed"]
                 / england_kpi_aggregation[f"{kpi}_total_eligible"]
                 * 100,
-                "Numerator": england_kpi_aggregation[f"{kpi}_passed"],
-                "Denominator": england_kpi_aggregation[f"{kpi}_total_eligible"],
-            }
+            "Numerator": england_kpi_aggregation[f"{kpi}_passed"],
+            "Denominator": england_kpi_aggregation[f"{kpi}_total_eligible"],
+        }
         final_list.append(item)
-        if wales_kpi_aggregation[f"{kpi}_total_eligible"] == 0:
-            item = {
-            "Country": "Wales",
-            "Measure": kpi,
-            "Percentage": 0,
-            "Numerator": wales_kpi_aggregation[f"{kpi}_passed"],
-            "Denominator": wales_kpi_aggregation[f"{kpi}_total_eligible"],
-            }
-        else:
-            item = {
-                "Country": "Wales",
-                "Measure": kpi,
-                "Percentage": wales_kpi_aggregation[f"{kpi}_passed"]
-                / wales_kpi_aggregation[f"{kpi}_total_eligible"]
-                * 100,
-                "Numerator": wales_kpi_aggregation[f"{kpi}_passed"],
-                "Denominator": wales_kpi_aggregation[f"{kpi}_total_eligible"],
-            }
+        item = {
+        "Country": "Wales",
+        "Measure": kpi,
+        "Percentage": 0 if wales_kpi_aggregation[f"{kpi}_total_eligible"] == 0 else
+            wales_kpi_aggregation[f"{kpi}_passed"]
+            / wales_kpi_aggregation[f"{kpi}_total_eligible"]
+            * 100,
+        "Numerator": wales_kpi_aggregation[f"{kpi}_passed"],
+        "Denominator": wales_kpi_aggregation[f"{kpi}_total_eligible"],
+        }
         final_list.append(item)
 
     country_df = pd.DataFrame.from_dict(final_list)
