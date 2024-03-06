@@ -143,7 +143,7 @@ class Case(TimeStampAbstractBaseClass, UserStampAbstractBaseClass, HelpTextMixin
     def save(self, *args, **kwargs) -> None:
         # calculate the index of multiple deprivation quintile if the postcode is present
         # Skips the calculation if the postcode is on the 'unknown' list
-        if self.postcode:
+        if self.postcode and not self.index_of_multiple_deprivation_quintile:
             if str(self.postcode).replace(" ", "") not in UNKNOWN_POSTCODES_NO_SPACES:
                 try:
                     self.index_of_multiple_deprivation_quintile = imd_for_postcode(
