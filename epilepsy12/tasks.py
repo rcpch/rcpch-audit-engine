@@ -115,21 +115,29 @@ def download_kpi_summary_as_csv(cohort):
         "school_individual_healthcare_plan",
     ]
 
-    def create_dataframe(KPI_model1, constants_list, KPI_model2=None, constants_list2=None):
+    def create_dataframe(KPI_model1, constants_list, KPI_model2=None, constants_list2=None, is_regional=False):
         '''
-        Accepts names of KPI aggregation models and the constants list of the organisations/trusts/ICBs
+        Accepts names of KPI aggregation models and the constants list of the organisations/trusts/ICBs. is_regional is a special case to workaround the non-existent 
+        'Health Board' NHS region, which is set True only when creating a dataframe for the NHS regional level.
 
         Computes dataframe of each model, grouped by KPI and NOT by model
 
         Returns dataframe containing KPI measures
         '''
 
+        # Define models
         model_aggregation = apps.get_model("epilepsy12", KPI_model1)
         model_aggregation_2 = None
+        wales_region_object = None
 
+        # Set condiitonal model if KPI_model2==True or is_regional==True
         if KPI_model2:
             model_aggregation_2 = apps.get_model("epilepsy12", KPI_model2)
-        
+        if is_regional:
+            model_aggregation_2 = apps.get_model("epilepsy12", "CountryKPIAggregation")
+            wales_region_object = model_aggregation_2.objects.filter(cohort=cohort, abstraction_relation=4).values().first()
+
+        # Extract relevant value from each organisation body in each item, to be used as a label as per the template from the E12 team (Issue 791)
         objects = {}
 
         for i, body in enumerate(constants_list):
@@ -151,7 +159,10 @@ def download_kpi_summary_as_csv(cohort):
                     uid = i+1
                     objects[key] = model_aggregation_2.objects.filter(cohort=cohort, abstraction_relation=uid).values().first()
         
+        # Create list containing dictionary items from which final dataframe will be created
         final_list = []
+
+        # Saves organisation type to be used as column name in each sheet
 
         if (constants_list == LOCAL_HEALTH_BOARDS):
             title = "HBT"
@@ -162,6 +173,7 @@ def download_kpi_summary_as_csv(cohort):
         elif (constants_list == OPEN_UK_NETWORKS):
             title = "Network"
 
+        # Group KPIs by Trust, and add to dataframe - ie collect all KPIs for a specific trust, then add to dataframe
         if constants_list2 == TRUSTS:
             for key in objects:
                 object = objects[key]
@@ -193,8 +205,31 @@ def download_kpi_summary_as_csv(cohort):
                             "Denominator": object[f"{kpi}_total_eligible"],
                         }
                     final_list.append(item)  
+        
+        # Group organisation body by KPI, then add to dataframe - collect all values relating to KPI 1 across all organisation bodies, add to dataframe, repeat for next KPI
+
         else:
             for kpi in measures:
+                if is_regional:
+                    if wales_region_object[f"{kpi}_total_eligible"] == 0:
+                        item = {
+                        title: "Health Boards",
+                        "Measure": kpi,
+                        "Percentage": 0,
+                        "Numerator": wales_region_object[f"{kpi}_passed"],
+                        "Denominator": wales_region_object[f"{kpi}_total_eligible"],
+                        }
+                    else:
+                        item = {
+                            title: "Health Boards",
+                            "Measure": kpi,
+                            "Percentage": wales_region_object[f"{kpi}_passed"]
+                            / wales_region_object[f"{kpi}_total_eligible"]
+                            * 100,
+                            "Numerator": wales_region_object[f"{kpi}_passed"],
+                            "Denominator": wales_region_object[f"{kpi}_total_eligible"],
+                        }
+                    final_list.append(item)
                 for key in objects:
                     object = objects[key]
                     if object == None:
@@ -293,7 +328,7 @@ def download_kpi_summary_as_csv(cohort):
 
     # NHS region level - SHEET 4
 
-    region_df = create_dataframe("NHSEnglandRegionKPIAggregation", NHS_ENGLAND_REGIONS)
+    region_df = create_dataframe("NHSEnglandRegionKPIAggregation", NHS_ENGLAND_REGIONS, is_regional=True)
 
     # NETWORKS - SHEET 5
         
