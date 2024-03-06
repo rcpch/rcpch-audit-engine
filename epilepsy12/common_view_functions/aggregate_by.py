@@ -15,10 +15,23 @@ from django.contrib.gis.db.models import (
 )
 
 # E12 imports
-from epilepsy12.constants import ETHNICITIES, SEX_TYPE, EnumAbstractionLevel
+from epilepsy12.constants import (
+    ETHNICITIES, 
+    SEX_TYPE, 
+    EnumAbstractionLevel, 
+    LOCAL_HEALTH_BOARDS, 
+    TRUSTS, 
+    INTEGRATED_CARE_BOARDS, 
+    NHS_ENGLAND_REGIONS,
+    OPEN_UK_NETWORKS
+)
 
 # Logging setup
 logger = logging.getLogger(__name__)
+
+# Third party imports
+
+import pandas as pd
 
 """
 Reporting
@@ -749,3 +762,154 @@ def ___delete_and_recreate_all_kpi_aggregation_models():
         aggregation_model.objects.all().delete()
 
     _seed_all_aggregation_models()
+
+def create_KPI_aggregation_dataframe(KPI_model1, constants_list1, cohort, measures, KPI_model2=None, constants_list2=None, is_regional=False):
+        '''
+        INPUTS:
+        - KPI_model1, KPI_model2: a KPI aggregation model specific to the organisation body (ie trust, health board, NHSregion
+        - constants_list1, constants_list2: list of names of the organisation bodies stored in E12 ( ie trusts, ICBs)
+        - cohort: which cohort of cases to perform the aggregations on
+        - measures: which KPI measures to calculate
+        - is_regional: a special case to workaround the non-existent 'Health Board' NHS region. Gets set True only when creating a dataframe for the NHS regional level.
+
+        BODY: Computes dataframe of KPI aggregations at specified organisation levl.
+
+        OUTPUTS: Returns dataframe containing KPI measures
+        '''
+
+        # Define models
+        model_aggregation1 = apps.get_model("epilepsy12", KPI_model1)
+        model_aggregation_2 = None
+        wales_region_object = None
+
+        # Set condiitonal model if KPI_model2==True or is_regional==True
+        if KPI_model2:
+            model_aggregation_2 = apps.get_model("epilepsy12", KPI_model2)
+        if is_regional:
+            model_aggregation_2 = apps.get_model("epilepsy12", "CountryKPIAggregation")
+            wales_region_object = model_aggregation_2.objects.filter(cohort=cohort, abstraction_relation=4).values().first()
+
+        # Extract relevant value from each organisation body in each item, to be used as a label as per the template from the E12 team (Issue 791)
+        objects = {}
+
+        for i, body in enumerate(constants_list1):
+            if (constants_list1 == LOCAL_HEALTH_BOARDS):
+                key = body["ods_code"]
+            elif (constants_list1 == INTEGRATED_CARE_BOARDS):
+                key = body["name"]
+            elif (constants_list1 == NHS_ENGLAND_REGIONS):
+                key = body["NHS_ENGLAND_REGION_NAME"]
+            elif (constants_list1 == OPEN_UK_NETWORKS):
+                key = body["OPEN_UK_Network_Code"]
+            uid = i+1
+            objects[key] = model_aggregation1.objects.filter(cohort=cohort, abstraction_relation=uid).values().first()
+
+        if model_aggregation_2:
+            if constants_list2 == TRUSTS:
+                for i, body in enumerate(constants_list2):
+                    key = body["ods_code"]
+                    uid = i+1
+                    objects[key] = model_aggregation_2.objects.filter(cohort=cohort, abstraction_relation=uid).values().first()
+        
+        # Create list containing dictionary items from which final dataframe will be created
+        final_list = []
+
+        # Saves organisation type to be used as column name in each sheet
+
+        if (constants_list1 == LOCAL_HEALTH_BOARDS):
+            title = "HBT"
+        elif (constants_list1 == INTEGRATED_CARE_BOARDS):
+            title = "ICB"
+        elif (constants_list1 == NHS_ENGLAND_REGIONS):
+            title = "NHSregion"
+        elif (constants_list1 == OPEN_UK_NETWORKS):
+            title = "Network"
+
+        # Group KPIs by Trust, and add to dataframe - ie collect all KPIs for a specific trust, then add to dataframe
+        if constants_list2 == TRUSTS:
+            for key in objects:
+                object = objects[key]
+                for kpi in measures:
+                    if object == None:
+                        item = {
+                            title: key,
+                            "Measure": kpi,
+                            "Percentage": 0,
+                            "Numerator": 0,
+                            "Denominator": 0,
+                        }
+                    elif object[f"{kpi}_total_eligible"] == 0:
+                        item = {
+                            title: key,
+                            "Measure": kpi,
+                            "Percentage": 0,
+                            "Numerator": object[f"{kpi}_passed"],
+                            "Denominator": object[f"{kpi}_total_eligible"],
+                        }
+                    else:
+                        item = {
+                            title: key,
+                            "Measure": kpi,
+                            "Percentage": object[f"{kpi}_passed"]
+                            / object[f"{kpi}_total_eligible"]
+                            * 100,
+                            "Numerator": object[f"{kpi}_passed"],
+                            "Denominator": object[f"{kpi}_total_eligible"],
+                        }
+                    final_list.append(item)  
+        
+        # Group organisation body by KPI, then add to dataframe - collect all values relating to KPI 1 across all organisation bodies, add to dataframe, repeat for next KPI
+
+        else:
+            for kpi in measures:
+                if is_regional:
+                    if wales_region_object[f"{kpi}_total_eligible"] == 0:
+                        item = {
+                        title: "Health Boards",
+                        "Measure": kpi,
+                        "Percentage": 0,
+                        "Numerator": wales_region_object[f"{kpi}_passed"],
+                        "Denominator": wales_region_object[f"{kpi}_total_eligible"],
+                        }
+                    else:
+                        item = {
+                            title: "Health Boards",
+                            "Measure": kpi,
+                            "Percentage": wales_region_object[f"{kpi}_passed"]
+                            / wales_region_object[f"{kpi}_total_eligible"]
+                            * 100,
+                            "Numerator": wales_region_object[f"{kpi}_passed"],
+                            "Denominator": wales_region_object[f"{kpi}_total_eligible"],
+                        }
+                    final_list.append(item)
+                for key in objects:
+                    object = objects[key]
+                    if object == None:
+                        item = {
+                            title: key,
+                            "Measure": kpi,
+                            "Percentage": 0,
+                            "Numerator": 0,
+                            "Denominator": 0,
+                        }
+                    elif object[f"{kpi}_total_eligible"] == 0:
+                        item = {
+                            title: key,
+                            "Measure": kpi,
+                            "Percentage": 0,
+                            "Numerator": object[f"{kpi}_passed"],
+                            "Denominator": object[f"{kpi}_total_eligible"],
+                        }
+                    else:
+                        item = {
+                            title: key,
+                            "Measure": kpi,
+                            "Percentage": object[f"{kpi}_passed"]
+                            / object[f"{kpi}_total_eligible"]
+                            * 100,
+                            "Numerator": object[f"{kpi}_passed"],
+                            "Denominator": object[f"{kpi}_total_eligible"],
+                        }
+                    final_list.append(item) 
+        
+        return pd.DataFrame.from_dict(final_list)
