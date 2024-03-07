@@ -23,6 +23,8 @@ logger = logging.getLogger(__name__)
 """
 Reporting
 """
+
+
 def cases_aggregated_by_sex(selected_organisation):
     # aggregate queries on trust level cases
 
@@ -506,9 +508,16 @@ def update_all_kpi_agg_models(
     Case = apps.get_model("epilepsy12", "Case")
 
     all_cases = Case.objects.filter(
-        site__site_is_actively_involved_in_epilepsy_care=True,
-        site__site_is_primary_centre_of_epilepsy_care=True,
-        registration__cohort=cohort,
+        Q(site__site_is_actively_involved_in_epilepsy_care=True)
+        & Q(site__site_is_primary_centre_of_epilepsy_care=True)
+        & Q(registration__cohort=cohort)
+        & Q(registration__audit_progress__registration_complete=True)
+        & Q(registration__audit_progress__first_paediatric_assessment_complete=True)
+        & Q(registration__audit_progress__assessment_complete=True)
+        & Q(registration__audit_progress__epilepsy_context_complete=True)
+        & Q(registration__audit_progress__multiaxial_diagnosis_complete=True)
+        & Q(registration__audit_progress__investigations_complete=True)
+        & Q(registration__audit_progress__management_complete=True)
     )
 
     abstraction_levels = EnumAbstractionLevel if abstractions == "all" else abstractions
@@ -702,7 +711,9 @@ def _seed_all_aggregation_models() -> None:
                 abstraction_relation=entity,
                 cohort=current_cohort,
             ).exists():
-                logger.info(f"AggregationModel for {entity} already exists. Skipping...")
+                logger.info(
+                    f"AggregationModel for {entity} already exists. Skipping..."
+                )
                 continue
 
             new_agg_model = AggregationModel.objects.create(
