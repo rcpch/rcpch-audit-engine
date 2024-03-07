@@ -33,7 +33,7 @@ from ..general_functions import (
     construct_transfer_epilepsy12_site_email,
     cohorts_and_dates,
 )
-from ..tasks import asynchronously_send_email_to_recipients
+from ..tasks import send_email_to_recipients
 
 
 @login_and_otp_required()
@@ -462,7 +462,7 @@ def update_lead_site(request, registration_id, site_id, update):
             origin_organisation=origin_organisation,
         )
 
-        asynchronously_send_email_to_recipients.delay(
+        send_email_to_recipients(
             recipients=recipients, subject=subject, message=email
         )
 
