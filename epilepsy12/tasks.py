@@ -16,8 +16,8 @@ import pandas as pd
 
 # E12 Imports
 from .general_functions import cohort_number_from_first_paediatric_assessment_date
-from epilepsy12.constants import EnumAbstractionLevel, TRUSTS, LOCAL_HEALTH_BOARDS, INTEGRATED_CARE_BOARDS, NHS_ENGLAND_REGIONS, OPEN_UK_NETWORKS
-from epilepsy12.common_view_functions.aggregate_by import create_KPI_aggregation_dataframe, update_all_kpi_agg_models
+from epilepsy12.constants import EnumAbstractionLevel, TRUSTS, LOCAL_HEALTH_BOARDS, INTEGRATED_CARE_BOARDS, NHS_ENGLAND_REGIONS, OPEN_UK_NETWORKS, OPEN_UK_NETWORKS_TRUSTS, INTEGRATED_CARE_BOARDS_LOCAL_AUTHORITIES
+from epilepsy12.common_view_functions.aggregate_by import create_KPI_aggregation_dataframe, create_reference_dataframe, update_all_kpi_agg_models
 from epilepsy12.management.commands.old_pt_data_scripts import insert_old_pt_data
 from epilepsy12.management.commands.user_scripts import insert_user_data
 
@@ -194,4 +194,8 @@ def download_kpi_summary_as_csv(cohort):
 
     national_df = pd.DataFrame.from_dict(final_list)
 
-    return country_df, trust_hb_df, icb_df, region_df, network_df, national_df
+    # REFERENCE - SHEET 7
+
+    reference_df = create_reference_dataframe(TRUSTS, LOCAL_HEALTH_BOARDS, OPEN_UK_NETWORKS_TRUSTS, INTEGRATED_CARE_BOARDS_LOCAL_AUTHORITIES)
+
+    return country_df, trust_hb_df, icb_df, region_df, network_df, national_df, reference_df

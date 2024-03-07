@@ -452,7 +452,7 @@ def kpi_download(request, organisation_id):
 @permission_required("epilepsy12.can_publish_epilepsy12_data")
 def kpi_download_file(request):
 
-    country_df, trust_hb_df, icb_df, region_df, network_df, national_df = download_kpi_summary_as_csv(cohort=6)
+    country_df, trust_hb_df, icb_df, region_df, network_df, national_df, reference_df = download_kpi_summary_as_csv(cohort=6)
 
     with pd.ExcelWriter('kpi_export.xlsx') as writer:
         country_df.to_excel(writer, sheet_name="Country_level")
@@ -461,6 +461,7 @@ def kpi_download_file(request):
         region_df.to_excel(writer, sheet_name="NHSregion_level")
         network_df.to_excel(writer, sheet_name="Network_level")
         national_df.to_excel(writer, sheet_name="National_level")
+        reference_df.to_excel(writer, sheet_name="Reference")
 
     with open("kpi_export.xlsx", "rb") as file:
         excel_data = file.read()

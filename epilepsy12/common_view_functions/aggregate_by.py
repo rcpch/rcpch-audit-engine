@@ -23,7 +23,8 @@ from epilepsy12.constants import (
     TRUSTS, 
     INTEGRATED_CARE_BOARDS, 
     NHS_ENGLAND_REGIONS,
-    OPEN_UK_NETWORKS
+    OPEN_UK_NETWORKS,
+    OPEN_UK_NETWORKS_TRUSTS
 )
 
 # Logging setup
@@ -913,3 +914,74 @@ def create_KPI_aggregation_dataframe(KPI_model1, constants_list1, cohort, measur
                     final_list.append(item) 
         
         return pd.DataFrame.from_dict(final_list)
+
+def create_reference_dataframe(trusts, health_boards, networks, icbs):
+    '''
+    INPUTS:
+    - trusts: TRUSTS should be passed in. Contains a list of trust objects
+    - health_boards: LOCAL_HEALTH_BOARDS should be passed in. Contains a list of local health board objects
+    - networks: OPEN_UK_NETWORK_TRUSTS should be passed in. Contains a list of trusts and their ods codes
+    - icbs: INTEGRATED_CARE_BOARDS_LOCAL_AUTHORITIES should be passed in. Contains a list of ICBs, with their trusts and ods codes
+
+    BODY - Create Reference sheet containing all trusts and health boards with their respective networks, ods codes, countries, NHS regions and ICBs
+
+    OUTPUT - Dataframe containing list of trusts and health boards and their organisational relationships; columns specified as HBT, HBT_name, Network, Country, UK, NHSregion and ICB
+    '''
+
+    final_list = []
+
+    # For Welsh health boards - create row with HBT, HBT_name, Network, Country, UK, NHSregion and ICB as the column names
+    for health_board in health_boards:
+        ods_code = health_board["ods_code"]
+        health_board_name = health_board["health_board"]
+        network_name = ""
+
+        for network in networks:
+            if ods_code == network["ods trust code"]:
+                network_name = network["OPEN UK Network Code"]
+    
+        item = {
+                "HBT": ods_code,
+                "HBT_name": health_board_name,
+                "Network": network_name,
+                "Country": "Wales",
+                "UK": "England and Wales",
+                "NHSregion": "",
+                "ICB": ""
+        }
+        
+        final_list.append(item)
+
+    # For the English Trusts - create row with HBT, HBT_name, Network, Country, UK, NHSregion and ICB as the column names
+    for trust in trusts:
+        ods_code = trust["ods_code"]
+        trust_name = trust["trust_name"]
+        network_name = ""
+        region = ""
+        icb = ""
+
+        for network in networks:
+            if ods_code == network["ods trust code"]:
+                network_name = network["OPEN UK Network Code"]
+        
+        for board in icbs:
+            if ods_code == board["ODS Trust Code"]:
+                icb = board["ICB Name"]
+                region = board["NHS England Region"]
+                if region == "Midlands (Y60)":
+                    region = "Midlands"
+        
+        item = {
+            "HBT": ods_code,
+            "HBT_name": trust_name,
+            "Network": network_name,
+            "Country": "England",
+            "UK": "England and Wales",
+            "NHSregion": region,
+            "ICB": icb
+        }
+
+        final_list.append(item)
+
+    return pd.DataFrame.from_dict(final_list)
+        
