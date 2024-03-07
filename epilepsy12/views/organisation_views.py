@@ -455,13 +455,13 @@ def kpi_download_file(request):
     country_df, trust_hb_df, icb_df, region_df, network_df, national_df, reference_df = download_kpi_summary_as_csv(cohort=6)
 
     with pd.ExcelWriter('kpi_export.xlsx') as writer:
-        country_df.to_excel(writer, sheet_name="Country_level")
-        trust_hb_df.to_excel(writer, sheet_name="HBT_level")
-        icb_df.to_excel(writer, sheet_name="ICB_level")
-        region_df.to_excel(writer, sheet_name="NHSregion_level")
-        network_df.to_excel(writer, sheet_name="Network_level")
-        national_df.to_excel(writer, sheet_name="National_level")
-        reference_df.to_excel(writer, sheet_name="Reference")
+        country_df.to_excel(writer, sheet_name="Country_level", index=False)
+        trust_hb_df.to_excel(writer, sheet_name="HBT_level", index=False)
+        icb_df.to_excel(writer, sheet_name="ICB_level", index=False)
+        region_df.to_excel(writer, sheet_name="NHSregion_level", index=False)
+        network_df.to_excel(writer, sheet_name="Network_level", index=False)
+        national_df.to_excel(writer, sheet_name="National_level", index=False)
+        reference_df.to_excel(writer, sheet_name="Reference", index=False)
 
     with open("kpi_export.xlsx", "rb") as file:
         excel_data = file.read()
