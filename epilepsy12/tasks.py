@@ -146,6 +146,7 @@ def download_kpi_summary_as_csv(cohort):
     final_list = []
     for index, kpi in enumerate(measures):
         item = {
+            "CountryMeasure": "England" + measures_titles[index],
             "Country": "England",
             "Measure": measures_titles[index],
             "Percentage": 0 if england_kpi_aggregation[f"{kpi}_total_eligible"] == 0 else
@@ -157,6 +158,7 @@ def download_kpi_summary_as_csv(cohort):
         }
         final_list.append(item)
         item = {
+        "CountryMeasure": "Wales" + measures_titles[index],
         "Country": "Wales",
         "Measure": measures_titles[index],
         "Percentage": 0 if wales_kpi_aggregation[f"{kpi}_total_eligible"] == 0 else
