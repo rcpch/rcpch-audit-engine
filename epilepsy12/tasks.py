@@ -8,9 +8,6 @@ from django.utils.html import strip_tags
 from django.core.mail import send_mail, BadHeaderError
 from django.conf import settings
 
-# Third party imports
-from celery import shared_task
-
 # E12 Imports
 from .general_functions import cohort_number_from_first_paediatric_assessment_date
 from epilepsy12.constants import EnumAbstractionLevel
@@ -21,7 +18,7 @@ from epilepsy12.management.commands.user_scripts import insert_user_data
 # Logging setup
 logger = logging.getLogger(__name__)
 
-@shared_task
+
 def send_email_to_recipients(
     recipients: list, subject: str, message: str
 ):
@@ -40,10 +37,3 @@ def send_email_to_recipients(
     except Exception:
         raise BadHeaderError
 
-@shared_task
-def hello():
-    """
-    THIS IS A SCHEDULED TASK THAT IS CALLED AT 06:00 EVERY DAY
-    THE CRON DATE/FREQUENCY IS SET IN SETTING.PY
-    """
-    logger.debug("0600 cron check task ran successfully")
