@@ -23,7 +23,7 @@ from ...models import Organisation, Case, Registration
 from .create_groups import groups_seeder
 from .create_e12_records import create_epilepsy12_record, create_registrations
 from epilepsy12.tests.factories import E12CaseFactory
-from epilepsy12.tasks import (
+from epilepsy12.management.commands.old_pt_data_scripts import (
     insert_old_pt_data,
 )
 from epilepsy12.management.commands.user_scripts import insert_user_data
