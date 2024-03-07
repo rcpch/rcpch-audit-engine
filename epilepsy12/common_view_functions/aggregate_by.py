@@ -788,7 +788,7 @@ def create_KPI_aggregation_dataframe(KPI_model1, constants_list1, cohort, measur
             model_aggregation_2 = apps.get_model("epilepsy12", KPI_model2)
         if is_regional:
             model_aggregation_2 = apps.get_model("epilepsy12", "CountryKPIAggregation")
-            wales_region_object = model_aggregation_2.objects.filter(cohort=cohort, abstraction_relation=4).values().first()
+            wales_region_object = model_aggregation_2.objects.filter(cohort=cohort, abstraction_relation=4, open_access=False).values().first()
 
         # Extract relevant value from each organisation body in each item, to be used as a label as per the template from the E12 team (Issue 791)
         objects = {}
@@ -803,14 +803,14 @@ def create_KPI_aggregation_dataframe(KPI_model1, constants_list1, cohort, measur
             elif (constants_list1 == OPEN_UK_NETWORKS):
                 key = body["OPEN_UK_Network_Code"]
             uid = i+1
-            objects[key] = model_aggregation1.objects.filter(cohort=cohort, abstraction_relation=uid).values().first()
+            objects[key] = model_aggregation1.objects.filter(cohort=cohort, abstraction_relation=uid, open_access=False).values().first()
 
         if model_aggregation_2:
             if constants_list2 == TRUSTS:
                 for i, body in enumerate(constants_list2):
                     key = body["ods_code"]
                     uid = i+1
-                    objects[key] = model_aggregation_2.objects.filter(cohort=cohort, abstraction_relation=uid).values().first()
+                    objects[key] = model_aggregation_2.objects.filter(cohort=cohort, abstraction_relation=uid, open_access=False).values().first()
         
         # Create list containing dictionary items from which final dataframe will be created
         final_list = []

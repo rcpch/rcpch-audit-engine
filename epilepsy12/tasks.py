@@ -178,7 +178,7 @@ def download_kpi_summary_as_csv(cohort):
 
     NationalKPIAggregation = apps.get_model("epilepsy12", "NationalKPIAggregation")
 
-    national_kpi_aggregation = NationalKPIAggregation.objects.filter(cohort=cohort).values().first()
+    national_kpi_aggregation = NationalKPIAggregation.objects.filter(cohort=cohort, open_access=False).values().first()
 
     final_list = []
     for kpi in measures:
