@@ -29,7 +29,7 @@ from epilepsy12.forms_folder.epilepsy12_user_form import (
     Epilepsy12UserAdminCreationForm,
     CaptchaAuthenticationForm,
 )
-from ..general_functions import construct_confirm_email, match_in_choice_key
+from ..general_functions import construct_confirm_email, match_in_choice_key, send_email_to_recipients
 from ..common_view_functions import group_for_role
 from ..decorator import (
     user_may_view_this_organisation,
@@ -41,7 +41,6 @@ from ..constants import (
     AUDIT_CENTRE_ROLES,
     EPILEPSY12_AUDIT_TEAM_FULL_ACCESS,
 )
-from ..tasks import send_email_to_recipients
 
 
 @login_and_otp_required()
