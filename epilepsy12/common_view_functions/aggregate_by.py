@@ -764,7 +764,7 @@ def ___delete_and_recreate_all_kpi_aggregation_models():
 
     _seed_all_aggregation_models()
 
-def create_KPI_aggregation_dataframe(KPI_model1, constants_list1, cohort, measures, KPI_model2=None, constants_list2=None, is_regional=False):
+def create_KPI_aggregation_dataframe(KPI_model1, constants_list1, cohort, measures, measures_titles, KPI_model2=None, constants_list2=None, is_regional=False):
         '''
         INPUTS:
         - KPI_model1, KPI_model2: a KPI aggregation model specific to the organisation body (ie trust, health board, NHSregion
@@ -830,11 +830,11 @@ def create_KPI_aggregation_dataframe(KPI_model1, constants_list1, cohort, measur
         if constants_list2 == TRUSTS:
             for key in objects:
                 object = objects[key]
-                for kpi in measures:
+                for index, kpi in enumerate(measures):
                     if object == None:
                         item = {
                             title: key,
-                            "Measure": kpi,
+                            "Measure": measures_titles[index],
                             "Percentage": 0,
                             "Numerator": 0,
                             "Denominator": 0,
@@ -842,7 +842,7 @@ def create_KPI_aggregation_dataframe(KPI_model1, constants_list1, cohort, measur
                     elif object[f"{kpi}_total_eligible"] == 0:
                         item = {
                             title: key,
-                            "Measure": kpi,
+                            "Measure": measures_titles[index],
                             "Percentage": 0,
                             "Numerator": object[f"{kpi}_passed"],
                             "Denominator": object[f"{kpi}_total_eligible"],
@@ -850,7 +850,7 @@ def create_KPI_aggregation_dataframe(KPI_model1, constants_list1, cohort, measur
                     else:
                         item = {
                             title: key,
-                            "Measure": kpi,
+                            "Measure": measures_titles[index],
                             "Percentage": object[f"{kpi}_passed"]
                             / object[f"{kpi}_total_eligible"]
                             * 100,
@@ -862,12 +862,12 @@ def create_KPI_aggregation_dataframe(KPI_model1, constants_list1, cohort, measur
         # Group organisation body by KPI, then add to dataframe - collect all values relating to KPI 1 across all organisation bodies, add to dataframe, repeat for next KPI
 
         else:
-            for kpi in measures:
+            for index, kpi in enumerate(measures):
                 if is_regional:
                     if wales_region_object[f"{kpi}_total_eligible"] == 0:
                         item = {
                         title: "Health Boards",
-                        "Measure": kpi,
+                        "Measure": measures_titles[index],
                         "Percentage": 0,
                         "Numerator": wales_region_object[f"{kpi}_passed"],
                         "Denominator": wales_region_object[f"{kpi}_total_eligible"],
@@ -875,7 +875,7 @@ def create_KPI_aggregation_dataframe(KPI_model1, constants_list1, cohort, measur
                     else:
                         item = {
                             title: "Health Boards",
-                            "Measure": kpi,
+                            "Measure": measures_titles[index],
                             "Percentage": wales_region_object[f"{kpi}_passed"]
                             / wales_region_object[f"{kpi}_total_eligible"]
                             * 100,
@@ -888,7 +888,7 @@ def create_KPI_aggregation_dataframe(KPI_model1, constants_list1, cohort, measur
                     if object == None:
                         item = {
                             title: key,
-                            "Measure": kpi,
+                            "Measure": measures_titles[index],
                             "Percentage": 0,
                             "Numerator": 0,
                             "Denominator": 0,
@@ -896,7 +896,7 @@ def create_KPI_aggregation_dataframe(KPI_model1, constants_list1, cohort, measur
                     elif object[f"{kpi}_total_eligible"] == 0:
                         item = {
                             title: key,
-                            "Measure": kpi,
+                            "Measure": measures_titles[index],
                             "Percentage": 0,
                             "Numerator": object[f"{kpi}_passed"],
                             "Denominator": object[f"{kpi}_total_eligible"],
@@ -904,7 +904,7 @@ def create_KPI_aggregation_dataframe(KPI_model1, constants_list1, cohort, measur
                     else:
                         item = {
                             title: key,
-                            "Measure": kpi,
+                            "Measure": measures_titles[index],
                             "Percentage": object[f"{kpi}_passed"]
                             / object[f"{kpi}_total_eligible"]
                             * 100,

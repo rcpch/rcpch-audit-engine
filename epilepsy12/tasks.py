@@ -115,6 +115,21 @@ def download_kpi_summary_as_csv(cohort):
         "school_individual_healthcare_plan",
     ]
 
+    measures_titles = [
+        "1. Paediatrician with expertise",
+        "2. Epilepsy specialist nurse",
+        "3a. Tertiary involvement",
+        "3b. Epilepsy surgery referral",
+        "4. ECG",
+        "5. MRI",
+        "6. Assessment of mental health issues",
+        "7. Mental health support",
+        "8. Sodium valproate",
+        "9a. Comprehensive care planning agreement",
+        "9b. Comprehensive care planning content",
+        "10. School Individual Health Care Plan"
+    ]
+
     # COUNTRY - SHEET 1
     # create a dataframe with a row for each measure of each country, and a column for each of ["Measure", "Percentage", "Numerator", "Denominator"]
     
@@ -129,10 +144,10 @@ def download_kpi_summary_as_csv(cohort):
     )
 
     final_list = []
-    for kpi in measures:
+    for index, kpi in enumerate(measures):
         item = {
             "Country": "England",
-            "Measure": kpi,
+            "Measure": measures_titles[index],
             "Percentage": 0 if england_kpi_aggregation[f"{kpi}_total_eligible"] == 0 else
                 england_kpi_aggregation[f"{kpi}_passed"]
                 / england_kpi_aggregation[f"{kpi}_total_eligible"]
@@ -143,7 +158,7 @@ def download_kpi_summary_as_csv(cohort):
         final_list.append(item)
         item = {
         "Country": "Wales",
-        "Measure": kpi,
+        "Measure": measures_titles[index],
         "Percentage": 0 if wales_kpi_aggregation[f"{kpi}_total_eligible"] == 0 else
             wales_kpi_aggregation[f"{kpi}_passed"]
             / wales_kpi_aggregation[f"{kpi}_total_eligible"]
@@ -157,19 +172,19 @@ def download_kpi_summary_as_csv(cohort):
 
     # HBT (Trusts & Health Boards) - SHEET 2
 
-    trust_hb_df = create_KPI_aggregation_dataframe("LocalHealthBoardKPIAggregation", LOCAL_HEALTH_BOARDS, cohort, measures, KPI_model2="TrustKPIAggregation", constants_list2=TRUSTS)
+    trust_hb_df = create_KPI_aggregation_dataframe("LocalHealthBoardKPIAggregation", LOCAL_HEALTH_BOARDS, cohort, measures, measures_titles, KPI_model2="TrustKPIAggregation", constants_list2=TRUSTS)
 
     # ICB (Integrated Care Board) - SHEET 3
 
-    icb_df = create_KPI_aggregation_dataframe("ICBKPIAggregation", INTEGRATED_CARE_BOARDS, cohort, measures)
+    icb_df = create_KPI_aggregation_dataframe("ICBKPIAggregation", INTEGRATED_CARE_BOARDS, cohort, measures, measures_titles)
 
     # NHS region level - SHEET 4
 
-    region_df = create_KPI_aggregation_dataframe("NHSEnglandRegionKPIAggregation", NHS_ENGLAND_REGIONS, cohort, measures, is_regional=True)
+    region_df = create_KPI_aggregation_dataframe("NHSEnglandRegionKPIAggregation", NHS_ENGLAND_REGIONS, cohort, measures, measures_titles, is_regional=True)
 
     # NETWORKS - SHEET 5
         
-    network_df = create_KPI_aggregation_dataframe("OpenUKKPIAggregation", OPEN_UK_NETWORKS, cohort, measures)
+    network_df = create_KPI_aggregation_dataframe("OpenUKKPIAggregation", OPEN_UK_NETWORKS, cohort, measures, measures_titles)
 
     # NATIONAL - SHEET 6
     # create a dataframe with a row for each measure, and column for each of ["Measure", "Percentage", "Numerator", "Denominator"]
@@ -181,9 +196,9 @@ def download_kpi_summary_as_csv(cohort):
     national_kpi_aggregation = NationalKPIAggregation.objects.filter(cohort=cohort, open_access=False).values().first()
 
     final_list = []
-    for kpi in measures:
+    for index, kpi in enumerate(measures):
         item = {
-            "Measure": kpi,
+            "Measure": measures_titles[index],
             "Percentage": national_kpi_aggregation[f"{kpi}_passed"]
             / national_kpi_aggregation[f"{kpi}_total_eligible"]
             * 100,
