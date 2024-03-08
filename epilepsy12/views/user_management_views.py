@@ -41,7 +41,7 @@ from ..constants import (
     AUDIT_CENTRE_ROLES,
     EPILEPSY12_AUDIT_TEAM_FULL_ACCESS,
 )
-from ..tasks import asynchronously_send_email_to_recipients
+from ..tasks import send_email_to_recipients
 
 
 @login_and_otp_required()
@@ -372,7 +372,7 @@ def create_epilepsy12_user(request, organisation_id, user_type, epilepsy12_user_
             subject = "Password Reset Requested"
             email = construct_confirm_email(request=request, user=new_user)
 
-            asynchronously_send_email_to_recipients.delay(
+            send_email_to_recipients(
                 recipients=[new_user.email], subject=subject, message=email
             )
 
@@ -462,7 +462,7 @@ def edit_epilepsy12_user(request, organisation_id, epilepsy12_user_id):
                 request=request, user=epilepsy12_user_to_edit
             )
 
-            asynchronously_send_email_to_recipients.delay(
+            send_email_to_recipients(
                 recipients=[epilepsy12_user_to_edit.email],
                 subject=subject,
                 message=email,

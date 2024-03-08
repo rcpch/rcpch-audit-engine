@@ -25,8 +25,6 @@ from .create_e12_records import create_epilepsy12_record, create_registrations
 from epilepsy12.tests.factories import E12CaseFactory
 from epilepsy12.tasks import (
     insert_old_pt_data,
-    async_insert_old_pt_data,
-    async_insert_user_data,
 )
 from epilepsy12.management.commands.user_scripts import insert_user_data
 
@@ -81,15 +79,9 @@ class Command(BaseCommand):
         elif options["mode"] == "upload_old_patient_data":
             self.stdout.write("Uploading old patient data.")
             insert_old_pt_data()
-        elif options["mode"] == "async_upload_old_patient_data":
-            self.stdout.write("CELERY: uploading old patient data.")
-            async_insert_old_pt_data.delay()
         elif options["mode"] == "upload_user_data":
             self.stdout.write("Uploading user data.")
             insert_user_data()
-        elif options["mode"] == "async_upload_user_data":
-            self.stdout.write("CELERY: uploading user data.")
-            async_insert_user_data.delay()
         elif options["mode"] == "add_new_epilepsy_causes":
             extra_concept_ids = options["snomedctids"]
             if not isinstance(extra_concept_ids, list):

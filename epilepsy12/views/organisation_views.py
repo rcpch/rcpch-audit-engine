@@ -29,9 +29,8 @@ from ..general_functions import (
     value_from_key,
     cohorts_and_dates,
 )
-from ..tasks import (
-    asynchronously_aggregate_kpis_and_update_models_for_cohort_and_abstraction_level,
-)
+
+from epilepsy12.common_view_functions.aggregate_by import update_all_kpi_agg_models
 
 
 def selected_organisation_summary_select(request):
@@ -199,7 +198,7 @@ def publish_kpis(request, organisation_id):
     cohort_data = dates_for_cohort(cohort)
 
     # perform aggregations and update all the KPIAggregation models only for clinicians
-    asynchronously_aggregate_kpis_and_update_models_for_cohort_and_abstraction_level.delay(
+    update_all_kpi_agg_models(
         cohort=cohort_data["cohort"], open_access=True
     )
 
@@ -242,7 +241,7 @@ def selected_trust_kpis(request, organisation_id, access):
 
         if access == "private":
             # perform aggregations and update all the KPIAggregation models only for clinicians
-            asynchronously_aggregate_kpis_and_update_models_for_cohort_and_abstraction_level.delay(
+            update_all_kpi_agg_models(
                 cohort=cohort_data["submitting_cohort"], open_access=False
             )
 
