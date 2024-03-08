@@ -142,6 +142,7 @@ staticdocs
 
 data/*
 data.csv
+kpi_export.xlsx
 
 # exclude github actions local testing secret file
 .secrets

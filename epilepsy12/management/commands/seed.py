@@ -29,6 +29,7 @@ from epilepsy12.tasks import (
     async_insert_user_data,
 )
 from epilepsy12.management.commands.user_scripts import insert_user_data
+from ...common_view_functions import update_all_kpi_agg_models
 
 
 class Command(BaseCommand):
@@ -72,6 +73,7 @@ class Command(BaseCommand):
             )
             cohort = options["cohort"]
             run_registrations(cohort=cohort)
+            update_all_kpi_agg_models(cohort=cohort)
         elif options["mode"] == "seed_groups_and_permissions":
             self.stdout.write("setting up groups and permissions...")
             groups_seeder(run_create_groups=True)
