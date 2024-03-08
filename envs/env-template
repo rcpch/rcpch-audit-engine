@@ -12,10 +12,6 @@ LETSENCRYPT_EMAIL_ADDRESS="letsencrypt@example.com" # the email address to send 
 LETSENCRYPT_ENDPOINT="https://acme-staging-v02.api.letsencrypt.org/directory" # Optionally set to Letsencrypt staging endpoint for testing (https://acme-staging-v02.api.letsencrypt.org/directory)
 TLS_SOURCE="internal" # for localhost with SSL, or use "acme" for LetsEncrypt in production
 
-# CELERY
-CELERY_BROKER_URL="redis://redis:6379/0"
-CELERY_RESULT_BACKEND="redis://redis:6379/0"
-
 # CENSUS PLATFORM (Deprivation Scores)
 RCPCH_CENSUS_PLATFORM_TOKEN= # API key for RCPCH Census Platform (Deprivation scoring service API)
 RCPCH_CENSUS_PLATFORM_URL="https://api.rcpch.ac.uk/deprivation/v1"
@@ -50,11 +46,6 @@ EMAIL_HOST_SERVER= # hostname of SMTP service
 EMAIL_HOST_USER= # username for SMTP service
 # To output emails to console, set SMTP_EMAIL_ENABLED=False
 SMTP_EMAIL_ENABLED=True # To output emails to console, set SMTP_EMAIL_ENABLED=False
-
-# FLOWER
-FLOWER_PASSWORD="SET_ME"
-FLOWER_PORT=8888
-FLOWER_USER="flower@example.com"
 
 # HERMES (SNOMED CT)
 RCPCH_HERMES_SERVER_URL= # SNOMED server API URL
