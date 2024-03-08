@@ -23,11 +23,9 @@ A secure connection (HTTPS, also known as SSL) is used to access the application
 
 ### Database
 
-The application uses a **PostgreSQL** database, which is a common and reliable open-source relational database management system used by millions of other applications. The database is hosted on Azure, and is accessed by the application using a secure connection. This database is only used for the Epilepsy12 application, and is not shared with any other application.
+The application uses a **PostgreSQL** database, which is a common and reliable open-source relational database management system used by millions of other applications. The database is part of the same docker compose setup as the Django app itself and runs on the same VPS. This database is only used for the Epilepsy12 application, and is not shared with any other application.
 
-All the data in the live instance of the application is stored in the database. The database is backed up daily, and the backups are stored in a secure location on Azure.
-
-A system called **Redis** is used to cache data from the database, which improves the performance of the application. This is managed by **Celery**, which is a system for running background tasks.
+All the data in the live instance of the application is stored in the database. The VPS running the app and database is backed up daily.
 
 ### Authentication
 

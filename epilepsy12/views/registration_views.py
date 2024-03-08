@@ -32,8 +32,8 @@ from ..decorator import user_may_view_this_child, login_and_otp_required
 from ..general_functions import (
     construct_transfer_epilepsy12_site_email,
     cohorts_and_dates,
+    send_email_to_recipients,
 )
-from ..tasks import asynchronously_send_email_to_recipients
 
 
 @login_and_otp_required()
@@ -462,9 +462,7 @@ def update_lead_site(request, registration_id, site_id, update):
             origin_organisation=origin_organisation,
         )
 
-        asynchronously_send_email_to_recipients.delay(
-            recipients=recipients, subject=subject, message=email
-        )
+        send_email_to_recipients(recipients=recipients, subject=subject, message=email)
 
         if new_organisation.country.boundary_identifier == "W92000004":
             parent_trust = new_organisation.local_health_board.name

@@ -132,9 +132,6 @@ root.crt
 
 .kube/
 
-# exclude celerybeat-schedule
-celerybeat-schedule
-
 # exclude site/ and .cache/ folders anywhere (MkDocs)
 */site/
 */.cache/

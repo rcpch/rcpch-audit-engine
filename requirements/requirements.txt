@@ -21,12 +21,6 @@ phonenumbers # though not currently using phonenumbers, this is a dependency of 
 psycopg2-binary
 whitenoise
 
-## scheduled tasks
-celery
-django-celery-beat
-flower
-redis
-
 ## graphing
 plotly
 
