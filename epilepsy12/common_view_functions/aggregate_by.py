@@ -831,6 +831,7 @@ def create_KPI_aggregation_dataframe(KPI_model1, constants_list1, cohort, measur
             for key in objects:
                 object = objects[key]
                 for index, kpi in enumerate(measures):
+                    # Catch empty entries
                     if object == None:
                         item = {
                             title: key,
@@ -839,6 +840,7 @@ def create_KPI_aggregation_dataframe(KPI_model1, constants_list1, cohort, measur
                             "Numerator": 0,
                             "Denominator": 0,
                         }
+                    # Catch Zero Division Errors
                     elif object[f"{kpi}_total_eligible"] == 0:
                         item = {
                             title: key,
@@ -864,8 +866,10 @@ def create_KPI_aggregation_dataframe(KPI_model1, constants_list1, cohort, measur
         else:
             for index, kpi in enumerate(measures):
                 if is_regional:
+                    # Catch Zero Division Errors
                     if wales_region_object[f"{kpi}_total_eligible"] == 0:
                         item = {
+                        "NHSregionMeasure": "Health Boards" + measures_titles[index],
                         title: "Health Boards",
                         "Measure": measures_titles[index],
                         "Percentage": 0,
@@ -874,6 +878,7 @@ def create_KPI_aggregation_dataframe(KPI_model1, constants_list1, cohort, measur
                         }
                     else:
                         item = {
+                            "NHSregionMeasure": "Health Boards" + measures_titles[index],
                             title: "Health Boards",
                             "Measure": measures_titles[index],
                             "Percentage": wales_region_object[f"{kpi}_passed"]
@@ -885,33 +890,73 @@ def create_KPI_aggregation_dataframe(KPI_model1, constants_list1, cohort, measur
                     final_list.append(item)
                 for key in objects:
                     object = objects[key]
-                    if object == None:
-                        item = {
-                            title: key,
-                            "Measure": measures_titles[index],
-                            "Percentage": 0,
-                            "Numerator": 0,
-                            "Denominator": 0,
-                        }
-                    elif object[f"{kpi}_total_eligible"] == 0:
-                        item = {
-                            title: key,
-                            "Measure": measures_titles[index],
-                            "Percentage": 0,
-                            "Numerator": object[f"{kpi}_passed"],
-                            "Denominator": object[f"{kpi}_total_eligible"],
-                        }
+                    if ((constants_list1 == INTEGRATED_CARE_BOARDS) or 
+                        (constants_list1 == NHS_ENGLAND_REGIONS) or 
+                        (constants_list1 == OPEN_UK_NETWORKS) or 
+                        (constants_list1 == TRUSTS)):
+                        # Catch empty entries
+                        if object == None:
+                            item = {
+                                title + "Measure": key + measures_titles[index],
+                                title: key,
+                                "Measure": measures_titles[index],
+                                "Percentage": 0,
+                                "Numerator": 0,
+                                "Denominator": 0,
+                            }
+                        # Catch zero division errors
+                        elif object[f"{kpi}_total_eligible"] == 0:
+                            item = {
+                                title + "Measure": key + measures_titles[index],
+                                title: key,
+                                "Measure": measures_titles[index],
+                                "Percentage": 0,
+                                "Numerator": object[f"{kpi}_passed"],
+                                "Denominator": object[f"{kpi}_total_eligible"],
+                            }
+                        else:
+                            item = {
+                                title + "Measure": key + measures_titles[index],
+                                title: key,
+                                "Measure": measures_titles[index],
+                                "Percentage": object[f"{kpi}_passed"]
+                                / object[f"{kpi}_total_eligible"]
+                                * 100,
+                                "Numerator": object[f"{kpi}_passed"],
+                                "Denominator": object[f"{kpi}_total_eligible"],
+                            }
+                        final_list.append(item) 
                     else:
-                        item = {
-                            title: key,
-                            "Measure": measures_titles[index],
-                            "Percentage": object[f"{kpi}_passed"]
-                            / object[f"{kpi}_total_eligible"]
-                            * 100,
-                            "Numerator": object[f"{kpi}_passed"],
-                            "Denominator": object[f"{kpi}_total_eligible"],
-                        }
-                    final_list.append(item) 
+                        # Catch empty entries
+                        if object == None:
+                            item = {
+                                title: key,
+                                "Measure": measures_titles[index],
+                                "Percentage": 0,
+                                "Numerator": 0,
+                                "Denominator": 0,
+                            }
+                        # Catch zero division errors
+                        elif object[f"{kpi}_total_eligible"] == 0:
+                            item = {
+                                title: key,
+                                "Measure": measures_titles[index],
+                                "Percentage": 0,
+                                "Numerator": object[f"{kpi}_passed"],
+                                "Denominator": object[f"{kpi}_total_eligible"],
+                            }
+                        else:
+                            item = {
+                                title: key,
+                                "Measure": measures_titles[index],
+                                "Percentage": object[f"{kpi}_passed"]
+                                / object[f"{kpi}_total_eligible"]
+                                * 100,
+                                "Numerator": object[f"{kpi}_passed"],
+                                "Denominator": object[f"{kpi}_total_eligible"],
+                            }
+                        final_list.append(item) 
+
         
         return pd.DataFrame.from_dict(final_list)
 

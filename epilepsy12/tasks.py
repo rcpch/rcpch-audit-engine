@@ -200,6 +200,8 @@ def download_kpi_summary_as_csv(cohort):
     final_list = []
     for index, kpi in enumerate(measures):
         item = {
+            "ukMeasure": "England and Wales" + measures_titles[index],
+            "uk": "England and Wales",
             "Measure": measures_titles[index],
             "Percentage": national_kpi_aggregation[f"{kpi}_passed"]
             / national_kpi_aggregation[f"{kpi}_total_eligible"]
