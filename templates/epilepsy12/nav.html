@@ -48,16 +48,6 @@
             Home
           </a>
         {% if user.is_authenticated %}
-
-          {% if request.user|has_group:"patient_access" %}
-            <a {% if request.resolver_match.url_name|is_in:'patient' %}class="active item" id="active_menu_item" {% else %} class="item" {% endif %}
-            id="link"
-            <!-- href='https://www.rcpch.ac.uk/resources/patient-parent-guide-epilepsy12-audit' -->
-            href="{% url 'open_access' %}"
-            >
-            Patient access
-            </a>
-          {% endif %}
           
           <a {% if request.resolver_match.url_name|is_in:'docs' %}class="active item" id="active_menu_item" {% else %} class="item" {% endif %}
           id="link"
