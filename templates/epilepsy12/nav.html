@@ -15,7 +15,10 @@
           <div class="rcpch_logged_in">
             <h5><i class="id badge icon"></i>{{ user.get_full_name }}</h5>
           </div>
-          <div class="ui button" onclick="location.href='{% url 'logout' %}'">Log out</div>
+          <form method="POST" action="{% url 'logout' %}">
+            {% csrf_token %}
+            <button class="ui rcpch_light_blue button" type="submit">Log out</button>
+          </form>
           <div class="ui floating dropdown icon button">
           <i class="dropdown icon"></i>
           <div class="menu">
