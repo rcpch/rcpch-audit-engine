@@ -997,15 +997,6 @@ TRUSTS = [
         "country": "ENGLAND"
     },
     {
-        "ods_code": "RQF",
-        "trust_name": "VELINDRE NHS TRUST",
-        "address_line_1": "UNIT 2",
-        "address_line_2": "CHARNWOOD COURT",
-        "town": "CARDIFF",
-        "postcode": "CF15 7QZ",
-        "country": "WALES"
-    },
-    {
         "ods_code": "RQM",
         "trust_name": "CHELSEA AND WESTMINSTER HOSPITAL NHS FOUNDATION TRUST",
         "address_line_1": "CHELSEA & WESTMINSTER HOSPITAL",
@@ -1139,15 +1130,6 @@ TRUSTS = [
         "town": "ASHTON-UNDER-LYNE",
         "postcode": "OL6 7SR",
         "country": "ENGLAND"
-    },
-    {
-        "ods_code": "RT4",
-        "trust_name": "WELSH AMBULANCE SERVICES NHS TRUST",
-        "address_line_1": "UNIT 7",
-        "address_line_2": "FFORDD RICHARD DAVIES",
-        "town": "ST. ASAPH",
-        "postcode": "LL17 0LJ",
-        "country": "WALES"
     },
     {
         "ods_code": "RT5",
@@ -1859,15 +1841,6 @@ TRUSTS = [
         "town": "WORTHING",
         "postcode": "BN11 2DH",
         "country": "ENGLAND"
-    },
-    {
-        "ods_code": "RYT",
-        "trust_name": "PUBLIC HEALTH WALES NHS TRUST",
-        "address_line_1": "2 CAPITAL QUARTER",
-        "address_line_2": "TYNDALL STREET",
-        "town": "CARDIFF",
-        "postcode": "CF10 4BZ",
-        "country": "WALES"
     },
     {
         "ods_code": "RYV",
