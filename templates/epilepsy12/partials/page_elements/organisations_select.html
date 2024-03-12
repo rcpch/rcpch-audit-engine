@@ -32,11 +32,14 @@ hx_confirm: if present, the text to confirm continue
             hx-trigger="{{hx_trigger}}"
             name='{{hx_name}}'
             value="{{test_positive}}"
-            _="init js $('.ui.rcpch_light_blue.search.selection.dropdown').dropdown(); end"
+            _="init js $('.ui.rcpch_light_blue.search.selection.dropdown').dropdown(); end
+            on change remove .disabled from #{{hx_name}}_button"
         >
         
         <div class="default text">{{hx_default_text}}</div>
-            <div class="menu" >
+            <div 
+                class="menu"
+            >
                 {% for item in organisation_list %}
                     {% if item.trust %}
                         <div class="item" data-value="{{item.pk}}" >{{item.name}} ({{item.trust.name}})</div>
@@ -50,8 +53,9 @@ hx_confirm: if present, the text to confirm continue
 
 
         <div class='ui buttons'>
-            <button 
-                class="ui rcpch_primary button"
+            <button
+                id="{{hx_name}}_button"
+                class="ui rcpch_primary disabled button"
                 hx-post="{{hx_post}}"
                 hx-target="{{hx_target}}"
                 hx-swap="innerHTML"
