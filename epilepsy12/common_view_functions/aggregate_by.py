@@ -12,7 +12,9 @@ from django.contrib.gis.db.models import (
     CharField,
     PositiveSmallIntegerField,
     Case as DJANGO_CASE,
+    F,
 )
+from django.db.models.functions import ExtractDay
 
 # E12 imports
 from epilepsy12.constants import ETHNICITIES, SEX_TYPE, EnumAbstractionLevel
@@ -23,6 +25,8 @@ logger = logging.getLogger(__name__)
 """
 Reporting
 """
+
+
 def cases_aggregated_by_sex(selected_organisation):
     # aggregate queries on trust level cases
 
@@ -159,11 +163,17 @@ def get_filtered_cases_queryset_for(
 
         abstraction_filter = {cases_filter_key: abstraction_key}
 
-    return Case.objects.filter(
+    return Case.objects.annotate(
+        days_elapsed_since_first_paediatric_assessment=(
+            ExtractDay(date.today())
+            - ExtractDay(F("registration__first_paediatric_assessment_date"))
+        )
+    ).filter(
         **abstraction_filter,
         site__site_is_actively_involved_in_epilepsy_care=True,
         site__site_is_primary_centre_of_epilepsy_care=True,
         registration__cohort=cohort,
+        days_elapsed_since_first_paediatric_assessment__gte=365,
     )
 
 
@@ -505,10 +515,23 @@ def update_all_kpi_agg_models(
 
     Case = apps.get_model("epilepsy12", "Case")
 
-    all_cases = Case.objects.filter(
+    """
+    filter all Cases at this Site where
+    # site is actively involved in care
+    # site is lead centre
+    # matched for cohort
+    # have completed a full year of epilepsy care
+    """
+    all_cases = Case.objects.annotate(
+        days_elapsed_since_first_paediatric_assessment=(
+            ExtractDay(date.today())
+            - ExtractDay(F("registration__first_paediatric_assessment_date"))
+        )
+    ).filter(
         site__site_is_actively_involved_in_epilepsy_care=True,
         site__site_is_primary_centre_of_epilepsy_care=True,
         registration__cohort=cohort,
+        days_elapsed_since_first_paediatric_assessment__gte=365,
     )
 
     abstraction_levels = EnumAbstractionLevel if abstractions == "all" else abstractions
@@ -702,7 +725,9 @@ def _seed_all_aggregation_models() -> None:
                 abstraction_relation=entity,
                 cohort=current_cohort,
             ).exists():
-                logger.info(f"AggregationModel for {entity} already exists. Skipping...")
+                logger.info(
+                    f"AggregationModel for {entity} already exists. Skipping..."
+                )
                 continue
 
             new_agg_model = AggregationModel.objects.create(
