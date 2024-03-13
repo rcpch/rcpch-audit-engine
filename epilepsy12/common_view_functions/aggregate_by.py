@@ -163,17 +163,12 @@ def get_filtered_cases_queryset_for(
 
         abstraction_filter = {cases_filter_key: abstraction_key}
 
-    return Case.objects.annotate(
-        days_elapsed_since_first_paediatric_assessment=(
-            ExtractDay(date.today())
-            - ExtractDay(F("registration__first_paediatric_assessment_date"))
-        )
-    ).filter(
+    return Case.objects.filter(
         **abstraction_filter,
         site__site_is_actively_involved_in_epilepsy_care=True,
         site__site_is_primary_centre_of_epilepsy_care=True,
         registration__cohort=cohort,
-        days_elapsed_since_first_paediatric_assessment__gte=365,
+        registration__completed_first_year_of_care_date__gte=date.today(),
     )
 
 
@@ -522,16 +517,11 @@ def update_all_kpi_agg_models(
     # matched for cohort
     # have completed a full year of epilepsy care
     """
-    all_cases = Case.objects.annotate(
-        days_elapsed_since_first_paediatric_assessment=(
-            ExtractDay(date.today())
-            - ExtractDay(F("registration__first_paediatric_assessment_date"))
-        )
-    ).filter(
+    all_cases = Case.objects.filter(
         site__site_is_actively_involved_in_epilepsy_care=True,
         site__site_is_primary_centre_of_epilepsy_care=True,
         registration__cohort=cohort,
-        days_elapsed_since_first_paediatric_assessment__gte=365,
+        registration__completed_first_year_of_care_date__gte=date.today(),
     )
 
     abstraction_levels = EnumAbstractionLevel if abstractions == "all" else abstractions
