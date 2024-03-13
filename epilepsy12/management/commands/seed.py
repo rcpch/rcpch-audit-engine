@@ -27,6 +27,7 @@ from epilepsy12.management.commands.old_pt_data_scripts import (
     insert_old_pt_data,
 )
 from epilepsy12.management.commands.user_scripts import insert_user_data
+from epilepsy12.common_view_functions import _seed_all_aggregation_models
 
 
 class Command(BaseCommand):
@@ -70,6 +71,7 @@ class Command(BaseCommand):
             )
             cohort = options["cohort"]
             run_registrations(cohort=cohort)
+            _seed_all_aggregation_models()
         elif options["mode"] == "seed_groups_and_permissions":
             self.stdout.write("setting up groups and permissions...")
             groups_seeder(run_create_groups=True)
