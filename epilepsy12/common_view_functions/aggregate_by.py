@@ -168,7 +168,7 @@ def get_filtered_cases_queryset_for(
         site__site_is_actively_involved_in_epilepsy_care=True,
         site__site_is_primary_centre_of_epilepsy_care=True,
         registration__cohort=cohort,
-        registration__completed_first_year_of_care_date__gte=date.today(),
+        registration__completed_first_year_of_care_date__lte=date.today(),
     )
 
 
@@ -521,7 +521,7 @@ def update_all_kpi_agg_models(
         site__site_is_actively_involved_in_epilepsy_care=True,
         site__site_is_primary_centre_of_epilepsy_care=True,
         registration__cohort=cohort,
-        registration__completed_first_year_of_care_date__gte=date.today(),
+        registration__completed_first_year_of_care_date__lte=date.today(),
     )
 
     abstraction_levels = EnumAbstractionLevel if abstractions == "all" else abstractions
