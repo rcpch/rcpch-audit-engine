@@ -24,4 +24,3 @@ from .calculate_age_at_first_paediatric_assessment_in_years import (
     calculate_age_at_first_paediatric_assessment_in_years,
 )
 from .check_is_registered import check_is_registered
-from .check_has_completed_one_year_of_care import check_has_completed_one_year_of_care

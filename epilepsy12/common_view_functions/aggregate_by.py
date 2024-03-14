@@ -12,9 +12,7 @@ from django.contrib.gis.db.models import (
     CharField,
     PositiveSmallIntegerField,
     Case as DJANGO_CASE,
-    F,
 )
-from django.db.models.functions import ExtractDay
 
 # E12 imports
 from epilepsy12.constants import ETHNICITIES, SEX_TYPE, EnumAbstractionLevel
