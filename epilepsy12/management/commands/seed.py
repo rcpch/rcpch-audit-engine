@@ -3,6 +3,8 @@ from random import randint, choice
 from datetime import date
 from random import randint
 import logging
+from dateutil.relativedelta import relativedelta
+
 
 from django.core.management.base import BaseCommand
 
@@ -52,6 +54,14 @@ class Command(BaseCommand):
             default=7,
         )
         parser.add_argument(
+            "-fy",
+            "--full_year",
+            nargs="?",
+            type=bool,
+            help="Optional parameter. Set True if all cases must have completed a full year of care.",
+            default=False,
+        )
+        parser.add_argument(
             "-sctids",
             "--snomedctids",
             nargs="+",
@@ -70,7 +80,8 @@ class Command(BaseCommand):
                 "register cases in audit and complete all fields with random answers..."
             )
             cohort = options["cohort"]
-            run_registrations(cohort=cohort)
+            completed_full_year = options["full_year"]
+            run_registrations(cohort=cohort, full_year=completed_full_year)
             _seed_all_aggregation_models()
         elif options["mode"] == "seed_groups_and_permissions":
             self.stdout.write("setting up groups and permissions...")
@@ -153,7 +164,7 @@ def run_dummy_cases_seed(verbose=True, cases=50):
         )
 
 
-def run_registrations(verbose=True, cohort=7):
+def run_registrations(verbose=True, cohort=7, full_year=False):
     """
     Calling function to register all cases in Epilepsy12 and complete all fields with random answers
     """
@@ -162,7 +173,7 @@ def run_registrations(verbose=True, cohort=7):
 
     create_registrations(verbose=verbose)
 
-    complete_registrations(verbose=verbose, cohort=cohort)
+    complete_registrations(verbose=verbose, cohort=cohort, full_year=full_year)
 
     if not verbose:
         print(
@@ -170,7 +181,7 @@ def run_registrations(verbose=True, cohort=7):
         )
 
 
-def complete_registrations(verbose=True, cohort=None):
+def complete_registrations(verbose=True, cohort=None, full_year=False):
     """
     Loop through the registrations and score all fields
     """
@@ -190,10 +201,31 @@ def complete_registrations(verbose=True, cohort=None):
         current_cohort_data = dates_for_cohort(cohort=cohort)
 
     for registration in Registration.objects.all():
-        registration.first_paediatric_assessment_date = random_date(
+
+        fpa_date = random_date(
             start=current_cohort_data["cohort_start_date"],
             end=current_cohort_data["cohort_end_date"],
         )
+
+        if full_year:
+            # this flag ensures any registrations include a full year of care
+            if (
+                current_cohort_data["cohort_start_date"] + relativedelta(years=1)
+                > date.today()
+            ):
+                # It is not possible to generate registrations that are complete as they would be in the future
+                logger.warning(
+                    "It is not possible for registrations to be complete for this cohort as they would be in the future."
+                )
+            else:
+                while fpa_date + relativedelta(years=1) >= date.today():
+                    # regenerate any dates that cannot be complete
+                    fpa_date = random_date(
+                        start=current_cohort_data["cohort_start_date"],
+                        end=current_cohort_data["cohort_end_date"],
+                    )
+
+        registration.first_paediatric_assessment_date = fpa_date
         registration.eligibility_criteria_met = True
         registration.save()
 

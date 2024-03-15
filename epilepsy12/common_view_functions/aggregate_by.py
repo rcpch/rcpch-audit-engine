@@ -161,13 +161,15 @@ def get_filtered_cases_queryset_for(
 
         abstraction_filter = {cases_filter_key: abstraction_key}
 
-    return Case.objects.filter(
+    cases = Case.objects.filter(
         **abstraction_filter,
         site__site_is_actively_involved_in_epilepsy_care=True,
         site__site_is_primary_centre_of_epilepsy_care=True,
         registration__cohort=cohort,
         registration__completed_first_year_of_care_date__lte=date.today(),
     )
+
+    return cases
 
 
 def calculate_kpi_value_counts_queryset(
@@ -188,6 +190,7 @@ def calculate_kpi_value_counts_queryset(
 
     Returns `ValuesQuerySet[KPI, dict[str, any]]`.
     """
+
     # Get models
     KPI = apps.get_model("epilepsy12", "KPI")
 
@@ -239,35 +242,17 @@ def calculate_kpi_value_counts_queryset(
             )  # To ensure order is always as expected
         )
 
-    # WALES HAS NO ICB
-    if abstraction_level is EnumAbstractionLevel.ICB:
+    # WALES HAS NO TRUST, ICB, NHS ENGLAND REGION
+    if (
+        abstraction_level is EnumAbstractionLevel.ICB
+        or abstraction_level is EnumAbstractionLevel.TRUST
+        or abstraction_level is EnumAbstractionLevel.NHS_ENGLAND_REGION
+    ):
         Case = apps.get_model("epilepsy12", "Case")
         welsh_cases = Case.objects.filter(
-            **{f"organisations__{EnumAbstractionLevel.ICB.value}": None}
-        )
-
-        # Filter out Welsh Cases from the value count
-        kpi_value_counts = kpi_value_counts.exclude(
-            registration__id__in=welsh_cases.values_list("registration")
-        )
-
-    # WALES HAS NO TRUST
-    if abstraction_level is EnumAbstractionLevel.TRUST:
-        Case = apps.get_model("epilepsy12", "Case")
-        welsh_cases = Case.objects.filter(
-            **{f"organisations__{EnumAbstractionLevel.TRUST.value}": None}
-        )
-
-        # Filter out Welsh Cases from the value count
-        kpi_value_counts = kpi_value_counts.exclude(
-            registration__id__in=welsh_cases.values_list("registration")
-        )
-
-    # Wales has no NHS England Region
-    if abstraction_level is EnumAbstractionLevel.NHS_ENGLAND_REGION:
-        Case = apps.get_model("epilepsy12", "Case")
-        welsh_cases = Case.objects.filter(
-            **{f"organisations__{EnumAbstractionLevel.NHS_ENGLAND_REGION.value}": None}
+            organisations__country__boundary_identifier="W92000004",
+            site__site_is_actively_involved_in_epilepsy_care=True,
+            site__site_is_primary_centre_of_epilepsy_care=True,
         )
 
         # Filter out Welsh Cases from the value count
@@ -279,7 +264,9 @@ def calculate_kpi_value_counts_queryset(
     if abstraction_level is EnumAbstractionLevel.LOCAL_HEALTH_BOARD:
         Case = apps.get_model("epilepsy12", "Case")
         english_cases = Case.objects.filter(
-            **{f"organisations__{EnumAbstractionLevel.LOCAL_HEALTH_BOARD.value}": None}
+            organisations__country__boundary_identifier="E92000001",
+            site__site_is_actively_involved_in_epilepsy_care=True,
+            site__site_is_primary_centre_of_epilepsy_care=True,
         )
 
         # Filter out Welsh Cases from the value count
@@ -452,33 +439,33 @@ def update_kpi_aggregation_model(
                 logger.debug(f"updated {new_obj}")
 
 
-def aggregate_kpis_update_models_all_abstractions_for_organisation(
-    organisation,
-    cohort: int,
-) -> None:
-    """
-    Aggregates all KPI data, for each level of EnumAbstractionLevel abstraction, updates the relevant AbstractionModel. Returns None.
-    """
-    for enum_abstraction_level in EnumAbstractionLevel:
-        filtered_cases = get_filtered_cases_queryset_for(
-            organisation=organisation,
-            abstraction_level=enum_abstraction_level,
-            cohort=cohort,
-        )
+# def aggregate_kpis_update_models_all_abstractions_for_organisation(
+#     organisation,
+#     cohort: int,
+# ) -> None:
+#     """
+#     Aggregates all KPI data, for each level of EnumAbstractionLevel abstraction, updates the relevant AbstractionModel. Returns None.
+#     """
+#     for enum_abstraction_level in EnumAbstractionLevel:
+#         filtered_cases = get_filtered_cases_queryset_for(
+#             organisation=organisation,
+#             abstraction_level=enum_abstraction_level,
+#             cohort=cohort,
+#         )
 
-        # For these Cases, calculate KPI value counts, grouped by specified abstraction level
-        kpi_value_counts = calculate_kpi_value_counts_queryset(
-            filtered_cases=filtered_cases,
-            abstraction_level=enum_abstraction_level,
-            kpis="all",
-        )
+#         # For these Cases, calculate KPI value counts, grouped by specified abstraction level
+#         kpi_value_counts = calculate_kpi_value_counts_queryset(
+#             filtered_cases=filtered_cases,
+#             abstraction_level=enum_abstraction_level,
+#             kpis="all",
+#         )
 
-        # Update the relevant abstraction's KPIAggregation model(s)
-        update_kpi_aggregation_model(
-            abstraction_level=enum_abstraction_level,
-            kpi_value_counts=kpi_value_counts,
-            cohort=cohort,
-        )
+#         # Update the relevant abstraction's KPIAggregation model(s)
+#         update_kpi_aggregation_model(
+#             abstraction_level=enum_abstraction_level,
+#             kpi_value_counts=kpi_value_counts,
+#             cohort=cohort,
+#         )
 
 
 def update_all_kpi_agg_models(
@@ -525,6 +512,7 @@ def update_all_kpi_agg_models(
     abstraction_levels = EnumAbstractionLevel if abstractions == "all" else abstractions
 
     for ABSTRACTION_LEVEL in abstraction_levels:
+
         kpi_value_counts = calculate_kpi_value_counts_queryset(
             filtered_cases=all_cases,
             abstraction_level=ABSTRACTION_LEVEL,
