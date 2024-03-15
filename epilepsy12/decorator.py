@@ -372,7 +372,9 @@ def login_and_otp_required():
 
             # Prevent unverified users
             if not user.is_verified():
-                logger.info("User %s is unverified. Tried accessing %s", user, view)
+                user_list = user.__dict__
+                epilepsy12_user = user_list['_wrapped']
+                logger.info("User %s is unverified. Tried accessing %s", epilepsy12_user , view.__qualname__)
                 raise PermissionDenied()
 
             return view(request, *args, **kwargs)
