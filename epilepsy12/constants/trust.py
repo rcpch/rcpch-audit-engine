@@ -241,15 +241,6 @@ TRUSTS = [
         "country": "ENGLAND"
     },
     {
-        "ods_code": "RBQ",
-        "trust_name": "LIVERPOOL HEART AND CHEST HOSPITAL NHS FOUNDATION TRUST",
-        "address_line_1": "THOMAS DRIVE",
-        "address_line_2": "",
-        "town": "LIVERPOOL",
-        "postcode": "L14 3PE",
-        "country": "ENGLAND"
-    },
-    {
         "ods_code": "RBS",
         "trust_name": "ALDER HEY CHILDREN'S NHS FOUNDATION TRUST",
         "address_line_1": "ALDER HEY HOSPITAL",
