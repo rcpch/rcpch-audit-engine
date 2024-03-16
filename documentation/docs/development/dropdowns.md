@@ -56,5 +56,4 @@ in the shell:
 
 ```console
 from epilepsy12.common_view_functions import _seed_all_aggregation_models
-_seed_all_aggregation_models()
 ```

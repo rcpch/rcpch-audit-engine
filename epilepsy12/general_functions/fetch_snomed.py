@@ -43,6 +43,8 @@ def fetch_concept(concept_id):
 
     serialised = response.json()
 
+    print(serialised)
+
     return serialised
 
 
