@@ -16,7 +16,7 @@ class EnumAbstractionLevel(Enum):
     """These are all with respect to Organisation so queries would all require e.g. organisation__ODSCode"""
 
     ORGANISATION = "ods_code"
-    TRUST = "trust__ods_code" 
+    TRUST = "trust__ods_code"
     LOCAL_HEALTH_BOARD = "local_health_board__boundary_identifier"
     ICB = "integrated_care_board__boundary_identifier"
     NHS_ENGLAND_REGION = "nhs_england_region__boundary_identifier"

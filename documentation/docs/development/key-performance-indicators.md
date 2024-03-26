@@ -444,4 +444,8 @@ This scoring system allows a child's individual score to be displayed clearly in
 
 The KPIs are final endpoint of the audit and therefore their accuracy is essential. A full suite of [tests](./testing/testing.md) is in place to ensure this is true.
 
+Note that the KPIs are only calculated for the **currently submitting** cohort *that have completed a full year of care*
+
+The KPIs are aggregated to generate totals and percentages as well as averages across different levels of abstraction - by this is meant, either at organisational level, trust/health board level, or NHS region etc.
+
 They are key part of the [reporting](reporting.md) dashboard.

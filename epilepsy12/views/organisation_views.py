@@ -198,9 +198,7 @@ def publish_kpis(request, organisation_id):
     cohort_data = dates_for_cohort(cohort)
 
     # perform aggregations and update all the KPIAggregation models only for clinicians
-    update_all_kpi_agg_models(
-        cohort=cohort_data["cohort"], open_access=True
-    )
+    update_all_kpi_agg_models(cohort=cohort_data["cohort"], open_access=True)
 
     return render(
         request=request,

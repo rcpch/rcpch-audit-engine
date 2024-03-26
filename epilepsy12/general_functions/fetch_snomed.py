@@ -1,7 +1,6 @@
 # standard imports
 import logging
 import requests
-from pprint import pprint
 
 # third party imports
 from django.conf import settings
