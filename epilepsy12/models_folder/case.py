@@ -89,7 +89,6 @@ class Case(TimeStampAbstractBaseClass, UserStampAbstractBaseClass, HelpTextMixin
         max_length=8,
         blank=True,
         null=True,
-        # validators=[validate_postcode] #TODO #490
     )
 
     ethnicity = CharField(max_length=4, choices=ETHNICITIES, blank=True, null=True)
@@ -143,19 +142,25 @@ class Case(TimeStampAbstractBaseClass, UserStampAbstractBaseClass, HelpTextMixin
     def save(self, *args, **kwargs) -> None:
         # calculate the index of multiple deprivation quintile if the postcode is present
         # Skips the calculation if the postcode is on the 'unknown' list
-        if self.postcode and not self.index_of_multiple_deprivation_quintile:
+        if self.postcode:
             if str(self.postcode).replace(" ", "") not in UNKNOWN_POSTCODES_NO_SPACES:
-                try:
-                    self.index_of_multiple_deprivation_quintile = imd_for_postcode(
-                        self.postcode
-                    )
-                except Exception as error:
-                    # Deprivation score not persisted if deprivation score server down
-                    self.index_of_multiple_deprivation_quintile = None
-                    logger.exception(
-                        f"Cannot calculate deprivation score for {self.postcode}: {error}"
-                    )
-                    pass
+                if not self.index_of_multiple_deprivation_quintile:
+                    try:
+                        self.index_of_multiple_deprivation_quintile = imd_for_postcode(
+                            self.postcode
+                        )
+                    except Exception as error:
+                        # Deprivation score not persisted if deprivation score server down
+                        self.index_of_multiple_deprivation_quintile = None
+                        logger.exception(
+                            f"Cannot calculate deprivation score for {self.postcode}: {error}"
+                        )
+                        pass
+            else:
+                # if the IMD quintile has previously been added and postcode now unknown, set
+                # index_of_multiple_deprivation_quintile back to None
+                self.index_of_multiple_deprivation_quintile = None
+
         return super().save(*args, **kwargs)
 
     def delete(self, *args, **kwargs):

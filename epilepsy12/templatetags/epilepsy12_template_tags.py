@@ -274,22 +274,6 @@ def return_case(value):
         return "Error"
 
 
-@register.filter("has_group")
-def has_group(user, group_names_string):
-    # thanks to Lucas Simon for this efficiency
-    # https://stackoverflow.com/questions/1052531/get-user-group-in-a-template
-    """
-    Check if user has permission
-    """
-    result = [x.strip() for x in group_names_string.split(",")]
-    groups = user.groups.all().values_list("name", flat=True)
-    match = False
-    for group in groups:
-        if group in result:
-            match = True
-    return match
-
-
 @register.simple_tag
 def none_masked(field):
     if field is None:

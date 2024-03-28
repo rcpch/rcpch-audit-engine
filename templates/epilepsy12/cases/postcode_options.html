@@ -22,6 +22,7 @@
               set id_postcode.value to '' then
               hide #postcode_field then 
               hide #no_postcode then 
+              add .disabled to #create_update_case_button then
               show #unknown_postcode then 
               show #add_postcode"
           >No postcode</button>
@@ -33,6 +34,7 @@
           _="on click 
             halt the event then 
             set id_postcode.value to '' then
+            remove .disabled from #create_update_case_button then
             show #postcode_field then 
             hide #unknown_postcode then 
             show #no_postcode then hide me"
