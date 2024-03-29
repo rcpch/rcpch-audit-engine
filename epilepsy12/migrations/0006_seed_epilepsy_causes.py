@@ -63,6 +63,12 @@ def seed_epilepsy_causes(apps, schema_editor):
     # Cerebral ischemic stroke due to global hypoperfusion with watershed infarct - 788882003
     # Schizencephaly (disorder) - 253159001
     # Tetrasomy 12p syndrome (disorder) - 9527009
+    # Klinefelter syndrome (disorder)	22053006
+    # Hypothalamic neuronal hamartoma (disorder)	230791000
+    # Traumatic brain injury (disorder)	127295002
+    # Angelman syndrome (disorder)	76880004
+    # Rett's disorder (disorder)	68618008
+    # Neuronal ceroid lipofuscinosis (disorder)	42012007
     extra_concept_ids = [
         764946008,
         52767006,
@@ -78,6 +84,12 @@ def seed_epilepsy_causes(apps, schema_editor):
         788882003,
         253159001,
         9527009,
+        22053006,
+        230791000,
+        127295002,
+        76880004,
+        68618008,
+        42012007
     ]
     add_epilepsy_cause_list_by_sctid(extra_concept_ids=extra_concept_ids)
 
