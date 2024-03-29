@@ -63,6 +63,27 @@ def seed_epilepsy_causes(apps, schema_editor):
     # Cerebral ischemic stroke due to global hypoperfusion with watershed infarct - 788882003
     # Schizencephaly (disorder) - 253159001
     # Tetrasomy 12p syndrome (disorder) - 9527009
+    # Klinefelter syndrome (disorder)	22053006
+    # Hypothalamic neuronal hamartoma (disorder)	230791000
+    # Traumatic brain injury (disorder)	127295002
+    # Angelman syndrome (disorder)	76880004
+    # Rett's disorder (disorder)	68618008
+    # Neuronal ceroid lipofuscinosis (disorder)	42012007
+    # UBE3A 722056009
+    # GLUT1 445252005
+    # SLC2A1 782911008
+    # MECP2 702816000
+    # SCN1A 230437002
+    # STXBP1 768666006
+    # CDKL5 773230003
+    # KCNQ2 778001003
+    # SCN2A 778002005
+    # KCNT1 no code - NOTE THIS NEEDS ADDING TO THE DATABASE MANUALLY
+    # ARX 725163002
+    # FOXG1 702450004
+    # PCDH19 888801000000105
+    # GRIN2A 770431001
+    # Dysembryoplastic neuroepithelial neoplasm of brain (disorder) 1196837008 - NOTE THIS DOES NOT EXIST IN CURRENT SNOMED TERMINOLOGY SERVER: ADD MANUALLY
     extra_concept_ids = [
         764946008,
         52767006,
@@ -78,6 +99,25 @@ def seed_epilepsy_causes(apps, schema_editor):
         788882003,
         253159001,
         9527009,
+        22053006,
+        230791000,
+        127295002,
+        76880004,
+        68618008,
+        42012007,
+        722056009,
+        445252005,
+        782911008,
+        702816000,
+        230437002,
+        768666006,
+        773230003,
+        778001003,
+        778002005,
+        725163002,
+        702450004,
+        888801000000105,
+        770431001
     ]
     add_epilepsy_cause_list_by_sctid(extra_concept_ids=extra_concept_ids)
 
