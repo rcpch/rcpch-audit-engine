@@ -530,8 +530,8 @@ class BaseKPIAggregation(BaseKPIMetrics, HelpTextMixin):
 
         sum(
             paediatrician_with_expertise_in_epilepsies_total_eligible,
-            paediatrician_with_expertise_in_epilepsies_total_ineligible,
-            paediatrician_with_expertise_in_epilepsies_total_incomplete,
+            paediatrician_with_expertise_in_epilepsies_ineligible,
+            paediatrician_with_expertise_in_epilepsies_incomplete,
             ).
         """
 
@@ -568,9 +568,7 @@ class OrganisationKPIAggregation(BaseKPIAggregation):
             Upper("abstraction_name"),
         ]
         # custom permissions for KPIAggregation class
-        permissions = [
-            CAN_PUBLISH_EPILEPSY12_DATA
-        ]
+        permissions = [CAN_PUBLISH_EPILEPSY12_DATA]
 
     def get_abstraction_level(self) -> str:
         return EnumAbstractionLevel.ORGANISATION
