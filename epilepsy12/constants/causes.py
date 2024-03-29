@@ -34,7 +34,7 @@ EPILEPSY_GENETIC_CAUSE_TYPES = (
 
 EPILEPSY_GENE_DEFECTS = (
     ("UBE", "UBE3A"),    # 722056009
-    ("GLU", "GLUT1"),
+    ("GLU", "GLUT1"),   # 445252005
     ("SLC", "SLC2A1"),  # 782911008
     ("MEC", "MECP2"),   # 702816000
     ("SCN", "SCN1A"),   # 230437002
@@ -42,13 +42,15 @@ EPILEPSY_GENE_DEFECTS = (
     ("CDK", "CDKL5"),   # 773230003
     ("KCN", "KCNQ2"),   # 778001003
     ("SCN", "SCN2A"),   # 778002005
-    ("KCN", "KCNT1"),
+    ("KCN", "KCNT1"),   # no code
     ("ARX", "ARX"),     # 725163002
     ("FOX", "FOXG1"),   # 702450004
-    ("PCD", "PCDH19"),
+    ("PCD", "PCDH19"),  # 888801000000105
     ("GRI", "GRIN2A"),  # 770431001
     ("Oth", "Other")
 )
+
+
 
 METABOLIC_CAUSES = (
     # 240096000
