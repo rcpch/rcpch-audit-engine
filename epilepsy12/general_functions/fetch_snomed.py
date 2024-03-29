@@ -1,7 +1,6 @@
 # standard imports
 import logging
 import requests
-from pprint import pprint
 
 # third party imports
 from django.conf import settings
@@ -42,8 +41,6 @@ def fetch_concept(concept_id):
         return None
 
     serialised = response.json()
-
-    print(serialised)
 
     return serialised
 
