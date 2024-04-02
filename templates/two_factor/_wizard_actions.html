@@ -1,13 +1,21 @@
 {% load i18n %}
 
 <div class="rcpch_signin_buttons_wrapper">
-  <div class='field'>
-    <button type="submit" class="ui rcpch_primary button">{% trans "Next" %}</button>
+  <div class="field">
+    <button type="submit" class="ui rcpch_primary button">
+      {% trans "Next" %}
+    </button>
   </div>
   {% if wizard.steps.prev %}
-  <div class='field'>
-    <button name="wizard_goto_step" type="submit" value="{{ wizard.steps.prev }}"
-      class="ui rcpch_grey button">Back</button>
+  <div class="field">
+    <button
+      name="wizard_goto_step"
+      type="submit"
+      value="{{ wizard.steps.prev }}"
+      class="ui rcpch_grey button"
+    >
+      Back
+    </button>
   </div>
   {% endif %}
 </div>
@@ -16,5 +24,14 @@
 {% if not wizard.steps.prev %}
 <div class="field">
   <a href="{% url 'password_reset' %}">Reset Password</a>
+  <div>
+    <p class="ui rcpch_warning message login">
+      For users of the old platform (cohort 1 - 5), you will require a new
+      username and password to access this new platform. Please contact your
+      Lead Clinician or 
+      <a href="mailto:epilepsy12@rcpch.ac.uk">epilepsy12@rcpch.ac.uk</a> 
+      for assistance.
+    </p>
+  </div>
 </div>
 {% endif %}
