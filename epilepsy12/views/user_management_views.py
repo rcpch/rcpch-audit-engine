@@ -565,7 +565,7 @@ class ResetPasswordView(SuccessMessageMixin, PasswordResetView):
         "please make sure you've entered the address you registered with, and check your spam folder."
     )
     extra_email_context= { 
-                          "reset_password_link_expires_at": datetime.now() + timedelta(seconds=settings.PASSWORD_RESET_TIMEOUT) }
+                          "reset_password_link_expires_at": datetime.now() + timedelta(seconds=int(settings.PASSWORD_RESET_TIMEOUT)) }
     success_url = reverse_lazy("index")
 
     # extend form_valid to set user.password_last_set
