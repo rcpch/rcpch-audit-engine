@@ -46,6 +46,9 @@ EMAIL_HOST_SERVER= # hostname of SMTP service
 EMAIL_HOST_USER= # username for SMTP service
 # To output emails to console, set SMTP_EMAIL_ENABLED=False
 SMTP_EMAIL_ENABLED=True # To output emails to console, set SMTP_EMAIL_ENABLED=False
+# Password reset link expires after (in seconds)
+PASSWORD_RESET_TIMEOUT=259200
+
 
 # HERMES (SNOMED CT)
 RCPCH_HERMES_SERVER_URL= # SNOMED server API URL
