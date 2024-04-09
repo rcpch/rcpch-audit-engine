@@ -16,6 +16,7 @@ from django.contrib.gis.db.models import (
 
 # E12 imports
 from epilepsy12.constants import ETHNICITIES, SEX_TYPE, EnumAbstractionLevel
+from epilepsy12.general_functions import cohorts_and_dates
 
 # Logging setup
 logger = logging.getLogger(__name__)
@@ -421,12 +422,14 @@ def update_kpi_aggregation_model(
                     defaults={
                         "abstraction_relation": abstraction_relation_instance,
                         "cohort": cohort,
+                        "open_access": False,
                         **value_count,
                     },
                     abstraction_relation=abstraction_relation_instance,
                     cohort=cohort,
                     open_access=open_access,
                 )
+                logger.info(f"updating/saving: {abstraction_relation_instance}")
             except Exception as error:
                 logger.exception(
                     f"CLOSED VIEW: Can't update/save KPIAggregations for {abstraction_level} for {abstraction_relation_instance}: {error}"
@@ -623,11 +626,11 @@ def get_all_kpi_aggregation_data_for_view(
     return ALL_DATA
 
 
-def _seed_all_aggregation_models() -> None:
-    from epilepsy12.general_functions import (
-        dates_for_cohort,
-        cohort_number_from_first_paediatric_assessment_date,
-    )
+def _seed_all_aggregation_models(cohort=None) -> None:
+    """
+    Seeds all KPIAggregation models for each level of abstraction, for requested cohort
+    If no cohort supplied, defaults to currently recruiting cohort
+    """
 
     Organisation = apps.get_model("epilepsy12", "Organisation")
     OrganisationKPIAggregation = apps.get_model(
@@ -658,7 +661,13 @@ def _seed_all_aggregation_models() -> None:
 
     NationalKPIAggregation = apps.get_model("epilepsy12", "NationalKPIAggregation")
 
-    current_cohort = cohort_number_from_first_paediatric_assessment_date(date.today())
+    if cohort:
+        requested_cohort = cohort
+    else:
+        cohort = cohorts_and_dates(
+            first_paediatric_assessment_date=date.today()
+        )  # gets current recruiting and submitting cohorts
+        requested_cohort = cohort["currently_recruiting_cohort"]
 
     all_orgs = Organisation.objects.all().distinct()
     all_trusts = Trust.objects.all().distinct()
@@ -699,7 +708,7 @@ def _seed_all_aggregation_models() -> None:
         for entity in entities:
             if AggregationModel.objects.filter(
                 abstraction_relation=entity,
-                cohort=current_cohort,
+                cohort=requested_cohort,
             ).exists():
                 logger.info(
                     f"AggregationModel for {entity} already exists. Skipping..."
@@ -708,21 +717,21 @@ def _seed_all_aggregation_models() -> None:
 
             new_agg_model = AggregationModel.objects.create(
                 abstraction_relation=entity,
-                cohort=current_cohort,
+                cohort=requested_cohort,
             )
 
             logger.info(f"Created {new_agg_model}")
 
     # National handled separately as it has no abstraction relation field
     if NationalKPIAggregation.objects.filter(
-        cohort=current_cohort,
+        cohort=requested_cohort,
     ).exists():
         logger.info(f"NationalKPIAggregation for {entity} already exists. Skipping...")
     else:
         new_agg_model = NationalKPIAggregation.objects.create(
-            cohort=current_cohort,
+            cohort=requested_cohort,
         )
-        logger.info(f"Created {new_agg_model} (Cohort {current_cohort})")
+        logger.info(f"Created {new_agg_model} (Cohort {requested_cohort})")
 
 
 def ___delete_and_recreate_all_kpi_aggregation_models():
