@@ -250,10 +250,13 @@ def calculate_kpi_value_counts_queryset(
         or abstraction_level is EnumAbstractionLevel.NHS_ENGLAND_REGION
     ):
         Case = apps.get_model("epilepsy12", "Case")
+        # must filter out any cases with no registrations else returns empty queryset
+        # when excluding welsh cases
         welsh_cases = Case.objects.filter(
             organisations__country__boundary_identifier="W92000004",
             site__site_is_actively_involved_in_epilepsy_care=True,
             site__site_is_primary_centre_of_epilepsy_care=True,
+            registration__isnull=False,
         )
 
         # Filter out Welsh Cases from the value count
@@ -264,13 +267,16 @@ def calculate_kpi_value_counts_queryset(
     # England HAS NO Local Health Boards
     if abstraction_level is EnumAbstractionLevel.LOCAL_HEALTH_BOARD:
         Case = apps.get_model("epilepsy12", "Case")
+        # must filter out cases with no registrations else returns empty queryset
+        # when excluding english cases
         english_cases = Case.objects.filter(
             organisations__country__boundary_identifier="E92000001",
             site__site_is_actively_involved_in_epilepsy_care=True,
             site__site_is_primary_centre_of_epilepsy_care=True,
+            registration__isnull=False,
         )
 
-        # Filter out Welsh Cases from the value count
+        # Filter out English Cases from the value count
         kpi_value_counts = kpi_value_counts.exclude(
             registration__id__in=english_cases.values_list("registration")
         )
@@ -538,7 +544,9 @@ def get_all_kpi_aggregation_data_for_view(
     open_access=False,
 ) -> dict:
     """
-    Aggregates all KPI data, for each level of EnumAbstractionLevel abstraction, updates the relevant AbstractionModel and returns the KPI model as a dict.
+    Pulls KPI data stored in the KPIAggregation tables, for each level of EnumAbstractionLevel abstraction,
+    updates the relevant AbstractionModel and returns the KPI model as a dict.
+
     """
     ALL_DATA = {}
     for enum_abstraction_level in EnumAbstractionLevel:
