@@ -1,4 +1,4 @@
-# Base Docker image Official Python 3.10
+# Base Docker image Official Python 3.11
 FROM python:3.11
 
 # Set 'build-time' environment variables
@@ -35,3 +35,5 @@ WORKDIR /app/
 # (Excludes any files/dirs matched by patterns in .dockerignore)
 COPY . /app/
 
+# Startup command
+ENTRYPOINT s/docker-entrypoint
