@@ -84,6 +84,7 @@ INSTALLED_APPS = [
     "django.contrib.sessions",
     "django.contrib.messages",
     "django.contrib.admindocs",
+    "django.contrib.humanize",
     "rest_framework",
     "whitenoise.runserver_nostatic",
     "django.contrib.staticfiles",
@@ -239,7 +240,7 @@ else:
     EMAIL_BACKEND = "django.core.mail.backends.console.EmailBackend"
 logger.info("EMAIL_BACKEND: %s", EMAIL_BACKEND)
 
-PASSWORD_RESET_TIMEOUT = 259200  # Default: 259200 (3 days, in seconds)
+PASSWORD_RESET_TIMEOUT = os.environ.get("PASSWORD_RESET_TIMEOUT", 259200)  # Default: 259200 (3 days, in seconds)
 
 SITE_CONTACT_EMAIL = os.environ.get("SITE_CONTACT_EMAIL")
 
