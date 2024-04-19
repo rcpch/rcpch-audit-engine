@@ -126,7 +126,9 @@ def create_registrations(verbose=True):
             return case.registration
 
 
-def create_epilepsy12_record(registration_instance, verbose=True):
+def create_epilepsy12_record(
+    registration_instance, end_date=date.today(), verbose=True
+):
     """
     Creates a full randomised record for a given registration instance.
     """
@@ -173,7 +175,9 @@ def create_epilepsy12_record(registration_instance, verbose=True):
     calculate_kpis(registration_instance=registration_instance)
 
 
-def create_first_paediatric_assessment(registration_instance, verbose=True):
+def create_first_paediatric_assessment(
+    registration_instance, end_date=date.today(), verbose=True
+):
     """
     Complete the first paediatric assessment aspect of the audit
     """
@@ -223,7 +227,9 @@ def create_epilepsy_context(registration_instance, verbose=True):
         return registration_instance.epilepsycontext
 
 
-def create_multiaxial_diagnosis(registration_instance, verbose=True):
+def create_multiaxial_diagnosis(
+    registration_instance, end_date=date.today(), verbose=True
+):
     """
     Complete the multiaxial diagnosis aspect of the audit, including episodes,
     syndromes, causes and comorbidities
@@ -256,7 +262,7 @@ def create_multiaxial_diagnosis(registration_instance, verbose=True):
         Syndrome.objects.create(
             syndrome_diagnosis_date=random_date(
                 start=registration_instance.first_paediatric_assessment_date,
-                end=date.today(),
+                end=end_date,
             ),
             syndrome=syndrome_entity,
             multiaxial_diagnosis=multiaxial_diagnosis,
@@ -264,7 +270,9 @@ def create_multiaxial_diagnosis(registration_instance, verbose=True):
 
     if multiaxial_diagnosis.epilepsy_cause_known:
         multiaxial_diagnosis.epilepsy_cause = choice(EpilepsyCause.objects.all())
-        multiaxial_diagnosis.epilepsy_cause_categories = choices(EPILEPSY_CAUSES, k = randint(1, 3))
+        multiaxial_diagnosis.epilepsy_cause_categories = choices(
+            EPILEPSY_CAUSES, k=randint(1, 3)
+        )
 
     if multiaxial_diagnosis.mental_health_issue_identified:
         multiaxial_diagnosis.mental_health_issues = [choice(NEUROPSYCHIATRIC)[0]]
@@ -279,7 +287,7 @@ def create_multiaxial_diagnosis(registration_instance, verbose=True):
                     multiaxial_diagnosis=multiaxial_diagnosis,
                     comorbidity_diagnosis_date=random_date(
                         start=registration_instance.first_paediatric_assessment_date,
-                        end=date.today(),
+                        end=end_date,
                     ),
                     comorbidityentity=random_comorbidity,
                 )
@@ -296,7 +304,7 @@ def create_multiaxial_diagnosis(registration_instance, verbose=True):
             seizure_onset_date=random_date(
                 start=registration_instance.first_paediatric_assessment_date
                 - relativedelta(months=6),
-                end=date.today(),
+                end=end_date,
             ),
             seizure_onset_date_confidence=choice(DATE_ACCURACY)[0],
             episode_definition=choice(EPISODE_DEFINITION)[0],
@@ -397,7 +405,7 @@ def create_multiaxial_diagnosis(registration_instance, verbose=True):
         return registration_instance.multiaxialdiagnosis
 
 
-def create_assessment(registration_instance, verbose=True):
+def create_assessment(registration_instance, end_date=date.today(), verbose=True):
     """
     Complete the assessment aspect of the audit, including specialist sites,
     """
@@ -416,7 +424,7 @@ def create_assessment(registration_instance, verbose=True):
         if assessment.consultant_paediatrician_referral_made:
             assessment.consultant_paediatrician_referral_date = random_date(
                 start=registration_instance.first_paediatric_assessment_date,
-                end=date.today(),
+                end=end_date,
             )
             assessment.consultant_paediatrician_input_date = (
                 assessment.consultant_paediatrician_referral_date
@@ -446,7 +454,7 @@ def create_assessment(registration_instance, verbose=True):
         if assessment.paediatric_neurologist_referral_made:
             assessment.paediatric_neurologist_referral_date = random_date(
                 start=registration_instance.first_paediatric_assessment_date,
-                end=date.today(),
+                end=end_date,
             )
             assessment.paediatric_neurologist_input_date = (
                 assessment.paediatric_neurologist_referral_date
@@ -476,7 +484,7 @@ def create_assessment(registration_instance, verbose=True):
         if assessment.childrens_epilepsy_surgical_service_referral_made:
             assessment.childrens_epilepsy_surgical_service_referral_date = random_date(
                 start=registration_instance.first_paediatric_assessment_date,
-                end=date.today(),
+                end=end_date,
             )
             assessment.childrens_epilepsy_surgical_service_input_date = (
                 assessment.childrens_epilepsy_surgical_service_referral_date
@@ -506,7 +514,7 @@ def create_assessment(registration_instance, verbose=True):
         if assessment.epilepsy_specialist_nurse_referral_made:
             assessment.epilepsy_specialist_nurse_referral_date = random_date(
                 start=registration_instance.first_paediatric_assessment_date,
-                end=date.today(),
+                end=end_date,
             )
             assessment.epilepsy_specialist_nurse_input_date = (
                 assessment.epilepsy_specialist_nurse_referral_date
@@ -521,7 +529,7 @@ def create_assessment(registration_instance, verbose=True):
         return registration_instance.assessment
 
 
-def create_investigations(registration_instance, verbose=True):
+def create_investigations(registration_instance, end_date=date.today(), verbose=True):
     """
     Complete the investigations aspect of the audit, including medications
     """
@@ -536,7 +544,7 @@ def create_investigations(registration_instance, verbose=True):
         if investigations.eeg_indicated:
             investigations.eeg_request_date = random_date(
                 start=registration_instance.first_paediatric_assessment_date,
-                end=date.today(),
+                end=end_date,
             )
             investigations.eeg_performed_date = (
                 investigations.eeg_request_date + relativedelta(weeks=randint(1, 5))
@@ -544,7 +552,7 @@ def create_investigations(registration_instance, verbose=True):
         if investigations.mri_indicated:
             investigations.mri_brain_requested_date = random_date(
                 start=registration_instance.first_paediatric_assessment_date,
-                end=date.today(),
+                end=end_date,
             )
             investigations.mri_brain_reported_date = (
                 investigations.mri_brain_requested_date
@@ -558,7 +566,7 @@ def create_investigations(registration_instance, verbose=True):
         return registration_instance.investigations
 
 
-def create_management(registration_instance, verbose=True):
+def create_management(registration_instance, end_date=date.today(), verbose=True):
     """
     Complete the management aspect of the audit, including medications
     """
@@ -581,7 +589,7 @@ def create_management(registration_instance, verbose=True):
                     is_rescue_medicine=False,
                     antiepilepsy_medicine_start_date=random_date(
                         start=registration_instance.first_paediatric_assessment_date,
-                        end=date.today(),
+                        end=end_date,
                     ),
                     antiepilepsy_medicine_risk_discussed=bool(getrandbits(1)),
                     medicine_entity=random_medicine,
@@ -622,7 +630,7 @@ def create_management(registration_instance, verbose=True):
                     is_rescue_medicine=True,
                     antiepilepsy_medicine_start_date=random_date(
                         start=registration_instance.first_paediatric_assessment_date,
-                        end=date.today(),
+                        end=end_date,
                     ),
                     antiepilepsy_medicine_risk_discussed=bool(getrandbits(1)),
                     medicine_entity=random_medicine,
@@ -635,7 +643,7 @@ def create_management(registration_instance, verbose=True):
     if management.individualised_care_plan_in_place:
         management.individualised_care_plan_date = random_date(
             start=registration_instance.first_paediatric_assessment_date,
-            end=date.today(),
+            end=end_date,
         )
         management.individualised_care_plan_has_parent_carer_child_agreement = bool(
             getrandbits(1)

@@ -62,6 +62,14 @@ class Command(BaseCommand):
             default=False,
         )
         parser.add_argument(
+            "-orgs",
+            "--organisations",
+            nargs="+",
+            type=str,
+            help="Optional parameter. List of organisations to seed cases to. If empty, a default list will be chosen.",
+            default=False,
+        )
+        parser.add_argument(
             "-sctids",
             "--snomedctids",
             nargs="+",
@@ -72,8 +80,9 @@ class Command(BaseCommand):
     def handle(self, *args, **options):
         if options["mode"] == "cases":
             cases = options["cases"]
+            organisations = options["organisations"]
             self.stdout.write("seeding with dummy case data...")
-            run_dummy_cases_seed(cases=cases)
+            run_dummy_cases_seed(cases=cases, organisation_include=organisations)
 
         elif options["mode"] == "seed_registrations":
             self.stdout.write(
@@ -106,7 +115,14 @@ class Command(BaseCommand):
             self.stdout.write("No options supplied...")
 
 
-def run_dummy_cases_seed(verbose=True, cases=50):
+def run_dummy_cases_seed(verbose=True, cases=50, organisation_include=[]):
+    """
+    takes creates number of fictional cases and divides them across different organisations
+    params:
+    cases - user can set number to seed
+    organisation_include - user can include an array of ods codes of organisations
+    verbose - activates logging
+    """
     if verbose:
         print("\033[33m", f"Seeding {cases} fictional cases...", "\033[33m")
     # there should not be any cases yet, but sometimes seed gets run more than once
@@ -128,6 +144,9 @@ def run_dummy_cases_seed(verbose=True, cases=50):
         "7A6BJ",
         "7A6AV",
     ]
+    if len(organisation_include) > 0:
+        different_organisations += organisation_include
+
     organisations_list = Organisation.objects.filter(
         ods_code__in=different_organisations
     ).order_by("name")
@@ -215,7 +234,11 @@ def complete_registrations(verbose=True, cohort=None, full_year=False):
             ):
                 # It is not possible to generate registrations that are complete as they would be in the future
                 logger.warning(
-                    "It is not possible for registrations to be complete for this cohort as they would be in the future."
+                    "It is not possible for registrations to be complete for this cohort as they would be in the future. Skipping the requirement for cases to have completed a full year of care."
+                )
+                fpa_date = random_date(
+                    start=current_cohort_data["cohort_start_date"],
+                    end=date.today(),
                 )
             else:
                 while fpa_date + relativedelta(years=1) >= date.today():
@@ -229,7 +252,11 @@ def complete_registrations(verbose=True, cohort=None, full_year=False):
         registration.eligibility_criteria_met = True
         registration.save()
 
-        create_epilepsy12_record(registration_instance=registration, verbose=verbose)
+        create_epilepsy12_record(
+            registration_instance=registration,
+            end_date=current_cohort_data["cohort_end_date"],
+            verbose=verbose,
+        )
 
 
 def image():
