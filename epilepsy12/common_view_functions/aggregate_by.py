@@ -141,7 +141,11 @@ def get_filtered_cases_queryset_for(
 ):
     """Returns queryset of current audit filtered cases within the same abstraction level.
 
-    Ensures the Case is filtered for an active, primary Site, and in the correct cohort.
+    Ensures the Case is filtered for:
+    1. an active, primary Site
+    2. in the correct cohort
+    3. has completed a full year of care
+    4. has completed a full audit return
     """
 
     cases_filter_key = f"organisations__{abstraction_level.value}"
@@ -168,6 +172,13 @@ def get_filtered_cases_queryset_for(
         site__site_is_primary_centre_of_epilepsy_care=True,
         registration__cohort=cohort,
         registration__completed_first_year_of_care_date__lte=date.today(),
+        registration__audit_progress__registration_complete=True,
+        registration__audit_progress__first_paediatric_assessment_complete=True,
+        registration__audit_progress__epilepsy_context_complete=True,
+        registration__audit_progress__assessment_complete=True,
+        registration__audit_progress__multiaxial_diagnosis_complete=True,
+        registration__audit_progress__investigations_complete=True,
+        registration__audit_progress__management_complete=True,
     )
 
     return cases
@@ -505,7 +516,7 @@ def update_all_kpi_agg_models(
     Case = apps.get_model("epilepsy12", "Case")
 
     """
-    filter all Cases at this Site where
+    filter all Cases where:
     # site is actively involved in care
     # site is lead centre
     # matched for cohort
@@ -516,6 +527,13 @@ def update_all_kpi_agg_models(
         site__site_is_primary_centre_of_epilepsy_care=True,
         registration__cohort=cohort,
         registration__completed_first_year_of_care_date__lte=date.today(),
+        registration__audit_progress__registration_complete=True,
+        registration__audit_progress__first_paediatric_assessment_complete=True,
+        registration__audit_progress__epilepsy_context_complete=True,
+        registration__audit_progress__assessment_complete=True,
+        registration__audit_progress__multiaxial_diagnosis_complete=True,
+        registration__audit_progress__investigations_complete=True,
+        registration__audit_progress__management_complete=True,
     )
 
     abstraction_levels = EnumAbstractionLevel if abstractions == "all" else abstractions
