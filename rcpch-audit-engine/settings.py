@@ -18,7 +18,6 @@ import os
 from pathlib import Path
 
 # third party imports
-from celery.schedules import crontab
 from django.core.management.utils import get_random_secret_key
 
 # RCPCH imports
@@ -85,6 +84,7 @@ INSTALLED_APPS = [
     "django.contrib.sessions",
     "django.contrib.messages",
     "django.contrib.admindocs",
+    "django.contrib.humanize",
     "rest_framework",
     "whitenoise.runserver_nostatic",
     "django.contrib.staticfiles",
@@ -150,32 +150,6 @@ AUTO_LOGOUT = {
 LOGIN_URL = "two_factor:login"  # change LOGIN_URL to the 2fa one
 LOGIN_REDIRECT_URL = "two_factor:profile"
 LOGOUT_REDIRECT_URL = "two_factor:login"
-
-# REDIS / Celery
-CELERY_BROKER_URL = os.getenv("CELERY_BROKER_URL")
-CELERY_RESULT_BACKEND = os.getenv("CELERY_RESULT_BACKEND")
-CELERY_ACCEPT_CONTENT = ["application/json"]
-CELERY_TASK_SERIALIZER = "json"
-CELERY_RESULT_SERIALIZER = "json"
-CELERY_TIMEZONE = "Europe/London"
-
-# CELERY_BEAT_SCHEDULE = {
-#     "run-daily-at-six-am": {
-#         "task": "epilepsy12.tasks.hello",
-#         "schedule": crontab(hour="6", minute=0),
-#         "options": {
-#             "expires": 15.0,
-#         },
-#     },
-#     "run-ever-10-seconds": {
-#         "task": "epilepsy12.tasks.hello",
-#         "schedule": 10,
-#         "options": {
-#             "expires": 15.0,
-#         },
-#     },
-
-# }
 
 TEMPLATES = [
     {
@@ -266,7 +240,7 @@ else:
     EMAIL_BACKEND = "django.core.mail.backends.console.EmailBackend"
 logger.info("EMAIL_BACKEND: %s", EMAIL_BACKEND)
 
-PASSWORD_RESET_TIMEOUT = 259200  # Default: 259200 (3 days, in seconds)
+PASSWORD_RESET_TIMEOUT = os.environ.get("PASSWORD_RESET_TIMEOUT", 259200)  # Default: 259200 (3 days, in seconds)
 
 SITE_CONTACT_EMAIL = os.environ.get("SITE_CONTACT_EMAIL")
 

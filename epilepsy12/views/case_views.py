@@ -29,8 +29,10 @@ from ..decorator import (
 
 from django.conf import settings
 
-from ..general_functions import construct_transfer_epilepsy12_site_outcome_email
-from ..tasks import asynchronously_send_email_to_recipients
+from ..general_functions import (
+    construct_transfer_epilepsy12_site_outcome_email,
+    send_email_to_recipients,
+)
 
 # Logging setup
 logger = logging.getLogger(__name__)
@@ -82,6 +84,7 @@ def case_list(request, organisation_id):
                         Q(first_name__icontains=filter_term)
                         | Q(surname__icontains=filter_term)
                         | Q(nhs_number__icontains=filter_term)
+                        | Q(id__icontains=filter_term)
                     )
                 )
                 .order_by("surname")
@@ -107,6 +110,7 @@ def case_list(request, organisation_id):
                         Q(first_name__icontains=filter_term)
                         | Q(surname__icontains=filter_term)
                         | Q(nhs_number__icontains=filter_term)
+                        | Q(id__icontains=filter_term)
                     )
                 )
                 .order_by("surname")
@@ -122,6 +126,7 @@ def case_list(request, organisation_id):
                         Q(first_name__icontains=filter_term)
                         | Q(surname__icontains=filter_term)
                         | Q(nhs_number__icontains=filter_term)
+                        | Q(id__icontains=filter_term)
                     )
                 )
                 .order_by("surname")
@@ -498,9 +503,7 @@ def transfer_response(request, organisation_id, case_id, organisation_response):
         recipients = [settings.SITE_CONTACT_EMAIL]
         subject = f"Epilepsy12 Lead Site Transfer {outcome}  - NO LEAD CLINICIAN"
 
-    asynchronously_send_email_to_recipients.delay(
-        recipients=recipients, subject=subject, message=email
-    )
+    send_email_to_recipients(recipients=recipients, subject=subject, message=email)
 
     return HttpResponseClientRedirect(
         reverse("cases", kwargs={"organisation_id": organisation_id})

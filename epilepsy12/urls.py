@@ -368,9 +368,7 @@ global_htmx_trigger_patterns = [
         "registration/<int:case_id>/registration_active/<str:active_template>",
         view=registration_active,
         name="registration_active",
-    ),
-    path("download_select", download_select, name="download_select"),
-    path("<str:model_name>/download", download, name="download"),
+    )
 ]
 
 first_paediatric_assessment_patterns = [

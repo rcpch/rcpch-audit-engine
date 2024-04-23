@@ -16,6 +16,7 @@ Organisation.objects.exclude(
 # python imports
 import pytest
 from datetime import date
+from unittest.mock import patch
 
 # 3rd party imports
 from django.db.models import Count
@@ -24,9 +25,7 @@ from django.db.models import Count
 from epilepsy12.common_view_functions import (
     get_filtered_cases_queryset_for,
 )
-from epilepsy12.models import (
-    Organisation,
-)
+from epilepsy12.models import Organisation, Registration
 from epilepsy12.constants import (
     EnumAbstractionLevel,
 )
@@ -38,14 +37,26 @@ from .helpers import _clean_cases_from_test_db, _register_cases_in_organisation
     "abstraction_level, ODSCodes, expected_count",
     [
         (EnumAbstractionLevel.ORGANISATION, ("RGT01", "7A6AV"), (10, 10)),
-        (EnumAbstractionLevel.TRUST, ("RP401", "RP416", "7A6AV"), (20, 20, 0)), # Welsh have no Trust
-        (EnumAbstractionLevel.LOCAL_HEALTH_BOARD, ("RP401", "RP416", "7A6AV"), (0, 0, 10)), # English have no LHB
-        (EnumAbstractionLevel.ICB, ("RGT01", "RGN90", "7A6AV"), (20, 20, 0)), # Welsh have no ICB
+        (
+            EnumAbstractionLevel.TRUST,
+            ("RP401", "RP416", "7A6AV"),
+            (20, 20, 0),
+        ),  # Welsh have no Trust
+        (
+            EnumAbstractionLevel.LOCAL_HEALTH_BOARD,
+            ("RP401", "RP416", "7A6AV"),
+            (0, 0, 10),
+        ),  # English have no LHB
+        (
+            EnumAbstractionLevel.ICB,
+            ("RGT01", "RGN90", "7A6AV"),
+            (20, 20, 0),
+        ),  # Welsh have no ICB
         (
             EnumAbstractionLevel.NHS_ENGLAND_REGION,
             ("RGT01", "RGN90", "7A6AV"),
             (20, 20, 0),
-        ), # Welsh have no NHS_ENGLAND_REGION
+        ),  # Welsh have no NHS_ENGLAND_REGION
         (EnumAbstractionLevel.OPEN_UK, ("RGT01", "RGN90", "7A6AV"), (20, 20, 10)),
         (EnumAbstractionLevel.COUNTRY, ("RGT01", "RGN90", "7A6AV"), (20, 20, 10)),
         (EnumAbstractionLevel.NATIONAL, ("RGT01", "RGN90", "7A6AV"), (30, 30, 30)),
@@ -59,7 +70,7 @@ def test_get_filtered_cases_queryset_for_returns_correct_count(
     e12_case_factory,
 ):
     """Testing the `get_filtered_cases_queryset_for` returns the correct expected_count for filtered cases.
-
+    Not the mocked first paediatric assessment date is 1/1/23 so all will have completed their first year of care
     For each abstraction, 20 Cases are registered in the same abstraction level (all English organisations, split between 2 organisations), and 10 Cases in Wales - so should be excluded from agg counts.
     """
 
@@ -106,6 +117,37 @@ def test_get_filtered_cases_queryset_includes_only_specified_cohort(
         organisations__organisation=org,
         first_name=f"temp_{org.name}",
         registration__first_paediatric_assessment_date=date(2021, 1, 1),
+    )
+
+    for abstraction_level in EnumAbstractionLevel:
+        output_filtered_cases = get_filtered_cases_queryset_for(
+            abstraction_level=abstraction_level, cohort=6, organisation=org
+        )
+
+        assert 0 == output_filtered_cases.count()
+
+
+@patch.object(Registration, "get_current_date", return_value=date(2024, 3, 1))
+@pytest.mark.django_db
+def test_get_filtered_cases_queryset_includes_only_specified_cohort_that_have_completed_one_full_year(
+    e12_case_factory,
+):
+    """Testing the `get_filtered_cases_queryset_for` function ignores kids who are from same `cohort` but did not complete 1y. Here, all test kids are part of Cohort 6, but none have completed 1 y."""
+
+    # Ensure Case db empty for this test
+    _clean_cases_from_test_db()
+
+    # Cohort 6 includes patients who had a first assessment between 1 December 2022 and 30 November 2023. Patients will then complete their first year of care between 1 December 2023 to 30 November 2024.
+
+    # Generate test cases
+    org = Organisation.objects.get(ods_code="RGT01")
+    e12_case_factory.create_batch(
+        10,
+        organisations__organisation=org,
+        first_name=f"temp_{org.name}",
+        registration__first_paediatric_assessment_date=date(
+            2023, 8, 1
+        ),  # cohort 6 (1/12/22-30/11/23): end of first year of care therefore 1/8/24: mocked date of 1/3/24 therefore before completion of 1y of care
     )
 
     for abstraction_level in EnumAbstractionLevel:

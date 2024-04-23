@@ -1,33 +1,33 @@
 /* message styling */
 
 .ui.rcpch_dark_blue.message {
-    background-color: var(--rcpch_dark_blue);
-    color: #fff;
-  }
-  
-  .info.circle.icon {
-    color: #fff;
-  }
-  
-  .ui.rcpch_lightest_blue.message {
-    background-color: var(--rcpch_light_blue_tint2);
-    color: var(--rcpch_black);
-  }
-  
-  .ui.rcpch_light_blue.message {
-    background-color: var(--rcpch_light_blue);
-    color: #fff;
-  }
-  
-  .ui.rcpch_light_grey.message {
-    background-color: var(--rcpch_light_grey);
-  }
-  
-  .ui.rcpch_lightest_grey.message {
-    background-color: var(--rcpch_lightest_grey);
-  }
+  background-color: var(--rcpch_dark_blue);
+  color: #fff;
+}
 
-  /* rcpch message */
+.info.circle.icon {
+  color: #fff;
+}
+
+.ui.rcpch_lightest_blue.message {
+  background-color: var(--rcpch_light_blue_tint2);
+  color: var(--rcpch_black);
+}
+
+.ui.rcpch_light_blue.message {
+  background-color: var(--rcpch_light_blue);
+  color: #fff;
+}
+
+.ui.rcpch_light_grey.message {
+  background-color: var(--rcpch_light_grey);
+}
+
+.ui.rcpch_lightest_grey.message {
+  background-color: var(--rcpch_lightest_grey);
+}
+
+/* rcpch message */
 
 .ui.rcpch_info.message {
   border-radius: 0%;
@@ -110,4 +110,8 @@
   /* margin-top: -1em; */
   border-radius: 0%;
   box-shadow: 0em 0em 0em 1px rgba(113, 89, 170, 0.15) inset;
+}
+
+.ui.rcpch_warning.message.login {
+  margin-top: 20px;
 }

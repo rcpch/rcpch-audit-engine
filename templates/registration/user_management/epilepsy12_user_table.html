@@ -170,7 +170,7 @@
                 {% elif epilepsy12_user.email_confirmed and not epilepsy12_user.is_active %}
                     <i 
                         class="red close icon"
-                        id="{{epilepsy12_user.id}}_inactive_icon"
+                        id="{{epilepsy12_user.id}}_is_inactive_icon"
                         data-title="User status"
                         data-content="{{epilepsy12_user}} is an inactive user."
                         data-position="top left"
@@ -222,7 +222,7 @@
                     
                     <button 
                         data-tooltip="Edit {{epilepsy12_user}}'s details."
-                        {% if perms.epilepsy12.change_epilepsy12user %}
+                        {% if perms.epilepsy12.change_epilepsy12user and epilepsy12_user.is_active %}
                             class="ui rcpch_primary icon button" 
                         {% else %}
                             class="ui rcpch_primary icon disabled button" 
@@ -234,8 +234,8 @@
                     </button>
                     
                     <button 
-                        data-tooltip='Delete {{epilepsy12_user}}. This is irreversible.' 
-                        {% if perms.epilepsy12.delete_epilepsy12user and epilepsy12_user.email != user.email %}
+                        data-tooltip='Deactivate {{epilepsy12_user}}.' 
+                        {% if perms.epilepsy12.delete_epilepsy12user and epilepsy12_user.email != user.email  and epilepsy12_user.is_active %}
                             class="ui rcpch_danger icon button" 
                         {% else %}
                             class="ui rcpch_danger icon disabled button" 
@@ -248,13 +248,13 @@
                             halt the event
                             call Swal.fire({
                                 title: 'Confirmation Required',
-                                text: 'Are you sure you want to delete {{epilepsy12_user}}? This is an irreversible step.',
+                                text: 'Are you sure you want to deactivate {{epilepsy12_user}}?',
                                 icon: 'warning',
                                 iconColor: '#e00087',
                                 showCancelButton: true,
                                 confirmButtonColor: '#11a7f2',
                                 cancelButtonColor: '#e60700',
-                                confirmButtonText: 'Delete {{epilepsy12_user}}'
+                                confirmButtonText: 'Deactivate {{epilepsy12_user}}'
                             })
                             if result.isConfirmed issueRequest()"
                     >
@@ -262,7 +262,7 @@
                     </button>
                     
                     <button
-                        {% if perms.epilepsy12.view_logs %}
+                        {% if perms.epilepsy12.view_logs and epilepsy12_user.is_active %}
                             class='ui rcpch_light_blue icon right floated button'
                         {% else %}
                             class='ui rcpch_light_blue icon right floated disabled button'
