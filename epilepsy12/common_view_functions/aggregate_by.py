@@ -782,6 +782,33 @@ def ___delete_and_recreate_all_kpi_aggregation_models():
 
     _seed_all_aggregation_models()
 
+def create_kpi_report_row(key, measure, kpi, aggregation_row):
+    ret = {
+        "Measure": measure,
+        "Percentage": 0,
+        "Numerator": 0,
+        "Denominator": 0
+    }
+
+    if aggregation_row:
+        numerator = aggregation_row[f"{kpi}_passed"]
+        denominator = aggregation_row[f"{kpi}_total_eligible"]
+
+        if numerator is None:
+            logger.info(f"Missing numerator for {key} {measure} {kpi}")
+        
+        if denominator is None:
+            logger.info(f"Missing denominator for {key} {measure} {kpi}")
+        
+        ret["Numerator"] = numerator
+        ret["Denominator"] = denominator
+
+        # Make sure we don't divide by zero
+        if denominator != 0:
+            ret["Percentage"] = (numerator / denominator) * 100
+    
+    return ret
+
 def create_KPI_aggregation_dataframe(KPI_model1, constants_list1, cohort, measures, measures_titles, KPI_model2=None, constants_list2=None, is_regional=False):
         '''
         INPUTS:
@@ -849,130 +876,34 @@ def create_KPI_aggregation_dataframe(KPI_model1, constants_list1, cohort, measur
             for key in objects:
                 object = objects[key]
                 for index, kpi in enumerate(measures):
-                    # Catch empty entries
-                    if object == None:
-                        item = {
-                            title: key,
-                            "Measure": measures_titles[index],
-                            "Percentage": 0,
-                            "Numerator": 0,
-                            "Denominator": 0,
-                        }
-                    # Catch Zero Division Errors
-                    elif object[f"{kpi}_total_eligible"] == 0:
-                        item = {
-                            title: key,
-                            "Measure": measures_titles[index],
-                            "Percentage": 0,
-                            "Numerator": object[f"{kpi}_passed"],
-                            "Denominator": object[f"{kpi}_total_eligible"],
-                        }
-                    else:
-                        item = {
-                            title: key,
-                            "Measure": measures_titles[index],
-                            "Percentage": object[f"{kpi}_passed"]
-                            / object[f"{kpi}_total_eligible"]
-                            * 100,
-                            "Numerator": object[f"{kpi}_passed"],
-                            "Denominator": object[f"{kpi}_total_eligible"],
-                        }
+                    item = create_kpi_report_row(key, measures_titles[index], kpi, object)
+                    item[title] = key
                     final_list.append(item)  
         
         # Group organisation body by KPI, then add to dataframe - collect all values relating to KPI 1 across all organisation bodies, add to dataframe, repeat for next KPI
-
         else:
             for index, kpi in enumerate(measures):
                 if is_regional:
-                    # Catch Zero Division Errors
-                    if wales_region_object[f"{kpi}_total_eligible"] == 0:
-                        item = {
-                        "NHSregionMeasure": "Health Boards" + measures_titles[index],
-                        title: "Health Boards",
-                        "Measure": measures_titles[index],
-                        "Percentage": 0,
-                        "Numerator": wales_region_object[f"{kpi}_passed"],
-                        "Denominator": wales_region_object[f"{kpi}_total_eligible"],
-                        }
-                    else:
-                        item = {
-                            "NHSregionMeasure": "Health Boards" + measures_titles[index],
-                            title: "Health Boards",
-                            "Measure": measures_titles[index],
-                            "Percentage": wales_region_object[f"{kpi}_passed"]
-                            / wales_region_object[f"{kpi}_total_eligible"]
-                            * 100,
-                            "Numerator": wales_region_object[f"{kpi}_passed"],
-                            "Denominator": wales_region_object[f"{kpi}_total_eligible"],
-                        }
+                    measure_title = measures_titles[index]
+                    item = create_kpi_report_row("wales", measure_title, kpi, wales_region_object)
+                    item["NHSregionMeasure"]: f"Health Boards{measure_title}"
+                    item[title] = "Health Boards"
                     final_list.append(item)
                 for key in objects:
                     object = objects[key]
+                    measure_title = measures_titles[index]
+
                     if ((constants_list1 == INTEGRATED_CARE_BOARDS) or 
                         (constants_list1 == NHS_ENGLAND_REGIONS) or 
                         (constants_list1 == OPEN_UK_NETWORKS) or 
                         (constants_list1 == TRUSTS)):
-                        # Catch empty entries
-                        if object == None:
-                            item = {
-                                title + "Measure": key + measures_titles[index],
-                                title: key,
-                                "Measure": measures_titles[index],
-                                "Percentage": 0,
-                                "Numerator": 0,
-                                "Denominator": 0,
-                            }
-                        # Catch zero division errors
-                        elif object[f"{kpi}_total_eligible"] == 0:
-                            item = {
-                                title + "Measure": key + measures_titles[index],
-                                title: key,
-                                "Measure": measures_titles[index],
-                                "Percentage": 0,
-                                "Numerator": object[f"{kpi}_passed"],
-                                "Denominator": object[f"{kpi}_total_eligible"],
-                            }
-                        else:
-                            item = {
-                                title + "Measure": key + measures_titles[index],
-                                title: key,
-                                "Measure": measures_titles[index],
-                                "Percentage": object[f"{kpi}_passed"]
-                                / object[f"{kpi}_total_eligible"]
-                                * 100,
-                                "Numerator": object[f"{kpi}_passed"],
-                                "Denominator": object[f"{kpi}_total_eligible"],
-                            }
+                        item = create_kpi_report_row(key, measure_title, kpi, object)
+                        item[f"{title}Measure"] = f"{key}{measure_title}"
+                        item[title] = key
                         final_list.append(item) 
                     else:
-                        # Catch empty entries
-                        if object == None:
-                            item = {
-                                title: key,
-                                "Measure": measures_titles[index],
-                                "Percentage": 0,
-                                "Numerator": 0,
-                                "Denominator": 0,
-                            }
-                        # Catch zero division errors
-                        elif object[f"{kpi}_total_eligible"] == 0:
-                            item = {
-                                title: key,
-                                "Measure": measures_titles[index],
-                                "Percentage": 0,
-                                "Numerator": object[f"{kpi}_passed"],
-                                "Denominator": object[f"{kpi}_total_eligible"],
-                            }
-                        else:
-                            item = {
-                                title: key,
-                                "Measure": measures_titles[index],
-                                "Percentage": object[f"{kpi}_passed"]
-                                / object[f"{kpi}_total_eligible"]
-                                * 100,
-                                "Numerator": object[f"{kpi}_passed"],
-                                "Denominator": object[f"{kpi}_total_eligible"],
-                            }
+                        item = create_kpi_report_row(key, measure_title, kpi, object)
+                        item[title] = key
                         final_list.append(item) 
 
         
