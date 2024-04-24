@@ -1,0 +1,33 @@
+{% extends "base.html" %} {% load static %} {% load epilepsy12_template_tags %}
+{% csrf_token %} {% block content %}
+<div class="ui rcpch container main_content">
+  <h1>KPI downloading for E12 team</h1>
+  <p>
+    KPIs are re-aggregated everytime a user enters their organisation's summary
+    page. This ensures that the aggregations are as up to date as possible. The
+    aggregate data itself can be calculated for different levels of location -
+    from organisationally to nationally.
+  </p>
+  <h2>Structure of the KPI report</h2>
+  <p>
+    The KPI report is a single page and provides a summary of all the Key Performance Indicators for England and Wales.
+  </p>
+  <span class="ui buttons">
+    <div id="kpi_download_button">
+        <a href="{% url 'kpi_download_file' %}">
+          <button 
+            class="ui rcpch_positive button jump"
+          >
+          Download most recent KPI report
+        </button>
+        </a>
+    </div>
+    <div id="organisation_return" class="ui rcpch_grey button bold">
+        <a href="{% url 'selected_organisation_summary' organisation_id=organisation_id %}">
+          Return to Organisation View
+        </a>
+    </div>
+  </span>
+</div>
+
+{% endblock content %}
