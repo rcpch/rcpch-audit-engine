@@ -884,27 +884,10 @@ def create_KPI_aggregation_dataframe(KPI_model1, constants_list1, cohort, measur
         else:
             for index, kpi in enumerate(measures):
                 if is_regional:
-                    # Catch Zero Division Errors
-                    if wales_region_object[f"{kpi}_total_eligible"] == 0:
-                        item = {
-                        "NHSregionMeasure": "Health Boards" + measures_titles[index],
-                        title: "Health Boards",
-                        "Measure": measures_titles[index],
-                        "Percentage": 0,
-                        "Numerator": wales_region_object[f"{kpi}_passed"],
-                        "Denominator": wales_region_object[f"{kpi}_total_eligible"],
-                        }
-                    else:
-                        item = {
-                            "NHSregionMeasure": "Health Boards" + measures_titles[index],
-                            title: "Health Boards",
-                            "Measure": measures_titles[index],
-                            "Percentage": wales_region_object[f"{kpi}_passed"]
-                            / wales_region_object[f"{kpi}_total_eligible"]
-                            * 100,
-                            "Numerator": wales_region_object[f"{kpi}_passed"],
-                            "Denominator": wales_region_object[f"{kpi}_total_eligible"],
-                        }
+                    measure_title = measures_titles[index]
+                    item = create_kpi_report_row("wales", measure_title, kpi, wales_region_object)
+                    item["NHSregionMeasure"]: f"Health Boards{measure_title}"
+                    item[title] = "Health Boards"
                     final_list.append(item)
                 for key in objects:
                     object = objects[key]
