@@ -1,6 +1,5 @@
 # Python imports
 from datetime import date
-import asyncio
 
 # third party libraries
 from django.shortcuts import render
