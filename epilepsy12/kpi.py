@@ -6,8 +6,8 @@ import pandas as pd
 
 # E12 Imports
 from epilepsy12.constants import EnumAbstractionLevel, TRUSTS, LOCAL_HEALTH_BOARDS, INTEGRATED_CARE_BOARDS, NHS_ENGLAND_REGIONS, OPEN_UK_NETWORKS, OPEN_UK_NETWORKS_TRUSTS, INTEGRATED_CARE_BOARDS_LOCAL_AUTHORITIES
-from epilepsy12.common_view_functions.aggregate_by import create_KPI_aggregation_dataframe, create_reference_dataframe
-
+from epilepsy12.common_view_functions.aggregate_by import create_KPI_aggregation_dataframe, create_reference_dataframe, create_kpi_report_row
+    
 def download_kpi_summary_as_csv(cohort):
     """
     Asynchronous task to pull data from KPIAggregation tables and store as dataframe for export as CSV
@@ -123,16 +123,10 @@ def download_kpi_summary_as_csv(cohort):
 
     final_list = []
     for index, kpi in enumerate(measures):
-        item = {
-            "ukMeasure": "England and Wales" + measures_titles[index],
-            "uk": "England and Wales",
-            "Measure": measures_titles[index],
-            "Percentage": national_kpi_aggregation[f"{kpi}_passed"]
-            / national_kpi_aggregation[f"{kpi}_total_eligible"]
-            * 100,
-            "Numerator": national_kpi_aggregation[f"{kpi}_passed"],
-            "Denominator": national_kpi_aggregation[f"{kpi}_total_eligible"],
-        }
+        measure_title = measures_titles[index]
+        item = create_kpi_report_row("national", measure_title, kpi, national_kpi_aggregation)
+        item["ukMeasure"] = f"England and Wales{measure_title}"
+        item["uk"]: "England and Wales"
         final_list.append(item)
 
     national_df = pd.DataFrame.from_dict(final_list)
