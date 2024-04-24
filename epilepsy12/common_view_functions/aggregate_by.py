@@ -785,27 +785,24 @@ def ___delete_and_recreate_all_kpi_aggregation_models():
 def create_kpi_report_row(key, measure, kpi, aggregation_row):
     ret = {
         "Measure": measure,
-        "Percentage": 0,
-        "Numerator": 0,
-        "Denominator": 0
     }
 
     if aggregation_row:
         numerator = aggregation_row[f"{kpi}_passed"]
         denominator = aggregation_row[f"{kpi}_total_eligible"]
 
+        if numerator is not None and denominator is not None:
+            ret["Numerator"] = numerator
+            ret["Denominator"] = denominator
+
+            # Make sure we don't divide by zero
+            ret["Percentage"] = 0 if denominator == 0 else (numerator / denominator) * 100
+
         if numerator is None:
             logger.info(f"Missing numerator for {key} {measure} {kpi}")
         
         if denominator is None:
             logger.info(f"Missing denominator for {key} {measure} {kpi}")
-        
-        ret["Numerator"] = numerator
-        ret["Denominator"] = denominator
-
-        # Make sure we don't divide by zero
-        if denominator != 0:
-            ret["Percentage"] = (numerator / denominator) * 100
     
     return ret
 
