@@ -22,6 +22,7 @@ pandas==2.2.1
 phonenumbers==8.13.31
 psycopg2-binary==2.9.9
 whitenoise==6.6.0
+openpyxl==3.1.2
 
 ## graphing
 plotly==5.19.0

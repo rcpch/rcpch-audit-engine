@@ -15,11 +15,25 @@ from django.contrib.gis.db.models import (
 )
 
 # E12 imports
-from epilepsy12.constants import ETHNICITIES, SEX_TYPE, EnumAbstractionLevel
+from epilepsy12.constants import (
+    ETHNICITIES, 
+    SEX_TYPE, 
+    EnumAbstractionLevel, 
+    LOCAL_HEALTH_BOARDS, 
+    TRUSTS, 
+    INTEGRATED_CARE_BOARDS, 
+    NHS_ENGLAND_REGIONS,
+    OPEN_UK_NETWORKS,
+    OPEN_UK_NETWORKS_TRUSTS
+)
 from epilepsy12.general_functions import cohorts_and_dates
 
 # Logging setup
 logger = logging.getLogger(__name__)
+
+# Third party imports
+
+import pandas as pd
 
 """
 Reporting
@@ -767,3 +781,198 @@ def ___delete_and_recreate_all_kpi_aggregation_models():
         aggregation_model.objects.all().delete()
 
     _seed_all_aggregation_models()
+
+def create_kpi_report_row(key, measure, kpi, aggregation_row):
+    ret = {
+        "Measure": measure,
+    }
+
+    if aggregation_row:
+        numerator = aggregation_row[f"{kpi}_passed"]
+        denominator = aggregation_row[f"{kpi}_total_eligible"]
+
+        if numerator is not None and denominator is not None:
+            ret["Numerator"] = numerator
+            ret["Denominator"] = denominator
+
+            # Make sure we don't divide by zero
+            ret["Percentage"] = 0 if denominator == 0 else (numerator / denominator) * 100
+
+        if numerator is None:
+            logger.info(f"Missing numerator for {key} {measure} {kpi}")
+        
+        if denominator is None:
+            logger.info(f"Missing denominator for {key} {measure} {kpi}")
+    
+    return ret
+
+def create_KPI_aggregation_dataframe(KPI_model1, constants_list1, cohort, measures, measures_titles, KPI_model2=None, constants_list2=None, is_regional=False):
+        '''
+        INPUTS:
+        - KPI_model1, KPI_model2: a KPI aggregation model specific to the organisation body (ie trust, health board, NHSregion
+        - constants_list1, constants_list2: list of names of the organisation bodies stored in E12 ( ie trusts, ICBs)
+        - cohort: which cohort of cases to perform the aggregations on
+        - measures: which KPI measures to calculate
+        - is_regional: a special case to workaround the non-existent 'Health Board' NHS region. Gets set True only when creating a dataframe for the NHS regional level.
+
+        BODY: Computes dataframe of KPI aggregations at specified organisation levl.
+
+        OUTPUTS: Returns dataframe containing KPI measures
+        '''
+
+        # Define models
+        model_aggregation1 = apps.get_model("epilepsy12", KPI_model1)
+        model_aggregation_2 = None
+        wales_region_object = None
+
+        # Set condiitonal model if KPI_model2==True or is_regional==True
+        if KPI_model2:
+            model_aggregation_2 = apps.get_model("epilepsy12", KPI_model2)
+        if is_regional:
+            model_aggregation_2 = apps.get_model("epilepsy12", "CountryKPIAggregation")
+            wales_region_object = model_aggregation_2.objects.filter(cohort=cohort, abstraction_relation=4, open_access=False).values().first()
+
+        # Extract relevant value from each organisation body in each item, to be used as a label as per the template from the E12 team (Issue 791)
+        objects = {}
+
+        for i, body in enumerate(constants_list1):
+            if (constants_list1 == LOCAL_HEALTH_BOARDS):
+                key = body["ods_code"]
+            elif (constants_list1 == INTEGRATED_CARE_BOARDS):
+                key = body["name"]
+            elif (constants_list1 == NHS_ENGLAND_REGIONS):
+                key = body["NHS_ENGLAND_REGION_NAME"]
+            elif (constants_list1 == OPEN_UK_NETWORKS):
+                key = body["OPEN_UK_Network_Code"]
+            uid = i+1
+            objects[key] = model_aggregation1.objects.filter(cohort=cohort, abstraction_relation=uid, open_access=False).values().first()
+
+        if model_aggregation_2:
+            if constants_list2 == TRUSTS:
+                for i, body in enumerate(constants_list2):
+                    key = body["ods_code"]
+                    uid = i+1
+                    objects[key] = model_aggregation_2.objects.filter(cohort=cohort, abstraction_relation=uid, open_access=False).values().first()
+        
+        # Create list containing dictionary items from which final dataframe will be created
+        final_list = []
+
+        # Saves organisation type to be used as column name in each sheet
+
+        if (constants_list1 == LOCAL_HEALTH_BOARDS):
+            title = "HBT"
+        elif (constants_list1 == INTEGRATED_CARE_BOARDS):
+            title = "ICB"
+        elif (constants_list1 == NHS_ENGLAND_REGIONS):
+            title = "NHSregion"
+        elif (constants_list1 == OPEN_UK_NETWORKS):
+            title = "Network"
+
+        # Group KPIs by Trust, and add to dataframe - ie collect all KPIs for a specific trust, then add to dataframe
+        if constants_list2 == TRUSTS:
+            for key in objects:
+                object = objects[key]
+                for index, kpi in enumerate(measures):
+                    item = create_kpi_report_row(key, measures_titles[index], kpi, object)
+                    item[title] = key
+                    final_list.append(item)  
+        
+        # Group organisation body by KPI, then add to dataframe - collect all values relating to KPI 1 across all organisation bodies, add to dataframe, repeat for next KPI
+        else:
+            for index, kpi in enumerate(measures):
+                if is_regional:
+                    measure_title = measures_titles[index]
+                    item = create_kpi_report_row("wales", measure_title, kpi, wales_region_object)
+                    item["NHSregionMeasure"]: f"Health Boards{measure_title}"
+                    item[title] = "Health Boards"
+                    final_list.append(item)
+                for key in objects:
+                    object = objects[key]
+                    measure_title = measures_titles[index]
+
+                    if ((constants_list1 == INTEGRATED_CARE_BOARDS) or 
+                        (constants_list1 == NHS_ENGLAND_REGIONS) or 
+                        (constants_list1 == OPEN_UK_NETWORKS) or 
+                        (constants_list1 == TRUSTS)):
+                        item = create_kpi_report_row(key, measure_title, kpi, object)
+                        item[f"{title}Measure"] = f"{key}{measure_title}"
+                        item[title] = key
+                        final_list.append(item) 
+                    else:
+                        item = create_kpi_report_row(key, measure_title, kpi, object)
+                        item[title] = key
+                        final_list.append(item) 
+
+        
+        return pd.DataFrame.from_dict(final_list)
+
+def create_reference_dataframe(trusts, health_boards, networks, icbs):
+    '''
+    INPUTS:
+    - trusts: TRUSTS should be passed in. Contains a list of trust objects
+    - health_boards: LOCAL_HEALTH_BOARDS should be passed in. Contains a list of local health board objects
+    - networks: OPEN_UK_NETWORK_TRUSTS should be passed in. Contains a list of trusts and their ods codes
+    - icbs: INTEGRATED_CARE_BOARDS_LOCAL_AUTHORITIES should be passed in. Contains a list of ICBs, with their trusts and ods codes
+
+    BODY - Create Reference sheet containing all trusts and health boards with their respective networks, ods codes, countries, NHS regions and ICBs
+
+    OUTPUT - Dataframe containing list of trusts and health boards and their organisational relationships; columns specified as HBT, HBT_name, Network, Country, UK, NHSregion and ICB
+    '''
+
+    final_list = []
+
+    # For Welsh health boards - create row with HBT, HBT_name, Network, Country, UK, NHSregion and ICB as the column names
+    for health_board in health_boards:
+        ods_code = health_board["ods_code"]
+        health_board_name = health_board["health_board"]
+        network_name = ""
+
+        for network in networks:
+            if ods_code == network["ods trust code"]:
+                network_name = network["OPEN UK Network Code"]
+    
+        item = {
+                "HBT": ods_code,
+                "HBT_name": health_board_name,
+                "Network": network_name,
+                "Country": "Wales",
+                "UK": "England and Wales",
+                "NHSregion": "",
+                "ICB": ""
+        }
+        
+        final_list.append(item)
+
+    # For the English Trusts - create row with HBT, HBT_name, Network, Country, UK, NHSregion and ICB as the column names
+    for trust in trusts:
+        ods_code = trust["ods_code"]
+        trust_name = trust["trust_name"]
+        network_name = ""
+        region = ""
+        icb = ""
+
+        for network in networks:
+            if ods_code == network["ods trust code"]:
+                network_name = network["OPEN UK Network Code"]
+        
+        for board in icbs:
+            if ods_code == board["ODS Trust Code"]:
+                icb = board["ICB Name"]
+                region = board["NHS England Region"]
+                if region == "Midlands (Y60)":
+                    region = "Midlands"
+        
+        item = {
+            "HBT": ods_code,
+            "HBT_name": trust_name,
+            "Network": network_name,
+            "Country": "England",
+            "UK": "England and Wales",
+            "NHSregion": region,
+            "ICB": icb
+        }
+
+        final_list.append(item)
+
+    return pd.DataFrame.from_dict(final_list)
+        

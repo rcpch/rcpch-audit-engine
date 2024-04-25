@@ -5,6 +5,12 @@
     {% include 'epilepsy12/partials/selected_organisation_summary.html' with organisation_list=organisation_list selected_organisation=selected_organisation organisation_list=organisation_list cases_aggregated_by_ethnicity=cases_aggregated_by_ethnicity cases_aggregated_by_sex=cases_aggregated_by_sex cases_aggregated_by_deprivation=cases_aggregated_by_deprivation percent_completed_registrations=percent_completed_registrations total_registrations=total_registrations total_cases=total_cases cohort_data=cohort_data total_referred_to_neurology=total_referred_to_neurology total_referred_to_surgery=total_referred_to_surgery %}
   </div>
 
+  {% if request.user.epilepsy12_audit_team_full_access %}
+    <div class="row" id="frida_button">
+      {% include 'epilepsy12/partials/frida_button.html' with model_list=model_list selected_model=selected_model %}
+    </div>
+  {% endif %}
+
 </div>
 
 {% endblock content %}

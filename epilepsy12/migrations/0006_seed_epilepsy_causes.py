@@ -84,6 +84,9 @@ def seed_epilepsy_causes(apps, schema_editor):
     # PCDH19 888801000000105
     # GRIN2A 770431001
     # Dysembryoplastic neuroepithelial neoplasm of brain (disorder) 1196837008 - NOTE THIS DOES NOT EXIST IN CURRENT SNOMED TERMINOLOGY SERVER: ADD MANUALLY
+    # Cavernous hemangioma (disorder) SCTID: 416824008
+    # Chromosome 11p13 deletion syndrome (disorder) SCTID: 715215007
+
     extra_concept_ids = [
         764946008,
         52767006,
@@ -117,7 +120,9 @@ def seed_epilepsy_causes(apps, schema_editor):
         725163002,
         702450004,
         888801000000105,
-        770431001
+        770431001,
+        416824008,
+        715215007,
     ]
     add_epilepsy_cause_list_by_sctid(extra_concept_ids=extra_concept_ids)
 

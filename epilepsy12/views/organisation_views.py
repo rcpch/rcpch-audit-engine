@@ -5,7 +5,10 @@ from datetime import date
 from django.shortcuts import render
 from django.urls import reverse
 from django.contrib.auth.decorators import permission_required
+from django.http import HttpResponse
+
 from django_htmx.http import HttpResponseClientRedirect
+import pandas as pd
 
 # E12 imports
 from ..decorator import user_may_view_this_organisation, login_and_otp_required
@@ -29,7 +32,7 @@ from ..general_functions import (
     value_from_key,
     cohorts_and_dates,
 )
-
+from ..kpi import download_kpi_summary_as_csv
 from epilepsy12.common_view_functions.aggregate_by import update_all_kpi_agg_models
 
 
@@ -424,3 +427,40 @@ def view_preference(request, organisation_id, template_name):
     return HttpResponseClientRedirect(
         reverse(template_name, kwargs={"organisation_id": organisation.pk})
     )
+
+
+@login_and_otp_required()
+@permission_required("epilepsy12.can_publish_epilepsy12_data")
+def kpi_download(request, organisation_id):
+    """
+    GET: Loads the page necessary for downloading KPIs
+    """
+
+    context = {"organisation_id": organisation_id}
+
+    template_name = "epilepsy12/partials/kpis/kpi_download.html"
+
+    return render(request=request, template_name=template_name, context=context)
+
+
+@login_and_otp_required()
+@permission_required("epilepsy12.can_publish_epilepsy12_data")
+def kpi_download_file(request):
+
+    country_df, trust_hb_df, icb_df, region_df, network_df, national_df, reference_df = download_kpi_summary_as_csv(cohort=6)
+
+    with pd.ExcelWriter('kpi_export.xlsx') as writer:
+        country_df.to_excel(writer, sheet_name="Country_level", index=False)
+        trust_hb_df.to_excel(writer, sheet_name="HBT_level", index=False)
+        icb_df.to_excel(writer, sheet_name="ICB_level", index=False)
+        region_df.to_excel(writer, sheet_name="NHSregion_level", index=False)
+        network_df.to_excel(writer, sheet_name="Network_level", index=False)
+        national_df.to_excel(writer, sheet_name="National_level", index=False)
+        reference_df.to_excel(writer, sheet_name="Reference", index=False)
+
+    with open("kpi_export.xlsx", "rb") as file:
+        excel_data = file.read()
+
+    response = HttpResponse(excel_data, content_type="application/vnd.openxmlformats-officedocument.spreadsheetml.sheet")
+    response["Content-Disposition"] = "attachment; filename=kpi_export.xlsx"
+    return response
