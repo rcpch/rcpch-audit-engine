@@ -106,6 +106,8 @@ def calculate_kpis(registration_instance):
     if has_all_attributes(
         registration_instance, ["multiaxialdiagnosis", "investigations"]
     ):
+
+        registration_instance.investigations.mri_indicated = True
         mri = score_kpi_5(registration_instance, age_at_first_paediatric_assessment)
 
     if hasattr(registration_instance, "multiaxialdiagnosis"):
