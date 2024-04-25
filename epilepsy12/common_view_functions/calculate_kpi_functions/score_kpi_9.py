@@ -120,6 +120,10 @@ def score_kpi_9Aiii(registration_instance) -> int:
 
     management = registration_instance.management
 
+    # unscored measure if plan not in place is still a fail
+    if management.individualised_care_plan_in_place is False:
+        return KPI_SCORE["FAIL"]
+
     # unscored
     if management.has_individualised_care_plan_been_updated_in_the_last_year is None:
         return KPI_SCORE["NOT_SCORED"]
