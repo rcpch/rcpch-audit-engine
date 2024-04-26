@@ -69,30 +69,17 @@ def download_kpi_summary_as_csv(cohort):
 
     final_list = []
     for index, kpi in enumerate(measures):
-        item = {
-            "CountryMeasure": "England" + measures_titles[index],
-            "Country": "England",
-            "Measure": measures_titles[index],
-            "Percentage": 0 if england_kpi_aggregation[f"{kpi}_total_eligible"] == 0 else
-                england_kpi_aggregation[f"{kpi}_passed"]
-                / england_kpi_aggregation[f"{kpi}_total_eligible"]
-                * 100,
-            "Numerator": england_kpi_aggregation[f"{kpi}_passed"],
-            "Denominator": england_kpi_aggregation[f"{kpi}_total_eligible"],
-        }
-        final_list.append(item)
-        item = {
-        "CountryMeasure": "Wales" + measures_titles[index],
-        "Country": "Wales",
-        "Measure": measures_titles[index],
-        "Percentage": 0 if wales_kpi_aggregation[f"{kpi}_total_eligible"] == 0 else
-            wales_kpi_aggregation[f"{kpi}_passed"]
-            / wales_kpi_aggregation[f"{kpi}_total_eligible"]
-            * 100,
-        "Numerator": wales_kpi_aggregation[f"{kpi}_passed"],
-        "Denominator": wales_kpi_aggregation[f"{kpi}_total_eligible"],
-        }
-        final_list.append(item)
+        measure_title = measures_titles[index]
+        
+        england_row = create_kpi_report_row(
+            "england", measure_title, kpi, england_kpi_aggregation
+        )
+        wales_row = create_kpi_report_row(
+            "wales", measure_title, kpi, wales_kpi_aggregation
+        )
+
+        final_list.append(england_row)
+        final_list.append(wales_row)
 
     country_df = pd.DataFrame.from_dict(final_list)
 
