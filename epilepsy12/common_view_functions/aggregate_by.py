@@ -185,22 +185,24 @@ def get_filtered_cases_queryset_for(
     ):
         cases = Case.objects.filter(
             **abstraction_filter,
-            site__organisation__country="E92000001",
-            site__site_is_actively_involved_in_epilepsy_care=True,
-            site__site_is_primary_centre_of_epilepsy_care=True,
-            registration__cohort=cohort,
-            registration__completed_first_year_of_care_date__lte=date.today(),
+            site__organisation__country__boundary_identifier="E92000001",
+            # site__site_is_actively_involved_in_epilepsy_care=True,
+            # site__site_is_primary_centre_of_epilepsy_care=True,
+            # registration__cohort=cohort,
+            # registration__completed_first_year_of_care_date__lte=date.today(),
         )
     else:
         cases = Case.objects.filter(
             **abstraction_filter,
-            site__organisation__country="W92000004",
+            site__organisation__country__boundary_identifier="W92000004",
             site__site_is_actively_involved_in_epilepsy_care=True,
             site__site_is_primary_centre_of_epilepsy_care=True,
             registration__cohort=cohort,
             registration__completed_first_year_of_care_date__lte=date.today(),
         )
 
+    print("hello world")
+    print(cases.count())
     return cases
 
 
@@ -399,9 +401,17 @@ def update_kpi_aggregation_model(
 
         if open_access:
             # for public view: create a new record
+
             value_count["abstraction_relation"] = abstraction_relation_instance
             value_count["cohort"] = cohort
             value_count["open_access"] = open_access
+
+            if abstraction_relation_instance is None:
+                logger.warning(
+                    f"Abstraction code{ABSTRACTION_CODE} affects this model: {AbstractionKPIAggregationModel}"
+                )
+                return
+
             try:
                 new_obj = AbstractionKPIAggregationModel.objects.create(**value_count)
                 logger.debug(f"created {new_obj}")
@@ -413,6 +423,11 @@ def update_kpi_aggregation_model(
 
         else:
             # not for public view - create or update existing
+            if abstraction_relation_instance is None:
+                logger.warning(
+                    f"Abstraction code{ABSTRACTION_CODE} is None. Skipping this model: {AbstractionKPIAggregationModel}"
+                )
+                return
             try:
                 (
                     new_obj,
@@ -470,6 +485,44 @@ def update_kpi_aggregation_model(
 #         )
 
 
+def filter_completed_cases_at_one_year_by_abstraction_level(
+    abstraction_level: EnumAbstractionLevel, cohort: int
+):
+    """
+    Filters all cases for a given abstraction level and cohort
+    Cases returned are for all children registered at lead sites actively involve in care, a full year has been completed and all cases have been fully scored.
+    """
+    Case = apps.get_model("epilepsy12", "Case")
+    if abstraction_level == EnumAbstractionLevel.NATIONAL:
+        abstraction_filter = None
+    # elif abstraction_level == EnumAbstractionLevel.ORGANISATION:
+    #     print(f"callesd {abstraction_level.name}")
+    #     abstraction_filter = {f"site__organisation__ods_code__isnull": False}
+    else:
+        abstraction_filter = {
+            f"site__organisation__{abstraction_level.value}__isnull": False
+        }
+
+    all_cases = Case.objects.filter(
+        site__site_is_actively_involved_in_epilepsy_care=True,
+        site__site_is_primary_centre_of_epilepsy_care=True,
+        registration__id__isnull=False,
+        registration__cohort=cohort,
+        registration__completed_first_year_of_care_date__lte=date.today(),
+        registration__audit_progress__registration_complete=True,
+        registration__audit_progress__first_paediatric_assessment_complete=True,
+        registration__audit_progress__assessment_complete=True,
+        registration__audit_progress__epilepsy_context_complete=True,
+        registration__audit_progress__multiaxial_diagnosis_complete=True,
+        registration__audit_progress__investigations_complete=True,
+        registration__audit_progress__management_complete=True,
+    )
+
+    if abstraction_filter:
+        return all_cases.filter(**abstraction_filter)
+    return all_cases
+
+
 def update_all_kpi_agg_models(
     cohort: int,
     abstractions: Union[Literal["all"], list[EnumAbstractionLevel]] = "all",
@@ -484,6 +537,7 @@ def update_all_kpi_agg_models(
         `cohort` - cohort filter for Cases
         `abstraction` (optional, default='all') - specify abstraction level(s) to update. Provide list of EnumAbstractionLevel values if required.
     """
+
     if (abstractions != "all") and not isinstance(abstractions, list):
         raise ValueError(
             'Can only be string literal "all" or list of EnumAbstraction values'
@@ -495,25 +549,50 @@ def update_all_kpi_agg_models(
                 "If providing list, all items must be EnumAbstraction values"
             )
 
-    Case = apps.get_model("epilepsy12", "Case")
+    # Case = apps.get_model("epilepsy12", "Case")
 
     """
-    filter all Cases at this Site where
+    filter all Cases for all sites where
     # site is actively involved in care
     # site is lead centre
     # matched for cohort
     # have completed a full year of epilepsy care
     """
-    all_cases = Case.objects.filter(
-        site__site_is_actively_involved_in_epilepsy_care=True,
-        site__site_is_primary_centre_of_epilepsy_care=True,
-        registration__cohort=cohort,
-        registration__completed_first_year_of_care_date__lte=date.today(),
-    )
+    # all_cases = Case.objects.filter(
+    #     site__site_is_actively_involved_in_epilepsy_care=True,
+    #     site__site_is_primary_centre_of_epilepsy_care=True,
+    #     registration__cohort=cohort,
+    #     registration__completed_first_year_of_care_date__lte=date.today(),
+    # )
 
     abstraction_levels = EnumAbstractionLevel if abstractions == "all" else abstractions
 
     for ABSTRACTION_LEVEL in abstraction_levels:
+
+        # if (
+        #     ABSTRACTION_LEVEL is EnumAbstractionLevel.ICB
+        #     or ABSTRACTION_LEVEL is EnumAbstractionLevel.TRUST
+        #     or ABSTRACTION_LEVEL is EnumAbstractionLevel.NHS_ENGLAND_REGION
+        # ):
+        #     all_cases = Case.objects.filter(
+        #         site__organisation__country__boundary_identifier="E92000001",
+        #         site__site_is_actively_involved_in_epilepsy_care=True,
+        #         site__site_is_primary_centre_of_epilepsy_care=True,
+        #         registration__cohort=cohort,
+        #         registration__completed_first_year_of_care_date__lte=date.today(),
+        #     )
+        # elif (ABSTRACTION_LEVEL is EnumAbstractionLevel.LOCAL_HEALTH_BOARD):
+        #     all_cases = Case.objects.filter(
+        #         site__organisation__country__boundary_identifier="W92000004",
+        #         site__site_is_actively_involved_in_epilepsy_care=True,
+        #         site__site_is_primary_centre_of_epilepsy_care=True,
+        #         registration__cohort=cohort,
+        #         registration__completed_first_year_of_care_date__lte=date.today(),
+        #     )
+
+        all_cases = filter_completed_cases_at_one_year_by_abstraction_level(
+            abstraction_level=ABSTRACTION_LEVEL, cohort=cohort
+        )
 
         kpi_value_counts = calculate_kpi_value_counts_queryset(
             filtered_cases=all_cases,
