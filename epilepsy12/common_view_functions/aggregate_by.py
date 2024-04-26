@@ -39,6 +39,9 @@ import pandas as pd
 Reporting
 """
 
+"""
+Aggregations for pie charts
+"""
 
 def cases_aggregated_by_sex(selected_organisation):
     # aggregate queries on trust level cases
@@ -134,77 +137,71 @@ def cases_aggregated_by_ethnicity(selected_organisation):
     return cases_aggregated_by_ethnicity
 
 
-def get_abstraction_value_from(organisation, abstraction_level: EnumAbstractionLevel):
-    """For the given abstraction level, will call getattr until the final object's value is returned.
-
-    If attribute can't be found, default return is None. E.g. Welsh hospitals will not have an ICB Code.
+"""
+Filter cases, run aggregations and store results in KPIAggregation models - there is one for each cohort and one for each level of abstraction
+"""
+def update_all_kpi_agg_models(
+    cohort: int,
+    abstractions: Union[Literal["all"], list[EnumAbstractionLevel]] = "all",
+    open_access=False,
+) -> None:
     """
-    if abstraction_level is EnumAbstractionLevel.NATIONAL:
+    Using all cases in a given cohort,
+        for all abstraction levels | specified `abstractions`,
+            aggregate kpi scores and update that abstraction's KPIAggregation model
+
+    Args:
+        `cohort` - cohort filter for Cases
+        `abstraction` (optional, default='all') - specify abstraction level(s) to update. Provide list of EnumAbstractionLevel values if required.
+    """
+
+    if (abstractions != "all") and not isinstance(abstractions, list):
         raise ValueError(
-            "EnumAbstractionLevel.NATIONAL should not be used with this function."
+            'Can only be string literal "all" or list of EnumAbstraction values'
         )
 
-    return_object = organisation
-    for attribute in abstraction_level.value.split("__"):
-        return_object = getattr(return_object, attribute, None)
-    return return_object
+    if isinstance(abstractions, list):
+        if not all(isinstance(item, EnumAbstractionLevel) for item in abstractions):
+            raise ValueError(
+                "If providing list, all items must be EnumAbstraction values"
+            )
 
+    abstraction_levels = EnumAbstractionLevel if abstractions == "all" else abstractions
 
-def get_filtered_cases_queryset_for(
-    abstraction_level: EnumAbstractionLevel, organisation, cohort: int
-):
-    """Returns queryset of current audit filtered cases within the same abstraction level.
+    for ABSTRACTION_LEVEL in abstraction_levels:
+        """
+        Loop through each level of abstraction
+        
+        For each level of of abstraction:
 
-    Ensures the Case is filtered for an active, primary Site, and in the correct cohort.
-    """
+        filter all Cases for all sites where
+        # site is actively involved in care
+        # site is lead centre
+        # matched for cohort
+        # have completed a full year of epilepsy care
+        """
 
-    cases_filter_key = f"organisations__{abstraction_level.value}"
-
-    Case = apps.get_model("epilepsy12", "Case")
-
-    # This should just be all cases so no filtering based on code
-    if abstraction_level is EnumAbstractionLevel.NATIONAL:
-        abstraction_filter = {}
-    else:
-        abstraction_key = get_abstraction_value_from(
-            organisation, abstraction_level=abstraction_level
+        all_cases = filter_completed_cases_at_one_year_by_abstraction_level(
+            abstraction_level=ABSTRACTION_LEVEL, cohort=cohort
         )
 
-        # Some organisations have null values for abstraction e.g. Welsh Orgs don't have ICBs; English orgs don't have  LHBs. Therefore, should return no Cases
-        if abstraction_key is None:
-            return Case.objects.none()
+        """
+        calculate the totals for each KPI
+        """
 
-        abstraction_filter = {cases_filter_key: abstraction_key}
-
-    # filter out Welsh cases if England, or English cases if Wales
-
-    if (
-        abstraction_level is EnumAbstractionLevel.ICB
-        or abstraction_level is EnumAbstractionLevel.TRUST
-        or abstraction_level is EnumAbstractionLevel.NHS_ENGLAND_REGION
-    ):
-        cases = Case.objects.filter(
-            **abstraction_filter,
-            site__organisation__country__boundary_identifier="E92000001",
-            # site__site_is_actively_involved_in_epilepsy_care=True,
-            # site__site_is_primary_centre_of_epilepsy_care=True,
-            # registration__cohort=cohort,
-            # registration__completed_first_year_of_care_date__lte=date.today(),
+        kpi_value_counts = calculate_kpi_value_counts_queryset(
+            filtered_cases=all_cases,
+            abstraction_level=ABSTRACTION_LEVEL,
+            kpis="all",
         )
-    else:
-        cases = Case.objects.filter(
-            **abstraction_filter,
-            site__organisation__country__boundary_identifier="W92000004",
-            site__site_is_actively_involved_in_epilepsy_care=True,
-            site__site_is_primary_centre_of_epilepsy_care=True,
-            registration__cohort=cohort,
-            registration__completed_first_year_of_care_date__lte=date.today(),
+        
+        # Update all KPIAggregation models for abstraction
+        update_kpi_aggregation_model(
+            abstraction_level=ABSTRACTION_LEVEL,
+            kpi_value_counts=kpi_value_counts,
+            cohort=cohort,
+            open_access=open_access,
         )
-
-    print("hello world")
-    print(cases.count())
-    return cases
-
 
 def calculate_kpi_value_counts_queryset(
     filtered_cases,
@@ -262,7 +259,7 @@ def calculate_kpi_value_counts_queryset(
         kpi_value_counts = KPI.objects.filter(
             registration__id__in=filtered_cases.values_list("registration")
         ).aggregate(**aggregate_queries)
-    else:
+    elif abstraction_level in [EnumAbstractionLevel.COUNTRY, EnumAbstractionLevel.NHS_ENGLAND_REGION, EnumAbstractionLevel.OPEN_UK, EnumAbstractionLevel.ICB, EnumAbstractionLevel.TRUST, EnumAbstractionLevel.ORGANISATION, EnumAbstractionLevel.LOCAL_HEALTH_BOARD]:
         kpi_value_counts = (
             KPI.objects.filter(
                 registration__id__in=filtered_cases.values_list("registration")
@@ -275,56 +272,11 @@ def calculate_kpi_value_counts_queryset(
                 f"organisation__{abstraction_level.value}"
             )  # To ensure order is always as expected
         )
+    else:
+        logger.exception(f"abstraction_level is {abstraction_level}, which would generate an abnormal kpi_value_count. Skipping...")
+        return
 
     return kpi_value_counts
-
-
-def get_abstraction_model_from_level(
-    enum_abstraction_level: EnumAbstractionLevel,
-) -> dict:
-    """Returns dict, for abstraction, of structure:
-
-    {
-        "kpi_aggregation_model": abstractionKPIAggregation model name (str),
-        "abstraction_entity_model": that KPIAggregation's abstraction_relation entity model's name (str)
-    }
-    """
-    abstraction_model_map = {
-        EnumAbstractionLevel.ORGANISATION: {
-            "kpi_aggregation_model": "OrganisationKPIAggregation",
-            "abstraction_entity_model": "Organisation",
-        },
-        EnumAbstractionLevel.TRUST: {
-            "kpi_aggregation_model": "TrustKPIAggregation",
-            "abstraction_entity_model": "Trust",
-        },
-        EnumAbstractionLevel.LOCAL_HEALTH_BOARD: {
-            "kpi_aggregation_model": "LocalHealthBoardKPIAggregation",
-            "abstraction_entity_model": "LocalHealthBoard",
-        },
-        EnumAbstractionLevel.ICB: {
-            "kpi_aggregation_model": "ICBKPIAggregation",
-            "abstraction_entity_model": "IntegratedCareBoard",
-        },
-        EnumAbstractionLevel.NHS_ENGLAND_REGION: {
-            "kpi_aggregation_model": "NHSEnglandRegionKPIAggregation",
-            "abstraction_entity_model": "NHSEnglandRegion",
-        },
-        EnumAbstractionLevel.OPEN_UK: {
-            "kpi_aggregation_model": "OpenUKKPIAggregation",
-            "abstraction_entity_model": "OPENUKNetwork",
-        },
-        EnumAbstractionLevel.COUNTRY: {
-            "kpi_aggregation_model": "CountryKPIAggregation",
-            "abstraction_entity_model": "Country",
-        },
-        EnumAbstractionLevel.NATIONAL: {
-            "kpi_aggregation_model": "NationalKPIAggregation",
-            "abstraction_entity_model": "Country",
-        },
-    }
-    return abstraction_model_map[enum_abstraction_level]
-
 
 def update_kpi_aggregation_model(
     abstraction_level: EnumAbstractionLevel,
@@ -364,27 +316,32 @@ def update_kpi_aggregation_model(
                 },
             )
             logger.debug(f"created {new_obj}")
+            return
 
         else:
-            new_obj, created = NationalKPIAggregation.objects.update_or_create(
-                defaults={
-                    "cohort": cohort,
-                    "open_access": open_access,
-                    **kpi_value_counts,
-                },
-                cohort=cohort,
-                open_access=open_access,
-            )
+            try:
+                new_obj, created = NationalKPIAggregation.objects.update_or_create(
+                    defaults={
+                        "cohort": cohort,
+                        "open_access": open_access,
+                        **kpi_value_counts,
+                    },
+                    cohort=cohort,
+                    open_access=open_access,
+                )
+                if created:
+                    logger.debug(f"created {new_obj}")
+                else:
+                    logger.debug(f"updated {new_obj}")
+            except Exception as error:
+                logger.exception(f"Unable to save National KPIAggregation: {error}")
 
-            if created:
-                logger.debug(f"created {new_obj}")
-            else:
-                logger.debug(f"updated {new_obj}")
-
-        return None
+        return
 
     for value_count in kpi_value_counts:
         ABSTRACTION_CODE = value_count.pop(f"organisation__{abstraction_level.value}")
+        if ABSTRACTION_CODE is None:
+            return
 
         # Get the model field name for the given abstraction model. As the enum values are all with respect to Organisation, this split and grab last gets just that related model's related field.
         related_key_field = abstraction_level.value.split("__")[-1]
@@ -405,13 +362,7 @@ def update_kpi_aggregation_model(
             value_count["abstraction_relation"] = abstraction_relation_instance
             value_count["cohort"] = cohort
             value_count["open_access"] = open_access
-
-            if abstraction_relation_instance is None:
-                logger.warning(
-                    f"Abstraction code{ABSTRACTION_CODE} affects this model: {AbstractionKPIAggregationModel}"
-                )
-                return
-
+            
             try:
                 new_obj = AbstractionKPIAggregationModel.objects.create(**value_count)
                 logger.debug(f"created {new_obj}")
@@ -423,11 +374,6 @@ def update_kpi_aggregation_model(
 
         else:
             # not for public view - create or update existing
-            if abstraction_relation_instance is None:
-                logger.warning(
-                    f"Abstraction code{ABSTRACTION_CODE} is None. Skipping this model: {AbstractionKPIAggregationModel}"
-                )
-                return
             try:
                 (
                     new_obj,
@@ -455,49 +401,19 @@ def update_kpi_aggregation_model(
             else:
                 logger.debug(f"updated {new_obj}")
 
-
-# def aggregate_kpis_update_models_all_abstractions_for_organisation(
-#     organisation,
-#     cohort: int,
-# ) -> None:
-#     """
-#     Aggregates all KPI data, for each level of EnumAbstractionLevel abstraction, updates the relevant AbstractionModel. Returns None.
-#     """
-#     for enum_abstraction_level in EnumAbstractionLevel:
-#         filtered_cases = get_filtered_cases_queryset_for(
-#             organisation=organisation,
-#             abstraction_level=enum_abstraction_level,
-#             cohort=cohort,
-#         )
-
-#         # For these Cases, calculate KPI value counts, grouped by specified abstraction level
-#         kpi_value_counts = calculate_kpi_value_counts_queryset(
-#             filtered_cases=filtered_cases,
-#             abstraction_level=enum_abstraction_level,
-#             kpis="all",
-#         )
-
-#         # Update the relevant abstraction's KPIAggregation model(s)
-#         update_kpi_aggregation_model(
-#             abstraction_level=enum_abstraction_level,
-#             kpi_value_counts=kpi_value_counts,
-#             cohort=cohort,
-#         )
-
-
 def filter_completed_cases_at_one_year_by_abstraction_level(
     abstraction_level: EnumAbstractionLevel, cohort: int
 ):
     """
     Filters all cases for a given abstraction level and cohort
     Cases returned are for all children registered at lead sites actively involve in care, a full year has been completed and all cases have been fully scored.
+
+    NOTE: this step is used as a filter query prior to performing aggregations and persisting results in the KPIAggregations tables
     """
     Case = apps.get_model("epilepsy12", "Case")
     if abstraction_level == EnumAbstractionLevel.NATIONAL:
+        # no filters required for National level data
         abstraction_filter = None
-    # elif abstraction_level == EnumAbstractionLevel.ORGANISATION:
-    #     print(f"callesd {abstraction_level.name}")
-    #     abstraction_filter = {f"site__organisation__ods_code__isnull": False}
     else:
         abstraction_filter = {
             f"site__organisation__{abstraction_level.value}__isnull": False
@@ -523,91 +439,78 @@ def filter_completed_cases_at_one_year_by_abstraction_level(
     return all_cases
 
 
-def update_all_kpi_agg_models(
-    cohort: int,
-    abstractions: Union[Literal["all"], list[EnumAbstractionLevel]] = "all",
-    open_access=False,
-) -> None:
-    """
-    Using all cases in a given cohort,
-        for all abstraction levels | specified `abstractions`,
-            aggregate kpi scores and update that abstraction's KPIAggregation model
+"""
+Get KPIAggregation data from tables
+"""
 
-    Args:
-        `cohort` - cohort filter for Cases
-        `abstraction` (optional, default='all') - specify abstraction level(s) to update. Provide list of EnumAbstractionLevel values if required.
+def get_filtered_cases_queryset_for(
+    abstraction_level: EnumAbstractionLevel, organisation, cohort: int
+):
+    """Returns queryset of current audit filtered cases within the same abstraction level.
+
+    Ensures the Case is filtered for an active, primary Site, and in the correct cohort, and all cases are completely scored and have completed a full year of care
+    NOTE as this is confusing. It is NOT used in any aggregation calculation steps prior to updating KPIAggregation models. It is only used to pull existing data from KPIAggregation tables
+    It is also used in the test suite.
     """
 
-    if (abstractions != "all") and not isinstance(abstractions, list):
-        raise ValueError(
-            'Can only be string literal "all" or list of EnumAbstraction values'
+    cases_filter_key = f"organisations__{abstraction_level.value}"
+
+    Case = apps.get_model("epilepsy12", "Case")
+
+    # This should just be all cases so no filtering based on code
+    if abstraction_level is EnumAbstractionLevel.NATIONAL:
+        abstraction_filter = {}
+    else:
+        abstraction_key = get_abstraction_value_from(
+            organisation, abstraction_level=abstraction_level
         )
 
-    if isinstance(abstractions, list):
-        if not all(isinstance(item, EnumAbstractionLevel) for item in abstractions):
-            raise ValueError(
-                "If providing list, all items must be EnumAbstraction values"
-            )
+        # Some organisations have null values for abstraction e.g. Welsh Orgs don't have ICBs; English orgs don't have  LHBs. Therefore, should return no Cases
+        if abstraction_key is None:
+            return Case.objects.none()
 
-    # Case = apps.get_model("epilepsy12", "Case")
+        abstraction_filter = {cases_filter_key: abstraction_key}
 
-    """
-    filter all Cases for all sites where
-    # site is actively involved in care
-    # site is lead centre
-    # matched for cohort
-    # have completed a full year of epilepsy care
-    """
-    # all_cases = Case.objects.filter(
-    #     site__site_is_actively_involved_in_epilepsy_care=True,
-    #     site__site_is_primary_centre_of_epilepsy_care=True,
-    #     registration__cohort=cohort,
-    #     registration__completed_first_year_of_care_date__lte=date.today(),
-    # )
+    # filter out Welsh cases if England, or English cases if Wales
 
-    abstraction_levels = EnumAbstractionLevel if abstractions == "all" else abstractions
-
-    for ABSTRACTION_LEVEL in abstraction_levels:
-
-        # if (
-        #     ABSTRACTION_LEVEL is EnumAbstractionLevel.ICB
-        #     or ABSTRACTION_LEVEL is EnumAbstractionLevel.TRUST
-        #     or ABSTRACTION_LEVEL is EnumAbstractionLevel.NHS_ENGLAND_REGION
-        # ):
-        #     all_cases = Case.objects.filter(
-        #         site__organisation__country__boundary_identifier="E92000001",
-        #         site__site_is_actively_involved_in_epilepsy_care=True,
-        #         site__site_is_primary_centre_of_epilepsy_care=True,
-        #         registration__cohort=cohort,
-        #         registration__completed_first_year_of_care_date__lte=date.today(),
-        #     )
-        # elif (ABSTRACTION_LEVEL is EnumAbstractionLevel.LOCAL_HEALTH_BOARD):
-        #     all_cases = Case.objects.filter(
-        #         site__organisation__country__boundary_identifier="W92000004",
-        #         site__site_is_actively_involved_in_epilepsy_care=True,
-        #         site__site_is_primary_centre_of_epilepsy_care=True,
-        #         registration__cohort=cohort,
-        #         registration__completed_first_year_of_care_date__lte=date.today(),
-        #     )
-
-        all_cases = filter_completed_cases_at_one_year_by_abstraction_level(
-            abstraction_level=ABSTRACTION_LEVEL, cohort=cohort
+    if (
+        abstraction_level is EnumAbstractionLevel.ICB
+        or abstraction_level is EnumAbstractionLevel.TRUST
+        or abstraction_level is EnumAbstractionLevel.NHS_ENGLAND_REGION
+    ):
+        cases = Case.objects.filter(
+            **abstraction_filter,
+            site__organisation__country__boundary_identifier="E92000001",
+            site__site_is_actively_involved_in_epilepsy_care=True,
+            site__site_is_primary_centre_of_epilepsy_care=True,
+            registration__cohort=cohort,
+            registration__completed_first_year_of_care_date__lte=date.today(),
+            registration__audit_progress__registration_complete=True,
+            registration__audit_progress__first_paediatric_assessment_complete=True,
+            registration__audit_progress__assessment_complete=True,
+            registration__audit_progress__epilepsy_context_complete=True,
+            registration__audit_progress__multiaxial_diagnosis_complete=True,
+            registration__audit_progress__investigations_complete=True,
+            registration__audit_progress__management_complete=True,
+        )
+    else:
+        cases = Case.objects.filter(
+            **abstraction_filter,
+            site__organisation__country__boundary_identifier="W92000004",
+            site__site_is_actively_involved_in_epilepsy_care=True,
+            site__site_is_primary_centre_of_epilepsy_care=True,
+            registration__cohort=cohort,
+            registration__completed_first_year_of_care_date__lte=date.today(),
+            registration__audit_progress__registration_complete=True,
+            registration__audit_progress__first_paediatric_assessment_complete=True,
+            registration__audit_progress__assessment_complete=True,
+            registration__audit_progress__epilepsy_context_complete=True,
+            registration__audit_progress__multiaxial_diagnosis_complete=True,
+            registration__audit_progress__investigations_complete=True,
+            registration__audit_progress__management_complete=True,
         )
 
-        kpi_value_counts = calculate_kpi_value_counts_queryset(
-            filtered_cases=all_cases,
-            abstraction_level=ABSTRACTION_LEVEL,
-            kpis="all",
-        )
-
-        # Update all KPIAggregation models for abstraction
-        update_kpi_aggregation_model(
-            abstraction_level=ABSTRACTION_LEVEL,
-            kpi_value_counts=kpi_value_counts,
-            cohort=cohort,
-            open_access=open_access,
-        )
-
+    return cases
 
 def get_all_kpi_aggregation_data_for_view(
     organisation,
@@ -705,7 +608,102 @@ def get_all_kpi_aggregation_data_for_view(
 
     return ALL_DATA
 
+"""
+Helper functions
+"""
+def get_abstraction_value_from(organisation, abstraction_level: EnumAbstractionLevel):
+    """For the given abstraction level, will call getattr until the final object's value is returned.
 
+    If attribute can't be found, default return is None. E.g. Welsh hospitals will not have an ICB Code.
+    """
+    if abstraction_level is EnumAbstractionLevel.NATIONAL:
+        raise ValueError(
+            "EnumAbstractionLevel.NATIONAL should not be used with this function."
+        )
+
+    return_object = organisation
+    for attribute in abstraction_level.value.split("__"):
+        return_object = getattr(return_object, attribute, None)
+    return return_object
+
+def get_abstraction_model_from_level(
+    enum_abstraction_level: EnumAbstractionLevel,
+) -> dict:
+    """Returns dict, for abstraction, of structure:
+
+    {
+        "kpi_aggregation_model": abstractionKPIAggregation model name (str),
+        "abstraction_entity_model": that KPIAggregation's abstraction_relation entity model's name (str)
+    }
+    """
+    abstraction_model_map = {
+        EnumAbstractionLevel.ORGANISATION: {
+            "kpi_aggregation_model": "OrganisationKPIAggregation",
+            "abstraction_entity_model": "Organisation",
+        },
+        EnumAbstractionLevel.TRUST: {
+            "kpi_aggregation_model": "TrustKPIAggregation",
+            "abstraction_entity_model": "Trust",
+        },
+        EnumAbstractionLevel.LOCAL_HEALTH_BOARD: {
+            "kpi_aggregation_model": "LocalHealthBoardKPIAggregation",
+            "abstraction_entity_model": "LocalHealthBoard",
+        },
+        EnumAbstractionLevel.ICB: {
+            "kpi_aggregation_model": "ICBKPIAggregation",
+            "abstraction_entity_model": "IntegratedCareBoard",
+        },
+        EnumAbstractionLevel.NHS_ENGLAND_REGION: {
+            "kpi_aggregation_model": "NHSEnglandRegionKPIAggregation",
+            "abstraction_entity_model": "NHSEnglandRegion",
+        },
+        EnumAbstractionLevel.OPEN_UK: {
+            "kpi_aggregation_model": "OpenUKKPIAggregation",
+            "abstraction_entity_model": "OPENUKNetwork",
+        },
+        EnumAbstractionLevel.COUNTRY: {
+            "kpi_aggregation_model": "CountryKPIAggregation",
+            "abstraction_entity_model": "Country",
+        },
+        EnumAbstractionLevel.NATIONAL: {
+            "kpi_aggregation_model": "NationalKPIAggregation",
+            "abstraction_entity_model": "Country",
+        },
+    }
+    return abstraction_model_map[enum_abstraction_level]
+
+# def aggregate_kpis_update_models_all_abstractions_for_organisation(
+#     organisation,
+#     cohort: int,
+# ) -> None:
+#     """
+#     Aggregates all KPI data, for each level of EnumAbstractionLevel abstraction, updates the relevant AbstractionModel. Returns None.
+#     """
+#     for enum_abstraction_level in EnumAbstractionLevel:
+#         filtered_cases = get_filtered_cases_queryset_for(
+#             organisation=organisation,
+#             abstraction_level=enum_abstraction_level,
+#             cohort=cohort,
+#         )
+
+#         # For these Cases, calculate KPI value counts, grouped by specified abstraction level
+#         kpi_value_counts = calculate_kpi_value_counts_queryset(
+#             filtered_cases=filtered_cases,
+#             abstraction_level=enum_abstraction_level,
+#             kpis="all",
+#         )
+
+#         # Update the relevant abstraction's KPIAggregation model(s)
+#         update_kpi_aggregation_model(
+#             abstraction_level=enum_abstraction_level,
+#             kpi_value_counts=kpi_value_counts,
+#             cohort=cohort,
+#         )
+
+"""
+Sets up the KPIAggregation models - one for each cohort and each level of abstraction
+Function also to delete them
+"""
 def _seed_all_aggregation_models(cohort=None) -> None:
     """
     Seeds all KPIAggregation models for each level of abstraction, for requested cohort
@@ -840,7 +838,9 @@ def ___delete_and_recreate_all_kpi_aggregation_models():
 
     _seed_all_aggregation_models()
 
-
+"""
+Functions to create Excel reports
+"""
 def create_kpi_report_row(key, measure, kpi, aggregation_row):
     ret = {
         "Measure": measure,
@@ -866,7 +866,6 @@ def create_kpi_report_row(key, measure, kpi, aggregation_row):
             logger.info(f"Missing denominator for {key} {measure} {kpi}")
 
     return ret
-
 
 def create_KPI_aggregation_dataframe(
     KPI_model1,
