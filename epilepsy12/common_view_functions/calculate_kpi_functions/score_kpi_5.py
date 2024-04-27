@@ -15,7 +15,7 @@ def score_kpi_5(registration_instance, age_at_first_paediatric_assessment) -> in
     Calculation Method
 
     Numerator = Number of children and young people diagnosed with epilepsy at first year AND who are NOT JME or JAE or CAE or CECTS/Rolandic OR number of children aged under 2 years at first assessment with a diagnosis of epilepsy at first year AND who had an MRI within 6 weeks of request
-    
+
     Denominator = Number of children and young people diagnosed with epilepsy at first year AND ((who are NOT JME or JAE or CAE or BECTS) OR (number of children aged under  2 years  at first assessment with a diagnosis of epilepsy at first year))
     """
     multiaxial_diagnosis = registration_instance.multiaxialdiagnosis
@@ -53,8 +53,12 @@ def score_kpi_5(registration_instance, age_at_first_paediatric_assessment) -> in
             (investigations.mri_brain_requested_date is None),
             (investigations.mri_brain_reported_date is None),
         ]
-        if any(mri_dates_are_none):
-            return KPI_SCORE["NOT_SCORED"]
+
+        if investigations.mri_indicated is not None:
+            if any(mri_dates_are_none) and investigations.mri_indicated is True:
+                return KPI_SCORE["NOT_SCORED"]
+            elif investigations.mri_indicated is False:
+                return KPI_SCORE["FAIL"]
 
         # eligible for this measure - score kpi
         passing_criteria_met = (
