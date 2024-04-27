@@ -61,15 +61,21 @@ def score_kpi_5(registration_instance, age_at_first_paediatric_assessment) -> in
                 return KPI_SCORE["FAIL"]
 
         # eligible for this measure - score kpi
-        passing_criteria_met = (
-            abs(
-                (
-                    investigations.mri_brain_requested_date
-                    - investigations.mri_brain_reported_date
-                ).days
+        if (
+            investigations.mri_brain_requested_date is not None
+            and investigations.mri_brain_reported_date is not None
+        ):
+            passing_criteria_met = (
+                abs(
+                    (
+                        investigations.mri_brain_requested_date
+                        - investigations.mri_brain_reported_date
+                    ).days
+                )
+                <= 42
             )
-            <= 42
-        )
+        else:
+            passing_criteria_met = 0
 
         if passing_criteria_met:
             return KPI_SCORE["PASS"]
