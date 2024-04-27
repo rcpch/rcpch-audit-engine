@@ -95,15 +95,15 @@ class E12RegistrationFactory(factory.django.DjangoModelFactory):
 
         E12ManagementFactory.create(
             registration=self,
-            antiepilepsymedicine__sodium_valproate=sodium_valproate
-            if sodium_valproate
-            else None,
+            antiepilepsymedicine__sodium_valproate=(
+                sodium_valproate if sodium_valproate else None
+            ),
             **kwargs,
         )
 
     class Params:
         ineligible_mri = factory.Trait(
-            first_paediatric_assessment_date=date(2023, 1, 1)
+            first_paediatric_assessment_date=date(2023, 1, 1),  # child < 2y
         )
 
         pass_assessment_of_mental_health_issues = factory.Trait(ineligible_mri=True)
