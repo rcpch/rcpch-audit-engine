@@ -146,6 +146,7 @@ def test_measure_1_should_fail_not_seen_14_days_after_referral(
         kpi_score == KPI_SCORE["FAIL"]
     ), f"Patient did not see a Paediatrician/Neurologist within 14 days of referral (seen after {INPUT_DATE - REFERRAL_DATE}), but did not fail measure"
 
+
 @pytest.mark.django_db
 def test_measure_1_should_fail_no_doctor_involved(
     e12_case_factory,
