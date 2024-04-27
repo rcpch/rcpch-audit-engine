@@ -1,0 +1,3 @@
+#!/bin/bash -e
+
+docker compose run -it django python manage.py shell

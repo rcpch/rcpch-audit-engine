@@ -6,8 +6,6 @@ import pandas as pd
 
 # E12 Imports
 from epilepsy12.constants import (
-    EnumAbstractionLevel,
-    TRUSTS,
     LOCAL_HEALTH_BOARDS,
     INTEGRATED_CARE_BOARDS,
     NHS_ENGLAND_REGIONS,
@@ -20,6 +18,7 @@ from epilepsy12.common_view_functions.aggregate_by import (
     create_reference_dataframe,
     create_kpi_report_row,
 )
+from epilepsy12.models import (Organisation, Trust)
 
 
 def download_kpi_summary_as_csv(cohort):
@@ -68,6 +67,9 @@ def download_kpi_summary_as_csv(cohort):
         "10. School Individual Health Care Plan",
     ]
 
+    trusts_from_organisations = Organisation.objects.values('trust').distinct()
+    trusts = Trust.objects.filter(id__in=trusts_from_organisations).values()
+
     # COUNTRY - SHEET 1
     # create a dataframe with a row for each measure of each country, and a column for each of ["Measure", "Percentage", "Numerator", "Denominator"]
 
@@ -110,7 +112,7 @@ def download_kpi_summary_as_csv(cohort):
         measures,
         measures_titles,
         KPI_model2="TrustKPIAggregation",
-        constants_list2=TRUSTS,
+        constants_list2=trusts,
     )
 
     # ICB (Integrated Care Board) - SHEET 3
@@ -164,7 +166,7 @@ def download_kpi_summary_as_csv(cohort):
     # REFERENCE - SHEET 7
 
     reference_df = create_reference_dataframe(
-        TRUSTS,
+        trusts,
         LOCAL_HEALTH_BOARDS,
         OPEN_UK_NETWORKS_TRUSTS,
         INTEGRATED_CARE_BOARDS_LOCAL_AUTHORITIES,

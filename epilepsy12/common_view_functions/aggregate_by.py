@@ -907,7 +907,7 @@ def create_KPI_aggregation_dataframe(
         )
 
     if model_aggregation_2:
-        if constants_list2 == TRUSTS:
+        if constants_list2:
             for i, body in enumerate(constants_list2):
                 key = body["ods_code"]
                 uid = i + 1
@@ -934,7 +934,7 @@ def create_KPI_aggregation_dataframe(
         title = "Network"
 
     # Group KPIs by Trust, and add to dataframe - ie collect all KPIs for a specific trust, then add to dataframe
-    if constants_list2 == TRUSTS:
+    if constants_list2:
         for key in objects:
             object = objects[key]
             for index, kpi in enumerate(measures):
@@ -1015,7 +1015,7 @@ def create_reference_dataframe(trusts, health_boards, networks, icbs):
     # For the English Trusts - create row with HBT, HBT_name, Network, Country, UK, NHSregion and ICB as the column names
     for trust in trusts:
         ods_code = trust["ods_code"]
-        trust_name = trust["trust_name"]
+        trust_name = trust["name"]
         network_name = ""
         region = ""
         icb = ""
