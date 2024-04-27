@@ -1,0 +1,7 @@
+pre-build: >
+  apt-get install -y binutils libproj-dev gdal-bin
+    libgdal-dev python3-gdal
+    libz-dev libjpeg-dev libfreetype6-dev
+    git python3-cffi python3-brotli
+    libpango-1.0-0 libpangoft2-1.0-0
+    --no-install-recommends
