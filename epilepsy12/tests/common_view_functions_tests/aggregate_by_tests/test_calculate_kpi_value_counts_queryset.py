@@ -89,14 +89,16 @@ def test_calculate_kpi_value_counts_queryset_all_levels(
     _register_kpi_scored_cases(
         e12_case_factory,
         ods_codes=ods_codes,
-        num_cases=5
-        if abstraction_level
-        not in [
-            # in these 3 abstraction levels, kids are split into half the number of organisations, so register double the nubmer of kids (10) instead of 5
-            EnumAbstractionLevel.ORGANISATION,
-            EnumAbstractionLevel.TRUST,
-        ]
-        else 10, 
+        num_cases=(
+            5
+            if abstraction_level
+            not in [
+                # in these 3 abstraction levels, kids are split into half the number of organisations, so register double the nubmer of kids (10) instead of 5
+                EnumAbstractionLevel.ORGANISATION,
+                EnumAbstractionLevel.TRUST,
+            ]
+            else 10
+        ),
     )
 
     for code in ods_codes:

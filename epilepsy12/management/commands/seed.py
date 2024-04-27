@@ -119,14 +119,14 @@ def run_dummy_cases_seed(verbose=True, cases=50):
         cases = 50
 
     different_organisations = [
-        "RJZ01",
-        "RGT01",
-        "RBS25",
-        "RQM01",
-        "RCF22",
-        "7A2AJ",
-        "7A6BJ",
-        "7A6AV",
+        "RJZ01",  # King's College Hospital
+        "RGT01",  # Addenbrooks
+        "RBS25",  # Alderhey
+        "RQM01",  # Chelsea and Westminster
+        "RCF22",  # Airedale
+        "7A2AJ",  # Bronglais
+        "7A6BJ",  # Chepstow Community
+        "7A6AV",  # Ysbyty Ystrad Fawr
     ]
     organisations_list = Organisation.objects.filter(
         ods_code__in=different_organisations
