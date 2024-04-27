@@ -950,7 +950,7 @@ def create_KPI_aggregation_dataframe(
                 item = create_kpi_report_row(
                     "wales", measure_title, kpi, wales_region_object
                 )
-                item["NHSregionMeasure"]: f"Health Boards{measure_title}"
+                item["NHSregionMeasure"]=f"Health Boards{measure_title}"
                 item[title] = "Health Boards"
                 final_list.append(item)
             for key in objects:
