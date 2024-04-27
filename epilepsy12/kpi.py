@@ -5,9 +5,23 @@ from django.apps import apps
 import pandas as pd
 
 # E12 Imports
-from epilepsy12.constants import EnumAbstractionLevel, TRUSTS, LOCAL_HEALTH_BOARDS, INTEGRATED_CARE_BOARDS, NHS_ENGLAND_REGIONS, OPEN_UK_NETWORKS, OPEN_UK_NETWORKS_TRUSTS, INTEGRATED_CARE_BOARDS_LOCAL_AUTHORITIES
-from epilepsy12.common_view_functions.aggregate_by import create_KPI_aggregation_dataframe, create_reference_dataframe, create_kpi_report_row
-    
+from epilepsy12.constants import (
+    EnumAbstractionLevel,
+    TRUSTS,
+    LOCAL_HEALTH_BOARDS,
+    INTEGRATED_CARE_BOARDS,
+    NHS_ENGLAND_REGIONS,
+    OPEN_UK_NETWORKS,
+    OPEN_UK_NETWORKS_TRUSTS,
+    INTEGRATED_CARE_BOARDS_LOCAL_AUTHORITIES,
+)
+from epilepsy12.common_view_functions.aggregate_by import (
+    create_KPI_aggregation_dataframe,
+    create_reference_dataframe,
+    create_kpi_report_row,
+)
+
+
 def download_kpi_summary_as_csv(cohort):
     """
     Asynchronous task to pull data from KPIAggregation tables and store as dataframe for export as CSV
@@ -51,26 +65,30 @@ def download_kpi_summary_as_csv(cohort):
         "8. Sodium valproate",
         "9a. Comprehensive care planning agreement",
         "9b. Comprehensive care planning content",
-        "10. School Individual Health Care Plan"
+        "10. School Individual Health Care Plan",
     ]
 
     # COUNTRY - SHEET 1
     # create a dataframe with a row for each measure of each country, and a column for each of ["Measure", "Percentage", "Numerator", "Denominator"]
-    
+
     CountryKPIAggregation = apps.get_model("epilepsy12", "CountryKPIAggregation")
 
     england_kpi_aggregation = (
-        CountryKPIAggregation.objects.filter(cohort=cohort, abstraction_relation=1).values().first()
+        CountryKPIAggregation.objects.filter(cohort=cohort, abstraction_relation=1)
+        .values()
+        .first()
     )
 
     wales_kpi_aggregation = (
-        CountryKPIAggregation.objects.filter(cohort=cohort, abstraction_relation=4).values().first()
+        CountryKPIAggregation.objects.filter(cohort=cohort, abstraction_relation=4)
+        .values()
+        .first()
     )
 
     final_list = []
     for index, kpi in enumerate(measures):
         measure_title = measures_titles[index]
-        
+
         england_row = create_kpi_report_row(
             "england", measure_title, kpi, england_kpi_aggregation
         )
@@ -85,19 +103,38 @@ def download_kpi_summary_as_csv(cohort):
 
     # HBT (Trusts & Health Boards) - SHEET 2
 
-    trust_hb_df = create_KPI_aggregation_dataframe("LocalHealthBoardKPIAggregation", LOCAL_HEALTH_BOARDS, cohort, measures, measures_titles, KPI_model2="TrustKPIAggregation", constants_list2=TRUSTS)
+    trust_hb_df = create_KPI_aggregation_dataframe(
+        "LocalHealthBoardKPIAggregation",
+        LOCAL_HEALTH_BOARDS,
+        cohort,
+        measures,
+        measures_titles,
+        KPI_model2="TrustKPIAggregation",
+        constants_list2=TRUSTS,
+    )
 
     # ICB (Integrated Care Board) - SHEET 3
 
-    icb_df = create_KPI_aggregation_dataframe("ICBKPIAggregation", INTEGRATED_CARE_BOARDS, cohort, measures, measures_titles)
+    icb_df = create_KPI_aggregation_dataframe(
+        "ICBKPIAggregation", INTEGRATED_CARE_BOARDS, cohort, measures, measures_titles
+    )
 
     # NHS region level - SHEET 4
 
-    region_df = create_KPI_aggregation_dataframe("NHSEnglandRegionKPIAggregation", NHS_ENGLAND_REGIONS, cohort, measures, measures_titles, is_regional=True)
+    region_df = create_KPI_aggregation_dataframe(
+        "NHSEnglandRegionKPIAggregation",
+        NHS_ENGLAND_REGIONS,
+        cohort,
+        measures,
+        measures_titles,
+        is_regional=True,
+    )
 
     # NETWORKS - SHEET 5
-        
-    network_df = create_KPI_aggregation_dataframe("OpenUKKPIAggregation", OPEN_UK_NETWORKS, cohort, measures, measures_titles)
+
+    network_df = create_KPI_aggregation_dataframe(
+        "OpenUKKPIAggregation", OPEN_UK_NETWORKS, cohort, measures, measures_titles
+    )
 
     # NATIONAL - SHEET 6
     # create a dataframe with a row for each measure, and column for each of ["Measure", "Percentage", "Numerator", "Denominator"]
@@ -106,20 +143,39 @@ def download_kpi_summary_as_csv(cohort):
 
     NationalKPIAggregation = apps.get_model("epilepsy12", "NationalKPIAggregation")
 
-    national_kpi_aggregation = NationalKPIAggregation.objects.filter(cohort=cohort, open_access=False).values().first()
+    national_kpi_aggregation = (
+        NationalKPIAggregation.objects.filter(cohort=cohort, open_access=False)
+        .values()
+        .first()
+    )
 
     final_list = []
     for index, kpi in enumerate(measures):
         measure_title = measures_titles[index]
-        item = create_kpi_report_row("national", measure_title, kpi, national_kpi_aggregation)
+        item = create_kpi_report_row(
+            "national", measure_title, kpi, national_kpi_aggregation
+        )
         item["ukMeasure"] = f"England and Wales{measure_title}"
-        item["uk"]: "England and Wales"
+        item["uk"] = "England and Wales"
         final_list.append(item)
 
     national_df = pd.DataFrame.from_dict(final_list)
 
     # REFERENCE - SHEET 7
 
-    reference_df = create_reference_dataframe(TRUSTS, LOCAL_HEALTH_BOARDS, OPEN_UK_NETWORKS_TRUSTS, INTEGRATED_CARE_BOARDS_LOCAL_AUTHORITIES)
+    reference_df = create_reference_dataframe(
+        TRUSTS,
+        LOCAL_HEALTH_BOARDS,
+        OPEN_UK_NETWORKS_TRUSTS,
+        INTEGRATED_CARE_BOARDS_LOCAL_AUTHORITIES,
+    )
 
-    return country_df, trust_hb_df, icb_df, region_df, network_df, national_df, reference_df
+    return (
+        country_df,
+        trust_hb_df,
+        icb_df,
+        region_df,
+        network_df,
+        national_df,
+        reference_df,
+    )
