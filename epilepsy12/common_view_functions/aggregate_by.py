@@ -471,44 +471,21 @@ def get_filtered_cases_queryset_for(
 
         abstraction_filter = {cases_filter_key: abstraction_key}
 
-    # filter out Welsh cases if England, or English cases if Wales
-
-    if (
-        abstraction_level is EnumAbstractionLevel.ICB
-        or abstraction_level is EnumAbstractionLevel.TRUST
-        or abstraction_level is EnumAbstractionLevel.NHS_ENGLAND_REGION
-    ):
-        cases = Case.objects.filter(
-            **abstraction_filter,
-            site__organisation__country__boundary_identifier="E92000001",
-            site__site_is_actively_involved_in_epilepsy_care=True,
-            site__site_is_primary_centre_of_epilepsy_care=True,
-            registration__cohort=cohort,
-            registration__completed_first_year_of_care_date__lte=date.today(),
-            registration__audit_progress__registration_complete=True,
-            registration__audit_progress__first_paediatric_assessment_complete=True,
-            registration__audit_progress__assessment_complete=True,
-            registration__audit_progress__epilepsy_context_complete=True,
-            registration__audit_progress__multiaxial_diagnosis_complete=True,
-            registration__audit_progress__investigations_complete=True,
-            registration__audit_progress__management_complete=True,
-        )
-    else:
-        cases = Case.objects.filter(
-            **abstraction_filter,
-            site__organisation__country__boundary_identifier="W92000004",
-            site__site_is_actively_involved_in_epilepsy_care=True,
-            site__site_is_primary_centre_of_epilepsy_care=True,
-            registration__cohort=cohort,
-            registration__completed_first_year_of_care_date__lte=date.today(),
-            registration__audit_progress__registration_complete=True,
-            registration__audit_progress__first_paediatric_assessment_complete=True,
-            registration__audit_progress__assessment_complete=True,
-            registration__audit_progress__epilepsy_context_complete=True,
-            registration__audit_progress__multiaxial_diagnosis_complete=True,
-            registration__audit_progress__investigations_complete=True,
-            registration__audit_progress__management_complete=True,
-        )
+    cases = Case.objects.filter(
+        **abstraction_filter,
+        # site__organisation__country__boundary_identifier="E92000001",
+        site__site_is_actively_involved_in_epilepsy_care=True,
+        site__site_is_primary_centre_of_epilepsy_care=True,
+        registration__cohort=cohort,
+        registration__completed_first_year_of_care_date__lte=date.today(),
+        registration__audit_progress__registration_complete=True,
+        registration__audit_progress__first_paediatric_assessment_complete=True,
+        registration__audit_progress__assessment_complete=True,
+        registration__audit_progress__epilepsy_context_complete=True,
+        registration__audit_progress__multiaxial_diagnosis_complete=True,
+        registration__audit_progress__investigations_complete=True,
+        registration__audit_progress__management_complete=True,
+    )
 
     return cases
 
