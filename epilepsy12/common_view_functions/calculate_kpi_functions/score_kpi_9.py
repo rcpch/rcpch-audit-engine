@@ -24,13 +24,20 @@ def score_kpi_9A(registration_instance) -> int:
     management = registration_instance.management
 
     fields_not_filled = [
-        (management.individualised_care_plan_in_place is None),
         (management.has_individualised_care_plan_been_updated_in_the_last_year is None),
         (management.individualised_care_plan_has_parent_carer_child_agreement is None),
     ]
 
     # unscored
-    if any(fields_not_filled):
+    if management.individualised_care_plan_in_place is not None:
+        if management.individualised_care_plan_in_place:
+            if any(fields_not_filled):
+                # there is a care plan in place but not yet known if updated in the last year or evidence of agreement not yet scored
+                return KPI_SCORE["NOT_SCORED"]
+        else:
+            # there is no care plan in place
+            return KPI_SCORE["FAIL"]
+    else:
         return KPI_SCORE["NOT_SCORED"]
 
     # score kpi
@@ -86,12 +93,16 @@ def score_kpi_9Aii(registration_instance) -> int:
 
     management = registration_instance.management
 
+    # unscored measure if plan not in place is still a fail
+    if management.individualised_care_plan_in_place is False:
+        return KPI_SCORE["FAIL"]
+
     # unscored
     if management.individualised_care_plan_has_parent_carer_child_agreement is None:
         return KPI_SCORE["NOT_SCORED"]
 
     # score kpi
-    if management.individualised_care_plan_has_parent_carer_child_agreement is True:
+    elif management.individualised_care_plan_has_parent_carer_child_agreement is True:
         return KPI_SCORE["PASS"]
     else:
         return KPI_SCORE["FAIL"]
@@ -108,6 +119,10 @@ def score_kpi_9Aiii(registration_instance) -> int:
     """
 
     management = registration_instance.management
+
+    # unscored measure if plan not in place is still a fail
+    if management.individualised_care_plan_in_place is False:
+        return KPI_SCORE["FAIL"]
 
     # unscored
     if management.has_individualised_care_plan_been_updated_in_the_last_year is None:
@@ -145,6 +160,18 @@ def score_kpi_9B(registration_instance) -> int:
         ),
         (management.individualised_care_plan_addresses_sudep is None),
     ]
+
+    # unscored
+    if management.individualised_care_plan_in_place is not None:
+        if management.individualised_care_plan_in_place:
+            if any(fields_not_filled):
+                # there is a care plan in place but not yet known if updated in the last year or evidence of agreement not yet scored
+                return KPI_SCORE["NOT_SCORED"]
+        else:
+            # there is no care plan in place
+            return KPI_SCORE["FAIL"]
+    else:
+        return KPI_SCORE["NOT_SCORED"]
 
     # unscored
     if any(fields_not_filled):
@@ -194,6 +221,10 @@ def score_kpi_9Bi(registration_instance) -> int:
         (management.individualised_care_plan_parental_prolonged_seizure_care is None),
     ]
 
+    # unscored measure if plan not in place is still a fail
+    if management.individualised_care_plan_in_place is False:
+        return KPI_SCORE["FAIL"]
+
     # unscored
     if any(fields_not_filled):
         return KPI_SCORE["NOT_SCORED"]
@@ -223,6 +254,10 @@ def score_kpi_9Bii(registration_instance) -> int:
 
     management = registration_instance.management
 
+    # unscored measure if plan not in place is still a fail
+    if management.individualised_care_plan_in_place is False:
+        return KPI_SCORE["FAIL"]
+
     # unscored
     if management.individualised_care_plan_addresses_water_safety is None:
         return KPI_SCORE["NOT_SCORED"]
@@ -247,6 +282,10 @@ def score_kpi_9Biii(registration_instance) -> int:
     """
 
     management = registration_instance.management
+
+    # unscored measure if plan not in place is still a fail
+    if management.individualised_care_plan_in_place is False:
+        return KPI_SCORE["FAIL"]
 
     # unscored
     if management.individualised_care_plan_include_first_aid is None:
@@ -273,6 +312,10 @@ def score_kpi_9Biv(registration_instance) -> int:
 
     management = registration_instance.management
 
+    # unscored measure if plan not in place is still a fail
+    if management.individualised_care_plan_in_place is False:
+        return KPI_SCORE["FAIL"]
+
     # unscored
     if management.individualised_care_plan_includes_general_participation_risk is None:
         return KPI_SCORE["NOT_SCORED"]
@@ -298,6 +341,10 @@ def score_kpi_9Bv(registration_instance) -> int:
 
     management = registration_instance.management
 
+    # unscored measure if plan not in place is still a fail
+    if management.individualised_care_plan_in_place is False:
+        return KPI_SCORE["FAIL"]
+
     # unscored
     if management.individualised_care_plan_includes_service_contact_details is None:
         return KPI_SCORE["NOT_SCORED"]
@@ -322,6 +369,10 @@ def score_kpi_9Bvi(registration_instance) -> int:
     """
 
     management = registration_instance.management
+
+    # unscored measure if plan not in place is still a fail
+    if management.individualised_care_plan_in_place is False:
+        return KPI_SCORE["FAIL"]
 
     fields_not_filled = [
         (management.individualised_care_plan_addresses_sudep is None),

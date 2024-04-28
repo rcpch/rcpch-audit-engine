@@ -2,6 +2,7 @@
 import pytest
 import random
 from datetime import date
+from dateutil.relativedelta import relativedelta
 
 # 3rd party imports
 
@@ -97,6 +98,20 @@ def _register_kpi_scored_cases(
             filled_case_objects += test_cases
 
     for test_case in filled_case_objects:
+        test_case.registration.completed_first_year_of_care_date = (
+            test_case.registration.first_paediatric_assessment_date
+            + relativedelta(years=1)
+        )
+        test_case.registration.audit_progress.registration_complete = True
+        test_case.registration.audit_progress.first_paediatric_assessment_complete = (
+            True
+        )
+        test_case.registration.audit_progress.assessment_complete = True
+        test_case.registration.audit_progress.epilepsy_context_complete = True
+        test_case.registration.audit_progress.multiaxial_diagnosis_complete = True
+        test_case.registration.audit_progress.investigations_complete = True
+        test_case.registration.audit_progress.management_complete = True
+
         calculate_kpis(registration_instance=test_case.registration)
 
 
