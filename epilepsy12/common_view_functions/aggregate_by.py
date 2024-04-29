@@ -824,6 +824,9 @@ def create_kpi_report_row(key, measure, kpi, aggregation_row):
     }
 
     if aggregation_row:
+        # Add "England" and "Wales" as Country param for Sheet 2 - Country
+        ret["Country"] = "England" if key == "england" else "Wales" if key == "wales" else None
+
         numerator = aggregation_row[f"{kpi}_passed"]
         denominator = aggregation_row[f"{kpi}_total_eligible"]
 
