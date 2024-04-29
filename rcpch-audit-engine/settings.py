@@ -25,6 +25,8 @@ from .logging_settings import (
     LOGGING,
 )  # no it is not an unused import, it pulls LOGGING into the settings file
 
+from .db import database_config
+
 logger = logging.getLogger(__name__)
 
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
@@ -176,14 +178,7 @@ WSGI_APPLICATION = "rcpch-audit-engine.wsgi.application"
 # https://docs.djangoproject.com/en/3.2/ref/settings/#databases
 
 DATABASES = {
-    "default": {
-        "ENGINE": "django.contrib.gis.db.backends.postgis",
-        "NAME": os.environ.get("E12_POSTGRES_DB_NAME"),
-        "USER": os.environ.get("E12_POSTGRES_DB_USER"),
-        "PASSWORD": os.environ.get("E12_POSTGRES_DB_PASSWORD"),
-        "HOST": os.environ.get("E12_POSTGRES_DB_HOST"),
-        "PORT": os.environ.get("E12_POSTGRES_DB_PORT"),
-    }
+    "default": database_config
 }
 
 # Password validation
