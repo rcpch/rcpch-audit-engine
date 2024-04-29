@@ -88,15 +88,23 @@ def download_kpi_summary_as_csv(cohort):
     )
 
     final_list = []
+    row_order = ["Measure", "Country", "Numerator", "Denominator", "Percentage"]
     for index, kpi in enumerate(measures):
         measure_title = measures_titles[index]
 
         england_row = create_kpi_report_row(
             "england", measure_title, kpi, england_kpi_aggregation
         )
+        england_row["Country"] = "England"
+
         wales_row = create_kpi_report_row(
             "wales", measure_title, kpi, wales_kpi_aggregation
         )
+        wales_row["Country"] = "Wales"
+
+        for key in row_order:
+            england_row[key] = england_row.pop(key)
+            wales_row[key] = wales_row.pop(key)
 
         final_list.append(england_row)
         final_list.append(wales_row)

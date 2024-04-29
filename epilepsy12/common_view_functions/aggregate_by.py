@@ -1,6 +1,7 @@
 from typing import Literal, Union
 from datetime import date
 import logging
+from collections import OrderedDict
 
 # Django imports
 from django.apps import apps
@@ -819,14 +820,11 @@ def ___delete_and_recreate_all_kpi_aggregation_models():
 Functions to create Excel reports
 """
 def create_kpi_report_row(key, measure, kpi, aggregation_row):
-    ret = {
+    ret = OrderedDict({
         "Measure": measure,
-    }
+    })
 
     if aggregation_row:
-        # Add "England" and "Wales" as Country param for Sheet 2 - Country
-        ret["Country"] = "England" if key == "england" else "Wales" if key == "wales" else None
-
         numerator = aggregation_row[f"{kpi}_passed"]
         denominator = aggregation_row[f"{kpi}_total_eligible"]
 
