@@ -192,25 +192,35 @@ def complete_registrations(verbose=True, cohort=None, full_year=False):
             "\033[33m",
         )
 
-    if cohort is None:
-        current_cohort = cohort_number_from_first_paediatric_assessment_date(
+    # Cohort number if today is date of FPA
+    current_cohort_number = cohort_number_from_first_paediatric_assessment_date(
             date.today()
         )
-        current_cohort_data = dates_for_cohort(current_cohort)
+
+    if cohort is None:
+        # Generate cohort data for current cohort
+        current_cohort = current_cohort_number
+        cohort_data = dates_for_cohort(current_cohort)
     else:
-        current_cohort_data = dates_for_cohort(cohort=cohort)
+        cohort_data = dates_for_cohort(cohort=cohort)
 
     for registration in Registration.objects.all():
 
-        fpa_date = random_date(
-            start=current_cohort_data["cohort_start_date"],
-            end=date.today(),
-        )
+        if cohort is not None and cohort != current_cohort_number:
+            fpa_date = random_date(
+                start=cohort_data["cohort_start_date"],
+                end=cohort_data["cohort_end_date"],
+            )
+        else:
+            fpa_date = random_date(
+                start=cohort_data["cohort_start_date"],
+                end=date.today(),
+            )
 
         if full_year:
             # this flag ensures any registrations include a full year of care
             if (
-                current_cohort_data["cohort_start_date"] + relativedelta(years=1)
+                cohort_data["cohort_start_date"] + relativedelta(years=1)
                 > date.today()
             ):
                 # It is not possible to generate registrations that are complete as they would be in the future
@@ -221,8 +231,8 @@ def complete_registrations(verbose=True, cohort=None, full_year=False):
                 while fpa_date + relativedelta(years=1) >= date.today():
                     # regenerate any dates that cannot be complete
                     fpa_date = random_date(
-                        start=current_cohort_data["cohort_start_date"],
-                        end=date.today(),
+                        start=cohort_data["cohort_start_date"],
+                        end=cohort_data["cohort_end_date"],
                     )
 
         registration.first_paediatric_assessment_date = fpa_date
