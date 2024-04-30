@@ -204,7 +204,7 @@ def complete_registrations(verbose=True, cohort=None, full_year=False):
 
         fpa_date = random_date(
             start=current_cohort_data["cohort_start_date"],
-            end=current_cohort_data["cohort_end_date"],
+            end=date.today(),
         )
 
         if full_year:
@@ -222,7 +222,7 @@ def complete_registrations(verbose=True, cohort=None, full_year=False):
                     # regenerate any dates that cannot be complete
                     fpa_date = random_date(
                         start=current_cohort_data["cohort_start_date"],
-                        end=current_cohort_data["cohort_end_date"],
+                        end=date.today(),
                     )
 
         registration.first_paediatric_assessment_date = fpa_date
