@@ -818,8 +818,9 @@ def ___delete_and_recreate_all_kpi_aggregation_models():
 """
 Functions to create Excel reports
 """
-def create_kpi_report_row(key, measure, kpi, aggregation_row):
+def create_kpi_report_row(key, measure, kpi, aggregation_row, level):
     ret = {
+        level: key,
         "Measure": measure,
     }
 
@@ -828,13 +829,13 @@ def create_kpi_report_row(key, measure, kpi, aggregation_row):
         denominator = aggregation_row[f"{kpi}_total_eligible"]
 
         if numerator is not None and denominator is not None:
-            ret["Numerator"] = numerator
-            ret["Denominator"] = denominator
-
             # Make sure we don't divide by zero
             ret["Percentage"] = (
                 0 if denominator == 0 else (numerator / denominator) * 100
             )
+            ret["Numerator"] = numerator
+            ret["Denominator"] = denominator
+
 
         if numerator is None:
             logger.info(f"Missing numerator for {key} {measure} {kpi}")
@@ -938,8 +939,7 @@ def create_KPI_aggregation_dataframe(
         for key in objects:
             object = objects[key]
             for index, kpi in enumerate(measures):
-                item = create_kpi_report_row(key, measures_titles[index], kpi, object)
-                item[title] = key
+                item = create_kpi_report_row(key, measures_titles[index], kpi, object, level=title)
                 final_list.append(item)
 
     # Group organisation body by KPI, then add to dataframe - collect all values relating to KPI 1 across all organisation bodies, add to dataframe, repeat for next KPI
@@ -948,10 +948,8 @@ def create_KPI_aggregation_dataframe(
             if is_regional:
                 measure_title = measures_titles[index]
                 item = create_kpi_report_row(
-                    "wales", measure_title, kpi, wales_region_object
+                    "wales", measure_title, kpi, wales_region_object, level=title
                 )
-                item["NHSregionMeasure"]=f"Health Boards{measure_title}"
-                item[title] = "Health Boards"
                 final_list.append(item)
             for key in objects:
                 object = objects[key]
@@ -963,13 +961,10 @@ def create_KPI_aggregation_dataframe(
                     or (constants_list1 == OPEN_UK_NETWORKS)
                     or (constants_list1 == TRUSTS)
                 ):
-                    item = create_kpi_report_row(key, measure_title, kpi, object)
-                    item[f"{title}Measure"] = f"{key}{measure_title}"
-                    item[title] = key
+                    item = create_kpi_report_row(key, measure_title, kpi, object, level=title)
                     final_list.append(item)
                 else:
-                    item = create_kpi_report_row(key, measure_title, kpi, object)
-                    item[title] = key
+                    item = create_kpi_report_row(key, measure_title, kpi, object, level=title)
                     final_list.append(item)
 
     return pd.DataFrame.from_dict(final_list)
