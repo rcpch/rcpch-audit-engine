@@ -420,103 +420,13 @@ def update_kpi_aggregation_model(
                 logger.debug(f"updated {new_obj}")
             
     
-    # value_counts for this abstraction level  already updated
-    # Set all measures to 0 for remaining abstraction levels
     logger.info(f"{len(list_of_updated_abstraction_level_instance)} scored {abstraction_level.name} instances updated with aggregated scores of a total {AbstractionKPIAggregationModel.objects.filter(cohort=cohort).count()} {abstraction_level.name}s")
-    empty_kpis = {
-                'paediatrician_with_expertise_in_epilepsies_passed': 0,
-                'paediatrician_with_expertise_in_epilepsies_total_eligible': 0,
-                'paediatrician_with_expertise_in_epilepsies_ineligible': 0,
-                'paediatrician_with_expertise_in_epilepsies_incomplete': 0,
-                'epilepsy_specialist_nurse_passed': 0,
-                'epilepsy_specialist_nurse_total_eligible': 0,
-                'epilepsy_specialist_nurse_ineligible': 0,
-                'epilepsy_specialist_nurse_incomplete': 0,
-                'tertiary_input_passed': 0,
-                'tertiary_input_total_eligible': 0,
-                'tertiary_input_ineligible': 0,
-                'tertiary_input_incomplete': 0,
-                'epilepsy_surgery_referral_passed': 0,
-                'epilepsy_surgery_referral_total_eligible': 0,
-                'epilepsy_surgery_referral_ineligible': 0,
-                'epilepsy_surgery_referral_incomplete': 0,
-                'ecg_passed': 0,
-                'ecg_total_eligible': 0,
-                'ecg_ineligible': 0,
-                'ecg_incomplete': 0,
-                'mri_passed': 0,
-                'mri_total_eligible': 0,
-                'mri_ineligible': 0,
-                'mri_incomplete': 0,
-                'assessment_of_mental_health_issues_passed': 0,
-                'assessment_of_mental_health_issues_total_eligible': 0,
-                'assessment_of_mental_health_issues_ineligible': 0,
-                'assessment_of_mental_health_issues_incomplete': 0,
-                'mental_health_support_passed': 0,
-                'mental_health_support_total_eligible': 0,
-                'mental_health_support_ineligible': 0,
-                'mental_health_support_incomplete': 0,
-                'sodium_valproate_passed': 0,
-                'sodium_valproate_total_eligible': 0,
-                'sodium_valproate_ineligible': 0,
-                'sodium_valproate_incomplete': 0,
-                'comprehensive_care_planning_agreement_passed': 0,
-                'comprehensive_care_planning_agreement_total_eligible': 0,
-                'comprehensive_care_planning_agreement_ineligible': 0,
-                'comprehensive_care_planning_agreement_incomplete': 0,
-                'patient_held_individualised_epilepsy_document_passed': 0,
-                'patient_held_individualised_epilepsy_document_total_eligible': 0,
-                'patient_held_individualised_epilepsy_document_ineligible': 0,
-                'patient_held_individualised_epilepsy_document_incomplete': 0,
-                'patient_carer_parent_agreement_to_the_care_planning_passed': 0,
-                'patient_carer_parent_agreement_to_the_care_planning_total_eligible': 0,
-                'patient_carer_parent_agreement_to_the_care_planning_ineligible': 0,
-                'patient_carer_parent_agreement_to_the_care_planning_incomplete': 0,
-                'care_planning_has_been_updated_when_necessary_passed': 0,
-                'care_planning_has_been_updated_when_necessary_total_eligible': 0,
-                'care_planning_has_been_updated_when_necessary_ineligible': 0,
-                'care_planning_has_been_updated_when_necessary_incomplete': 0,
-                'comprehensive_care_planning_content_passed': 0,
-                'comprehensive_care_planning_content_total_eligible': 0,
-                'comprehensive_care_planning_content_ineligible': 0,
-                'comprehensive_care_planning_content_incomplete': 0,
-                'parental_prolonged_seizures_care_plan_passed': 0,
-                'parental_prolonged_seizures_care_plan_total_eligible': 0,
-                'parental_prolonged_seizures_care_plan_ineligible': 0,
-                'parental_prolonged_seizures_care_plan_incomplete': 0,
-                'water_safety_passed': 0,
-                'water_safety_total_eligible': 0,
-                'water_safety_ineligible': 0,
-                'water_safety_incomplete': 0,
-                'first_aid_passed': 0,
-                'first_aid_total_eligible': 0,
-                'first_aid_ineligible': 0,
-                'first_aid_incomplete': 0,
-                'general_participation_and_risk_passed': 0,
-                'general_participation_and_risk_total_eligible': 0,
-                'general_participation_and_risk_ineligible': 0,
-                'general_participation_and_risk_incomplete': 0,
-                'sudep_passed': 0,
-                'sudep_total_eligible': 0,
-                'sudep_ineligible': 0,
-                'sudep_incomplete': 0,
-                'service_contact_details_passed': 0,
-                'service_contact_details_total_eligible': 0,
-                'service_contact_details_ineligible': 0,
-                'service_contact_details_incomplete': 0,
-                'school_individual_healthcare_plan_passed': 0,
-                'school_individual_healthcare_plan_total_eligible': 0,
-                'school_individual_healthcare_plan_ineligible': 0,
-                'school_individual_healthcare_plan_incomplete': 0
-            }
     
-    try:
-        AbstractionKPIAggregationModel.objects.filter(cohort=cohort).exclude(abstraction_relation__in=list_of_updated_abstraction_level_instance).update(**empty_kpis)
-    except Exception as error:
-        logger.exception(f"It was not possible to udate the remaining abstractions")
-        raise Exception(f"It was not possible to udate the remaining abstractions")
+    not_updated = AbstractionKPIAggregationModel.objects.exclude(abstraction_relation__in=list_of_updated_abstraction_level_instance).filter(cohort=cohort)
+
+    if not_updated.count() > 0:
+        logger.info(f"Not updated: {list(not_updated.values_list('abstraction_name'))})")
     
-    logger.info(f"{AbstractionKPIAggregationModel.objects.filter(cohort=cohort).exclude(abstraction_relation__in=list_of_updated_abstraction_level_instance).count()} unscored {abstraction_level.name} updated with 0 scores for all measures.")
 
 def filter_completed_cases_at_one_year_by_abstraction_level(
     abstraction_level: EnumAbstractionLevel, cohort: int
