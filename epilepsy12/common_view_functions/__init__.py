@@ -16,10 +16,10 @@ from .aggregate_by import (
     update_kpi_aggregation_model,
     get_filtered_cases_queryset_for,
     calculate_kpi_value_counts_queryset,
+    filter_completed_cases_at_one_year_by_abstraction_level,
     get_abstraction_model_from_level,
     get_abstraction_value_from,
     get_all_kpi_aggregation_data_for_view,
-    # aggregate_kpis_update_models_all_abstractions_for_organisation,
     update_all_kpi_agg_models,
     _seed_all_aggregation_models,
 )
