@@ -263,14 +263,14 @@ def calculate_kpi_value_counts_queryset(
     if abstraction_level is EnumAbstractionLevel.NATIONAL:
         # NO NEED TO GROUPBY IF NATIONAL
         kpi_value_counts = KPI.objects.filter(
-            registration__id__in=filtered_cases.values_list("registration")
+            registration__id__in=filtered_cases.values("registration")
         ).aggregate(**aggregate_queries)
     else: 
         kpi_value_counts = (
             KPI.objects.filter(
                 registration__id__in=filtered_cases.values("registration")
             )  # filter for KPIs associated with filtered cases
-            .values_list(
+            .values(
                 f"organisation__{abstraction_level.value}"
             )  # GROUPBY abstraction level
             .annotate(**aggregate_queries)  # AGGREGATE on each abstraction
@@ -349,7 +349,7 @@ def update_kpi_aggregation_model(
     
     # update models where numbers have changed.
     for value_count in kpi_value_counts:
-        ABSTRACTION_CODE = value_count.get(next(iter(value_count))) # value_count.pop(f"organisation__{abstraction_level.value}")
+        ABSTRACTION_CODE = value_count.pop(f"organisation__{abstraction_level.value}")
         if ABSTRACTION_CODE is None:
             # the last value in each abstraction_level is None - discard
             return
