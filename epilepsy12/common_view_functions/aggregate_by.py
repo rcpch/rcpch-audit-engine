@@ -270,7 +270,7 @@ def calculate_kpi_value_counts_queryset(
             KPI.objects.filter(
                 registration__id__in=filtered_cases.values("registration")
             )  # filter for KPIs associated with filtered cases
-            .values_list(
+            .values(
                 f"organisation__{abstraction_level.value}"
             )  # GROUPBY abstraction level
             .annotate(**aggregate_queries)  # AGGREGATE on each abstraction
@@ -349,80 +349,78 @@ def update_kpi_aggregation_model(
     
     # update models where numbers have changed.
     for value_count in kpi_value_counts:
-        ABSTRACTION_CODE = value_count.get(next(iter(value_count))) # value_count.pop(f"organisation__{abstraction_level.value}")
-        if ABSTRACTION_CODE is None:
+        ABSTRACTION_CODE = value_count.pop(f"organisation__{abstraction_level.value}") #value_count.get(next(iter(value_count))) # 
+        if ABSTRACTION_CODE is not None:
             # the last value in each abstraction_level is None - discard
-            return
 
-        # Get the model field name for the given abstraction model. As the enum values are all with respect to Organisation, this split and grab last gets just that related model's related field.
-        related_key_field = abstraction_level.value.split("__")[-1]
-
-
-        # Get related entity model
-        abstraction_entity_model = apps.get_model(
-            "epilepsy12", abstraction_level_models["abstraction_entity_model"]
-        )
+            # Get the model field name for the given abstraction model. As the enum values are all with respect to Organisation, this split and grab last gets just that related model's related field.
+            related_key_field = abstraction_level.value.split("__")[-1]
 
 
-        # Get instance of the related entity model to link with Aggregation model
-        abstraction_relation_instance = abstraction_entity_model.objects.filter(
-            **{f"{related_key_field}": ABSTRACTION_CODE}
-        ).first()
+            # Get related entity model
+            abstraction_entity_model = apps.get_model(
+                "epilepsy12", abstraction_level_models["abstraction_entity_model"]
+            )
 
 
-        # store this instance in a temporary list - this is used to identify remaining unscored abstraction level records to set to 0
-        list_of_updated_abstraction_level_instance.append(abstraction_relation_instance)
+            # Get instance of the related entity model to link with Aggregation model
+            abstraction_relation_instance = abstraction_entity_model.objects.filter(
+                **{f"{related_key_field}": ABSTRACTION_CODE}
+            ).first()
 
-        if open_access:
-            # for public view: create a new record
 
-            value_count["abstraction_relation"] = abstraction_relation_instance
-            value_count["cohort"] = cohort
-            value_count["open_access"] = open_access
-            
-            try:
-                new_obj = AbstractionKPIAggregationModel.objects.create(**value_count)
-                logger.debug(f"created {new_obj}")
-            except Exception as error:
-                logger.exception(
-                    f"Can't save new KPIAggregations for {abstraction_level} for {abstraction_relation_instance}: {error}"
-                )
-                return
+            # store this instance in a temporary list - this is used to identify remaining unscored abstraction level records to set to 0
+            list_of_updated_abstraction_level_instance.append(abstraction_relation_instance)
 
-        else:
-            # not for public view - create or update existing
-            try:
-                (
-                    new_obj,
-                    created,
-                ) = AbstractionKPIAggregationModel.objects.update_or_create(
-                    defaults={
-                        "abstraction_relation": abstraction_relation_instance,
-                        "cohort": cohort,
-                        "open_access": False,
-                        **value_count,
-                    },
-                    abstraction_relation=abstraction_relation_instance,
-                    cohort=cohort,
-                    open_access=open_access,
-                )
-                logger.info(f"updating/saving: {abstraction_relation_instance}")
+            if open_access:
+                # for public view: create a new record
 
-            except Exception as error:
-                logger.exception(
-                    f"CLOSED VIEW: Can't update/save KPIAggregations for {abstraction_level} for {abstraction_relation_instance}: {error}"
-                )
-                return
+                value_count["abstraction_relation"] = abstraction_relation_instance
+                value_count["cohort"] = cohort
+                value_count["open_access"] = open_access
+                
+                try:
+                    new_obj = AbstractionKPIAggregationModel.objects.create(**value_count)
+                    logger.debug(f"created {new_obj}")
+                except Exception as error:
+                    logger.exception(
+                        f"Can't save new KPIAggregations for {abstraction_level} for {abstraction_relation_instance}: {error}"
+                    )
+                    return
 
-            if created:
-                logger.debug(f"created {new_obj}")
             else:
-                logger.debug(f"updated {new_obj}")
+                # not for public view - create or update existing
+                try:
+                    (
+                        new_obj,
+                        created,
+                    ) = AbstractionKPIAggregationModel.objects.update_or_create(
+                        defaults={
+                            "abstraction_relation": abstraction_relation_instance,
+                            "cohort": cohort,
+                            "open_access": False,
+                            **value_count,
+                        },
+                        abstraction_relation=abstraction_relation_instance,
+                        cohort=cohort,
+                        open_access=open_access,
+                    )
+                    logger.info(f"updating/saving: {abstraction_relation_instance}")
+
+                except Exception as error:
+                    logger.exception(
+                        f"CLOSED VIEW: Can't update/save KPIAggregations for {abstraction_level} for {abstraction_relation_instance}: {error}"
+                    )
+                    return
+
+                if created:
+                    logger.debug(f"created {new_obj}")
+                else:
+                    logger.debug(f"updated {new_obj}")
             
-    
     # value_counts for this abstraction level  already updated
     # Set all measures to 0 for remaining abstraction levels
-    logger.info(f"{len(list_of_updated_abstraction_level_instance)} scored {abstraction_level.name} instances updated with aggregated scores of a total {AbstractionKPIAggregationModel.objects.filter(cohort=cohort).count()} {abstraction_level.name}s")
+    logger.debug(f"{len(list_of_updated_abstraction_level_instance)} scored {abstraction_level.name} instances updated with aggregated scores of a total {AbstractionKPIAggregationModel.objects.filter(cohort=cohort).count()} {abstraction_level.name}s")
     empty_kpis = {
                 'paediatrician_with_expertise_in_epilepsies_passed': 0,
                 'paediatrician_with_expertise_in_epilepsies_total_eligible': 0,
@@ -512,10 +510,9 @@ def update_kpi_aggregation_model(
     try:
         AbstractionKPIAggregationModel.objects.filter(cohort=cohort).exclude(abstraction_relation__in=list_of_updated_abstraction_level_instance).update(**empty_kpis)
     except Exception as error:
-        logger.exception(f"It was not possible to udate the remaining abstractions")
         raise Exception(f"It was not possible to udate the remaining abstractions")
     
-    logger.info(f"{AbstractionKPIAggregationModel.objects.filter(cohort=cohort).exclude(abstraction_relation__in=list_of_updated_abstraction_level_instance).count()} unscored {abstraction_level.name} updated with 0 scores for all measures.")
+    logger.debug(f"{AbstractionKPIAggregationModel.objects.filter(cohort=cohort).exclude(abstraction_relation__in=list_of_updated_abstraction_level_instance).count()} unscored {abstraction_level.name} updated with 0 scores for all measures.")
 
 def filter_completed_cases_at_one_year_by_abstraction_level(
     abstraction_level: EnumAbstractionLevel, cohort: int
