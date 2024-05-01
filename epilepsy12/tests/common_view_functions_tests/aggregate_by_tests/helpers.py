@@ -98,9 +98,12 @@ def _register_kpi_scored_cases(
             filled_case_objects += test_cases
 
     for test_case in filled_case_objects:
+        test_case.registration.first_paediatric_assessment_date = date(
+            year=2023, month=3, day=1
+        )
         test_case.registration.completed_first_year_of_care_date = (
             test_case.registration.first_paediatric_assessment_date
-            + relativedelta(years=1)
+            + relativedelta(years=1)  # this is before today, so will not fail
         )
         test_case.registration.audit_progress.registration_complete = True
         test_case.registration.audit_progress.first_paediatric_assessment_complete = (

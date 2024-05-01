@@ -586,7 +586,6 @@ def get_filtered_cases_queryset_for(
 
     cases = Case.objects.filter(
         **abstraction_filter,
-        # site__organisation__country__boundary_identifier="E92000001",
         site__site_is_actively_involved_in_epilepsy_care=True,
         site__site_is_primary_centre_of_epilepsy_care=True,
         registration__cohort=cohort,

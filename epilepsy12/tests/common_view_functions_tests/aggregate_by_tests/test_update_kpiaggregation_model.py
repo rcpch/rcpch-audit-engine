@@ -99,13 +99,15 @@ def test_update_kpi_aggregation_model_all_levels(
     _register_kpi_scored_cases(
         e12_case_factory,
         ods_codes=ods_codes,
-        num_cases=5
-        if abstraction_level
-        not in [
-            EnumAbstractionLevel.ORGANISATION,
-            EnumAbstractionLevel.TRUST,
-        ]
-        else 10,
+        num_cases=(
+            5
+            if abstraction_level
+            not in [
+                EnumAbstractionLevel.ORGANISATION,
+                EnumAbstractionLevel.TRUST,
+            ]
+            else 10
+        ),
     )
 
     # PERFORM AGGREGATIONS AND UPDATE AGGREGATION MODEL
@@ -134,7 +136,7 @@ def test_update_kpi_aggregation_model_all_levels(
         )
 
     # ASSERTION
-    if abstraction_level is EnumAbstractionLevel.NATIONAL:
+    if abstraction_level == EnumAbstractionLevel.NATIONAL:
         output = NationalKPIAggregation.objects.get(cohort=6).get_value_counts_for_kpis(
             kpis_tested
         )
@@ -176,8 +178,7 @@ def test_update_kpi_aggregation_model_all_levels(
 
             kpi_aggregation_model_instance = (
                 abstraction_kpi_aggregation_model.objects.get(
-                    abstraction_relation=abstraction_relation_instance,
-                    cohort=6
+                    abstraction_relation=abstraction_relation_instance, cohort=6
                 )
             )
 
