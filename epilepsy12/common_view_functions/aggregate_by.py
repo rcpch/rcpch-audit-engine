@@ -263,12 +263,12 @@ def calculate_kpi_value_counts_queryset(
     if abstraction_level is EnumAbstractionLevel.NATIONAL:
         # NO NEED TO GROUPBY IF NATIONAL
         kpi_value_counts = KPI.objects.filter(
-            registration__id__in=filtered_cases.values("registration")
+            registration__id__in=filtered_cases.values_list("registration")
         ).aggregate(**aggregate_queries)
     else: 
         kpi_value_counts = (
             KPI.objects.filter(
-                registration__id__in=filtered_cases.values("registration")
+                registration__id__in=filtered_cases.values_list("registration")
             )  # filter for KPIs associated with filtered cases
             .values(
                 f"organisation__{abstraction_level.value}"
@@ -278,10 +278,6 @@ def calculate_kpi_value_counts_queryset(
                 f"organisation__{abstraction_level.value}"
             )  # To ensure order is always as expected
         )
-        if abstraction_level.value is None:
-            print("Oh fuck i am none")
-            
-    
 
     return kpi_value_counts
 
@@ -351,26 +347,23 @@ def update_kpi_aggregation_model(
     for value_count in kpi_value_counts:
         ABSTRACTION_CODE = value_count.pop(f"organisation__{abstraction_level.value}")
         if ABSTRACTION_CODE is None:
-            # the last value in each abstraction_level is None - discard
+            # we don't have any values for this abstraction level (eg ICB only applies in Wales not England)
             return
 
         # Get the model field name for the given abstraction model. As the enum values are all with respect to Organisation, this split and grab last gets just that related model's related field.
         related_key_field = abstraction_level.value.split("__")[-1]
-
 
         # Get related entity model
         abstraction_entity_model = apps.get_model(
             "epilepsy12", abstraction_level_models["abstraction_entity_model"]
         )
 
-
         # Get instance of the related entity model to link with Aggregation model
         abstraction_relation_instance = abstraction_entity_model.objects.filter(
             **{f"{related_key_field}": ABSTRACTION_CODE}
         ).first()
 
-
-        # store this instance in a temporary list - this is used to identify remaining unscored abstraction level records to set to 0
+        # store this instance in a temporary list - this is used to identify remaining unscored abstraction level records
         list_of_updated_abstraction_level_instance.append(abstraction_relation_instance)
 
         if open_access:
