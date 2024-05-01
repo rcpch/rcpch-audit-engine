@@ -265,7 +265,7 @@ def calculate_kpi_value_counts_queryset(
         kpi_value_counts = KPI.objects.filter(
             registration__id__in=filtered_cases.values_list("registration")
         ).aggregate(**aggregate_queries)
-    else: 
+    else:
         kpi_value_counts = (
             KPI.objects.filter(
                 registration__id__in=filtered_cases.values_list("registration")
@@ -347,7 +347,7 @@ def update_kpi_aggregation_model(
     for value_count in kpi_value_counts:
         ABSTRACTION_CODE = value_count.pop(f"organisation__{abstraction_level.value}")
         if ABSTRACTION_CODE is None:
-            # we don't have any values for this abstraction level (eg ICB only applies in Wales not England)
+            # we don't have any values for this abstraction level (eg local health board only applies in Wales not England)
             return
 
         # Get the model field name for the given abstraction model. As the enum values are all with respect to Organisation, this split and grab last gets just that related model's related field.
@@ -400,7 +400,6 @@ def update_kpi_aggregation_model(
                     open_access=open_access,
                 )
                 logger.info(f"updating/saving: {abstraction_relation_instance}")
-
             except Exception as error:
                 logger.exception(
                     f"CLOSED VIEW: Can't update/save KPIAggregations for {abstraction_level} for {abstraction_relation_instance}: {error}"
