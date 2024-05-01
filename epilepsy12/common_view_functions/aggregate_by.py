@@ -237,18 +237,24 @@ def calculate_kpi_value_counts_queryset(
         aggregate_queries.update(
             {
                 f"{kpi_name}_passed": Count(
-                    DJANGO_CASE(When(**{f"{kpi_name}": 1}, then=1))
+                    DJANGO_CASE(
+                        When(**{f"{kpi_name}": 1}, then=1),
+                    ),
                 ),
                 f"{kpi_name}_total_eligible": Count(
                     DJANGO_CASE(
-                        When(Q(**{f"{kpi_name}": 1}) | Q(**{f"{kpi_name}": 0}), then=1)
+                        When(Q(**{f"{kpi_name}": 1}) | Q(**{f"{kpi_name}": 0}), then=1),
                     )
                 ),
                 f"{kpi_name}_ineligible": Count(
-                    DJANGO_CASE(When(**{f"{kpi_name}": 2}, then=1))
+                    DJANGO_CASE(
+                        When(**{f"{kpi_name}": 2}, then=1),
+                    ),
                 ),
                 f"{kpi_name}_incomplete": Count(
-                    DJANGO_CASE(When(**{f"{kpi_name}": None}, then=1))
+                    DJANGO_CASE(
+                        When(**{f"{kpi_name}": None}, then=1),
+                    ),
                 ),
             }
         )
@@ -259,7 +265,7 @@ def calculate_kpi_value_counts_queryset(
         kpi_value_counts = KPI.objects.filter(
             registration__id__in=filtered_cases.values_list("registration")
         ).aggregate(**aggregate_queries)
-    elif abstraction_level in [EnumAbstractionLevel.COUNTRY, EnumAbstractionLevel.NHS_ENGLAND_REGION, EnumAbstractionLevel.OPEN_UK, EnumAbstractionLevel.ICB, EnumAbstractionLevel.TRUST, EnumAbstractionLevel.ORGANISATION, EnumAbstractionLevel.LOCAL_HEALTH_BOARD]:
+    else:
         kpi_value_counts = (
             KPI.objects.filter(
                 registration__id__in=filtered_cases.values_list("registration")
@@ -272,9 +278,6 @@ def calculate_kpi_value_counts_queryset(
                 f"organisation__{abstraction_level.value}"
             )  # To ensure order is always as expected
         )
-    else:
-        logger.exception(f"abstraction_level is {abstraction_level}, which would generate an abnormal kpi_value_count. Skipping...")
-        return
 
     return kpi_value_counts
 
@@ -302,6 +305,8 @@ def update_kpi_aggregation_model(
     AbstractionKPIAggregationModel = apps.get_model(
         "epilepsy12", abstraction_level_models["kpi_aggregation_model"]
     )
+
+    list_of_updated_abstraction_level_instance = []
 
     # Separate logic for national as no groupby key in aggregation value counts
     if abstraction_level is EnumAbstractionLevel.NATIONAL:
@@ -337,10 +342,12 @@ def update_kpi_aggregation_model(
                 logger.exception(f"Unable to save National KPIAggregation: {error}")
 
         return
-
+    
+    # update models where numbers have changed.
     for value_count in kpi_value_counts:
         ABSTRACTION_CODE = value_count.pop(f"organisation__{abstraction_level.value}")
         if ABSTRACTION_CODE is None:
+            # we don't have any values for this abstraction level (eg local health board only applies in Wales not England)
             return
 
         # Get the model field name for the given abstraction model. As the enum values are all with respect to Organisation, this split and grab last gets just that related model's related field.
@@ -355,6 +362,9 @@ def update_kpi_aggregation_model(
         abstraction_relation_instance = abstraction_entity_model.objects.filter(
             **{f"{related_key_field}": ABSTRACTION_CODE}
         ).first()
+
+        # store this instance in a temporary list - this is used to identify remaining unscored abstraction level records
+        list_of_updated_abstraction_level_instance.append(abstraction_relation_instance)
 
         if open_access:
             # for public view: create a new record
@@ -400,6 +410,15 @@ def update_kpi_aggregation_model(
                 logger.debug(f"created {new_obj}")
             else:
                 logger.debug(f"updated {new_obj}")
+            
+    
+    logger.info(f"{len(list_of_updated_abstraction_level_instance)} scored {abstraction_level.name} instances updated with aggregated scores of a total {AbstractionKPIAggregationModel.objects.filter(cohort=cohort).count()} {abstraction_level.name}s")
+    
+    not_updated = AbstractionKPIAggregationModel.objects.exclude(abstraction_relation__in=list_of_updated_abstraction_level_instance).filter(cohort=cohort)
+
+    if not_updated.count() > 0:
+        logger.info(f"Not updated: {list(not_updated.values_list('abstraction_name'))})")
+    
 
 def filter_completed_cases_at_one_year_by_abstraction_level(
     abstraction_level: EnumAbstractionLevel, cohort: int
