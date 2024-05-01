@@ -34,6 +34,3 @@ WORKDIR /app/
 # Copy application code into image
 # (Excludes any files/dirs matched by patterns in .dockerignore)
 COPY . /app/
-
-# Startup command
-ENTRYPOINT s/docker-entrypoint

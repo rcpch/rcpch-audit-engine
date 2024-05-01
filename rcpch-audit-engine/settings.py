@@ -19,6 +19,7 @@ from pathlib import Path
 
 # third party imports
 from django.core.management.utils import get_random_secret_key
+from dotenv import load_dotenv
 
 # RCPCH imports
 from .logging_settings import (
@@ -28,6 +29,12 @@ from .logging_settings import (
 from .db import database_config
 
 logger = logging.getLogger(__name__)
+
+env_file = os.getenv("ENV_FILE")
+
+if(env_file):
+    logger.info(f"Loading env file from {env_file}")
+    load_dotenv(env_file)
 
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
 BASE_DIR = Path(__file__).resolve().parent.parent
