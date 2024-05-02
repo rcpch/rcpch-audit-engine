@@ -10,6 +10,7 @@ from epilepsy12.common_view_functions import (
     update_kpi_aggregation_model,
     get_filtered_cases_queryset_for,
     get_abstraction_model_from_level,
+    filter_completed_cases_at_one_year_by_abstraction_level,
 )
 from epilepsy12.models import (
     Organisation,
@@ -115,10 +116,8 @@ def test_update_kpi_aggregation_model_all_levels(
         organisation = Organisation.objects.get(ods_code=code)
 
         # Get filtered cases
-        filtered_cases = get_filtered_cases_queryset_for(
-            organisation=organisation,
-            abstraction_level=abstraction_level,
-            cohort=6,
+        filtered_cases = filter_completed_cases_at_one_year_by_abstraction_level(
+            abstraction_level=abstraction_level, cohort=6
         )
 
         # Get value counts
@@ -176,14 +175,31 @@ def test_update_kpi_aggregation_model_all_levels(
                 **{abstraction_relation_instance_key: abstraction_relation_code}
             ).first()
 
-            kpi_aggregation_model_instance = (
-                abstraction_kpi_aggregation_model.objects.get(
+            # kpi_aggregation_model_instance = (
+            #     abstraction_kpi_aggregation_model.objects.filter(
+            #         abstraction_relation=abstraction_relation_instance, cohort=6
+            #     ).values("ecg", "mental_health_support")
+            # )
+
+            # output = kpi_aggregation_model_instance.get_value_counts_for_kpis(
+            #     kpis_tested
+            # )
+
+            output = (
+                abstraction_kpi_aggregation_model.objects.filter(
                     abstraction_relation=abstraction_relation_instance, cohort=6
                 )
-            )
-
-            output = kpi_aggregation_model_instance.get_value_counts_for_kpis(
-                kpis_tested
+                .values(
+                    "ecg_passed",
+                    "ecg_total_eligible",
+                    "ecg_ineligible",
+                    "ecg_incomplete",
+                    "mental_health_support_passed",
+                    "mental_health_support_total_eligible",
+                    "mental_health_support_ineligible",
+                    "mental_health_support_incomplete",
+                )
+                .first()
             )
 
             assert output == expected_scores[abstraction_relation_code]

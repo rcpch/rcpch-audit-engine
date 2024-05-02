@@ -563,7 +563,7 @@ def get_filtered_cases_queryset_for(
 
     Ensures the Case is filtered for an active, primary Site, and in the correct cohort, and all cases are completely scored and have completed a full year of care
     NOTE as this is confusing. It is NOT used in any aggregation calculation steps prior to updating KPIAggregation models. It is only used to pull existing data from KPIAggregation tables
-    It is also used in the test suite.
+    It has been deprecated from the test suite.
     """
 
     cases_filter_key = f"organisations__{abstraction_level.value}"
