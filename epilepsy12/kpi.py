@@ -107,35 +107,37 @@ def download_kpi_summary_as_csv(cohort):
 
     trust_hb_df = create_KPI_aggregation_dataframe(
         "LocalHealthBoardKPIAggregation",
-        LOCAL_HEALTH_BOARDS,
+        "ods_code",
         cohort,
         measures,
         measures_titles,
+        "HBT",
         KPI_model2="TrustKPIAggregation",
-        constants_list2=trusts,
+        abstraction_key_field2="ods_code",
     )
 
     # ICB (Integrated Care Board) - SHEET 3
 
     icb_df = create_KPI_aggregation_dataframe(
-        "ICBKPIAggregation", INTEGRATED_CARE_BOARDS, cohort, measures, measures_titles
+        "ICBKPIAggregation", "name", cohort, measures, measures_titles, "ICB"
     )
 
     # NHS region level - SHEET 4
 
     region_df = create_KPI_aggregation_dataframe(
         "NHSEnglandRegionKPIAggregation",
-        NHS_ENGLAND_REGIONS,
+        "name",
         cohort,
         measures,
         measures_titles,
+        "NHSregion",
         is_regional=True,
     )
 
     # NETWORKS - SHEET 5
 
     network_df = create_KPI_aggregation_dataframe(
-        "OpenUKKPIAggregation", OPEN_UK_NETWORKS, cohort, measures, measures_titles
+        "OpenUKKPIAggregation", "boundary_identifier", cohort, measures, measures_titles, "Network"
     )
 
     # NATIONAL - SHEET 6
