@@ -6,6 +6,7 @@ import logging
 from django.apps import apps
 from django.contrib.gis.db.models import (
     Q,
+    F,
     Count,
     When,
     Value,
@@ -866,18 +867,19 @@ def create_kpi_report_row(key, measure, kpi, aggregation_row, level):
 
 def create_KPI_aggregation_dataframe(
     KPI_model1,
-    constants_list1,
+    abstraction_key_field1,
     cohort,
     measures,
     measures_titles,
+    title,
     KPI_model2=None,
-    constants_list2=None,
+    abstraction_key_field2=None,
     is_regional=False,
 ):
     """
     INPUTS:
     - KPI_model1, KPI_model2: a KPI aggregation model specific to the organisation body (ie trust, health board, NHSregion
-    - constants_list1, constants_list2: list of names of the organisation bodies stored in E12 ( ie trusts, ICBs)
+    - abstraction_key_field1, abstraction_key_field2: field to look up the value to use as the key (eg ODS code for trusts, names for ICBS)
     - cohort: which cohort of cases to perform the aggregations on
     - measures: which KPI measures to calculate
     - is_regional: a special case to workaround the non-existent 'Health Board' NHS region. Gets set True only when creating a dataframe for the NHS regional level.
@@ -888,7 +890,7 @@ def create_KPI_aggregation_dataframe(
     """
 
     # Define models
-    model_aggregation1 = apps.get_model("epilepsy12", KPI_model1)
+    model_aggregation_1 = apps.get_model("epilepsy12", KPI_model1)
     model_aggregation_2 = None
     wales_region_object = None
 
@@ -908,53 +910,19 @@ def create_KPI_aggregation_dataframe(
     # Extract relevant value from each organisation body in each item, to be used as a label as per the template from the E12 team (Issue 791)
     objects = {}
 
-    for i, body in enumerate(constants_list1):
-        if constants_list1 == LOCAL_HEALTH_BOARDS:
-            key = body["ods_code"]
-        elif constants_list1 == INTEGRATED_CARE_BOARDS:
-            key = body["name"]
-        elif constants_list1 == NHS_ENGLAND_REGIONS:
-            key = body["NHS_ENGLAND_REGION_NAME"]
-        elif constants_list1 == OPEN_UK_NETWORKS:
-            key = body["OPEN_UK_Network_Code"]
-        uid = i + 1
-        objects[key] = (
-            model_aggregation1.objects.filter(
-                cohort=cohort, abstraction_relation=uid, open_access=False
-            )
-            .values()
-            .first()
-        )
+    for aggregation_row in model_aggregation_1.objects.filter(cohort=cohort, open_access=False).annotate(key_field=F(f"abstraction_relation__{abstraction_key_field1}")).values():
+        objects[aggregation_row["key_field"]] = aggregation_row
 
     if model_aggregation_2:
-        if constants_list2:
-            for i, body in enumerate(constants_list2):
-                key = body["ods_code"]
-                uid = i + 1
-                objects[key] = (
-                    model_aggregation_2.objects.filter(
-                        cohort=cohort, abstraction_relation=uid, open_access=False
-                    )
-                    .values()
-                    .first()
-                )
+        if abstraction_key_field2:
+            for aggregation_row in model_aggregation_2.objects.filter(cohort=cohort, open_access=False).annotate(key_field=F(f"abstraction_relation__{abstraction_key_field2}")).values():
+                objects[aggregation_row["key_field"]] = aggregation_row
 
     # Create list containing dictionary items from which final dataframe will be created
     final_list = []
 
-    # Saves organisation type to be used as column name in each sheet
-
-    if constants_list1 == LOCAL_HEALTH_BOARDS:
-        title = "HBT"
-    elif constants_list1 == INTEGRATED_CARE_BOARDS:
-        title = "ICB"
-    elif constants_list1 == NHS_ENGLAND_REGIONS:
-        title = "NHSregion"
-    elif constants_list1 == OPEN_UK_NETWORKS:
-        title = "Network"
-
     # Group KPIs by Trust, and add to dataframe - ie collect all KPIs for a specific trust, then add to dataframe
-    if constants_list2:
+    if abstraction_key_field2:
         for key in objects:
             object = objects[key]
             for index, kpi in enumerate(measures):
@@ -974,17 +942,8 @@ def create_KPI_aggregation_dataframe(
                 object = objects[key]
                 measure_title = measures_titles[index]
 
-                if (
-                    (constants_list1 == INTEGRATED_CARE_BOARDS)
-                    or (constants_list1 == NHS_ENGLAND_REGIONS)
-                    or (constants_list1 == OPEN_UK_NETWORKS)
-                    or (constants_list1 == TRUSTS)
-                ):
-                    item = create_kpi_report_row(key, measure_title, kpi, object, level=title)
-                    final_list.append(item)
-                else:
-                    item = create_kpi_report_row(key, measure_title, kpi, object, level=title)
-                    final_list.append(item)
+                item = create_kpi_report_row(key, measure_title, kpi, object, level=title)
+                final_list.append(item)
 
     return pd.DataFrame.from_dict(final_list)
 
