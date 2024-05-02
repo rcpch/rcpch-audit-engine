@@ -278,10 +278,6 @@ def calculate_kpi_value_counts_queryset(
                 f"organisation__{abstraction_level.value}"
             )  # To ensure order is always as expected
         )
-        if abstraction_level.value is None:
-            print("Oh fuck i am none")
-            
-    
 
     return kpi_value_counts
 
@@ -362,7 +358,6 @@ def update_kpi_aggregation_model(
                 "epilepsy12", abstraction_level_models["abstraction_entity_model"]
             )
 
-
             # Get instance of the related entity model to link with Aggregation model
             abstraction_relation_instance = abstraction_entity_model.objects.filter(
                 **{f"{related_key_field}": ABSTRACTION_CODE}
@@ -389,6 +384,7 @@ def update_kpi_aggregation_model(
                     return
 
             else:
+                
                 # not for public view - create or update existing
                 try:
                     (
@@ -406,7 +402,6 @@ def update_kpi_aggregation_model(
                         open_access=open_access,
                     )
                     logger.info(f"updating/saving: {abstraction_relation_instance}")
-
                 except Exception as error:
                     logger.exception(
                         f"CLOSED VIEW: Can't update/save KPIAggregations for {abstraction_level} for {abstraction_relation_instance}: {error}"
@@ -506,13 +501,17 @@ def update_kpi_aggregation_model(
                 'school_individual_healthcare_plan_ineligible': 0,
                 'school_individual_healthcare_plan_incomplete': 0
             }
-    
+    # set unscored AbstractionKPIAggregation records to zero
     try:
         AbstractionKPIAggregationModel.objects.filter(cohort=cohort).exclude(abstraction_relation__in=list_of_updated_abstraction_level_instance).update(**empty_kpis)
     except Exception as error:
+        logger.exception(f"It was not possible to udate the remaining abstractions")
         raise Exception(f"It was not possible to udate the remaining abstractions")
     
-    logger.debug(f"{AbstractionKPIAggregationModel.objects.filter(cohort=cohort).exclude(abstraction_relation__in=list_of_updated_abstraction_level_instance).count()} unscored {abstraction_level.name} updated with 0 scores for all measures.")
+    not_updated = AbstractionKPIAggregationModel.objects.exclude(abstraction_relation__in=list_of_updated_abstraction_level_instance).filter(cohort=cohort)
+
+    if not_updated.count() > 0:
+        logger.info(f"Not updated: {list(not_updated.values_list('abstraction_name'))})")
 
 def filter_completed_cases_at_one_year_by_abstraction_level(
     abstraction_level: EnumAbstractionLevel, cohort: int
@@ -930,8 +929,9 @@ def ___delete_and_recreate_all_kpi_aggregation_models():
 """
 Functions to create Excel reports
 """
-def create_kpi_report_row(key, measure, kpi, aggregation_row):
+def create_kpi_report_row(key, measure, kpi, aggregation_row, level):
     ret = {
+        level: key,
         "Measure": measure,
     }
 
@@ -940,13 +940,13 @@ def create_kpi_report_row(key, measure, kpi, aggregation_row):
         denominator = aggregation_row[f"{kpi}_total_eligible"]
 
         if numerator is not None and denominator is not None:
-            ret["Numerator"] = numerator
-            ret["Denominator"] = denominator
-
             # Make sure we don't divide by zero
             ret["Percentage"] = (
                 0 if denominator == 0 else (numerator / denominator) * 100
             )
+            ret["Numerator"] = numerator
+            ret["Denominator"] = denominator
+
 
         if numerator is None:
             logger.info(f"Missing numerator for {key} {measure} {kpi}")
@@ -1019,7 +1019,7 @@ def create_KPI_aggregation_dataframe(
         )
 
     if model_aggregation_2:
-        if constants_list2 == TRUSTS:
+        if constants_list2:
             for i, body in enumerate(constants_list2):
                 key = body["ods_code"]
                 uid = i + 1
@@ -1046,12 +1046,11 @@ def create_KPI_aggregation_dataframe(
         title = "Network"
 
     # Group KPIs by Trust, and add to dataframe - ie collect all KPIs for a specific trust, then add to dataframe
-    if constants_list2 == TRUSTS:
+    if constants_list2:
         for key in objects:
             object = objects[key]
             for index, kpi in enumerate(measures):
-                item = create_kpi_report_row(key, measures_titles[index], kpi, object)
-                item[title] = key
+                item = create_kpi_report_row(key, measures_titles[index], kpi, object, level=title)
                 final_list.append(item)
 
     # Group organisation body by KPI, then add to dataframe - collect all values relating to KPI 1 across all organisation bodies, add to dataframe, repeat for next KPI
@@ -1060,10 +1059,8 @@ def create_KPI_aggregation_dataframe(
             if is_regional:
                 measure_title = measures_titles[index]
                 item = create_kpi_report_row(
-                    "wales", measure_title, kpi, wales_region_object
+                    "wales", measure_title, kpi, wales_region_object, level=title
                 )
-                item["NHSregionMeasure"]=f"Health Boards{measure_title}"
-                item[title] = "Health Boards"
                 final_list.append(item)
             for key in objects:
                 object = objects[key]
@@ -1075,13 +1072,10 @@ def create_KPI_aggregation_dataframe(
                     or (constants_list1 == OPEN_UK_NETWORKS)
                     or (constants_list1 == TRUSTS)
                 ):
-                    item = create_kpi_report_row(key, measure_title, kpi, object)
-                    item[f"{title}Measure"] = f"{key}{measure_title}"
-                    item[title] = key
+                    item = create_kpi_report_row(key, measure_title, kpi, object, level=title)
                     final_list.append(item)
                 else:
-                    item = create_kpi_report_row(key, measure_title, kpi, object)
-                    item[title] = key
+                    item = create_kpi_report_row(key, measure_title, kpi, object, level=title)
                     final_list.append(item)
 
     return pd.DataFrame.from_dict(final_list)
@@ -1127,7 +1121,7 @@ def create_reference_dataframe(trusts, health_boards, networks, icbs):
     # For the English Trusts - create row with HBT, HBT_name, Network, Country, UK, NHSregion and ICB as the column names
     for trust in trusts:
         ods_code = trust["ods_code"]
-        trust_name = trust["trust_name"]
+        trust_name = trust["name"]
         network_name = ""
         region = ""
         icb = ""
