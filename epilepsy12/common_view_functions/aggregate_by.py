@@ -838,7 +838,10 @@ def ___delete_and_recreate_all_kpi_aggregation_models():
 """
 Functions to create Excel reports
 """
-def create_kpi_report_row(key, measure, kpi, aggregation_row, level):
+def create_kpi_report_row(key, kpi_field, aggregation_row, level):
+    kpi = kpi_field.name
+    measure = kpi_field.help_text['label']
+
     ret = {
         level: key,
         "Measure": measure,
@@ -870,7 +873,6 @@ def create_KPI_aggregation_dataframe(
     abstraction_key_field1,
     cohort,
     measures,
-    measures_titles,
     title,
     KPI_model2=None,
     abstraction_key_field2=None,
@@ -881,7 +883,7 @@ def create_KPI_aggregation_dataframe(
     - KPI_model1, KPI_model2: a KPI aggregation model specific to the organisation body (ie trust, health board, NHSregion
     - abstraction_key_field1, abstraction_key_field2: field to look up the value to use as the key (eg ODS code for trusts, names for ICBS)
     - cohort: which cohort of cases to perform the aggregations on
-    - measures: which KPI measures to calculate
+    - measures: the Django fields from KPI defining which measures to calculate
     - is_regional: a special case to workaround the non-existent 'Health Board' NHS region. Gets set True only when creating a dataframe for the NHS regional level.
 
     BODY: Computes dataframe of KPI aggregations at specified organisation levl.
@@ -925,24 +927,22 @@ def create_KPI_aggregation_dataframe(
     if abstraction_key_field2:
         for key in objects:
             object = objects[key]
-            for index, kpi in enumerate(measures):
-                item = create_kpi_report_row(key, measures_titles[index], kpi, object, level=title)
+            for measure in measures:
+                item = create_kpi_report_row(key, measure, object, level=title)
                 final_list.append(item)
 
     # Group organisation body by KPI, then add to dataframe - collect all values relating to KPI 1 across all organisation bodies, add to dataframe, repeat for next KPI
     else:
-        for index, kpi in enumerate(measures):
+        for measure in measures:
             if is_regional:
-                measure_title = measures_titles[index]
                 item = create_kpi_report_row(
-                    "wales", measure_title, kpi, wales_region_object, level=title
+                    "wales", measure, wales_region_object, level=title
                 )
                 final_list.append(item)
             for key in objects:
                 object = objects[key]
-                measure_title = measures_titles[index]
 
-                item = create_kpi_report_row(key, measure_title, kpi, object, level=title)
+                item = create_kpi_report_row(key, measure, object, level=title)
                 final_list.append(item)
 
     return pd.DataFrame.from_dict(final_list)

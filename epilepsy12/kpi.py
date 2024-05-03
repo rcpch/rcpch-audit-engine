@@ -18,7 +18,7 @@ from epilepsy12.common_view_functions.aggregate_by import (
     create_reference_dataframe,
     create_kpi_report_row,
 )
-from epilepsy12.models import (Organisation, Trust)
+from epilepsy12.models import (Organisation, Trust, KPI)
 
 
 def download_kpi_summary_as_csv(cohort):
@@ -36,35 +36,20 @@ def download_kpi_summary_as_csv(cohort):
     - National_comparison
     """
 
-    # Define KPI measures for extraction
+    # The summary only includes some measures
     measures = [
-        "paediatrician_with_expertise_in_epilepsies",
-        "epilepsy_specialist_nurse",
-        "tertiary_input",
-        "epilepsy_surgery_referral",
-        "ecg",
-        "mri",
-        "assessment_of_mental_health_issues",
-        "mental_health_support",
-        "sodium_valproate",
-        "comprehensive_care_planning_agreement",
-        "comprehensive_care_planning_content",
-        "school_individual_healthcare_plan",
-    ]
-
-    measures_titles = [
-        "1. Paediatrician with expertise",
-        "2. Epilepsy specialist nurse",
-        "3a. Tertiary involvement",
-        "3b. Epilepsy surgery referral",
-        "4. ECG",
-        "5. MRI",
-        "6. Assessment of mental health issues",
-        "7. Mental health support",
-        "8. Sodium valproate",
-        "9a. Comprehensive care planning agreement",
-        "9b. Comprehensive care planning content",
-        "10. School Individual Health Care Plan",
+        KPI._meta.get_field('paediatrician_with_expertise_in_epilepsies'),
+        KPI._meta.get_field('epilepsy_specialist_nurse'),
+        KPI._meta.get_field('tertiary_input'),
+        KPI._meta.get_field('epilepsy_surgery_referral'),
+        KPI._meta.get_field('ecg'),
+        KPI._meta.get_field('mri'),
+        KPI._meta.get_field('assessment_of_mental_health_issues'),
+        KPI._meta.get_field('mental_health_support'),
+        KPI._meta.get_field('sodium_valproate'),
+        KPI._meta.get_field('comprehensive_care_planning_agreement'),
+        KPI._meta.get_field('comprehensive_care_planning_content'),
+        KPI._meta.get_field('school_individual_healthcare_plan'),
     ]
 
     trusts_from_organisations = Organisation.objects.values('trust').distinct()
@@ -88,14 +73,12 @@ def download_kpi_summary_as_csv(cohort):
     )
 
     final_list = []
-    for index, kpi in enumerate(measures):
-        measure_title = measures_titles[index]
-
+    for measure in measures:
         england_row = create_kpi_report_row(
-            "england", measure_title, kpi, england_kpi_aggregation, "Country"
+            "england", measure, england_kpi_aggregation, "Country"
         )
         wales_row = create_kpi_report_row(
-            "wales", measure_title, kpi, wales_kpi_aggregation, "Country"
+            "wales", measure, wales_kpi_aggregation, "Country"
         )
 
         final_list.append(england_row)
@@ -110,7 +93,6 @@ def download_kpi_summary_as_csv(cohort):
         "ods_code",
         cohort,
         measures,
-        measures_titles,
         "HBT",
         KPI_model2="TrustKPIAggregation",
         abstraction_key_field2="ods_code",
@@ -119,7 +101,7 @@ def download_kpi_summary_as_csv(cohort):
     # ICB (Integrated Care Board) - SHEET 3
 
     icb_df = create_KPI_aggregation_dataframe(
-        "ICBKPIAggregation", "name", cohort, measures, measures_titles, "ICB"
+        "ICBKPIAggregation", "name", cohort, measures, "ICB"
     )
 
     # NHS region level - SHEET 4
@@ -129,7 +111,6 @@ def download_kpi_summary_as_csv(cohort):
         "name",
         cohort,
         measures,
-        measures_titles,
         "NHSregion",
         is_regional=True,
     )
@@ -137,7 +118,7 @@ def download_kpi_summary_as_csv(cohort):
     # NETWORKS - SHEET 5
 
     network_df = create_KPI_aggregation_dataframe(
-        "OpenUKKPIAggregation", "boundary_identifier", cohort, measures, measures_titles, "Network"
+        "OpenUKKPIAggregation", "boundary_identifier", cohort, measures, "Network"
     )
 
     # NATIONAL - SHEET 6
@@ -154,10 +135,9 @@ def download_kpi_summary_as_csv(cohort):
     )
 
     final_list = []
-    for index, kpi in enumerate(measures):
-        measure_title = measures_titles[index]
+    for measure in measures:
         item = create_kpi_report_row(
-            "national", measure_title, kpi, national_kpi_aggregation, "uk"
+            "national", measure, national_kpi_aggregation, "uk"
         )
         item["uk"] = "England and Wales"
         final_list.append(item)
