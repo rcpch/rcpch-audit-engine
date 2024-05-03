@@ -1,3 +1,6 @@
+# Python imports
+from itertools import chain
+
 # Django Imports
 from django.apps import apps
 
@@ -17,8 +20,9 @@ from epilepsy12.common_view_functions.aggregate_by import (
     create_KPI_aggregation_dataframe,
     create_reference_dataframe,
     create_kpi_report_row,
+    get_kpi_aggregation_rows
 )
-from epilepsy12.models import (Organisation, Trust, KPI)
+from epilepsy12.models import (Organisation, Trust, KPI, ICBKPIAggregation, OpenUKKPIAggregation, CountryKPIAggregation, LocalHealthBoardKPIAggregation, TrustKPIAggregation, NHSEnglandRegionKPIAggregation)
 
 
 def download_kpi_summary_as_csv(cohort):
@@ -58,47 +62,89 @@ def download_kpi_summary_as_csv(cohort):
     # COUNTRY - SHEET 1
     # create a dataframe with a row for each measure of each country, and a column for each of ["Measure", "Percentage", "Numerator", "Denominator"]
 
-    country_df = create_KPI_aggregation_dataframe(
-        "CountryKPIAggregation",
-        "name",
+    all_country_rows = get_kpi_aggregation_rows(
+        CountryKPIAggregation,
         cohort,
+        abstraction_key_field="name"
+    )
+    
+    # Only England and Wales participate in the audit but we have entries in the country table for NI and Scotland
+    # Even if a participating country doesn't have any data yet we'd still like to include a blank row for it
+    # We keep a row for Wales as we need it later on for SHEET 4 - NHS Region level
+    england_rows = all_country_rows.filter(key_field="England")
+    wales_rows = all_country_rows.filter(key_field="Wales")
+
+    country_df = create_KPI_aggregation_dataframe(
+        chain(england_rows, wales_rows),
         measures,
-        "Country"
+        title="Country"
     )
 
     # HBT (Trusts & Health Boards) - SHEET 2
 
-    trust_hb_df = create_KPI_aggregation_dataframe(
-        "LocalHealthBoardKPIAggregation",
-        "ods_code",
+    # Only in Wales
+    local_health_board_rows = get_kpi_aggregation_rows(
+        LocalHealthBoardKPIAggregation,
         cohort,
+        abstraction_key_field="ods_code"
+    )
+
+    # Only in England
+    trust_rows = get_kpi_aggregation_rows(
+        TrustKPIAggregation,
+        cohort,
+        abstraction_key_field="ods_code"
+    )
+
+    trust_hb_df = create_KPI_aggregation_dataframe(
+        chain(local_health_board_rows, trust_rows),
         measures,
-        "HBT",
-        KPI_model2="TrustKPIAggregation",
-        abstraction_key_field2="ods_code",
+        title="HBT"
     )
 
     # ICB (Integrated Care Board) - SHEET 3
 
+    icb_rows = get_kpi_aggregation_rows(
+        ICBKPIAggregation,
+        cohort,
+        abstraction_key_field="name"
+    )
+
     icb_df = create_KPI_aggregation_dataframe(
-        "ICBKPIAggregation", "name", cohort, measures, "ICB"
+        icb_rows,
+        measures,
+        title="ICB"
     )
 
     # NHS region level - SHEET 4
 
-    region_df = create_KPI_aggregation_dataframe(
-        "NHSEnglandRegionKPIAggregation",
-        "name",
+    nhs_england_regional_rows = get_kpi_aggregation_rows(
+        NHSEnglandRegionKPIAggregation,
         cohort,
+        abstraction_key_field="name"
+    )
+
+    # Treat Wales as a single region
+    region_rows = chain(nhs_england_regional_rows, wales_rows)
+
+    region_df = create_KPI_aggregation_dataframe(
+        region_rows,
         measures,
-        "NHSregion",
-        is_regional=True,
+        title="NHSregion",
     )
 
     # NETWORKS - SHEET 5
 
+    network_rows = get_kpi_aggregation_rows(
+        OpenUKKPIAggregation,
+        cohort,
+        abstraction_key_field="boundary_identifier"
+    )
+
     network_df = create_KPI_aggregation_dataframe(
-        "OpenUKKPIAggregation", "boundary_identifier", cohort, measures, "Network"
+        network_rows,
+        measures,
+        title="Network"
     )
 
     # NATIONAL - SHEET 6
