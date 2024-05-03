@@ -871,14 +871,20 @@ def create_kpi_report_row(key, kpi_field, aggregation_row, level):
 def get_kpi_aggregation_rows(
     model_aggregation,
     cohort,
-    abstraction_key_field,
+    abstraction_key_field=None,
 ):
-    return list(model_aggregation.objects.filter(
+    query = model_aggregation.objects.filter(
         cohort=cohort,
         open_access=False
-    ).annotate(
-        key_field=F(f"abstraction_relation__{abstraction_key_field}")
-    ).values())
+    )
+
+    if abstraction_key_field:
+        query = query.annotate(
+            key_field=F(f"abstraction_relation__{abstraction_key_field}")
+        )
+    
+    # Eagerly evaluate the query
+    return list(query.values())
 
 def create_KPI_aggregation_dataframe(
     aggregation_rows,

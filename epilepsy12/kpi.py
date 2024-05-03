@@ -19,7 +19,7 @@ from epilepsy12.common_view_functions.aggregate_by import (
     create_kpi_report_row,
     get_kpi_aggregation_rows
 )
-from epilepsy12.models import (Organisation, Trust, KPI, ICBKPIAggregation, OpenUKKPIAggregation, CountryKPIAggregation, LocalHealthBoardKPIAggregation, TrustKPIAggregation, NHSEnglandRegionKPIAggregation)
+from epilepsy12.models import (Organisation, Trust, KPI, ICBKPIAggregation, OpenUKKPIAggregation, CountryKPIAggregation, LocalHealthBoardKPIAggregation, TrustKPIAggregation, NHSEnglandRegionKPIAggregation, NationalKPIAggregation)
 
 
 def download_kpi_summary_as_csv(cohort):
@@ -147,25 +147,15 @@ def download_kpi_summary_as_csv(cohort):
     # NATIONAL - SHEET 6
     # create a dataframe with a row for each measure, and column for each of ["Measure", "Percentage", "Numerator", "Denominator"]
     # note rows are named ["1. Paediatrician with expertise","2. Epilepsy specialist nurse","3a. Tertiary involvement","3b. Epilepsy surgery referral","4. ECG","5. MRI","6. Assessment of mental health issues","7. Mental health support","8. Sodium valproate","9a. Comprehensive care planning agreement","9b. Comprehensive care planning content","10. School Individual Health Care Plan"]
-    # Note that the function create_dataframe is not called here because there is no list of organisations to iterate through
+    
+    # NationalKPIAggregation has no abstraction relation to walk so add the key field manually
+    national_rows = [row | {"key_field": "England and Wales"} for row in get_kpi_aggregation_rows(NationalKPIAggregation, cohort)]
 
-    NationalKPIAggregation = apps.get_model("epilepsy12", "NationalKPIAggregation")
-
-    national_kpi_aggregation = (
-        NationalKPIAggregation.objects.filter(cohort=cohort, open_access=False)
-        .values()
-        .first()
+    national_df = create_KPI_aggregation_dataframe(
+        national_rows,
+        measures,
+        title="uk"
     )
-
-    final_list = []
-    for measure in measures:
-        item = create_kpi_report_row(
-            "national", measure, national_kpi_aggregation, "uk"
-        )
-        item["uk"] = "England and Wales"
-        final_list.append(item)
-
-    national_df = pd.DataFrame.from_dict(final_list)
 
     # REFERENCE - SHEET 7
 
