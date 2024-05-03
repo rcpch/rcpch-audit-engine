@@ -53,8 +53,11 @@ def download_kpi_summary_as_csv(cohort):
         KPI._meta.get_field('school_individual_healthcare_plan'),
     ]
 
+    # Many trusts do not have organisations that participate in the audit
+    # The list of trusts in the database includes all of them
+    # The list of organisations however is curated to just those that participate
     trusts_from_organisations = Organisation.objects.values('trust').distinct()
-    trusts = Trust.objects.filter(id__in=trusts_from_organisations).values()
+    trusts_participating_in_the_audit = Trust.objects.filter(id__in=trusts_from_organisations).values()
 
     # COUNTRY - SHEET 1
     # create a dataframe with a row for each measure of each country, and a column for each of ["Measure", "Percentage", "Numerator", "Denominator"]
@@ -92,6 +95,10 @@ def download_kpi_summary_as_csv(cohort):
         cohort,
         abstraction_key_field="ods_code"
     )
+
+    # Only those trusts that participate in the audit
+    ods_codes_for_trusts_participating_in_the_audit = [trust["ods_code"] for trust in trusts_participating_in_the_audit]
+    trust_rows = [row for row in trust_rows if row["key_field"] in ods_codes_for_trusts_participating_in_the_audit]
 
     trust_hb_df = create_KPI_aggregation_dataframe(
         local_health_board_rows + trust_rows,
@@ -160,7 +167,7 @@ def download_kpi_summary_as_csv(cohort):
     # REFERENCE - SHEET 7
 
     reference_df = create_reference_dataframe(
-        trusts,
+        trusts_participating_in_the_audit,
         LOCAL_HEALTH_BOARDS,
         OPEN_UK_NETWORKS_TRUSTS,
         INTEGRATED_CARE_BOARDS_LOCAL_AUTHORITIES,
