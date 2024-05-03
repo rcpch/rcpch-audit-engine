@@ -868,82 +868,34 @@ def create_kpi_report_row(key, kpi_field, aggregation_row, level):
 
     return ret
 
+def get_kpi_aggregation_rows(
+    model_aggregation,
+    abstraction_key_field,
+    cohort
+):
+    return model_aggregation.objects.filter(
+        cohort=cohort,
+        open_access=False
+    ).annotate(
+        key_field=F(f"abstraction_relation__{abstraction_key_field}")
+    )
+
 def create_KPI_aggregation_dataframe(
-    KPI_model1,
-    abstraction_key_field1,
+    aggregation_rows,
     cohort,
     measures,
     title,
-    KPI_model2=None,
-    abstraction_key_field2=None,
-    is_regional=False,
 ):
-    """
-    INPUTS:
-    - KPI_model1, KPI_model2: a KPI aggregation model specific to the organisation body (ie trust, health board, NHSregion
-    - abstraction_key_field1, abstraction_key_field2: field to look up the value to use as the key (eg ODS code for trusts, names for ICBS)
-    - cohort: which cohort of cases to perform the aggregations on
-    - measures: the Django fields from KPI defining which measures to calculate
-    - is_regional: a special case to workaround the non-existent 'Health Board' NHS region. Gets set True only when creating a dataframe for the NHS regional level.
-
-    BODY: Computes dataframe of KPI aggregations at specified organisation levl.
-
-    OUTPUTS: Returns dataframe containing KPI measures
-    """
-
-    # Define models
-    model_aggregation_1 = apps.get_model("epilepsy12", KPI_model1)
-    model_aggregation_2 = None
-    wales_region_object = None
-
-    # Set condiitonal model if KPI_model2==True or is_regional==True
-    if KPI_model2:
-        model_aggregation_2 = apps.get_model("epilepsy12", KPI_model2)
-    if is_regional:
-        model_aggregation_2 = apps.get_model("epilepsy12", "CountryKPIAggregation")
-        wales_region_object = (
-            model_aggregation_2.objects.filter(
-                cohort=cohort, abstraction_relation=4, open_access=False
-            )
-            .values()
-            .first()
-        )
-
-    # Extract relevant value from each organisation body in each item, to be used as a label as per the template from the E12 team (Issue 791)
-    objects = {}
-
-    for aggregation_row in model_aggregation_1.objects.filter(cohort=cohort, open_access=False).annotate(key_field=F(f"abstraction_relation__{abstraction_key_field1}")).values():
-        objects[aggregation_row["key_field"]] = aggregation_row
-
-    if model_aggregation_2:
-        if abstraction_key_field2:
-            for aggregation_row in model_aggregation_2.objects.filter(cohort=cohort, open_access=False).annotate(key_field=F(f"abstraction_relation__{abstraction_key_field2}")).values():
-                objects[aggregation_row["key_field"]] = aggregation_row
-
-    # Create list containing dictionary items from which final dataframe will be created
     final_list = []
 
-    # Group KPIs by Trust, and add to dataframe - ie collect all KPIs for a specific trust, then add to dataframe
-    if abstraction_key_field2:
-        for key in objects:
-            object = objects[key]
-            for measure in measures:
-                item = create_kpi_report_row(key, measure, object, level=title)
-                final_list.append(item)
-
-    # Group organisation body by KPI, then add to dataframe - collect all values relating to KPI 1 across all organisation bodies, add to dataframe, repeat for next KPI
-    else:
-        for measure in measures:
-            if is_regional:
-                item = create_kpi_report_row(
-                    "wales", measure, wales_region_object, level=title
-                )
-                final_list.append(item)
-            for key in objects:
-                object = objects[key]
-
-                item = create_kpi_report_row(key, measure, object, level=title)
-                final_list.append(item)
+    for measure in measures:
+        for aggregation_row in aggregation_rows:
+            final_list.append(create_kpi_report_row(
+                aggregation_row["key_field"],
+                measure,
+                aggregation_row,
+                title
+            ))
 
     return pd.DataFrame.from_dict(final_list)
 
