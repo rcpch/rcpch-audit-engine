@@ -1,6 +1,3 @@
-# Python imports
-from itertools import chain
-
 # Django Imports
 from django.apps import apps
 
@@ -71,11 +68,11 @@ def download_kpi_summary_as_csv(cohort):
     # Only England and Wales participate in the audit but we have entries in the country table for NI and Scotland
     # Even if a participating country doesn't have any data yet we'd still like to include a blank row for it
     # We keep a row for Wales as we need it later on for SHEET 4 - NHS Region level
-    england_rows = all_country_rows.filter(key_field="England")
-    wales_rows = all_country_rows.filter(key_field="Wales")
+    england_rows = [row for row in all_country_rows if row["key_field"] == "England"]
+    wales_rows = [row for row in all_country_rows if row["key_field"] == "Wales"]
 
     country_df = create_KPI_aggregation_dataframe(
-        chain(england_rows, wales_rows),
+        england_rows + wales_rows,
         measures,
         title="Country"
     )
@@ -97,7 +94,7 @@ def download_kpi_summary_as_csv(cohort):
     )
 
     trust_hb_df = create_KPI_aggregation_dataframe(
-        chain(local_health_board_rows, trust_rows),
+        local_health_board_rows + trust_rows,
         measures,
         title="HBT"
     )
@@ -125,7 +122,7 @@ def download_kpi_summary_as_csv(cohort):
     )
 
     # Treat Wales as a single region
-    region_rows = chain(nhs_england_regional_rows, wales_rows)
+    region_rows = nhs_england_regional_rows + wales_rows
 
     region_df = create_KPI_aggregation_dataframe(
         region_rows,

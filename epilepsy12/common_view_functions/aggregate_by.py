@@ -873,12 +873,12 @@ def get_kpi_aggregation_rows(
     cohort,
     abstraction_key_field,
 ):
-    return model_aggregation.objects.filter(
+    return list(model_aggregation.objects.filter(
         cohort=cohort,
         open_access=False
     ).annotate(
         key_field=F(f"abstraction_relation__{abstraction_key_field}")
-    ).values()
+    ).values())
 
 def create_KPI_aggregation_dataframe(
     aggregation_rows,
@@ -889,12 +889,14 @@ def create_KPI_aggregation_dataframe(
 
     for measure in measures:
         for aggregation_row in aggregation_rows:
-            final_list.append(create_kpi_report_row(
+            report_row = create_kpi_report_row(
                 aggregation_row["key_field"],
                 measure,
                 aggregation_row,
                 title
-            ))
+            )
+
+            final_list.append(report_row)
 
     return pd.DataFrame.from_dict(final_list)
 
