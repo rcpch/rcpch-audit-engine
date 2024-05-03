@@ -58,33 +58,13 @@ def download_kpi_summary_as_csv(cohort):
     # COUNTRY - SHEET 1
     # create a dataframe with a row for each measure of each country, and a column for each of ["Measure", "Percentage", "Numerator", "Denominator"]
 
-    CountryKPIAggregation = apps.get_model("epilepsy12", "CountryKPIAggregation")
-
-    england_kpi_aggregation = (
-        CountryKPIAggregation.objects.filter(cohort=cohort, abstraction_relation=1)
-        .values()
-        .first()
+    country_df = create_KPI_aggregation_dataframe(
+        "CountryKPIAggregation",
+        "name",
+        cohort,
+        measures,
+        "Country"
     )
-
-    wales_kpi_aggregation = (
-        CountryKPIAggregation.objects.filter(cohort=cohort, abstraction_relation=4)
-        .values()
-        .first()
-    )
-
-    final_list = []
-    for measure in measures:
-        england_row = create_kpi_report_row(
-            "england", measure, england_kpi_aggregation, "Country"
-        )
-        wales_row = create_kpi_report_row(
-            "wales", measure, wales_kpi_aggregation, "Country"
-        )
-
-        final_list.append(england_row)
-        final_list.append(wales_row)
-
-    country_df = pd.DataFrame.from_dict(final_list)
 
     # HBT (Trusts & Health Boards) - SHEET 2
 
