@@ -883,7 +883,9 @@ def get_kpi_aggregation_rows(
             key_field=F(f"abstraction_relation__{abstraction_key_field}")
         )
     
-    # Eagerly evaluate the query
+    # Eagerly evaluate the query as we use some result sets twice in kpi.py
+    # Otherwise we'd have to re-run the query to avoid getting empty results
+    # the second time we try and use it.
     return list(query.values())
 
 def create_KPI_aggregation_dataframe(
