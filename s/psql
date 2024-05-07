@@ -1,3 +1,32 @@
 #!/bin/bash -e
 
-docker compose exec postgis psql -U epilepsy12user -d epilepsy12db
+ENVIRONMENT=local
+
+while [[ $# -gt 0 ]]; do
+    case ${1} in
+        --environment)
+            ENVIRONMENT="${2}"
+            shift # past argument
+            shift # past value
+        ;;
+        -*|--*)
+            echo "Unknown option ${1}"
+            exit 1
+            ;;
+  esac
+done
+
+case ${ENVIRONMENT} in
+    'local')
+        docker compose exec postgis psql -U epilepsy12user -d epilepsy12db
+        ;;
+    
+    'staging')
+        host='e12-staging.postgres.database.azure.com'
+        access_token=$(az account get-access-token --resource-type oss-rdbms --query 'accessToken' --output tsv)
+        PGPASSWORD=${access_token} psql "host=${host} user=E12\ Staging\ Database\ Owners dbname=postgres sslmode=require" 
+        ;;
+    
+    *)
+        echo "Unknown environment ${ENVIRONMENT} - expected local, staging"
+esac
