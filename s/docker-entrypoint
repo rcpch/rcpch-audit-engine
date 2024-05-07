@@ -1,7 +1,13 @@
 #!/bin/bash -e
 
+echo 'collectstatic'
 python manage.py collectstatic --noinput
+
+echo 'migrate'
 python manage.py migrate
+
+echo 'seed'
 python manage.py seed --mode=seed_groups_and_permissions
-echo ${DJANGO_STARTUP_COMMAND}
-${DJANGO_STARTUP_COMMAND}
+
+echo 'startup'
+gunicorn --bind=0.0.0.0:8000 --timeout 600 rcpch-audit-engine.wsgi
