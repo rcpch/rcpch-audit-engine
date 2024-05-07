@@ -28,6 +28,7 @@ from epilepsy12.constants import (
     OPEN_UK_NETWORKS_TRUSTS,
 )
 from epilepsy12.general_functions import cohorts_and_dates
+from epilepsy12.common_view_functions import calculate_kpis
 
 # Logging setup
 logger = logging.getLogger(__name__)
@@ -696,6 +697,23 @@ def get_abstraction_model_from_level(
 #             kpi_value_counts=kpi_value_counts,
 #             cohort=cohort,
 #         )
+
+def _calculate_all_kpis():
+    """
+    Loops through all registered cases for all cohorts and reruns the KPI calculation for each one
+    """
+    Case = apps.get_model("epilepsy12", "Case")
+    all_cases = Case.objects.filter(registration__isnull=False)
+    index = 0
+    for case in all_cases:
+        try:
+            calculate_kpis(case.registration)
+            logger.debug(f"KPIs recalculated for {case}")
+            index += 1
+        except Exception as error:
+            logger.error(f"It was not possible to calculate and update KPI record for {case}: {error}")
+            continue
+    logger.info(f"{index} cases updated from a total of {all_cases.count()}")
 
 """
 Sets up the KPIAggregation models - one for each cohort and each level of abstraction
