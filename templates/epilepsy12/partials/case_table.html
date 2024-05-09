@@ -305,15 +305,19 @@
         <th colspan="10" class="right aligned">
           {% if case_list.has_previous %}
           <div class="ui rcpch_primary button" hx-target="#case_table"
-          hx-get="{% url 'cases' organisation_id=organisation.pk %}?page={{case_list.previous_page_number}}&filtered_case_list={{filtered_case_list}}&sort_flag={{sort_flag}}"
+          hx-get="{% url 'cases' organisation_id=organisation.pk %}?page={{case_list.previous_page_number}}&sort_flag={{sort_flag}}"
           hx-swap="innerHTML">Previous 10</div>
           {% endif %}
           {% if case_list.has_next %}
-          <div class="ui rcpch_primary button" name="next_button" hx-target="#case_table"
-          hx-get="{% url 'cases' organisation_id=organisation.pk  %}?page={{ case_list.next_page_number }}&filtered_case_list={{filtered_case_list}}&sort_flag={{sort_flag}}"
-          hx-swap="innerHTML">Next 10</div>
+            <div class="ui rcpch_primary button" name="next_button" hx-target="#case_table"
+            {% if filtered_case_list %} {% comment %} items have been entered into the search box - return filtered_case_list and sort_flag{% endcomment %}
+              hx-get="{% url 'cases' organisation_id=organisation.pk  %}?page={{ case_list.next_page_number }}&filtered_case_list={{filtered_case_list}}&sort_flag={{sort_flag}}"
+            {% else %} {% comment %} no items in the search box - return only the sort_flag {% endcomment %}
+              hx-get="{% url 'cases' organisation_id=organisation.pk  %}?page={{ case_list.next_page_number }}&sort_flag={{sort_flag}}"
+            {% endif %}
+            hx-swap="innerHTML">Next 10</div>
           {% endif %}
-        </th>
+        </th> 
       </tr>
       <tr>
         <th colspan="12" class="right aligned">
