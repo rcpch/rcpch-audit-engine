@@ -32,7 +32,7 @@ class Assessment(TimeStampAbstractBaseClass, UserStampAbstractBaseClass, HelpTex
     consultant_paediatrician_referral_made = models.BooleanField(
         help_text={
             "label": "Has a referral been made to a consultant paediatrician with expertise in epilepsies?",
-            "reference": "Has a referral been made to a consultant paediatrician with expertise in epilepsies?",
+            "reference": "A 'paediatrician with expertise' is a paediatric consultant (or associate specialist) defined by themselves, their employer and tertiary services/networks has having: 1) Training & continuing education in epilepsies, 2) Peer review of practice and 3) Regular audit of diagnosis (eg. participation in Epilepsy12). A paediatric neurologist is also defined as a paediatrician with expertise. Informs KPI 1",
         },
         blank=True,
         default=None,
@@ -41,7 +41,7 @@ class Assessment(TimeStampAbstractBaseClass, UserStampAbstractBaseClass, HelpTex
     consultant_paediatrician_referral_date = models.DateField(
         help_text={
             "label": "Date of referral to a consultant paediatrician with expertise in epilepsies.",
-            "reference": "Has a referral been made to a consultant paediatrician with expertise in epilepsies?",
+            "reference": "Date referral made to a consultant paediatrician with expertise in epilepsies.",
         },
         blank=True,
         null=True,
