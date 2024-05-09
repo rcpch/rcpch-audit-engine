@@ -5,6 +5,11 @@
   <table class="ui rcpch purple table cases_table">
     <thead>
       <tr>
+        <th class="one wide">
+          <div class="rcpch_td_data_indicator_wrapper">
+            <p>E12 ID</p>
+          </div>
+        </th>
         <th class="two wide">
           <div class="rcpch_td_data_indicator_wrapper">
             <p>Name</p>
@@ -110,11 +115,17 @@
           {% else %}
               <tr>
           {% endif %}
-        
           <td>
-            <span data-tooltip="Epilepsy12 unique identifier: {{case.id}}" data-position="top left">
-              <i class="rcpch question circle icon"></i>
-            </span>
+            {% if request.user.is_rcpch_audit_team_member %}
+              {% with case|lead_site_for_case as lead_site  %}
+                <span {% if lead_site %} data-tooltip="Lead site: {{lead_site.organisation}} ({{lead_site.organisation.trust}})" {% else %}  data-tooltip="There is no allocated lead site" {% endif %}data-position="top left">
+                  <i class="rcpch question circle icon"></i>
+                </span>
+              {% endwith %}
+            {% endif %}
+            {{case.id}}
+          </td>
+          <td>
             {% none_masked case.first_name %} {% none_masked case.surname %}</td>
           <td>{% none_masked case.get_sex_display %}</td>
           <td data-mask="000 000 0000">{% none_masked case.nhs_number %}</td>
@@ -305,15 +316,19 @@
         <th colspan="10" class="right aligned">
           {% if case_list.has_previous %}
           <div class="ui rcpch_primary button" hx-target="#case_table"
-          hx-get="{% url 'cases' organisation_id=organisation.pk %}?page={{case_list.previous_page_number}}&filtered_case_list={{filtered_case_list}}&sort_flag={{sort_flag}}"
+          hx-get="{% url 'cases' organisation_id=organisation.pk %}?page={{case_list.previous_page_number}}&sort_flag={{sort_flag}}"
           hx-swap="innerHTML">Previous 10</div>
           {% endif %}
           {% if case_list.has_next %}
-          <div class="ui rcpch_primary button" name="next_button" hx-target="#case_table"
-          hx-get="{% url 'cases' organisation_id=organisation.pk  %}?page={{ case_list.next_page_number }}&filtered_case_list={{filtered_case_list}}&sort_flag={{sort_flag}}"
-          hx-swap="innerHTML">Next 10</div>
+            <div class="ui rcpch_primary button" name="next_button" hx-target="#case_table"
+            {% if filtered_case_list %} {% comment %} items have been entered into the search box - return filtered_case_list and sort_flag{% endcomment %}
+              hx-get="{% url 'cases' organisation_id=organisation.pk  %}?page={{ case_list.next_page_number }}&filtered_case_list={{filtered_case_list}}&sort_flag={{sort_flag}}"
+            {% else %} {% comment %} no items in the search box - return only the sort_flag {% endcomment %}
+              hx-get="{% url 'cases' organisation_id=organisation.pk  %}?page={{ case_list.next_page_number }}&sort_flag={{sort_flag}}"
+            {% endif %}
+            hx-swap="innerHTML">Next 10</div>
           {% endif %}
-        </th>
+        </th> 
       </tr>
       <tr>
         <th colspan="12" class="right aligned">

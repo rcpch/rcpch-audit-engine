@@ -284,7 +284,7 @@ def case_list(request, organisation_id):
 
     cases_in_transfer = registered_cases.filter(site__active_transfer=True)
 
-    paginator = Paginator(all_cases, 10)
+    paginator = Paginator(all_cases, 50)
     page_number = request.GET.get("page", 1)
     case_list = paginator.page(page_number)
 
