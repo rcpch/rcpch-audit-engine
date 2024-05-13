@@ -22,11 +22,11 @@
         </button>
         </a>
     </div>
-    <div id="organisation_return" class="ui rcpch_grey button bold">
-        <a href="{% url 'selected_organisation_summary' organisation_id=organisation_id %}">
-          Return to Organisation View
-        </a>
-    </div>
+    <a href="{% url 'selected_organisation_summary' organisation_id=organisation_id %}">
+      <div id="organisation_return" class="ui rcpch_grey button">
+        Return to Organisation View
+      </div>
+    </a>
   </span>
 </div>
 
