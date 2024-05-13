@@ -869,7 +869,7 @@ def create_kpi_report_row(key, measure, kpi, aggregation_row, level):
         if numerator is not None and denominator is not None:
             # Make sure we don't divide by zero
             ret["Percentage"] = (
-                0 if denominator == 0 else (numerator / denominator) * 100
+                0 if denominator == 0 else (numerator / denominator)
             )
             ret["Numerator"] = numerator
             ret["Denominator"] = denominator
