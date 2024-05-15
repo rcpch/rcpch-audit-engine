@@ -140,10 +140,15 @@ def completed_fields(model_instance):
                         "focal_onset_occipital",
                         "focal_onset_right",
                         "focal_onset_left",
+                        "focal_onset_laterality_unknown",
                     ]:
                         if getattr(model_instance, field.name, ()) == True:
                             # only count the true values in the radio buttons in focal epilepsy to do with focality
-                            if field.name in ["focal_onset_right", "focal_onset_left"]:
+                            if field.name in [
+                                "focal_onset_right",
+                                "focal_onset_left",
+                                "focal_onset_laterality_unknown",
+                            ]:
                                 counter += 1
                     else:
                         counter += 1

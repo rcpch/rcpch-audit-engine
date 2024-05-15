@@ -136,7 +136,10 @@
                 {% else %}
 
                     <div class="field" id="allocate_surgical_centre">
-                        <p>There is currently no surgical centre involved in the care of {{assessment.registration.case.first_name}} {{assessment.registration.case.surname}}</label>
+                        <span data-tooltip="This field is mandatory" data-inverted="" data-position="top left">
+                            <i class="rcpch_light_blue dot circle outline icon" ></i>
+                            There is currently no surgical centre involved in the care of {{assessment.registration.case.first_name}} {{assessment.registration.case.surname}}
+                        </span>
                         {% url 'epilepsy_surgery_centre' assessment_id=assessment.pk as hx_post %}
                         {% url 'update_epilepsy_surgery_centre_pressed' assessment_id=assessment.pk site_id=active_surgical_site.pk action='cancel' as hx_cancel %}
                         {% include 'epilepsy12/partials/page_elements/organisations_select.html' with organisation_list=organisation_list hx_post=hx_post hx_target="#childrens_epilepsy_surgical_service" hx_trigger="click" hx_swap="innerHTML" hx_name="epilepsy_surgery_centre" test_positive=None label="Allocate Children's Surgical Centre" hx_default_text="Search children's surgical centres..." data_position="top left" enabled=perms.epilepsy12.change_assessment has_permission=perms.epilepsy12.change_assessment %}
