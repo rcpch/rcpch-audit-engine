@@ -360,8 +360,6 @@ def general_paediatric_centre(request, assessment_id):
     consultant_paediatrician partial which is its parent
     """
 
-    print(request.POST.get("general_paediatric_centre"))
-
     general_paediatric_centre = Organisation.objects.get(
         pk=request.POST.get("general_paediatric_centre")
     )
@@ -372,15 +370,6 @@ def general_paediatric_centre(request, assessment_id):
         selected_organisation=general_paediatric_centre,
         case=assessment.registration.case,
         user=request.user,
-    )
-
-    print("creating")
-    print(
-        Site.objects.filter(
-            case=assessment.registration.case,
-            site_is_actively_involved_in_epilepsy_care=True,
-            site_is_general_paediatric_centre=True,
-        )
     )
 
     # filter list to include only NHS organisations
@@ -432,15 +421,6 @@ def edit_general_paediatric_centre(request, assessment_id, site_id):
         case=assessment.registration.case,
         user=request.user,
         site_id=site_id,
-    )
-
-    print("updating")
-    print(
-        Site.objects.filter(
-            case=assessment.registration.case,
-            site_is_actively_involved_in_epilepsy_care=True,
-            site_is_general_paediatric_centre=True,
-        )
     )
 
     # filter list to include only NHS organisations
@@ -554,15 +534,6 @@ def delete_general_paediatric_centre(request, assessment_id, site_id):
 
     # refresh all objects and return
     assessment = Assessment.objects.get(pk=assessment_id)
-
-    print("deleting")
-    print(
-        Site.objects.filter(
-            case=assessment.registration.case,
-            site_is_actively_involved_in_epilepsy_care=True,
-            site_is_general_paediatric_centre=True,
-        )
-    )
 
     # filter list to include only NHS organisations
     organisation_list = Organisation.objects.order_by("name")
