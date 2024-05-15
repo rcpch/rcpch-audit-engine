@@ -141,10 +141,11 @@ def completed_fields(model_instance):
                         "focal_onset_right",
                         "focal_onset_left",
                     ]:
-                        if getattr(model_instance, field.name, ()) == True:
-                            # only count the true values in the radio buttons in focal epilepsy to do with focality
-                            if field.name in ["focal_onset_right", "focal_onset_left"]:
-                                counter += 1
+                        # if getattr(model_instance, field.name, ()) == True:
+                        #     # only count the true values in the radio buttons in focal epilepsy to do with focality
+                        #     if field.name in ["focal_onset_right", "focal_onset_left"]:
+                        #         counter += 1
+                        pass  # deprecated as per #955
                     else:
                         counter += 1
     return counter
@@ -544,8 +545,8 @@ def expected_score_for_single_episode(episode):
             cumulative_score += 1
         elif episode.epileptic_seizure_onset_type == "FO":
             # focal onset
-            # minimum score is laterality
-            cumulative_score += 1
+            # minimum score is laterality - deprecated #955
+            cumulative_score += 0
         else:
             # either unclassified or unknown onset
             # no further score
