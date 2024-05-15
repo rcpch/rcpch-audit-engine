@@ -30,7 +30,11 @@ from epilepsy12.forms_folder.epilepsy12_user_form import (
     Epilepsy12UserAdminCreationForm,
     CaptchaAuthenticationForm,
 )
-from ..general_functions import construct_confirm_email, match_in_choice_key, send_email_to_recipients
+from ..general_functions import (
+    construct_confirm_email,
+    match_in_choice_key,
+    send_email_to_recipients,
+)
 from ..common_view_functions import group_for_role
 from ..decorator import (
     user_may_view_this_organisation,
@@ -76,21 +80,21 @@ def epilepsy12_user_list(request, organisation_id):
         filter_term_Q = (
             Q(first_name__icontains=filter_term)
             | Q(surname__icontains=filter_term)
-            | Q(organisation_employer__name__icontains=filter_term)
+            | Q(organisation_employer=organisation)
             | Q(email__icontains=filter_term)
         )
 
         # filter_term is called if filtering by search box
         if request.user.view_preference == 0:
             # user has requested organisation level view
-            basic_filter = Q(organisation_employer=organisation.name)
+            basic_filter = Q(organisation_employer=organisation)
         elif request.user.view_preference == 1:
             # user has requested trust level view
             if organisation.country.boundary_identifier == "W92000004":
-                parent_trust = organisation.organisation.local_health_board.name
+                parent_trust = organisation.local_health_board
             else:
-                parent_trust = organisation.organisation.trust.name
-            basic_filter = Q(organisation_employer=parent_trust)
+                parent_trust = organisation.trust
+            basic_filter = Q(organisation_employer__trust=parent_trust)
         elif request.user.view_preference == 2:
             # user has requested national level view
             basic_filter = None
@@ -564,8 +568,10 @@ class ResetPasswordView(SuccessMessageMixin, PasswordResetView):
         " If you don't receive an email, "
         "please make sure you've entered the address you registered with, and check your spam folder."
     )
-    extra_email_context= { 
-                          "reset_password_link_expires_at": datetime.now() + timedelta(seconds=int(settings.PASSWORD_RESET_TIMEOUT)) }
+    extra_email_context = {
+        "reset_password_link_expires_at": datetime.now()
+        + timedelta(seconds=int(settings.PASSWORD_RESET_TIMEOUT))
+    }
     success_url = reverse_lazy("index")
 
     # extend form_valid to set user.password_last_set
