@@ -91,7 +91,10 @@
             {% else %}
 
                 <div class="field" id="allocate_general_paediatric_centre">
-                    <p>There is currently no general paediatric centre involved in the care of {{assessment.registration.case.first_name}} {{assessment.registration.case.surname}}</label>
+                    <span class="episode-date" data-tooltip="This field is mandatory" data-inverted="" data-position="top left">
+                        <i class="rcpch_light_blue dot circle outline icon" ></i>
+                        <p>There is currently no general paediatric centre involved in the care of {{assessment.registration.case.first_name}} {{assessment.registration.case.surname}}</label>
+                    </span>
                     <div class="field" id="allocate_general_paediatric_centre" >
                         {% url 'general_paediatric_centre' assessment_id=assessment.pk as hx_post %}
                         {% url 'update_general_paediatric_centre_pressed' assessment_id=assessment.pk site_id=active_general_paediatric_site.pk action='cancel' as hx_cancel %}
