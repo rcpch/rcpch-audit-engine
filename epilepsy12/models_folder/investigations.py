@@ -68,7 +68,7 @@ class Investigations(
 
     mri_indicated = models.BooleanField(
         help_text={
-            "label": "Has a brain MRI been requested?",
+            "label": "Has a brain MRI been achieved?",
             "reference": "NICE recommends that an MRI scan should be offered to children, young people and adults diagnosed with epilepsy, unless they have idiopathic generalised epilepsy or self-limited epilepsy with centrotemporal spikes. The MRI should be carried out within 6 weeks of the MRI referral.",
         },
         default=None,

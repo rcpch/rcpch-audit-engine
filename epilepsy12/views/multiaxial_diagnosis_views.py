@@ -380,7 +380,7 @@ def seizure_onset_date(request, episode_id):
             model_id=episode_id,
             field_name="seizure_onset_date",
             page_element="date_field",
-            earliest_allowable_date=None,  # episodes may precede the first assessment date or cohort date
+            earliest_allowable_date=episode.multiaxial_diagnosis.registration.case.date_of_birth,  # episodes may precede the first assessment date or cohort date
         )
     except ValueError as error:
         error_message = error
@@ -1660,7 +1660,7 @@ def comorbidity_diagnosis_date(request, comorbidity_id):
             model_id=comorbidity_id,
             field_name="comorbidity_diagnosis_date",
             page_element="date_field",
-            earliest_allowable_date=comorbidity.multiaxial_diagnosis.registration.first_paediatric_assessment_date,
+            earliest_allowable_date=comorbidity.multiaxial_diagnosis.registration.case.date_of_birth,
         )
     except ValueError as error:
         error_message = error

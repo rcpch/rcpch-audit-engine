@@ -628,7 +628,7 @@ def antiepilepsy_medicine_stop_date(request, antiepilepsy_medicine_id):
             page_element="date_field",
             comparison_date_field_name="antiepilepsy_medicine_start_date",
             is_earliest_date=False,
-            earliest_allowable_date=antiepilepsy_medicine.management.registration.first_paediatric_assessment_date,
+            earliest_allowable_date=antiepilepsy_medicine.antiepilepsy_medicine_start_date,
         )
     except ValueError as error:
         error_message = error
