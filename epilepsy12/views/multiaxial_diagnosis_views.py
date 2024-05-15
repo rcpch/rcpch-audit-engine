@@ -1660,7 +1660,7 @@ def comorbidity_diagnosis_date(request, comorbidity_id):
             model_id=comorbidity_id,
             field_name="comorbidity_diagnosis_date",
             page_element="date_field",
-            earliest_allowable_date=comorbidity.multiaxial_diagnosis.registration.first_paediatric_assessment_date,
+            earliest_allowable_date=comorbidity.multiaxial_diagnosis.registration.case.date_of_birth,
         )
     except ValueError as error:
         error_message = error
