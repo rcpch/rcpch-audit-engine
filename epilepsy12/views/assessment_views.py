@@ -253,7 +253,7 @@ def consultant_paediatrician_referral_date(request, assessment_id):
             page_element="date_field",
             comparison_date_field_name="consultant_paediatrician_input_date",
             is_earliest_date=True,
-            earliest_allowable_date=None,
+            earliest_allowable_date=assessment.registration.case.date_of_birth,
         )
     except ValueError as error:
         error_message = error
@@ -723,7 +723,7 @@ def paediatric_neurologist_input_date(request, assessment_id):
             page_element="date_field",
             comparison_date_field_name="paediatric_neurologist_referral_date",
             is_earliest_date=False,
-            earliest_allowable_date=assessment.registration.first_paediatric_assessment_date,
+            earliest_allowable_date=assessment.paediatric_neurologist_referral_date,
         )
     except ValueError as error:
         error_message = error
@@ -1244,7 +1244,7 @@ def childrens_epilepsy_surgical_service_input_date(request, assessment_id):
             page_element="date_field",
             comparison_date_field_name="childrens_epilepsy_surgical_service_referral_date",
             is_earliest_date=False,
-            earliest_allowable_date=assessment.registration.first_paediatric_assessment_date,
+            earliest_allowable_date=assessment.childrens_epilepsy_surgical_service_referral_date,
         )
     except ValueError as error:
         error_message = error
@@ -1572,7 +1572,7 @@ def epilepsy_specialist_nurse_referral_date(request, assessment_id):
             page_element="date_field",
             comparison_date_field_name="epilepsy_specialist_nurse_input_date",
             is_earliest_date=True,
-            earliest_allowable_date=None,
+            earliest_allowable_date=assessment.registration.first_paediatric_assessment_date,
         )
     except ValueError as error:
         error_message = error

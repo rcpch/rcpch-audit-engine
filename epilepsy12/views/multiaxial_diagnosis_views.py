@@ -380,7 +380,7 @@ def seizure_onset_date(request, episode_id):
             model_id=episode_id,
             field_name="seizure_onset_date",
             page_element="date_field",
-            earliest_allowable_date=None,  # episodes may precede the first assessment date or cohort date
+            earliest_allowable_date=episode.multiaxial_diagnosis.registration.case.date_of_birth,  # episodes may precede the first assessment date or cohort date
         )
     except ValueError as error:
         error_message = error
