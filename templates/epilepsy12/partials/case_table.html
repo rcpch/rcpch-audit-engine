@@ -111,7 +111,11 @@
               <tr>
           {% endif %}
         
-          <td>{% none_masked case.first_name %} {% none_masked case.surname %}</td>
+          <td>
+            <span data-tooltip="Epilepsy12 unique identifier: {{case.id}}" data-position="top left">
+              <i class="rcpch question circle icon"></i>
+            </span>
+            {% none_masked case.first_name %} {% none_masked case.surname %}</td>
           <td>{% none_masked case.get_sex_display %}</td>
           <td data-mask="000 000 0000">{% none_masked case.nhs_number %}</td>
           <td>{% none_masked case.registration.audit_submission_date|date:'D j M Y' %}</td>
@@ -120,15 +124,16 @@
           <td class='two wide'>
             <div class='ui buttons'>
               <button 
-                data-tooltip='Edit child details.'
+                data-tooltip='Edit or delete child.'
                 {% if case.locked or case.registration.days_remaining_before_submission == 0 %}
                   class="ui rcpch_purple icon disabled button"
                 {% else %}
                   class="ui rcpch_purple icon button"
                 {% endif %}
                 tabindexed="0" {% if case.locked or not perms.epilepsy12.change_case %}disabled{% endif %}>
-                <a href="{% url 'update_case' organisation_id=organisation_id case_id=case.id%}">
-                  <i class="edit outline icon"></i>
+                <a href="{% url 'update_case' organisation_id=organisation_id case_id=case.id%}" class="rcpch_purple half_button">
+                  <i class="edit outline icon icon_white"></i>
+                  Edit
                 </a>
               </button>
               
@@ -300,13 +305,20 @@
         <th colspan="10" class="right aligned">
           {% if case_list.has_previous %}
           <div class="ui rcpch_primary button" hx-target="#case_table"
-            hx-get="{% url 'cases' organisation_id=organisation.pk %}?page={{case_list.previous_page_number}}&sort_flag={{sort_flag}}"
-            hx-swap="innerHTML">Previous 10</div>
+          hx-get="{% url 'cases' organisation_id=organisation.pk %}?page={{case_list.previous_page_number}}&filtered_case_list={{filtered_case_list}}&sort_flag={{sort_flag}}"
+          hx-swap="innerHTML">Previous 10</div>
           {% endif %}
           {% if case_list.has_next %}
           <div class="ui rcpch_primary button" name="next_button" hx-target="#case_table"
-            hx-get="{% url 'cases' organisation_id=organisation.pk  %}?page={{case_list.next_page_number}}&sort_flag={{sort_flag}}"
-            hx-swap="innerHTML">Next 10</div>
+          hx-get="{% url 'cases' organisation_id=organisation.pk  %}?page={{ case_list.next_page_number }}&filtered_case_list={{filtered_case_list}}&sort_flag={{sort_flag}}"
+          hx-swap="innerHTML">Next 10</div>
+          {% endif %}
+        </th>
+      </tr>
+      <tr>
+        <th colspan="12" class="right aligned">
+          {% if case_list %}
+            <label>Page {{case_list.number}} of {{case_list.paginator.num_pages}}</label>
           {% endif %}
         </th>
       </tr>
@@ -317,7 +329,7 @@
   {% else %}
   <div class='ui container'>
     <div class='padded_container'>
-      <div class='ui rcpch_info fluid message'>There are no children registered yet</div>
+      <div class='ui rcpch_info fluid message'>No children found.</div>
     </div>
   </div>
   {% endif %}

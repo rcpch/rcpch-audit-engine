@@ -351,6 +351,16 @@ organisation_patterns = [
         view=open_access,
         name="open_access",
     ),
+    path(
+        "organisation/<int:organisation_id>/kpi_download",
+        view=kpi_download,
+        name="kpi_download",
+    ),
+    path(
+        "kpi_download_file",
+        view=kpi_download_file,
+        name="kpi_download_file",
+    ),
 ]
 
 global_htmx_trigger_patterns = [
@@ -358,9 +368,7 @@ global_htmx_trigger_patterns = [
         "registration/<int:case_id>/registration_active/<str:active_template>",
         view=registration_active,
         name="registration_active",
-    ),
-    path("download_select", download_select, name="download_select"),
-    path("<str:model_name>/download", download, name="download"),
+    )
 ]
 
 first_paediatric_assessment_patterns = [
@@ -979,11 +987,6 @@ registration_patterns = [
         "registration/<int:registration_id>/allocate_lead_site",
         allocate_lead_site,
         name="allocate_lead_site",
-    ),
-    path(
-        "registration/<int:registration_id>/site/<int:site_id>/delete",
-        delete_lead_site,
-        name="delete_lead_site",
     ),
     path(
         "registration/<int:registration_id>/previous_sites",

@@ -1,9 +1,9 @@
 ---
-title: Manual dev setup
+title: Manual development setup
 reviewers: Dr Marcus Baw
 ---
 
-If you prefer to set up a development environment manually, here are the steps. Please note that we do not provide support for developers using a bespoke setup, only the Docker development environment is supported.
+If you prefer to set up a development environment manually, here are the steps. **Please note that we do not provide support for developers using a bespoke setup, only the Docker development environment is supported.**
 
 This manual approach will require you to have much more familiarity with configuring PostgresQL, Django, and Python to achieve your aims, and is not for beginners.
 
@@ -11,7 +11,7 @@ This manual approach will require you to have much more familiarity with configu
 
 You will need the [Postgresql](https://www.postgresql.org/) database, which can be installed natively on your development machine, or (recommended) can be installed using Docker.
 
-Using the command below will create a development database with credentials that match those in our `example.env` file.
+Using the command below will create a development database with credentials that match those in our `envs/env-template` file.
 You will need Docker to be installed on your local machine. (Please search the web for instructions for installation on your operating system and setup)
 
 ```console
@@ -25,12 +25,12 @@ docker run --name epilepsy12postgres \
 
 ## Install the correct Python version
 
-If you don't have python 3.10 installed already, you will need it.
+If you don't have Python installed already, you will need it. To avoid specifying a specific Python version for the project here in the documentation, please check the `Dockerfile` in the project root for the version of Python that is currently being used.
 
 We recommend the use of a tool such as [pyenv](https://github.com/pyenv/pyenv) to assist with managing multiple Python versions and their accompanying virtualenvs.
 
 ```console
-pyenv install 3.10.0
+pyenv install <PYTHON_VERSION>
 ```
 
 > On some platforms, you will get errors at build-time, which indicates you need to install some dependencies which are required for building the Python binaries locally. Rather than listing these here, where they may become out of date, please refer to the [pyenv wiki](https://github.com/pyenv/pyenv/wiki) which covers this in detail.
@@ -38,7 +38,7 @@ pyenv install 3.10.0
 Then create a virtual environment:
 
 ```console
-pyenv virtualenv 3.10.0 rcpch-audit-engine
+pyenv virtualenv <PYTHON_VERSION> rcpch-audit-engine
 ```
 
 Clone the repository and `cd` into the directory:
@@ -54,10 +54,12 @@ Then install all the requirements. Note you can't do this without PostgreSQL alr
 pip install -r requirements/development-requirements.txt
 ```
 
-## Initialize the environment variables
+## Set and initialize the environment variables
+
+You will need to set the environment variables for your local development, using the `envs/env-template` file as a starting point. **This file should not be committed to the repository**. You can use real values for the environment variables in this file.
 
 ```console
-source example.env
+source envs/.env
 ```
 
 !!! danger
@@ -66,7 +68,7 @@ The included example environment variables are not secure and must never be used
 ## Prepare the database for use
 
 ```console
-s/migrate
+python manage.py migrate
 ```
 
 ## Create superuser to enable logging into admin section
@@ -75,10 +77,11 @@ s/migrate
 python manage.py createsuperuser
 ```
 
-Then follow the command line prompts to create the first user. Createsuperuser is a django base feature but there are some custom fields which are mandatory. These include:
+Then follow the command line prompts to create the first user. Createsuperuser is a Django base feature but there are some custom fields which are mandatory. These include:
 
-- role: It is not possible easily to override the CLI for this function. The options are: 1 - Clinical Lead, 2 - Clinician, 3 - E12 Site Administrator, 4 - RCPCH Audit Team. If the integer selected in 1-3 (ie a role within the E12 site, KCH is automatically allocated. If it is an RCPCH user, is_rcpcph_staff is automatically set to true, as it is_rcpch_audit_team_member)
-- is_rcpch_audit_team_member: invites a True/False reply.
+- `role`: The options are: `1 - Clinical Lead, 2 - Clinician, 3 - E12 Site Administrator, 4 - RCPCH Audit Team`. If the integer selected in 1-3 (ie a role within the E12 site) KCH is automatically allocated. If it is an RCPCH user, `is_rcpch_staff` is automatically set to true, as is `is_rcpch_audit_team_member`
+
+- `is_rcpch_audit_team_member`: `True|False`.
 
 Further users can subsequently be created in the Admin UI
 
@@ -87,23 +90,12 @@ Further users can subsequently be created in the Admin UI
 Navigate to the epilepsy12 outer folder and run the server:
 
 ```console
-s/runserver
-```
-
-or
-
-you may need to allow permissions to run the bash script in that folder first:
-
-```console
-chmod +x ./s/runserver
-chmod +x ./s/migrate
-chmod +x ./s/seed
-chmod +x ./s/init
+python manage.py runserver
 ```
 
 ## Seeding the Database
 
-Migrations 002 to 011 will seed the database with the following:
+Migrations will seed the database with the following:
 
 - Organisations
 - Trusts
@@ -142,11 +134,6 @@ There are some other functions here also, but these are likely soon to be deprec
 - upload_user_data
 - async_upload_user_data
 
-If you want to seed with all these, there is a short cut in the start folder:
-
-```console
-s/seed
-```
 
 This will seed with the defaults documented above.
 

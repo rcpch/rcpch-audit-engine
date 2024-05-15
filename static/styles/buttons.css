@@ -1,377 +1,385 @@
 /* buttons / icon buttons / toggle buttons / date_field input */
 
 .toggle_button_label {
-    padding-bottom: 10px;
-    color: black;
-  }
-  
-  .ui.rcpch_dark_blue.button {
-    transition-duration: 0.4s;
-    font-weight: 400;
-  }
-  
-  .ui.rcpch_dark_blue.button {
-    background-color: var(--rcpch_light_grey);
-    color: black;
-    border-radius: 0% !important;
-    font-weight: 1000;
-    padding-bottom: 10px;
-    font-family: Montserrat-Bold !important;
-  }
-  
-  .ui.rcpch_dark_blue.button:active {
-    background-color: var(--rcpch_pink);
-    color: white;
-    border-radius: 0% !important;
-    font-weight: 800;
-  }
-  
-  .ui.rcpch_dark_blue.positive.button {
-    background-color: var(--rcpch_light_blue);
-    color: white;
-    border-radius: 0% !important;
-    font-family: Montserrat-Bold !important;
-    font-weight: 900;
-  }
-  
-  .ui.rcpch_dark_blue.button:hover {
-    background-color: var(--rcpch_dark_blue);
-    color: white;
-    border-radius: 0% !important;
-  }
-  
-  .ui.rcpch_dark_blue.positive.button:hover {
-    background-color: var(--rcpch_dark_blue);
-    color: white;
-    border-radius: 0% !important;
-  }
+  padding-bottom: 10px;
+  color: black;
+}
 
-  /* buttons */
+.ui.rcpch_dark_blue.button {
+  transition-duration: 0.4s;
+  font-weight: 400;
+}
+
+.ui.rcpch_dark_blue.button {
+  background-color: var(--rcpch_light_grey);
+  color: black;
+  border-radius: 0% !important;
+  font-weight: 1000;
+  padding-bottom: 10px;
+  font-family: Montserrat-Bold !important;
+}
+
+.ui.rcpch_dark_blue.button:active {
+  background-color: var(--rcpch_pink);
+  color: white;
+  border-radius: 0% !important;
+  font-weight: 800;
+}
+
+.ui.rcpch_dark_blue.positive.button {
+  background-color: var(--rcpch_light_blue);
+  color: white;
+  border-radius: 0% !important;
+  font-family: Montserrat-Bold !important;
+  font-weight: 900;
+}
+
+.ui.rcpch_dark_blue.button:hover {
+  background-color: var(--rcpch_dark_blue);
+  color: white;
+  border-radius: 0% !important;
+}
+
+.ui.rcpch_dark_blue.positive.button:hover {
+  background-color: var(--rcpch_dark_blue);
+  color: white;
+  border-radius: 0% !important;
+}
+
+/* buttons */
 
 .ui.rcpch_light_blue.buttons {
-    border-radius: 0% !important;
-    color: white;
-    background-color: var(--rcpch_light_blue);
-  }
-  
-  .ui.rcpch_light_blue.buttons:active {
-    border-radius: 0% !important;
-    color: white;
-    background-color: var(--rcpch_pink);
-  }
-  
-  .ui.rcpch_light_blue.buttons:hover {
-    border-radius: 0% !important;
-    color: white;
-    background-color: var(--rcpch_dark_blue);
-  }
-  
-  .ui.rcpch_light_blue.button {
-    border-radius: 0% !important;
-    color: black;
-    background-color: var(--rcpch_light_blue);
-  }
-  
-  .ui.rcpch_light_blue.button:active {
-    border-radius: 0% !important;
-    color: white;
-    background-color: var(--rcpch_pink);
-  }
-  
-  .ui.rcpch_light_blue.button:hover {
-    border-radius: 0% !important;
-    color: white;
-    background-color: var(--rcpch_dark_blue);
-    border-color: transparent;
-  }
+  border-radius: 0% !important;
+  color: white;
+  background-color: var(--rcpch_light_blue);
+}
 
-  .ui.rcpch_dark_blue.lighter_font.button{
-    background-color: var(--rcpch_light_grey);
-    font-weight: 800;
-    font-family: var(--rcpch_standard_font) !important;
-  }
-  
-  /* individual buttons */
-  
-  .ui.rcpch_primary.button {
-    border-radius: 0% !important;
-    color: black;
-    background-color: var(--rcpch_light_blue);
-    border-color: var(--rcpch_light_blue);
-    font-weight: 400;
-  }
+.ui.rcpch_light_blue.buttons:active {
+  border-radius: 0% !important;
+  color: white;
+  background-color: var(--rcpch_pink);
+}
 
-  .ui.rcpch_primary.button.bold {
-    font-family: 'Montserrat-Bold' !important;
-  }
-  
-  .ui.rcpch_primary.button.jump {
-    margin: 5px;
-    width: 130.23px;
-    height: 25.98px;
-    font-size: .85714286rem;
-    white-space: normal;
-  }
-  
-  .topbar {
-    display: flex !important;
-    justify-content: space-between;
-  }
-  
-  .ui.rcpch_info.button {
-    border-radius: 0% !important;
-    color: black;
-    background-color: var(--rcpch_light_blue_tint3);
-    border-color: var(--rcpch_light_blue_tint3);
-    font-weight: 400;
-    height: 100%;
-    width: 100%;
-    justify-content: center;
-  }
-  
-  .ui.rcpch_purple.button {
-    border-radius: 0% !important;
-    color: white;
-    background-color: var(--rcpch_purple_light_tint1);
-    border-color: var(--rcpch_purple_light_tint1);
-    font-weight: 400;
-  }
-  
-  .ui.rcpch_dark_purple.button {
-    border-radius: 0% !important;
-    color: white;
-    background-color: var(--rcpch_purple);
-    border-color: var(--rcpch_purple);
-    font-weight: 400;
-  }
-  
-  .ui.rcpch_dark_purple.button:hover {
-    border-radius: 0% !important;
-    color: white;
-    background-color: var(--rcpch_purple_light_tint1);
-    transition-duration: 0.4s;
-    font-weight: 400;
-  }
-  
-  .ui.rcpch_grey.button {
-    border-radius: 0% !important;
-    color: black;
-    background-color: var(--rcpch_mid_grey);
-    border-color: var(--rcpch_mid_grey);
-    font-weight: 400;
-  }
-  
-  .ui.rcpch_grey.button:hover {
-    border-radius: 0% !important;
-    color: white;
-    background-color: var(--rcpch_dark_blue);
-    transition-duration: 0.4s;
-    font-weight: 400;
-  }
+.ui.rcpch_light_blue.buttons:hover {
+  border-radius: 0% !important;
+  color: white;
+  background-color: var(--rcpch_dark_blue);
+}
 
-  .ui.rcpch_grey.button.bold {
-    font-family: 'Montserrat-Bold' !important;
-  }
-  
-  #first_paediatric_assessment_date_button {
-    border-style: solid;
-  }
-  
-  .ui.rcpch_primary.button:hover {
-    border-radius: 0% !important;
-    color: white;
-    background-color: var(--rcpch_dark_blue);
-    transition-duration: 0.4s;
-    font-weight: 400;
-  }
-  
-  .ui.rcpch_purple.button:hover {
-    border-radius: 0% !important;
-    color: white;
-    background-color: var(--rcpch_purple);
-    transition-duration: 0.4s;
-    font-weight: 400;
-  }
-  
-  .ui.rcpch_primary.button .icon:hover {
-    border-radius: 0% !important;
-    color: white;
-    background-color: var(--rcpch_dark_blue);
-    transition-duration: 0.4s;
-    font-weight: 400;
-  }
-  
-  .ui.rcpch_purple.button .icon:hover {
-    border-radius: 0% !important;
-    color: white;
-    background-color: var(--rcpch_purple_dark_tint);
-    transition-duration: 0.4s;
-    font-weight: 400;
-  }
-  
-  .ui.rcpch_negative.button {
-    border-radius: 0% !important;
-    color: white;
-    background-color: var(--rcpch_yellow);
-    font-weight: 400;
-  }
-  
-  .ui.rcpch_negative.button:hover {
-    border-radius: 0% !important;
-    color: white;
-    background-color: var(--rcpch_orange);
-    transition-duration: 0.4s;
-    font-weight: 400;
-  }
-  
-  .ui.rcpch_positive.button {
-    border-radius: 0% !important;
-    color: white;
-    background-color: var(--rcpch_strong_blue);
-    font-weight: 400;
-  }
+.ui.rcpch_light_blue.button {
+  border-radius: 0% !important;
+  color: black;
+  background-color: var(--rcpch_light_blue);
+}
 
-  .back.link {
-    display: flex;
-    align-items: center;
-  }
-  
-  a.ui.button {
-    display: flex;
-    justify-content: center;
-    align-items: center;
-  }
-  
-  .ui.rcpch_positive.button:hover {
-    border-radius: 0% !important;
-    color: white;
-    background-color: var(--rcpch_dark_blue);
-    transition-duration: 0.4s;
-    font-weight: 400;
-  }
-  
-  .ui.rcpch_danger.button {
-    border-radius: 0% !important;
-    color: white;
-    background-color: var(--rcpch_red);
-    font-weight: 400;
-  }
-  
-  .ui.rcpch_danger.button:hover {
-    border-radius: 0% !important;
-    color: white;
-    background-color: #8a0400;
-    transition-duration: 0.4s;
-    font-weight: 400;
-  }
-  
-  .ui.rcpch_danger.button .icon:hover {
-    border-radius: 0% !important;
-    color: white;
-    background-color: #8a0400;
-    transition-duration: 0.4s;
-    font-weight: 400;
-  }
+.ui.rcpch_light_blue.button:active {
+  border-radius: 0% !important;
+  color: white;
+  background-color: var(--rcpch_pink);
+}
 
-  .ui.rcpch_danger.button.bold {
-    font-family: 'Montserrat-Bold' !important;
-  }
+.ui.rcpch_light_blue.button:hover {
+  border-radius: 0% !important;
+  color: white;
+  background-color: var(--rcpch_dark_blue);
+  border-color: transparent;
+}
 
-  /* icons and icon buttons */
+.ui.rcpch_dark_blue.lighter_font.button {
+  background-color: var(--rcpch_light_grey);
+  font-weight: 800;
+  font-family: var(--rcpch_standard_font) !important;
+}
 
-  .icon.close:hover {
-    color: var(--rcpch_dark_blue);
-  }
+/* individual buttons */
 
-  .icon {
-    color: var(--rcpch_black);
-  }
-  
-  .icon_white {
-    color: white;
-  }
-  
-  .rcpch_pink.icon {
-    color: var(--rcpch_pink);
-  }
-  
-  .rcpch_red.icon {
-    color: var(--rcpch_red_light_tint2);
-  }
-  
-  .rcpch_light_blue.icon {
-    color: var(--rcpch_light_blue);
-  }
-  
-  .rcpch_orange.icon {
-    color: var(--rcpch_orange);
-  }
-  
-  .rcpch_light_grey.icon {
-    color: var(--rcpch_light_grey);
-  }
-  
-  .ui.rcpch_red.icon.button {
-    border-radius: 0%;
-    background-color: var(--rcpch_red);
-    color: var(--rcpch_white);
-  }
-  
-  .ui.rcpch_red.icon.button:hover {
-    border-radius: 0%;
-    background-color: var(--rcpch_dark_red);
-    color: var(--rcpch_white);
-  }
+.ui.rcpch_primary.button {
+  border-radius: 0% !important;
+  color: black;
+  background-color: var(--rcpch_light_blue);
+  border-color: var(--rcpch_light_blue);
+  font-weight: 400;
+}
 
+.ui.rcpch_primary.button.bold {
+  font-family: "Montserrat-Bold" !important;
+}
 
-  /* download button */
-  .ui.rcpch_positive.download.button a {
-    color: white;
-  }
-  
-  .ui.rcpch_positive.download.button:hover {
-    background-color: var(--rcpch_pink);
-  }
+.ui.rcpch_primary.button.jump {
+  margin: 5px;
+  width: 130.23px;
+  height: 25.98px;
+  font-size: 0.85714286rem;
+  white-space: normal;
+}
 
-  /* cancel button in popup for allocate organisation in registration */
-  .ui.buttons .ui.rcpch_cancel.button {
-    border-radius: 0%;
-  }
+.topbar {
+  display: flex !important;
+  justify-content: space-between;
+}
 
-  .multiple_toggle_buttons_wrapper {
-    display: flex;
-    justify-content: space-between;
-    flex-wrap: wrap;
-    gap: 10px;
-    padding-bottom: 12px;
-  }
-  
-  .multiple_toggle_buttons_wrapper .rcpch_dark_blue.button {
-    flex-grow: 1;
-  }
-  
-  .add_user_button:hover a {
-    color: var(--rcpch_white);
-  }
+.ui.rcpch_info.button {
+  border-radius: 0% !important;
+  color: black;
+  background-color: var(--rcpch_light_blue_tint3);
+  border-color: var(--rcpch_light_blue_tint3);
+  font-weight: 400;
+  height: 100%;
+  width: 100%;
+  justify-content: center;
+}
 
-  .org_view_all_buttons_wrapper a.ui.button {
-    display: flex;
-    justify-content: center;
-    align-items: center;
-    height: 100%;
-  }
+.ui.rcpch_purple.button {
+  border-radius: 0% !important;
+  color: white;
+  background-color: var(--rcpch_purple_light_tint1);
+  border-color: var(--rcpch_purple_light_tint1);
+  font-weight: 400;
+}
 
-  .case_create_buttons_wrapper {
-    display: flex;
-  }
+.ui.rcpch_dark_purple.button {
+  border-radius: 0% !important;
+  color: white;
+  background-color: var(--rcpch_purple);
+  border-color: var(--rcpch_purple);
+  font-weight: 400;
+}
 
-  .rcpch_signin_buttons_wrapper {
-    display: flex;
-    margin-bottom: 1em;
-  }
-  
-  .rcpch_signin_buttons_wrapper>.reset_pass_button {
-    display: block;
-  }
-  
-  
+.ui.rcpch_dark_purple.button:hover {
+  border-radius: 0% !important;
+  color: white;
+  background-color: var(--rcpch_purple_light_tint1);
+  transition-duration: 0.4s;
+  font-weight: 400;
+}
+
+.ui.rcpch_grey.button {
+  border-radius: 0% !important;
+  color: black;
+  background-color: var(--rcpch_mid_grey);
+  border-color: var(--rcpch_mid_grey);
+  font-weight: 400;
+}
+
+.ui.rcpch_grey.button:hover {
+  border-radius: 0% !important;
+  color: white;
+  background-color: var(--rcpch_dark_blue);
+  transition-duration: 0.4s;
+  font-weight: 400;
+}
+
+.ui.rcpch_grey.button.bold {
+  font-family: "Montserrat-Bold" !important;
+}
+
+#first_paediatric_assessment_date_button {
+  border-style: solid;
+}
+
+.ui.rcpch_primary.button:hover {
+  border-radius: 0% !important;
+  color: white;
+  background-color: var(--rcpch_dark_blue);
+  transition-duration: 0.4s;
+  font-weight: 400;
+}
+
+.ui.rcpch_purple.button:hover {
+  border-radius: 0% !important;
+  color: white;
+  background-color: var(--rcpch_purple);
+  transition-duration: 0.4s;
+  font-weight: 400;
+}
+
+.ui.rcpch_primary.button .icon:hover {
+  border-radius: 0% !important;
+  color: white;
+  background-color: var(--rcpch_dark_blue);
+  transition-duration: 0.4s;
+  font-weight: 400;
+}
+
+.ui.rcpch_purple.button .icon:hover {
+  border-radius: 0% !important;
+  color: white;
+  transition-duration: 0.4s;
+  font-weight: 400;
+}
+
+.ui.rcpch_negative.button {
+  border-radius: 0% !important;
+  color: white;
+  background-color: var(--rcpch_yellow);
+  font-weight: 400;
+}
+
+.ui.rcpch_negative.button:hover {
+  border-radius: 0% !important;
+  color: white;
+  background-color: var(--rcpch_orange);
+  transition-duration: 0.4s;
+  font-weight: 400;
+}
+
+.ui.rcpch_positive.button {
+  border-radius: 0% !important;
+  color: white;
+  background-color: var(--rcpch_strong_blue);
+  font-weight: 400;
+}
+
+.back.link {
+  display: flex;
+  align-items: center;
+}
+
+.download.link {
+  display: flex;
+  justify-content: right;
+  align-items: center;
+}
+
+a.ui.button {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
+
+.ui.rcpch_positive.button:hover {
+  border-radius: 0% !important;
+  color: white;
+  background-color: var(--rcpch_dark_blue);
+  transition-duration: 0.4s;
+  font-weight: 400;
+}
+
+.ui.rcpch_danger.button {
+  border-radius: 0% !important;
+  color: white;
+  background-color: var(--rcpch_red);
+  font-weight: 400;
+}
+
+.ui.rcpch_danger.button:hover {
+  border-radius: 0% !important;
+  color: white;
+  background-color: #8a0400;
+  transition-duration: 0.4s;
+  font-weight: 400;
+}
+
+.ui.rcpch_danger.button .icon:hover {
+  border-radius: 0% !important;
+  color: white;
+  background-color: #8a0400;
+  transition-duration: 0.4s;
+  font-weight: 400;
+}
+
+.ui.rcpch_danger.button.bold {
+  font-family: "Montserrat-Bold" !important;
+}
+
+/* icons and icon buttons */
+
+.icon.close:hover {
+  color: var(--rcpch_dark_blue);
+}
+
+.icon {
+  color: var(--rcpch_black);
+}
+
+.icon_white {
+  color: white;
+}
+
+.rcpch_pink.icon {
+  color: var(--rcpch_pink);
+}
+
+.rcpch_red.icon {
+  color: var(--rcpch_red_light_tint2);
+}
+
+.rcpch_light_blue.icon {
+  color: var(--rcpch_light_blue);
+}
+
+.rcpch_orange.icon {
+  color: var(--rcpch_orange);
+}
+
+.rcpch_light_grey.icon {
+  color: var(--rcpch_light_grey);
+}
+
+.ui.rcpch_red.icon.button {
+  border-radius: 0%;
+  background-color: var(--rcpch_red);
+  color: var(--rcpch_white);
+}
+
+.ui.rcpch_red.icon.button:hover {
+  border-radius: 0%;
+  background-color: var(--rcpch_dark_red);
+  color: var(--rcpch_white);
+}
+
+/* download button */
+.ui.rcpch_positive.download.button a {
+  color: white;
+}
+
+.ui.rcpch_positive.download.button:hover {
+  background-color: var(--rcpch_pink);
+}
+
+/* cancel button in popup for allocate organisation in registration */
+.ui.buttons .ui.rcpch_cancel.button {
+  border-radius: 0%;
+}
+
+.multiple_toggle_buttons_wrapper {
+  display: flex;
+  justify-content: space-between;
+  flex-wrap: wrap;
+  gap: 10px;
+  padding-bottom: 12px;
+}
+
+.multiple_toggle_buttons_wrapper .rcpch_dark_blue.button {
+  flex-grow: 1;
+}
+
+.add_user_button:hover a {
+  color: var(--rcpch_white);
+}
+
+.org_view_all_buttons_wrapper a.ui.button {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  height: 100%;
+}
+
+.case_create_buttons_wrapper {
+  display: flex;
+}
+
+.rcpch_signin_buttons_wrapper {
+  display: flex;
+  margin-bottom: 1em;
+}
+
+.rcpch_signin_buttons_wrapper > .reset_pass_button {
+  display: block;
+}
+
+.rcpch_purple.half_button {
+  border-radius: 0% !important;
+  color: white;
+  font-weight: 400;
+}

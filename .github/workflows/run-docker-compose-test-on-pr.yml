@@ -17,63 +17,23 @@ jobs:
     runs-on: ubuntu-latest
 
     steps:
-      - name: Checkout code
-        uses: actions/checkout@v3
+      - name: Checkout full code repo
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0 # to allow git_context_processor.py to still work
 
       - name: Create .env file from repo secrets
         run: |
-          touch envs/.env
-          echo "SITE_DOMAIN=${{ secrets.SITE_DOMAIN }}" >> envs/.env
-          echo "LETSENCRYPT_EMAIL_ADDRESS=${{ secrets.LETSENCRYPT_EMAIL_ADDRESS }}" >> envs/.env
-          echo "LETSENCRYPT_ENDPOINT=${{ secrets.LETSENCRYPT_ENDPOINT }}" >> envs/.env
-          echo "TLS_SOURCE=${{ secrets.TLS_SOURCE }}" >> envs/.env
-          echo "CELERY_BROKER_URL=${{ secrets.CELERY_BROKER_URL }}" >> envs/.env
-          echo "CELERY_RESULT_BACKEND=${{ secrets.CELERY_RESULT_BACKEND }}" >> envs/.env
-          echo "RCPCH_CENSUS_PLATFORM_TOKEN=${{ secrets.RCPCH_CENSUS_PLATFORM_TOKEN }}" >> envs/.env
-          echo "RCPCH_CENSUS_PLATFORM_URL=${{ secrets.RCPCH_CENSUS_PLATFORM_URL }}" >> envs/.env
-          echo "DEBUG=${{ secrets.DEBUG }}" >> envs/.env
-          echo "DJANGO_ALLOWED_HOSTS=${{ secrets.DJANGO_ALLOWED_HOSTS }}" >> envs/.env
-          echo "DJANGO_CSRF_TRUSTED_ORIGINS=${{ secrets.DJANGO_CSRF_TRUSTED_ORIGINS }}" >> envs/.env
-          echo "DJANGO_STARTUP_COMMAND=${{ secrets.DJANGO_STARTUP_COMMAND }}" >> envs/.env
-          echo "CONSOLE_DJANGO_LOG_LEVEL=${{ secrets.CONSOLE_DJANGO_LOG_LEVEL }}" >> envs/.env
-          echo "CONSOLE_LOG_LEVEL=${{ secrets.CONSOLE_LOG_LEVEL }}" >> envs/.env
-          echo "FILE_LOG_LEVEL=${{ secrets.FILE_LOG_LEVEL }}" >> envs/.env
-          echo "E12_SECRET_KEY=${{ secrets.E12_SECRET_KEY }}" >> envs/.env
-          echo "SITE_CONTACT_EMAIL=${{ secrets.SITE_CONTACT_EMAIL }}" >> envs/.env
-          echo "E12_POSTGRES_DB_HOST=${{ secrets.E12_POSTGRES_DB_HOST }}" >> envs/.env
-          echo "E12_POSTGRES_DB_NAME=${{ secrets.E12_POSTGRES_DB_NAME }}" >> envs/.env
-          echo "E12_POSTGRES_DB_PASSWORD=${{ secrets.E12_POSTGRES_DB_PASSWORD }}" >> envs/.env
-          echo "E12_POSTGRES_DB_PORT=${{ secrets.E12_POSTGRES_DB_PORT }}" >> envs/.env
-          echo "E12_POSTGRES_DB_USER=${{ secrets.E12_POSTGRES_DB_USER }}" >> envs/.env
-          echo "EMAIL_DEFAULT_FROM_EMAIL=${{ secrets.EMAIL_DEFAULT_FROM_EMAIL }}" >> envs/.env
-          echo "EMAIL_HOST_PASSWORD=${{ secrets.EMAIL_HOST_PASSWORD }}" >> envs/.env
-          echo "EMAIL_HOST_PORT=${{ secrets.EMAIL_HOST_PORT }}" >> envs/.env
-          echo "EMAIL_HOST_SERVER=${{ secrets.EMAIL_HOST_SERVER }}" >> envs/.env
-          echo "EMAIL_HOST_USER=${{ secrets.EMAIL_HOST_USER }}" >> envs/.env
-          echo "SMTP_EMAIL_ENABLED=${{ secrets.SMTP_EMAIL_ENABLED }}" >> envs/.env
-          echo "FLOWER_PASSWORD=${{ secrets.FLOWER_PASSWORD }}" >> envs/.env
-          echo "FLOWER_PORT=${{ secrets.FLOWER_PORT }}" >> envs/.env
-          echo "FLOWER_USER=${{ secrets.FLOWER_USER }}" >> envs/.env
-          echo "RCPCH_HERMES_SERVER_URL=${{ secrets.RCPCH_HERMES_SERVER_URL }}" >> envs/.env
-          echo "ENABLE_GIT_COMMITTERS=${{ secrets.ENABLE_GIT_COMMITTERS }}" >> envs/.env
-          echo "ENABLE_PDF_EXPORT=${{ secrets.ENABLE_PDF_EXPORT }}" >> envs/.env
-          echo "DOCS_URL=${{ secrets.DOCS_URL }}" >> envs/.env
-          echo "NHS_ODS_API_URL=${{ secrets.NHS_ODS_API_URL }}" >> envs/.env
-          echo "POSTCODE_API_BASE_URL=${{ secrets.POSTCODE_API_BASE_URL }}" >> envs/.env
-          echo "POSTGRES_DB=${{ secrets.POSTGRES_DB }}" >> envs/.env
-          echo "POSTGRES_PASSWORD=${{ secrets.POSTGRES_PASSWORD }}" >> envs/.env
-          echo "POSTGRES_USER=${{ secrets.POSTGRES_USER }}" >> envs/.env
-          echo "TZ=${{ secrets.TZ }}" >> envs/.env
+          echo -e "${{ secrets.ENVIRONMENT }}" | base64 -d > envs/.env
           cat envs/.env
-
-      - name: Creates git_hash.txt file current commit hash
-        id: hash
-        run: echo "GIT_BRANCH=$(echo ${GITHUB_REF#refs/heads/}),GIT_HASH=$(git rev-parse --short "$GITHUB_SHA")" > git_hash.txt
 
       - name: Install Docker Compose
         run: |
-          sudo apt-get update
           sudo apt-get install -y docker-compose
+
+      - name: Show Docker environment info
+        run: |
+          docker compose config
 
       - name: Build Docker images and run containers with compose
         run: |

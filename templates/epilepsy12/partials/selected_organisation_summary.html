@@ -8,6 +8,11 @@
                 <button class="ui rcpch_positive button jump" _="on click go to top of #kpis">Jump to All KPI Metrics</button>
             </div>
             <div class="ui rcpch_view label view_title">Organisation Dashboard</div>
+            {% if request.user.is_rcpch_audit_team_member %}
+                <div class="download link">
+                    <a class="ui rcpch_positive button jump" href="{% url 'kpi_download' organisation_id=selected_organisation.pk %}">Download KPI metrics</a>
+                </div>
+            {% endif %}
         </div>
 
         {% if request.user.is_rcpch_audit_team_member or request.user.is_rcpch_staff or request.user.is_superuser %}
@@ -278,7 +283,7 @@
                 {% if selected_organisation.trust %}
                 <div class="ui rcpch_light_blue card">
                     <div class="content">
-                        <h3 >NHS England Region</h3>
+                        <h3>NHS England Region</h3>
                     </div>
                     <div>
                         {% include 'epilepsy12/partials/charts/map.html' with abstraction_level='nhs_england_region' abstraction_level_border_colour='#ffd200' abstraction_level_data=nhsregion_tiles selected_organisation=selected_organisation hospital_region_name=selected_organisation.nhs_england_region.name %}

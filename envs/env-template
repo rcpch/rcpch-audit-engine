@@ -12,22 +12,24 @@ LETSENCRYPT_EMAIL_ADDRESS="letsencrypt@example.com" # the email address to send 
 LETSENCRYPT_ENDPOINT="https://acme-staging-v02.api.letsencrypt.org/directory" # Optionally set to Letsencrypt staging endpoint for testing (https://acme-staging-v02.api.letsencrypt.org/directory)
 TLS_SOURCE="internal" # for localhost with SSL, or use "acme" for LetsEncrypt in production
 
-# CELERY
-CELERY_BROKER_URL="redis://redis:6379/0"
-CELERY_RESULT_BACKEND="redis://redis:6379/0"
-
 # CENSUS PLATFORM (Deprivation Scores)
 RCPCH_CENSUS_PLATFORM_TOKEN= # API key for RCPCH Census Platform (Deprivation scoring service API)
 RCPCH_CENSUS_PLATFORM_URL="https://api.rcpch.ac.uk/deprivation/v1"
 
 # DJANGO
+AUTO_LOGOUT_DELAY_SECONDS=1800 # default 30 minutes
 DEBUG="True" # Set DEBUG=True for Local dev and Development, not Staging or Live
 DJANGO_ALLOWED_HOSTS="${SITE_DOMAIN}"
 DJANGO_CSRF_TRUSTED_ORIGINS="https://${SITE_DOMAIN}"
 DJANGO_STARTUP_COMMAND="python manage.py runserver 0.0.0.0:8000" # for local development with auto-reload
 # DJANGO_STARTUP_COMMAND="gunicorn --bind=0.0.0.0:8000 --timeout 600 rcpch-audit-engine.wsgi" # for live deployment
-E12_SECRET_KEY= # secret key for Django
+DJANGO_SECRET_KEY= # secret key for Django
 SITE_CONTACT_EMAIL="sitecontactemail@example.com" # email address for site contact
+
+# DJANGO LOGGING
+CONSOLE_DJANGO_LOG_LEVEL="WARNING" # default Django-specific console logs [DEBUG, INFO, WARNING, ERROR, CRITICAL]
+CONSOLE_LOG_LEVEL="DEBUG" # Epilepsy12 App console logs [DEBUG, INFO, WARNING, ERROR, CRITICAL]
+FILE_LOG_LEVEL="DEBUG" # All logs, but to file [DEBUG, INFO, WARNING, ERROR, CRITICAL]
 
 # DJANGO POSTGRES DATABASE CONNECTION
 E12_POSTGRES_DB_HOST="postgis"
@@ -44,11 +46,9 @@ EMAIL_HOST_SERVER= # hostname of SMTP service
 EMAIL_HOST_USER= # username for SMTP service
 # To output emails to console, set SMTP_EMAIL_ENABLED=False
 SMTP_EMAIL_ENABLED=True # To output emails to console, set SMTP_EMAIL_ENABLED=False
+# Password reset link expires after (in seconds)
+PASSWORD_RESET_TIMEOUT=259200
 
-# FLOWER
-FLOWER_PASSWORD="SET_ME"
-FLOWER_PORT=8888
-FLOWER_USER="flower@example.com"
 
 # HERMES (SNOMED CT)
 RCPCH_HERMES_SERVER_URL= # SNOMED server API URL

@@ -100,8 +100,8 @@ class KPI(models.Model, HelpTextMixin):
     14. Percentage of children and young people meeting defined criteria for paediatric neurology referral, with input of tertiary care and/or CESS referral within the first year of care.
     
     Calculation Method
-    Numerator = Number of children ([less than 3 years old at first assessment] AND [diagnosed with epilepsy] OR (number of children and young people diagnosed with epilepsy who had [3 or more maintenance AEDS] at first year) OR (Number of children less than 4 years old at first assessment with epilepsy AND myoclonic seizures)  OR (number of children and young people diagnosed with epilepsy  who met [CESS criteria] ) AND had [evidence of referral or involvement of a paediatric neurologist] OR [evidence of referral or involvement of CESS]
-    Denominator = Number of children [less than 3 years old at first assessment] AND [diagnosed with epilepsy] OR (number of children and young people diagnosed with epilepsy who had [3 or more maintenance AEDS] at first year )OR (number of children and young people diagnosed with epilepsy  who met [CESS criteria] OR (Number of children less than 4 years old at first assessment with epilepsy AND  [myoclonic seizures])
+    Numerator = Number of children ([less than 3 years old at first assessment] AND [diagnosed with epilepsy] OR (number of children and young people diagnosed with epilepsy who had [3 or more maintenance AEDS] at first year) OR (Number of children less than 4 years old at first assessment with epilepsy AND (generalised myoclonic seizures OR focal myoclonic seizures))  OR (number of children and young people diagnosed with epilepsy  who met [CESS criteria] ) AND had [evidence of referral or involvement of a paediatric neurologist] OR [evidence of referral or involvement of CESS]
+    Denominator = Number of children [less than 3 years old at first assessment] AND [diagnosed with epilepsy] OR (number of children and young people diagnosed with epilepsy who had [3 or more maintenance AEDS] at first year )OR (number of children and young people diagnosed with epilepsy  who met [CESS criteria] OR (Number of children less than 4 years old at first assessment with epilepsy AND  (generalised myoclonic seizures OR focal myoclonic seizures))
     """
     tertiary_input = models.IntegerField(
         help_text={
@@ -364,13 +364,13 @@ class KPI(models.Model, HelpTextMixin):
     Percentage of children and young people with epilepsy with evidence of discussion regarding SUDEP and evidence of a prolonged seizures care plan.
 
     Calculation Method
-    Numerator = Number of children diagnosed with epilepsy AND had evidence of discussions regarding SUDEP AND evidence of a written prolonged seizures plan at first year
+    Numerator = Number of children diagnosed with epilepsy AND had evidence of discussions regarding SUDEP
     Denominator = Number of children diagnosed with epilepsy at first year
     """
     sudep = models.IntegerField(
         help_text={
             "label": "v. Sudden unexpected death in epilepsy",
-            "reference": "Percentage of children and young people with epilepsy with evidence of discussion regarding SUDEP (Sudden unexpected death in epilepsy) and evidence of a prolonged seizures care plan.",
+            "reference": "Percentage of children and young people with epilepsy with evidence of discussion regarding SUDEP (Sudden unexpected death in epilepsy).",
         },
         default=None,
         null=True,
@@ -443,5 +443,9 @@ An example of an ineligible KPI would be a child with nonconvulsive epilepsy not
 This scoring system allows a child's individual score to be displayed clearly in the template using colours or icons to reflect their adherence to different measures, or for the scores to be aggregated together, for example to show how a give organisation performs against its peers in the same or another region. The results can be tabulated or mapped to show geographical variation, and sequentially against cohort to change over time.
 
 The KPIs are final endpoint of the audit and therefore their accuracy is essential. A full suite of [tests](./testing/testing.md) is in place to ensure this is true.
+
+Note that the KPIs are only calculated for the **currently submitting** cohort *that have completed a full year of care*
+
+The KPIs are aggregated to generate totals and percentages as well as averages across different levels of abstraction - by this is meant, either at organisational level, trust/health board level, or NHS region etc.
 
 They are key part of the [reporting](reporting.md) dashboard.

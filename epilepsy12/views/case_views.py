@@ -29,11 +29,14 @@ from ..decorator import (
 
 from django.conf import settings
 
-from ..general_functions import construct_transfer_epilepsy12_site_outcome_email
-from ..tasks import asynchronously_send_email_to_recipients
+from ..general_functions import (
+    construct_transfer_epilepsy12_site_outcome_email,
+    send_email_to_recipients,
+)
 
 # Logging setup
 logger = logging.getLogger(__name__)
+
 
 @login_and_otp_required()
 @user_may_view_this_organisation()
@@ -74,13 +77,14 @@ def case_list(request, organisation_id):
             # user has requested organisation level view
             all_cases = (
                 Case.objects.filter(
-                    Q(site__organisation__name__contains=organisation.name)
+                    Q(site__organisation=organisation)
                     & Q(site__site_is_primary_centre_of_epilepsy_care=True)
                     & Q(site__site_is_actively_involved_in_epilepsy_care=True)
                     & (
                         Q(first_name__icontains=filter_term)
                         | Q(surname__icontains=filter_term)
                         | Q(nhs_number__icontains=filter_term)
+                        | Q(id__icontains=filter_term)
                     )
                 )
                 .order_by("surname")
@@ -91,13 +95,11 @@ def case_list(request, organisation_id):
             if organisation.country.boundary_identifier == "W92000004":
                 # in Wales filter by health board
                 trust_filter = Q(
-                    site__organisation__local_health_board__ods_code__contains=organisation.local_health_board.ods_code
+                    site__organisation__local_health_board=organisation.local_health_board
                 )
             else:
                 # England filter by Trust
-                trust_filter = Q(
-                    site__organisation__trust__ods_code__contains=organisation.trust.ods_code
-                )
+                trust_filter = Q(site__organisation__trust=organisation.trust)
 
             all_cases = (
                 Case.objects.filter(
@@ -108,6 +110,7 @@ def case_list(request, organisation_id):
                         Q(first_name__icontains=filter_term)
                         | Q(surname__icontains=filter_term)
                         | Q(nhs_number__icontains=filter_term)
+                        | Q(id__icontains=filter_term)
                     )
                 )
                 .order_by("surname")
@@ -123,6 +126,7 @@ def case_list(request, organisation_id):
                         Q(first_name__icontains=filter_term)
                         | Q(surname__icontains=filter_term)
                         | Q(nhs_number__icontains=filter_term)
+                        | Q(id__icontains=filter_term)
                     )
                 )
                 .order_by("surname")
@@ -144,14 +148,14 @@ def case_list(request, organisation_id):
             if organisation.country.boundary_identifier == "W92000004":
                 # welsh - select health boards
                 filtered_cases = Case.objects.filter(
-                    organisations__local_health_board__name__contains=parent_trust.name,
+                    organisations__local_health_board=parent_trust,
                     site__site_is_primary_centre_of_epilepsy_care=True,
                     site__site_is_actively_involved_in_epilepsy_care=True,
                 )
             else:
                 # England - select trusts
                 filtered_cases = Case.objects.filter(
-                    organisations__trust__name__contains=parent_trust.name,
+                    organisations__trust=parent_trust,
                     site__site_is_primary_centre_of_epilepsy_care=True,
                     site__site_is_actively_involved_in_epilepsy_care=True,
                 )
@@ -159,7 +163,7 @@ def case_list(request, organisation_id):
         else:
             # filters all primary centres at organisation level, irrespective of if active or inactive
             filtered_cases = Case.objects.filter(
-                organisations__name__contains=organisation.name,
+                organisations__name=organisation,
                 site__site_is_primary_centre_of_epilepsy_care=True,
                 site__site_is_actively_involved_in_epilepsy_care=True,
             )
@@ -305,10 +309,16 @@ def case_list(request, organisation_id):
                 (2, "National level"),
             )
     else:
-        rcpch_choices = (
-            (0, "Organisation level"),
-            (1, "Trust level"),
-        )
+        if organisation.country.boundary_identifier == "W92000004":
+            rcpch_choices = (
+                (0, "Organisation level"),
+                (1, "Local Health Board level"),
+            )
+        else:
+            rcpch_choices = (
+                (0, "Organisation level"),
+                (1, "Trust level"),
+            )
 
     context = {
         "case_list": case_list,
@@ -320,6 +330,7 @@ def case_list(request, organisation_id):
         "rcpch_choices": rcpch_choices,
         "organisation_id": organisation_id,
         "cases_in_transfer": cases_in_transfer,
+        "filtered_case_list": filter_term,
     }
     if request.htmx:
         return render(
@@ -492,9 +503,7 @@ def transfer_response(request, organisation_id, case_id, organisation_response):
         recipients = [settings.SITE_CONTACT_EMAIL]
         subject = f"Epilepsy12 Lead Site Transfer {outcome}  - NO LEAD CLINICIAN"
 
-    asynchronously_send_email_to_recipients.delay(
-        recipients=recipients, subject=subject, message=email
-    )
+    send_email_to_recipients(recipients=recipients, subject=subject, message=email)
 
     return HttpResponseClientRedirect(
         reverse("cases", kwargs={"organisation_id": organisation_id})

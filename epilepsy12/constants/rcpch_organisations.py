@@ -8352,4 +8352,90 @@ RCPCH_ORGANISATIONS = [
         "Website": "",
         "LocalAuthority": "W06000018",
     },
+    {
+        "OrganisationID": "",
+        "OrganisationCode": "R0A07",
+        "OrganisationType": "",
+        "SubType": "",
+        "Sector": "",
+        "OrganisationStatus": "",
+        "IsPimsManaged": "",
+        "OrganisationName": "WYTHENSHAWE HOSPITAL",
+        "Address1": "SOUTHMOOR ROAD",
+        "Address2": "WYTHENSHAWE",
+        "Address3": "",
+        "City": "MANCHESTER",
+        "County": "GREATER MANCHESTER",
+        "Postcode": "M23 9LT",
+        "Latitude": "53.38792",
+        "Longitude": "-2.29319",
+        "ParentODSCode": "R0A",
+        "ParentName": "MANCHESTER UNIVERSITY NHS FOUNDATION TRUST",
+        "Phone": "",
+        "Email": "",
+        "Website": "",
+        "Fax": "",
+        "LocalAuthority": "E08000003",
+    },  # 01/10/2017, ICB QOP NHS GREATER MANCHESTER INTEGRATED CARE BOARD   NHS REGION Y62   NORTH WEST NORTH WEST CYP EPILEPSY INTEREST GROUP
+    {
+        "OrganisationID": "",
+        "OrganisationCode": "G0W1C",
+        "OrganisationType": "",
+        "SubType": "",
+        "Sector": "",
+        "OrganisationStatus": "",
+        "IsPimsManaged": "",
+        "OrganisationName": "ROYAL ALEXANDRA CHILDREN’S HOSPITAL",
+        "Address1": "EASTERN ROAD",
+        "Address2": "",
+        "Address3": "",
+        "City": "BRIGHTON",
+        "County": "EAST SUSSEX",
+        "Postcode": "BN2 5BE",
+        "Latitude": "50.81947",
+        "Longitude": "-0.11818",
+        "ParentODSCode": "RYR",
+        "ParentName": "UNIVERSITY HOSPITALS SUSSEX NHS FOUNDATION TRUST",
+        "Phone": "",
+        "Email": "",
+        "Website": "",
+        "Fax": "",
+        "LocalAuthority": "E06000043",
+    },  # 01/04/2021, QNX NHS SUSSEX INTEGRATED CARE BOARD, SOUTH EAST, SOUTH EAST THAMES EPILEPSY GROUP
+    {
+        "OrganisationID": "",
+        "OrganisationCode": "I3W1A",
+        "OrganisationType": "",
+        "SubType": "",
+        "Sector": "",
+        "OrganisationStatus": "",
+        "IsPimsManaged": "",
+        "OrganisationName": "MIDLAND METROPOLITAN UNIVERSITY HOSPITAL",
+        "Address1": "GROVE LANE",
+        "Address2": "",
+        "Address3": "",
+        "City": "SMETHWICK",
+        "County": "WEST MIDLANDS",
+        "Postcode": "B66 2QT",
+        "Latitude": "52.491258",
+        "Longitude": "-1.949846",
+        "ParentODSCode": "RXK",
+        "ParentName": "SANDWELL AND WEST BIRMINGHAM HOSPITALS NHS TRUST",
+        "Phone": "",
+        "Email": "",
+        "Website": "",
+        "Fax": "",
+        "LocalAuthority": "E08000028",
+    },  # 01/04/2023 QHL NHS BIRMINGHAM AND SOLIHULL INTEGRATED CARE BOARD, MIDLANDS, Birmingham Regional Paediatric Neurology Forum
 ]
+
+"""
+Steps to update organisation in the console once created in the admin
+from django.contrib.gis.geos import Point
+point = Point(x=longitude,y=latitude)
+o = Organisation.objects.get(ods_code="####")
+o.geocode_coordinates=point
+o.save()
+from epilepsy12.common_view_functions import _seed_all_aggregation_models
+_seed_all_aggregation_models()
+"""

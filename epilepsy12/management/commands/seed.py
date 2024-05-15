@@ -2,15 +2,21 @@
 from random import randint, choice
 from datetime import date
 from random import randint
+import logging
+from dateutil.relativedelta import relativedelta
 
 
 from django.core.management.base import BaseCommand
+
+# Logging setup
+logger = logging.getLogger(__name__)
 
 from ...general_functions import (
     cohort_number_from_first_paediatric_assessment_date,
     dates_for_cohort,
     return_random_postcode,
     random_date,
+    add_epilepsy_cause_list_by_sctid,
 )
 from ...constants import (
     ETHNICITIES,
@@ -19,12 +25,11 @@ from ...models import Organisation, Case, Registration
 from .create_groups import groups_seeder
 from .create_e12_records import create_epilepsy12_record, create_registrations
 from epilepsy12.tests.factories import E12CaseFactory
-from epilepsy12.tasks import (
+from epilepsy12.management.commands.old_pt_data_scripts import (
     insert_old_pt_data,
-    async_insert_old_pt_data,
-    async_insert_user_data,
 )
 from epilepsy12.management.commands.user_scripts import insert_user_data
+from epilepsy12.common_view_functions import _seed_all_aggregation_models
 
 
 class Command(BaseCommand):
@@ -48,6 +53,21 @@ class Command(BaseCommand):
             help="Indicates the cohort to create children for. Note cannot be less than 4.",
             default=7,
         )
+        parser.add_argument(
+            "-fy",
+            "--full_year",
+            nargs="?",
+            type=bool,
+            help="Optional parameter. Set True if all cases must have completed a full year of care.",
+            default=False,
+        )
+        parser.add_argument(
+            "-sctids",
+            "--snomedctids",
+            nargs="+",
+            help="List of SNOMED-CT ids to update the epilepsy causes with.",
+            type=int,
+        )
 
     def handle(self, *args, **options):
         if options["mode"] == "cases":
@@ -60,7 +80,9 @@ class Command(BaseCommand):
                 "register cases in audit and complete all fields with random answers..."
             )
             cohort = options["cohort"]
-            run_registrations(cohort=cohort)
+            completed_full_year = options["full_year"]
+            run_registrations(cohort=cohort, full_year=completed_full_year)
+            _seed_all_aggregation_models()
         elif options["mode"] == "seed_groups_and_permissions":
             self.stdout.write("setting up groups and permissions...")
             groups_seeder(run_create_groups=True)
@@ -70,15 +92,15 @@ class Command(BaseCommand):
         elif options["mode"] == "upload_old_patient_data":
             self.stdout.write("Uploading old patient data.")
             insert_old_pt_data()
-        elif options["mode"] == "async_upload_old_patient_data":
-            self.stdout.write("CELERY: uploading old patient data.")
-            async_insert_old_pt_data.delay()
         elif options["mode"] == "upload_user_data":
             self.stdout.write("Uploading user data.")
             insert_user_data()
-        elif options["mode"] == "async_upload_user_data":
-            self.stdout.write("CELERY: uploading user data.")
-            async_insert_user_data.delay()
+        elif options["mode"] == "add_new_epilepsy_causes":
+            extra_concept_ids = options["snomedctids"]
+            if not isinstance(extra_concept_ids, list):
+                self.stdout.write("Must provide a list of SNOMED CT ID integers.")
+                return
+            add_epilepsy_cause_list_by_sctid(extra_concept_ids=extra_concept_ids)
 
         else:
             self.stdout.write("No options supplied...")
@@ -97,13 +119,14 @@ def run_dummy_cases_seed(verbose=True, cases=50):
         cases = 50
 
     different_organisations = [
-        "RGT01",
-        "RBS25",
-        "RQM01",
-        "RCF22",
-        "7A2AJ",
-        "7A6BJ",
-        "7A6AV",
+        "RJZ01",  # King's College Hospital
+        "RGT01",  # Addenbrooks
+        "RBS25",  # Alderhey
+        "RQM01",  # Chelsea and Westminster
+        "RCF22",  # Airedale
+        "7A2AJ",  # Bronglais
+        "7A6BJ",  # Chepstow Community
+        "7A6AV",  # Ysbyty Ystrad Fawr
     ]
     organisations_list = Organisation.objects.filter(
         ods_code__in=different_organisations
@@ -123,9 +146,7 @@ def run_dummy_cases_seed(verbose=True, cases=50):
         postcode = return_random_postcode(
             country_boundary_identifier=org.country.boundary_identifier
         )
-        postcode = return_random_postcode(
-            country_boundary_identifier=org.country.boundary_identifier
-        )
+        index_of_multiple_deprivation_quintile = randint(1, 5)
 
         E12CaseFactory.create_batch(
             num_cases_to_seed_in_org,
@@ -134,6 +155,7 @@ def run_dummy_cases_seed(verbose=True, cases=50):
             date_of_birth=date_of_birth,
             postcode=postcode,
             ethnicity=ethnicity,
+            index_of_multiple_deprivation_quintile=index_of_multiple_deprivation_quintile,
             organisations__organisation=org,
             **{
                 "seed_male": seed_male,
@@ -142,7 +164,7 @@ def run_dummy_cases_seed(verbose=True, cases=50):
         )
 
 
-def run_registrations(verbose=True, cohort=7):
+def run_registrations(verbose=True, cohort=7, full_year=False):
     """
     Calling function to register all cases in Epilepsy12 and complete all fields with random answers
     """
@@ -151,7 +173,7 @@ def run_registrations(verbose=True, cohort=7):
 
     create_registrations(verbose=verbose)
 
-    complete_registrations(verbose=verbose, cohort=cohort)
+    complete_registrations(verbose=verbose, cohort=cohort, full_year=full_year)
 
     if not verbose:
         print(
@@ -159,7 +181,7 @@ def run_registrations(verbose=True, cohort=7):
         )
 
 
-def complete_registrations(verbose=True, cohort=None):
+def complete_registrations(verbose=True, cohort=None, full_year=False):
     """
     Loop through the registrations and score all fields
     """
@@ -179,9 +201,31 @@ def complete_registrations(verbose=True, cohort=None):
         current_cohort_data = dates_for_cohort(cohort=cohort)
 
     for registration in Registration.objects.all():
-        registration.first_paediatric_assessment_date = random_date(
-            start=current_cohort_data["cohort_start_date"], end=date.today()
+
+        fpa_date = random_date(
+            start=current_cohort_data["cohort_start_date"],
+            end=current_cohort_data["cohort_end_date"],
         )
+
+        if full_year:
+            # this flag ensures any registrations include a full year of care
+            if (
+                current_cohort_data["cohort_start_date"] + relativedelta(years=1)
+                > date.today()
+            ):
+                # It is not possible to generate registrations that are complete as they would be in the future
+                logger.warning(
+                    "It is not possible for registrations to be complete for this cohort as they would be in the future."
+                )
+            else:
+                while fpa_date + relativedelta(years=1) >= date.today():
+                    # regenerate any dates that cannot be complete
+                    fpa_date = random_date(
+                        start=current_cohort_data["cohort_start_date"],
+                        end=current_cohort_data["cohort_end_date"],
+                    )
+
+        registration.first_paediatric_assessment_date = fpa_date
         registration.eligibility_criteria_met = True
         registration.save()
 

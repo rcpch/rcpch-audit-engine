@@ -1,0 +1,3 @@
+#!/bin/bash -e
+
+docker compose exec postgis psql -U epilepsy12user -d epilepsy12db

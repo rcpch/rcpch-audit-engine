@@ -110,7 +110,9 @@ from epilepsy12.models import (
     Organisation,
     Case,
 )
-from epilepsy12.tests.view_tests.permissions_tests.perm_tests_utils import twofactor_signin
+from epilepsy12.tests.view_tests.permissions_tests.perm_tests_utils import (
+    twofactor_signin,
+)
 
 
 @pytest.mark.django_db
@@ -149,10 +151,8 @@ def test_user_create_same_org_success(
         ), f"Incorrect number of users selected. Requested {len(selected_users)} but queryset contains {len(users)}: {users}"
 
     for test_user in users:
-        
-        
         client.force_login(test_user)
-        
+
         # OTP ENABLE
         twofactor_signin(client, test_user)
 
@@ -178,7 +178,7 @@ def test_user_create_same_org_success(
             "organisation_employer": TEST_USER_ORGANISATION.id,
             "first_name": TEMP_CREATED_USER_FIRST_NAME,
             "surname": "User",
-            "is_rcpch_audit_team_member": True,
+            "is_rcpch_audit_team_member": False,
             "is_rcpch_staff": False,
             "email_confirmed": True,
         }
@@ -229,7 +229,7 @@ def test_user_create_diff_org_success(
 
     for test_user in users:
         client.force_login(test_user)
-        
+
         # OTP ENABLE
         twofactor_signin(client, test_user)
 
@@ -302,7 +302,7 @@ def test_user_creation_forbidden(
 
     for test_user in users:
         client.force_login(test_user)
-        
+
         # OTP ENABLE
         twofactor_signin(client, test_user)
 
@@ -328,7 +328,7 @@ def test_user_creation_forbidden(
             "organisation_employer": DIFF_TRUST_DIFF_ORGANISATION.id,
             "first_name": TEMP_CREATED_USER_FIRST_NAME,
             "surname": "User",
-            "is_rcpch_audit_team_member": True,
+            "is_rcpch_audit_team_member": False,
             "is_rcpch_staff": False,
             "email_confirmed": True,
         }
@@ -338,7 +338,7 @@ def test_user_creation_forbidden(
         # This is valid form data, should redirect
         assert (
             response.status_code == HTTPStatus.FORBIDDEN
-        ), f"Unpermitted E12User {test_user} attempted to create an E12User. expected status_code {HTTPStatus.FORBIDDEN}, received {response.status_code}"
+        ), f"Unpermitted E12User {test_user} from {test_user.organisation_employer} attempted to create an E12User from {DIFF_TRUST_DIFF_ORGANISATION}. expected status_code {HTTPStatus.FORBIDDEN}, received {response.status_code}"
 
     assert (
         Epilepsy12User.objects.filter(first_name=TEMP_CREATED_USER_FIRST_NAME).count()
@@ -388,7 +388,7 @@ def test_patient_create_success(
 
     for test_user in users:
         client.force_login(test_user)
-        
+
         # OTP ENABLE
         twofactor_signin(client, test_user)
 
@@ -508,7 +508,7 @@ def test_patient_creation_forbidden(
 
     for test_user in users:
         client.force_login(test_user)
-        
+
         # OTP ENABLE
         twofactor_signin(client, test_user)
 
@@ -600,7 +600,7 @@ def test_add_episode_comorbidity_syndrome_aem_success(client):
 
     for test_user in users:
         client.force_login(test_user)
-        
+
         # OTP ENABLE
         twofactor_signin(client, test_user)
 

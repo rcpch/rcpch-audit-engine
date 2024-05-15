@@ -1,68 +1,53 @@
 # Python standard library imports
-python-dateutil
-requests
+python-dateutil==2.9.0.post0
+requests==2.31.0
 
 # third party imports
 ## django and misc
-dj_database_url
-django
-django-auto-logout
-django-filter
-django-htmx
-django-semantic-admin
-django-simple-captcha
-django-simple-history
-django-two-factor-auth
-django-widget-tweaks
-djangorestframework
-docutils
-pandas
-phonenumbers # though not currently using phonenumbers, this is a dependency of dj-2fa
-psycopg2-binary
-whitenoise
-
-## scheduled tasks
-celery
-django-celery-beat
-flower
-redis
+dj_database_url==2.1.0
+django==5.0.3
+django-auto-logout==0.5.1
+django-filter==23.5
+django-htmx==1.17.3
+django-semantic-admin==0.4.1
+django-simple-captcha==0.6.0
+django-simple-history==3.5.0
+django-two-factor-auth==1.16.0
+django-widget-tweaks==1.5.0
+djangorestframework==3.14.0
+docutils==0.20.1
+pandas==2.2.1
+# We don't use this but django-two-factor-auth requires it
+# They are working to make it optional https://github.com/jazzband/django-two-factor-auth/issues/469
+phonenumbers==8.13.31
+psycopg2-binary==2.9.9
+whitenoise==6.6.0
+openpyxl==3.1.2
 
 ## graphing
-plotly
+plotly==5.19.0
 
 # NHS number
-nhs-number
+nhs-number==1.3.4
 
 # live application server
-gunicorn
+gunicorn==21.2.0
 
 # code linting and formatting
-autopep8
-black
+autopep8==2.0.4
+black==24.2.0
 
 # testing and code analysis
-coverage
-pytest-django
-pytest-factoryboy
-rapidfuzz
+coverage==7.4.3
+pytest-django==4.8.0
+pytest-factoryboy==2.7.0
+rapidfuzz==3.6.2
 
-# versioning
-bump2version
-
-# DOCUMENTATION - MATERIAL FOR MKDOCS INSIDERS
-# IMPORTANT: This project uses Material for MkDocs **INSIDERS** Edition.
-# To install this you will need a GitHub token which is available (for RCPCH team only)
-# in our .env files
-
-# git+https://${MATERIAL_FOR_MKDOCS_INSIDERS_TOKEN}@github.com/squidfunk/mkdocs-material-insiders.git
-
-# Further information is at https://squidfunk.github.io/mkdocs-material/insiders/getting-started/
-
-mkdocs-material
-mkdocs-git-committers-plugin-2 # displays authors at the bottom of the page
-mkdocs-git-revision-date-localized-plugin # displays last edit date at the bottom of the page
-mkdocs-macros-plugin # enables 'foldable' admonition text (used for large code blocks)
-mkdocs-with-pdf # PDF export feature
+mkdocs-material==9.5.13
+mkdocs-git-committers-plugin-2==2.3.0 # displays authors at the bottom of the page
+mkdocs-git-revision-date-localized-plugin==1.2.4 # displays last edit date at the bottom of the page
+mkdocs-macros-plugin==1.0.5 # enables 'foldable' admonition text (used for large code blocks)
+mkdocs-with-pdf==0.9.3 # PDF export feature
 
 # for colored logs
-colorlog
+colorlog==6.8.2

@@ -134,6 +134,7 @@
       </a>
       {% if perms.epilepsy12.change_case or perms.epilepsy12.add_case %}
         <button 
+        id="create_update_case_button"
         type="submit" 
         class="ui rcpch_primary button" 
         name="update" 
@@ -167,7 +168,7 @@
                 if result.isConfirmed issueRequest()
                 end
                       "
-          >Delete</button>
+          >Delete Child</button>
         {% endif %}
       {% endif %}
     </div>

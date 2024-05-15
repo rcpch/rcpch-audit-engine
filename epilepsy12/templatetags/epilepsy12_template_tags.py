@@ -274,22 +274,6 @@ def return_case(value):
         return "Error"
 
 
-@register.filter("has_group")
-def has_group(user, group_names_string):
-    # thanks to Lucas Simon for this efficiency
-    # https://stackoverflow.com/questions/1052531/get-user-group-in-a-template
-    """
-    Check if user has permission
-    """
-    result = [x.strip() for x in group_names_string.split(",")]
-    groups = user.groups.all().values_list("name", flat=True)
-    match = False
-    for group in groups:
-        if group in result:
-            match = True
-    return match
-
-
 @register.simple_tag
 def none_masked(field):
     if field is None:
@@ -309,7 +293,10 @@ def none_percentage(field):
 @register.filter(name="icon_for_score")
 def icon_for_score(score):
     if score is None:
-        return
+        return mark_safe(
+            """Data Incomplete
+            """
+        )
     if score < 1:
         return mark_safe(
             """<i
@@ -479,13 +466,24 @@ def no_eligible_cases(aggregation_model, kpi_name: str):
 # the list of which can be found in 'capitalised_words' below
 @register.filter
 def capitalise_org_names(organisation_name):
-    capitalised_words = ['Ii', 'Rbh', 'Nhs', 'Cdc', '(Hq)', '(Epma)', '(Epact)', 'Gstt', 'Qmc', 'Ctr']
+    capitalised_words = [
+        "Ii",
+        "Rbh",
+        "Nhs",
+        "Cdc",
+        "(Hq)",
+        "(Epma)",
+        "(Epact)",
+        "Gstt",
+        "Qmc",
+        "Ctr",
+    ]
     organisation_name = organisation_name.split()
     organisation_name = [
         name.upper() if name in capitalised_words else name
         for name in organisation_name
     ]
-    organisation_name = ' '.join(organisation_name)
+    organisation_name = " ".join(organisation_name)
     return mark_safe(organisation_name)
 
 

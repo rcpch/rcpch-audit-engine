@@ -22,6 +22,7 @@ from django_htmx.http import HttpResponseClientRedirect
 # Other dependencies
 from two_factor.views import LoginView as TwoFactorLoginView
 import pandas as pd
+from datetime import datetime, timedelta
 
 # epilepsy12
 from ..models import Epilepsy12User, Organisation, VisitActivity, Site
@@ -29,7 +30,7 @@ from epilepsy12.forms_folder.epilepsy12_user_form import (
     Epilepsy12UserAdminCreationForm,
     CaptchaAuthenticationForm,
 )
-from ..general_functions import construct_confirm_email, match_in_choice_key
+from ..general_functions import construct_confirm_email, match_in_choice_key, send_email_to_recipients
 from ..common_view_functions import group_for_role
 from ..decorator import (
     user_may_view_this_organisation,
@@ -41,7 +42,6 @@ from ..constants import (
     AUDIT_CENTRE_ROLES,
     EPILEPSY12_AUDIT_TEAM_FULL_ACCESS,
 )
-from ..tasks import asynchronously_send_email_to_recipients
 
 
 @login_and_otp_required()
@@ -83,14 +83,14 @@ def epilepsy12_user_list(request, organisation_id):
         # filter_term is called if filtering by search box
         if request.user.view_preference == 0:
             # user has requested organisation level view
-            basic_filter = Q(organisation_employer__name__icontains=organisation.name)
+            basic_filter = Q(organisation_employer=organisation.name)
         elif request.user.view_preference == 1:
             # user has requested trust level view
             if organisation.country.boundary_identifier == "W92000004":
                 parent_trust = organisation.organisation.local_health_board.name
             else:
                 parent_trust = organisation.organisation.trust.name
-            basic_filter = Q(organisation_employer__name__icontains=parent_trust)
+            basic_filter = Q(organisation_employer=parent_trust)
         elif request.user.view_preference == 2:
             # user has requested national level view
             basic_filter = None
@@ -140,19 +140,15 @@ def epilepsy12_user_list(request, organisation_id):
         elif request.user.view_preference == 1:
             # filters all primary Trust level centres, irrespective of if active or inactive
             if organisation.country.boundary_identifier == "W92000004":
-                parent_trust = organisation.local_health_board.name
-                basic_filter = Q(
-                    organisation_employer__local_health_board__name__contains=parent_trust
-                )
+                parent_trust = organisation.local_health_board
+                basic_filter = Q(organisation_employer__local_health_board=parent_trust)
             else:
-                parent_trust = organisation.trust.name
-                basic_filter = Q(
-                    organisation_employer__trust__name__contains=parent_trust
-                )
+                parent_trust = organisation.trust
+                basic_filter = Q(organisation_employer__trust__name=parent_trust)
 
         elif request.user.view_preference == 0:
             # filters all primary centres at organisation level, irrespective of if active or inactive
-            basic_filter = Q(organisation_employer__name__contains=organisation.name)
+            basic_filter = Q(organisation_employer=organisation)
         else:
             raise Exception("No View Preference supplied")
 
@@ -250,9 +246,9 @@ def epilepsy12_user_list(request, organisation_id):
             epilepsy12_user_list = filtered_epilepsy12_users.order_by("surname").all()
 
     if organisation.country.boundary_identifier == "W92000004":
-        parent_trust = organisation.local_health_board.name
+        parent_trust = organisation.local_health_board
     else:
-        parent_trust = organisation.trust.name
+        parent_trust = organisation.trust
 
     if (
         request.user.is_rcpch_audit_team_member
@@ -320,22 +316,25 @@ def create_epilepsy12_user(request, organisation_id, user_type, epilepsy12_user_
             "organisation_employer": organisation,
         }
         form = Epilepsy12UserAdminCreationForm(
-            rcpch_organisation=user_type, initial=prepopulated_data
+            rcpch_organisation=user_type,
+            requesting_user=request.user,
+            initial=prepopulated_data,
         )
     elif user_type == "rcpch-staff":
         admin_title = "Add RCPCH Epilepsy12 staff member"
         form = Epilepsy12UserAdminCreationForm(
-            rcpch_organisation=user_type, initial=None
+            rcpch_organisation=user_type, requesting_user=request.user, initial=None
         )
 
     if request.method == "POST":
         form = Epilepsy12UserAdminCreationForm(
             user_type,
+            request.user,
             request.POST or None,
         )
 
         if form.is_valid():
-            # save new user and add to gropup - return to user list with success message
+            # save new user and add to group - return to user list with success message
             # send sign up email asynchronously
             # If signup unsuccessful, user not saved return to list with error message. Email not sent.
             new_user = form.save(commit=False)
@@ -373,7 +372,7 @@ def create_epilepsy12_user(request, organisation_id, user_type, epilepsy12_user_
             subject = "Password Reset Requested"
             email = construct_confirm_email(request=request, user=new_user)
 
-            asynchronously_send_email_to_recipients.delay(
+            send_email_to_recipients(
                 recipients=[new_user.email], subject=subject, message=email
             )
 
@@ -429,6 +428,7 @@ def edit_epilepsy12_user(request, organisation_id, epilepsy12_user_id):
             request.POST["email"] = epilepsy12_user_to_edit.email
         form = Epilepsy12UserAdminCreationForm(
             user_type,
+            request.user,
             request.POST or None,
             instance=epilepsy12_user_to_edit,
         )
@@ -438,7 +438,11 @@ def edit_epilepsy12_user(request, organisation_id, epilepsy12_user_id):
 
     if request.method == "POST":
         if "delete" in request.POST:
-            epilepsy12_user_to_edit.delete()
+            # This call back from the user form, not the table.
+            # Rather than delete user, instead set is_active to False as prevents cascade delete error for any cases/registrations
+            # updated by this user (see issue #813)
+            epilepsy12_user_to_edit.is_active = False
+            epilepsy12_user_to_edit.save(update_fields=["is_active"])
             messages.success(
                 request, f"{epilepsy12_user_to_edit.email} Deleted successfully."
             )
@@ -458,7 +462,7 @@ def edit_epilepsy12_user(request, organisation_id, epilepsy12_user_id):
                 request=request, user=epilepsy12_user_to_edit
             )
 
-            asynchronously_send_email_to_recipients.delay(
+            send_email_to_recipients(
                 recipients=[epilepsy12_user_to_edit.email],
                 subject=subject,
                 message=email,
@@ -527,8 +531,15 @@ def edit_epilepsy12_user(request, organisation_id, epilepsy12_user_id):
 @user_can_access_user()
 @permission_required("epilepsy12.delete_epilepsy12user", raise_exception=True)
 def delete_epilepsy12_user(request, organisation_id, epilepsy12_user_id):
+    """
+    HTMX callback from epilepsy12user table
+    Sets user is_active flag to False
+    """
     try:
-        Epilepsy12User.objects.get(pk=epilepsy12_user_id).delete()
+        # This call back from the table, not the form
+        # rather than delete user, instead set is_active to False as prevents cascade delete error for any cases/registrations
+        # updated by this user (see issue #813)
+        Epilepsy12User.objects.filter(pk=epilepsy12_user_id).update(is_active=False)
     except ValueError as error:
         messages.error(request, f"Delete User Unsuccessful: {error}")
 
@@ -553,6 +564,8 @@ class ResetPasswordView(SuccessMessageMixin, PasswordResetView):
         " If you don't receive an email, "
         "please make sure you've entered the address you registered with, and check your spam folder."
     )
+    extra_email_context= { 
+                          "reset_password_link_expires_at": datetime.now() + timedelta(seconds=int(settings.PASSWORD_RESET_TIMEOUT)) }
     success_url = reverse_lazy("index")
 
     # extend form_valid to set user.password_last_set

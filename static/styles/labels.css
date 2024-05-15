@@ -65,13 +65,6 @@ a label {
     margin:0%;
   }
 
-  /* used in the Fridah button */
-  .ui.rcpch_secret.label {
-    background-color: var(--rcpch_light_blue_tint2);
-    color: var(--rcpch_dark_grey);
-    border-radius: 0%;
-  }
-
   /* ADDS SPACING FOR HEADERS ON TABLE VIEWS USERLIST/CASES */
   .view_label_container.tables {
     display: grid;
@@ -84,10 +77,6 @@ a label {
     font-size: 25px;
     text-align: center;
     margin-left: 30px ;
-  }
-
-  .ui.rcpch_secret.label > i {
-    color: var(--rcpch_pink);
   }
 
   /* used in episodes, focal epilepsy, syndromes and multiple toggle */
@@ -130,6 +119,7 @@ a label {
     flex-direction: column;
     justify-content: space-evenly;
     align-items: center;
+    padding: 10px 20px 10px 20px;
   }
   
   div.rcpch_summary_stats > div.rcpch_summary_stats_row {

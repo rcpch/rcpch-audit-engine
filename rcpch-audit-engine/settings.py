@@ -18,11 +18,12 @@ import os
 from pathlib import Path
 
 # third party imports
-from celery.schedules import crontab
 from django.core.management.utils import get_random_secret_key
 
 # RCPCH imports
-from .logging_settings import LOGGING
+from .logging_settings import (
+    LOGGING,
+)  # no it is not an unused import, it pulls LOGGING into the settings file
 
 logger = logging.getLogger(__name__)
 
@@ -83,6 +84,7 @@ INSTALLED_APPS = [
     "django.contrib.sessions",
     "django.contrib.messages",
     "django.contrib.admindocs",
+    "django.contrib.humanize",
     "rest_framework",
     "whitenoise.runserver_nostatic",
     "django.contrib.staticfiles",
@@ -128,13 +130,18 @@ SECURE_HSTS_SECONDS = 3600
 SECURE_HSTS_PRELOAD = True
 SECURE_CONTENT_TYPE_NOSNIFF = True
 X_FRAME_OPTIONS = "DENY"
-# SESSION_COOKIE_SECURE = True
+
+# Session cookies
+SESSION_COOKIE_SECURE = True  # enforces HTTPS
+CSRF_COOKIE_SECURE = True
+SESSION_COOKIE_HTTPONLY = True  # cannot access session cookie on client-side using JS
+SESSION_EXPIRE_AT_BROWSER_CLOSE = True  # session expires on browser close
 
 ROOT_URLCONF = "rcpch-audit-engine.urls"
 
 # AUTO LOGOUT SESSION EXPIRATION
 AUTO_LOGOUT = {
-    "IDLE_TIME": datetime.timedelta(minutes=30),
+    "IDLE_TIME": int(os.getenv("AUTO_LOGOUT_DELAY_SECONDS", 1800)),
     "REDIRECT_TO_LOGIN_IMMEDIATELY": True,
     "MESSAGE": "You have been automatically logged out as there was no activity for 30 minutes. Please login again to continue.",
 }
@@ -142,33 +149,7 @@ AUTO_LOGOUT = {
 # LOGIN_URL = "/registration/login/"
 LOGIN_URL = "two_factor:login"  # change LOGIN_URL to the 2fa one
 LOGIN_REDIRECT_URL = "two_factor:profile"
-LOGOUT_REDIRECT_URL = "/"
-
-# REDIS / Celery
-CELERY_BROKER_URL = os.getenv("CELERY_BROKER_URL")
-CELERY_RESULT_BACKEND = os.getenv("CELERY_RESULT_BACKEND")
-CELERY_ACCEPT_CONTENT = ["application/json"]
-CELERY_TASK_SERIALIZER = "json"
-CELERY_RESULT_SERIALIZER = "json"
-CELERY_TIMEZONE = "Europe/London"
-
-# CELERY_BEAT_SCHEDULE = {
-#     "run-daily-at-six-am": {
-#         "task": "epilepsy12.tasks.hello",
-#         "schedule": crontab(hour="6", minute=0),
-#         "options": {
-#             "expires": 15.0,
-#         },
-#     },
-#     "run-ever-10-seconds": {
-#         "task": "epilepsy12.tasks.hello",
-#         "schedule": 10,
-#         "options": {
-#             "expires": 15.0,
-#         },
-#     },
-
-# }
+LOGOUT_REDIRECT_URL = "two_factor:login"
 
 TEMPLATES = [
     {
@@ -259,7 +240,7 @@ else:
     EMAIL_BACKEND = "django.core.mail.backends.console.EmailBackend"
 logger.info("EMAIL_BACKEND: %s", EMAIL_BACKEND)
 
-PASSWORD_RESET_TIMEOUT = 259200  # Default: 259200 (3 days, in seconds)
+PASSWORD_RESET_TIMEOUT = os.environ.get("PASSWORD_RESET_TIMEOUT", 259200)  # Default: 259200 (3 days, in seconds)
 
 SITE_CONTACT_EMAIL = os.environ.get("SITE_CONTACT_EMAIL")
 

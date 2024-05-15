@@ -1,16 +1,15 @@
 """
 
 ## Custom Permissions Tests
-TODO #511
 
 Opt out
-    [x] Assert an Audit Centre Administrator CANNOT let a child opt out of Epilepsy12
-    [x] Assert an audit centre clinician CANNOT let a child opt out of Epilepsy12
-    [x] Assert an Audit Centre Lead Clinician CANNOT let a child outside their own Trust opt out of Epilepsy12
+[x] Assert an Audit Centre Administrator CANNOT let a child opt out of Epilepsy12
+[x] Assert an audit centre clinician CANNOT let a child opt out of Epilepsy12
+[x] Assert an Audit Centre Lead Clinician CANNOT let a child outside their own Trust opt out of Epilepsy12
 
-    [] Assert an Audit Centre Lead Clinician can let a child within their own Trust opt out of Epilepsy12
-    [] Assert RCPCH Audit Team can let a child opt out of Epilepsy12
-    [] Assert Clinical Audit Team can let a child opt out of Epilepsy12
+[] Assert an Audit Centre Lead Clinician can let a child within their own Trust opt out of Epilepsy12
+[] Assert RCPCH Audit Team can let a child opt out of Epilepsy12
+[] Assert Clinical Audit Team can let a child opt out of Epilepsy12
 
 Locking
 [] Assert an Audit Centre Administrator CANNOT lock a child from being edited
@@ -35,12 +34,6 @@ can_register_child_in_epilepsy12
 [] Assert an Audit Centre Lead Clinician CAN register a child within their own Trust in Epilepsy12
 [] Assert an Audit Centre Lead Clinician CANNOT register a child outside their own Trust in Epilepsy12
 [] Assert RCPCH Audit Team CAN register a child within any Trust in Epilepsy12
-
-can_delete_epilepsy12_lead_centre
-[] Assert an Audit Centre Administrator CANNOT 'delete_lead_site'
-[] Assert an audit centre clinician CANNOT delete_lead_site
-[] Assert an Audit Centre Lead Clinician CANNOT delete_lead_site
-[] Assert RCPCH Audit Team CAN delete_lead_site
 
 """
 # python imports

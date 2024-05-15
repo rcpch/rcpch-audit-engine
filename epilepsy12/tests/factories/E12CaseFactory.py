@@ -1,4 +1,5 @@
 """Factory fn to create new E12 Cases"""
+
 # standard imports
 from datetime import date
 
@@ -9,10 +10,7 @@ import factory
 from epilepsy12.models import Case
 from .E12SiteFactory import E12SiteFactory
 from .E12RegistrationFactory import E12RegistrationFactory
-from epilepsy12.constants import (
-    SEX_TYPE,
-    DEPRIVATION_QUINTILES
-    )
+from epilepsy12.constants import SEX_TYPE, DEPRIVATION_QUINTILES
 import nhs_number
 
 
@@ -26,7 +24,7 @@ class E12CaseFactory(factory.django.DjangoModelFactory):
 
     class Meta:
         model = Case
-        skip_postgeneration_save=True
+        skip_postgeneration_save = True
 
     class Params:
         # helper eligibility flags to set age
@@ -60,14 +58,14 @@ class E12CaseFactory(factory.django.DjangoModelFactory):
             pass_school_individual_healthcare_plan=True,
         )
         seed_male = factory.Trait(
-            first_name = 'Agent',
-            surname = factory.Sequence(lambda n: f'Smith-{n}'),
-            registration=None
+            first_name="Agent",
+            surname=factory.Sequence(lambda n: f"Smith-{n}"),
+            registration=None,
         )
         seed_female = factory.Trait(
-            first_name = 'Dolly',
-            surname = factory.Sequence(lambda n: f'Shepard-{n}'),
-            registration=None
+            first_name="Dolly",
+            surname=factory.Sequence(lambda n: f"Shepard-{n}"),
+            registration=None,
         )
 
     @factory.lazy_attribute
@@ -90,7 +88,7 @@ class E12CaseFactory(factory.django.DjangoModelFactory):
     date_of_birth = date(2022, 1, 1)
 
     ethnicity = "A"
-    index_of_multiple_deprivation_quintile=DEPRIVATION_QUINTILES.first
+    index_of_multiple_deprivation_quintile = DEPRIVATION_QUINTILES.first
     locked = False
 
     # once case created, create a Site, which acts as a link table between the Case and Organisation

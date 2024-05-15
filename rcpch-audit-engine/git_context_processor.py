@@ -1,42 +1,42 @@
+"""
+This module contains a function to get the active branch and latest commit hash
+from the git repo.
+"""
+
 from pathlib import Path
+import logging
+
+# set up logging
+logger = logging.getLogger(__name__)
 
 
-def get_active_branch_and_commit(request):
+def get_active_branch_and_commit(
+    request,  # pylint: disable=unused-argument
+):
     """
-    Gets the `GIT_HASH` environment variable, created in GitHub Actions workflow, inserts into all templates.
-    
-    If there is no git_hash.txt, such as in local dev, looks directly in the .git folder.
+    Gets the active branch and latest commit hash from the git repo
     """
-    # Load the txt file containing hash
-    try:
-        with open("git_hash.txt", "r") as f:
-            git_branch, git_hash = f.read().split(",")
 
-            latest_git_commit = git_hash.replace("GIT_HASH=", "")
-            active_git_branch = git_branch.replace("GIT_BRANCH=", "")
-
-    except FileNotFoundError:
-        try:
-            head_dir = Path(".") / ".git" / "HEAD"
-            with head_dir.open("r") as f:
-                head_branch = f.read().splitlines()
-            for line in head_branch:
-                if line[0:4] == "ref:":
-                    active_git_branch = line.partition("refs/heads/")[2]
-        except:
-            active_git_branch = "[branch name not found]"
-
-        try:
-            refs_dir = Path(".") / ".git" / "refs" / "heads" / active_git_branch
-            with refs_dir.open("r") as f:
-                latest_git_commit = f.read().splitlines()[0]
-
-        except:
-            latest_git_commit = "[latest commit hash not found]"
-
-    admin_data = {
-        "latest_git_commit": latest_git_commit,
-        "active_git_branch": active_git_branch,
+    # set defaults/fallback for values in git_data dict
+    git_data = {
+        "active_git_branch": "[branch name not found]",
+        "latest_git_commit": "[latest commit hash not found]",
     }
 
-    return admin_data
+    try:
+        head_dir = Path(".") / ".git" / "HEAD"
+        with head_dir.open("r") as f:
+            head_branch = f.read().splitlines()
+        for line in head_branch:
+            if line[0:4] == "ref:":
+                git_data["active_git_branch"] = line.partition("refs/heads/")[2]
+        logger.info("Active git branch: %s", git_data["active_git_branch"])
+
+        refs_dir = Path(".") / ".git" / "refs" / "heads" / git_data["active_git_branch"]
+        with refs_dir.open("r") as f:
+            git_data["latest_git_commit"] = f.read().splitlines()[0]
+        logger.info("Latest git commit: %s", git_data["latest_git_commit"])
+    except:  # pylint: disable=bare-except
+        logger.exception("Error getting git data from repository")
+
+    return git_data

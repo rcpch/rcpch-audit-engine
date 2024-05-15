@@ -20,17 +20,23 @@ def rcpch_403(request, exception):
     # it is called on raise PermissionDenied()
     # If a 403 template were to be returned at this point as in standard django,
     # the 403 template would be inserted into the target. This way the HttpReponseClientRedirect
-    # from django-htmx middleware forces a redirect. Neat.
+    # from django-htmx middleware forces a redirect to the two-factor sign-in page
     if request.htmx:
-        redirect = reverse_lazy("redirect_403")
-        return HttpResponseClientRedirect(redirect, status=403)
+        if request.user.is_authenticated:
+            redirect_url = reverse_lazy("redirect_403")
+            return HttpResponseClientRedirect(redirect_url, status=403)
+        else: 
+            return HttpResponseClientRedirect('two_factor:login', status=403)
     else:
-        return render(
+        if request.user.is_authenticated:
+            return render(
             request,
             template_name="epilepsy12/error_pages/rcpch_403.html",
             context={},
             status=403,
         )
+        else:
+            return redirect('two_factor:login')
 
 
 def redirect_403(request):

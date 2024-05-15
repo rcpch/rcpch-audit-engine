@@ -243,6 +243,7 @@
 
 
 """
+
 # python imports
 import pytest
 from http import HTTPStatus
@@ -378,6 +379,7 @@ def test_users_update_users_forbidden(
                 response.status_code == HTTPStatus.FORBIDDEN
             ), f"{test_user.first_name} (from {test_user.organisation_employer}) requested update user {test_user} in {TEST_USER_ORGANISATION}. Has groups: {test_user.groups.all()} Expected {HTTPStatus.FORBIDDEN} response status code, received {response.status_code}"
 
+
 @pytest.mark.django_db
 def test_user_cant_change_rcpch_or_superuser_flag(
     client,
@@ -451,12 +453,12 @@ def test_user_cant_change_rcpch_or_superuser_flag(
                 "role": USER_FROM_DIFFERENT_ORG.role,
                 "is_rcpch_audit_team_member": True,
                 "is_superuser": False,
-                'email':USER_FROM_DIFFERENT_ORG.email,
+                "email": USER_FROM_DIFFERENT_ORG.email,
             },
         )
-        
+
         assert r.status_code == HTTPStatus.FORBIDDEN
-        
+
         # Attempt to change is_superuser
         r = client.post(
             url,
@@ -466,10 +468,10 @@ def test_user_cant_change_rcpch_or_superuser_flag(
                 "role": USER_FROM_DIFFERENT_ORG.role,
                 "is_rcpch_audit_team_member": False,
                 "is_superuser": True,
-                'email':USER_FROM_DIFFERENT_ORG.email,
+                "email": USER_FROM_DIFFERENT_ORG.email,
             },
         )
-        
+
         assert r.status_code == HTTPStatus.FORBIDDEN
 
 
@@ -537,9 +539,12 @@ def test_user_cannot_see_rcpch_or_superuser_flag_in_template(
             },
         )
         r = client.get(url)
-        
-        for flag in ['id_is_rcpch_audit_team_member', 'id_is_superuser']:
-            assert flag.encode() not in r.content, f'{test_user} should not be able to see {flag} in template'
+
+        for flag in ["id_is_rcpch_audit_team_member", "id_is_superuser"]:
+            assert (
+                flag.encode() not in r.content
+            ), f"{test_user} should not be able to see {flag} in template"
+
 
 @pytest.mark.django_db
 def test_users_update_users_success(
@@ -1200,7 +1205,7 @@ def test_users_update_multiaxial_diagnosis_success(client):
                         },
                     ),
                     headers={"Hx-Trigger-Name": "epilepsy_cause", "Hx-Request": "true"},
-                    data={"epilepsy_cause": "142"}, # Saldino-Mainzer dysplasia
+                    data={"epilepsy_cause": "142"},  # Saldino-Mainzer dysplasia
                 )
 
             assert (
@@ -1711,11 +1716,11 @@ def test_users_update_comorbidity_success(client):
                     reverse(
                         URL,
                         kwargs={
-                            "comorbidity_id": comorbidity.pk,
+                            "comorbidity_id": comorbidity.id,
                         },
                     ),
                     headers={"Hx-Trigger-Name": URL, "Hx-Request": "true"},
-                    data={URL: Comorbidity.objects.all().first().id},
+                    data={URL: ComorbidityList.objects.all().first().id},
                 )
 
             assert (

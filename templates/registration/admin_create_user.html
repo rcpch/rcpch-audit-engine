@@ -18,9 +18,9 @@
         </div>
         
         <form 
-          class='ui rcpch form' 
+          class='ui rcpch form'
+          id="rcpch_edit_user_form"
           method="POST" 
-          action="" 
           name='create_epilepsy12_user_form'>
           {% csrf_token %}
 
@@ -140,30 +140,23 @@
                 {% endif %}
                 name="delete"
                 id="delete"
-                value="Delete"
-                  _= "on click
+                value="Deactivate"
+                hx-post="{% url 'delete_epilepsy12_user' organisation_id=organisation_id epilepsy12_user_id=form.instance.pk %}"
+                hx-trigger='click'
+                hx-headers='{"X-CSRFToken": "{{ csrf_token }}"}'
+                _= "on htmx:confirm(issueRequest)
                   halt the event
                   call Swal.fire({
                     title: 'Confirmation Required',
-                    text: 'This will irreversibly remove {{epilepsy12_user}} and related dated from Epilepsy12.',
+                    text: 'This will deactivate the account for {{form.first_name.value}} {{form.surname.value}}.',
                     icon: 'warning',
                     iconColor: '#e00087',
                     showCancelButton: true,
                     confirmButtonColor: '#11a7f2',
                     cancelButtonColor: '#e60700',
-                    confirmButtonText: 'Remove user from Epilepsy12'
+                    confirmButtonText: 'Deactivate Epilepsy12 user account.'
                   })
-                  if result.isConfirmed then fetch {% url 'edit_epilepsy12_user' organisation_id user.pk %}
-                  {
-                    method: 'post',
-                    headers: {
-                      'X-CSRFToken': {{csrf_token}},
-                      'Accept': 'network/json',
-                      'Content-Type': 'network/json',
-                    }
-                  }
-                  end
-                  "
+                  if result.isConfirmed issueRequest()"
               />
             
             {% endif %}
@@ -194,7 +187,6 @@
   </div>
 
 </div>
-
 {% endblock %}
 
 

@@ -1,3 +1,6 @@
+# python
+from datetime import date
+
 # django imports
 from django.shortcuts import render
 from django.contrib.auth.decorators import permission_required
@@ -28,9 +31,9 @@ from ..common_view_functions import (
 from ..decorator import user_may_view_this_child, login_and_otp_required
 from ..general_functions import (
     construct_transfer_epilepsy12_site_email,
-    dates_for_cohort,
+    cohorts_and_dates,
+    send_email_to_recipients,
 )
-from ..tasks import asynchronously_send_email_to_recipients
 
 
 @login_and_otp_required()
@@ -459,9 +462,7 @@ def update_lead_site(request, registration_id, site_id, update):
             origin_organisation=origin_organisation,
         )
 
-        asynchronously_send_email_to_recipients.delay(
-            recipients=recipients, subject=subject, message=email
-        )
+        send_email_to_recipients(recipients=recipients, subject=subject, message=email)
 
         if new_organisation.country.boundary_identifier == "W92000004":
             parent_trust = new_organisation.local_health_board.name
@@ -476,70 +477,6 @@ def update_lead_site(request, registration_id, site_id, update):
     return HttpResponseClientRedirect(
         reverse("cases", kwargs={"organisation_id": previous_lead_site.organisation.pk})
     )
-
-
-@login_and_otp_required()
-@user_may_view_this_child()
-@permission_required(
-    "epilepsy12.can_delete_epilepsy12_lead_centre", raise_exception=True
-)
-def delete_lead_site(request, registration_id, site_id):
-    """
-    HTMX POST request on button click from the lead_site partial
-    It deletes the site.
-    Returns a lead_site partial but also updates the previous_sites partial also
-    """
-    registration = Registration.objects.get(pk=registration_id)
-
-    # test first to see if this site is associated with other roles
-    # either past or present
-    if Site.objects.filter(
-        Q(case=registration.case)
-        & Q(pk=site_id)
-        & Q(
-            Q(site_is_childrens_epilepsy_surgery_centre=True)
-            | Q(site_is_paediatric_neurology_centre=True)
-            | Q(site_is_general_paediatric_centre=True)
-        )
-    ).exists():
-        # remove the lead role allocation
-        Site.objects.filter(pk=site_id).update(
-            site_is_primary_centre_of_epilepsy_care=False,
-            updated_at=timezone.now(),
-            updated_by=request.user,
-        )
-
-    else:
-        # there are no other roles (previous or current)
-        # it is safe to delete this record
-        Site.objects.filter(pk=site_id).delete()
-
-    lead_site = Site.objects.filter(
-        case=registration.case,
-        site_is_primary_centre_of_epilepsy_care=True,
-        site_is_actively_involved_in_epilepsy_care=True,
-    ).first()
-
-    organisation_list = Organisation.objects.order_by("name")
-
-    context = {
-        "registration": registration,
-        "site": lead_site,
-        "edit": False,
-        "transfer": False,
-        "organisation_list": organisation_list,
-    }
-
-    template_name = "epilepsy12/partials/registration/lead_site.html"
-
-    response = recalculate_form_generate_response(
-        model_instance=registration,
-        request=request,
-        context=context,
-        template=template_name,
-    )
-
-    return response
 
 
 @login_and_otp_required()
@@ -666,9 +603,11 @@ def first_paediatric_assessment_date(request, case_id):
     if request.user.is_superuser or request.user.is_rcpch_audit_team_member:
         earliest_allowable_date = case.date_of_birth
     else:
-        earliest_allowable_date = dates_for_cohort(registration.cohort)[
-            "cohort_start_date"
-        ]
+        # registering a new child in the audit by a clinical team
+        # sets the minimum allowable date to the currently submitting cohort start date
+        earliest_allowable_date = cohorts_and_dates(
+            first_paediatric_assessment_date=date.today()
+        )["submitting_cohort_start_date"]
 
     try:
         error_message = None

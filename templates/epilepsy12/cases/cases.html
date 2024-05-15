@@ -33,7 +33,7 @@
 
         <div class="sixteen wide notupperpadded column">
 
-          <div class="ui rcpch icon fluid input" data-tooltip="Start typing to Filter by name or NHS Number.">
+          <div class="ui rcpch icon fluid input" data-tooltip="Start typing to Filter by name, NHS Number or case ID.">
             <input type="text" class='prompt' placeholder="Search..." name='filtered_case_list' hx-target="#case_table" hx-trigger="keyup" hx-get="{% url 'filter_case_list' organisation_id=organisation.pk %}" hx-swap="innerHTML">
             <i class="ui rcpch_light_blue circular search link icon"></i>
           </div>
@@ -43,7 +43,7 @@
       </div>
 
       <div id="case_table">
-        {% include '../partials/case_table.html' with case_list=case_list paginated=paginated organisation=organisation %}
+        {% include '../partials/case_table.html' with case_list=case_list paginated=paginated organisation=organisation filtered_case_list=filter_case_list %}
       </div>
 
       

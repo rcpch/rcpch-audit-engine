@@ -9,6 +9,8 @@
     name="unknown_postcode"
     hidden
     {% if test_positive %}
-        _="on load set id_postcode.value to '{{test_positive}}'"
+        _="on load set id_postcode.value to '{{test_positive}}' then
+        remove .disabled from #create_update_case_button
+        "
     {% endif %}
 />
