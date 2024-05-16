@@ -139,7 +139,7 @@ class AuditProgress(models.Model, HelpTextMixin):
         Registration = apps.get_model("epilepsy12", "Registration")
         Site = apps.get_model("epilepsy12", "Site")
         registration = Registration.objects.filter(audit_progress=self).first()
-        if registration:
+        if registration and hasattr(registration, "case"):
             lead_site = Site.objects.get(
                 case=registration.case,
                 site_is_actively_involved_in_epilepsy_care=True,
