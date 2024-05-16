@@ -108,7 +108,7 @@
     <tbody>
       {% for case in case_list %}
         
-          {% if case.registration.days_remaining_before_submission == 0 %}
+          {% if case.registration.days_remaining_before_submission == 0 and not request.user.is_rcpch_audit_team_member %}
               <tr class='disabled'>
           {% elif case in cases_in_transfer %}
               <tr class='active_transfer'>
@@ -136,12 +136,12 @@
             <div class='ui buttons'>
               <button 
                 data-tooltip='Edit or delete child.'
-                {% if case.locked or case.registration.days_remaining_before_submission == 0 %}
+                {% if case.locked or case.registration.days_remaining_before_submission == 0 and not request.user.is_rcpch_audit_team_member %}
                   class="ui rcpch_purple icon disabled button"
                 {% else %}
                   class="ui rcpch_purple icon button"
                 {% endif %}
-                tabindexed="0" {% if case.locked or not perms.epilepsy12.change_case %}disabled{% endif %}>
+                tabindexed="0" {% if case.locked or not perms.epilepsy12.change_case and not request.user.is_rcpch_audit_team_member %}disabled{% endif %}>
                 <a href="{% url 'update_case' organisation_id=organisation_id case_id=case.id%}" class="rcpch_purple half_button">
                   <i class="edit outline icon icon_white"></i>
                   Edit
@@ -159,7 +159,7 @@
                 {% else %}
                 <button 
                   data-tooltip='Complete audit details.'
-                  {% if case.registration.days_remaining_before_submission == 0 %}
+                  {% if case.registration.days_remaining_before_submission == 0 and not request.user.is_rcpch_audit_team_member %}
                     class="ui rcpch_dark_purple disabled button"
                   {% else %}
                     class="ui rcpch_dark_purple button"
@@ -170,7 +170,7 @@
                 
                 {% endif %}
               {% else %}
-                {% if case.locked %}
+                {% if case.locked and not request.user.is_rcpch_audit_team_member %}
 
                 <button 
                   class="ui rcpch_dark_purple disabled button" 

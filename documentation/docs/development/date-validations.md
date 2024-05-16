@@ -80,7 +80,7 @@ It raises a ValueError which is caught in the UI.
 
 | Model | Date | mandatory | earliest allowable date | other flags |
 | ---- | ---- | ---- | ---- | ---- |
-| Registration | first_paediatric_assessment_date | Yes | date_of_birth |   |
+| Registration | first_paediatric_assessment_date | Yes | current submitting cohort start date for clinicians or date_of_birth if RCPCH audit team |   |
 | Episode | seizure_onset_date | Yes | date_of_birth |   |
 | Syndrome | syndrome_diagnosis_date | Yes | date_of_birth |   |
 | Comorbidity | comorbidity_diagnosis_date | Yes | date_of_birth |   |
