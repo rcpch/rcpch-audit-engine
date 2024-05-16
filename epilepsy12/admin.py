@@ -127,7 +127,7 @@ admin.site.register(FirstPaediatricAssessment, SimpleHistoryAdmin)
 admin.site.register(Management, SimpleHistoryAdmin)
 admin.site.register(Registration, SimpleHistoryAdmin)
 admin.site.register(Site, SimpleHistoryAdmin)
-admin.site.register(AuditProgress)
+admin.site.register(AuditProgress, SimpleHistoryAdmin)
 admin.site.register(Episode, SimpleHistoryAdmin)
 
 admin.site.register(Keyword, SimpleHistoryAdmin)

@@ -122,6 +122,6 @@ class Registration(
 
     def __str__(self) -> str:
         if self.first_paediatric_assessment_date:
-            return f"Epilepsy12 registration for {self.case} on {self.first_paediatric_assessment_date}"
+            return f"Epilepsy12 registration for {self.pk} - {self.case} on {self.first_paediatric_assessment_date}"
         else:
             return f"Epilepsy12 registration for {self.case} incomplete."

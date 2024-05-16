@@ -1,3 +1,4 @@
+from django.apps import apps
 from django.contrib.gis.db import models
 from .help_text_mixin import HelpTextMixin
 
@@ -135,7 +136,18 @@ class AuditProgress(models.Model, HelpTextMixin):
             return False
 
     def __str__(self):
-        return f"Audit progress for {self.registration.case}"
+        Registration = apps.get_model("epilepsy12", "Registration")
+        Site = apps.get_model("epilepsy12", "Site")
+        registration = Registration.objects.filter(audit_progress=self).first()
+        if registration:
+            lead_site = Site.objects.get(
+                case=registration.case,
+                site_is_actively_involved_in_epilepsy_care=True,
+                site_is_primary_centre_of_epilepsy_care=True,
+            )
+            return f"Audit progress for {self.registration.case} [{lead_site.organisation}](cohort {registration.cohort})"
+        else:
+            return f"No AuditProgress record yet"
 
     class Meta:
         verbose_name = "Audit Progress"
