@@ -365,12 +365,10 @@ class KPI(models.Model, HelpTextMixin):
         ordering = ["registration__case"]
 
     def __str__(self):
-        Registration = apps.get_model("epilepsy12", "Registration")
-        registration = Registration.objects.filter(kpi=self).get()
-        if registration:
+        if hasattr(self, "registration"):
             if self.organisation.trust:
-                return f"KPI for {registration.case} in {self.organisation.name}({self.organisation.trust.name})[cohort {registration.cohort}]"
+                return f"KPI for {self.registration.case} in {self.organisation.name}({self.organisation.trust.name})[cohort {self.registration.cohort}]"
             else:
-                return f"KPI for {registration.case} in {self.organisation.name}({self.organisation.local_health_board.name})[cohort {registration.cohort}]"
+                return f"KPI for {self.registration.case} in {self.organisation.name}({self.organisation.local_health_board.name})[cohort {self.registration.cohort}]"
         else:
             return "There is no Registration associated with this KPI"
