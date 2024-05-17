@@ -189,8 +189,8 @@ class Epilepsy12User(AbstractUser, PermissionsMixin):
     password_last_set = models.DateTimeField(default=timezone.now)
 
     # Tracking fields
-    created_at = models.DateTimeField(auto_now_add=True)
-    updated_at = models.DateTimeField(auto_now=True)
+    created_at = models.DateTimeField(auto_now_add=True, null=True, blank=True)
+    updated_at = models.DateTimeField(auto_now=True, null=True, blank=True)
     created_by = models.ForeignKey(
         settings.AUTH_USER_MODEL,
         on_delete=models.SET_NULL,
