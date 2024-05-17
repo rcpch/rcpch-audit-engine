@@ -421,7 +421,6 @@ def view_preference(request, organisation_id, template_name):
     """
     organisation = Organisation.objects.get(pk=organisation_id)
 
-    print("helllooooo")
     request.user.view_preference = request.htmx.trigger_name
     request.user.save(update_fields=["view_preference"])
 
