@@ -20,9 +20,10 @@
             </thead>
             <tbody>
                 <tr>
-                    <td colspan="3">
+                    <td colspan="3" style="background-color: #d9d9d9;">
                         <h5>{{epilepsy12user}} user account was created on {{epilepsy12_user.date_joined}} Created by: {{epilepsy12_user.created_by}}</h5>
-                        <h5><i>Last updated: {{epilepsy12_user.updated_at}} by: {{epilepsy12_user.updated_by}}</i></h5>
+                        <h5><i>User record last updated: {{epilepsy12_user.updated_at}} by: {{epilepsy12_user.updated_by}}</i></h5>
+                        <h5><i>Password last set: {{epilepsy12_user.password_last_set}}</i></h5>
                     </td>
                 </tr>
                 {% for activity in activities %}

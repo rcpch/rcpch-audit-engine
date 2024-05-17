@@ -12,12 +12,12 @@ class VisitActivity(models.Model):
     SETUP_TWO_FACTOR_AUTHENTICATION = 6
 
     ACTIVITY = (
-        (SUCCESSFUL_LOGIN, "SUCCESSFUL_LOGIN"),
-        (UNSUCCESSFUL_LOGIN, "UNSUCCESSFUL_LOGIN"),
-        (LOGOUT, "LOGOUT"),
-        (PASSWORD_RESET_LINK_SENT, "PASSWORD_RESET_LINK_SENT"),
-        (PASSWORD_RESET, "PASSWORD_RESET"),
-        (SETUP_TWO_FACTOR_AUTHENTICATION, "SETUP_TWO_FACTOR_AUTHENTICATION"),
+        (SUCCESSFUL_LOGIN, "Successful login"),
+        (UNSUCCESSFUL_LOGIN, "Login failed"),
+        (LOGOUT, "Logout"),
+        (PASSWORD_RESET_LINK_SENT, "Password Reset link sent"),
+        (PASSWORD_RESET, "Password reset"),
+        (SETUP_TWO_FACTOR_AUTHENTICATION, "Two factor authentication set up"),
     )
 
     activity_datetime = models.DateTimeField(auto_created=True, default=timezone.now)
