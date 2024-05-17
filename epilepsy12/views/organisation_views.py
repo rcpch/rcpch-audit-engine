@@ -151,10 +151,32 @@ def selected_organisation_summary(request, organisation_id):
     else:
         total_percent_trust = 0
 
+    # organisation list scoped to permissions of user
+    if (
+        request.user.is_rcpch_audit_team_member
+        or request.user.is_superuser
+        or request.user.is_rcpch_staff
+    ):
+        # select any organisations except currently selected organisation
+        organisation_list = (
+            Organisation.objects.all()
+            .exclude(pk=selected_organisation.pk)
+            .order_by("name")
+        )
+    else:
+        if selected_organisation.country.boundary_identifier == "W92000004":  # Wales
+            organisation_list = Organisation.objects.filter(
+                trust=selected_organisation.local_health_board
+            )
+        else:
+            organisation_list = Organisation.objects.filter(
+                trust=selected_organisation.trust
+            )
+
     context = {
         "user": request.user,
         "selected_organisation": selected_organisation,
-        "organisation_list": Organisation.objects.order_by("name").all(),
+        "organisation_list": organisation_list,
         "cases_aggregated_by_ethnicity": cases_aggregated_by_ethnicity(
             selected_organisation=selected_organisation
         ),
