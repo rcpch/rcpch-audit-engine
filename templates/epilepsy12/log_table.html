@@ -19,6 +19,12 @@
                 </tr>
             </thead>
             <tbody>
+                <tr>
+                    <td colspan="3">
+                        <h5>{{epilepsy12user}} user account was created on {{epilepsy12_user.date_joined}} Created by: {{epilepsy12_user.created_by}}</h5>
+                        <h5><i>Last updated: {{epilepsy12_user.updated_at}} by: {{epilepsy12_user.updated_by}}</i></h5>
+                    </td>
+                </tr>
                 {% for activity in activities %}
                     <tr>
                         <td>{{activity.epilepsy12user}}</td>

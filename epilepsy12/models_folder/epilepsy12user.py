@@ -1,6 +1,8 @@
 import logging
 
 # django
+from django.apps import apps
+from django.conf import settings
 from django.contrib.auth.models import AbstractUser, PermissionsMixin
 from django.contrib.auth.base_user import BaseUserManager
 from django.utils import timezone
@@ -8,7 +10,6 @@ from django.utils.translation import gettext_lazy as _
 from django.contrib.gis.db import models
 from django.db.models.functions import Lower
 from django.contrib.gis.db.models import UniqueConstraint
-from django.apps import apps
 
 # 3rd party
 from simple_history.models import HistoricalRecords
@@ -23,6 +24,7 @@ from epilepsy12.constants.user_types import (
 )
 
 logger = logging.getLogger(__name__)
+
 
 class Epilepsy12UserManager(BaseUserManager):
     """
@@ -107,16 +109,17 @@ class Epilepsy12UserManager(BaseUserManager):
         if extra_fields.get("is_superuser") is not True:
             raise ValueError(_("Superuser must have is_superuser=True."))
 
-        if extra_fields.get("role") not in [1,2,3,4]:
-            raise ValueError(
-                "--role must be an integer between 1 and 4")
+        if extra_fields.get("role") not in [1, 2, 3, 4]:
+            raise ValueError("--role must be an integer between 1 and 4")
         else:
             if extra_fields.get("role") == 4:
                 extra_fields.setdefault("is_rcpch_staff", True)
-                extra_fields.setdefault("view_preference", 2) # national scope
+                extra_fields.setdefault("view_preference", 2)  # national scope
                 extra_fields.setdefault("organisation_employer", None)
             else:
-                organisation_employer = Organisation.objects.get(ods_code="RJZ01") # clinicians added to KCH by default
+                organisation_employer = Organisation.objects.get(
+                    ods_code="RJZ01"
+                )  # clinicians added to KCH by default
                 extra_fields.setdefault("organisation_employer", organisation_employer)
 
         logged_in_user = self.create_user(email.lower(), password, **extra_fields)
@@ -184,6 +187,24 @@ class Epilepsy12User(AbstractUser, PermissionsMixin):
     role = models.PositiveSmallIntegerField(choices=ROLES, blank=True, null=True)
     email_confirmed = models.BooleanField(default=False)
     password_last_set = models.DateTimeField(default=timezone.now)
+
+    # Tracking fields
+    created_at = models.DateTimeField(auto_now_add=True)
+    updated_at = models.DateTimeField(auto_now=True)
+    created_by = models.ForeignKey(
+        settings.AUTH_USER_MODEL,
+        on_delete=models.SET_NULL,
+        null=True,
+        blank=True,
+        related_name="created_users",
+    )
+    updated_by = models.ForeignKey(
+        settings.AUTH_USER_MODEL,
+        on_delete=models.SET_NULL,
+        null=True,
+        blank=True,
+        related_name="updated_users",
+    )
 
     history = HistoricalRecords()
 
