@@ -24,7 +24,7 @@ test_positive: currently selected organisation id
                     hx-trigger="{{hx_trigger}}"
                     name='{{hx_name}}'
                     value="{{test_positive}}"
-                    _="init js $('.ui.rcpch.search.selection.dropdown').dropdown(); end"
+                    _="init js $('.ui.rcpch.search.selection.dropdown').dropdown({ fullTextSearch: true }); end"
                 >
                 <div class="default text">{{hx_default_text}}</div>
                 <div class="menu" >
