@@ -31,7 +31,7 @@
                     <div class="column">
                         <a class="ui rcpch_grey button bold fluid" href="{% url 'epilepsy12_user_list' organisation_id=selected_organisation.pk %}">
                             View All Epilepsy12 Staff of 
-                            {% with organisation_name=selected_organisation.name|title %}
+                            {% with organisation_name=selected_organisation.trust.name|title %}
                             {{ organisation_name|capitalise_org_names }} 
                             {% endwith %}
                         </a>
@@ -39,9 +39,15 @@
                     <div class="column">
                         <a class="ui rcpch_primary button bold fluid " href="{% url 'cases' organisation_id=selected_organisation.pk %}">
                             View All Children of
-                            {% with organisation_name=selected_organisation.name|title %}
-                            {{ organisation_name|capitalise_org_names }} 
-                            {% endwith %}
+                            {% if selected_organisation.trust %}
+                                {% with organisation_name=selected_organisation.trust.name|title %}
+                                {{ organisation_name|capitalise_org_names }} 
+                                {% endwith %}
+                            {% elif selected_organisation.local_health_board %}
+                                {% with organisation_name=selected_organisation.local_health_board.name|title %}
+                                {{ organisation_name|capitalise_org_names }} 
+                                {% endwith %}
+                            {% endif %}
                         </a>
                     </div>
                     <div class="column" id="publish_button">
