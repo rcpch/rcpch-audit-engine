@@ -82,6 +82,14 @@ user_patterns = [
         name="password_reset_confirm",
     ),
     path(
+        "reset/<uidb64>/<token>/",
+        ResetPasswordConfirmView.as_view(),
+        name="password_reset_confirm",
+    ),
+    path(
+        "reset/done/", ResetPasswordComplete.as_view(), name="password_reset_complete"
+    ),
+    path(
         "organisation/<int:organisation_id>/epilepsy12_users/<int:epilepsy12_user_id>/logs",
         view=logs,
         name="logs",

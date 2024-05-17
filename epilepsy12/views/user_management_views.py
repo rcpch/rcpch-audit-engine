@@ -13,7 +13,11 @@ from django.http import (
 )
 from django.core.exceptions import PermissionDenied
 from django.urls import reverse_lazy
-from django.contrib.auth.views import PasswordResetView
+from django.contrib.auth.views import (
+    PasswordResetView,
+    PasswordResetConfirmView,
+    PasswordResetCompleteView,
+)
 from django.contrib.messages.views import SuccessMessageMixin
 from django.utils.html import strip_tags
 from django_htmx.http import HttpResponseClientRedirect
@@ -576,12 +580,67 @@ class ResetPasswordView(SuccessMessageMixin, PasswordResetView):
 
     # extend form_valid to set user.password_last_set
     def form_valid(self, form):
-        self.request.user.password_last_set = timezone.now()
+        email = form.cleaned_data["email"]
+        if Epilepsy12User.objects.filter(email=email, is_active=True).exists():
+            e12user = Epilepsy12User.objects.filter(email=email, is_active=True).get()
+            # password reset link sent
+            VisitActivity.objects.create(epilepsy12user=e12user, activity=4)
+        else:
+            messages.warning(
+                self.request, f"This email ({email}) is not attached to a user account."
+            )
+            return redirect(reverse("password_reset"))
 
         return super().form_valid(form)
 
 
-# 08:38:01
+class ResetPasswordConfirmView(PasswordResetConfirmView):
+    # overridden custom django password reset work flow. User has submitted a valide password for reset
+    # their email is stored in session for use later to update logs if they are successful
+    def form_valid(self, form):
+        # Store the user's email in the session
+        self.request.session["user_email"] = form.user.email
+        return super().form_valid(form)
+
+
+class ResetPasswordComplete(PasswordResetCompleteView):
+    # Overridden custom django password reset work flow. Picks up user email who has reset password from session
+    # and updates VisitActivity,
+    template_name = "registration/password_reset_complete.html"
+
+    def dispatch(self, request, *args, **kwargs):
+        # Call the dispatch method of the superclass
+        response = super().dispatch(request, *args, **kwargs)
+
+        # Get the user's email from the session (or request)
+        user_email = request.session.get("user_email")
+        if (
+            user_email
+            and Epilepsy12User.objects.filter(email=user_email, is_active=True).exists()
+        ):
+            updated_user = Epilepsy12User.objects.filter(
+                email=user_email, is_active=True
+            ).get()
+            try:
+                # log that User has successfully reset password
+                VisitActivity.objects.create(
+                    activity_datetime=timezone.now(),
+                    activity=5,  # successful password reset
+                    ip_address=request.META.get("REMOTE_ADDR"),
+                    epilepsy12user=updated_user,
+                )
+                # reset the password_last_set field to current date/time
+                updated_user.password_last_set = timezone.now()
+                updated_user.save(update_fields=["password_last_set"])
+            except Epilepsy12User.DoesNotExist:
+                pass
+
+        # Clear the session variable
+        request.session.pop("user_email", None)
+
+        return response
+
+
 class RCPCHLoginView(TwoFactorLoginView):
     def __init__(self, **kwargs):
         super().__init__(**kwargs)
