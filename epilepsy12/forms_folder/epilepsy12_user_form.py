@@ -54,6 +54,12 @@ class Epilepsy12UserUpdatePasswordForm(SetPasswordForm):
         if commit:
             logger.debug(f"Updating password_last_set to {timezone.now()}")
             user.save()
+            VisitActivity.objects.create(
+                activity_datetime=timezone.now(),
+                activity=5,
+                ip_address=self.request.META.get("REMOTE_ADDR"),
+                epilepsy12user=user,
+            )
         return user
 
 
