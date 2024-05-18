@@ -8,7 +8,7 @@ class CurrentUserMiddleware:
 
     def __call__(self, request):
         if request.user.is_authenticated:
-            Epilepsy12User._created_by = request.user
-            Epilepsy12User._updated_by = request.user
+            Epilepsy12User.created_by = request.user
+            Epilepsy12User.updated_by = request.user
         response = self.get_response(request)
         return response

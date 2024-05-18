@@ -25,6 +25,8 @@ from django_htmx.http import HttpResponseClientRedirect
 
 # Other dependencies
 from two_factor.views import LoginView as TwoFactorLoginView
+from django_otp import devices_for_user, user_has_device
+
 import pandas as pd
 from datetime import datetime, timedelta
 
@@ -713,39 +715,34 @@ class RCPCHLoginView(TwoFactorLoginView):
 @user_can_access_user()
 def logs(request, organisation_id, epilepsy12_user_id):
     """
-    returns logs for given organisation
+    returns logs for given organisation and user
     """
     organisation = Organisation.objects.get(pk=organisation_id)
     epilepsy12_user = Epilepsy12User.objects.get(pk=epilepsy12_user_id)
 
-    activities = VisitActivity.objects.filter(epilepsy12user=epilepsy12_user).all()
+    activities = (
+        VisitActivity.objects.filter(epilepsy12user=epilepsy12_user)
+        .all()
+        .order_by("-activity_datetime")
+    )
+    devices = devices_for_user(user=epilepsy12_user)
+    has_device = user_has_device(user=epilepsy12_user)
 
-    template_name = "epilepsy12/logs.html"
+    if request.htmx:
+        for device in devices:
+            if device.name == request.htmx.trigger_name:
+                device.delete()
+        devices = devices_for_user(user=epilepsy12_user, confirmed=True)
+        template_name = "epilepsy12/logs_user_summary.html"
+    else:
+        template_name = "epilepsy12/logs.html"
+
     context = {
         "epilepsy12_user": epilepsy12_user,
         "organisation": organisation,
         "activities": activities,
-    }
-
-    return render(request=request, template_name=template_name, context=context)
-
-
-@login_and_otp_required()
-@user_can_access_user()
-def log_list(request, organisation_id, epilepsy12_user_id):
-    """
-    GET request to return log table
-    """
-    organisation = Organisation.objects.get(pk=organisation_id)
-    epilepsy12_user = Epilepsy12User.objects.get(pk=epilepsy12_user_id)
-
-    activities = VisitActivity.objects.filter(epilepsy12user=epilepsy12_user).all()
-
-    template_name = "epilepsy12/logs.html"
-    context = {
-        "epilepsy12_user": epilepsy12_user,
-        "organisation": organisation,
-        "activities": activities,
+        "devices": devices,
+        "has_device": has_device,
     }
 
     return render(request=request, template_name=template_name, context=context)

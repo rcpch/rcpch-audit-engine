@@ -2,13 +2,18 @@
 {% load static %}
 {% csrf_token %}
 
+<div id="logs_user_summary">
+    {% include 'epilepsy12/logs_user_summary.html' with epilepy12_user=epilepy12_user devices=devices organisation=organisation %}
+</div>
+
 {% if activities|length > 0 %}
     <div 
         hx-target='#log_table' 
-        hx-get="{% url 'log_list' organisation_id=organisation.pk epilepsy12_user_id=epilepsy12_user.pk %}" 
+        hx-get="{% url 'logs' organisation_id=organisation.pk epilepsy12_user_id=epilepsy12_user.pk %}" 
         hx-trigger='log_table from:body'
         hx-swap='innerHTML' 
         name='log_table'>
+
     
         <table class="ui rcpch table">
             <thead>
@@ -20,13 +25,6 @@
                 </tr>
             </thead>
             <tbody>
-                <tr>
-                    <td colspan="4" style="background-color: #d9d9d9;">
-                        <h5>{{epilepsy12user}} user account was created on {{epilepsy12_user.date_joined}} Created by: {{epilepsy12_user.created_by}}</h5>
-                        <h5><i>User record last updated: {{epilepsy12_user.updated_at}} by: {{epilepsy12_user.updated_by}}</i></h5>
-                        <h5><i>Password last set: {{epilepsy12_user.password_last_set}}</i></h5>
-                    </td>
-                </tr>
                 {% for activity in activities %}
                     <tr>
                         <td>{{activity.epilepsy12user}}</td>
