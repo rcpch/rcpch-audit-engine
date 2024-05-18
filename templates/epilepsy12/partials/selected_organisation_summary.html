@@ -287,17 +287,6 @@
                     </div>
                 </div>
 
-                {% if selected_organisation.city == "LONDON" %}
-                <div class="ui rcpch_light_blue  card">
-                    <div class="content">
-                        <h3 >London Borough</h3>
-                    </div>
-                    <div>
-                        {% include 'epilepsy12/partials/charts/map.html' with abstraction_level='london_borough' abstraction_level_border_colour='#66cc33' abstraction_level_data=london_borough_tiles selected_organisation=selected_organisation hospital_region_name=selected_organisation.london_borough.name %}
-                    </div>
-                </div>
-                {% endif %}
-
                 {% if selected_organisation.trust %}
                 <div class="ui rcpch_light_blue card">
                     <div class="content">
@@ -307,9 +296,11 @@
                         {% include 'epilepsy12/partials/charts/map.html' with abstraction_level='nhs_england_region' abstraction_level_border_colour='#ffd200' abstraction_level_data=nhsregion_tiles selected_organisation=selected_organisation hospital_region_name=selected_organisation.nhs_england_region.name %}
                     </div>
                 </div>
+                {% else %}
+                <!-- leave a blank space in welsh orgs -->
+                <div class="ui hidden card"></div>
                 {% endif %}
 
-                {% if selected_organisation.city != "LONDON" %}
                 <div class="ui rcpch_light_blue card">
                     <div class="content">
                         <h3>
@@ -320,7 +311,6 @@
                         {% include 'epilepsy12/partials/charts/map.html' with abstraction_level='country' abstraction_level_border_colour='#66cc33' abstraction_level_data=country_tiles selected_organisation=selected_organisation hospital_region_name=selected_organisation.country.name %}
                     </div>
                 </div>
-                {% endif %}
 
             </div>
         </div>
