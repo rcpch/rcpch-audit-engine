@@ -31,6 +31,17 @@ from epilepsy12.management.commands.old_pt_data_scripts import (
 from epilepsy12.management.commands.user_scripts import insert_user_data
 from epilepsy12.common_view_functions import _seed_all_aggregation_models
 
+ORGANISATION_SEED_LIST = [
+    "RJZ01",  # King's College Hospital
+    "RGT01",  # Addenbrooks
+    "RBS25",  # Alderhey
+    "RQM01",  # Chelsea and Westminster
+    "RCF22",  # Airedale
+    "7A2AJ",  # Bronglais
+    "7A6BJ",  # Chepstow Community
+    "7A6AV",  # Ysbyty Ystrad Fawr
+]
+
 
 class Command(BaseCommand):
     help = "seed database with organisation trust data for testing and development."
@@ -46,6 +57,12 @@ class Command(BaseCommand):
             default=50,
         )
         parser.add_argument(
+            "-s",
+            "--skip",
+            action="store_false",
+            help="Optional parameter. Set to disable skipping cases if they already exist",
+        )
+        parser.add_argument(
             "-ct",
             "--cohort",
             nargs="?",
@@ -56,10 +73,8 @@ class Command(BaseCommand):
         parser.add_argument(
             "-fy",
             "--full_year",
-            nargs="?",
-            type=bool,
-            help="Optional parameter. Set True if all cases must have completed a full year of care.",
-            default=False,
+            action="store_true",
+            help="Optional parameter. Set to ensure all cases have completed a full year of care.",
         )
         parser.add_argument(
             "-sctids",
@@ -68,12 +83,23 @@ class Command(BaseCommand):
             help="List of SNOMED-CT ids to update the epilepsy causes with.",
             type=int,
         )
+        parser.add_argument(
+            "-orgs",
+            "--organisations",
+            nargs="+",
+            help="Optional List of Organisation ODS codes.",
+            type=str,
+        )
 
     def handle(self, *args, **options):
         if options["mode"] == "cases":
             cases = options["cases"]
+            skip = options.get("skip", True)
+            organisations_list = options.get("organisations", ORGANISATION_SEED_LIST)
             self.stdout.write("seeding with dummy case data...")
-            run_dummy_cases_seed(cases=cases)
+            run_dummy_cases_seed(
+                cases=cases, organisations=organisations_list, skip=skip
+            )
 
         elif options["mode"] == "seed_registrations":
             self.stdout.write(
@@ -106,11 +132,12 @@ class Command(BaseCommand):
             self.stdout.write("No options supplied...")
 
 
-def run_dummy_cases_seed(verbose=True, cases=50):
+def run_dummy_cases_seed(cases, organisations, skip, verbose=True):
+
     if verbose:
         print("\033[33m", f"Seeding {cases} fictional cases...", "\033[33m")
     # there should not be any cases yet, but sometimes seed gets run more than once
-    if Case.objects.all().exists():
+    if Case.objects.all().exists() and skip:
         if verbose:
             print("Cases already exist. Skipping this step...")
         return
@@ -118,21 +145,11 @@ def run_dummy_cases_seed(verbose=True, cases=50):
     if cases is None or cases == 0:
         cases = 50
 
-    different_organisations = [
-        "RJZ01",  # King's College Hospital
-        "RGT01",  # Addenbrooks
-        "RBS25",  # Alderhey
-        "RQM01",  # Chelsea and Westminster
-        "RCF22",  # Airedale
-        "7A2AJ",  # Bronglais
-        "7A6BJ",  # Chepstow Community
-        "7A6AV",  # Ysbyty Ystrad Fawr
-    ]
     organisations_list = Organisation.objects.filter(
-        ods_code__in=different_organisations
+        ods_code__in=organisations
     ).order_by("name")
     for org in organisations_list:
-        num_cases_to_seed_in_org = int(cases / len(different_organisations))
+        num_cases_to_seed_in_org = int(cases / len(organisations))
         print(f"Creating {num_cases_to_seed_in_org} Cases in {org}")
 
         # Create random attributes
@@ -194,8 +211,8 @@ def complete_registrations(verbose=True, cohort=None, full_year=False):
 
     # Cohort number if today is date of FPA
     current_cohort_number = cohort_number_from_first_paediatric_assessment_date(
-            date.today()
-        )
+        date.today()
+    )
 
     if cohort is None:
         # Generate cohort data for current cohort
@@ -219,10 +236,7 @@ def complete_registrations(verbose=True, cohort=None, full_year=False):
 
         if full_year:
             # this flag ensures any registrations include a full year of care
-            if (
-                cohort_data["cohort_start_date"] + relativedelta(years=1)
-                > date.today()
-            ):
+            if cohort_data["cohort_start_date"] + relativedelta(years=1) > date.today():
                 # It is not possible to generate registrations that are complete as they would be in the future
                 logger.warning(
                     "It is not possible for registrations to be complete for this cohort as they would be in the future."
