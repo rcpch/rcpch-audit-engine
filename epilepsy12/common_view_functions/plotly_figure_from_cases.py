@@ -1,7 +1,6 @@
 import pandas as pd
 import plotly.express as px
 import plotly.io as pio
-from pyproj import Transformer
 from django.conf import settings
 from ..constants import RCPCH_LIGHT_BLUE, RCPCH_PINK
 
@@ -15,7 +14,6 @@ def generate_ploty_figure_from_cases(filtered_cases, organisation=None):
 
     if not geo_df.empty:
         if "location_wgs84" in geo_df.columns:
-            # geo_df["longitude"], geo_df["latitude"] = zip(*geo_df["location_wgs84"])
             geo_df["longitude"] = geo_df["location_wgs84"].apply(lambda loc: loc.x)
             geo_df["latitude"] = geo_df["location_wgs84"].apply(lambda loc: loc.y)
             geo_df["distance_km"] = geo_df["distance_from_lead_organisation"].apply(

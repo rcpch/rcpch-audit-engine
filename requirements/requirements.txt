@@ -17,7 +17,6 @@ django-widget-tweaks==1.5.0
 djangorestframework==3.14.0
 docutils==0.20.1
 pandas==2.2.1
-pyproj==3.6.1
 # We don't use this but django-two-factor-auth requires it
 # They are working to make it optional https://github.com/jazzband/django-two-factor-auth/issues/469
 phonenumbers==8.13.31
