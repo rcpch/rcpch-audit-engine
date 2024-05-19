@@ -2,6 +2,7 @@ import pandas as pd
 import plotly.express as px
 import plotly.io as pio
 from pyproj import Transformer
+from django.conf import settings
 
 
 def generate_ploty_figure_from_cases(filtered_cases):
@@ -23,6 +24,7 @@ def generate_ploty_figure_from_cases(filtered_cases):
     geo_df["latitude"] = latitudes
     geo_df["longitude"] = longitudes
 
+    px.set_mapbox_access_token(settings.MAPBOX_API_KEY)
     fig = px.scatter_mapbox(
         data_frame=geo_df,
         lat="latitude",
