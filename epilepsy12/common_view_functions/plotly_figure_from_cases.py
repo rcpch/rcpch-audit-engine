@@ -3,6 +3,7 @@ import plotly.express as px
 import plotly.io as pio
 from pyproj import Transformer
 from django.conf import settings
+from ..constants import RCPCH_LIGHT_BLUE, RCPCH_PINK
 
 
 def generate_ploty_figure_from_cases(filtered_cases):
@@ -11,32 +12,46 @@ def generate_ploty_figure_from_cases(filtered_cases):
     """
     geo_df = pd.DataFrame(list(filtered_cases))
     # Ensure location is a tuple of (easting, northing)
-    if "location" in geo_df.columns:
-        geo_df["easting"], geo_df["northing"] = zip(*geo_df["location"])
 
-    # Create a transformer to convert from EPSG:27700 to EPSG:4326
-    transformer = Transformer.from_crs("EPSG:27700", "EPSG:4326")
-
-    # Convert the coordinates
-    latitudes, longitudes = transformer.transform(
-        geo_df["easting"].values, geo_df["northing"].values
-    )
-    geo_df["latitude"] = latitudes
-    geo_df["longitude"] = longitudes
+    if not geo_df.empty:
+        if "location_wgs84" in geo_df.columns:
+            # geo_df["longitude"], geo_df["latitude"] = zip(*geo_df["location_wgs84"])
+            geo_df["longitude"] = geo_df["location_wgs84"].apply(lambda loc: loc.x)
+            geo_df["latitude"] = geo_df["location_wgs84"].apply(lambda loc: loc.y)
+            geo_df["distance_km"] = geo_df["distance_from_lead_organisation"].apply(
+                lambda d: d.km
+            )
 
     px.set_mapbox_access_token(settings.MAPBOX_API_KEY)
     fig = px.scatter_mapbox(
         data_frame=geo_df,
-        lat="latitude",
-        lon="longitude",
-        hover_name="surname",
-        zoom=10,
+        lat="latitude" if not geo_df.empty else [],
+        lon="longitude" if not geo_df.empty else [],
+        hover_name="site__organisation__name" if not geo_df.empty else None,
+        zoom=8,
         height=600,
+        color_discrete_sequence=[RCPCH_PINK],
+        custom_data=["pk", "distance_km"],
     )
 
     # Update the map layout
-    fig.update_layout(mapbox_style="open-street-map")
-    fig.update_layout(margin={"r": 0, "t": 0, "l": 0, "b": 0})
-
+    fig.update_layout(
+        mapbox_style="mapbox://styles/mapbox/light-v11",
+        mapbox_accesstoken=settings.MAPBOX_API_KEY,
+    )
+    fig.update_layout(
+        margin={"r": 0, "t": 0, "l": 0, "b": 0},
+        font=dict(family="Montserrat", color="#FFFFFF"),
+        hoverlabel=dict(
+            bgcolor=RCPCH_LIGHT_BLUE,
+            font_size=12,
+            font=dict(color="white"),
+            bordercolor=RCPCH_LIGHT_BLUE,
+        ),
+    )
+    # Update the hover template
+    fig.update_traces(
+        hovertemplate="<b>%{hovertext}</b><br>Epilepsy12 ID: %{customdata[0]}<br>Distance to Lead Centre: %{customdata[1]:.2f} km<extra></extra>"
+    )
     # Convert the Plotly figure to JSON
     return pio.to_json(fig)

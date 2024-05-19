@@ -5,7 +5,6 @@ from datetime import date
 # django
 from django.contrib.gis.db import models
 from django.contrib.gis.db.models import CharField, DateField, PointField
-from django.contrib.gis.gdal import SpatialReference
 from django.contrib.gis.geos import Point
 from django.conf import settings
 
@@ -96,9 +95,23 @@ class Case(TimeStampAbstractBaseClass, UserStampAbstractBaseClass, HelpTextMixin
         null=True,
     )
 
-    location = PointField(
-        help_text="longitude and latitude of the postcode",
+    location_wgs = PointField(
+        help_text="longitude and latitude of the postcode as British National Grid (BNG)",
         srid=27700,
+        null=True,
+        blank=True,
+    )
+
+    location_bng = PointField(
+        help_text="longitude and latitude of the postcode as British National Grid (BNG)",
+        srid=27700,
+        null=True,
+        blank=True,
+    )
+
+    location_wgs84 = PointField(
+        help_text="longitude and latitude of the postcode as WGS 84",
+        srid=4326,
         null=True,
         blank=True,
     )
@@ -179,9 +192,10 @@ class Case(TimeStampAbstractBaseClass, UserStampAbstractBaseClass, HelpTextMixin
 
                 # update the longitude and latitude
                 """
-                The SRID (Spatial Reference System Identifier) 27700 refers to the British National Grid (BNG), a common system used for mapping in the UK.
+                The SRID (Spatial Reference System Identifier) 27700 refers to the British National Grid (BNG), a common system used for mapping in the UK. It uses Eastings and Northings, rather than longitude & latitude.
                 This system is different from the more common geographic coordinate systems like WGS 84 (SRID 4326), which is used by most global datasets including GPS and many web APIs.
                 Coordinates from the ONS data therefore need transforming from WGS 84 (SRID 4326) to British National Grid (SRID 27700).
+                Both are included here and stored in the model, as the shape files for the UK health boundaries are produced as BNG, rather than WGS84.
                 """
                 try:
                     # Fetch the coordinates (WGS 84)
@@ -189,15 +203,18 @@ class Case(TimeStampAbstractBaseClass, UserStampAbstractBaseClass, HelpTextMixin
 
                     # Create a Point in WGS 84
                     point_wgs84 = Point(lon, lat, srid=4326)
+                    # Assign the transformed point to self.location
+                    self.location_wgs84 = point_wgs84
 
-                    # Transform to British National Grid (SRID 27700)
+                    # Transform to British National Grid (SRID 27700) - this has Eastings and Northings, rather than longitude and latitude.
                     point_bng = point_wgs84.transform(27700, clone=True)
 
                     # Assign the transformed point to self.location
-                    self.location = point_bng
+                    self.location_bng = point_bng
 
                 except Exception as error:
-                    self.location = None
+                    self.location_wgs84 = None
+                    self.location_bng = None
                     logger.exception(
                         f"Cannot get longitude and latitude for {self.postcode}: {error}"
                     )
@@ -205,7 +222,8 @@ class Case(TimeStampAbstractBaseClass, UserStampAbstractBaseClass, HelpTextMixin
                 # if the IMD quintile has previously been added and postcode now unknown, set
                 # index_of_multiple_deprivation_quintile back to None
                 self.index_of_multiple_deprivation_quintile = None
-                self.location = None
+                self.location_wgs84 = None
+                self.location_bng = None
 
         return super().save(*args, **kwargs)
 

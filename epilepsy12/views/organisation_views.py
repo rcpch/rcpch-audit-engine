@@ -84,13 +84,7 @@ def selected_organisation_summary(request, organisation_id):
     else:
         abstraction_level = "trust"
 
-    # if selected_organisation.city == "LONDON":
-    #     london_borough_tiles = return_tile_for_region("london_borough")
-
-    # get latest cohort - in future will be selectable
-    # cohort = cohort_number_from_first_paediatric_assessment_date(date.today())
-    # cohort_data = dates_for_cohort(cohort)
-    # get submitting_cohort number
+    # get submitting_cohort number - in future will be selectable
     cohort_data = cohorts_and_dates(first_paediatric_assessment_date=date.today())
 
     cases_to_plot = filter_all_registered_cases_by_active_lead_site_and_cohort_and_level_of_abstraction(
