@@ -91,7 +91,9 @@ def selected_organisation_summary(request, organisation_id):
         organisation=selected_organisation, cohort=cohort_data["submitting_cohort"]
     )
 
-    fig_json = generate_ploty_figure_from_cases(filtered_cases=cases_to_plot)
+    fig_json = generate_ploty_figure_from_cases(
+        filtered_cases=cases_to_plot, organisation=selected_organisation
+    )
 
     # query to return all completed E12 cases in the current cohort in this organisation
     count_of_current_cohort_registered_completed_cases_in_this_organisation = (

@@ -6,7 +6,7 @@ from django.conf import settings
 from ..constants import RCPCH_LIGHT_BLUE, RCPCH_PINK
 
 
-def generate_ploty_figure_from_cases(filtered_cases):
+def generate_ploty_figure_from_cases(filtered_cases, organisation=None):
     """
     Returns a plottable map with Cases overlayed as dots with tooltips on hover
     """
@@ -21,6 +21,9 @@ def generate_ploty_figure_from_cases(filtered_cases):
             geo_df["distance_km"] = geo_df["distance_from_lead_organisation"].apply(
                 lambda d: d.km
             )
+            geo_df["distance_mi"] = geo_df["distance_from_lead_organisation"].apply(
+                lambda d: d.mi
+            )
 
     px.set_mapbox_access_token(settings.MAPBOX_API_KEY)
     fig = px.scatter_mapbox(
@@ -28,10 +31,10 @@ def generate_ploty_figure_from_cases(filtered_cases):
         lat="latitude" if not geo_df.empty else [],
         lon="longitude" if not geo_df.empty else [],
         hover_name="site__organisation__name" if not geo_df.empty else None,
-        zoom=8,
+        zoom=10,
         height=600,
         color_discrete_sequence=[RCPCH_PINK],
-        custom_data=["pk", "distance_km"],
+        custom_data=["pk", "distance_mi", "distance_km"],
     )
 
     # Update the map layout
@@ -51,7 +54,14 @@ def generate_ploty_figure_from_cases(filtered_cases):
     )
     # Update the hover template
     fig.update_traces(
-        hovertemplate="<b>%{hovertext}</b><br>Epilepsy12 ID: %{customdata[0]}<br>Distance to Lead Centre: %{customdata[1]:.2f} km<extra></extra>"
+        hovertemplate="<b>%{hovertext}</b><br>Epilepsy12 ID: %{customdata[0]}<br>Distance to Lead Centre: %{customdata[1]:.2f} mi (%{customdata[2]:.2f} km)<extra></extra>"
     )
+
+    if organisation:
+        # centre the map on the lead organisation
+        fig.update_geos(
+            center=dict(lat=organisation.latitude, lon=organisation.longitude)
+        )
+
     # Convert the Plotly figure to JSON
     return pio.to_json(fig)
