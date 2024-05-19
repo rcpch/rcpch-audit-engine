@@ -25,6 +25,7 @@ from ..common_view_functions import (
     get_all_kpi_aggregation_data_for_view,
     logged_in_user_may_access_this_organisation,
     filter_all_registered_cases_by_active_lead_site_and_cohort_and_level_of_abstraction,
+    generate_ploty_figure_from_cases,
 )
 from epilepsy12.common_view_functions.render_charts import update_all_data_with_charts
 from ..general_functions import (
@@ -95,8 +96,8 @@ def selected_organisation_summary(request, organisation_id):
     cases_to_plot = filter_all_registered_cases_by_active_lead_site_and_cohort_and_level_of_abstraction(
         organisation=selected_organisation, cohort=cohort_data["submitting_cohort"]
     )
-    geo_df = pd.DataFrame(list(cases_to_plot))
-    print(geo_df)
+
+    fig_json = generate_ploty_figure_from_cases(filtered_cases=cases_to_plot)
 
     # query to return all completed E12 cases in the current cohort in this organisation
     count_of_current_cohort_registered_completed_cases_in_this_organisation = (
@@ -206,6 +207,7 @@ def selected_organisation_summary(request, organisation_id):
         "country_tiles": country_tiles,
         "lhb_tiles": lhb_tiles,
         "london_borough_tiles": london_borough_tiles,
+        "organisation_cases_map": fig_json,
     }
 
     return render(

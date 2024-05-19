@@ -20,6 +20,6 @@ def filter_all_registered_cases_by_active_lead_site_and_cohort_and_level_of_abst
         site__organisation=organisation,
         site__site_is_actively_involved_in_epilepsy_care=True,
         site__site_is_primary_centre_of_epilepsy_care=True,
-    ).values("pk", "location")
+    ).values("pk", "site__organisation", "first_name", "surname", "location")
 
     return filtered_cases
