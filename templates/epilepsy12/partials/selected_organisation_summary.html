@@ -273,6 +273,12 @@
                         <h3>{{selected_organisation}}</h3>
                     </div>
                     <div id="organisation_cases_map" style="width:100%; height:600px;"></div>
+                    <div class="extra content" style="color: white;">
+                        <small>Max: {{ aggregated_distances.max_distance_travelled_mi }} mi ({{ aggregated_distances.max_distance_travelled_km }} km)</small>
+                        <small>Mean: {{ aggregated_distances.mean_distance_travelled_mi }} mi ({{ aggregated_distances.mean_distance_travelled_km }} km)</small>
+                        <small>Median: {{ aggregated_distances.median_distance_travelled_mi }} mi ({{ aggregated_distances.median_distance_travelled_km }} km)</small>
+                        <small>Std: {{ aggregated_distances.std_distance_travelled_mi }} mi ({{ aggregated_distances.std_distance_travelled_km }} km)</small>
+                    </div>
                 </div>
                 <div class="ui rcpch_light_blue card"></div>
             </div>
