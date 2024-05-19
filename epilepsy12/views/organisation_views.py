@@ -24,6 +24,7 @@ from ..common_view_functions import (
     return_tile_for_region,
     get_all_kpi_aggregation_data_for_view,
     logged_in_user_may_access_this_organisation,
+    filter_all_registered_cases_by_active_lead_site_and_cohort_and_level_of_abstraction,
 )
 from epilepsy12.common_view_functions.render_charts import update_all_data_with_charts
 from ..general_functions import (
@@ -82,14 +83,20 @@ def selected_organisation_summary(request, organisation_id):
     else:
         abstraction_level = "trust"
 
-    if selected_organisation.city == "LONDON":
-        london_borough_tiles = return_tile_for_region("london_borough")
+    # if selected_organisation.city == "LONDON":
+    #     london_borough_tiles = return_tile_for_region("london_borough")
 
     # get latest cohort - in future will be selectable
     # cohort = cohort_number_from_first_paediatric_assessment_date(date.today())
     # cohort_data = dates_for_cohort(cohort)
     # get submitting_cohort number
     cohort_data = cohorts_and_dates(first_paediatric_assessment_date=date.today())
+
+    cases_to_plot = filter_all_registered_cases_by_active_lead_site_and_cohort_and_level_of_abstraction(
+        organisation=selected_organisation, cohort=cohort_data["submitting_cohort"]
+    )
+    geo_df = pd.DataFrame(list(cases_to_plot))
+    print(geo_df)
 
     # query to return all completed E12 cases in the current cohort in this organisation
     count_of_current_cohort_registered_completed_cases_in_this_organisation = (
