@@ -36,6 +36,7 @@ from .sanction_user_access import (
 )
 from .group_for_group import group_for_role
 from .tiles_for_region import return_tile_for_region
+from .map_from_shape_file import *
 
 from .comorbidity_choices import get_comorbidity_choices
 from .filter_cases_for_geography import *

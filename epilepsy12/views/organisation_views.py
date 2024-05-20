@@ -37,6 +37,7 @@ from ..general_functions import (
 )
 from ..kpi import download_kpi_summary_as_csv
 from epilepsy12.common_view_functions.aggregate_by import update_all_kpi_agg_models
+from epilepsy12.common_view_functions import generate_plotly_map
 
 
 def selected_organisation_summary_select(request):
@@ -71,6 +72,10 @@ def selected_organisation_summary(request, organisation_id):
     nhsregion_tiles = return_tile_for_region("nhs_england_region")
     icb_tiles = return_tile_for_region("icb")
     country_tiles = return_tile_for_region("country")
+
+    nhsregion_heatmap = generate_plotly_map(
+        region_tiles=nhsregion_tiles, properties="properties.boundary_identifier"
+    )
 
     selected_organisation = Organisation.objects.get(pk=organisation_id)
     template_name = "epilepsy12/organisation.html"
@@ -208,6 +213,7 @@ def selected_organisation_summary(request, organisation_id):
         "london_borough_tiles": london_borough_tiles,
         "organisation_cases_map": fig_json,
         "aggregated_distances": aggregated_distances,
+        "nhsregion_heatmap": nhsregion_heatmap,
     }
 
     return render(
