@@ -1,3 +1,4 @@
+import json
 import plotly.express as px
 import plotly.io as pio
 from django.conf import settings
@@ -10,11 +11,18 @@ def generate_plotly_map(region_tiles, properties):
     """
     px.set_mapbox_access_token(settings.MAPBOX_API_KEY)
 
+    geojson_data = json.loads(region_tiles)
+    features = geojson_data["features"]
+    location_ids = [feature["id"] for feature in features]
+
+    # Dummy color data
+    color_data = [1 for _ in range(len(location_ids))]
+
     # Create a Plotly Express map using the GeoJSON data
     fig = px.choropleth_mapbox(
-        geojson=region_tiles,
+        geojson=geojson_data,
         locations=[0],  # Dummy location just to trigger the map creation
-        featureidkey=properties,  # Adjust this to match your GeoJSON properties key
+        featureidkey="properties.id",  # Adjust this to match your GeoJSON properties key
         color=[1],  # Dummy data for color
         color_continuous_scale="Viridis",
         range_color=(0, 1),

@@ -35,8 +35,7 @@ def return_tile_for_region(
         model = LondonBorough
 
     unedited_tile = serialize("geojson", model.objects.all())
-    edited_tile = json.loads(unedited_tile)
-    edited_tile.pop("crs", None)
-    tile = json.dumps(edited_tile)
+    geojson_dict = json.loads(unedited_tile)
+    geojson_dict.pop("crs", None)
 
-    return tile
+    return json.dumps(geojson_dict)
