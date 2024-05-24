@@ -2,13 +2,18 @@
 {% load static %}
 {% csrf_token %}
 
+<div id="logs_user_summary">
+    {% include 'epilepsy12/logs_user_summary.html' with epilepy12_user=epilepy12_user devices=devices organisation=organisation %}
+</div>
+
 {% if activities|length > 0 %}
     <div 
         hx-target='#log_table' 
-        hx-get="{% url 'log_list' organisation_id=organisation.pk epilepsy12_user_id=epilepsy12_user.pk %}" 
+        hx-get="{% url 'logs' organisation_id=organisation.pk epilepsy12_user_id=epilepsy12_user.pk %}" 
         hx-trigger='log_table from:body'
         hx-swap='innerHTML' 
         name='log_table'>
+
     
         <table class="ui rcpch table">
             <thead>
@@ -16,6 +21,7 @@
                     <th>User</th>
                     <th>Activity</th>
                     <th>Timestamp</th>
+                    <th>IP Adress</th>
                 </tr>
             </thead>
             <tbody>
@@ -24,6 +30,7 @@
                         <td>{{activity.epilepsy12user}}</td>
                         <td>{{activity.get_activity_display}}</td>
                         <td>{{activity.activity_datetime}}</td>
+                        <td>{{activity.ip_address}}</td>
                     </tr>
                 {% endfor %}
             </tbody>

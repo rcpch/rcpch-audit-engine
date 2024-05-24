@@ -151,10 +151,32 @@ def selected_organisation_summary(request, organisation_id):
     else:
         total_percent_trust = 0
 
+    # organisation list scoped to permissions of user
+    if (
+        request.user.is_rcpch_audit_team_member
+        or request.user.is_superuser
+        or request.user.is_rcpch_staff
+    ):
+        # select any organisations except currently selected organisation
+        organisation_list = (
+            Organisation.objects.all()
+            .exclude(pk=selected_organisation.pk)
+            .order_by("name")
+        )
+    else:
+        if selected_organisation.country.boundary_identifier == "W92000004":  # Wales
+            organisation_list = Organisation.objects.filter(
+                trust=selected_organisation.local_health_board
+            )
+        else:
+            organisation_list = Organisation.objects.filter(
+                trust=selected_organisation.trust
+            )
+
     context = {
         "user": request.user,
         "selected_organisation": selected_organisation,
-        "organisation_list": Organisation.objects.order_by("name").all(),
+        "organisation_list": organisation_list,
         "cases_aggregated_by_ethnicity": cases_aggregated_by_ethnicity(
             selected_organisation=selected_organisation
         ),
@@ -422,7 +444,7 @@ def view_preference(request, organisation_id, template_name):
     organisation = Organisation.objects.get(pk=organisation_id)
 
     request.user.view_preference = request.htmx.trigger_name
-    request.user.save()
+    request.user.save(update_fields=["view_preference"])
 
     return HttpResponseClientRedirect(
         reverse(template_name, kwargs={"organisation_id": organisation.pk})
@@ -447,9 +469,17 @@ def kpi_download(request, organisation_id):
 @permission_required("epilepsy12.can_publish_epilepsy12_data")
 def kpi_download_file(request):
 
-    country_df, trust_hb_df, icb_df, region_df, network_df, national_df, reference_df = download_kpi_summary_as_csv(cohort=6)
+    (
+        country_df,
+        trust_hb_df,
+        icb_df,
+        region_df,
+        network_df,
+        national_df,
+        reference_df,
+    ) = download_kpi_summary_as_csv(cohort=6)
 
-    with pd.ExcelWriter('kpi_export.xlsx') as writer:
+    with pd.ExcelWriter("kpi_export.xlsx") as writer:
         country_df.to_excel(writer, sheet_name="Country_level", index=False)
         trust_hb_df.to_excel(writer, sheet_name="HBT_level", index=False)
         icb_df.to_excel(writer, sheet_name="ICB_level", index=False)
@@ -461,6 +491,9 @@ def kpi_download_file(request):
     with open("kpi_export.xlsx", "rb") as file:
         excel_data = file.read()
 
-    response = HttpResponse(excel_data, content_type="application/vnd.openxmlformats-officedocument.spreadsheetml.sheet")
+    response = HttpResponse(
+        excel_data,
+        content_type="application/vnd.openxmlformats-officedocument.spreadsheetml.sheet",
+    )
     response["Content-Disposition"] = "attachment; filename=kpi_export.xlsx"
     return response

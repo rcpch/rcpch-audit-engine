@@ -13,7 +13,11 @@ from django.http import (
 )
 from django.core.exceptions import PermissionDenied
 from django.urls import reverse_lazy
-from django.contrib.auth.views import PasswordResetView
+from django.contrib.auth.views import (
+    PasswordResetView,
+    PasswordResetConfirmView,
+    PasswordResetCompleteView,
+)
 from django.contrib.messages.views import SuccessMessageMixin
 from django.utils.html import strip_tags
 from django_htmx.http import HttpResponseClientRedirect
@@ -21,6 +25,8 @@ from django_htmx.http import HttpResponseClientRedirect
 
 # Other dependencies
 from two_factor.views import LoginView as TwoFactorLoginView
+from django_otp import devices_for_user, user_has_device
+
 import pandas as pd
 from datetime import datetime, timedelta
 
@@ -30,7 +36,11 @@ from epilepsy12.forms_folder.epilepsy12_user_form import (
     Epilepsy12UserAdminCreationForm,
     CaptchaAuthenticationForm,
 )
-from ..general_functions import construct_confirm_email, match_in_choice_key, send_email_to_recipients
+from ..general_functions import (
+    construct_confirm_email,
+    match_in_choice_key,
+    send_email_to_recipients,
+)
 from ..common_view_functions import group_for_role
 from ..decorator import (
     user_may_view_this_organisation,
@@ -76,21 +86,21 @@ def epilepsy12_user_list(request, organisation_id):
         filter_term_Q = (
             Q(first_name__icontains=filter_term)
             | Q(surname__icontains=filter_term)
-            | Q(organisation_employer__name__icontains=filter_term)
+            | Q(organisation_employer=organisation)
             | Q(email__icontains=filter_term)
         )
 
         # filter_term is called if filtering by search box
         if request.user.view_preference == 0:
             # user has requested organisation level view
-            basic_filter = Q(organisation_employer=organisation.name)
+            basic_filter = Q(organisation_employer=organisation)
         elif request.user.view_preference == 1:
             # user has requested trust level view
             if organisation.country.boundary_identifier == "W92000004":
-                parent_trust = organisation.organisation.local_health_board.name
+                parent_trust = organisation.local_health_board
             else:
-                parent_trust = organisation.organisation.trust.name
-            basic_filter = Q(organisation_employer=parent_trust)
+                parent_trust = organisation.trust
+            basic_filter = Q(organisation_employer__trust=parent_trust)
         elif request.user.view_preference == 2:
             # user has requested national level view
             basic_filter = None
@@ -564,18 +574,75 @@ class ResetPasswordView(SuccessMessageMixin, PasswordResetView):
         " If you don't receive an email, "
         "please make sure you've entered the address you registered with, and check your spam folder."
     )
-    extra_email_context= { 
-                          "reset_password_link_expires_at": datetime.now() + timedelta(seconds=int(settings.PASSWORD_RESET_TIMEOUT)) }
+    extra_email_context = {
+        "reset_password_link_expires_at": datetime.now()
+        + timedelta(seconds=int(settings.PASSWORD_RESET_TIMEOUT))
+    }
     success_url = reverse_lazy("index")
 
     # extend form_valid to set user.password_last_set
     def form_valid(self, form):
-        self.request.user.password_last_set = timezone.now()
+        email = form.cleaned_data["email"]
+        if Epilepsy12User.objects.filter(email=email, is_active=True).exists():
+            e12user = Epilepsy12User.objects.filter(email=email, is_active=True).get()
+            # password reset link sent
+            VisitActivity.objects.create(epilepsy12user=e12user, activity=4)
+        else:
+            messages.warning(
+                self.request, f"This email ({email}) is not attached to a user account."
+            )
+            return redirect(reverse("password_reset"))
 
         return super().form_valid(form)
 
 
-# 08:38:01
+class ResetPasswordConfirmView(PasswordResetConfirmView):
+    # overridden custom django password reset work flow. User has submitted a valide password for reset
+    # their email is stored in session for use later to update logs if they are successful
+    def form_valid(self, form):
+        # Store the user's email in the session
+        self.request.session["user_email"] = form.user.email
+        return super().form_valid(form)
+
+
+class ResetPasswordComplete(PasswordResetCompleteView):
+    # Overridden custom django password reset work flow. Picks up user email who has reset password from session
+    # and updates VisitActivity,
+    template_name = "registration/password_reset_complete.html"
+
+    def dispatch(self, request, *args, **kwargs):
+        # Call the dispatch method of the superclass
+        response = super().dispatch(request, *args, **kwargs)
+
+        # Get the user's email from the session (or request)
+        user_email = request.session.get("user_email")
+        if (
+            user_email
+            and Epilepsy12User.objects.filter(email=user_email, is_active=True).exists()
+        ):
+            updated_user = Epilepsy12User.objects.filter(
+                email=user_email, is_active=True
+            ).get()
+            try:
+                # log that User has successfully reset password
+                VisitActivity.objects.create(
+                    activity_datetime=timezone.now(),
+                    activity=5,  # successful password reset
+                    ip_address=request.META.get("REMOTE_ADDR"),
+                    epilepsy12user=updated_user,
+                )
+                # reset the password_last_set field to current date/time
+                updated_user.password_last_set = timezone.now()
+                updated_user.save(update_fields=["password_last_set"])
+            except Epilepsy12User.DoesNotExist:
+                pass
+
+        # Clear the session variable
+        request.session.pop("user_email", None)
+
+        return response
+
+
 class RCPCHLoginView(TwoFactorLoginView):
     def __init__(self, **kwargs):
         super().__init__(**kwargs)
@@ -648,39 +715,34 @@ class RCPCHLoginView(TwoFactorLoginView):
 @user_can_access_user()
 def logs(request, organisation_id, epilepsy12_user_id):
     """
-    returns logs for given organisation
+    returns logs for given organisation and user
     """
     organisation = Organisation.objects.get(pk=organisation_id)
     epilepsy12_user = Epilepsy12User.objects.get(pk=epilepsy12_user_id)
 
-    activities = VisitActivity.objects.filter(epilepsy12user=epilepsy12_user).all()
+    activities = (
+        VisitActivity.objects.filter(epilepsy12user=epilepsy12_user)
+        .all()
+        .order_by("-activity_datetime")
+    )
+    devices = devices_for_user(user=epilepsy12_user)
+    has_device = user_has_device(user=epilepsy12_user)
 
-    template_name = "epilepsy12/logs.html"
+    if request.htmx:
+        for device in devices:
+            if device.name == request.htmx.trigger_name:
+                device.delete()
+        devices = devices_for_user(user=epilepsy12_user, confirmed=True)
+        template_name = "epilepsy12/logs_user_summary.html"
+    else:
+        template_name = "epilepsy12/logs.html"
+
     context = {
         "epilepsy12_user": epilepsy12_user,
         "organisation": organisation,
         "activities": activities,
-    }
-
-    return render(request=request, template_name=template_name, context=context)
-
-
-@login_and_otp_required()
-@user_can_access_user()
-def log_list(request, organisation_id, epilepsy12_user_id):
-    """
-    GET request to return log table
-    """
-    organisation = Organisation.objects.get(pk=organisation_id)
-    epilepsy12_user = Epilepsy12User.objects.get(pk=epilepsy12_user_id)
-
-    activities = VisitActivity.objects.filter(epilepsy12user=epilepsy12_user).all()
-
-    template_name = "epilepsy12/logs.html"
-    context = {
-        "epilepsy12_user": epilepsy12_user,
-        "organisation": organisation,
-        "activities": activities,
+        "devices": devices,
+        "has_device": has_device,
     }
 
     return render(request=request, template_name=template_name, context=context)

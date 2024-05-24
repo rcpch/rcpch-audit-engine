@@ -166,6 +166,9 @@ class Episode(TimeStampAbstractBaseClass, UserStampAbstractBaseClass, HelpTextMi
     focal_onset_clonic = models.BooleanField(default=None, blank=True, null=True)
     focal_onset_left = models.BooleanField(default=None, blank=True, null=True)
     focal_onset_right = models.BooleanField(default=None, blank=True, null=True)
+    focal_onset_laterality_unknown = models.BooleanField(
+        default=None, blank=True, null=True
+    )
     focal_onset_epileptic_spasms = models.BooleanField(
         default=None, blank=True, null=True
     )

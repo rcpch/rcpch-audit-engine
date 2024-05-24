@@ -10,7 +10,6 @@ For the full list of settings and their values, see
 https://docs.djangoproject.com/en/3.2/ref/settings/
 """
 
-
 # standard imports
 import datetime
 import logging
@@ -120,6 +119,7 @@ MIDDLEWARE = [
     "django_htmx.middleware.HtmxMiddleware",
     "simple_history.middleware.HistoryRequestMiddleware",
     "django_auto_logout.middleware.auto_logout",
+    "epilepsy12.middleware.CurrentUserMiddleware",
     # 2fa
     "django_otp.middleware.OTPMiddleware",
 ]
@@ -240,7 +240,9 @@ else:
     EMAIL_BACKEND = "django.core.mail.backends.console.EmailBackend"
 logger.info("EMAIL_BACKEND: %s", EMAIL_BACKEND)
 
-PASSWORD_RESET_TIMEOUT = os.environ.get("PASSWORD_RESET_TIMEOUT", 259200)  # Default: 259200 (3 days, in seconds)
+PASSWORD_RESET_TIMEOUT = os.environ.get(
+    "PASSWORD_RESET_TIMEOUT", 259200
+)  # Default: 259200 (3 days, in seconds)
 
 SITE_CONTACT_EMAIL = os.environ.get("SITE_CONTACT_EMAIL")
 

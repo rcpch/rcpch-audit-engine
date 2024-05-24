@@ -87,6 +87,7 @@ def seed_epilepsy_causes(apps, schema_editor):
     # Cavernous hemangioma (disorder) SCTID: 416824008
     # Chromosome 11p13 deletion syndrome (disorder) SCTID: 715215007
     # Cortical dysplasia (disorder) SCTID: 253153000
+    # 2q23.3 Microdeletion Syndrome - NOTE THIS NEEDS ADDING TO THE DATABASE MANUALLY AS THERE IS NO SNOMED CODE
 
     extra_concept_ids = [
         764946008,

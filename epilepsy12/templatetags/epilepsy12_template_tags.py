@@ -4,6 +4,7 @@ import math
 from django import template
 from django.utils.safestring import mark_safe
 from django.conf import settings
+from ..models import Site
 
 register = template.Library()
 
@@ -499,3 +500,19 @@ def get_org_id_from_user(user):
 @register.simple_tag
 def site_contact_email():
     return settings.SITE_CONTACT_EMAIL
+
+
+@register.filter
+def lead_site_for_case(case):
+    """
+    Returns all active sites for a given case
+    """
+    site = Site.objects.filter(
+        case=case,
+        site_is_actively_involved_in_epilepsy_care=True,
+        site_is_primary_centre_of_epilepsy_care=True,
+    ).first()
+    if site:
+        return site
+    else:
+        return None

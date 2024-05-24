@@ -7,7 +7,7 @@
     <div class="four wide column">
         
             <h5>
-                {% if episode.focal_onset_right or episode.focal_onset_left %}
+                {% if episode.focal_onset_right or episode.focal_onset_left or episode.focal_onset_laterality_unknown %}
                     <i class="rcpch_pink check circle outline icon"></i>
                 {% else %}
                     <span data-tooltip="Incomplete field. This must be scored to complete the record." data-inverted="" data-position="{{data_position}}">

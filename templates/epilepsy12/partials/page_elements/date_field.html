@@ -37,7 +37,7 @@
             <div class='ui left icon input'>
                 <input
                     {% if not enabled %}disabled{% endif %}
-                    _="on keyup or change if my value remove @disabled from #{{input_date_field_name}}_id"
+                    _="on keyup or change if my value remove @disabled from #{{input_date_field_name}}{{tooltip_id}}_id"
                     type="date"
                     name="{{input_date_field_name}}"
                     value="{{date_value|date:'Y-m-d'}}">
@@ -51,7 +51,7 @@
                 </input>
                 <i class="htmx-indicator spinner loading icon" id="spinner"></i>
                 <button 
-                    id= "{{input_date_field_name}}_id"
+                    id= "{{input_date_field_name}}{{tooltip_id}}_id"
                     class="ui rcpch_light_blue button"
                     {% if not enabled or date_value is None %}disabled{% endif %}
                     hx-headers='{"X-CSRFToken": "{{ csrf_token }}"}'
@@ -70,6 +70,7 @@
                             icon: 'warning',
                             iconColor: '#e00087',
                             showCancelButton: true,
+                            position: 'top',
                             confirmButtonColor: '#11a7f2',
                             cancelButtonColor: '#e60700',
                             confirmButtonText: 'I confirm the date is correct'
