@@ -14,7 +14,15 @@ import plotly.io as pio
 import plotly.graph_objects as go
 
 # RCPCH imports
-from ..constants import RCPCH_LIGHT_BLUE, RCPCH_PINK, EnumAbstractionLevel
+from ..constants import (
+    RCPCH_LIGHT_BLUE,
+    RCPCH_PINK,
+    RCPCH_LIGHT_BLUE_TINT1,
+    RCPCH_LIGHT_BLUE_TINT2,
+    RCPCH_LIGHT_BLUE_TINT3,
+    RCPCH_LIGHT_BLUE_DARK_TINT,
+    EnumAbstractionLevel,
+)
 
 
 def generate_case_count_choropleth_map(
@@ -30,6 +38,13 @@ def generate_case_count_choropleth_map(
     features = geojson_data["features"]
     abstraction_level_ids = [feature["properties"][properties] for feature in features]
     abstraction_level_names = [feature["properties"]["name"] for feature in features]
+    custom_colorscale = [
+        [0, RCPCH_LIGHT_BLUE_TINT1],  # Very light blue
+        [0.25, RCPCH_LIGHT_BLUE_TINT2],  # Light blue
+        [0.5, RCPCH_LIGHT_BLUE_TINT3],  # Medium light blue
+        [0.75, RCPCH_LIGHT_BLUE],  # blue
+        [1, RCPCH_LIGHT_BLUE_DARK_TINT],  # Dark blue
+    ]
 
     # Create a Plotly map using the GeoJSON data, data, and color data
     fig = go.Figure(
@@ -38,7 +53,7 @@ def generate_case_count_choropleth_map(
             locations=abstraction_level_ids,
             featureidkey=f"properties.{properties}",
             z=dataframe["cases"],
-            colorscale="Viridis",
+            colorscale=custom_colorscale,
             marker_line_width=1,  # Set the width of the boundaries
             marker_line_color=RCPCH_LIGHT_BLUE,  # Set the color of the boundaries
             customdata=abstraction_level_names,
@@ -96,7 +111,6 @@ def generate_case_count_choropleth_map(
             geojson=geojson_data,
             locations=highlighted_region["identifier"],
             z=highlighted_region["cases"],
-            colorscale="Viridis",
             marker_line_color=RCPCH_PINK,  # Set the outline color
             marker_line_width=3,  # Set the outline width
         )
