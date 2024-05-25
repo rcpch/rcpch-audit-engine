@@ -19,13 +19,11 @@ from ..common_view_functions import (
     cases_aggregated_by_ethnicity,
     cases_aggregated_by_deprivation_score,
     all_registered_cases_for_cohort_and_abstraction_level,
-    return_tile_for_region,
     get_all_kpi_aggregation_data_for_view,
     logged_in_user_may_access_this_organisation,
     filter_all_registered_cases_by_active_lead_site_and_cohort_and_level_of_abstraction,
     generate_dataframe_and_aggregated_distance_data_from_cases,
     generate_distance_from_organisation_scatterplot_figure,
-    generate_case_counts_for_each_region_in_each_abstraction_level,
     generate_case_count_choropleth_map,
 )
 from epilepsy12.common_view_functions.render_charts import update_all_data_with_charts
@@ -71,23 +69,7 @@ def selected_organisation_summary(request, organisation_id):
     """
     selected_organisation = Organisation.objects.get(pk=organisation_id)
 
-    # get geojson tiles for each region
-    nhsregion_tiles = return_tile_for_region("nhs_england_region")
-    icb_tiles = return_tile_for_region("icb")
-    country_tiles = return_tile_for_region("country")
-
     template_name = "epilepsy12/organisation.html"
-
-    # set lhb_tiles to None by default - these are only used in Wales
-    lhb_tiles = None
-    # set london_borough_tiles to None by default - these are only used in London
-    london_borough_tiles = None
-
-    if selected_organisation.country.boundary_identifier == "W92000004":  # Wales
-        lhb_tiles = return_tile_for_region("lhb")
-        abstraction_level = "local_health_board"
-    else:
-        abstraction_level = "trust"
 
     # get submitting_cohort number - in future will be selectable
     cohort_data = cohorts_and_dates(first_paediatric_assessment_date=date.today())
@@ -104,29 +86,49 @@ def selected_organisation_summary(request, organisation_id):
         )
     )
 
-    # get case counts for each level of abstraction
-    case_numbers_by_abstraction_level_data_frame = (
-        generate_case_counts_for_each_region_in_each_abstraction_level(
-            abstraction_level=EnumAbstractionLevel.NHS_ENGLAND_REGION,
-            cohort=cohort_data["submitting_cohort"],
-            organisation=selected_organisation,
-        )
-    )
-
-    # generate choropleth map of case counts for each level of abstraction
-    nhsregion_heatmap = generate_case_count_choropleth_map(
-        region_tiles=nhsregion_tiles,
-        properties="region_code",
-        dataframe=case_numbers_by_abstraction_level_data_frame,
-        abstraction_level=EnumAbstractionLevel.NHS_ENGLAND_REGION,
-        organisation=selected_organisation,
-    )
-
     # generate scatterplot of cases by distance from the selected organisation
     scatterplot_of_cases_for_selected_organisation = (
         generate_distance_from_organisation_scatterplot_figure(
             geo_df=case_distances_dataframe, organisation=selected_organisation
         )
+    )
+
+    if selected_organisation.country.boundary_identifier == "W92000004":  # Wales
+        abstraction_level = "local_health_board"
+        # generate choropleth map of case counts for each level of abstraction
+        lhb_heatmap = generate_case_count_choropleth_map(
+            properties="ods_code",
+            abstraction_level=EnumAbstractionLevel.LOCAL_HEALTH_BOARD,
+            organisation=selected_organisation,
+            cohort=cohort_data["submitting_cohort"],
+        )
+    else:
+        # generate choropleth map of case counts for each level of abstraction
+        abstraction_level = "trust"
+        trust_heatmap = generate_case_count_choropleth_map(
+            properties="ods_code",
+            abstraction_level=EnumAbstractionLevel.TRUST,
+            organisation=selected_organisation,
+            cohort=cohort_data["submitting_cohort"],
+        )
+        icb_heatmap = generate_case_count_choropleth_map(
+            properties="ods_code",
+            abstraction_level=EnumAbstractionLevel.ICB,
+            organisation=selected_organisation,
+            cohort=cohort_data["submitting_cohort"],
+        )
+        nhsregion_heatmap = generate_case_count_choropleth_map(
+            properties="region_code",
+            abstraction_level=EnumAbstractionLevel.NHS_ENGLAND_REGION,
+            organisation=selected_organisation,
+            cohort=cohort_data["submitting_cohort"],
+        )
+
+    country_heatmap = generate_case_count_choropleth_map(
+        properties="boundary_identifier",
+        abstraction_level=EnumAbstractionLevel.COUNTRY,
+        organisation=selected_organisation,
+        cohort=cohort_data["submitting_cohort"],
     )
 
     # query to return all completed E12 cases in the current cohort in this organisation
@@ -232,15 +234,20 @@ def selected_organisation_summary(request, organisation_id):
         "count_of_current_cohort_registered_completed_cases_in_this_trust": count_of_current_cohort_registered_completed_cases_in_this_trust,
         "cohort_data": cohort_data,
         "individual_kpi_choices": INDIVIDUAL_KPI_MEASURES,
-        "icb_tiles": icb_tiles,
-        "country_tiles": country_tiles,
-        "lhb_tiles": lhb_tiles,
-        "nhsregion_tiles": nhsregion_tiles,
-        "london_borough_tiles": london_borough_tiles,
         "organisation_cases_map": scatterplot_of_cases_for_selected_organisation,
         "aggregated_distances": aggregated_distances,
-        "nhsregion_heatmap": nhsregion_heatmap,
+        "country_heatmap": nhsregion_heatmap,
     }
+    if selected_organisation.country.boundary_identifier == "W92000004":
+        context["lhb_heatmap"] = lhb_heatmap
+        context["trust_heatmap"] = None
+        context["icb_heatmap"] = None
+        context["nhsregion_heatmap"] = None
+    else:
+        context["lhb_heatmap"] = None
+        context["trust_heatmap"] = trust_heatmap
+        context["icb_heatmap"] = icb_heatmap
+        context["nhsregion_heatmap"] = nhsregion_heatmap
 
     return render(
         request=request,

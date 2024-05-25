@@ -23,18 +23,21 @@ from ..constants import (
     RCPCH_LIGHT_BLUE_DARK_TINT,
     EnumAbstractionLevel,
 )
+from .tiles_for_region import return_tile_for_region
 
 
 def generate_case_count_choropleth_map(
-    region_tiles, properties, dataframe, organisation, abstraction_level
+    properties, organisation, abstraction_level, cohort
 ):
     """
     Generates a Plotly Choropleth map from GeoJSON data.
-    Accepts the geojson data as a string, the properties key to use as the identifier, and a dataframe with the data to plot.
+    Accepts the geojson data as a string, the properties key to use as the identifier, and the cohort.
     """
     px.set_mapbox_access_token(settings.MAPBOX_API_KEY)
 
-    geojson_data = json.loads(region_tiles)
+    region_tile = region_tile_for_abstraction_level(abstraction_level=abstraction_level)
+
+    geojson_data = json.loads(region_tile)
     features = geojson_data["features"]
     abstraction_level_ids = [feature["properties"][properties] for feature in features]
     abstraction_level_names = [feature["properties"]["name"] for feature in features]
@@ -45,6 +48,10 @@ def generate_case_count_choropleth_map(
         [0.75, RCPCH_LIGHT_BLUE],  # blue
         [1, RCPCH_LIGHT_BLUE_DARK_TINT],  # Dark blue
     ]
+
+    dataframe = generate_case_counts_for_each_region_in_each_abstraction_level(
+        abstraction_level=abstraction_level, cohort=cohort, organisation=organisation
+    )
 
     # Create a Plotly map using the GeoJSON data, data, and color data
     fig = go.Figure(
@@ -209,7 +216,7 @@ def all_level_of_abstraction_members(abstraction_level: EnumAbstractionLevel):
     Country = apps.get_model("epilepsy12", "Country")
 
     if abstraction_level == EnumAbstractionLevel.TRUST:
-        level_abstraction_members = Trust.objects.all(active=True).order_by("name")
+        level_abstraction_members = Trust.objects.filter(active=True).order_by("name")
         identifier = "ods_code"
     elif abstraction_level == EnumAbstractionLevel.ICB:
         level_abstraction_members = IntegratedCareBoard.objects.all().order_by("name")
@@ -263,3 +270,24 @@ def all_organisations_within_a_level_of_abstraction(
         raise ValueError("Invalid abstraction level")
 
     return level_abstraction_organisations
+
+
+def region_tile_for_abstraction_level(abstraction_level: EnumAbstractionLevel):
+    """
+    Returns the geojson tile for a given level of abstraction
+    """
+
+    if abstraction_level == EnumAbstractionLevel.TRUST:
+        region_tile = return_tile_for_region("trust")
+    elif abstraction_level == EnumAbstractionLevel.ICB:
+        region_tile = return_tile_for_region("icb")
+    elif abstraction_level == EnumAbstractionLevel.LOCAL_HEALTH_BOARD:
+        region_tile = lhb_tiles = return_tile_for_region("lhb")
+    elif abstraction_level == EnumAbstractionLevel.NHS_ENGLAND_REGION:
+        region_tile = return_tile_for_region("nhs_england_region")
+    elif abstraction_level == EnumAbstractionLevel.COUNTRY:
+        region_tile = return_tile_for_region("country")
+    else:  # pragma: no cover
+        raise ValueError("Invalid abstraction level")
+
+    return region_tile
