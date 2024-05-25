@@ -87,6 +87,7 @@ def selected_organisation_summary(request, organisation_id):
     )
 
     # generate scatterplot of cases by distance from the selected organisation
+
     scatterplot_of_cases_for_selected_organisation = (
         generate_distance_from_organisation_scatterplot_figure(
             geo_df=case_distances_dataframe, organisation=selected_organisation
@@ -236,7 +237,7 @@ def selected_organisation_summary(request, organisation_id):
         "individual_kpi_choices": INDIVIDUAL_KPI_MEASURES,
         "organisation_cases_map": scatterplot_of_cases_for_selected_organisation,
         "aggregated_distances": aggregated_distances,
-        "country_heatmap": nhsregion_heatmap,
+        "country_heatmap": country_heatmap,
     }
     if selected_organisation.country.boundary_identifier == "W92000004":
         context["lhb_heatmap"] = lhb_heatmap

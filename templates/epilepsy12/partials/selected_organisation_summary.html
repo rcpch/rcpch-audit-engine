@@ -269,9 +269,9 @@
             <div class="ui three stackable cards">
                 <div class="ui rcpch_light_blue card">
                     <div class="content">
-                        <h3>NHS Region</h3>
+                        <!-- <h3>NHS Region</h3> -->
                     </div>
-                    <div id="nhs_region_map" style="width:100%;height:600px;"></div>
+                    
                 </div>
                 <div class="ui rcpch_light_blue card">
                     <div class="content">
@@ -304,9 +304,18 @@
                     </div>
                     <div>
                         {% if selected_organisation.trust %}
-                        <div id="icb_map" style="width:100%;height:600px;"></div>
+                        <div 
+                            id="icb_map" 
+                            style="width:100%;height:600px;"
+                        ></div>
                         {% else %}
-                        <div id="lhb_map" style="width:100%;height:600px;"></div>
+                        <div 
+                            id="lhb_map" 
+                            style="width:100%;height:600px;"
+                            _='init js 
+                                var lhb_plotly_map = {{ lhb_heatmap|safe }}; 
+                                Plotly.newPlot("lhb_map", lhb_plotly_map.data, lhb_plotly_map.layout);
+                                end'></div>
                         {% endif %}
                     </div>
                 </div>
@@ -317,7 +326,9 @@
                         <h3>NHS England Region</h3>
                     </div>
                     <div>
-                        <div id="nhs_region_map" style="width:100%;height:600px;"></div>
+                        <div 
+                            id="nhs_region_map" style="width:100%;height:600px;"
+                        ></div>
                     </div>
                 </div>
                 {% else %}
@@ -332,7 +343,9 @@
                         </h3>
                     </div>
                     <div>
-                        <div id="country_map" style="width:100%;height:600px;"></div>
+                        <div 
+                            id="country_map" 
+                            style="width:100%;height:600px;"></div>
                     </div>
                 </div>
 
@@ -381,17 +394,13 @@
 <script src="https://cdn.jsdelivr.net/npm/chart.js@3.8.0/dist/chart.min.js" integrity="sha256-cHVO4dqZfamRhWD7s4iXyaXWVK10odD+qp4xidFzqTI=" crossorigin="anonymous"></script>
 <script>
     var organisation_plotly_map = {{ organisation_cases_map|safe }}
-    var country_plotly_map = {{ country_heatmap|safe }}
-    if ({{trust_heatmap|safe}} != null) {
-        
-        var icb_plotly_map = {{ icb_heatmap|safe }}
-        var nhs_region_plotly_map = {{ nhsregion_heatmap|safe }}
-        
-        Plotly.react('icb_map', icb_plotly_map.data, icb_plotly_map.layout)
-        Plotly.react('nhs_region_map', nhs_region_plotly_map.data, nhs_region_plotly_map.layout)
-    }
-    var lhb_plotly_map = {{ lhb_heatmap|safe }}
-    Plotly.newPlot('lhb_map', lhb_plotly_map.data, lhb_plotly_map.layout)
-    Plotly.react('country_map', country_plotly_map.data, country_plotly_map.layout)
+    
+    var country_plotly_map = {{ country_heatmap|safe }}; 
+    Plotly.newPlot("country_map", country_plotly_map.data, country_plotly_map.layout);
     Plotly.react('organisation_cases_map', organisation_plotly_map.data, organisation_plotly_map.layout)
+    
+    var nhs_region_data = {{ nhsregion_heatmap|safe }};
+    var icb_data = {{ icb_heatmap|safe }};
+    Plotly.react("icb_map", icb_data.data, icb_data.layout);
+    Plotly.react("nhs_region_map", nhs_region_data.data, nhs_region_data.layout);
 </script>
