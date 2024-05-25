@@ -24,7 +24,9 @@ from ..common_view_functions import (
     logged_in_user_may_access_this_organisation,
     filter_all_registered_cases_by_active_lead_site_and_cohort_and_level_of_abstraction,
     generate_dataframe_and_aggregated_distance_data_from_cases,
-    generate_ploty_figure,
+    generate_distance_from_organisation_scatterplot_figure,
+    generate_case_counts_for_each_region_in_each_abstraction_level,
+    generate_case_count_choropleth_map,
 )
 from epilepsy12.common_view_functions.render_charts import update_all_data_with_charts
 from ..general_functions import (
@@ -36,9 +38,7 @@ from ..general_functions import (
 from ..kpi import download_kpi_summary_as_csv
 from epilepsy12.common_view_functions.aggregate_by import (
     update_all_kpi_agg_models,
-    get_filtered_cases_queryset_for,
 )
-from epilepsy12.common_view_functions import generate_plotly_map
 
 
 def selected_organisation_summary_select(request):
@@ -71,25 +71,16 @@ def selected_organisation_summary(request, organisation_id):
     """
     selected_organisation = Organisation.objects.get(pk=organisation_id)
 
+    # get geojson tiles for each region
     nhsregion_tiles = return_tile_for_region("nhs_england_region")
     icb_tiles = return_tile_for_region("icb")
     country_tiles = return_tile_for_region("country")
 
-    nhsregion_heatmap = generate_plotly_map(
-        region_tiles=nhsregion_tiles, properties="properties.boundary_identifier"
-    )
-
-    nhs_region_result = get_filtered_cases_queryset_for(
-        organisation=selected_organisation,
-        abstraction_level=EnumAbstractionLevel.NHS_ENGLAND_REGION,
-        cohort=6,
-    )
-
-    print(nhs_region_result)
-
     template_name = "epilepsy12/organisation.html"
-    lhb_tiles = None
 
+    # set lhb_tiles to None by default - these are only used in Wales
+    lhb_tiles = None
+    # set london_borough_tiles to None by default - these are only used in London
     london_borough_tiles = None
 
     if selected_organisation.country.boundary_identifier == "W92000004":  # Wales
@@ -101,17 +92,42 @@ def selected_organisation_summary(request, organisation_id):
     # get submitting_cohort number - in future will be selectable
     cohort_data = cohorts_and_dates(first_paediatric_assessment_date=date.today())
 
+    # thes are all registered cases for the current cohort at the selected organisation to be plotted in the map
     cases_to_plot = filter_all_registered_cases_by_active_lead_site_and_cohort_and_level_of_abstraction(
         organisation=selected_organisation, cohort=cohort_data["submitting_cohort"]
     )
 
-    aggregated_distances, dataframe_results = (
+    # aggregated distances (mean, median, max, min) that cases have travelled to the selected organisation
+    aggregated_distances, case_distances_dataframe = (
         generate_dataframe_and_aggregated_distance_data_from_cases(
             filtered_cases=cases_to_plot
         )
     )
 
-    fig_json = generate_ploty_figure(geo_df=dataframe_results)
+    # get case counts for each level of abstraction
+    case_numbers_by_abstraction_level_data_frame = (
+        generate_case_counts_for_each_region_in_each_abstraction_level(
+            abstraction_level=EnumAbstractionLevel.NHS_ENGLAND_REGION,
+            cohort=cohort_data["submitting_cohort"],
+            organisation=selected_organisation,
+        )
+    )
+
+    # generate choropleth map of case counts for each level of abstraction
+    nhsregion_heatmap = generate_case_count_choropleth_map(
+        region_tiles=nhsregion_tiles,
+        properties="region_code",
+        dataframe=case_numbers_by_abstraction_level_data_frame,
+        abstraction_level=EnumAbstractionLevel.NHS_ENGLAND_REGION,
+        organisation=selected_organisation,
+    )
+
+    # generate scatterplot of cases by distance from the selected organisation
+    scatterplot_of_cases_for_selected_organisation = (
+        generate_distance_from_organisation_scatterplot_figure(
+            geo_df=case_distances_dataframe, organisation=selected_organisation
+        )
+    )
 
     # query to return all completed E12 cases in the current cohort in this organisation
     count_of_current_cohort_registered_completed_cases_in_this_organisation = (
@@ -216,13 +232,12 @@ def selected_organisation_summary(request, organisation_id):
         "count_of_current_cohort_registered_completed_cases_in_this_trust": count_of_current_cohort_registered_completed_cases_in_this_trust,
         "cohort_data": cohort_data,
         "individual_kpi_choices": INDIVIDUAL_KPI_MEASURES,
-        # "nhsregion_tiles": nhsregion_tiles,
         "icb_tiles": icb_tiles,
         "country_tiles": country_tiles,
         "lhb_tiles": lhb_tiles,
         "nhsregion_tiles": nhsregion_tiles,
         "london_borough_tiles": london_borough_tiles,
-        "organisation_cases_map": fig_json,
+        "organisation_cases_map": scatterplot_of_cases_for_selected_organisation,
         "aggregated_distances": aggregated_distances,
         "nhsregion_heatmap": nhsregion_heatmap,
     }

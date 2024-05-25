@@ -382,6 +382,6 @@
 <script>
     var organisation_plotly_map = {{ organisation_cases_map|safe }};
     var nhs_region_plotly_map = {{ nhsregion_heatmap|safe }};
-    Plotly.newPlot('organisation_cases_map', organisation_plotly_map.data, organisation_plotly_map.layout);
-    Plotly.newPlot('nhs_region_map', nhs_region_plotly_map.data, nhs_region_plotly_map.layout);
+    Plotly.react('nhs_region_map', nhs_region_plotly_map.data, nhs_region_plotly_map.layout);
+    Plotly.react('organisation_cases_map', organisation_plotly_map.data, organisation_plotly_map.layout);
 </script>

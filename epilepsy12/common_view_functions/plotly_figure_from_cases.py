@@ -1,34 +1,70 @@
-from django.apps import apps
+# python imports
+from datetime import date
+
+# django imports
+from django.conf import settings
+
+# third party imports
 import pandas as pd
 import plotly.express as px
 import plotly.io as pio
-from django.conf import settings
-from ..constants import RCPCH_LIGHT_BLUE, RCPCH_PINK, EnumAbstractionLevel
-from .aggregate_by import get_abstraction_model_from_level
+import plotly.graph_objects as go
+
+# RCPCH imports
+from ..constants import RCPCH_LIGHT_BLUE, RCPCH_PINK
 
 
-def generate_ploty_figure(geo_df: pd.DataFrame, organisation=None):
+def generate_distance_from_organisation_scatterplot_figure(
+    geo_df: pd.DataFrame, organisation
+):
     """
     Returns a plottable map with Cases overlayed as dots with tooltips on hover
     """
 
-    px.set_mapbox_access_token(settings.MAPBOX_API_KEY)
-    fig = px.scatter_mapbox(
-        data_frame=geo_df,
-        lat="latitude" if not geo_df.empty else [],
-        lon="longitude" if not geo_df.empty else [],
-        hover_name="site__organisation__name" if not geo_df.empty else None,
-        zoom=10,
-        height=600,
-        color_discrete_sequence=[RCPCH_PINK],
-        custom_data=["pk", "distance_mi", "distance_km"],
+    fig = go.Figure(
+        go.Scattermapbox(
+            lat=geo_df["latitude"] if not geo_df.empty else [],
+            lon=geo_df["longitude"] if not geo_df.empty else [],
+            hovertext=geo_df["site__organisation__name"] if not geo_df.empty else None,
+            mode="markers",
+            marker=go.scattermapbox.Marker(
+                size=9,
+                color=RCPCH_PINK,
+            ),
+            customdata=geo_df[["pk", "distance_mi", "distance_km"]],
+        )
     )
 
-    # Update the map layout
     fig.update_layout(
-        mapbox_style="mapbox://styles/mapbox/light-v11",
+        mapbox_style="carto-positron",
+        mapbox_zoom=10,
+        mapbox_center=dict(lat=organisation.latitude, lon=organisation.longitude),
+        height=600,
         mapbox_accesstoken=settings.MAPBOX_API_KEY,
+        showlegend=False,
     )
+
+    # Update the hover template
+    fig.update_traces(
+        hovertemplate="<b>%{hovertext}</b><br>Epilepsy12 ID: %{customdata[0]}<br>Distance to Lead Centre: %{customdata[1]:.2f} mi (%{customdata[2]:.2f} km)<extra></extra>"
+    )
+
+    # Add a scatterplot point for the organization
+    fig.add_trace(
+        go.Scattermapbox(
+            lat=[organisation.latitude],
+            lon=[organisation.longitude],
+            mode="markers",
+            marker=go.scattermapbox.Marker(
+                size=12,
+                color=RCPCH_PINK,  # Set the color of the point
+            ),
+            text=[organisation.name],  # Set the hover text for the point
+            hovertemplate="%{text}<extra></extra>",  # Custom hovertemplate just for the lead organisation
+            showlegend=False,
+        )
+    )
+
     fig.update_layout(
         margin={"r": 0, "t": 0, "l": 0, "b": 0},
         font=dict(family="Montserrat", color="#FFFFFF"),
@@ -39,16 +75,6 @@ def generate_ploty_figure(geo_df: pd.DataFrame, organisation=None):
             bordercolor=RCPCH_LIGHT_BLUE,
         ),
     )
-    # Update the hover template
-    fig.update_traces(
-        hovertemplate="<b>%{hovertext}</b><br>Epilepsy12 ID: %{customdata[0]}<br>Distance to Lead Centre: %{customdata[1]:.2f} mi (%{customdata[2]:.2f} km)<extra></extra>"
-    )
-
-    if organisation:
-        # centre the map on the lead organisation
-        fig.update_geos(
-            center=dict(lat=organisation.latitude, lon=organisation.longitude)
-        )
 
     # Convert the Plotly figure to JSON
     return pio.to_json(fig)
@@ -92,58 +118,3 @@ def generate_dataframe_and_aggregated_distance_data_from_cases(filtered_cases):
                 "median_distance_travelled_mi": f"{median_distance_travelled_mi:.2f}",
                 "std_distance_travelled_mi": f"{std_distance_travelled_mi:.2f}",
             }, geo_df
-
-
-def generate_case_counts_for_each_region_in_each_abstraction_level(
-    abstraction_level: EnumAbstractionLevel, cohort: int, organisation
-):
-    """
-    Returns a dataframe of all case counts, for a given cohort, in all members of a given abstraction_level.
-    The member of the level of abstraction where the organisation is a child is flagged in the result
-    """
-
-    # get lists of all members of each level of abstraction
-    Trust = apps.get_model("epilepsy12", "Trust")
-    IntegratedCareBoard = apps.get_model("epilepsy12", "IntegratedCareBoard")
-    LocalHealthBoard = apps.get_model("epilepsy12", "LocalHealthBoard")
-    NHSEnglandRegion = apps.get_model("epilepsy12", "NHSEnglandRegion")
-    Country = apps.get_model("epilepsy12", "Country")
-    National = apps.get_model("epilepsy12", "National")
-
-    level_abstraction_members = None
-    if abstraction_level == EnumAbstractionLevel.Trust:
-        level_abstraction_members = (
-            Trust.objects.filter(active=True).order_by("name").values("ods_code", "name")
-        )
-    elif abstraction_level == EnumAbstractionLevel.ICB:
-        level_abstraction_members = (
-            IntegratedCareBoard.objects.all()
-            .order_by("name")
-            .values("boundary_identifier", "name", "ods_code")
-        )
-    elif abstraction_level == EnumAbstractionLevel.LOCAL_HEALTH_BOARD:
-        level_abstraction_members = (
-            LocalHealthBoard.objects.all()
-            .order_by("name")
-            .values("boundary_identifier", "name", "ods_code")
-        )
-    elif abstraction_level == EnumAbstractionLevel.NHS_ENGLAND_REGION
-        level_abstraction_members = (
-            NHSEnglandRegion.objects.all()
-            .order_by("name")
-            .values("boundary_identifier", "name", "region_code")
-        )
-    elif abstraction_level == EnumAbstractionLevel.COUNTRY:
-        level_abstraction_members = (
-            Country.objects.all()
-            .order_by("name")
-            .values(
-                "boundary_identifier",
-                "name",
-            )
-    )
-        
-    for member in level_abstraction_members:
-        
-
-

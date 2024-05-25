@@ -95,7 +95,11 @@ class Command(BaseCommand):
         if options["mode"] == "cases":
             cases = options["cases"]
             skip = options.get("skip", True)
-            organisations_list = options.get("organisations", ORGANISATION_SEED_LIST)
+            organisations_list = (
+                options["organisations"]
+                if options["organisations"] is not None
+                else ORGANISATION_SEED_LIST
+            )
             self.stdout.write("seeding with dummy case data...")
             run_dummy_cases_seed(
                 cases=cases, organisations=organisations_list, skip=skip
