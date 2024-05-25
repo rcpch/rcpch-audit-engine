@@ -12,9 +12,7 @@ import pandas as pd
 
 # E12 imports
 from ..decorator import user_may_view_this_organisation, login_and_otp_required
-from epilepsy12.constants import (
-    INDIVIDUAL_KPI_MEASURES,
-)
+from epilepsy12.constants import INDIVIDUAL_KPI_MEASURES, EnumAbstractionLevel
 from epilepsy12.models import Organisation, KPI, OrganisationKPIAggregation
 from ..common_view_functions import (
     cases_aggregated_by_sex,
@@ -25,7 +23,7 @@ from ..common_view_functions import (
     get_all_kpi_aggregation_data_for_view,
     logged_in_user_may_access_this_organisation,
     filter_all_registered_cases_by_active_lead_site_and_cohort_and_level_of_abstraction,
-    generate_dataframe_and_aggregated_data_from_cases,
+    generate_dataframe_and_aggregated_distance_data_from_cases,
     generate_ploty_figure,
 )
 from epilepsy12.common_view_functions.render_charts import update_all_data_with_charts
@@ -36,7 +34,10 @@ from ..general_functions import (
     cohorts_and_dates,
 )
 from ..kpi import download_kpi_summary_as_csv
-from epilepsy12.common_view_functions.aggregate_by import update_all_kpi_agg_models
+from epilepsy12.common_view_functions.aggregate_by import (
+    update_all_kpi_agg_models,
+    get_filtered_cases_queryset_for,
+)
 from epilepsy12.common_view_functions import generate_plotly_map
 
 
@@ -68,6 +69,7 @@ def selected_organisation_summary(request, organisation_id):
     If a POST request from selected_organisation_summary.html on organisation select, it returns epilepsy12/partials/selected_organisation_summary.html
     Otherwise it returns the organisation.html template
     """
+    selected_organisation = Organisation.objects.get(pk=organisation_id)
 
     nhsregion_tiles = return_tile_for_region("nhs_england_region")
     icb_tiles = return_tile_for_region("icb")
@@ -77,9 +79,15 @@ def selected_organisation_summary(request, organisation_id):
         region_tiles=nhsregion_tiles, properties="properties.boundary_identifier"
     )
 
-    selected_organisation = Organisation.objects.get(pk=organisation_id)
-    template_name = "epilepsy12/organisation.html"
+    nhs_region_result = get_filtered_cases_queryset_for(
+        organisation=selected_organisation,
+        abstraction_level=EnumAbstractionLevel.NHS_ENGLAND_REGION,
+        cohort=6,
+    )
 
+    print(nhs_region_result)
+
+    template_name = "epilepsy12/organisation.html"
     lhb_tiles = None
 
     london_borough_tiles = None
@@ -98,7 +106,9 @@ def selected_organisation_summary(request, organisation_id):
     )
 
     aggregated_distances, dataframe_results = (
-        generate_dataframe_and_aggregated_data_from_cases(filtered_cases=cases_to_plot)
+        generate_dataframe_and_aggregated_distance_data_from_cases(
+            filtered_cases=cases_to_plot
+        )
     )
 
     fig_json = generate_ploty_figure(geo_df=dataframe_results)

@@ -1,8 +1,10 @@
+from django.apps import apps
 import pandas as pd
 import plotly.express as px
 import plotly.io as pio
 from django.conf import settings
-from ..constants import RCPCH_LIGHT_BLUE, RCPCH_PINK
+from ..constants import RCPCH_LIGHT_BLUE, RCPCH_PINK, EnumAbstractionLevel
+from .aggregate_by import get_abstraction_model_from_level
 
 
 def generate_ploty_figure(geo_df: pd.DataFrame, organisation=None):
@@ -52,7 +54,7 @@ def generate_ploty_figure(geo_df: pd.DataFrame, organisation=None):
     return pio.to_json(fig)
 
 
-def generate_dataframe_and_aggregated_data_from_cases(filtered_cases):
+def generate_dataframe_and_aggregated_distance_data_from_cases(filtered_cases):
     """
     Returns a dataframe of all Cases, location data and distances with aggregated results
     """
@@ -90,3 +92,58 @@ def generate_dataframe_and_aggregated_data_from_cases(filtered_cases):
                 "median_distance_travelled_mi": f"{median_distance_travelled_mi:.2f}",
                 "std_distance_travelled_mi": f"{std_distance_travelled_mi:.2f}",
             }, geo_df
+
+
+def generate_case_counts_for_each_region_in_each_abstraction_level(
+    abstraction_level: EnumAbstractionLevel, cohort: int, organisation
+):
+    """
+    Returns a dataframe of all case counts, for a given cohort, in all members of a given abstraction_level.
+    The member of the level of abstraction where the organisation is a child is flagged in the result
+    """
+
+    # get lists of all members of each level of abstraction
+    Trust = apps.get_model("epilepsy12", "Trust")
+    IntegratedCareBoard = apps.get_model("epilepsy12", "IntegratedCareBoard")
+    LocalHealthBoard = apps.get_model("epilepsy12", "LocalHealthBoard")
+    NHSEnglandRegion = apps.get_model("epilepsy12", "NHSEnglandRegion")
+    Country = apps.get_model("epilepsy12", "Country")
+    National = apps.get_model("epilepsy12", "National")
+
+    level_abstraction_members = None
+    if abstraction_level == EnumAbstractionLevel.Trust:
+        level_abstraction_members = (
+            Trust.objects.filter(active=True).order_by("name").values("ods_code", "name")
+        )
+    elif abstraction_level == EnumAbstractionLevel.ICB:
+        level_abstraction_members = (
+            IntegratedCareBoard.objects.all()
+            .order_by("name")
+            .values("boundary_identifier", "name", "ods_code")
+        )
+    elif abstraction_level == EnumAbstractionLevel.LOCAL_HEALTH_BOARD:
+        level_abstraction_members = (
+            LocalHealthBoard.objects.all()
+            .order_by("name")
+            .values("boundary_identifier", "name", "ods_code")
+        )
+    elif abstraction_level == EnumAbstractionLevel.NHS_ENGLAND_REGION
+        level_abstraction_members = (
+            NHSEnglandRegion.objects.all()
+            .order_by("name")
+            .values("boundary_identifier", "name", "region_code")
+        )
+    elif abstraction_level == EnumAbstractionLevel.COUNTRY:
+        level_abstraction_members = (
+            Country.objects.all()
+            .order_by("name")
+            .values(
+                "boundary_identifier",
+                "name",
+            )
+    )
+        
+    for member in level_abstraction_members:
+        
+
+
