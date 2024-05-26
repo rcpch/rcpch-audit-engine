@@ -213,8 +213,6 @@ def selected_organisation_summary(request, organisation_id):
                 trust=selected_organisation.trust
             )
 
-    print(cases_aggregated_by_age(selected_organisation=selected_organisation))
-
     context = {
         "user": request.user,
         "selected_organisation": selected_organisation,
