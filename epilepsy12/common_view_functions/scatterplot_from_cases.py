@@ -38,7 +38,7 @@ def generate_distance_from_organisation_scatterplot_figure(
         mapbox_style="carto-positron",
         mapbox_zoom=10,
         mapbox_center=dict(lat=organisation.latitude, lon=organisation.longitude),
-        height=600,
+        height=890,
         mapbox_accesstoken=settings.MAPBOX_API_KEY,
         showlegend=False,
     )
