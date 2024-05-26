@@ -184,109 +184,103 @@
 
         </div>
 
+        <div class="row">
+            
+                <div class="five wide left fluid column">
 
-
-        <div class='sixteen wide fluid column'>
-
-
-            <div class="ui three stackable cards">
-
-                <div class="ui rcpch_light_blue card">
-                    <div class="content">
-
-                        <h3 >Distribution by Ethnicity</h3>
-
-                    </div>
-
-                        <div class="">
-                            <div id="ethnicity_piechart" class="ui rcpch_chart_container stackable segment">
+                    <div class="ui rcpch_light_blue fluid card">
+                        <div class="content">
+                            <h3 >Distribution by Ethnicity</h3>
+                        </div>
+    
+                        <div class="description">
                                 {% if cases_aggregated_by_ethnicity %}
-                                    {% include 'epilepsy12/partials/charts/ethnicity_piechart.html' with cases_aggregated_by_ethnicity=cases_aggregated_by_ethnicity %}
+                                    <div id="ethnicity_piechart" style="width:100%; height:400px;"></div>
                                 {% else %}
                                     <h5>No data yet!<h5>
                                 {% endif %}
-                            </div>
-
+                        </div>
+    
                     </div>
-                </div>
-
-                <div class="ui rcpch_light_blue card">
-                    <div class="content">
-
-                            <h3>Distribution by Sex</h3>
-
-                    </div>
-                    <div class="">
+    
+                    <div class="ui rcpch_light_blue fluid card">
+                        <div class="content">
+                                <h3>
+                                    Distribution by Index of Multiple Deprivation
+                                    <i
+                                        class="info circle icon"
+                                        id='deprivation_help'
+                                        data-title='Epilepsy12 Index of Multiple Deprivation'
+                                        data-content="1st quintile = most deprived"
+                                        data-position='top right'
+                                        _="init js $('#deprivation_help').popup(); end"
+                                    ></i>
+                                </h3>
+                        </div>
+    
                         <div class='description'>
-                            <div id="cases_aggregated_by_sex" class="ui rcpch_chart_container stackable segment">
+                            {% if cases_aggregated_by_deprivation %}
+                                <div id="index_of_multiple_deprivation_score_piechart" style="width:100%; height:400px;"></div>
+                            {% else %}
+                                <h5>No data yet!<h5>
+                            {% endif %}
+                        </div>
+                        
+                    </div>
+                
+                </div>
+                
+                <div class="five wide fluid column">
+
+                    <div class="ui rcpch_light_blue fluid card">
+                        <div class="content">
+                                <h3>Distribution by Sex</h3>
+                        </div>
+                    
+                        <div class='description'>
                                 {% if cases_aggregated_by_sex %}
-                                    {% include 'epilepsy12/partials/charts/cases_aggregated_by_sex.html' with cases_aggregated_by_sex=cases_aggregated_by_sex %}
+                                    <div id="sex_piechart" style="width:100%; height:400px;"></div>
                                 {% else %}
                                     <h5>No data yet!<h5>
                                 {% endif %}
-                            </div>
                         </div>
-                    </div>
-                </div>
-
-                <div class="ui rcpch_light_blue card">
-                    <div class="content">
-
-                            <h3>
-                                Distribution by Index of Multiple Deprivation
-                                <i
-                                    class="info circle icon"
-                                    id='deprivation_help'
-                                    data-title='Epilepsy12 Index of Multiple Deprivation'
-                                    data-content="1st quintile = most deprived"
-                                    data-position='top right'
-                                    _="init js $('#deprivation_help').popup(); end"
-                                ></i>
-                            </h3>
-
-                    </div>
-                    <div class="">
-                        <div class='description'>
-                            <div id="cases_aggregated_by_ethnicity" class="ui rcpch_chart_container stackable segment">
-                                {% if cases_aggregated_by_deprivation %}
-                                    {% include 'epilepsy12/partials/charts/deprivation_scores.html' with cases_aggregated_by_ethnicity=cases_aggregated_by_ethnicity %}
-                                {% else %}
-                                    <h5>No data yet!<h5>
-                                {% endif %}
-                            </div>
-                        </div>
-                    </div>
-                </div>
-
-
-
-
-            </div>
-
-        </div>
-
-        <div class="sixteen wide right fluid column">
-            <div class="ui three stackable cards">
-                <div class="ui rcpch_light_blue card">
-                    <div class="content">
-                        <!-- <h3>NHS Region</h3> -->
+    
                     </div>
                     
-                </div>
-                <div class="ui rcpch_light_blue card">
-                    <div class="content">
-                        <h3>{{selected_organisation}}</h3>
+                    <div class="ui rcpch_light_blue fluid card">
+                        <div class="content">
+                                <h3>Distribution by Age Range</h3>
+                        </div>
+                    
+                        <div class='description'>
+                                {% if cases_aggregated_by_age_range %}
+                                    <div id="age_range_piechart" style="width:100%; height:400px;"></div>
+                                {% else %}
+                                    <h5>No data yet!<h5>
+                                {% endif %}
+                        </div>
+    
                     </div>
-                    <div id="organisation_cases_map" style="width:100%; height:600px;"></div>
-                    <div class="extra content" style="color: white;">
-                        <small>Max: {{ aggregated_distances.max_distance_travelled_mi }} mi ({{ aggregated_distances.max_distance_travelled_km }} km)</small>
-                        <small>Mean: {{ aggregated_distances.mean_distance_travelled_mi }} mi ({{ aggregated_distances.mean_distance_travelled_km }} km)</small>
-                        <small>Median: {{ aggregated_distances.median_distance_travelled_mi }} mi ({{ aggregated_distances.median_distance_travelled_km }} km)</small>
-                        <small>Std: {{ aggregated_distances.std_distance_travelled_mi }} mi ({{ aggregated_distances.std_distance_travelled_km }} km)</small>
-                    </div>
+
                 </div>
-                <div class="ui rcpch_light_blue card"></div>
-            </div>
+                
+                <div class="six wide right fluid column">
+
+                    <div class="ui rcpch_light_blue fluid card">
+                        <div class="content">
+                            <h3>{{selected_organisation}}</h3>
+                        </div>
+                        <div id="organisation_cases_map" style="width:100%; height:600px;"></div>
+                        <div class="extra content" style="color: white;">
+                            <small>Max: {{ aggregated_distances.max_distance_travelled_mi }} mi ({{ aggregated_distances.max_distance_travelled_km }} km)</small>
+                            <small>Mean: {{ aggregated_distances.mean_distance_travelled_mi }} mi ({{ aggregated_distances.mean_distance_travelled_km }} km)</small>
+                            <small>Median: {{ aggregated_distances.median_distance_travelled_mi }} mi ({{ aggregated_distances.median_distance_travelled_km }} km)</small>
+                            <small>Std: {{ aggregated_distances.std_distance_travelled_mi }} mi ({{ aggregated_distances.std_distance_travelled_km }} km)</small>
+                        </div>
+                    </div>
+
+                </div>
+            
         </div>
 
         <div class="sixteen wide right fluid column">
@@ -403,4 +397,13 @@
     var icb_data = {{ icb_heatmap|safe }};
     Plotly.react("icb_map", icb_data.data, icb_data.layout);
     Plotly.react("nhs_region_map", nhs_region_data.data, nhs_region_data.layout);
+
+    var index_of_multiple_deprivation_score_piechart = {{ index_of_multiple_deprivation_score_piechart|safe }};
+    var ethnicity_piechart = {{ ethnicity_piechart|safe }};
+    var sex_piechart = {{ sex_piechart|safe }};
+    var age_range_piechart = {{ age_range_piechart|safe }};
+    Plotly.react('index_of_multiple_deprivation_score_piechart', index_of_multiple_deprivation_score_piechart.data, index_of_multiple_deprivation_score_piechart.layout);
+    Plotly.react('ethnicity_piechart', ethnicity_piechart.data, ethnicity_piechart.layout);
+    Plotly.react('sex_piechart', sex_piechart.data, sex_piechart.layout);
+    Plotly.react('age_range_piechart', age_range_piechart.data, age_range_piechart.layout);
 </script>

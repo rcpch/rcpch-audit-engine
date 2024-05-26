@@ -12,6 +12,7 @@ from .aggregate_by import (
     cases_aggregated_by_deprivation_score,
     cases_aggregated_by_ethnicity,
     cases_aggregated_by_sex,
+    cases_aggregated_by_age,
     calculate_kpi_value_counts_queryset,
     update_kpi_aggregation_model,
     get_filtered_cases_queryset_for,
@@ -40,4 +41,5 @@ from .map_from_shape_file import *
 
 from .comorbidity_choices import get_comorbidity_choices
 from .filter_cases_for_geography import *
-from .plotly_figure_from_cases import *
+from .scatterplot_from_cases import *
+from .piechart_from_aggregated_data import *

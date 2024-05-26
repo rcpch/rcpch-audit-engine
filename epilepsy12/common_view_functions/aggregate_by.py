@@ -13,19 +13,16 @@ from django.contrib.gis.db.models import (
     CharField,
     PositiveSmallIntegerField,
     Case as DJANGO_CASE,
+    ExpressionWrapper,
+    IntegerField
 )
+from django.db.models.functions import ExtractYear, ExtractMonth, ExtractDay
 
 # E12 imports
 from epilepsy12.constants import (
     ETHNICITIES,
     SEX_TYPE,
     EnumAbstractionLevel,
-    LOCAL_HEALTH_BOARDS,
-    TRUSTS,
-    INTEGRATED_CARE_BOARDS,
-    NHS_ENGLAND_REGIONS,
-    OPEN_UK_NETWORKS,
-    OPEN_UK_NETWORKS_TRUSTS,
 )
 from epilepsy12.general_functions import cohorts_and_dates
 from epilepsy12.common_view_functions import calculate_kpis
@@ -62,6 +59,69 @@ def cases_aggregated_by_sex(selected_organisation):
     )
 
     return cases_aggregated_by_sex
+
+def cases_aggregated_by_age(selected_organisation):
+    """
+    Aggregates cases by age in days in the selected organisation by age ranges
+    - under a year
+    - 1 to 5 years
+    - 5 to 11 years
+    - 11 to 18 years
+    """
+
+    Case = apps.get_model("epilepsy12", "Case")
+
+    # Define age ranges in days
+    under_a_year = 365
+    one_to_five_years = 5 * 365
+    five_to_eleven_years = 11 * 365
+    eleven_to_eighteen_years = 18 * 365
+
+    # Current date
+    today = date.today()
+
+    # Annotate each case with its age in days
+    cases_with_age = Case.objects.filter(organisations=selected_organisation).annotate(
+        age_in_days=ExpressionWrapper(
+            (ExtractYear(today) - ExtractYear(F('date_of_birth'))) * 365 +
+            (ExtractMonth(today) - ExtractMonth(F('date_of_birth'))) * 30 +
+            (ExtractDay(today) - ExtractDay(F('date_of_birth'))),
+            output_field=IntegerField()
+        )
+    )
+
+    # Aggregate cases by age range
+    cases_aggregated_by_age_ranges = cases_with_age.annotate(
+        age_range=DJANGO_CASE(
+            When(age_in_days__isnull=False, age_in_days__lt=under_a_year, then=Value('under_a_year')),
+            When(age_in_days__isnull=False, age_in_days__gte=under_a_year, age_in_days__lt=one_to_five_years, then=Value('one_to_five_years')),
+            When(age_in_days__isnull=False, age_in_days__gte=one_to_five_years, age_in_days__lt=five_to_eleven_years, then=Value('five_to_eleven_years')),
+            When(age_in_days__isnull=False, age_in_days__gte=five_to_eleven_years, age_in_days__lt=eleven_to_eighteen_years, then=Value('eleven_to_eighteen_years')),
+            When(age_in_days__isnull=False, age_in_days__gte=eleven_to_eighteen_years, then=Value('over_eighteen_years')),
+            default=Value('unknown'),
+            output_field=CharField(),
+        )
+    ).values('age_range').annotate(count=Count('id')).order_by('age_range')
+
+    # add the display name for each age range
+    age_categories = {
+        "under_a_year": "Under a year",
+        "one_to_five_years": "1 to 5 years",
+        "five_to_eleven_years": "5 to 11 years",
+        "eleven_to_eighteen_years": "11 to 18 years",
+        "over_eighteen_years": "Over 18 years",
+    }
+
+    for aggregate in cases_aggregated_by_age_ranges:
+        age_range = aggregate["age_range"]
+
+        str_map = age_categories.get(age_range, "Unknown")
+
+        aggregate.update(
+            {"age_category_label": str_map}
+        )
+
+    return cases_aggregated_by_age_ranges
 
 
 def cases_aggregated_by_deprivation_score(selected_organisation):
@@ -670,33 +730,6 @@ def get_abstraction_model_from_level(
     }
     return abstraction_model_map[enum_abstraction_level]
 
-# def aggregate_kpis_update_models_all_abstractions_for_organisation(
-#     organisation,
-#     cohort: int,
-# ) -> None:
-#     """
-#     Aggregates all KPI data, for each level of EnumAbstractionLevel abstraction, updates the relevant AbstractionModel. Returns None.
-#     """
-#     for enum_abstraction_level in EnumAbstractionLevel:
-#         filtered_cases = get_filtered_cases_queryset_for(
-#             organisation=organisation,
-#             abstraction_level=enum_abstraction_level,
-#             cohort=cohort,
-#         )
-
-#         # For these Cases, calculate KPI value counts, grouped by specified abstraction level
-#         kpi_value_counts = calculate_kpi_value_counts_queryset(
-#             filtered_cases=filtered_cases,
-#             abstraction_level=enum_abstraction_level,
-#             kpis="all",
-#         )
-
-#         # Update the relevant abstraction's KPIAggregation model(s)
-#         update_kpi_aggregation_model(
-#             abstraction_level=enum_abstraction_level,
-#             kpi_value_counts=kpi_value_counts,
-#             cohort=cohort,
-#         )
 
 def _calculate_all_kpis():
     """

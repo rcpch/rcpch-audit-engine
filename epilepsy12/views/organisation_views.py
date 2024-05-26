@@ -18,6 +18,7 @@ from ..common_view_functions import (
     cases_aggregated_by_sex,
     cases_aggregated_by_ethnicity,
     cases_aggregated_by_deprivation_score,
+    cases_aggregated_by_age,
     all_registered_cases_for_cohort_and_abstraction_level,
     get_all_kpi_aggregation_data_for_view,
     logged_in_user_may_access_this_organisation,
@@ -25,6 +26,10 @@ from ..common_view_functions import (
     generate_dataframe_and_aggregated_distance_data_from_cases,
     generate_distance_from_organisation_scatterplot_figure,
     generate_case_count_choropleth_map,
+    piechart_plot_cases_by_ethnicity,
+    piechart_plot_cases_by_index_of_multiple_deprivation,
+    piechart_plot_cases_by_sex,
+    piechart_plot_cases_by_age_range,
 )
 from epilepsy12.common_view_functions.render_charts import update_all_data_with_charts
 from ..general_functions import (
@@ -208,6 +213,8 @@ def selected_organisation_summary(request, organisation_id):
                 trust=selected_organisation.trust
             )
 
+    print(cases_aggregated_by_age(selected_organisation=selected_organisation))
+
     context = {
         "user": request.user,
         "selected_organisation": selected_organisation,
@@ -220,6 +227,19 @@ def selected_organisation_summary(request, organisation_id):
         ),
         "cases_aggregated_by_deprivation": cases_aggregated_by_deprivation_score(
             selected_organisation=selected_organisation
+        ),
+        "cases_aggregated_by_age_range": cases_aggregated_by_age(
+            selected_organisation=selected_organisation
+        ),
+        "index_of_multiple_deprivation_score_piechart": piechart_plot_cases_by_index_of_multiple_deprivation(
+            organisation=selected_organisation
+        ),
+        "ethnicity_piechart": piechart_plot_cases_by_ethnicity(
+            organisation=selected_organisation
+        ),
+        "sex_piechart": piechart_plot_cases_by_sex(organisation=selected_organisation),
+        "age_range_piechart": piechart_plot_cases_by_age_range(
+            organisation=selected_organisation
         ),
         "percent_completed_organisation": total_percent_organisation,
         "percent_completed_trust": total_percent_trust,
