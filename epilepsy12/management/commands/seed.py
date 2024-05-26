@@ -57,8 +57,8 @@ class Command(BaseCommand):
             default=50,
         )
         parser.add_argument(
-            "-s",
-            "--skip",
+            "-ns",
+            "--noskip",
             action="store_false",
             help="Optional parameter. Set to disable skipping cases if they already exist",
         )
