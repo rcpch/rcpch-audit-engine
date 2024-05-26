@@ -91,7 +91,7 @@ def piechart_plot_cases_by_age_range(organisation):
     # Customize the layout
     fig.update_layout(
         font=dict(family="Montserrat-Regular, sans-serif", size=10, color="#7f7f7f"),
-        margin=dict(t=0, b=0, l=10, r=10),
+        margin=dict(t=10, b=0, l=10, r=10),
         legend=dict(yanchor="top", y=0.01, xanchor="left", x=0.01),
     )
 

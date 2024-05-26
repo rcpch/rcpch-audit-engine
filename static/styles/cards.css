@@ -32,6 +32,7 @@
   
   .ui.rcpch_light_blue.card div.content > h3 {
     color: var(--rcpch_white);
+    font-size: small;
   }
   
   .ui.rcpch_light_blue.card .content {

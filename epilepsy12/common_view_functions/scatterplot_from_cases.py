@@ -124,12 +124,12 @@ def generate_dataframe_and_aggregated_distance_data_from_cases(filtered_cases):
         geo_df["distance_km"] = 0
         geo_df["distance_mi"] = 0
         return {
-            "max_distance_travelled_km": f"No data",
-            "mean_distance_travelled_km": f"No data",
-            "median_distance_travelled_km": f"No data",
-            "std_distance_travelled_km": f"No data",
-            "max_distance_travelled_mi": f"No data",
-            "mean_distance_travelled_mi": f"No data",
-            "median_distance_travelled_mi": f"No data",
-            "std_distance_travelled_mi": f"No data",
+            "max_distance_travelled_km": f"~",
+            "mean_distance_travelled_km": f"~",
+            "median_distance_travelled_km": f"~",
+            "std_distance_travelled_km": f"~",
+            "max_distance_travelled_mi": f"~",
+            "mean_distance_travelled_mi": f"~",
+            "median_distance_travelled_mi": f"~",
+            "std_distance_travelled_mi": f"~",
         }, geo_df
