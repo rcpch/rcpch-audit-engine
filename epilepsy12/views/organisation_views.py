@@ -106,12 +106,6 @@ def selected_organisation_summary(request, organisation_id):
     else:
         # generate choropleth map of case counts for each level of abstraction
         abstraction_level = "trust"
-        trust_heatmap = generate_case_count_choropleth_map(
-            properties="ods_code",
-            abstraction_level=EnumAbstractionLevel.TRUST,
-            organisation=selected_organisation,
-            cohort=cohort_data["submitting_cohort"],
-        )
         icb_heatmap = generate_case_count_choropleth_map(
             properties="ods_code",
             abstraction_level=EnumAbstractionLevel.ICB,
@@ -246,7 +240,6 @@ def selected_organisation_summary(request, organisation_id):
         context["nhsregion_heatmap"] = None
     else:
         context["lhb_heatmap"] = None
-        context["trust_heatmap"] = trust_heatmap
         context["icb_heatmap"] = icb_heatmap
         context["nhsregion_heatmap"] = nhsregion_heatmap
 

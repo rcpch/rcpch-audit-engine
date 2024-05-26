@@ -11,7 +11,7 @@ import plotly.io as pio
 import plotly.graph_objects as go
 
 # RCPCH imports
-from ..constants import RCPCH_LIGHT_BLUE, RCPCH_PINK
+from ..constants import RCPCH_LIGHT_BLUE, RCPCH_PINK, RCPCH_DARK_BLUE
 
 
 def generate_distance_from_organisation_scatterplot_figure(
@@ -57,7 +57,7 @@ def generate_distance_from_organisation_scatterplot_figure(
             mode="markers",
             marker=go.scattermapbox.Marker(
                 size=12,
-                color=RCPCH_PINK,  # Set the color of the point
+                color=RCPCH_DARK_BLUE,  # Set the color of the point
             ),
             text=[organisation.name],  # Set the hover text for the point
             hovertemplate="%{text}<extra></extra>",  # Custom hovertemplate just for the lead organisation
@@ -67,11 +67,11 @@ def generate_distance_from_organisation_scatterplot_figure(
 
     fig.update_layout(
         margin={"r": 0, "t": 0, "l": 0, "b": 0},
-        font=dict(family="Montserrat", color="#FFFFFF"),
+        font=dict(family="Montserrat-Regular", color="#FFFFFF"),
         hoverlabel=dict(
             bgcolor=RCPCH_LIGHT_BLUE,
             font_size=12,
-            font=dict(color="white"),
+            font=dict(color="white", family="Montserrat-Regular"),
             bordercolor=RCPCH_LIGHT_BLUE,
         ),
     )
