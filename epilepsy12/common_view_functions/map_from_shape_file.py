@@ -42,9 +42,9 @@ def generate_case_count_choropleth_map(
     abstraction_level_ids = [feature["properties"][properties] for feature in features]
     abstraction_level_names = [feature["properties"]["name"] for feature in features]
     custom_colorscale = [
-        [0, RCPCH_LIGHT_BLUE_TINT1],  # Very light blue
+        [0, RCPCH_LIGHT_BLUE_TINT3],  # Very light blue
         [0.25, RCPCH_LIGHT_BLUE_TINT2],  # Light blue
-        [0.5, RCPCH_LIGHT_BLUE_TINT3],  # Medium light blue
+        [0.5, RCPCH_LIGHT_BLUE_TINT1],  # Medium light blue
         [0.75, RCPCH_LIGHT_BLUE],  # blue
         [1, RCPCH_LIGHT_BLUE_DARK_TINT],  # Dark blue
     ]
@@ -71,7 +71,6 @@ def generate_case_count_choropleth_map(
     # centre the map on the lead organisation
     fig.update_layout(
         mapbox_style="carto-positron",
-        mapbox_zoom=8,
         mapbox_center={
             "lat": organisation.latitude,
             "lon": organisation.longitude,
@@ -84,6 +83,7 @@ def generate_case_count_choropleth_map(
         font=dict(family="Montserrat-Regular", size=12, color="black"),
     )
 
+    # Make hover label pink and montserrat
     fig.update_traces(
         hoverlabel=dict(
             bgcolor=RCPCH_PINK,
@@ -95,14 +95,19 @@ def generate_case_count_choropleth_map(
     # Add a layer for the region to highlight
     if abstraction_level == EnumAbstractionLevel.NHS_ENGLAND_REGION:
         identifier = "nhs_england_region"
+        custom_zoom = 6
     elif abstraction_level == EnumAbstractionLevel.LOCAL_HEALTH_BOARD:
         identifier = "local_health_board"
+        custom_zoom = 7
     elif abstraction_level == EnumAbstractionLevel.ICB:
         identifier = "integrated_care_board"
+        custom_zoom = 7
     elif abstraction_level == EnumAbstractionLevel.COUNTRY:
         identifier = "country"
+        custom_zoom = 5
     elif abstraction_level == EnumAbstractionLevel.TRUST:
         identifier = "trust"
+        custom_zoom = 8
     else:
         identifier = None
 
@@ -117,7 +122,6 @@ def generate_case_count_choropleth_map(
         go.Choroplethmapbox(
             geojson=geojson_data,
             locations=highlighted_region["identifier"],
-            z=highlighted_region["cases"],
             marker_line_color=RCPCH_PINK,  # Set the outline color
             marker_line_width=3,  # Set the outline width
         )
@@ -138,7 +142,7 @@ def generate_case_count_choropleth_map(
         )
     )
 
-    fig.update_layout(margin={"r": 0, "t": 0, "l": 0, "b": 0})
+    fig.update_layout(margin={"r": 0, "t": 0, "l": 0, "b": 0}, mapbox_zoom=custom_zoom)
 
     # Convert the Plotly figure to JSON
     return pio.to_json(fig)
