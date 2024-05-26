@@ -50,14 +50,14 @@ def cases_aggregated_by_sex(selected_organisation):
     sex_long_list = [When(sex=k, then=Value(v)) for k, v in SEX_TYPE]
 
     cases_aggregated_by_sex = (
-        Case.objects.filter(organisations=selected_organisation)
+        Case.objects.filter(site__organisation=selected_organisation, site__site_is_primary_centre_of_epilepsy_care=True, site__site_is_actively_involved_in_epilepsy_care=True)
         .values("sex")
         .annotate(sex_display=DJANGO_CASE(*sex_long_list, output_field=CharField()))
         .values("sex_display")
         .annotate(sexes=Count("sex"))
         .order_by("sexes")
     )
-
+    
     return cases_aggregated_by_sex
 
 def cases_aggregated_by_age(selected_organisation):
@@ -81,7 +81,7 @@ def cases_aggregated_by_age(selected_organisation):
     today = date.today()
 
     # Annotate each case with its age in days
-    cases_with_age = Case.objects.filter(organisations=selected_organisation).annotate(
+    cases_with_age = Case.objects.filter(site__organisation=selected_organisation, site__site_is_primary_centre_of_epilepsy_care=True, site__site_is_actively_involved_in_epilepsy_care=True).annotate(
         age_in_days=ExpressionWrapper(
             (ExtractYear(today) - ExtractYear(F('date_of_birth'))) * 365 +
             (ExtractMonth(today) - ExtractMonth(F('date_of_birth'))) * 30 +
@@ -128,9 +128,7 @@ def cases_aggregated_by_deprivation_score(selected_organisation):
     # aggregate queries on trust level cases
     Case = apps.get_model("epilepsy12", "Case")
 
-    cases_in_selected_organisation = Case.objects.filter(
-        organisations__name__contains=selected_organisation
-    )
+    cases_in_selected_organisation = Case.objects.filter(site__organisation=selected_organisation, site__site_is_primary_centre_of_epilepsy_care=True, site__site_is_actively_involved_in_epilepsy_care=True)
 
     cases_aggregated_by_deprivation = (
         # Filter just Cases in selected org
@@ -184,7 +182,7 @@ def cases_aggregated_by_ethnicity(selected_organisation):
     ethnicity_long_list = [When(ethnicity=k, then=Value(v)) for k, v in ETHNICITIES]
 
     cases_aggregated_by_ethnicity = (
-        Case.objects.filter(organisations__name__contains=selected_organisation)
+        Case.objects.filter(site__organisation=selected_organisation, site__site_is_primary_centre_of_epilepsy_care=True, site__site_is_actively_involved_in_epilepsy_care=True)
         .values("ethnicity")
         .annotate(
             ethnicity_display=DJANGO_CASE(
