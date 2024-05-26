@@ -190,7 +190,7 @@
 
                 <div class="column" style="height: 100%;">
     
-                    <div class="ui rcpch_light_blue fluid card">
+                    <div class="ui rcpch_light_blue fluid card" style="height: 350px;;">
                         <div class="content">
                             <h3 >Distribution by Ethnicity
                                 <i
@@ -206,7 +206,7 @@
     
                         <div class="description">
                                 {% if cases_aggregated_by_ethnicity %}
-                                    <div id="ethnicity_piechart" style="width:100%;"></div>
+                                    <div id="ethnicity_piechart" style="width:100%; height: 300px;"></div>
                                 {% else %}
                                     <h5>No data yet!<h5>
                                 {% endif %}
@@ -214,7 +214,7 @@
     
                     </div>
     
-                    <div class="ui rcpch_light_blue fluid card">
+                    <div class="ui rcpch_light_blue fluid card" style="height: 350px;">
                         <div class="content">
                                 <h3>
                                     Distribution by Index of Multiple Deprivation
@@ -231,7 +231,7 @@
     
                         <div class='description'>
                             {% if cases_aggregated_by_deprivation %}
-                                <div id="index_of_multiple_deprivation_score_piechart" style="width:100%;"></div>
+                                <div id="index_of_multiple_deprivation_score_piechart" style="width:100%; height: 300px;"></div>
                             {% else %}
                                 <h5>No data yet!<h5>
                             {% endif %}
@@ -243,7 +243,7 @@
                 
                 <div class="column" style="height: 100%;">
     
-                    <div class="ui rcpch_light_blue fluid card">
+                    <div class="ui rcpch_light_blue fluid card" style="height: 350px;">
                         <div class="content">
                                 <h3>Distribution by Sex
                                     <i
@@ -259,7 +259,7 @@
                     
                         <div class='description'>
                                 {% if cases_aggregated_by_sex %}
-                                    <div id="sex_piechart" style="width:100%;"></div>
+                                    <div id="sex_piechart" style="width:100%; height: 300px;"></div>
                                 {% else %}
                                     <h5>No data yet!<h5>
                                 {% endif %}
@@ -267,7 +267,7 @@
     
                     </div>
                     
-                    <div class="ui rcpch_light_blue fluid card">
+                    <div class="ui rcpch_light_blue fluid card" style="height: 350px;">
                         <div class="content">
                                 <h3>Distribution by Age Range
                                     <i
@@ -283,7 +283,7 @@
                     
                         <div class='description'>
                                 {% if cases_aggregated_by_age_range %}
-                                    <div id="age_range_piechart" style="width:100%;"></div>
+                                    <div id="age_range_piechart" style="width:100%; height: 300px;"></div>
                                 {% else %}
                                     <h5>No data yet!<h5>
                                 {% endif %}
@@ -295,7 +295,7 @@
                 
                 <div class="column" style="height:100%;">
 
-                    <div class="ui rcpch_light_blue fluid card">
+                    <div class="ui rcpch_light_blue fluid card" style="height: 715px;">
                         <div class="content">
                             <h3>{{selected_organisation}}
                                 <i
@@ -308,7 +308,7 @@
                                 ></i>
                             </h3>
                         </div>
-                        <div id="organisation_cases_map" style="width:100%; height: 890px;"></div>
+                        <div id="organisation_cases_map" style="width:100%; height: 700px;"></div>
                         <div class="extra content">
                             <p style="color: white; font-family: Montserrat-Regular;">
                                 Max: {{ aggregated_distances.max_distance_travelled_mi }} mi 
