@@ -10,6 +10,27 @@ from epilepsy12.common_view_functions import (
     cases_aggregated_by_age,
 )
 
+from ..constants import (
+    RCPCH_MID_GREY,
+    RCPCH_LIGHTEST_GREY,
+    RCPCH_DARK_BLUE,
+    RCPCH_STRONG_BLUE,
+    RCPCH_STRONG_BLUE_LIGHT_TINT1,
+    RCPCH_STRONG_BLUE_LIGHT_TINT2,
+    RCPCH_STRONG_BLUE_LIGHT_TINT3,
+    RCPCH_STRONG_BLUE_DARK_TINT,
+    RCPCH_LIGHT_BLUE,
+    RCPCH_LIGHT_BLUE_TINT1,
+    RCPCH_LIGHT_BLUE_TINT2,
+    RCPCH_LIGHT_BLUE_TINT3,
+    RCPCH_LIGHT_BLUE_DARK_TINT,
+    RCPCH_PINK,
+    RCPCH_PINK_LIGHT_TINT1,
+    RCPCH_PINK_LIGHT_TINT2,
+    RCPCH_PINK_LIGHT_TINT3,
+    RCPCH_PINK_DARK_TINT,
+)
+
 
 def piechart_plot_cases_by_sex(organisation):
     """
@@ -23,6 +44,31 @@ def piechart_plot_cases_by_sex(organisation):
 
     # Create the pie chart
     fig = go.Figure(data=[go.Pie(labels=labels, values=values)])
+
+    # Customize the layout
+    fig.update_layout(
+        font=dict(family="Montserrat-Regular, sans-serif", size=10, color="#7f7f7f"),
+    )
+
+    # Customize the colors
+    fig.update_traces(
+        marker=dict(
+            colors=[
+                RCPCH_MID_GREY,
+                RCPCH_LIGHT_BLUE_TINT3,
+                RCPCH_LIGHT_BLUE_TINT1,
+            ]
+        )
+    )
+
+    # update hover label
+    fig.update_traces(
+        hoverlabel=dict(
+            bgcolor=RCPCH_PINK,
+            font_size=12,
+            font_family="Montserrat-Regular",
+        ),
+    )
 
     return pio.to_json(fig)
 
@@ -40,6 +86,33 @@ def piechart_plot_cases_by_age_range(organisation):
     # Create the pie chart
     fig = go.Figure(data=[go.Pie(labels=labels, values=values)])
 
+    # Customize the layout
+    fig.update_layout(
+        font=dict(family="Montserrat-Regular, sans-serif", size=10, color="#7f7f7f"),
+    )
+
+    # Customize the colors
+    fig.update_traces(
+        marker=dict(
+            colors=[
+                RCPCH_LIGHT_BLUE,
+                RCPCH_LIGHT_BLUE_TINT1,
+                RCPCH_LIGHT_BLUE_TINT2,
+                RCPCH_LIGHT_BLUE_TINT3,
+                RCPCH_LIGHT_BLUE_DARK_TINT,
+            ]
+        )
+    )
+
+    # update hover label
+    fig.update_traces(
+        hoverlabel=dict(
+            bgcolor=RCPCH_PINK,
+            font_size=12,
+            font_family="Montserrat-Regular",
+        ),
+    )
+
     return pio.to_json(fig)
 
 
@@ -55,6 +128,45 @@ def piechart_plot_cases_by_ethnicity(organisation):
 
     # Create the pie chart
     fig = go.Figure(data=[go.Pie(labels=labels, values=values)])
+
+    # Customize the layout
+    fig.update_layout(
+        font=dict(family="Montserrat-Regular, sans-serif", size=10, color="#7f7f7f"),
+    )
+
+    # Customize the colors
+    fig.update_traces(
+        marker=dict(
+            colors=[
+                RCPCH_LIGHTEST_GREY,
+                RCPCH_DARK_BLUE,
+                RCPCH_STRONG_BLUE,
+                RCPCH_STRONG_BLUE_LIGHT_TINT1,
+                RCPCH_STRONG_BLUE_LIGHT_TINT2,
+                RCPCH_STRONG_BLUE_LIGHT_TINT3,
+                RCPCH_STRONG_BLUE_DARK_TINT,
+                RCPCH_LIGHT_BLUE,
+                RCPCH_LIGHT_BLUE_TINT1,
+                RCPCH_LIGHT_BLUE_TINT2,
+                RCPCH_LIGHT_BLUE_TINT3,
+                RCPCH_LIGHT_BLUE_DARK_TINT,
+                RCPCH_PINK,
+                RCPCH_PINK_LIGHT_TINT1,
+                RCPCH_PINK_LIGHT_TINT2,
+                RCPCH_PINK_LIGHT_TINT3,
+                RCPCH_PINK_DARK_TINT,
+            ]
+        )
+    )
+
+    # update hover label
+    fig.update_traces(
+        hoverlabel=dict(
+            bgcolor=RCPCH_PINK,
+            font_size=12,
+            font_family="Montserrat-Regular",
+        ),
+    )
 
     return pio.to_json(fig)
 
@@ -76,5 +188,32 @@ def piechart_plot_cases_by_index_of_multiple_deprivation(organisation):
 
     # Create the pie chart
     fig = go.Figure(data=[go.Pie(labels=labels, values=values)])
+
+    # Customize the layout
+    fig.update_layout(
+        font=dict(family="Montserrat-Regular, sans-serif", size=10, color="#7f7f7f"),
+    )
+
+    # Customize the colors
+    fig.update_traces(
+        marker=dict(
+            colors=[
+                RCPCH_LIGHT_BLUE,
+                RCPCH_LIGHT_BLUE_TINT1,
+                RCPCH_LIGHT_BLUE_TINT2,
+                RCPCH_LIGHT_BLUE_TINT3,
+                RCPCH_LIGHT_BLUE_DARK_TINT,
+            ]
+        )
+    )
+
+    # update hover label
+    fig.update_traces(
+        hoverlabel=dict(
+            bgcolor=RCPCH_PINK,
+            font_size=12,
+            font_family="Montserrat-Regular",
+        ),
+    )
 
     return pio.to_json(fig)
