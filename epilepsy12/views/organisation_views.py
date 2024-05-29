@@ -79,9 +79,11 @@ def selected_organisation_summary(request, organisation_id):
     # get submitting_cohort number - in future will be selectable
     cohort_data = cohorts_and_dates(first_paediatric_assessment_date=date.today())
 
+    cohort_number=cohort_data["submitting_cohort"]
+
     # thes are all registered cases for the current cohort at the selected organisation to be plotted in the map
     cases_to_plot = filter_all_registered_cases_by_active_lead_site_and_cohort_and_level_of_abstraction(
-        organisation=selected_organisation, cohort=cohort_data["submitting_cohort"]
+        organisation=selected_organisation, cohort=cohort_number
     )
 
     # aggregated distances (mean, median, max, min) that cases have travelled to the selected organisation
@@ -106,7 +108,7 @@ def selected_organisation_summary(request, organisation_id):
             properties="ods_code",
             abstraction_level=EnumAbstractionLevel.LOCAL_HEALTH_BOARD,
             organisation=selected_organisation,
-            cohort=cohort_data["submitting_cohort"],
+            cohort=cohort_number,
         )
     else:
         # generate choropleth map of case counts for each level of abstraction
@@ -115,27 +117,27 @@ def selected_organisation_summary(request, organisation_id):
             properties="ods_code",
             abstraction_level=EnumAbstractionLevel.ICB,
             organisation=selected_organisation,
-            cohort=cohort_data["submitting_cohort"],
+            cohort=cohort_number,
         )
         nhsregion_heatmap = generate_case_count_choropleth_map(
             properties="region_code",
             abstraction_level=EnumAbstractionLevel.NHS_ENGLAND_REGION,
             organisation=selected_organisation,
-            cohort=cohort_data["submitting_cohort"],
+            cohort=cohort_number,
         )
 
     country_heatmap = generate_case_count_choropleth_map(
         properties="boundary_identifier",
         abstraction_level=EnumAbstractionLevel.COUNTRY,
         organisation=selected_organisation,
-        cohort=cohort_data["submitting_cohort"],
+        cohort=cohort_number,
     )
 
     # query to return all completed E12 cases in the current cohort in this organisation
     count_of_current_cohort_registered_completed_cases_in_this_organisation = (
         all_registered_cases_for_cohort_and_abstraction_level(
             organisation_instance=selected_organisation,
-            cohort=cohort_data["submitting_cohort"],
+            cohort=cohort_number,
             case_complete=True,
             abstraction_level="organisation",
         ).count()
@@ -144,7 +146,7 @@ def selected_organisation_summary(request, organisation_id):
     count_of_current_cohort_registered_completed_cases_in_this_trust = (
         all_registered_cases_for_cohort_and_abstraction_level(
             organisation_instance=selected_organisation,
-            cohort=cohort_data["submitting_cohort"],
+            cohort=cohort_number,
             case_complete=True,
             abstraction_level=abstraction_level,
         ).count()
@@ -153,7 +155,7 @@ def selected_organisation_summary(request, organisation_id):
     count_of_all_current_cohort_registered_cases_in_this_organisation = (
         all_registered_cases_for_cohort_and_abstraction_level(
             organisation_instance=selected_organisation,
-            cohort=cohort_data["submitting_cohort"],
+            cohort=cohort_number,
             case_complete=False,
             abstraction_level="organisation",
         ).count()
@@ -162,7 +164,7 @@ def selected_organisation_summary(request, organisation_id):
     count_of_all_current_cohort_registered_cases_in_this_trust = (
         all_registered_cases_for_cohort_and_abstraction_level(
             organisation_instance=selected_organisation,
-            cohort=cohort_data["submitting_cohort"],
+            cohort=cohort_number,
             case_complete=False,
             abstraction_level=abstraction_level,
         ).count()
@@ -215,6 +217,7 @@ def selected_organisation_summary(request, organisation_id):
 
     context = {
         "user": request.user,
+        "cohort": cohort_number,
         "selected_organisation": selected_organisation,
         "organisation_list": organisation_list,
         "cases_aggregated_by_ethnicity": cases_aggregated_by_ethnicity(
