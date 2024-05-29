@@ -338,11 +338,22 @@
         <div class="sixteen wide right fluid column">
             <div class="ui three stackable cards">
 
-                <div class="ui rcpch_light_blue card">
+                <div class="ui rcpch_light_blue fluid card">
                     <div class="content">
                         <!-- ENGLISH ORG -->
                         {% if selected_organisation.trust %}
-                            <h3>Integrated Care Board</h3>
+                            <h3>
+                                Integrated Care Board
+                                <i
+                                    class="info circle icon"
+                                    id='icb_help'
+                                    data-title='Epilepsy12 Cases Distribution'
+                                    data-content="Density of children with epilepsy across ICBs, registered within cohort {{cohort}} only and who have completed one year of care at {{selected_organisation}} in the Epilepsy12 audit."
+                                    data-position='top right'
+                                    _="init js $('#icb_help').popup(); end"
+                                ></i>
+                            </h3>
+                            
                         <!-- WELSH ORG -->
                         {% else %}
                             <h3>Local Health Board</h3>
@@ -367,9 +378,19 @@
                 </div>
 
                 {% if selected_organisation.trust %}
-                <div class="ui rcpch_light_blue card">
+                <div class="ui rcpch_light_blue fluid card">
                     <div class="content">
-                        <h3>NHS England Region</h3>
+                        <h3>
+                            NHS England Region
+                            <i
+                                class="info circle icon"
+                                id='nhsregion_help'
+                                data-title='Epilepsy12 Cases Distribution'
+                                data-content="Density of children with epilepsy across NHS England Regions, registered within cohort {{cohort}} only and who have completed one year of care at {{selected_organisation}} in the Epilepsy12 audit."
+                                data-position='top right'
+                                _="init js $('#nhsregion_help').popup(); end"
+                            ></i>
+                        </h3>
                     </div>
                     <div>
                         <div 
@@ -382,10 +403,18 @@
                 <div class="ui hidden card"></div>
                 {% endif %}
 
-                <div class="ui rcpch_light_blue card">
+                <div class="ui rcpch_light_blue fluid card">
                     <div class="content">
                         <h3>
                             Country
+                            <i
+                                class="info circle icon"
+                                id='country_help'
+                                data-title='Epilepsy12 Cases Distribution'
+                                data-content="Density of children with epilepsy across countries, registered within cohort {{cohort}} only and who have completed one year of care at {{selected_organisation}} in the Epilepsy12 audit."
+                                data-position='top right'
+                                _="init js $('#country_help').popup(); end"
+                            ></i>
                         </h3>
                     </div>
                     <div>
