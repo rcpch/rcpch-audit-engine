@@ -160,7 +160,6 @@ def selected_organisation_summary(request, organisation_id):
         # select any organisations except currently selected organisation
         organisation_list = (
             Organisation.objects.all()
-            .exclude(pk=selected_organisation.pk)
             .order_by("name")
         )
     else:
