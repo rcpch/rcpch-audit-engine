@@ -856,7 +856,10 @@ def ___delete_and_recreate_all_kpi_aggregation_models():
 """
 Functions to create Excel reports
 """
-def create_kpi_report_row(key, measure, kpi, aggregation_row, level):
+def create_kpi_report_row(key, kpi_field, aggregation_row, level):
+    kpi = kpi_field.name
+    measure = kpi_field.help_text['label']
+
     ret = {
         level: key,
         "Measure": measure,
@@ -869,7 +872,7 @@ def create_kpi_report_row(key, measure, kpi, aggregation_row, level):
         if numerator is not None and denominator is not None:
             # Make sure we don't divide by zero
             ret["Percentage"] = (
-                0 if denominator == 0 else (numerator / denominator) * 100
+                0 if denominator == 0 else (numerator / denominator)
             )
             ret["Numerator"] = numerator
             ret["Denominator"] = denominator
@@ -883,85 +886,43 @@ def create_kpi_report_row(key, measure, kpi, aggregation_row, level):
 
     return ret
 
-def create_KPI_aggregation_dataframe(
-    KPI_model1,
-    abstraction_key_field1,
+def get_kpi_aggregation_rows(
+    model_aggregation,
     cohort,
-    measures,
-    measures_titles,
-    title,
-    KPI_model2=None,
-    abstraction_key_field2=None,
-    is_regional=False,
+    abstraction_key_field=None,
 ):
-    """
-    INPUTS:
-    - KPI_model1, KPI_model2: a KPI aggregation model specific to the organisation body (ie trust, health board, NHSregion
-    - abstraction_key_field1, abstraction_key_field2: field to look up the value to use as the key (eg ODS code for trusts, names for ICBS)
-    - cohort: which cohort of cases to perform the aggregations on
-    - measures: which KPI measures to calculate
-    - is_regional: a special case to workaround the non-existent 'Health Board' NHS region. Gets set True only when creating a dataframe for the NHS regional level.
+    query = model_aggregation.objects.filter(
+        cohort=cohort,
+        open_access=False
+    )
 
-    BODY: Computes dataframe of KPI aggregations at specified organisation levl.
-
-    OUTPUTS: Returns dataframe containing KPI measures
-    """
-
-    # Define models
-    model_aggregation_1 = apps.get_model("epilepsy12", KPI_model1)
-    model_aggregation_2 = None
-    wales_region_object = None
-
-    # Set condiitonal model if KPI_model2==True or is_regional==True
-    if KPI_model2:
-        model_aggregation_2 = apps.get_model("epilepsy12", KPI_model2)
-    if is_regional:
-        model_aggregation_2 = apps.get_model("epilepsy12", "CountryKPIAggregation")
-        wales_region_object = (
-            model_aggregation_2.objects.filter(
-                cohort=cohort, abstraction_relation=4, open_access=False
-            )
-            .values()
-            .first()
+    if abstraction_key_field:
+        query = query.annotate(
+            key_field=F(f"abstraction_relation__{abstraction_key_field}")
         )
+    
+    # Eagerly evaluate the query as we use some result sets twice in kpi.py
+    # Otherwise we'd have to re-run the query to avoid getting empty results
+    # the second time we try and use it.
+    return list(query.values())
 
-    # Extract relevant value from each organisation body in each item, to be used as a label as per the template from the E12 team (Issue 791)
-    objects = {}
-
-    for aggregation_row in model_aggregation_1.objects.filter(cohort=cohort, open_access=False).annotate(key_field=F(f"abstraction_relation__{abstraction_key_field1}")).values():
-        objects[aggregation_row["key_field"]] = aggregation_row
-
-    if model_aggregation_2:
-        if abstraction_key_field2:
-            for aggregation_row in model_aggregation_2.objects.filter(cohort=cohort, open_access=False).annotate(key_field=F(f"abstraction_relation__{abstraction_key_field2}")).values():
-                objects[aggregation_row["key_field"]] = aggregation_row
-
-    # Create list containing dictionary items from which final dataframe will be created
+def create_KPI_aggregation_dataframe(
+    aggregation_rows,
+    measures,
+    title,
+):
     final_list = []
 
-    # Group KPIs by Trust, and add to dataframe - ie collect all KPIs for a specific trust, then add to dataframe
-    if abstraction_key_field2:
-        for key in objects:
-            object = objects[key]
-            for index, kpi in enumerate(measures):
-                item = create_kpi_report_row(key, measures_titles[index], kpi, object, level=title)
-                final_list.append(item)
+    for measure in measures:
+        for aggregation_row in aggregation_rows:
+            report_row = create_kpi_report_row(
+                aggregation_row["key_field"],
+                measure,
+                aggregation_row,
+                title
+            )
 
-    # Group organisation body by KPI, then add to dataframe - collect all values relating to KPI 1 across all organisation bodies, add to dataframe, repeat for next KPI
-    else:
-        for index, kpi in enumerate(measures):
-            if is_regional:
-                measure_title = measures_titles[index]
-                item = create_kpi_report_row(
-                    "wales", measure_title, kpi, wales_region_object, level=title
-                )
-                final_list.append(item)
-            for key in objects:
-                object = objects[key]
-                measure_title = measures_titles[index]
-
-                item = create_kpi_report_row(key, measure_title, kpi, object, level=title)
-                final_list.append(item)
+            final_list.append(report_row)
 
     return pd.DataFrame.from_dict(final_list)
 

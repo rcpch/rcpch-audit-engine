@@ -172,6 +172,7 @@ nav:
       - Dropdown Lists: 'development/dropdowns.md'
       - Audit Forms: 'development/audit-forms.md'
       - Form Scoring: 'development/form-scoring.md'
+      - Date Validations: 'development/date-validations.md'
       - KPIs: 'development/key-performance-indicators.md'
       - Organisations, Trusts and Regions: 'development/organisations.md'
       - Reporting: 'development/reporting.md'

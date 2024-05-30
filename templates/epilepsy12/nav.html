@@ -45,11 +45,25 @@
         </a>
         <h4 class="med">Epilepsy12 Audit Platform</h4>
         <div class='right menu'>
+        {% if user.is_authenticated %}
+          <a {% if request.resolver_match.url_name|is_in:'index' %}class="active item" id="active_menu_item"{% else %} class="item" {% endif %}
+            id="link"
+            {% if user.organisation_employer %}
+            href="{% url 'selected_organisation_summary' organisation_id=user.organisation_employer.pk %}">
+            {% else %}
+            href="{% url 'selected_organisation_summary' organisation_id=1 %}">
+            {% endif %}
+            Home
+          </a>
+          
+        {% else %}
           <a {% if request.resolver_match.url_name|is_in:'index' %}class="active item" id="active_menu_item"{% else %} class="item" {% endif %}
              id="link"
              href="{% url 'index' %}">
             Home
           </a>
+        {% endif %}
+
         {% if user.is_authenticated %}
           
           <a {% if request.resolver_match.url_name|is_in:'docs' %}class="active item" id="active_menu_item" {% else %} class="item" {% endif %}

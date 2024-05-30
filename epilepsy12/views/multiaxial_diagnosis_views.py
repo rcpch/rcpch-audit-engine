@@ -178,6 +178,7 @@ def add_episode(request, multiaxial_diagnosis_id):
         focal_onset_clonic=None,
         focal_onset_left=None,
         focal_onset_right=None,
+        focal_onset_laterality_unknown=None,
         focal_onset_epileptic_spasms=None,
         focal_onset_hyperkinetic=None,
         focal_onset_myoclonic=None,
@@ -380,7 +381,7 @@ def seizure_onset_date(request, episode_id):
             model_id=episode_id,
             field_name="seizure_onset_date",
             page_element="date_field",
-            earliest_allowable_date=None,  # episodes may precede the first assessment date or cohort date
+            earliest_allowable_date=episode.multiaxial_diagnosis.registration.case.date_of_birth,  # episodes may precede the first assessment date or cohort date
         )
     except ValueError as error:
         error_message = error
@@ -889,6 +890,7 @@ def focal_onset_epilepsy_checked_changed(request, episode_id):
     episode = Episode.objects.get(pk=episode_id)
 
     update_fields = {}
+
     for item in focal_fields:
         item_status = getattr(episode, item.get("name"))
         if request.htmx.trigger == item.get("name"):
@@ -896,7 +898,7 @@ def focal_onset_epilepsy_checked_changed(request, episode_id):
             update_fields.update({item.get("name"): not item_status})
         else:
             if request.htmx.trigger_name == "LATERALITY":
-                # sets the opposite side to that selected as false
+                # sets the other 2 choices to that selected as false
                 update_fields.update({item.get("name"): False})
             else:
                 # leaves all other selections the same - allows therefore multiselect
@@ -1660,7 +1662,7 @@ def comorbidity_diagnosis_date(request, comorbidity_id):
             model_id=comorbidity_id,
             field_name="comorbidity_diagnosis_date",
             page_element="date_field",
-            earliest_allowable_date=comorbidity.multiaxial_diagnosis.registration.first_paediatric_assessment_date,
+            earliest_allowable_date=comorbidity.multiaxial_diagnosis.registration.case.date_of_birth,
         )
     except ValueError as error:
         error_message = error

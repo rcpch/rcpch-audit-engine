@@ -15,14 +15,14 @@
             {% endif %}
         </div>
 
-        {% if request.user.is_rcpch_audit_team_member or request.user.is_rcpch_staff or request.user.is_superuser %}
+        
             <div class='sixteen wide column'>
                 <div class="field" hx-headers='{"X-CSRFToken": "{{ csrf_token }}"}'>
                     {% url 'selected_organisation_summary_select' as hx_post %}
                     {% include 'epilepsy12/partials/page_elements/rcpch_organisations_select.html' with organisation_list=organisation_list hx_post=hx_post hx_target="#rcpch_organisation_select" hx_trigger="change" hx_swap="innerHTML" hx_name="selected_organisation_summary_select" test_positive=selected_organisation.pk label="Select an organisation to view" hx_default_text="Search general paediatric organisations..." data_position="top left" %}
                 </div>
             </div>
-        {% endif %}
+        
 
 
             <div class="fluid row stackable org_view_all_buttons_wrapper three column grid">
@@ -31,7 +31,7 @@
                     <div class="column">
                         <a class="ui rcpch_grey button bold fluid" href="{% url 'epilepsy12_user_list' organisation_id=selected_organisation.pk %}">
                             View All Epilepsy12 Staff of 
-                            {% with organisation_name=selected_organisation.name|title %}
+                            {% with organisation_name=selected_organisation.trust.name|title %}
                             {{ organisation_name|capitalise_org_names }} 
                             {% endwith %}
                         </a>
@@ -39,9 +39,15 @@
                     <div class="column">
                         <a class="ui rcpch_primary button bold fluid " href="{% url 'cases' organisation_id=selected_organisation.pk %}">
                             View All Children of
-                            {% with organisation_name=selected_organisation.name|title %}
-                            {{ organisation_name|capitalise_org_names }} 
-                            {% endwith %}
+                            {% if selected_organisation.trust %}
+                                {% with organisation_name=selected_organisation.trust.name|title %}
+                                {{ organisation_name|capitalise_org_names }} 
+                                {% endwith %}
+                            {% elif selected_organisation.local_health_board %}
+                                {% with organisation_name=selected_organisation.local_health_board.name|title %}
+                                {{ organisation_name|capitalise_org_names }} 
+                                {% endwith %}
+                            {% endif %}
                         </a>
                     </div>
                     <div class="column" id="publish_button">
@@ -53,17 +59,29 @@
                     <div class="eight wide column">
                         <a class="ui rcpch_grey button bold fluid" href="{% url 'epilepsy12_user_list' organisation_id=selected_organisation.pk %}">
                             View All Epilepsy12 Staff of
-                            {% with organisation_name=selected_organisation.name|title %}
-                            {{ organisation_name|capitalise_org_names }} 
-                            {% endwith %}
+                            {% if selected_organisation.trust %}
+                                {% with organisation_name=selected_organisation.trust.name|title %}
+                                {{ organisation_name|capitalise_org_names }} 
+                                {% endwith %}
+                            {% elif selected_organisation.local_health_board %}
+                                {% with organisation_name=selected_organisation.local_health_board.name|title %}
+                                {{ organisation_name|capitalise_org_names }} 
+                                {% endwith %}
+                            {% endif %}
                         </a>
                     </div>
                     <div class="eight wide  column">
                         <a class="ui rcpch_primary button bold fluid" href="{% url 'cases' organisation_id=selected_organisation.pk %}">
                             View All Children of 
-                            {% with organisation_name=selected_organisation.name|title %}
-                            {{ organisation_name|capitalise_org_names }} 
-                            {% endwith %}
+                            {% if selected_organisation.trust %}
+                                {% with organisation_name=selected_organisation.trust.name|title %}
+                                {{ organisation_name|capitalise_org_names }} 
+                                {% endwith %}
+                            {% elif selected_organisation.local_health_board %}
+                                {% with organisation_name=selected_organisation.local_health_board.name|title %}
+                                {{ organisation_name|capitalise_org_names }} 
+                                {% endwith %}
+                            {% endif %}
                         </a>
                     </div>
 

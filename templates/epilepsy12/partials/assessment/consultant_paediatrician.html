@@ -91,12 +91,13 @@
             {% else %}
 
                 <div class="field" id="allocate_general_paediatric_centre">
-                    <p>There is currently no general paediatric centre involved in the care of {{assessment.registration.case.first_name}} {{assessment.registration.case.surname}}</label>
-                    <div class="field" id="allocate_general_paediatric_centre" >
-                        {% url 'general_paediatric_centre' assessment_id=assessment.pk as hx_post %}
-                        {% url 'update_general_paediatric_centre_pressed' assessment_id=assessment.pk site_id=active_general_paediatric_site.pk action='cancel' as hx_cancel %}
-                        {% include 'epilepsy12/partials/page_elements/organisations_select.html' with organisation_list=organisation_list hx_post=hx_post hx_target="#general_paediatric" hx_trigger="click" hx_swap="innerHTML" hx_name="general_paediatric_centre" test_positive=None label="Update General Paediatric Site" hx_default_text="Search general paediatric organisations..." data_position="top left" enabled=perms.epilepsy12.change_assessment hx_cancel=hx_cancel %}
-                    </div>
+                    <span data-tooltip="This field is mandatory" data-inverted="" data-position="top left">
+                        <i class="rcpch_light_blue dot circle outline icon" ></i>
+                    </span>
+                    There is currently no general paediatric centre involved in the care of {{assessment.registration.case.first_name}} {{assessment.registration.case.surname}}
+                    {% url 'general_paediatric_centre' assessment_id=assessment.pk as hx_post %}
+                    {% url 'update_general_paediatric_centre_pressed' assessment_id=assessment.pk site_id=active_general_paediatric_site.pk action='cancel' as hx_cancel %}
+                    {% include 'epilepsy12/partials/page_elements/organisations_select.html' with organisation_list=organisation_list hx_post=hx_post hx_target="#general_paediatric" hx_trigger="click" hx_swap="innerHTML" hx_name="general_paediatric_centre" test_positive=None label="Update General Paediatric Site" hx_default_text="Search general paediatric organisations..." data_position="top left" enabled=perms.epilepsy12.change_assessment hx_cancel=hx_cancel %}
                 </div>
 
             {% endif %}

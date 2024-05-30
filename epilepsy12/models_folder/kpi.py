@@ -1,3 +1,4 @@
+from django.apps import apps
 from django.contrib.gis.db import models
 from django.utils.translation import gettext_lazy as _
 from .help_text_mixin import HelpTextMixin
@@ -364,7 +365,10 @@ class KPI(models.Model, HelpTextMixin):
         ordering = ["registration__case"]
 
     def __str__(self):
-        if self.organisation.trust:
-            return f"KPI for {self.registration.case} in {self.organisation.name}({self.organisation.trust.name})"
+        if hasattr(self, "registration"):
+            if self.organisation.trust:
+                return f"KPI for {self.registration.case} in {self.organisation.name}({self.organisation.trust.name})[cohort {self.registration.cohort}]"
+            else:
+                return f"KPI for {self.registration.case} in {self.organisation.name}({self.organisation.local_health_board.name})[cohort {self.registration.cohort}]"
         else:
-            return f"KPI for {self.registration.case} in {self.organisation.name}({self.organisation.local_health_board.name})"
+            return "There is no Registration associated with this KPI"

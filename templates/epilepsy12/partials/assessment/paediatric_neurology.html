@@ -90,10 +90,13 @@
             {% else %}
 
                 <div class="field" id="allocate_paediatric_neurology_centre">
-                    <p>There is currently no paediatric neurology centre involved in the care of {{assessment.registration.case.first_name}} {{assessment.registration.case.surname}}</label>
-                    {% url 'paediatric_neurology_centre' assessment_id=assessment.pk as hx_post %}
-                    {% url 'update_paediatric_neurology_centre_pressed' assessment_id=assessment.pk site_id=active_neurology_site.pk action='cancel' as hx_cancel %}
-                    {% include 'epilepsy12/partials/page_elements/organisations_select.html' with organisation_list=organisation_list hx_post=hx_post hx_target="#paediatric_neurology" hx_trigger="click" hx_swap="innerHTML" hx_name="paediatric_neurology_centre" test_positive=None label="Allocate Paediatric Neurology Centre" hx_default_text="Search paediatric neurology centres..." data_position="top left" enabled=perms.epilepsy12.change_assessment hx_cancel=hx_cancel %}
+                    <span data-tooltip="This field is mandatory" data-inverted="" data-position="top left">
+                        <i class="rcpch_light_blue dot circle outline icon" ></i>
+                        There is currently no paediatric neurology centre involved in the care of {{assessment.registration.case.first_name}} {{assessment.registration.case.surname}}
+                    </span>
+                            {% url 'paediatric_neurology_centre' assessment_id=assessment.pk as hx_post %}
+                            {% url 'update_paediatric_neurology_centre_pressed' assessment_id=assessment.pk site_id=active_neurology_site.pk action='cancel' as hx_cancel %}
+                            {% include 'epilepsy12/partials/page_elements/organisations_select.html' with organisation_list=organisation_list hx_post=hx_post hx_target="#paediatric_neurology" hx_trigger="click" hx_swap="innerHTML" hx_name="paediatric_neurology_centre" test_positive=None label="Allocate Paediatric Neurology Centre" hx_default_text="Search paediatric neurology centres..." data_position="top left" enabled=perms.epilepsy12.change_assessment hx_cancel=hx_cancel %}
                 </div>
 
             {% endif %}

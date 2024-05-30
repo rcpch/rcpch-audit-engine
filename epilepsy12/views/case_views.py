@@ -3,6 +3,7 @@ from datetime import datetime
 import logging
 
 # django imports
+from django.apps import apps
 from django.core.exceptions import PermissionDenied
 from django.utils import timezone
 from django.shortcuts import get_object_or_404, redirect, render
@@ -284,7 +285,7 @@ def case_list(request, organisation_id):
 
     cases_in_transfer = registered_cases.filter(site__active_transfer=True)
 
-    paginator = Paginator(all_cases, 10)
+    paginator = Paginator(all_cases, 50)
     page_number = request.GET.get("page", 1)
     case_list = paginator.page(page_number)
 
@@ -660,6 +661,10 @@ def update_case(request, organisation_id, case_id):
         if not request.user.has_perm("epilepsy12.delete_case"):
             raise PermissionDenied()
         messages.success(request, f"You successfully deleted {case}'s details")
+        if hasattr(case, "registration"):
+            case.registration.kpi.delete()
+            case.registration.audit_progress.delete()
+            # deletes related registration, KPI and Registration if they exist
         case.delete()
         url = reverse("cases", kwargs={"organisation_id": organisation_id})
         return HttpResponseClientRedirect(redirect_to=url, status=200)
@@ -765,6 +770,8 @@ def opt_out(request, organisation_id, case_id):
 
     # delete all related records - this should cascade to all tables
     if hasattr(case, "registration"):
+        case.registration.kpi.delete()
+        case.registration.audit_progress.delete()
         case.registration.delete()
 
     # delete all related sites except the primary centre of care, which becomes inactive

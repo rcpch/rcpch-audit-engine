@@ -1,0 +1,42 @@
+<div>
+    <h5>{{epilepsy12_user}} user account was created on {{epilepsy12_user.date_joined}} by {{epilepsy12_user.created_by}}</h5>
+    <h5><i>User record last updated: {{epilepsy12_user.updated_at}} by: {{epilepsy12_user.updated_by}}</i></h5>
+    <h5><i>Password last set: {{epilepsy12_user.password_last_set}}</i></h5>
+    {% if has_device %}
+        {% for device in devices %}
+            <span
+                id="device-delete"
+                data-title="Warning"
+                data-content="This will delete any authorized devices associated with user. When they next log in, they will have to set up two factor authentication again."
+                data-position="top left"
+                data-variation="basic"
+                _="init js $('#device-delete').popup(); end"
+            >
+                <button 
+                    class="ui rcpch_danger button"
+                    hx-headers='{"X-CSRFToken": "{{ csrf_token }}"}'
+                    hx-post="{% url 'logs' organisation_id=organisation.pk epilepsy12_user_id=epilepsy12_user.pk %}"
+                    hx-target='#logs_user_summary' 
+                    hx-trigger="click"
+                    name="{{device.name}}"
+                    hx-swap="innerHTML"
+                    _="on htmx:confirm(issueRequest)
+                        halt the event
+                        call Swal.fire({
+                            title: 'Confirmation Required',
+                            text: 'This will permanently remove Device `{{device.name}}` from {{epilepsy12_user}}`s profile',
+                            icon: 'warning',
+                            iconColor: '#e00087',
+                            showCancelButton: true,
+                            position: 'top',
+                            confirmButtonColor: '#11a7f2',
+                            cancelButtonColor: '#e60700',
+                            confirmButtonText: 'Remove device'
+                          })
+                        if result.isConfirmed issueRequest()">Remove Device: <i><b>{{device.name}}</b></i></button>
+            </span>
+        {% endfor %}
+    {% else %}
+        <div class="ui rcpch_warning message">{{epilepsy12_user}} has no active, registered devices for two factor authentication.</div>
+    {% endif %}
+</div>
