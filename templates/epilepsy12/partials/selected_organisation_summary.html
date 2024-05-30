@@ -31,9 +31,15 @@
                     <div class="column">
                         <a class="ui rcpch_grey button bold fluid" href="{% url 'epilepsy12_user_list' organisation_id=selected_organisation.pk %}">
                             View All Epilepsy12 Staff of 
-                            {% with organisation_name=selected_organisation.trust.name|title %}
-                            {{ organisation_name|capitalise_org_names }} 
-                            {% endwith %}
+                            {% if selected_organisation.trust %}
+                                {% with organisation_name=selected_organisation.trust.name|title %}
+                                {{ organisation_name|capitalise_org_names }} 
+                                {% endwith %}
+                            {% elif selected_organisation.local_health_board %}
+                                {% with organisation_name=selected_organisation.local_health_board.name|title %}
+                                {{ organisation_name|capitalise_org_names }} 
+                                {% endwith %}
+                            {% endif %}
                         </a>
                     </div>
                     <div class="column">
@@ -184,95 +190,176 @@
 
         </div>
 
+        <div class="equal width row" style="height: 100%;">
 
+            
 
-        <div class='sixteen wide fluid column'>
-
-
-            <div class="ui three stackable cards">
-
-                <div class="ui rcpch_light_blue card">
-                    <div class="content">
-
-                        <h3 >Distribution by Ethnicity</h3>
-
-                    </div>
-
-                        <div class="">
-                            <div id="ethnicity_piechart" class="ui rcpch_chart_container stackable segment">
-                                {% if cases_aggregated_by_ethnicity %}
-                                    {% include 'epilepsy12/partials/charts/ethnicity_piechart.html' with cases_aggregated_by_ethnicity=cases_aggregated_by_ethnicity %}
-                                {% else %}
-                                    <h5>No data yet!<h5>
-                                {% endif %}
-                            </div>
-
-                    </div>
-                </div>
-
-                <div class="ui rcpch_light_blue card">
-                    <div class="content">
-
-                            <h3>Distribution by Sex</h3>
-
-                    </div>
-                    <div class="">
-                        <div class='description'>
-                            <div id="cases_aggregated_by_sex" class="ui rcpch_chart_container stackable segment">
-                                {% if cases_aggregated_by_sex %}
-                                    {% include 'epilepsy12/partials/charts/cases_aggregated_by_sex.html' with cases_aggregated_by_sex=cases_aggregated_by_sex %}
-                                {% else %}
-                                    <h5>No data yet!<h5>
-                                {% endif %}
-                            </div>
-                        </div>
-                    </div>
-                </div>
-
-                <div class="ui rcpch_light_blue card">
-                    <div class="content">
-
-                            <h3>
-                                Distribution by Index of Multiple Deprivation
+                <div class="column" style="height: 100%;">
+    
+                    <div class="ui rcpch_light_blue fluid card" style="height: 350px;;">
+                        <div class="content">
+                            <h3 >Distribution by Ethnicity
                                 <i
                                     class="info circle icon"
-                                    id='deprivation_help'
-                                    data-title='Epilepsy12 Index of Multiple Deprivation'
-                                    data-content="1st quintile = most deprived"
+                                    id='ethnicity_help'
+                                    data-title='Epilepsy12 Ethnicity Distribution'
+                                    data-content="Distribution of ethnicity of children with epilepsy registered across all cohorts at {{selected_organisation}} in the Epilepsy12 audit."
                                     data-position='top right'
-                                    _="init js $('#deprivation_help').popup(); end"
+                                    _="init js $('#ethnicity_help').popup(); end"
                                 ></i>
                             </h3>
-
-                    </div>
-                    <div class="">
-                        <div class='description'>
-                            <div id="cases_aggregated_by_ethnicity" class="ui rcpch_chart_container stackable segment">
-                                {% if cases_aggregated_by_deprivation %}
-                                    {% include 'epilepsy12/partials/charts/deprivation_scores.html' with cases_aggregated_by_ethnicity=cases_aggregated_by_ethnicity %}
+                        </div>
+    
+                        <div class="description">
+                                {% if cases_aggregated_by_ethnicity %}
+                                    <div id="ethnicity_piechart" style="width:100%; height: 300px;"></div>
                                 {% else %}
                                     <h5>No data yet!<h5>
                                 {% endif %}
-                            </div>
+                        </div>
+    
+                    </div>
+    
+                    <div class="ui rcpch_light_blue fluid card" style="height: 350px;">
+                        <div class="content">
+                                <h3>
+                                    Distribution by Index of Multiple Deprivation
+                                    <i
+                                        class="info circle icon"
+                                        id='deprivation_help'
+                                        data-title='Epilepsy12 Index of Multiple Deprivation'
+                                        data-content="1st quintile = most deprived. 5th quintile = least deprived. Distribution of Index of Multiple Deprivation scores of children with epilepsy registered across all cohorts at {{selected_organisation}} in the Epilepsy12 audit."
+                                        data-position='top right'
+                                        _="init js $('#deprivation_help').popup(); end"
+                                    ></i>
+                                </h3>
+                        </div>
+    
+                        <div class='description'>
+                            {% if cases_aggregated_by_deprivation %}
+                                <div id="index_of_multiple_deprivation_score_piechart" style="width:100%; height: 300px;"></div>
+                            {% else %}
+                                <h5>No data yet!<h5>
+                            {% endif %}
+                        </div>
+                        
+                    </div>
+                
+                </div>
+                
+                <div class="column" style="height: 100%;">
+    
+                    <div class="ui rcpch_light_blue fluid card" style="height: 350px;">
+                        <div class="content">
+                                <h3>Distribution by Sex
+                                    <i
+                                        class="info circle icon"
+                                        id='sex_help'
+                                        data-title='Epilepsy12 Sex Distribution'
+                                        data-content="Distribution of sex of children with epilepsy registered across all cohorts at {{selected_organisation}} in the Epilepsy12 audit."
+                                        data-position='top right'
+                                        _="init js $('#sex_help').popup(); end"
+                                    ></i>
+                                </h3>
+                        </div>
+                    
+                        <div class='description'>
+                                {% if cases_aggregated_by_sex %}
+                                    <div id="sex_piechart" style="width:100%; height: 300px;"></div>
+                                {% else %}
+                                    <h5>No data yet!<h5>
+                                {% endif %}
+                        </div>
+    
+                    </div>
+                    
+                    <div class="ui rcpch_light_blue fluid card" style="height: 350px;">
+                        <div class="content">
+                                <h3>Distribution by Age Range
+                                    <i
+                                        class="info circle icon"
+                                        id='age_range_help'
+                                        data-title='Epilepsy12 Age Range Distribution'
+                                        data-content="Distribution of age ranges of children with epilepsy registered across all cohorts at {{selected_organisation}} in the Epilepsy12 audit."
+                                        data-position='top right'
+                                        _="init js $('#age_range_help').popup(); end"
+                                    ></i>
+                                </h3>
+                        </div>
+                    
+                        <div class='description'>
+                                {% if cases_aggregated_by_age_range %}
+                                    <div id="age_range_piechart" style="width:100%; height: 300px;"></div>
+                                {% else %}
+                                    <h5>No data yet!<h5>
+                                {% endif %}
+                        </div>
+    
+                    </div>
+    
+                </div>
+                
+                <div class="column" style="height:100%;">
+
+                    <div class="ui rcpch_light_blue fluid card" style="height: 715px;">
+                        <div class="content">
+                            <h3>{{selected_organisation}}
+                                <i
+                                    class="info circle icon"
+                                    id='organisation_cases_help'
+                                    data-title='Epilepsy12 Cases Distribution'
+                                    data-content="Distribution of children with epilepsy registered within cohort {{cohort}} at {{selected_organisation}} in the Epilepsy12 audit."
+                                    data-position='top right'
+                                    _="init js $('#organisation_cases_help').popup(); end"
+                                ></i>
+                            </h3>
+                        </div>
+                        <div id="organisation_cases_map" style="width:100%; height: 700px;"></div>
+                        <div class="extra content">
+                            <p style="color: white; font-family: Montserrat-Regular;">
+                                Max: {{ aggregated_distances.max_distance_travelled_mi }} mi 
+                                ({{ aggregated_distances.max_distance_travelled_km }} km)
+                            </p>
+                            <p style="color: white; font-family: Montserrat-Regular;">
+                                Mean: {{ aggregated_distances.mean_distance_travelled_mi }} mi 
+                                ({{ aggregated_distances.mean_distance_travelled_km }} km)
+                            </p>
+                            <p style="color: white; font-family: Montserrat-Regular;">
+                                Median: {{ aggregated_distances.median_distance_travelled_mi }} mi 
+                                ({{ aggregated_distances.median_distance_travelled_km }} km)
+                            </p>
+                            <p style="color: white; font-family: Montserrat-Regular;">
+                                Std: {{ aggregated_distances.std_distance_travelled_mi }} mi 
+                                ({{ aggregated_distances.std_distance_travelled_km }} km)
+                            </p>
                         </div>
                     </div>
+
                 </div>
 
-
-
-
-            </div>
-
+            
+            
         </div>
 
         <div class="sixteen wide right fluid column">
             <div class="ui three stackable cards">
 
-                <div class="ui rcpch_light_blue card">
+                <div class="ui rcpch_light_blue fluid card">
                     <div class="content">
                         <!-- ENGLISH ORG -->
                         {% if selected_organisation.trust %}
-                            <h3>Integrated Care Board</h3>
+                            <h3>
+                                Integrated Care Board
+                                <i
+                                    class="info circle icon"
+                                    id='icb_help'
+                                    data-title='Epilepsy12 Cases Distribution'
+                                    data-content="Density of children with epilepsy across ICBs, registered within cohort {{cohort}} only and who have completed one year of care at {{selected_organisation}} in the Epilepsy12 audit."
+                                    data-position='top right'
+                                    _="init js $('#icb_help').popup(); end"
+                                ></i>
+                            </h3>
+                            
                         <!-- WELSH ORG -->
                         {% else %}
                             <h3>Local Health Board</h3>
@@ -280,47 +367,67 @@
                     </div>
                     <div>
                         {% if selected_organisation.trust %}
-                            {% include 'epilepsy12/partials/charts/map.html' with abstraction_level='icb' abstraction_level_border_colour='#ff8000' abstraction_level_data=icb_tiles selected_organisation=selected_organisation hospital_region_name=selected_organisation.integrated_care_board.name %}
+                        <div 
+                            id="icb_map" 
+                            style="width:100%;height:600px;"
+                        ></div>
                         {% else %}
-                            {% include 'epilepsy12/partials/charts/map.html' with abstraction_level='lhb' abstraction_level_border_colour='#ff8000' abstraction_level_data=lhb_tiles selected_organisation=selected_organisation hospital_region_name=selected_organisation.local_health_board.name %}
+                        <div 
+                            id="lhb_map" 
+                            style="width:100%;height:600px;"
+                            _='init js 
+                                var lhb_plotly_map = {{ lhb_heatmap|safe }}; 
+                                Plotly.newPlot("lhb_map", lhb_plotly_map.data, lhb_plotly_map.layout);
+                                end'></div>
                         {% endif %}
                     </div>
                 </div>
 
-                {% if selected_organisation.city == "LONDON" %}
-                <div class="ui rcpch_light_blue  card">
-                    <div class="content">
-                        <h3 >London Borough</h3>
-                    </div>
-                    <div>
-                        {% include 'epilepsy12/partials/charts/map.html' with abstraction_level='london_borough' abstraction_level_border_colour='#66cc33' abstraction_level_data=london_borough_tiles selected_organisation=selected_organisation hospital_region_name=selected_organisation.london_borough.name %}
-                    </div>
-                </div>
-                {% endif %}
-
                 {% if selected_organisation.trust %}
-                <div class="ui rcpch_light_blue card">
-                    <div class="content">
-                        <h3>NHS England Region</h3>
-                    </div>
-                    <div>
-                        {% include 'epilepsy12/partials/charts/map.html' with abstraction_level='nhs_england_region' abstraction_level_border_colour='#ffd200' abstraction_level_data=nhsregion_tiles selected_organisation=selected_organisation hospital_region_name=selected_organisation.nhs_england_region.name %}
-                    </div>
-                </div>
-                {% endif %}
-
-                {% if selected_organisation.city != "LONDON" %}
-                <div class="ui rcpch_light_blue card">
+                <div class="ui rcpch_light_blue fluid card">
                     <div class="content">
                         <h3>
-                            Country
+                            NHS England Region
+                            <i
+                                class="info circle icon"
+                                id='nhsregion_help'
+                                data-title='Epilepsy12 Cases Distribution'
+                                data-content="Density of children with epilepsy across NHS England Regions, registered within cohort {{cohort}} only and who have completed one year of care at {{selected_organisation}} in the Epilepsy12 audit."
+                                data-position='top right'
+                                _="init js $('#nhsregion_help').popup(); end"
+                            ></i>
                         </h3>
                     </div>
                     <div>
-                        {% include 'epilepsy12/partials/charts/map.html' with abstraction_level='country' abstraction_level_border_colour='#66cc33' abstraction_level_data=country_tiles selected_organisation=selected_organisation hospital_region_name=selected_organisation.country.name %}
+                        <div 
+                            id="nhs_region_map" style="width:100%;height:600px;"
+                        ></div>
                     </div>
                 </div>
+                {% else %}
+                <!-- leave a blank space in welsh orgs -->
                 {% endif %}
+
+                <div class="ui rcpch_light_blue fluid card">
+                    <div class="content">
+                        <h3>
+                            Country
+                            <i
+                                class="info circle icon"
+                                id='country_help'
+                                data-title='Epilepsy12 Cases Distribution'
+                                data-content="Density of children with epilepsy across countries, registered within cohort {{cohort}} only and who have completed one year of care at {{selected_organisation}} in the Epilepsy12 audit."
+                                data-position='top right'
+                                _="init js $('#country_help').popup(); end"
+                            ></i>
+                        </h3>
+                    </div>
+                    <div>
+                        <div 
+                            id="country_map" 
+                            style="width:100%;height:600px;"></div>
+                    </div>
+                </div>
 
             </div>
         </div>
@@ -364,4 +471,25 @@
 
 
 </div>
-<script src="https://cdn.jsdelivr.net/npm/chart.js@3.8.0/dist/chart.min.js" integrity="sha256-cHVO4dqZfamRhWD7s4iXyaXWVK10odD+qp4xidFzqTI=" crossorigin="anonymous"></script>
+
+<script>
+    var organisation_plotly_map = {{ organisation_cases_map|safe }}
+    
+    var country_plotly_map = {{ country_heatmap|safe }}; 
+    Plotly.newPlot("country_map", country_plotly_map.data, country_plotly_map.layout);
+    Plotly.react('organisation_cases_map', organisation_plotly_map.data, organisation_plotly_map.layout)
+    
+    var nhs_region_data = {{ nhsregion_heatmap|safe }};
+    var icb_data = {{ icb_heatmap|safe }};
+    Plotly.react("icb_map", icb_data.data, icb_data.layout);
+    Plotly.react("nhs_region_map", nhs_region_data.data, nhs_region_data.layout);
+
+    var index_of_multiple_deprivation_score_piechart = {{ index_of_multiple_deprivation_score_piechart|safe }};
+    var ethnicity_piechart = {{ ethnicity_piechart|safe }};
+    var sex_piechart = {{ sex_piechart|safe }};
+    var age_range_piechart = {{ age_range_piechart|safe }};
+    Plotly.react('index_of_multiple_deprivation_score_piechart', index_of_multiple_deprivation_score_piechart.data, index_of_multiple_deprivation_score_piechart.layout);
+    Plotly.react('ethnicity_piechart', ethnicity_piechart.data, ethnicity_piechart.layout);
+    Plotly.react('sex_piechart', sex_piechart.data, sex_piechart.layout);
+    Plotly.react('age_range_piechart', age_range_piechart.data, age_range_piechart.layout);
+</script>
