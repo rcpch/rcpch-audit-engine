@@ -72,6 +72,9 @@ NHS_ODS_API_KEY = os.getenv("NHS_ODS_API_KEY")
 # SNOMED Terminology server
 RCPCH_HERMES_SERVER_URL = os.getenv("RCPCH_HERMES_SERVER_URL")
 
+# Mapbox
+MAPBOX_API_KEY = os.getenv("MAPBOX_API_KEY")
+
 # Application definition
 
 INSTALLED_APPS = [
