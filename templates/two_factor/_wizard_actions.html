@@ -8,14 +8,12 @@
   </div>
   {% if wizard.steps.prev %}
   <div class="field">
-    <button
+    <a href="{% url 'two_factor:setup' %}"
       name="wizard_goto_step"
-      type="submit"
-      value="{{ wizard.steps.prev }}"
       class="ui rcpch_grey button"
     >
       Back
-    </button>
+  </a>
   </div>
   {% endif %}
 </div>
