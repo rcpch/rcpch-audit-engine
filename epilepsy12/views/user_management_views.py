@@ -1,6 +1,7 @@
 # Django
 from django.utils import timezone
 from django.contrib.auth.decorators import permission_required
+from django.contrib.auth import logout
 from django.shortcuts import render, redirect, get_object_or_404
 from django.urls import reverse
 from django.contrib.gis.db.models import Q
@@ -686,8 +687,9 @@ class RCPCHLoginView(TwoFactorLoginView):
                     request=self.request,
                     message=f"Your password has expired. Please reset it.",
                 )
+                # log user out
+                logout(self.request)
                 return redirect(reverse("password_reset"))
-
             last_logged_in = VisitActivity.objects.filter(
                 activity=1, epilepsy12user=user
             ).order_by("-activity_datetime")[:2]
