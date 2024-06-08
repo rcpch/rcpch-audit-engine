@@ -31,34 +31,56 @@ from epilepsy12.management.commands.old_pt_data_scripts import (
 from epilepsy12.management.commands.user_scripts import insert_user_data
 from epilepsy12.common_view_functions import _seed_all_aggregation_models
 
+ORGANISATION_SEED_LIST = [
+    "RJZ01",  # King's College Hospital
+    "RGT01",  # Addenbrooks
+    "RBS25",  # Alderhey
+    "RQM01",  # Chelsea and Westminster
+    "RCF22",  # Airedale
+    "7A2AJ",  # Bronglais
+    "7A6BJ",  # Chepstow Community
+    "7A6AV",  # Ysbyty Ystrad Fawr
+]
+
 
 class Command(BaseCommand):
     help = "seed database with organisation trust data for testing and development."
 
     def add_arguments(self, parser):
-        parser.add_argument("-m", "--mode", type=str, help="Mode")
+        parser.add_argument(
+            "-m",
+            "--mode",
+            type=str,
+            help="Mode - seed options to include: cases, seed_registrations, seed_groups_and_permissions, add_permissions_to_existing_groups, upload_old_patient_data, upload_user_data, add_new_epilepsy_causes",
+        )
         parser.add_argument(
             "-c",
             "--cases",
             nargs="?",
             type=int,
-            help="Indicates the number of children to be created",
+            help="Indicates the number of children to be created. Parameter for cases mode Default is 50.",
             default=50,
+        )
+        parser.add_argument(
+            "-ns",
+            "--noskip",
+            action="store_true",
+            help="Optional parameter. Set to disable skipping cases if they already exist",
+            default=False,
         )
         parser.add_argument(
             "-ct",
             "--cohort",
             nargs="?",
             type=int,
-            help="Indicates the cohort to create children for. Note cannot be less than 4.",
+            help="Indicates the cohort to create create registrations under. Note cannot be less than 4.",
             default=7,
         )
         parser.add_argument(
             "-fy",
             "--full_year",
-            nargs="?",
-            type=bool,
-            help="Optional parameter. Set True if all cases must have completed a full year of care.",
+            action="store_true",
+            help="Optional parameter. Set to ensure all cases being registered have completed a full year of care. Default is True.",
             default=False,
         )
         parser.add_argument(
@@ -68,12 +90,28 @@ class Command(BaseCommand):
             help="List of SNOMED-CT ids to update the epilepsy causes with.",
             type=int,
         )
+        parser.add_argument(
+            "-orgs",
+            "--organisations",
+            nargs="+",
+            help="Optional List of Organisation ODS codes.",
+            type=str,
+        )
 
     def handle(self, *args, **options):
         if options["mode"] == "cases":
             cases = options["cases"]
+            noskip = options.get("noskip", True)
+            organisations_list = (
+                options["organisations"]
+                if options["organisations"] is not None
+                else ORGANISATION_SEED_LIST
+            )
             self.stdout.write("seeding with dummy case data...")
-            run_dummy_cases_seed(cases=cases)
+            run_dummy_cases_seed(
+                cases=cases, organisations=organisations_list, noskip=noskip
+            )
+            self.stdout(image())
 
         elif options["mode"] == "seed_registrations":
             self.stdout.write(
@@ -83,14 +121,17 @@ class Command(BaseCommand):
             completed_full_year = options["full_year"]
             run_registrations(cohort=cohort, full_year=completed_full_year)
             _seed_all_aggregation_models()
+            print(image())
         elif options["mode"] == "seed_groups_and_permissions":
             self.stdout.write("setting up groups and permissions...")
             groups_seeder(run_create_groups=True)
+            print(image())
         elif options["mode"] == "add_permissions_to_existing_groups":
             self.stdout.write("adding permissions to groups...")
             groups_seeder(add_permissions_to_existing_groups=True)
+            print(image())
         elif options["mode"] == "upload_old_patient_data":
-            self.stdout.write("Uploading old patient data.")
+            print.write("Uploading old patient data.")
             insert_old_pt_data()
         elif options["mode"] == "upload_user_data":
             self.stdout.write("Uploading user data.")
@@ -101,16 +142,18 @@ class Command(BaseCommand):
                 self.stdout.write("Must provide a list of SNOMED CT ID integers.")
                 return
             add_epilepsy_cause_list_by_sctid(extra_concept_ids=extra_concept_ids)
+            print(image())
 
         else:
             self.stdout.write("No options supplied...")
 
 
-def run_dummy_cases_seed(verbose=True, cases=50):
+def run_dummy_cases_seed(cases, organisations, noskip, verbose=True):
+
     if verbose:
         print("\033[33m", f"Seeding {cases} fictional cases...", "\033[33m")
     # there should not be any cases yet, but sometimes seed gets run more than once
-    if Case.objects.all().exists():
+    if Case.objects.all().exists() and not noskip:
         if verbose:
             print("Cases already exist. Skipping this step...")
         return
@@ -118,21 +161,11 @@ def run_dummy_cases_seed(verbose=True, cases=50):
     if cases is None or cases == 0:
         cases = 50
 
-    different_organisations = [
-        "RJZ01",  # King's College Hospital
-        "RGT01",  # Addenbrooks
-        "RBS25",  # Alderhey
-        "RQM01",  # Chelsea and Westminster
-        "RCF22",  # Airedale
-        "7A2AJ",  # Bronglais
-        "7A6BJ",  # Chepstow Community
-        "7A6AV",  # Ysbyty Ystrad Fawr
-    ]
     organisations_list = Organisation.objects.filter(
-        ods_code__in=different_organisations
+        ods_code__in=organisations
     ).order_by("name")
     for org in organisations_list:
-        num_cases_to_seed_in_org = int(cases / len(different_organisations))
+        num_cases_to_seed_in_org = int(cases / len(organisations))
         print(f"Creating {num_cases_to_seed_in_org} Cases in {org}")
 
         # Create random attributes
@@ -194,8 +227,8 @@ def complete_registrations(verbose=True, cohort=None, full_year=False):
 
     # Cohort number if today is date of FPA
     current_cohort_number = cohort_number_from_first_paediatric_assessment_date(
-            date.today()
-        )
+        date.today()
+    )
 
     if cohort is None:
         # Generate cohort data for current cohort
@@ -219,10 +252,7 @@ def complete_registrations(verbose=True, cohort=None, full_year=False):
 
         if full_year:
             # this flag ensures any registrations include a full year of care
-            if (
-                cohort_data["cohort_start_date"] + relativedelta(years=1)
-                > date.today()
-            ):
+            if cohort_data["cohort_start_date"] + relativedelta(years=1) > date.today():
                 # It is not possible to generate registrations that are complete as they would be in the future
                 logger.warning(
                     "It is not possible for registrations to be complete for this cohort as they would be in the future."

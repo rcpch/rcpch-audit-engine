@@ -1,11 +1,11 @@
 # python
 import logging
 from datetime import date
-from dateutil.relativedelta import relativedelta
 
 # django
 from django.contrib.gis.db import models
-from django.contrib.gis.db.models import CharField, DateField
+from django.contrib.gis.db.models import CharField, DateField, PointField
+from django.contrib.gis.geos import Point
 from django.conf import settings
 
 # 3rd party
@@ -22,7 +22,11 @@ from ..constants import (
     CAN_OPT_OUT_CHILD_FROM_INCLUSION_IN_AUDIT,
     CAN_CONSENT_TO_AUDIT_PARTICIPATION,
 )
-from ..general_functions import imd_for_postcode, stringify_time_elapsed
+from ..general_functions import (
+    imd_for_postcode,
+    coordinates_for_postcode,
+    stringify_time_elapsed,
+)
 from .time_and_user_abstract_base_classes import *
 
 # Logging setup
@@ -91,6 +95,27 @@ class Case(TimeStampAbstractBaseClass, UserStampAbstractBaseClass, HelpTextMixin
         null=True,
     )
 
+    location_wgs = PointField(
+        help_text="longitude and latitude of the postcode as British National Grid (BNG)",
+        srid=27700,
+        null=True,
+        blank=True,
+    )
+
+    location_bng = PointField(
+        help_text="longitude and latitude of the postcode as British National Grid (BNG)",
+        srid=27700,
+        null=True,
+        blank=True,
+    )
+
+    location_wgs84 = PointField(
+        help_text="longitude and latitude of the postcode as WGS 84",
+        srid=4326,
+        null=True,
+        blank=True,
+    )
+
     ethnicity = CharField(max_length=4, choices=ETHNICITIES, blank=True, null=True)
 
     index_of_multiple_deprivation_quintile = models.PositiveSmallIntegerField(
@@ -143,23 +168,62 @@ class Case(TimeStampAbstractBaseClass, UserStampAbstractBaseClass, HelpTextMixin
         # calculate the index of multiple deprivation quintile if the postcode is present
         # Skips the calculation if the postcode is on the 'unknown' list
         if self.postcode:
-            if str(self.postcode).replace(" ", "") not in UNKNOWN_POSTCODES_NO_SPACES:
-                if not self.index_of_multiple_deprivation_quintile:
-                    try:
-                        self.index_of_multiple_deprivation_quintile = imd_for_postcode(
-                            self.postcode
-                        )
-                    except Exception as error:
-                        # Deprivation score not persisted if deprivation score server down
-                        self.index_of_multiple_deprivation_quintile = None
-                        logger.exception(
-                            f"Cannot calculate deprivation score for {self.postcode}: {error}"
-                        )
-                        pass
+            if (
+                str(self.postcode).replace(" ", "").replace("-", "")
+                not in UNKNOWN_POSTCODES_NO_SPACES
+            ):
+                # capitalize all characters, remove dashes and spaces
+                self.postcode = (
+                    str(self.postcode).replace(" ", "").replace("-", "").upper()
+                )
+
+                # get IMD for postcode from census platform: note, assumes postcode is valid
+                try:
+                    self.index_of_multiple_deprivation_quintile = imd_for_postcode(
+                        self.postcode
+                    )
+                except Exception as error:
+                    # Deprivation score not persisted if deprivation score server down
+                    self.index_of_multiple_deprivation_quintile = None
+                    logger.exception(
+                        f"Cannot calculate deprivation score for {self.postcode}: {error}"
+                    )
+                    pass
+
+                # update the longitude and latitude
+                """
+                The SRID (Spatial Reference System Identifier) 27700 refers to the British National Grid (BNG), a common system used for mapping in the UK. It uses Eastings and Northings, rather than longitude & latitude.
+                This system is different from the more common geographic coordinate systems like WGS 84 (SRID 4326), which is used by most global datasets including GPS and many web APIs.
+                Coordinates from the ONS data therefore need transforming from WGS 84 (SRID 4326) to British National Grid (SRID 27700).
+                Both are included here and stored in the model, as the shape files for the UK health boundaries are produced as BNG, rather than WGS84.
+                """
+                try:
+                    # Fetch the coordinates (WGS 84)
+                    lon, lat = coordinates_for_postcode(postcode=self.postcode)
+
+                    # Create a Point in WGS 84
+                    point_wgs84 = Point(lon, lat, srid=4326)
+                    # Assign the transformed point to self.location
+                    self.location_wgs84 = point_wgs84
+
+                    # Transform to British National Grid (SRID 27700) - this has Eastings and Northings, rather than longitude and latitude.
+                    point_bng = point_wgs84.transform(27700, clone=True)
+
+                    # Assign the transformed point to self.location
+                    self.location_bng = point_bng
+
+                except Exception as error:
+                    self.location_wgs84 = None
+                    self.location_bng = None
+                    logger.exception(
+                        f"Cannot get longitude and latitude for {self.postcode}: {error}"
+                    )
             else:
                 # if the IMD quintile has previously been added and postcode now unknown, set
                 # index_of_multiple_deprivation_quintile back to None
                 self.index_of_multiple_deprivation_quintile = None
+                self.location_wgs84 = None
+                self.location_bng = None
 
         return super().save(*args, **kwargs)
 
