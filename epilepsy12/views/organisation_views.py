@@ -79,7 +79,7 @@ def selected_organisation_summary(request, organisation_id):
     # get submitting_cohort number - in future will be selectable
     cohort_data = cohorts_and_dates(first_paediatric_assessment_date=date.today())
 
-    cohort_number=cohort_data["submitting_cohort"]
+    cohort_number = cohort_data["submitting_cohort"]
 
     # thes are all registered cases for the current cohort at the selected organisation to be plotted in the map
     cases_to_plot = filter_all_registered_cases_by_active_lead_site_and_cohort_and_level_of_abstraction(
@@ -200,14 +200,11 @@ def selected_organisation_summary(request, organisation_id):
         or request.user.is_rcpch_staff
     ):
         # select any organisations except currently selected organisation
-        organisation_list = (
-            Organisation.objects.all()
-            .order_by("name")
-        )
+        organisation_list = Organisation.objects.all().order_by("name")
     else:
         if selected_organisation.country.boundary_identifier == "W92000004":  # Wales
             organisation_list = Organisation.objects.filter(
-                trust=selected_organisation.local_health_board
+                local_health_board=selected_organisation.local_health_board
             )
         else:
             organisation_list = Organisation.objects.filter(
