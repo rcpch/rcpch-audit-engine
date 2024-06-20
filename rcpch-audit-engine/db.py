@@ -19,7 +19,7 @@ def get_azure_token(client_id):
     resp = requests.get(url=url, params=params, headers=headers)
     data = resp.json()
 
-    return data.access_token
+    return data['access_token']
 
 
 database_config = {

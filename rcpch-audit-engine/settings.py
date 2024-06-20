@@ -184,12 +184,6 @@ DATABASES = {
     "default": database_config
 }
 
-AZURE_IDENTITY_CLIENT_ID = os.environ.get('AZURE_IDENTITY_CLIENT_ID')
-
-if AZURE_IDENTITY_CLIENT_ID:
-    database_config["PASSWORD"] = DefaultAzureCredential().get_token('https://ossrdbms-aad.database.windows.net/.default').token
-    database_config["OPTIONS"] = {'sslmode': 'require'}
-
 # Password validation
 # https://docs.djangoproject.com/en/3.2/ref/settings/#auth-password-validators
 
