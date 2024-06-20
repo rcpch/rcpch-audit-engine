@@ -56,6 +56,14 @@ services:
       sh -c "mkdocs build --config-file documentation/mkdocs.yml &&
         mkdocs serve --config-file documentation/mkdocs.yml"
     restart: always
+  
+  # Temporary container to run pg_dump command without having to restart the actual db
+  pgdump:
+    image: ubuntu
+    volumes:
+      - type: bind
+        source: /mnt/e12-staging-pg-dump
+        target: /mnt/e12-staging-pg-dump
 
 volumes:
   caddy-data:
