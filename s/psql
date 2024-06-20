@@ -22,7 +22,7 @@ case ${ENVIRONMENT} in
     'staging')
         host='e12-staging.postgres.database.azure.com'
         access_token=$(az account get-access-token --resource-type oss-rdbms --query 'accessToken' --output tsv)
-        PGPASSWORD=${access_token} psql "host=${host} user=E12\ Staging\ Database\ Owners dbname=postgres sslmode=require" 
+        PGPASSWORD=${access_token} psql "host=${host} user=E12\ Staging\ Database\ Owners dbname=e12_staging sslmode=require" 
         ;;
 
     *)
