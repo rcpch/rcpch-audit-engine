@@ -1,3 +1,89 @@
-#!/bin/bash -e
+ENVIRONMENT=local
 
-docker compose exec postgis psql -U epilepsy12user -d epilepsy12db
+while [[ $# -gt 0 ]]; do
+    case ${1} in
+        --environment)
+            ENVIRONMENT="${2}"
+            shift # past argument
+            shift # past value
+        ;;
+        -*|--*)
+            echo "Unknown option ${1}"
+            exit 1
+            ;;
+  esac
+done
+
+function get_azure_access_token() {
+    # Are we running in an Azure VM?
+    curl \
+        -H 'Metadata: true' \
+        --connect-timeout 1 \
+        --silent \
+        "http://169.254.169.254/metadata/instance\?api-version=2021-02-01" > /dev/null
+
+    if [[ $? -eq 0 ]]; then
+        curl \
+            --get \
+            -H 'Metadata: true' \
+            -d 'api-version=2018-02-01' \
+            -d 'resource=https://ossrdbms-aad.database.windows.net' \
+            -d "client_id=$1" \
+            "http://169.254.169.254/metadata/identity/oauth2/token" \
+                | jq -r .access_token
+    else
+        az account get-access-token --resource-type oss-rdbms --query 'accessToken' --output tsv
+    fi
+}
+
+function connect_to_azure_db() {
+    local host="e12-$1.postgres.database.azure.com"
+    local user="E12\ $2\ Database\ Owners"
+    local dbname="$3"
+    
+    # used when running in VM only
+    local client_id="$4"
+    local access_token=''
+
+    # Are we running in an Azure VM?
+    curl \
+        -H 'Metadata: true' \
+        --connect-timeout 1 \
+        --silent \
+        "http://169.254.169.254/metadata/instance\?api-version=2021-02-01" > /dev/null
+    
+    if [[ $? -eq 0 ]]; then
+        access_token=$(curl \
+            --silent \
+            --get \
+            -H 'Metadata: true' \
+            -d 'api-version=2018-02-01' \
+            -d 'resource=https://ossrdbms-aad.database.windows.net' \
+            -d "client_id=${client_id}" \
+            "http://169.254.169.254/metadata/identity/oauth2/token" \
+                | jq -r .access_token)
+        
+        user="e12-$1-linux"
+    else
+        access_token=$(az account get-access-token --resource-type oss-rdbms --query 'accessToken' --output tsv)
+    fi
+
+    PGPASSWORD="${access_token}" psql "host=${host} user=${user} dbname=$3 sslmode=require"
+}
+
+case ${ENVIRONMENT} in
+    'local')
+        docker compose exec postgis psql -U epilepsy12user -d epilepsy12db
+        ;;
+
+    'staging')
+        connect_to_azure_db 'staging' 'Staging' 'e12_staging' 'e50f5ff9-02f1-4037-824b-5e52d4484928'
+        ;;
+    
+    'live')
+        connect_to_azure_db 'live' 'Live' 'e12_live' 'bcbeb6a1-cb5c-421f-adc5-b2926773b41f'
+        ;;
+
+    *)
+        echo "Unknown environment ${ENVIRONMENT} - expected local, staging or live"
+esac
