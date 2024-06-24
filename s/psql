@@ -81,7 +81,7 @@ case ${ENVIRONMENT} in
         ;;
     
     'live')
-        connect_to_azure_db 'live' 'Live' 'postgres' 'bcbeb6a1-cb5c-421f-adc5-b2926773b41f'
+        connect_to_azure_db 'live' 'Live' 'e12_live' 'bcbeb6a1-cb5c-421f-adc5-b2926773b41f'
         ;;
 
     *)
