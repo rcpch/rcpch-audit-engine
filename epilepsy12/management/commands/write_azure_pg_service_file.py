@@ -31,7 +31,7 @@ class Command(BaseCommand):
         return data['access_token']
 
     def handle(self, *args, **options):
-        service = os.environ.get('E12_POSTGRES_SERVICE') or 'e12'
+        service = os.environ.get('E12_POSTGRES_DB_SERVICE') or 'e12'
         service_file = os.environ.get('E12_POSTGRES_DB_SERVICE_FILE')
 
         if not service_file:

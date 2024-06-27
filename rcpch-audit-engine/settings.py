@@ -182,11 +182,11 @@ database_config = {
     "ENGINE": "django.contrib.gis.db.backends.postgis",
 }
 
-E12_POSTGRES_SERVICE = os.environ.get("E12_POSTGRES_SERVICE")
+service = os.environ.get("E12_POSTGRES_DB_SERVICE")
 
-if E12_POSTGRES_SERVICE:
+if service:
     database_config["OPTIONS"] = {
-        "service": E12_POSTGRES_SERVICE
+        "service": service
     }
 else:
     database_config["NAME"] = os.environ.get("E12_POSTGRES_DB_NAME")
