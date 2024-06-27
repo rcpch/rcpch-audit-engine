@@ -31,20 +31,12 @@ class Command(BaseCommand):
         return data['access_token']
 
     def handle(self, *args, **options):
-        service = os.environ.get('E12_POSTGRES_DB_SERVICE') or 'e12'
-        service_file = os.environ.get('E12_POSTGRES_DB_SERVICE_FILE')
+        password_file = os.environ.get('E12_POSTGRES_DB_PASSWORD_FILE')
 
-        if not service_file:
-            print('Not using service file, will read database password from the env file')
+        if not password_file:
             return
 
         password = self.fetch_azure_token()
 
-        with open(service_file, "w") as f:
-            f.write(f"""[#{service}]
-host={os.environ['E12_POSTGRES_DB_HOST']}
-user={os.environ['E12_POSTGRES_DB_USER']}
-password={password}
-dbname={os.environ['E12_POSTGRES_DB_NAME']}
-sslmode=require
-""")
+        with open(password_file, "w") as f:
+            f.write(f"*:*:*:*:{password}")
