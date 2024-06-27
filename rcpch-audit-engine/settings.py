@@ -180,10 +180,10 @@ WSGI_APPLICATION = "rcpch-audit-engine.wsgi.application"
 
 database_config = {
     "ENGINE": "django.contrib.gis.db.backends.postgis",
-    "NAME" = os.environ.get("E12_POSTGRES_DB_NAME"),
-    "USER" = os.environ.get("E12_POSTGRES_DB_USER"),
-    "HOST" = os.environ.get("E12_POSTGRES_DB_HOST"),
-    "PORT" = os.environ.get("E12_POSTGRES_DB_PORT"),
+    "NAME": os.environ.get("E12_POSTGRES_DB_NAME"),
+    "USER": os.environ.get("E12_POSTGRES_DB_USER"),
+    "HOST": os.environ.get("E12_POSTGRES_DB_HOST"),
+    "PORT": os.environ.get("E12_POSTGRES_DB_PORT"),
 }
 
 password_file = os.environ.get("E12_POSTGRES_DB_PASSWORD_FILE")
