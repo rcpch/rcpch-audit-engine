@@ -2,7 +2,7 @@ import os
 import requests
 from django.core.management.base import BaseCommand
 
-# https://www.postgresql.org/docs/current/libpq-pgservice.html
+# https://www.postgresql.org/docs/current/libpq-pgpass.html
 #
 # Allows us to periodically update the access token for Entra ID
 # authenticated connections in Azure (triggering this command from cron).
