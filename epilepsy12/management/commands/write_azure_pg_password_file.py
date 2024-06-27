@@ -40,3 +40,6 @@ class Command(BaseCommand):
 
         with open(password_file, "w") as f:
             f.write(f"*:*:*:*:{password}")
+        
+        # libpg silently ignores the file if it's readable by anyone else
+        os.chmod(password_file, 0o600)
