@@ -11,7 +11,7 @@ from django.core.management.base import BaseCommand
 # runtime so we store the connection details in a separate file.
 
 class Command(BaseCommand):
-    help = "Generate a Postgres service file to use an Azure managed identity to authenticate with the database."
+    help = "Generate a Postgres password file to use an Azure managed identity to authenticate with the database."
     
     def fetch_azure_token(self):
         url = 'http://169.254.169.254/metadata/identity/oauth2/token'
