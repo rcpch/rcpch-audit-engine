@@ -89,6 +89,8 @@ def seed_epilepsy_causes(apps, schema_editor):
     # Cortical dysplasia (disorder) SCTID: 253153000
     # 2q23.3 Microdeletion Syndrome - NOTE THIS NEEDS ADDING TO THE DATABASE MANUALLY AS THERE IS NO SNOMED CODE
     # 14q32 deletion syndrome (disorder) SCTID: 879939002
+    # 16p11.2 deletion syndrome is 699307007
+    # 16p11.2 microduplication syndrome 765142003
 
     extra_concept_ids = [
         764946008,
@@ -128,6 +130,8 @@ def seed_epilepsy_causes(apps, schema_editor):
         715215007,
         253153000,
         879939002,
+        699307007,
+        765142003,
     ]
     add_epilepsy_cause_list_by_sctid(extra_concept_ids=extra_concept_ids)
 
