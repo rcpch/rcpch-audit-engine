@@ -1,0 +1,11 @@
+#!/bin/bash -e
+
+az acr login --name rcpch
+
+# Tests (against local Postgres)
+docker compose up -d
+docker compose exec django pytest -v
+docker compose down
+
+# Push container to Azure
+docker build . -t ${{ secrets.REGISTRY_LOGIN_SERVER }}/aca-test:${{ github.sha }}
