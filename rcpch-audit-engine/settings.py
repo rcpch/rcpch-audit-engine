@@ -16,6 +16,8 @@ import logging
 import os
 from pathlib import Path
 
+from dotenv import load_dotenv
+
 # third party imports
 from django.core.management.utils import get_random_secret_key
 
@@ -25,6 +27,8 @@ from .logging_settings import (
 )  # no it is not an unused import, it pulls LOGGING into the settings file
 
 logger = logging.getLogger(__name__)
+
+load_dotenv('envs/.env')
 
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
 BASE_DIR = Path(__file__).resolve().parent.parent

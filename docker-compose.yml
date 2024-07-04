@@ -26,7 +26,6 @@ services:
 
   # Django web application
   django: &django
-    <<: *global # this will inherit all the envs from x-global-environment
     build: .
     image: e12-django:built # build image and save for use by other containers
     depends_on:
