@@ -31,13 +31,7 @@ services:
     image: e12-django:built # build image and save for use by other containers
     depends_on:
       - postgis
-    command: >
-      sh -c "python manage.py write_azure_pg_password_file &&
-        python manage.py collectstatic --noinput &&
-        python manage.py migrate &&
-        python manage.py seed --mode=seed_groups_and_permissions &&
-        echo $$DJANGO_STARTUP_COMMAND &&
-        $$DJANGO_STARTUP_COMMAND"
+    command: s/start-dev
     restart: always
 
   # PostgreSQL with PostGIS extension
@@ -61,4 +55,3 @@ services:
 volumes:
   caddy-data:
   postgis-data:
-

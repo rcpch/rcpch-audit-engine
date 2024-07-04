@@ -1,0 +1,12 @@
+#!/bin/bash -e
+
+python manage.py write_azure_pg_password_file
+python manage.py migrate
+python manage.py seed --mode=seed_groups_and_permissions
+
+gunicorn \
+    --bind=0.0.0.0:8000 \
+    --timeout 600 \
+    --access-logfile '-' \
+    --access-logformat '%({x-forwarded-for}i)s %(l)s %(u)s %(t)s "%(r)s" %(s)s %(b)s "%(f)s" "%(a)s"' \
+    rcpch-audit-engine.wsgi

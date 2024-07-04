@@ -1,0 +1,34 @@
+#!/bin/bash -e
+
+az acr login --name ${AZURE_REGISTRY_NAME}
+
+# Download .env file (--query avoids outputting all the info about the blob in our public logs)
+az storage file download \
+    --auth-mode login \
+    --enable-file-backup-request-intent \
+    --account-name ${AZURE_CONFIG_STORAGE_ACCOUNT} \
+    --share-name ${AZURE_CONFIG_FILE_SHARE} \
+    --query 'size' \
+    --path .env --dest envs/.env
+
+# Burn in build info (git hash, branch etc) into the image
+s/get-build-info > build_info.json
+
+docker compose build
+
+# Tests (against local Postgres)
+docker compose up -d
+s/test
+docker compose down
+
+# Push to Azure
+azure_tag="${AZURE_REGISTRY_NAME}.azurecr.io/e12-django:${GITHUB_SHA}"
+docker tag e12-django:built ${azure_tag}
+docker push ${azure_tag}
+
+# Deploy to Azure Container Apps
+az containerapp revision copy \
+    --name ${AZURE_STAGING_APP_NAME} \
+    --resource-group ${AZURE_RESOURCE_GROUP} \
+    --image ${azure_tag} \
+    --query 'properties.provisioningState'

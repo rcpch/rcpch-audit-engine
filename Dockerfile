@@ -35,3 +35,5 @@ WORKDIR /app/
 # (Excludes any files/dirs matched by patterns in .dockerignore)
 COPY . /app/
 
+# Collect and compress static files into image
+RUN python manage.py collectstatic --no-input

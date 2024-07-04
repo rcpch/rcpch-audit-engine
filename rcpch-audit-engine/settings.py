@@ -16,6 +16,8 @@ import logging
 import os
 from pathlib import Path
 
+from dotenv import load_dotenv
+
 # third party imports
 from django.core.management.utils import get_random_secret_key
 
@@ -25,6 +27,8 @@ from .logging_settings import (
 )  # no it is not an unused import, it pulls LOGGING into the settings file
 
 logger = logging.getLogger(__name__)
+
+load_dotenv('envs/.env')
 
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
 BASE_DIR = Path(__file__).resolve().parent.parent
@@ -166,7 +170,7 @@ TEMPLATES = [
                 "django.contrib.auth.context_processors.auth",
                 "django.contrib.messages.context_processors.messages",
                 "django_auto_logout.context_processors.auto_logout_client",  # auto logout
-                "rcpch-audit-engine.git_context_processor.get_active_branch_and_commit",
+                "rcpch-audit-engine.build_info.get_build_info",
             ]
         },
     },
