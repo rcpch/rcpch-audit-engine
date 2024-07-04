@@ -13,9 +13,12 @@ az storage file download \
 
 # Tests (against local Postgres)
 # TODO MRB: enable again before merge
+docker compose build
 # docker compose up -d
 # docker compose exec django pytest -v
 # docker compose down
 
-# Push container to Azure
-docker build . -t ${AZURE_REGISTRY_NAME}.azurecr.io/e12-django:${GITHUB_SHA}
+# Push to Azure
+AZURE_TAG="${AZURE_REGISTRY_NAME}.azurecr.io/e12-django:${GITHUB_SHA}"
+docker tag e12-django:built ${AZURE_TAG}
+docker push ${AZURE_TAG}
