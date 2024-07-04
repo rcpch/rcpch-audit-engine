@@ -25,7 +25,7 @@ jobs:
 
       - name: 'Run CI script'
         env:
-          REGISTRY_LOGIN_SERVER: ${{ secrets.REGISTRY_LOGIN_SERVER }}
+          AZURE_REGISTRY_NAME: ${{ secrets.AZURE_REGISTRY_NAME }}
           AZURE_CONFIG_STORAGE_ACCOUNT: ${{ secrets.AZURE_CONFIG_STORAGE_ACCOUNT }}
           AZURE_CONFIG_FILE_SHARE: ${{ secrets.AZURE_CONFIG_FILE_SHARE }}
         run: s/ci
