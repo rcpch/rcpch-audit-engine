@@ -17,4 +17,4 @@ docker compose exec django pytest -v
 docker compose down
 
 # Push container to Azure
-docker build . -t ${REGISTRY_LOGIN_SERVER }/e12-django:${GITHUB_SHA}
+docker build . -t ${REGISTRY_LOGIN_SERVER}/e12-django:${GITHUB_SHA}
