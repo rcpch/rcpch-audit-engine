@@ -23,6 +23,7 @@ phonenumbers==8.13.43
 psycopg2-binary==2.9.9
 whitenoise==6.7.0
 openpyxl==3.1.5
+python-dotenv==1.0.1
 
 ## graphing
 plotly==5.23.0
