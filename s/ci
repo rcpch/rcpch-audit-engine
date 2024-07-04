@@ -2,10 +2,19 @@
 
 az acr login --name rcpch
 
+# Download .env file (--query avoids outputting all the info about the blob in our public logs)
+az storage file download \
+    --auth-mode login \
+    --enable-file-backup-request-intent \
+    --account-name ${AZURE_CONFIG_STORAGE_ACCOUNT} \
+    --share-name ${AZURE_CONFIG_FILE_SHARE} \
+    --query 'size' \
+    --path .env --dest envs/.env
+
 # Tests (against local Postgres)
 docker compose up -d
 docker compose exec django pytest -v
 docker compose down
 
 # Push container to Azure
-docker build . -t ${{ secrets.REGISTRY_LOGIN_SERVER }}/aca-test:${{ github.sha }}
+docker build . -t ${REGISTRY_LOGIN_SERVER }/e12-django:${GITHUB_SHA}
