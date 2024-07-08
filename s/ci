@@ -14,8 +14,7 @@ az storage file download \
 docker compose build
 
 # Tests (against local Postgres)
-# TODO MRB: put this in the background again
-docker compose up
+docker compose up -d
 s/test
 docker compose down
 
