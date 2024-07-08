@@ -111,7 +111,7 @@ class Command(BaseCommand):
             run_dummy_cases_seed(
                 cases=cases, organisations=organisations_list, noskip=noskip
             )
-            self.stdout(image())
+            print(image())
 
         elif options["mode"] == "seed_registrations":
             self.stdout.write(
