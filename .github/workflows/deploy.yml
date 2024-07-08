@@ -28,4 +28,6 @@ jobs:
           AZURE_REGISTRY_NAME: ${{ secrets.AZURE_REGISTRY_NAME }}
           AZURE_CONFIG_STORAGE_ACCOUNT: ${{ secrets.AZURE_CONFIG_STORAGE_ACCOUNT }}
           AZURE_CONFIG_FILE_SHARE: ${{ secrets.AZURE_CONFIG_FILE_SHARE }}
+          AZURE_STAGING_APP_NAME: ${{ secrets.AZURE_STAGING_APP_NAME }}
+          AZURE_RESOURCE_GROUP: ${{ secrets.AZURE_RESOURCE_GROUP }}
         run: s/ci
