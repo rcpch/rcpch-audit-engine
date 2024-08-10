@@ -30,13 +30,15 @@ ANTIEPILEPSY_MEDICINE_TYPES = (
     (27, "Topiramate"),
     (28, "Vigabatrin"),
     (29, "Zonisamide"),
-    (0, "Other")
+    (0, "Other"),
 )
 
 SNOMED_ANTIEPILEPSY_MEDICINE_TYPES = (
     (774413005, "Acetazolamide"),
     (40789008, "ACTH"),
+    (774912006, "Brivaracetam"),
     (775043009, "Carbamazepine"),
+    (830245002, "Cenobamate"),
     (775294007, "Clobazam"),
     (775309006, "Clonazepam"),
     (775832002, "Eslicarbazepine acetate"),
@@ -63,21 +65,21 @@ SNOMED_ANTIEPILEPSY_MEDICINE_TYPES = (
     (777808008, "Topiramate"),
     (777931009, "Vigabatrin"),
     (777991006, "Zonisamide"),
-    (1001, "Other")
+    (1001, "Other"),
 )
 
 SNOMED_BENZODIAZEPINE_TYPES = (
     (776785007, "Buccal midazolam"),
     (775545008, "Rectal diazepam"),
     (1002, "Other"),
-    (776574008, "Lorazepam")
+    (776574008, "Lorazepam"),
 )
 
 BENZODIAZEPINE_TYPES = (
     (1000, "Buccal midazolam"),
     (1001, "Rectal diazepam"),
     (1002, "Other"),
-    (1003, "Lorazepam")
+    (1003, "Lorazepam"),
 )
 
 ANTIEPILEPSY_MEDICINES = (
@@ -112,5 +114,5 @@ ANTIEPILEPSY_MEDICINES = (
     (27, "Zonisamide"),
     (28, "Epidyolex® "),
     (29, "Other Cannabis-based medicinal product"),
-    (30, "Other")
+    (30, "Other"),
 )
