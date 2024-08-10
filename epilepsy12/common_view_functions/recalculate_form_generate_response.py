@@ -152,7 +152,6 @@ def completed_fields(model_instance):
                                 counter += 1
                     else:
                         counter += 1
-        print(f"field: {field.name} - counter: {counter}")
     return counter
 
 
