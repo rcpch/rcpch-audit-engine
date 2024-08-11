@@ -1,4 +1,4 @@
-# Issue 1011
+# Issue Multiple Employers (issue #879)
 
 This is a temporary folder and contains the step to migrate users in live from having single accounts associated with one Organisation, to being affiliated with multiple organisation affiliations. 
 
