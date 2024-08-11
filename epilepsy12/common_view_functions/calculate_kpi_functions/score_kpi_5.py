@@ -47,7 +47,7 @@ def score_kpi_5(registration_instance, age_at_first_paediatric_assessment) -> in
     # check eligibility criteria 1 & 2
     # 1 = none of the specified syndromes present
     # 2 = epilepsy is not simple generalised
-    if (not ineligible_syndrome_present) or (not generalised_epilepsy_only_present):
+    if not (ineligible_syndrome_present or generalised_epilepsy_only_present):
         # not scored
         mri_dates_are_none = [
             (investigations.mri_brain_requested_date is None),
