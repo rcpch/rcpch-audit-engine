@@ -40,7 +40,7 @@ def score_kpi_5(registration_instance, age_at_first_paediatric_assessment) -> in
 
     # define eligibility criteria 2
     generalised_epilepsy_only_present = (
-        registration_instance.epilepsy_context.were_any_of_the_epileptic_seizures_convulsive
+        registration_instance.epilepsycontext.were_any_of_the_epileptic_seizures_convulsive
         and multiaxial_diagnosis.syndrome_present is False
     )
 
