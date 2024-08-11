@@ -6,7 +6,11 @@ from django.apps import apps
 
 # E12 imports
 # from epilepsy12.models import Syndrome
-from epilepsy12.constants import KPI_SCORE
+from epilepsy12.constants import (
+    KPI_SCORE,
+    EPILEPSY_SEIZURE_TYPE,
+    EPILEPSY_DIAGNOSIS_STATUS,
+)
 
 
 def score_kpi_5(registration_instance, age_at_first_paediatric_assessment) -> int:
@@ -21,6 +25,7 @@ def score_kpi_5(registration_instance, age_at_first_paediatric_assessment) -> in
     multiaxial_diagnosis = registration_instance.multiaxialdiagnosis
     investigations = registration_instance.investigations
 
+    Episode = apps.get_model("epilepsy12", "Episode")
     Syndrome = apps.get_model("epilepsy12", "Syndrome")
 
     # define eligibility criteria 1
@@ -40,7 +45,12 @@ def score_kpi_5(registration_instance, age_at_first_paediatric_assessment) -> in
 
     # define eligibility criteria 2
     generalised_epilepsy_only_present = (
-        registration_instance.epilepsycontext.were_any_of_the_epileptic_seizures_convulsive
+        Episode.objects.filter(
+            multiaxial_diagnosis=multiaxial_diagnosis,
+            epilepsy_or_nonepilepsy_status=EPILEPSY_DIAGNOSIS_STATUS[0][0],
+            epileptic_seizure_onset_type=EPILEPSY_SEIZURE_TYPE[0][0],
+        ).count()
+        > 0  # epilepsy which is generalised onset
         and multiaxial_diagnosis.syndrome_present is False
     )
 
