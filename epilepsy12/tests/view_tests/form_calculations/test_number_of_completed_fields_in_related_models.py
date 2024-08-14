@@ -143,7 +143,7 @@ def test_related_model_fields_count_all_episode_fully_completed(
         "seizure_onset_date_confidence": DATE_ACCURACY[0][0],
         "episode_definition": EPISODE_DEFINITION[0][0],
         "has_description_of_the_episode_or_episodes_been_gathered": True,
-        "description": "The seizure happened when child was watching TV",
+        # "description": "The seizure happened when child was watching TV", # deprecated as per #1015 to unscored field.
     }
 
     EPILEPTIC_FOCAL_ONSET = {
@@ -230,7 +230,7 @@ def test_related_model_fields_count_all_episode_random_answers(
         "seizure_onset_date_confidence": DATE_ACCURACY[0][0],
         "episode_definition": EPISODE_DEFINITION[0][0],
         "has_description_of_the_episode_or_episodes_been_gathered": True,
-        "description": "The seizure happened when child was watching TV",
+        # "description": "The seizure happened when child was watching TV", # deprecated description as per #1015 to unscored field.
     }
 
     EPILEPTIC_FOCAL_ONSET = {

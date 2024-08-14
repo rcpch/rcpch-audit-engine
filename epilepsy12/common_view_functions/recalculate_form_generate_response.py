@@ -111,7 +111,7 @@ def completed_fields(model_instance):
             if getattr(model_instance, field.name, ()) is not None:
                 if (
                     field.name == "epilepsy_cause_categories"
-                    or field.name == "description"
+                    # or field.name == "description"
                     or field.name == "mental_health_issues"
                 ):
                     if len(getattr(model_instance, field.name)) > 0:
@@ -376,6 +376,7 @@ def avoid_fields(model_instance):
         return META_VARIABLES + [
             "multiaxial_diagnosis",
             "description_keywords",
+            "description",  # Nolonger scored -  issue #1015
             "expected_score",
             "calculated_score",
         ]
@@ -519,7 +520,7 @@ def expected_score_for_single_episode(episode):
     # essential fields already accounted for are:
     # seizure_onset_date
     # seizure_onset_date_confidence
-    # episode_definition
+    # episode_definition - DEPRECATED
     # has_description_of_the_episode_or_episodes_been_gathered
     # epilepsy_or_nonepilepsy_status
 
@@ -533,7 +534,8 @@ def expected_score_for_single_episode(episode):
     if episode.has_description_of_the_episode_or_episodes_been_gathered:
         # essential fields are:
         # description
-        cumulative_score += 1
+        # cumulative_score += 1: DEPRECATED
+        pass
     if episode.epilepsy_or_nonepilepsy_status == "E":
         # epileptic seizure: essential fields:
         # epileptic_seizure_onset_type

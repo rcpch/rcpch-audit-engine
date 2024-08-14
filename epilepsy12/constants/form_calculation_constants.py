@@ -1,6 +1,7 @@
 """
 Constants file to be referenced from the `recalculate_form_generate_response` function and its helper functions.
 """
+
 from dataclasses import dataclass
 
 
@@ -70,7 +71,7 @@ Episode_minimum_scorable_fields = MinimumScorableFieldsForModel(
         "seizure_onset_date",
         "seizure_onset_date_confidence",
         "episode_definition",
-        "has_description_of_the_episode_or_episodes_been_gathered",
+        "has_description_of_the_episode_or_episodes_been_gathered",  # deprecated as per #1015
         "epilepsy_or_nonepilepsy_status",
     ],
 )
