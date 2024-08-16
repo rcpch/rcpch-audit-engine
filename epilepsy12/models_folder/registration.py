@@ -34,7 +34,7 @@ class Registration(
     first_paediatric_assessment_date = models.DateField(
         help_text={
             "label": "First paediatric assessment",
-            "reference": "Setting this date is an irreversible step. Confirmation will be requested to complete this step.",
+            "reference": "'First paediatric assessment' is when the patient was initally seen by a paedaitric professional for parozysmal episodes in any healthcare setting. Setting this date is an irreversible step. Confirmation will be requested to complete this step.",
         },
         null=True,
         default=None,
