@@ -65,7 +65,7 @@ class KPI(models.Model, HelpTextMixin):
     """
     paediatrician_with_expertise_in_epilepsies = models.IntegerField(
         help_text={
-            "label": "1. Paediatrician with expertise in epilepsies",
+            "label": "1. Paediatrician with expertise",
             "reference": "Percentage of children and young people with epilepsy, with input by a 'consultant paediatrician with expertise in epilepsies' within 2 weeks of initial referral",
         },
         default=None,
@@ -89,7 +89,7 @@ class KPI(models.Model, HelpTextMixin):
     """
     tertiary_input = models.IntegerField(
         help_text={
-            "label": "3. Tertiary input",
+            "label": "3a. Tertiary involvement",
             "reference": "Percentage of children and young people meeting defined criteria for paediatric neurology referral, with input of tertiary care and/or CESS referral within the first year of care.",
         },
         default=None,
@@ -318,7 +318,7 @@ class KPI(models.Model, HelpTextMixin):
     """
     school_individual_healthcare_plan = models.IntegerField(
         help_text={
-            "label": "10. School individualised health care plan",
+            "label": "10. School Individual Healthcare Plan",
             "reference": "Percentage of children and young people with epilepsy aged 4 years and above with evidence of a school individual healthcare plan by 1 year after first paediatric assessment.",
         },
         default=None,
