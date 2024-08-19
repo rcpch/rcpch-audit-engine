@@ -11,6 +11,9 @@ az storage file download \
     --query 'size' \
     --path .env --dest envs/.env
 
+# Burn in build info (git hash, branch etc) into the image
+s/get-build-info > build_info.json
+
 docker compose build
 
 # Tests (against local Postgres)
