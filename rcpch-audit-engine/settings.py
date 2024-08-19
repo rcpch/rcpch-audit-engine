@@ -170,7 +170,7 @@ TEMPLATES = [
                 "django.contrib.auth.context_processors.auth",
                 "django.contrib.messages.context_processors.messages",
                 "django_auto_logout.context_processors.auto_logout_client",  # auto logout
-                "rcpch-audit-engine.git_context_processor.get_active_branch_and_commit",
+                "rcpch-audit-engine.build_info.get_build_info",
             ]
         },
     },

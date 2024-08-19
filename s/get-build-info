@@ -1,0 +1,10 @@
+#!/bin/bash
+
+git_hash=$(git rev-parse HEAD)
+branch_name=$(git rev-parse --abbrev-ref HEAD)
+
+if [[ "${git_hash}" == 'HEAD' ]]; then
+    git_hash='unknown'
+fi
+
+echo "{\"latest_git_commit\":\"${git_hash}\",\"active_git_branch\":\"${branch_name}\"}"
