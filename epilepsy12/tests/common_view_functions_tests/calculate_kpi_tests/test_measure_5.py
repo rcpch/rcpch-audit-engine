@@ -161,7 +161,7 @@ def test_measure_5_mri_syndromes_pass_fail(
                 "Juvenile myoclonic epilepsy",
                 "Juvenile absence epilepsy",
                 "Childhood absence epilepsy",
-                "Generalised tonic clonic seizures only",
+                "Epilepsy with generalized tonic–clonic seizures alone",
             ]
         )
     )
@@ -191,7 +191,7 @@ def test_measure_5_mri_syndromes_pass_fail(
         (SYNDROMES[17][1]),  # Juvenile absence epilepsy
         (SYNDROMES[16][1]),  # Childhood absence epilepsy
         (SYNDROMES[3][1]),  # Self-limited epilepsy with centrotemporal spikes
-        (SYNDROMES[19][1]),  # Generalised tonic clonic seizures only
+        (SYNDROMES[19][1]),  # Epilepsy with generalized tonic–clonic seizures alone
     ],
 )
 @pytest.mark.django_db
@@ -201,7 +201,7 @@ def test_measure_5_mri_syndromes_ineligible(
     """
     *INELIGIBLE*
     1)      ONE OF:
-                JME or JAE or CAE or CECTS/Rolandic or Generalised tonic clonic seizures only
+                JME or JAE or CAE or CECTS/Rolandic or Epilepsy with generalized tonic–clonic seizures alone
     """
 
     FIRST_PAEDIATRIC_ASSESSMENT_DATE = date(2023, 1, 1)
