@@ -25,7 +25,6 @@ def score_kpi_5(registration_instance, age_at_first_paediatric_assessment) -> in
     multiaxial_diagnosis = registration_instance.multiaxialdiagnosis
     investigations = registration_instance.investigations
 
-    Episode = apps.get_model("epilepsy12", "Episode")
     Syndrome = apps.get_model("epilepsy12", "Syndrome")
 
     # define eligibility criteria 1
@@ -35,29 +34,18 @@ def score_kpi_5(registration_instance, age_at_first_paediatric_assessment) -> in
         # ELECTROCLINICAL SYNDROMES: BECTS/JME/JAE/CAE currently not included
         Q(
             syndrome__syndrome_name__in=[
-                "Self-limited epilepsy with centrotemporal spikes",
-                "Juvenile myoclonic epilepsy",
-                "Juvenile absence epilepsy",
-                "Childhood absence epilepsy",
+                "Self-limited epilepsy with centrotemporal spikes",  # 3
+                "Juvenile myoclonic epilepsy",  # 18
+                "Juvenile absence epilepsy",  # 17
+                "Childhood absence epilepsy",  # 16
+                "Epilepsy with generalized tonic–clonic seizures alone",  # 19
             ]
         )
     ).exists()
 
-    # define eligibility criteria 2
-    generalised_epilepsy_only_present = (
-        Episode.objects.filter(
-            multiaxial_diagnosis=multiaxial_diagnosis,
-            epilepsy_or_nonepilepsy_status=EPILEPSY_DIAGNOSIS_STATUS[0][0],
-            epileptic_seizure_onset_type=EPILEPSY_SEIZURE_TYPE[0][0],
-        ).count()
-        > 0  # epilepsy which is generalised onset
-        and multiaxial_diagnosis.syndrome_present is False
-    )
-
     # check eligibility criteria 1 & 2
     # 1 = none of the specified syndromes present
-    # 2 = epilepsy is not simple generalised
-    if not (ineligible_syndrome_present or generalised_epilepsy_only_present):
+    if not (ineligible_syndrome_present):
         # not scored
         mri_dates_are_none = [
             (investigations.mri_brain_requested_date is None),
