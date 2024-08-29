@@ -6,6 +6,9 @@ from django.contrib.gis.db.models import (
     FloatField,
     BooleanField,
 )
+from django.contrib.gis.geos import Point
+from django.db.models.signals import pre_save
+from django.dispatch import receiver
 
 # 3rd party
 from simple_history.models import HistoricalRecords
@@ -107,3 +110,25 @@ class Organisation(TimeStampAbstractBaseClass):
 
     def __str__(self) -> str:
         return self.name
+
+    def save(self, *args, **kwargs):
+        if self.latitude and self.longitude and not self.geocode_coordinates:
+            self.geocode_coordinates = Point(
+                x=self.longitude, y=self.latitude, srid=4326
+            )
+        super(Organisation, self).save(*args, **kwargs)
+
+
+# This ensures that the geocode coordinates are set before saving, even if update is called
+@receiver(pre_save, sender=Organisation)
+def set_geocode_coordinates(sender, instance, **kwargs):
+    from django.contrib.gis.geos import Point
+
+    if instance.latitude and instance.longitude and not instance.geocode_coordinates:
+        instance.geocode_coordinates = Point(
+            x=instance.longitude, y=instance.latitude, srid=4326
+        )
+
+
+# Ensure the signal is connected
+pre_save.connect(set_geocode_coordinates, sender=Organisation)

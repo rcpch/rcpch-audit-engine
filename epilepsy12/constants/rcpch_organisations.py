@@ -8427,6 +8427,31 @@ RCPCH_ORGANISATIONS = [
         "Fax": "",
         "LocalAuthority": "E08000028",
     },  # 01/04/2023 QHL NHS BIRMINGHAM AND SOLIHULL INTEGRATED CARE BOARD, MIDLANDS, Birmingham Regional Paediatric Neurology Forum
+    {
+        "OrganisationID": "",
+        "OrganisationCode": "RTX02",
+        "OrganisationType": "",
+        "SubType": "",
+        "Sector": "",
+        "OrganisationStatus": "",
+        "IsPimsManaged": "",
+        "OrganisationName": "ROYAL LANCASTER INFIRMARY",
+        "Address1": "ASHTON ROAD",
+        "Address2": "",
+        "Address3": "",
+        "City": "LANCASTER",
+        "County": "LANCASHIRE",
+        "Postcode": "LA1 4RP",
+        "Latitude": "54.04260571850475",
+        "Longitude": "-2.8000539872490346",
+        "ParentODSCode": "RTX",
+        "ParentName": "UNIVERSITY HOSPITALS OF MORECAMBE BAY NHS FOUNDATION TRUST",
+        "Phone": "",
+        "Email": "",
+        "Website": "",
+        "Fax": "",
+        "LocalAuthority": "E07000121",
+    },  #01/04/1998 QE1 NHS LANCASHIRE AND SOUTH CUMBRIA INTEGRATED CARE BOARD, Y62 NORTH WEST COMMISSIONING REGION, North West Children and Young People's Epilepsy Interest Group' (NWIG)
 ]
 
 """
