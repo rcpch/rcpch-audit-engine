@@ -1,21 +1,20 @@
 """
 Measure 5 `mri`
 
-Number of children and young people diagnosed with epilepsy at first year AND who are NOT JME or JAE or CAE or CECTS/Rolandic OR number of children aged under 2 years at first assessment with a diagnosis of epilepsy at first year AND who had an MRI within 6 weeks of request
+Number of children and young people diagnosed with epilepsy at first year AND who are NOT JME or JAE or CAE or CECTS/Rolandic or Epilepsy with generalized tonic–clonic seizures alone at first assessment with a diagnosis of epilepsy at first year AND who had an MRI within 6 weeks of request
 
 =
 
 COUNT(kids)
 AND
-    NOT (JME or JAE or CAE or CECTS/Rolandic) 
-    OR 
-    age@FPA <2y 
+    NOT (JME or JAE or CAE or CECTS/Rolandic or Epilepsy with generalized tonic–clonic seizures alone) 
+
 AND
     had MRI within 6 weeks of request
 
-- [ x] Measure 5 passed (registration.kpi.mri == 1) if MRI done in 6 weeks and are NOT JME or JAE or CAE or CECTS/Rolandic or under 2 y (lines 270-324)
-- [ x] Measure 5 failed (registration.kpi.mri == 0) if MRI not done in 6 weeks and are NOT JME or JAE or CAE or CECTS/Rolandic or under 2 y (lines 270-324)
-- [ x] Measure 5 ineligible (registration.kpi.mri == 0) if JME or JAE or CAE or CECTS/Rolandic
+- [ x] Measure 5 passed (registration.kpi.mri == 1) if MRI done in 6 weeks and are NOT JME or JAE or CAE or CECTS/Rolandic or Epilepsy with generalized tonic–clonic seizures alone (lines 270-324)
+- [ x] Measure 5 failed (registration.kpi.mri == 0) if MRI not done in 6 weeks and are NOT JME or JAE or CAE or CECTS/Rolandic or Epilepsy with generalized tonic–clonic seizures alone (lines 270-324)
+- [ x] Measure 5 ineligible (registration.kpi.mri == 0) if JME or JAE or CAE or CECTS/Rolandic or Epilepsy with generalized tonic–clonic seizures alone
 """
 
 # Standard imports
@@ -69,9 +68,9 @@ def test_measure_5_mri_under2yo(
 ):
     """
     *PASS*
-    1) MRI done in 6 weeks post-referral and are under 2y@FPA
+    1) MRI done in 6 weeks post-referral
     *FAIL*
-    1) MRI NOT done in 6 weeks post-referral and are under 2y@FPA
+    1) MRI NOT done in 6 weeks post-referral
     """
     MRI_REQUESTED_DATE = FIRST_PAEDIATRIC_ASSESSMENT_DATE + relativedelta(days=1)
 
@@ -162,6 +161,7 @@ def test_measure_5_mri_syndromes_pass_fail(
                 "Juvenile myoclonic epilepsy",
                 "Juvenile absence epilepsy",
                 "Childhood absence epilepsy",
+                "Epilepsy with generalized tonic–clonic seizures alone",
             ]
         )
     )
@@ -191,6 +191,7 @@ def test_measure_5_mri_syndromes_pass_fail(
         (SYNDROMES[17][1]),  # Juvenile absence epilepsy
         (SYNDROMES[16][1]),  # Childhood absence epilepsy
         (SYNDROMES[3][1]),  # Self-limited epilepsy with centrotemporal spikes
+        (SYNDROMES[19][1]),  # Epilepsy with generalized tonic–clonic seizures alone
     ],
 )
 @pytest.mark.django_db
@@ -200,9 +201,7 @@ def test_measure_5_mri_syndromes_ineligible(
     """
     *INELIGIBLE*
     1)      ONE OF:
-                JME or JAE or CAE or CECTS/Rolandic
-        AND
-        age_at_first_paediatric_assessment >= 2 (testing using age at fpa = 2y exactly)
+                JME or JAE or CAE or CECTS/Rolandic or Epilepsy with generalized tonic–clonic seizures alone
     """
 
     FIRST_PAEDIATRIC_ASSESSMENT_DATE = date(2023, 1, 1)
