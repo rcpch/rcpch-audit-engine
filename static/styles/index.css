@@ -106,6 +106,14 @@ Styling relating to the index page
   .rcpch_index_card_select:hover > a {
     color: var(--rcpch_light_blue);
   }
+
+  a.e12landingpage_link {
+    color: var(--rcpch_light_blue);
+  }
+  a.e12landingpage_link:hover {
+    color: var(--rcpch_pink);
+    font-weight: bolder;
+  }
   
   .icon_container {
     display: flex !important;

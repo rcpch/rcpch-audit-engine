@@ -100,8 +100,9 @@ def test_count_episode_fields_epileptic_focal_onset(e12_case_factory, GOSH):
     return_value = count_episode_fields(episode_queryset)
 
     assert (
-        return_value == 8
-    ), f"Single completely filled Focal Onset Episode ({episode_queryset=}) inserted into count_episode_fields() fn. Should return 8. Instead, returned {return_value}"
+        return_value
+        == 7  # reduced from 8 as the episode description is nolonger a mandatory field: see issue #1015
+    ), f"Single completely filled Focal Onset Episode ({episode_queryset=}) inserted into count_episode_fields() fn. Should return 7. Instead, returned {return_value}"
 
 
 @pytest.mark.django_db
@@ -123,8 +124,9 @@ def test_count_episode_fields_epileptic_generalised_onset(e12_case_factory, GOSH
     return_value = count_episode_fields(episode_queryset)
 
     assert (
-        return_value == 8
-    ), f"Single completely filled Generalised Onset Episode ({episode_queryset=}) inserted into count_episode_fields() fn. Should return 8. Instead, returned {return_value}"
+        return_value
+        == 7  # reduced from 8 as the episode description is nolonger a mandatory field: see issue #1015
+    ), f"Single completely filled Generalised Onset Episode ({episode_queryset=}) inserted into count_episode_fields() fn. Should return 7. Instead, returned {return_value}"
 
 
 @pytest.mark.django_db
@@ -146,8 +148,9 @@ def test_count_episode_fields_epileptic_unclassified_onset(e12_case_factory, GOS
     return_value = count_episode_fields(episode_queryset)
 
     assert (
-        return_value == 7
-    ), f"Single completely filled unclassified Onset Episode ({episode_queryset=}) inserted into count_episode_fields() fn. Should return 7. Instead, returned {return_value}"
+        return_value
+        == 6  # reduced from 7 as the episode description is nolonger a mandatory field: see issue #1015
+    ), f"Single completely filled unclassified Onset Episode ({episode_queryset=}) inserted into count_episode_fields() fn. Should return 6. Instead, returned {return_value}"
 
 
 @pytest.mark.django_db
@@ -169,8 +172,9 @@ def test_count_episode_fields_epileptic_unknown_onset(e12_case_factory, GOSH):
     return_value = count_episode_fields(episode_queryset)
 
     assert (
-        return_value == 7
-    ), f"Single completely filled unknown Onset Episode ({episode_queryset=}) inserted into count_episode_fields() fn. Should return 7. Instead, returned {return_value}"
+        return_value
+        == 6  # reduced from 7 as the episode description is nolonger a mandatory field: see issue #1015
+    ), f"Single completely filled unknown Onset Episode ({episode_queryset=}) inserted into count_episode_fields() fn. Should return 6. Instead, returned {return_value}"
 
 
 @pytest.mark.django_db
@@ -178,7 +182,7 @@ def test_count_episode_fields_nonepileptic(e12_case_factory, GOSH):
     """
     Tests count_episode_fields with single non epileptic Episode queryset returns correct expected output, with a completed episode.
     """
-    expected_value = 11  # 5 for incomplete epileptic episode, ++6 for non epileptic episode base value incomplete fields
+    expected_value = 10  # 4 for incomplete epileptic episode, ++6 for non epileptic episode base value incomplete fields - not incomplete epileptic episode now reduced to 4 as the episode description is nolonger a mandatory field: see issue #1015
 
     # Either BPP (++3 to expected score) OR Oth (++2 to expected score)
     seizure_type_answer = random.choice(
@@ -226,7 +230,7 @@ def test_count_episode_fields_uncertain(e12_case_factory, GOSH):
     """
     Tests count_episode_fields with single uncertain epileptic Episode queryset returns correct expected output, with a completed episode.
     """
-    expected_value = 11  # 5 for incomplete epileptic episode, ++6 for uncertain episode base value incomplete fields
+    expected_value = 10  # 4 for incomplete epileptic episode, ++6 for uncertain episode base value incomplete fields - incomplete epileptic episode now reduced to 4 as the episode description is nolonger a mandatory field: see issue #1015
 
     CASE = e12_case_factory(
         first_name=f"temp_child_{GOSH.name}",
@@ -268,8 +272,8 @@ def test_total_fields_expected_multiaxial_diagnosis_episode_fields(
 
     multiaxial_diagnosis = CASE.registration.multiaxialdiagnosis
 
-    # Multiaxial diagnosis fields minimum == 7 ++ focal onset episode fields == 8
-    expected_value = 15
+    # Multiaxial diagnosis fields minimum == 7 ++ focal onset episode fields == 7 :  focal onset fields reduced to 7 as the episode description is nolonger a mandatory field: see issue #1015
+    expected_value = 14
     return_value = total_fields_expected(multiaxial_diagnosis)
 
     assert (
@@ -299,7 +303,7 @@ def test_total_fields_expected_multiaxial_diagnosis_syndrome_fields(
     # Initial value because Multiaxial diagnosis fields minimum == 7 ++ no episodes == 5
     expected_value = 12
 
-    ADD_SYNDROMES = random.choice([ True])
+    ADD_SYNDROMES = random.choice([True])
     if ADD_SYNDROMES is not None:
         # Create 3 syndromes
         SYNDROMES_LIST = SyndromeList.objects.all()[:3]

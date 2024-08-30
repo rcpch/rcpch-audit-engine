@@ -40,7 +40,7 @@ Two dates are supplied if the child has been referred, but only the referral dat
 ### Epilepsy nurse specialist
 
 2 dates are supplied and both are mandatory to complete the form - date referred and date seen
-The date seen cannot be before the date referred and the earliest allowable date is the first paediatric assessment date.
+The date seen cannot be before the date referred and the earliest allowable date is the date of birth (see [issue 1007](https://github.com/rcpch/rcpch-audit-engine/issues/1007#issue-2392653824)).
 
 ### EEG
 
