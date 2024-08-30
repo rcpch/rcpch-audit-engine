@@ -459,7 +459,7 @@ def update_kpi_aggregation_model(
                     cohort=cohort,
                     open_access=open_access,
                 )
-                logger.info(f"updating/saving: {abstraction_relation_instance}")
+                logger.debug(f"updating/saving: {abstraction_relation_instance}")
             except Exception as error:
                 logger.exception(
                     f"CLOSED VIEW: Can't update/save KPIAggregations for {abstraction_level} for {abstraction_relation_instance}: {error}"
@@ -472,12 +472,12 @@ def update_kpi_aggregation_model(
                 logger.debug(f"updated {new_obj}")
             
     
-    logger.info(f"{len(list_of_updated_abstraction_level_instance)} scored {abstraction_level.name} instances updated with aggregated scores of a total {AbstractionKPIAggregationModel.objects.filter(cohort=cohort).count()} {abstraction_level.name}s")
+    logger.debug(f"{len(list_of_updated_abstraction_level_instance)} scored {abstraction_level.name} instances updated with aggregated scores of a total {AbstractionKPIAggregationModel.objects.filter(cohort=cohort).count()} {abstraction_level.name}s")
     
     not_updated = AbstractionKPIAggregationModel.objects.exclude(abstraction_relation__in=list_of_updated_abstraction_level_instance).filter(cohort=cohort)
 
     if not_updated.count() > 0:
-        logger.info(f"Not updated: {list(not_updated.values_list('abstraction_name'))})")
+        logger.debug(f"Not updated: {list(not_updated.values_list('abstraction_name'))})")
     
 
 def filter_completed_cases_at_one_year_by_abstraction_level(
