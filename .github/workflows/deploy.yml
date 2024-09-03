@@ -3,7 +3,7 @@ name: Deploy on push to test ACA branch
 on:
   push:
     branches:
-      - mbarton/azure-container-apps
+      - live
 
 permissions:
   id-token: write
