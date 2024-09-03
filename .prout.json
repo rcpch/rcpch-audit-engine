@@ -1,0 +1,6 @@
+{
+    "checkpoints": {
+      "STAGING": { "url": "https://e12-staging.rcpch.tech/", "overdue": "30M" },
+      "LIVE": { "url": "https://e12.rcpch.ac.uk/", "overdue": "30M" }
+    }
+  }
