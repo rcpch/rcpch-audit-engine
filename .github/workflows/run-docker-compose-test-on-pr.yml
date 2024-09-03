@@ -6,11 +6,6 @@ on:
     pull_request:
       branches:
         - "*"
-    push:
-      branches:
-        - development
-        - staging
-        - live
 
 jobs:
   build-and-run-pytest-suite-in-docker-compose:
