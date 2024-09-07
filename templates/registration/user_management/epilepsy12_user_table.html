@@ -147,7 +147,7 @@
             <td>{{ epilepsy12_user.get_role_display }}</td>
             <td>{{ epilepsy12_user.organisation_employer  }}</td>
             <td>
-                {% if not epilepsy12_user.email_confirmed and not epilepsy12_user.is_active %}
+                {% if not epilepsy12_user.email_confirmed and epilepsy12_user.is_active %}
                     <i 
                         class="rcpch_light_blue dot circle outline icon"
                         id="{{epilepsy12_user.id}}_not_email_confirmed_icon"
@@ -162,7 +162,7 @@
                         class="rcpch_pink check circle outline icon"
                         id="{{epilepsy12_user.id}}_email_confirmed_icon"
                         data-title="User status"
-                        data-content="{{epilepsy12_user}} is an active user."
+                        data-content="{{epilepsy12_user}} has confirmed their account and is an active user."
                         data-position="top left"
                         data-variation="basic"
                         _="init js $('#{{epilepsy12_user.id}}_email_confirmed_icon').popup(); end"
@@ -172,7 +172,17 @@
                         class="red close icon"
                         id="{{epilepsy12_user.id}}_is_inactive_icon"
                         data-title="User status"
-                        data-content="{{epilepsy12_user}} is an inactive user."
+                        data-content="{{epilepsy12_user}} has previously confirmed their account but is now an inactive user."
+                        data-position="top left"
+                        data-variation="basic"
+                        _="init js $('#{{epilepsy12_user.id}}_is_inactive_icon').popup(); end"
+                    >
+                {% elif not epilepsy12_user.email_confirmed and not epilepsy12_user.is_active %}
+                    <i 
+                        class="red close icon"
+                        id="{{epilepsy12_user.id}}_is_inactive_icon"
+                        data-title="User status"
+                        data-content="{{epilepsy12_user}} has never confirmed their account but is now an inactive user."
                         data-position="top left"
                         data-variation="basic"
                         _="init js $('#{{epilepsy12_user.id}}_is_inactive_icon').popup(); end"
