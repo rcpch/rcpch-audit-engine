@@ -14,6 +14,10 @@ az storage file download \
 # Burn in build info (git hash, branch etc) into the image
 s/get-build-info > build_info.json
 
+# Build the docs
+docker compose run mkdocs /bin/bash -c 'mkdocs build --config-file documentation/mkdocs.yml'
+
+# Build the app
 docker compose build
 
 # Tests (against local Postgres)
@@ -34,8 +38,8 @@ az containerapp revision copy \
     --query 'properties.provisioningState'
 
 # Deploy to production
-az containerapp revision copy \
-    --name ${AZURE_LIVE_APP_NAME} \
-    --resource-group ${AZURE_RESOURCE_GROUP} \
-    --image ${azure_tag} \
-    --query 'properties.provisioningState'
+# az containerapp revision copy \
+#     --name ${AZURE_LIVE_APP_NAME} \
+#     --resource-group ${AZURE_RESOURCE_GROUP} \
+#     --image ${azure_tag} \
+#     --query 'properties.provisioningState'
