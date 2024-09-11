@@ -178,8 +178,7 @@ redirect_patterns = [
 ]
 
 home_page_patterns = [
-    path("", index, name="index"),
-    path("docs/", view=documentation, name="docs"),
+    path("", index, name="index")
 ]
 
 case_patterns = [

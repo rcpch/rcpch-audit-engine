@@ -16,5 +16,5 @@ os.environ.setdefault('DJANGO_SETTINGS_MODULE', 'rcpch-audit-engine.settings')
 
 application = get_wsgi_application()
 
-application = WhiteNoise(application)
+application = WhiteNoise(application, index_file=True)
 application.add_files("/app/staticdocs", prefix="docs/")

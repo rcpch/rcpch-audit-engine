@@ -14,10 +14,13 @@ az storage file download \
 # Burn in build info (git hash, branch etc) into the image
 s/get-build-info > build_info.json
 
+# Build the app
+docker compose build
+
 # Build the docs
 docker compose run mkdocs /bin/bash -c 'mkdocs build --config-file documentation/mkdocs.yml'
 
-# Build the app
+# HOTFIX: Build again to embed the docs
 docker compose build
 
 # Tests (against local Postgres)
