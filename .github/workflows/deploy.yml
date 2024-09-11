@@ -4,7 +4,6 @@ on:
   push:
     branches:
       - live
-      - mbarton/fix-the-docs
 
 permissions:
   id-token: write
