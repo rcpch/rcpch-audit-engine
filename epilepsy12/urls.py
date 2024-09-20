@@ -1060,6 +1060,10 @@ antiepilepsy_medicine_patterns = [
     ),
 ]
 
+organisational_audit_patterns = [
+    path("trust/<int:id>/audit/", view=organisational_audit, name="organisational_audit"),
+    path("health_board/<int:id>/audit/", view=organisational_audit, name="organisational_audit"),
+]
 
 urlpatterns = []
 
@@ -1092,6 +1096,7 @@ urlpatterns += epilepsy_causes_patterns
 urlpatterns += comorbidities_patterns
 urlpatterns += registration_patterns
 urlpatterns += antiepilepsy_medicine_patterns
+urlpatterns += organisational_audit_patterns
 
 # This is related to the DRF
 # urlpatterns += drf_routes
