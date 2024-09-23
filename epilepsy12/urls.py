@@ -1062,7 +1062,7 @@ antiepilepsy_medicine_patterns = [
 
 organisational_audit_patterns = [
     path("trust/<int:id>/audit/", view=organisational_audit, name="organisational_audit_trust"),
-    path("health_board/<int:id>/audit/", view=organisational_audit, name="organisational_audit_health_board"),
+    path("local_health_board/<int:id>/audit/", view=organisational_audit, name="organisational_audit_local_health_board"),
 ]
 
 urlpatterns = []
