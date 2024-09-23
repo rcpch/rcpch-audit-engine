@@ -248,7 +248,9 @@ def test_users_and_case_list_views_permissions_success(
         trust__ods_code="RGT",
     )
 
-    users = Epilepsy12User.objects.all()
+    users = Epilepsy12User.objects.filter(
+        organisation_employer__ods_code="RP401"
+    )
 
     for test_user in users:
         # Log in Test User
@@ -363,7 +365,9 @@ def test_registration_view_permissions_success(client):
         first_name=f"child_{TEST_USER_ORGANISATION.name}"
     )
 
-    users = Epilepsy12User.objects.all()
+    users = Epilepsy12User.objects.filter(
+        organisation_employer__ods_code="RP401"
+    )
 
     for test_user in users:
         client.force_login(test_user)
@@ -470,7 +474,9 @@ def test_episode_syndrome_aem_view_permissions_success(client):
         first_name=f"child_{TEST_USER_ORGANISATION.name}"
     )
 
-    users = Epilepsy12User.objects.all()
+    users = Epilepsy12User.objects.filter(
+        organisation_employer__ods_code="RP401"
+    )
 
     # Create objs to search for
     episode = Episode.objects.create(
@@ -756,7 +762,9 @@ def test_comborbidity_view_permissions_success(client, URL):
         ).first(),
     )
 
-    users = Epilepsy12User.objects.all()
+    users = Epilepsy12User.objects.filter(
+        organisation_employer__ods_code="RP401"
+    )
 
     for test_user in users:
         client.force_login(test_user)
@@ -915,7 +923,9 @@ def test_multiple_views_permissions_success(client):
         first_name=f"child_{TEST_USER_ORGANISATION.name}"
     )
 
-    users = Epilepsy12User.objects.all()
+    users = Epilepsy12User.objects.filter(
+        organisation_employer__ods_code="RP401"
+    )
 
     for test_user in users:
         client.force_login(test_user)

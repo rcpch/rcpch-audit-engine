@@ -3,6 +3,7 @@ import logging
 
 from django.conf import settings
 from django.core.exceptions import PermissionDenied
+from django.http import Http404
 from django.contrib.auth.decorators import login_required
 from .models import (
     FirstPaediatricAssessment,
@@ -21,6 +22,8 @@ from .models import (
     Assessment,
     Epilepsy12User,
 )
+
+from .constants import AUDIT_CENTRE_LEAD_CLINICIAN
 
 # Logging setup
 logger = logging.getLogger(__name__)
@@ -194,6 +197,30 @@ def user_may_view_this_organisation():
         return wrapper
 
     return decorator
+
+
+def user_may_view_organisational_audit(parent_model, parent_type):
+    def decorator(view):
+        def wrapper(request, *args, **kwargs):
+            user = request.user
+        
+            requested_id = kwargs.get("id")
+            parent = getattr(user.organisation_employer, parent_type)
+
+            can_view_parent = parent and parent.id == requested_id
+            is_lead_clinican = user.role == AUDIT_CENTRE_LEAD_CLINICIAN
+
+            if user.is_rcpch_audit_team_member or (can_view_parent and is_lead_clinican):
+                if not parent_model.objects.filter(id=requested_id).exists():
+                    raise Http404
+
+                return view(request, *args, **kwargs)
+            
+            raise PermissionDenied()
+
+        return wrapper
+
+    return decorator 
 
 
 def user_may_view_this_child():
