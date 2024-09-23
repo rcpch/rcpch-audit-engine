@@ -52,7 +52,10 @@ def seed_users_fixture(django_db_setup, django_db_blocker):
 
                 # seed a user of each type
                 for user in users:
-                    first_name = user.role_str
+                    # HACK: a lot of tests assume there is only one organisation and so look up the user
+                    # user by name. To avoid changing all the tests, for GOSH only) set this as it was before
+                    # we added multiple organisations in test
+                    first_name = user.role_str if org == GOSH else f"{org.name}_{user.role_str}"
 
                     # set RCPCH AUDIT TEAM MEMBER ATTRIBUTE
                     if user.role == RCPCH_AUDIT_TEAM:
@@ -61,7 +64,7 @@ def seed_users_fixture(django_db_setup, django_db_blocker):
 
                     if user.is_clinical_audit_team:
                         is_rcpch_audit_team_member = True
-                        first_name = "CLINICAL_AUDIT_TEAM"
+                        first_name = "CLINICAL_AUDIT_TEAM" if org == GOSH else f"{org.name}_CLINICAL_AUDIT_TEAM"
 
                     E12UserFactory(
                         first_name=first_name,
