@@ -71,3 +71,5 @@ from .entities.nhs_england_region import NHSEnglandRegion
 from .entities.organisation import Organisation
 from .entities.trust import Trust
 from .entities.local_health_board import LocalHealthBoard
+
+from .organisational_audit import OrganisationalAuditSubmissionPeriod, OrganisationalAuditSubmission
