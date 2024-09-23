@@ -11,7 +11,7 @@ from epilepsy12.tests.view_tests.permissions_tests.perm_tests_utils import twofa
     "local_health_board"
 ])
 def test_anonymous_user_cannot_access_organisational_audit(client, group):
-    response = client.get(reverse(f"organisational_audit_{group}", kwargs={ "id": 1 }))
+    response = client.get(reverse(f"organisational_audit_{group}", kwargs={ f"id": 1 }))
 
     assert(response.status_code == 302)
     assert(response.headers["Location"] == "/account/login/")
@@ -134,3 +134,25 @@ def test_rcpch_audit_team_can_access_all_organisational_audits(client, seed_grou
 
     response = client.get(reverse("organisational_audit_local_health_board", kwargs={ "id": noahs_ark_local_health_board.id }))
     assert(response.status_code == 200)
+
+
+@pytest.mark.django_db
+def test_organisational_audit_for_trust_that_doesnt_exist(client, seed_groups_fixture, seed_users_fixture):
+    rcpch_user = Epilepsy12User.objects.filter(is_rcpch_audit_team_member=True).first()
+
+    client.force_login(rcpch_user)
+    twofactor_signin(client, rcpch_user)
+
+    response = client.get(reverse("organisational_audit_trust", kwargs={ "id": 0 }))
+    assert(response.status_code == 404)
+
+
+@pytest.mark.django_db
+def test_organisational_audit_for_local_health_board_that_doesnt_exist(client, seed_groups_fixture, seed_users_fixture):
+    rcpch_user = Epilepsy12User.objects.filter(is_rcpch_audit_team_member=True).first()
+
+    client.force_login(rcpch_user)
+    twofactor_signin(client, rcpch_user)
+
+    response = client.get(reverse("organisational_audit_local_health_board", kwargs={ "id": 0 }))
+    assert(response.status_code == 404)
