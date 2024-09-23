@@ -51,7 +51,7 @@ def test_download_button_access(
                 kwargs={"organisation_id": TEST_USER_ORGANISATION.id},
             )
         )
-        if test_user.first_name == test_user_rcpch_audit_team_data.role_str:
+        if test_user.first_name.endswith(test_user_rcpch_audit_team_data.role_str):
             
             print(response)
             assert (
