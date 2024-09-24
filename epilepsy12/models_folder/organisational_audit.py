@@ -16,7 +16,7 @@ TextField = lambda: models.CharField(null=True, blank=True)
 YesNoField = lambda: models.BooleanField(null=True, blank=True)
 YesNoUncertainField = lambda: models.PositiveIntegerField(choices=YES_NO_UNCERTAIN, null=True, blank=True)
 PositiveIntegerField = lambda: models.PositiveIntegerField(null=True, blank=True)
-ChoiceField = lambda choices: models.PositiveIntegerField(choices, null=True, blank=True)
+ChoiceField = lambda choices: models.PositiveIntegerField(choices=choices, null=True, blank=True)
 
 
 class OrganisationalAuditSubmissionPeriod(models.Model):
