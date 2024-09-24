@@ -12,6 +12,7 @@ class OrganisationalAuditSubmissionPeriod(models.Model):
     is_open = models.BooleanField(default=False)
 
 ReasonableDecimalField = lambda: models.DecimalField(null=True, max_digits=7, decimal_places=3)
+YesNoUncertainField = lambda: models.PositiveIntegerField(choices=YES_NO_UNCERTAIN, null=True)
 
 class OrganisationalAuditSubmission(models.Model):
     # These field names mostly match the CSV export format from the old system for convenience
@@ -62,27 +63,27 @@ class OrganisationalAuditSubmission(models.Model):
     S03PaedNeurologistsDirectReferrals = models.BooleanField(null=True) # 3.3
     S03SatellitePaediatricNeurologyClinics = models.BooleanField(null=True) # 3.4
 
-    S03CommenceKetogenicDiet = models.PositiveIntegerField(choices=YES_NO_UNCERTAIN, null=True) # 3.5i
-    S03ReviewKetogenicDiet = models.PositiveIntegerField(choices=YES_NO_UNCERTAIN, null=True) # 3.5ii
-    S03VNSInsertion = models.PositiveIntegerField(choices=YES_NO_UNCERTAIN, null=True) # 3.5iii
-    S03VNSReview = models.PositiveIntegerField(choices=YES_NO_UNCERTAIN, null=True) # 3.5iv
+    S03CommenceKetogenicDiet = YesNoUncertainField() # 3.5i
+    S03ReviewKetogenicDiet = YesNoUncertainField() # 3.5ii
+    S03VNSInsertion = YesNoUncertainField() # 3.5iii
+    S03VNSReview = YesNoUncertainField() # 3.5iv
 
     
     # 4. Investigations
 
-    S04LeadECG = models.PositiveIntegerField(choices=YES_NO_UNCERTAIN, null=True) # 4.1i
-    S04AwakeMRI = models.PositiveSmallIntegerField(choices=YES_NO_UNCERTAIN, null=True) # 4.1ii
-    S04MriWithSedation = models.PositiveSmallIntegerField(choices=YES_NO_UNCERTAIN, null=True) # 4.1iii
-    S04MriWithGeneralAnaesthetic = models.PositiveSmallIntegerField(choices=YES_NO_UNCERTAIN, null=True) # 4.1iv
-    S04StandardEeg = models.PositiveSmallIntegerField(choices=YES_NO_UNCERTAIN, null=True) # 4.1v
-    S04SleepDeprivedEeg = models.PositiveSmallIntegerField(choices=YES_NO_UNCERTAIN, null=True) # 4.1vi
-    S04MelatoninInducedEeg = models.PositiveSmallIntegerField(choices=YES_NO_UNCERTAIN, null=True) # 4.1vii
-    S04SedatedEeg = models.PositiveSmallIntegerField(choices=YES_NO_UNCERTAIN, null=True) # 4.1viii
-    S042448HAmbulatoryEeg = models.PositiveSmallIntegerField(choices=YES_NO_UNCERTAIN, null=True) # 4.1ix
-    S04InpatientVideoTelemetry = models.PositiveSmallIntegerField(choices=YES_NO_UNCERTAIN, null=True) # 4.1x
-    S04OutpatientVideoTelemetry = models.PositiveSmallIntegerField(choices=YES_NO_UNCERTAIN, null=True) # 4.1xi
-    S04HomeVideoTelemetry = models.PositiveSmallIntegerField(choices=YES_NO_UNCERTAIN, null=True) # 4.1xii
-    S04PortableEEGOnWardAreaWithinTrust = moels.PositiveSmallIntegerField(choices=YES_NO_UNCERTAIN, null=True) # 4.1xiii
+    S04LeadECG = YesNoUncertainField() # 4.1i
+    S04AwakeMRI = YesNoUncertainField() # 4.1ii
+    S04MriWithSedation = YesNoUncertainField() # 4.1iii
+    S04MriWithGeneralAnaesthetic = YesNoUncertainField() # 4.1iv
+    S04StandardEeg = YesNoUncertainField() # 4.1v
+    S04SleepDeprivedEeg = YesNoUncertainField() # 4.1vi
+    S04MelatoninInducedEeg = YesNoUncertainField() # 4.1vii
+    S04SedatedEeg = YesNoUncertainField() # 4.1viii
+    S042448HAmbulatoryEeg = YesNoUncertainField() # 4.1ix
+    S04InpatientVideoTelemetry = YesNoUncertainField() # 4.1x
+    S04OutpatientVideoTelemetry = YesNoUncertainField() # 4.1xi
+    S04HomeVideoTelemetry = YesNoUncertainField() # 4.1xii
+    S04PortableEEGOnWardAreaWithinTrust = YesNoUncertainField() # 4.1xiii
     # TODO MRB: do we need an entry for requesting and consenting of Whole Genome Sequencing?
 
 
