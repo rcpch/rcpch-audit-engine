@@ -29,7 +29,8 @@ def _organisational_audit(request, group_id, group_model, group_field):
     if request.method == "POST":
         if not submission:
             submission_args = {
-                'submission_period': submission_period
+                "submission_period": submission_period,
+                "created_by": request.user
             }
             submission_args[group_field] = group
 

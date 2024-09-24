@@ -2,8 +2,13 @@ from django.core.validators import MaxValueValidator
 from django.contrib.gis.db import models
 from django.contrib.postgres.fields import ArrayField
 
+from simple_history.models import HistoricalRecords
+
 from .entities.trust import Trust
 from .entities.local_health_board import LocalHealthBoard
+
+from .help_text_mixin import HelpTextMixin
+from .time_and_user_abstract_base_classes import TimeStampAbstractBaseClass, UserStampAbstractBaseClass
 
 YES_NO_UNCERTAIN = {
     1: 'Yes',
@@ -27,13 +32,23 @@ class OrganisationalAuditSubmissionPeriod(models.Model):
         return f"Organisational Audit Submission Period {self.year}"
 
 
-class OrganisationalAuditSubmission(models.Model):
+class OrganisationalAuditSubmission(TimeStampAbstractBaseClass, UserStampAbstractBaseClass, HelpTextMixin):
     submission_period = models.ForeignKey(OrganisationalAuditSubmissionPeriod, on_delete=models.CASCADE)
 
     # Either
     trust = models.ForeignKey(Trust, null=True, on_delete=models.SET_NULL)
     # or
     local_health_board = models.ForeignKey(LocalHealthBoard, null=True, on_delete=models.SET_NULL)
+
+    history = HistoricalRecords()
+
+    @property
+    def _history_user(self):
+        return self.updated_by
+
+    @_history_user.setter
+    def _history_user(self, value):
+        self.updated_by = value
 
     # These field names mostly match the CSV export format from the old system for convenience
 
