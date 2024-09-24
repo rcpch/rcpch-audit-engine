@@ -8,7 +8,18 @@ from ..decorator import (
     user_may_view_organisational_audit
 )
 
-def _organisational_audit(request, group, group_field, submission_period, submission):
+def _organisational_audit(request, group_id, group_model, group_field):
+    submission_period = OrganisationalAuditSubmissionPeriod.objects.filter(is_open=True).order_by('-year').first()
+
+    group = group_model.objects.get(id=group_id)
+
+    submission_filter = {
+        "submission_period": submission_period
+    }
+
+    submission_filter[group_field] = group
+    submission = OrganisationalAuditSubmission.objects.filter(**submission_filter).first()
+
     context = {
         "group_name": group.name,
         "submission_period": submission_period,
@@ -34,21 +45,9 @@ def _organisational_audit(request, group, group_field, submission_period, submis
 @login_and_otp_required()
 @user_may_view_organisational_audit(Trust, "trust")
 def organisational_audit_trust(request, id):
-    submission_period = OrganisationalAuditSubmissionPeriod.objects.filter(is_open=True).order_by('-year').first()
-
-    trust = Trust.objects.get(id=id)
-
-    submission = OrganisationalAuditSubmission.objects.filter(submission_period=submission_period, trust=trust).first()
-
-    return _organisational_audit(request, trust, 'trust', submission_period, submission)
+    return _organisational_audit(request, id, Trust, 'trust')
 
 @login_and_otp_required()
 @user_may_view_organisational_audit(LocalHealthBoard, "local_health_board")
 def organisational_audit_local_health_board(request, id):
-    submission_period = OrganisationalAuditSubmissionPeriod.objects.filter(is_open=True).order_by('-year').first()
-    
-    local_health_board = LocalHealthBoard.objects.get(id=id)
-
-    submission = OrganisationalAuditSubmission.objects.filter(submission_period=submission_period, local_health_board=local_health_board).first()
-
-    return _organisational_audit(request, local_health_board, 'local_health_board', submission_period, submission)
+    return _organisational_audit(request, id, LocalHealthBoard, 'local_health_board')
