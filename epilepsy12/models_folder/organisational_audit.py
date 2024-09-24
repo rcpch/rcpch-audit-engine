@@ -11,10 +11,12 @@ YES_NO_UNCERTAIN = {
     3: 'Uncertain'
 }
 
-DecimalField = lambda: models.DecimalField(null=True, max_digits=7, decimal_places=3)
-TextField = lambda: models.CharField(null=True)
-YesNoField = lambda: models.BooleanField(null=True)
-YesNoUncertainField = lambda: models.PositiveIntegerField(choices=YES_NO_UNCERTAIN, null=True)
+DecimalField = lambda: models.DecimalField(null=True, blank=True, max_digits=7, decimal_places=3)
+TextField = lambda: models.CharField(null=True, blank=True)
+YesNoField = lambda: models.BooleanField(null=True, blank=True)
+YesNoUncertainField = lambda: models.PositiveIntegerField(choices=YES_NO_UNCERTAIN, null=True, blank=True)
+PositiveIntegerField = lambda: models.PositiveIntegerField(null=True, blank=True)
+ChoiceField = lambda choices: models.PositiveIntegerField(choices, null=True, blank=True)
 
 class OrganisationalAuditSubmission(models.Model):
     # Either
@@ -36,7 +38,7 @@ class OrganisationalAuditSubmission(models.Model):
 
     S01WTEEpilepsySpecialistNurses = DecimalField() # 1.4
     # TODO MRB: do they want this split out into separate columns as per the template CSV
-    S01ESNFunctions = ArrayField(models.PositiveIntegerField(null=True, choices={
+    S01ESNFunctions = ArrayField(models.PositiveIntegerField(choices={
         1: 'ED visits',
         2: 'Home visits',
         3: 'School Individual Healthcare Plan (IHP) facilitation',
@@ -47,10 +49,10 @@ class OrganisationalAuditSubmission(models.Model):
         8: 'School meetings',
         9: 'Ward visits',
         10: 'None of the above'
-    })) #1.4i
+    }), null=True, blank=True) #1.4i
 
     # New! https://github.com/rcpch/rcpch-audit-engine/issues/876#issuecomment-2312271287
-    S01JobPlannedHoursPerWeekLeadershipQIActivities = models.PositiveIntegerField(null=True)
+    S01JobPlannedHoursPerWeekLeadershipQIActivities = PositiveIntegerField()
 
 
     # 2. Epilepsy Clinic configuration
@@ -58,7 +60,7 @@ class OrganisationalAuditSubmission(models.Model):
     S02DefinedEpilepsyClinics = YesNoField() # 2.1
     S02EpilepsyClinicsPerWeek = DecimalField() # 2.1i
     S02Consultant20Mins = YesNoField() # 2.1ii
-    S02TFC223 = models.PositiveIntegerField(choices={
+    S02TFC223 = ChoiceField({
         1: 'Not applicable',
         2: 'Yes',
         3: 'No, not at all',
@@ -104,14 +106,14 @@ class OrganisationalAuditSubmission(models.Model):
     S05AdviceAvailableAllOutOfHours = YesNoField() # 5.1.2
     S05AdviceAvailable52WeeksPerYear = YesNoField() # 5.1.3
 
-    S05TypicalTimeToAchieveSpecialistAdvice = models.PositiveIntegerField(null=True, choices={
+    S05TypicalTimeToAchieveSpecialistAdvice = ChoiceField({
         1: 'Same working day',
         2: 'By next working day',
         3: 'Within 3-4 working days',
         4: 'Within a working week'
     }) # 5.2
 
-    S05WhoProvidesSpecialistAdvice = models.PositiveIntegerField(null=True, choices={
+    S05WhoProvidesSpecialistAdvice = ChoiceField({
         1: 'ESN',
         2: 'Consultant Paediatrician with expertise in epilepsy',
         3: 'Paediatric neurologist',
@@ -127,21 +129,21 @@ class OrganisationalAuditSubmission(models.Model):
     S06AgreeedReferralPathwaysAdultServices = YesNoField() # 6.1
 
     S06OutpatientClinicYoungPeopleEpilepsies = YesNoField() # 6.2
-    S06WhatAgeDoesThisClinicAcceptYoungPeople = models.PositiveIntegerField(null=True) # 6.2i
+    S06WhatAgeDoesThisClinicAcceptYoungPeople = PositiveIntegerField() # 6.2i
 
     S06ServiceForEpilepsyBopthAdultAndPaed = YesNoField() # 6.3
-    S06IsThisUsually = models.PositiveIntegerField(null=True, choices={
+    S06IsThisUsually = ChoiceField({
         1: 'A single joint appointment',
         2: 'A series of several joint appointments',
         3: 'A flexible appraoch including mixture of joint or individual reviews',
         4: 'Other'
     }) # 6.3i
     S06IsThisUsuallyOther = TextField() # 6.3i
-    S06PercentageOfYoungPeopleTransferred = models.PositiveIntegerField(null=True, validators=[
+    S06PercentageOfYoungPeopleTransferred = models.PositiveIntegerField(null=True, blank=True, validators=[
         MaxValueValidator(100)
     ]) # 6.3ii
 
-    S06ProfessionalsRoutinelyInvolvedInTransitionAdultESN = models.PositiveIntegerField(null=True, choices={
+    S06ProfessionalsRoutinelyInvolvedInTransitionAdultESN = ChoiceField({
         1: 'Adult ESN',
         2: 'Adult Learning difficulty ESN',
         3: 'Adult Neurologist',
@@ -157,7 +159,7 @@ class OrganisationalAuditSubmission(models.Model):
 
     # TODO MRB: in the CSV it references ADHD, ASD, Mental Health and None but in the docs it's Yes/No
     S07ScreenForIssuesMentalHealth = YesNoField() # 7.1
-    S07MentalHealthQuestionnaire = models.PositiveIntegerField(null=True, choices={
+    S07MentalHealthQuestionnaire = ChoiceField({
         1: 'BDI - Beck Depression Inventory',
         2: "Connor's Questionnaire",
         3: 'Emotional Thermometers Tool',
@@ -173,7 +175,7 @@ class OrganisationalAuditSubmission(models.Model):
     }) # 7.1i
     S07MentalHealthQuestionnaireOther = TextField() # 7.1i
 
-    S07MentalHealthAgreedPathway = models.PositiveIntegerField(null=True, choices={
+    S07MentalHealthAgreedPathway =ChoiceField({
         1: 'Anxiety',
         2: 'Depression',
         3: 'Mood Disorders',
@@ -183,7 +185,7 @@ class OrganisationalAuditSubmission(models.Model):
     S07MentalHealthAgreedPathwayOther = TextField() # 7.2
 
     S07MentalHealthProvisionEpilepsyClinics = YesNoField() # 7.3
-    S07DoesThisCompromise = models.PositiveIntegerField(null=True, choices={
+    S07DoesThisCompromise = ChoiceField({
         1: 'Epilepsy Clinics where mental health professionals can provide direct co-located clinical care',
         2: 'MDT meetings where epilepsy and mental health professionals discuss individual patients',
         3: 'Other'
@@ -191,7 +193,7 @@ class OrganisationalAuditSubmission(models.Model):
     S07DoesThisCompromiseOther = TextField() # 7.3.1
     S07CurrentTrustActionPlanCoLocatedMentalHealth = YesNoField() # 7.3.2
 
-    S07TrustAchieve = models.PositiveIntegerField(null=True, choices={
+    S07TrustAchieve = ChoiceField({
         1: 'Clinical psychology assessment',
         2: 'Educational psychology assessment',
         3: 'Formal developmental assessment',
@@ -205,7 +207,7 @@ class OrganisationalAuditSubmission(models.Model):
 
     # TODO MRB: this is not in the CSV?
     S08ScreenForNeurodevelopmentalConditions = YesNoField() # 8.1
-    S08AgreedReferralCriteriaChildrenNeurodevelopmental = models.PositiveIntegerField(null=True, choices={
+    S08AgreedReferralCriteriaChildrenNeurodevelopmental = ChoiceField({
         1: 'ADHD',
         2: 'ASD',
         3: 'Behavioural difficulties',
@@ -225,7 +227,7 @@ class OrganisationalAuditSubmission(models.Model):
 
     # 10. Patient Database/Register
 
-    S10TrustMaintainADatabaseOfChildrenWithEpilepsy = models.PositiveIntegerField(null=True, choices={
+    S10TrustMaintainADatabaseOfChildrenWithEpilepsy = ChoiceField({
         1: 'Yes, for all children',
         2: 'Yes, for some children',
         3: 'No'
