@@ -18,7 +18,18 @@ YesNoUncertainField = lambda: models.PositiveIntegerField(choices=YES_NO_UNCERTA
 PositiveIntegerField = lambda: models.PositiveIntegerField(null=True, blank=True)
 ChoiceField = lambda choices: models.PositiveIntegerField(choices, null=True, blank=True)
 
+
+class OrganisationalAuditSubmissionPeriod(models.Model):
+    year = models.PositiveIntegerField()
+    is_open = models.BooleanField(default=False)
+
+    def __str__(self):
+        return f"Organisational Audit Submission Period {self.year}"
+
+
 class OrganisationalAuditSubmission(models.Model):
+    submission_period = models.ForeignKey(OrganisationalAuditSubmissionPeriod, on_delete=models.CASCADE)
+
     # Either
     trust = models.ForeignKey(Trust, null=True, on_delete=models.SET_NULL)
     # or
@@ -232,13 +243,3 @@ class OrganisationalAuditSubmission(models.Model):
         2: 'Yes, for some children',
         3: 'No'
     }) # 10.1
-
-
-class OrganisationalAuditSubmissionPeriod(models.Model):
-    year = models.PositiveIntegerField()
-    is_open = models.BooleanField(default=False)
-
-    submissions = models.ForeignKey(OrganisationalAuditSubmission, null=True, blank=True, on_delete=models.CASCADE)
-
-    def __str__(self):
-        return f"Organisational Audit Submission Period {self.year}"
