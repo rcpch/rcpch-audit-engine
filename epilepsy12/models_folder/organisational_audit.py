@@ -236,4 +236,7 @@ class OrganisationalAuditSubmissionPeriod(models.Model):
     year = models.PositiveIntegerField()
     is_open = models.BooleanField(default=False)
 
-    submissions = models.ForeignKey(OrganisationalAuditSubmission, on_delete=models.CASCADE)
+    submissions = models.ForeignKey(OrganisationalAuditSubmission, null=True, blank=True, on_delete=models.CASCADE)
+
+    def __str__(self):
+        return f"Organisational Audit Submission Period {self.year}"
