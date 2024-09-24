@@ -2,22 +2,26 @@ from django.core.validators import MaxValueValidator
 from django.contrib.gis.db import models
 from django.contrib.postgres.fields import ArrayField
 
+from .entities.trust import Trust
+from .entities.local_health_board import LocalHealthBoard
+
 YES_NO_UNCERTAIN = {
     1: 'Yes',
     2: 'No',
     3: 'Uncertain'
 }
 
-class OrganisationalAuditSubmissionPeriod(models.Model):
-    year = models.PositiveIntegerField()
-    is_open = models.BooleanField(default=False)
-
 DecimalField = lambda: models.DecimalField(null=True, max_digits=7, decimal_places=3)
 TextField = lambda: models.CharField(null=True)
-YesNoField = lambda: models.BooleanField(null = True)
+YesNoField = lambda: models.BooleanField(null=True)
 YesNoUncertainField = lambda: models.PositiveIntegerField(choices=YES_NO_UNCERTAIN, null=True)
 
 class OrganisationalAuditSubmission(models.Model):
+    # Either
+    trust = models.ForeignKey(Trust, null=True, on_delete=models.SET_NULL)
+    # or
+    local_health_board = models.ForeignKey(LocalHealthBoard, null=True, on_delete=models.SET_NULL)
+
     # These field names mostly match the CSV export format from the old system for convenience
 
     # 1. Workforce
@@ -228,3 +232,8 @@ class OrganisationalAuditSubmission(models.Model):
     }) # 10.1
 
 
+class OrganisationalAuditSubmissionPeriod(models.Model):
+    year = models.PositiveIntegerField()
+    is_open = models.BooleanField(default=False)
+
+    submissions = models.ForeignKey(OrganisationalAuditSubmission, on_delete=models.CASCADE)
