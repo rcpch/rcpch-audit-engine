@@ -9,6 +9,7 @@
 
 .org-audit-child-fields {
     padding-left: 2em;
+    padding-top: .5em;
     font-size: 0.85em;
 }
 
@@ -27,4 +28,8 @@
 .org-audit-cell {
     padding: .5em;
     flex: 50%;
+}
+
+.org-audit-reference {
+    background-color: var(--rcpch_lightest_grey);
 }

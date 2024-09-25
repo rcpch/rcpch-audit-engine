@@ -167,16 +167,45 @@ class OrganisationalAuditSubmission(TimeStampAbstractBaseClass, UserStampAbstrac
     }, help_text={
         "question_number": "2.2",
         # TODO MRB: hide this question for Wales
-        "label": "Does the Trust currently run TFC 223 Epilepsy Best Practice Criteria (BPC) clinics? *For Trusts in England only"
+        "label": "Does the Trust currently run TFC 223 Epilepsy Best Practice Criteria (BPC) clinics?",
+        "reference": "For Trusts in England only"
     })
 
 
     # 3. Tertiary provision
 
-    S03WTEPaediatricNeurologists = DecimalField() # 3.1
-    S03PathwaysTertiaryPaedNeurology = YesNoField() # 3.2
-    S03PaedNeurologistsDirectReferrals = YesNoField() # 3.3
-    S03SatellitePaediatricNeurologyClinics = YesNoField() # 3.4
+    S03WTEPaediatricNeurologists = DecimalField(help_text={
+        "question_number": "3.1",
+        "label": "How many whole-time equivalent (WTE) paediatric neurologists who manage children with epilepsy do you employ?",
+        "reference": """
+            <p>
+                Acutely and or non-acutely.
+            </p>
+            <p>
+                This should not include visiting neurologists who are primarily employed by another trust 
+            </p>
+        """
+    })
+    S03PathwaysTertiaryPaedNeurology = YesNoField(help_text={
+        "question_number": "3.2",
+        "label": "Does you have agreed referral pathways to tertiary paediatric neurology services?"
+    })
+    S03PaedNeurologistsDirectReferrals = YesNoField(help_text={
+        "question_number": "3.3",
+        "label": "Can paediatric neurologists receive direct referrals from general practice or emergency services to assess children with possible epilepsy?"
+    })
+    S03SatellitePaediatricNeurologyClinics = YesNoField(help_text={
+        "question_number": "3.4",
+        "label": "Does the trust host satellite paediatric neurology clinics?",
+        "reference": """
+            <p>
+                e.g. a paediatric neurologist visits a site within the trust to undertake paediatric neurology clinics
+            </p>
+            <p>
+                A satellite clinic is where a neurologist supports a clinic outside their base hospital. This might be another hospital or clinic location in their trust or another hospital or clinic location in another trust. 
+            </p>
+        """
+    })
 
     S03CommenceKetogenicDiet = YesNoUncertainField() # 3.5i
     S03ReviewKetogenicDiet = YesNoUncertainField() # 3.5ii

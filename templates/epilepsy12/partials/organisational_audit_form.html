@@ -18,9 +18,14 @@
                         {{parent}}
                     </div>
                 </div>
-                <dfn class="org-audit-cell">
-                    {{parent.help_text.reference | safe}}
-                </dfn>
+                {% if parent.help_text.reference %}
+                    <dfn class="org-audit-cell org-audit-reference">
+                        {{parent.help_text.reference | safe}}
+                    </dfn>
+                {% else %}
+                    <div class="org-audit-cell">
+                    </div>
+                {% endif %}
             </div>
             <div class="org-audit-child-fields">
                 {% for child_with_config in parent_with_config.children %}
