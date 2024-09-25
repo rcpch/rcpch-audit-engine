@@ -1,23 +1,46 @@
 {% load epilepsy12_template_tags %}
 
 {% csrf_token %}
-{% for field in form %}
-    {% if field.hidden %}
-        {{field.as_hidden}}
-    {% else %}
+{% for key, parent_with_config in fields_by_question_number.items %}
+    {% with parent=parent_with_config.field %}
         <div class="field org-audit-field">
-            <div class="org-audit-cell">
-                <label>
-                    <em>{{field.help_text.question_number}}</em>
-                    {{field.help_text.label}}
-                </label>
-                <div class="field">
-                    {{field}}
+            <div class="org-audit-parent-field">
+                <div class="org-audit-cell">
+                    <label>
+                        <em>{{parent.help_text.question_number}}</em>
+                        {% if parent.help_text %}
+                            {{parent.help_text.label | default_if_none:parent.name}}
+                        {% else %}
+                            {{parent.name}}
+                        {% endif %}
+                    </label>
+                    <div class="field">
+                        {{parent}}
+                    </div>
                 </div>
+                <dfn class="org-audit-cell">
+                    {{parent.help_text.reference | safe}}
+                </dfn>
             </div>
-            <dfn class="org-audit-cell">
-                {{field.help_text.reference | safe}}
-            </dfn>
+            <div class="org-audit-child-fields">
+                {% for child_with_config in parent_with_config.children %}
+                    {% if child_with_config.hidden %}
+                        {{child.field.as_hidden}}
+                    {% else %}
+                        {% with child=child_with_config.field %}
+                            <div class="field">
+                                <label>
+                                    <em>{{child.help_text.question_number}}</em>
+                                    {{child.help_text.label}}
+                                </label>
+                                <div class="field">
+                                    {{child}}
+                                </div>
+                            </div>
+                        {% endwith %}
+                    {% endif %}
+                {% endfor %}
+            </div>
         </div>
-    {% endif %}
+    {% endwith %}
 {% endfor %}

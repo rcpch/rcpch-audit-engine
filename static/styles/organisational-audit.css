@@ -1,7 +1,15 @@
 .org-audit-field {
     border-bottom: 1px solid var(--rcpch_light_grey);
     padding: 1em;
+}
+
+.org-audit-parent-field {
     display: flex;
+}
+
+.org-audit-child-fields {
+    padding-left: 2em;
+    font-size: 0.85em;
 }
 
 .org-audit-field em {
