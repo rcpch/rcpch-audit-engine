@@ -19,8 +19,10 @@ YES_NO_UNCERTAIN = {
 def DecimalField(help_text=None):
     return models.DecimalField(null=True, blank=True, max_digits=7, decimal_places=3, help_text=help_text)
 
+def YesNoField(help_text=None):
+    return models.BooleanField(null=True, blank=True, help_text=help_text)
+
 TextField = lambda: models.CharField(null=True, blank=True)
-YesNoField = lambda: models.BooleanField(null=True, blank=True)
 YesNoUncertainField = lambda: models.PositiveIntegerField(choices=YES_NO_UNCERTAIN, null=True, blank=True)
 PositiveIntegerField = lambda: models.PositiveIntegerField(null=True, blank=True)
 ChoiceField = lambda choices: models.PositiveIntegerField(choices=choices, null=True, blank=True)
@@ -57,12 +59,21 @@ class OrganisationalAuditSubmission(TimeStampAbstractBaseClass, UserStampAbstrac
     # 1. Workforce
 
     S01WTEConsultants = DecimalField(help_text={
+        "question_number": "1.1",
         "label": "How many whole time equivalent (WTE) general paediatric consultants (community or hospital based) are there employed within the Health Board/Trust? (Including general paediatric consultants with 'expertise in epilepsy')",
         "reference": "Audit Unit - The audit unit is defined by your audit unit profile. Most audit units will include one or more secondary tier paediatric services grouped together using pragmatic boundaries agreed by the paediatric audit unit lead, the project team and the tertiary link. WTE = whole time equivalent. E.g One full time post is 1 WTE; Someone working 3 days a week = 0.6 WTE. 2 people both working 3 days a week = 1.2 WTE"
-    }) # 1.1
-    S01WTEConsultantsEpilepsy = DecimalField() # 1.2
+    })
 
-    S01EpilepsyClinicalLead = YesNoField() # 1.3
+    S01WTEConsultantsEpilepsy = DecimalField(help_text={
+        "question_number": "1.2",
+        "label": "Of these, how many whole time equivalent (WTE) general paediatric consultants with ‘expertise in epilepsy’ are there employed within the Health Board/Trust ? (Paediatric neurologists should not be included in your response.)",
+        "reference": "Paediatrician with expertise -Paediatric consultant (or associate specialist) defined by themselves, their employer and tertiary service/network as having: training and continuing education in epilepsies AND peer review of practice AND regular audit of diagnosis (e.g. participation in Epilepsy12)."
+    })
+
+    S01EpilepsyClinicalLead = YesNoField(help_text={
+        "question_number": "1.3",
+        "label": "Does the Health Board/Trust have a defined paediatric epilepsy clinical lead?"
+    })
     S01EpilepsyClinicalLeadTitle = TextField() # 1.3i
     S01EpilepsyClinicalLeadFirstName = TextField()
     S01EpilepsyClinicalLeadSurname = TextField()

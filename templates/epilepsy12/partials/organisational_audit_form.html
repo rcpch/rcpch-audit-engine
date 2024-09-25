@@ -3,9 +3,10 @@
 {% csrf_token %}
 {% for field in form %}
     <div class="field">
-        <label>{{field | help_text_label}}</label>
+        <label>{{field.help_text.question_number}} {{field.help_text.label}}</label>
         <div class="field">
             {{field}}
         </div>
+        <dfn>{{field.help_text.reference}}</dfn>
     </div>
 {% endfor %}

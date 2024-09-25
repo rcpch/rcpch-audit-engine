@@ -517,8 +517,3 @@ def lead_site_for_case(case):
         return site
     else:
         return None
-
-
-@register.simple_tag
-def help_text_label(field):
-    return json.loads(field.help_text)["label"]
