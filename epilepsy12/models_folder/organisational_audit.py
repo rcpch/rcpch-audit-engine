@@ -349,25 +349,53 @@ class OrganisationalAuditSubmission(TimeStampAbstractBaseClass, UserStampAbstrac
 
     # 5. Service Contact
 
-    S05ContactEpilepsyServiceForSpecialistAdvice = YesNoField() # 5.1
-    S05AdviceAvailableAllWeekdays = YesNoField() # 5.1.1
-    S05AdviceAvailableAllOutOfHours = YesNoField() # 5.1.2
-    S05AdviceAvailable52WeeksPerYear = YesNoField() # 5.1.3
+    S05ContactEpilepsyServiceForSpecialistAdvice = YesNoField(help_text={
+        "section": "5. Service Contact",
+        "question_number": "5.1",
+        "label": "Can patients contact the Epilepsy service for specialist advice?",
+        "reference": "e.g. from a paediatrician with expertise, paediatric neurologist or ESN) between scheduled reviews?"
+    })
+    S05AdviceAvailableAllWeekdays = YesNoField(help_text={
+        "section": "5. Service Contact",
+        "question_number": "5.1.1",
+        "parent_question_number": "5.1",
+        "label": "Is this available all weekdays?"
+    })
+    S05AdviceAvailableAllOutOfHours = YesNoField(help_text={
+        "section": "5. Service Contact",
+        "question_number": "5.1.2",
+        "parent_question_number": "5.1",
+        "label": "Is this available out of hours?"
+    })
+    S05AdviceAvailable52WeeksPerYear = YesNoField(help_text={
+        "section": "5. Service Contact",
+        "question_number": "5.1.3",
+        "parent_question_number": "5.1",
+        "label": "Is this available 52 weeks per year?"
+    })
 
-    S05TypicalTimeToAchieveSpecialistAdvice = ChoiceField({
+    S05TypicalTimeToAchieveSpecialistAdvice = ChoiceField(choices={
         1: 'Same working day',
         2: 'By next working day',
         3: 'Within 3-4 working days',
         4: 'Within a working week'
-    }) # 5.2
+    }, help_text={
+        "section": "5. Service Contact",
+        "question_number": "5.2",
+        "label": "What would your service describe as a typical time for a parent or young person to achieve specialist advice?"
+    })
 
-    S05WhoProvidesSpecialistAdvice = ChoiceField({
+    S05WhoProvidesSpecialistAdvice = ChoiceField(choices={
         1: 'ESN',
         2: 'Consultant Paediatrician with expertise in epilepsy',
         3: 'Paediatric neurologist',
         4: 'Trainee paediatric neurologist',
         5: 'Other'
-    }) # 5.3
+    }, help_text={
+        "section": "5. Service Contact",
+        "question_number": "5.3",
+        "label": "Who typically provides the initial ‘specialist advice’?"   
+    })
     S05WhoProvidesSpecialistAdviceOther = TextField() # 5.3
     S05evidenceclearpointofcontact = YesNoField() # 5.4
 
