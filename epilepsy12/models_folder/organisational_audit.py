@@ -22,7 +22,10 @@ def DecimalField(help_text=None):
 def YesNoField(help_text=None):
     return models.BooleanField(null=True, blank=True, help_text=help_text)
 
-TextField = lambda: models.CharField(null=True, blank=True)
+def TextField(help_text=None):
+    return models.CharField(null=True, blank=True, help_text=help_text)
+
+
 YesNoUncertainField = lambda: models.PositiveIntegerField(choices=YES_NO_UNCERTAIN, null=True, blank=True)
 PositiveIntegerField = lambda: models.PositiveIntegerField(null=True, blank=True)
 ChoiceField = lambda choices: models.PositiveIntegerField(choices=choices, null=True, blank=True)
@@ -74,11 +77,24 @@ class OrganisationalAuditSubmission(TimeStampAbstractBaseClass, UserStampAbstrac
         "question_number": "1.3",
         "label": "Does the Health Board/Trust have a defined paediatric epilepsy clinical lead?"
     })
-    S01EpilepsyClinicalLeadTitle = TextField() # 1.3i
-    S01EpilepsyClinicalLeadFirstName = TextField()
-    S01EpilepsyClinicalLeadSurname = TextField()
+    S01EpilepsyClinicalLeadTitle = TextField(help_text={
+        "parent_question_number": "1.3",
+        "label": "Title"
+    })
+    S01EpilepsyClinicalLeadFirstName = TextField(help_text={
+        "parent_question_number": "1.3",
+        "label": "First name"
+    })
+    S01EpilepsyClinicalLeadSurname = TextField(help_text={
+        "parent_question_number": "1.3",
+        "label": "Surname"
+    })
 
-    S01WTEEpilepsySpecialistNurses = DecimalField() # 1.4
+    S01WTEEpilepsySpecialistNurses = DecimalField(help_text={
+        "question_number": "1.4",
+        "label": "How many whole time equivalent (WTE) paediatric epilepsy specialist nurses (ESNs) are there employed within the Health Board/Trust?",
+        "reference": "Paediatric ESN - A children’s nurse with a defined role and specific qualification and/or training in children’s epilepsies"
+    })
     # TODO MRB: do they want this split out into separate columns as per the template CSV
     S01ESNFunctions = ArrayField(models.PositiveIntegerField(choices={
         1: 'ED visits',
