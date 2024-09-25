@@ -31,7 +31,8 @@ def PositiveIntegerField(help_text=None):
 def ChoiceField(choices, help_text=None):
     return models.PositiveIntegerField(choices=choices, null=True, blank=True, help_text=help_text)
 
-YesNoUncertainField = lambda: models.PositiveIntegerField(choices=YES_NO_UNCERTAIN, null=True, blank=True)
+def YesNoUncertainField(help_text=None):
+    return models.PositiveIntegerField(choices=YES_NO_UNCERTAIN, null=True, blank=True, help_text=help_text)
 
 
 class OrganisationalAuditSubmissionPeriod(models.Model):
@@ -207,10 +208,30 @@ class OrganisationalAuditSubmission(TimeStampAbstractBaseClass, UserStampAbstrac
         """
     })
 
-    S03CommenceKetogenicDiet = YesNoUncertainField() # 3.5i
-    S03ReviewKetogenicDiet = YesNoUncertainField() # 3.5ii
-    S03VNSInsertion = YesNoUncertainField() # 3.5iii
-    S03VNSReview = YesNoUncertainField() # 3.5iv
+    S03CommenceKetogenicDiet = YesNoUncertainField(help_text={
+        "question_number": "3.5i",
+        "label": "Commence ketogenic diet",
+        # 3.5 itself has no representation in the model, we construct it from the help text along
+        "parent_question_number": "3.5",
+        "parent_question_label": "Which of the following services can be obtained at a location within the Health Board/Trust?",
+        "parent_question_reference": "If the child would have to travel to a location outside the audit unit to have then service undertaken then answer ‘no‘"
+    })
+    S03ReviewKetogenicDiet = YesNoUncertainField(help_text={
+        "question_number": "3.5ii",
+        "label": "Ongoing dietetic review of ketogenic diet",
+        "parent_question_number": "3.5",
+        # no need to repeat the label and reference, we can use them from above
+    })
+    S03VNSInsertion = YesNoUncertainField(help_text={
+        "question_number": "3.5iii",
+        "label": "Vagal Nerve Stimulator (VNS) Insertion",
+        "parent_question_number": "3.5",
+    })
+    S03VNSReview = YesNoUncertainField(help_text={
+        "question_number": "3.5iv",
+        "label": "VNS review",
+        "parent_question_number": "3.5"
+    })
 
     
     # 4. Investigations

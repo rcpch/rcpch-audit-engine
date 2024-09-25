@@ -8,7 +8,7 @@ from ..decorator import (
     user_may_view_organisational_audit
 )
 
-def group_form_fields(form):
+def group_form_fields_by_question(form):
     fields_by_question_number = {}
 
     ix = 0
@@ -22,20 +22,38 @@ def group_form_fields(form):
         
         parent = fields_by_question_number.get(parent_question_number, None)
 
+        # Some questions like 3.5 don't have a direct representation in the model so construct them
+        # from help text defined on the first child
+        if parent_question_number and not parent:
+            parent = {
+                "question_number": parent_question_number,
+                "label": help_text.get("parent_question_label", None),
+                "reference": help_text.get("parent_question_reference", None),
+                "children": []
+            }
+
+            fields_by_question_number[parent_question_number] = parent
+
         if parent:
             parent["children"].append({
                 "field": field,
-                "hidden": not parent["field"].value()
+                "question_number": question_number,
+                "label": help_text.get("label", field.name),
+                "reference": help_text.get("reference", None),
+                "hidden": not parent["field"].value() if "field" in parent else False,
             })
         else:
             fields_by_question_number[question_number] = {
                 "field": field,
+                "question_number": question_number,
+                "label": help_text.get("label", field.name),
+                "reference": help_text.get("reference", None),
                 "children": []
             }
         
         ix += 1
 
-    return fields_by_question_number
+    return fields_by_question_number.values()
 
 
 def _organisational_audit(request, group_id, group_model, group_field):
@@ -55,7 +73,7 @@ def _organisational_audit(request, group_id, group_model, group_field):
     context = {
         "group_name": group.name,
         "submission_period": submission_period,
-        "fields_by_question_number": group_form_fields(form)
+        "questions": group_form_fields_by_question(form)
     }
 
     if request.method == "POST":
@@ -70,7 +88,7 @@ def _organisational_audit(request, group_id, group_model, group_field):
 
         form = OrganisationalAuditSubmissionForm(request.POST, instance=submission)
 
-        context["fields_by_question_number"] = group_form_fields(form)
+        context["questions"] = group_form_fields_by_question(form)
         form.save()
 
         return render(request, "epilepsy12/partials/organisational_audit_form.html", context)
