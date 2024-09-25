@@ -1,8 +1,8 @@
 from django.core.validators import MaxValueValidator
 from django.contrib.gis.db import models
-from django.contrib.postgres.fields import ArrayField
 
 from simple_history.models import HistoricalRecords
+from multiselectfield import MultiSelectField
 
 from .entities.trust import Trust
 from .entities.local_health_board import LocalHealthBoard
@@ -25,9 +25,10 @@ def YesNoField(help_text=None):
 def TextField(help_text=None):
     return models.CharField(null=True, blank=True, help_text=help_text)
 
+def PositiveIntegerField(help_text=None):
+    return models.PositiveIntegerField(null=True, blank=True, help_text=help_text)
 
 YesNoUncertainField = lambda: models.PositiveIntegerField(choices=YES_NO_UNCERTAIN, null=True, blank=True)
-PositiveIntegerField = lambda: models.PositiveIntegerField(null=True, blank=True)
 ChoiceField = lambda choices: models.PositiveIntegerField(choices=choices, null=True, blank=True)
 
 
@@ -96,7 +97,7 @@ class OrganisationalAuditSubmission(TimeStampAbstractBaseClass, UserStampAbstrac
         "reference": "Paediatric ESN - A children’s nurse with a defined role and specific qualification and/or training in children’s epilepsies"
     })
     # TODO MRB: do they want this split out into separate columns as per the template CSV
-    S01ESNFunctions = ArrayField(models.PositiveIntegerField(choices={
+    S01ESNFunctions = MultiSelectField(choices={
         1: 'ED visits',
         2: 'Home visits',
         3: 'School Individual Healthcare Plan (IHP) facilitation',
@@ -107,10 +108,17 @@ class OrganisationalAuditSubmission(TimeStampAbstractBaseClass, UserStampAbstrac
         8: 'School meetings',
         9: 'Ward visits',
         10: 'None of the above'
-    }), null=True, blank=True) #1.4i
+    }, null=True, blank=True, help_text={
+        "parent_question_number": "1.4",
+        "question_number": "1.4i",
+        "label": "Which of the following Paediatric ESN functions is the epilepsy service currently able to support?",
+    }) #1.4i
 
     # New! https://github.com/rcpch/rcpch-audit-engine/issues/876#issuecomment-2312271287
-    S01JobPlannedHoursPerWeekLeadershipQIActivities = PositiveIntegerField()
+    S01JobPlannedHoursPerWeekLeadershipQIActivities = PositiveIntegerField(help_text={
+        "question_number": "1.5",
+        "label": "How many job planned hours are there per week (ESN and/or paediatrician) specified for epilepsy leadership and/or QI activities?"
+    })
 
 
     # 2. Epilepsy Clinic configuration
