@@ -8,14 +8,37 @@ from ..decorator import (
     user_may_view_organisational_audit
 )
 
+def is_child_field_hidden(parent):
+    if not "field" in parent:
+        return False
+    
+    parent_field = parent["field"]
+    parent_model_field = OrganisationalAuditSubmission._meta.get_field(parent_field.name)
+
+    if parent_model_field.choices:
+        # Field values can be integers on page load but strings in request.POST
+        field_value_str = str(parent_field.value())
+
+        for (choice_id, choice_name) in parent_model_field.choices:
+            choice_id_str = str(choice_id)
+
+            if(choice_id_str == field_value_str):
+                return choice_name != "Other"
+        
+        return False
+
+    return not parent_field.value()
+
 def group_form_fields(form):
     fields_by_question_number = {}
 
     ix = 0
 
     for field in form:
+        model_field = OrganisationalAuditSubmission._meta.get_field(field.name)
+
         # TODO MRB: put the help text on the form to avoid migrations every time it changes?
-        help_text = OrganisationalAuditSubmission._meta.get_field(field.name).help_text or {}
+        help_text = model_field.help_text or {}
         
         section = help_text.get("section", "Other")
         question_number = help_text.get("question_number", ix)
@@ -40,10 +63,9 @@ def group_form_fields(form):
             parent["children"].append({
                 "section": section,
                 "field": field,
-                "question_number": question_number,
                 "label": help_text.get("label", field.name),
                 "reference": help_text.get("reference", None),
-                "hidden": not parent["field"].value() if "field" in parent else False,
+                "hidden": is_child_field_hidden(parent)
             })
         else:
             fields_by_question_number[question_number] = {
@@ -86,8 +108,7 @@ def _organisational_audit(request, group_id, group_model, group_field):
 
     context = {
         "group_name": group.name,
-        "submission_period": submission_period,
-        "questions_by_section": group_form_fields(form)
+        "submission_period": submission_period
     }
 
     if request.method == "POST":
@@ -106,6 +127,9 @@ def _organisational_audit(request, group_id, group_model, group_field):
         form.save()
 
         return render(request, "epilepsy12/partials/organisational_audit_form.html", context)
+    
+    form = OrganisationalAuditSubmissionForm(instance=submission)
+    context["questions_by_section"] = group_form_fields(form)
 
     return render(request, "epilepsy12/organisational_audit.html", context)
 

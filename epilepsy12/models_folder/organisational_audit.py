@@ -396,7 +396,11 @@ class OrganisationalAuditSubmission(TimeStampAbstractBaseClass, UserStampAbstrac
         "question_number": "5.3",
         "label": "Who typically provides the initial ‘specialist advice’?"   
     })
-    S05WhoProvidesSpecialistAdviceOther = TextField() # 5.3
+    S05WhoProvidesSpecialistAdviceOther = TextField(help_text={
+        "section": "5. Service Contact",
+        "parent_question_number": "5.3",
+        "label": "Other"
+    }) # 5.3
     S05evidenceclearpointofcontact = YesNoField() # 5.4
 
 
