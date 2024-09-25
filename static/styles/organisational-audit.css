@@ -1,0 +1,22 @@
+.org-audit-field {
+    border-bottom: 1px solid var(--rcpch_light_grey);
+    padding: 1em;
+    display: flex;
+}
+
+.org-audit-field em {
+    font-style: normal;
+    font-size: 1.3em;
+}
+
+.org-audit-field label {
+    /* !important to override Semantic UI font-size */
+    font-size: 1.2em !important;
+    display: block;
+    margin-bottom: 1em;
+}
+
+.org-audit-cell {
+    padding: .5em;
+    flex: 50%;
+}

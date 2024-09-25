@@ -2,15 +2,22 @@
 
 {% csrf_token %}
 {% for field in form %}
-    <div class="field">
-        {% if field.hidden %}
-            {{field.as_hidden}}
-        {% else %}
-            <label>{{field.help_text.question_number}} {{field.help_text.label}}</label>
-            <div class="field">
-                {{field}}
+    {% if field.hidden %}
+        {{field.as_hidden}}
+    {% else %}
+        <div class="field org-audit-field">
+            <div class="org-audit-cell">
+                <label>
+                    <em>{{field.help_text.question_number}}</em>
+                    {{field.help_text.label}}
+                </label>
+                <div class="field">
+                    {{field}}
+                </div>
             </div>
-            <dfn>{{field.help_text.reference}}</dfn>
-        {% endif %}
-    </div>
+            <dfn class="org-audit-cell">
+                {{field.help_text.reference | safe}}
+            </dfn>
+        </div>
+    {% endif %}
 {% endfor %}

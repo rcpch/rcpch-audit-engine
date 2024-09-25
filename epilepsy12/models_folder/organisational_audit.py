@@ -66,19 +66,37 @@ class OrganisationalAuditSubmission(TimeStampAbstractBaseClass, UserStampAbstrac
 
     S01WTEConsultants = DecimalField(help_text={
         "question_number": "1.1",
-        "label": "How many whole time equivalent (WTE) general paediatric consultants (community or hospital based) are there employed within the Health Board/Trust? (Including general paediatric consultants with 'expertise in epilepsy')",
-        "reference": "Audit Unit - The audit unit is defined by your audit unit profile. Most audit units will include one or more secondary tier paediatric services grouped together using pragmatic boundaries agreed by the paediatric audit unit lead, the project team and the tertiary link. WTE = whole time equivalent. E.g One full time post is 1 WTE; Someone working 3 days a week = 0.6 WTE. 2 people both working 3 days a week = 1.2 WTE"
+        "label": "How many whole time equivalent general paediatric consultants do you employ?",
+        "reference": """
+            <p>
+                Includes general paediatric consultants with 'expertise in epilepsy' (community or hospital based).
+            </p>
+            <p>
+                Audit Unit - The audit unit is defined by your audit unit profile. Most audit units will include one or more secondary tier paediatric services
+                grouped together using pragmatic boundaries agreed by the paediatric audit unit lead, the project team and the tertiary link.
+            </p>
+            <p>
+                WTE = whole time equivalent. E.g One full time post is 1 WTE; Someone working 3 days a week = 0.6 WTE. 2 people both working 3 days a week = 1.2 WTE
+            </p>
+        """
     })
 
     S01WTEConsultantsEpilepsy = DecimalField(help_text={
         "question_number": "1.2",
-        "label": "Of these, how many whole time equivalent (WTE) general paediatric consultants with ‘expertise in epilepsy’ are there employed within the Health Board/Trust ? (Paediatric neurologists should not be included in your response.)",
-        "reference": "Paediatrician with expertise -Paediatric consultant (or associate specialist) defined by themselves, their employer and tertiary service/network as having: training and continuing education in epilepsies AND peer review of practice AND regular audit of diagnosis (e.g. participation in Epilepsy12)."
+        "label": "Of these, how many have an ‘expertise in epilepsy’?",
+        "reference": """
+            <p>
+                Answer using whole time equivalent again. Paediatric neurologists should not be included in your response.
+            </p>
+            <p>
+                Paediatrician with expertise - Paediatric consultant (or associate specialist) defined by themselves, their employer and tertiary service/network as having: training and continuing education in epilepsies AND peer review of practice AND regular audit of diagnosis (e.g. participation in Epilepsy12).
+            </p>
+        """
     })
 
     S01EpilepsyClinicalLead = YesNoField(help_text={
         "question_number": "1.3",
-        "label": "Does the Health Board/Trust have a defined paediatric epilepsy clinical lead?"
+        "label": "Do you have a defined paediatric epilepsy clinical lead?"
     })
     S01EpilepsyClinicalLeadTitle = TextField(help_text={
         "parent_question_number": "1.3",
@@ -95,7 +113,7 @@ class OrganisationalAuditSubmission(TimeStampAbstractBaseClass, UserStampAbstrac
 
     S01WTEEpilepsySpecialistNurses = DecimalField(help_text={
         "question_number": "1.4",
-        "label": "How many whole time equivalent (WTE) paediatric epilepsy specialist nurses (ESNs) are there employed within the Health Board/Trust?",
+        "label": "How many WTE paediatric epilepsy specialist nurses do you employ?",
         "reference": "Paediatric ESN - A children’s nurse with a defined role and specific qualification and/or training in children’s epilepsies"
     })
     # TODO MRB: do they want this split out into separate columns as per the template CSV
