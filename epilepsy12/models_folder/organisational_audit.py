@@ -28,8 +28,10 @@ def TextField(help_text=None):
 def PositiveIntegerField(help_text=None):
     return models.PositiveIntegerField(null=True, blank=True, help_text=help_text)
 
+def ChoiceField(choices, help_text=None):
+    return models.PositiveIntegerField(choices=choices, null=True, blank=True, help_text=help_text)
+
 YesNoUncertainField = lambda: models.PositiveIntegerField(choices=YES_NO_UNCERTAIN, null=True, blank=True)
-ChoiceField = lambda choices: models.PositiveIntegerField(choices=choices, null=True, blank=True)
 
 
 class OrganisationalAuditSubmissionPeriod(models.Model):
@@ -123,15 +125,32 @@ class OrganisationalAuditSubmission(TimeStampAbstractBaseClass, UserStampAbstrac
 
     # 2. Epilepsy Clinic configuration
 
-    S02DefinedEpilepsyClinics = YesNoField() # 2.1
-    S02EpilepsyClinicsPerWeek = DecimalField() # 2.1i
-    S02Consultant20Mins = YesNoField() # 2.1ii
-    S02TFC223 = ChoiceField({
+    S02DefinedEpilepsyClinics = YesNoField(help_text={
+        "question_number": "2.1",
+        "label": "Does the Health Board/Trust have defined epilepsy clinics seeing patients at a secondary level?",
+        "reference": "A secondary level 'epilepsy clinic' is a clinic run just for children with seizures or epilepsy that takes referrals direct from GPs or emergency department (decimal answers are allowed). An ‘Epilepsy Clinic’ is defined as a paediatric clinic where all the children and young people attending have epilepsy or possible epileptic seizures."
+    })
+    S02EpilepsyClinicsPerWeek = DecimalField(help_text={
+        "parent_question_number": "2.1",
+        "question_number": "2.1i",
+        "label": "On average, how many consultant (or associate specialist) led secondary level ‘epilepsy clinics’ for children or young people take place within your Health Board/Trust per week?"
+    })
+    S02Consultant20Mins = YesNoField(help_text={
+       "parent_question_number": "2.1",
+       "question_number": "2.1ii",
+       "label": "Within the epilepsy clinics, does the clinic booking time allow at least 20 minutes of time with a consultant with expertise in epilepsy and an ESN? (This might be 20 min with the doctor and nurse at the same time or 20 mins each in succession)"
+    })
+
+    S02TFC223 = ChoiceField(choices={
         1: 'Not applicable',
         2: 'Yes',
         3: 'No, not at all',
         4: 'No, in development'
-    }) # 2.2
+    }, help_text={
+        "question_number": "2.2",
+        # TODO MRB: hide this question for Wales
+        "label": "Does the Trust currently run TFC 223 Epilepsy Best Practice Criteria (BPC) clinics? *For Trusts in England only"
+    })
 
 
     # 3. Tertiary provision
