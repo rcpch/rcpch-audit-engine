@@ -66,6 +66,7 @@ class OrganisationalAuditSubmission(TimeStampAbstractBaseClass, UserStampAbstrac
     # 1. Workforce
 
     S01WTEConsultants = DecimalField(help_text={
+        "section": "1. Workforce",
         "question_number": "1.1",
         "label": "How many whole time equivalent general paediatric consultants do you employ?",
         "reference": """
@@ -83,6 +84,7 @@ class OrganisationalAuditSubmission(TimeStampAbstractBaseClass, UserStampAbstrac
     })
 
     S01WTEConsultantsEpilepsy = DecimalField(help_text={
+        "section": "1. Workforce",
         "question_number": "1.2",
         "label": "Of these, how many have an ‘expertise in epilepsy’?",
         "reference": """
@@ -96,27 +98,33 @@ class OrganisationalAuditSubmission(TimeStampAbstractBaseClass, UserStampAbstrac
     })
 
     S01EpilepsyClinicalLead = YesNoField(help_text={
+        "section": "1. Workforce",
         "question_number": "1.3",
         "label": "Do you have a defined paediatric epilepsy clinical lead?"
     })
     S01EpilepsyClinicalLeadTitle = TextField(help_text={
+        "section": "1. Workforce",
         "parent_question_number": "1.3",
         "label": "Title"
     })
     S01EpilepsyClinicalLeadFirstName = TextField(help_text={
+        "section": "1. Workforce",
         "parent_question_number": "1.3",
         "label": "First name"
     })
     S01EpilepsyClinicalLeadSurname = TextField(help_text={
+        "section": "1. Workforce",
         "parent_question_number": "1.3",
         "label": "Surname"
     })
 
     S01WTEEpilepsySpecialistNurses = DecimalField(help_text={
+        "section": "1. Workforce",
         "question_number": "1.4",
         "label": "How many WTE paediatric epilepsy specialist nurses do you employ?",
         "reference": "Paediatric ESN - A children’s nurse with a defined role and specific qualification and/or training in children’s epilepsies"
     })
+
     # TODO MRB: do they want this split out into separate columns as per the template CSV
     S01ESNFunctions = MultiSelectField(choices={
         1: 'ED visits',
@@ -130,6 +138,7 @@ class OrganisationalAuditSubmission(TimeStampAbstractBaseClass, UserStampAbstrac
         9: 'Ward visits',
         10: 'None of the above'
     }, null=True, blank=True, help_text={
+        "section": "1. Workforce",
         "parent_question_number": "1.4",
         "question_number": "1.4i",
         "label": "Which of the following Paediatric ESN functions is the epilepsy service currently able to support?",
@@ -137,6 +146,7 @@ class OrganisationalAuditSubmission(TimeStampAbstractBaseClass, UserStampAbstrac
 
     # New! https://github.com/rcpch/rcpch-audit-engine/issues/876#issuecomment-2312271287
     S01JobPlannedHoursPerWeekLeadershipQIActivities = PositiveIntegerField(help_text={
+        "section": "1. Workforce",
         "question_number": "1.5",
         "label": "How many job planned hours are there per week (ESN and/or paediatrician) specified for epilepsy leadership and/or QI activities?"
     })
@@ -145,16 +155,19 @@ class OrganisationalAuditSubmission(TimeStampAbstractBaseClass, UserStampAbstrac
     # 2. Epilepsy Clinic configuration
 
     S02DefinedEpilepsyClinics = YesNoField(help_text={
+        "section": "2. Epilepsy Clinic configuration",
         "question_number": "2.1",
         "label": "Does the Health Board/Trust have defined epilepsy clinics seeing patients at a secondary level?",
         "reference": "A secondary level 'epilepsy clinic' is a clinic run just for children with seizures or epilepsy that takes referrals direct from GPs or emergency department (decimal answers are allowed). An ‘Epilepsy Clinic’ is defined as a paediatric clinic where all the children and young people attending have epilepsy or possible epileptic seizures."
     })
     S02EpilepsyClinicsPerWeek = DecimalField(help_text={
+        "section": "2. Epilepsy Clinic configuration",
         "parent_question_number": "2.1",
         "question_number": "2.1i",
         "label": "On average, how many consultant (or associate specialist) led secondary level ‘epilepsy clinics’ for children or young people take place within your Health Board/Trust per week?"
     })
     S02Consultant20Mins = YesNoField(help_text={
+        "section": "2. Epilepsy Clinic configuration",
        "parent_question_number": "2.1",
        "question_number": "2.1ii",
        "label": "Within the epilepsy clinics, does the clinic booking time allow at least 20 minutes of time with a consultant with expertise in epilepsy and an ESN? (This might be 20 min with the doctor and nurse at the same time or 20 mins each in succession)"
@@ -166,6 +179,7 @@ class OrganisationalAuditSubmission(TimeStampAbstractBaseClass, UserStampAbstrac
         3: 'No, not at all',
         4: 'No, in development'
     }, help_text={
+        "section": "2. Epilepsy Clinic configuration",
         "question_number": "2.2",
         # TODO MRB: hide this question for Wales
         "label": "Does the Trust currently run TFC 223 Epilepsy Best Practice Criteria (BPC) clinics?",
@@ -176,6 +190,7 @@ class OrganisationalAuditSubmission(TimeStampAbstractBaseClass, UserStampAbstrac
     # 3. Tertiary provision
 
     S03WTEPaediatricNeurologists = DecimalField(help_text={
+        "section": "3. Tertiary provision",
         "question_number": "3.1",
         "label": "How many whole-time equivalent (WTE) paediatric neurologists who manage children with epilepsy do you employ?",
         "reference": """
@@ -188,14 +203,17 @@ class OrganisationalAuditSubmission(TimeStampAbstractBaseClass, UserStampAbstrac
         """
     })
     S03PathwaysTertiaryPaedNeurology = YesNoField(help_text={
+        "section": "3. Tertiary provision",
         "question_number": "3.2",
         "label": "Does you have agreed referral pathways to tertiary paediatric neurology services?"
     })
     S03PaedNeurologistsDirectReferrals = YesNoField(help_text={
+        "section": "3. Tertiary provision",
         "question_number": "3.3",
         "label": "Can paediatric neurologists receive direct referrals from general practice or emergency services to assess children with possible epilepsy?"
     })
     S03SatellitePaediatricNeurologyClinics = YesNoField(help_text={
+        "section": "3. Tertiary provision",
         "question_number": "3.4",
         "label": "Do you host satellite paediatric neurology clinics?",
         "reference": """
@@ -209,6 +227,7 @@ class OrganisationalAuditSubmission(TimeStampAbstractBaseClass, UserStampAbstrac
     })
 
     S03CommenceKetogenicDiet = YesNoUncertainField(help_text={
+        "section": "3. Tertiary provision",
         "question_number": "3.5i",
         "label": "Commence ketogenic diet",
         # 3.5 itself has no representation in the model, we construct it from the help text alone
@@ -217,17 +236,20 @@ class OrganisationalAuditSubmission(TimeStampAbstractBaseClass, UserStampAbstrac
         "parent_question_reference": "If the child would have to travel to a location outside your audit unit then answer ‘no‘"
     })
     S03ReviewKetogenicDiet = YesNoUncertainField(help_text={
+        "section": "3. Tertiary provision",
         "question_number": "3.5ii",
         "label": "Ongoing dietetic review of ketogenic diet",
         "parent_question_number": "3.5",
         # no need to repeat the label and reference, we can use them from above
     })
     S03VNSInsertion = YesNoUncertainField(help_text={
+        "section": "3. Tertiary provision",
         "question_number": "3.5iii",
         "label": "Vagal Nerve Stimulator (VNS) Insertion",
         "parent_question_number": "3.5",
     })
     S03VNSReview = YesNoUncertainField(help_text={
+        "section": "3. Tertiary provision",
         "question_number": "3.5iv",
         "label": "VNS review",
         "parent_question_number": "3.5"
@@ -237,6 +259,7 @@ class OrganisationalAuditSubmission(TimeStampAbstractBaseClass, UserStampAbstrac
     # 4. Investigations
 
     S04LeadECG = YesNoUncertainField(help_text={
+        "section": "4. Investigations",
         "question_number": "4.1i",
         "label": "12 lead ECG",
         # 4 itself has no representation in the model, we construct it from the help text alone
@@ -245,66 +268,79 @@ class OrganisationalAuditSubmission(TimeStampAbstractBaseClass, UserStampAbstrac
         "parent_question_reference": "If the child would have to travel to a location outside your audit unit then answer ‘no‘"
     })
     S04AwakeMRI = YesNoUncertainField(help_text={
+        "section": "4. Investigations",
         "question_number": "4.1ii",
         "label": "'awake' MRI",
         "parent_question_number": "4",
     })
     S04MriWithSedation = YesNoUncertainField(help_text={
+        "section": "4. Investigations",
         "question_number": "4.1iii",
         "label": "MRI with sedation",
         "parent_question_number": "4",
     })
     S04MriWithGeneralAnaesthetic = YesNoUncertainField(help_text={
+        "section": "4. Investigations",
         "question_number": "4.1iv",
         "label": "MRI with general anaesthetic",
         "parent_question_number": "4",
     })
     S04StandardEeg = YesNoUncertainField(help_text={
+        "section": "4. Investigations",
         "question_number": "4.1v",
         "label": "Standard EEG",
         "parent_question_number": "4",
     })
     S04SleepDeprivedEeg = YesNoUncertainField(help_text={
+        "section": "4. Investigations",
         "question_number": "4.1vi",
         "label": "Sleep deprived EEG",
         "parent_question_number": "4",
     })
     S04MelatoninInducedEeg = YesNoUncertainField(help_text={
+        "section": "4. Investigations",
         "question_number": "4.1vii",
         "label": "Melatonin induced EEG",
         "parent_question_number": "4",
     })
     S04SedatedEeg = YesNoUncertainField(help_text={
+        "section": "4. Investigations",
         "question_number": "4.1viii",
         "label": "Sedated EEG",
         "parent_question_number": "4",
     })
     S042448HAmbulatoryEeg = YesNoUncertainField(help_text={
+        "section": "4. Investigations",
         "question_number": "4.1ix",
         "label": "24/48h ambulatory EEG",
         "parent_question_number": "4",
     })
     S04InpatientVideoTelemetry = YesNoUncertainField(help_text={
+        "section": "4. Investigations",
         "question_number": "4.1x",
         "label": "Inpatient video telemetry",
         "parent_question_number": "4",
     })
     S04OutpatientVideoTelemetry = YesNoUncertainField(help_text={
+        "section": "4. Investigations",
         "question_number": "4.1xi",
         "label": "Outpatient video telemetry",
         "parent_question_number": "4",
     })
     S04HomeVideoTelemetry = YesNoUncertainField(help_text={
+        "section": "4. Investigations",
         "question_number": "4.1xii",
         "label": "Home video telemetry",
         "parent_question_number": "4",
-    }) # 4.1xii
+    })
     S04PortableEEGOnWardAreaWithinTrust = YesNoUncertainField(help_text={
+        "section": "4. Investigations",
         "question_number": "4.1xiii",
         "label": "Portable EEG on ward area within Trust",
         "parent_question_number": "4",
     })
     S04WholeGenomeSequencing = YesNoUncertainField(help_text={
+        "section": "4. Investigations",
         "question_number": "4.1xiv",
         "label": "Requesting and consenting of Whole Genome Sequencing (WGS)",
         "parent_question_number": "4",

@@ -1,43 +1,48 @@
 {% load epilepsy12_template_tags %}
 
 {% csrf_token %}
-{% for parent in questions %}
-    <div class="field org-audit-field">
-        <div class="org-audit-parent-field">
-            <div class="org-audit-cell">
-                <label>
-                    <em>{{parent.question_number}}</em>
-                    {{parent.label}}
-                </label>
-                <div class="field">
-                    {{parent.field}}
-                </div>
-            </div>
-            {% if parent.reference %}
-                <dfn class="org-audit-cell org-audit-reference">
-                    {{parent.reference | safe}}
-                </dfn>
-            {% else %}
-                <div class="org-audit-cell">
-                </div>
-            {% endif %}
-        </div>
-        <div class="org-audit-child-fields">
-            {% for child in parent.children %}
-                {% if child.hidden %}
-                    {{child.field.as_hidden}}
-                {% else %}
-                    <div class="field">
+{% for section, questions in questions_by_section.items %}
+    <div>
+        <h3 class="org-audit-section-title">{{section}}</h3>
+        {% for parent in questions %}
+            <div class="field org-audit-field">
+                <div class="org-audit-parent-field">
+                    <div class="org-audit-cell">
                         <label>
-                            <em>{{child.question_number}}</em>
-                            {{child.label}}
+                            <em>{{parent.question_number}}</em>
+                            {{parent.label}}
                         </label>
                         <div class="field">
-                            {{child.field}}
+                            {{parent.field}}
                         </div>
                     </div>
-                {% endif %}
-            {% endfor %}
-        </div>
+                    {% if parent.reference %}
+                        <dfn class="org-audit-cell org-audit-reference">
+                            {{parent.reference | safe}}
+                        </dfn>
+                    {% else %}
+                        <div class="org-audit-cell">
+                        </div>
+                    {% endif %}
+                </div>
+                <div class="org-audit-child-fields">
+                    {% for child in parent.children %}
+                        {% if child.hidden %}
+                            {{child.field.as_hidden}}
+                        {% else %}
+                            <div class="field">
+                                <label>
+                                    <em>{{child.question_number}}</em>
+                                    {{child.label}}
+                                </label>
+                                <div class="field">
+                                    {{child.field}}
+                                </div>
+                            </div>
+                        {% endif %}
+                    {% endfor %}
+                </div>
+            </div>
+        {% endfor %}
     </div>
 {% endfor %}

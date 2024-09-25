@@ -8,7 +8,7 @@ from ..decorator import (
     user_may_view_organisational_audit
 )
 
-def group_form_fields_by_question(form):
+def group_form_fields(form):
     fields_by_question_number = {}
 
     ix = 0
@@ -17,6 +17,7 @@ def group_form_fields_by_question(form):
         # TODO MRB: put the help text on the form to avoid migrations every time it changes?
         help_text = OrganisationalAuditSubmission._meta.get_field(field.name).help_text or {}
         
+        section = help_text.get("section", "Other")
         question_number = help_text.get("question_number", ix)
         parent_question_number = help_text.get("parent_question_number", None)
         
@@ -26,6 +27,7 @@ def group_form_fields_by_question(form):
         # from help text defined on the first child
         if parent_question_number and not parent:
             parent = {
+                "section": section,
                 "question_number": parent_question_number,
                 "label": help_text.get("parent_question_label", None),
                 "reference": help_text.get("parent_question_reference", None),
@@ -36,6 +38,7 @@ def group_form_fields_by_question(form):
 
         if parent:
             parent["children"].append({
+                "section": section,
                 "field": field,
                 "question_number": question_number,
                 "label": help_text.get("label", field.name),
@@ -44,6 +47,7 @@ def group_form_fields_by_question(form):
             })
         else:
             fields_by_question_number[question_number] = {
+                "section": section,
                 "field": field,
                 "question_number": question_number,
                 "label": help_text.get("label", field.name),
@@ -53,7 +57,17 @@ def group_form_fields_by_question(form):
         
         ix += 1
 
-    return fields_by_question_number.values()
+    questions_by_section = {}
+
+    for question in fields_by_question_number.values():
+        section = question["section"]
+
+        if not section in questions_by_section:
+            questions_by_section[section] = []
+
+        questions_by_section[section].append(question)
+
+    return questions_by_section
 
 
 def _organisational_audit(request, group_id, group_model, group_field):
@@ -73,7 +87,7 @@ def _organisational_audit(request, group_id, group_model, group_field):
     context = {
         "group_name": group.name,
         "submission_period": submission_period,
-        "questions": group_form_fields_by_question(form)
+        "questions_by_section": group_form_fields(form)
     }
 
     if request.method == "POST":
@@ -88,7 +102,7 @@ def _organisational_audit(request, group_id, group_model, group_field):
 
         form = OrganisationalAuditSubmissionForm(request.POST, instance=submission)
 
-        context["questions"] = group_form_fields_by_question(form)
+        context["questions_by_section"] = group_form_fields(form)
         form.save()
 
         return render(request, "epilepsy12/partials/organisational_audit_form.html", context)
