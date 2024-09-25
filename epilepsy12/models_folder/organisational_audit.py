@@ -197,7 +197,7 @@ class OrganisationalAuditSubmission(TimeStampAbstractBaseClass, UserStampAbstrac
     })
     S03SatellitePaediatricNeurologyClinics = YesNoField(help_text={
         "question_number": "3.4",
-        "label": "Does the trust host satellite paediatric neurology clinics?",
+        "label": "Do you host satellite paediatric neurology clinics?",
         "reference": """
             <p>
                 e.g. a paediatric neurologist visits a site within the trust to undertake paediatric neurology clinics
@@ -211,10 +211,10 @@ class OrganisationalAuditSubmission(TimeStampAbstractBaseClass, UserStampAbstrac
     S03CommenceKetogenicDiet = YesNoUncertainField(help_text={
         "question_number": "3.5i",
         "label": "Commence ketogenic diet",
-        # 3.5 itself has no representation in the model, we construct it from the help text along
+        # 3.5 itself has no representation in the model, we construct it from the help text alone
         "parent_question_number": "3.5",
-        "parent_question_label": "Which of the following services can be obtained at a location within the Health Board/Trust?",
-        "parent_question_reference": "If the child would have to travel to a location outside the audit unit to have then service undertaken then answer ‘no‘"
+        "parent_question_label": "Which of the following services can be obtained?",
+        "parent_question_reference": "If the child would have to travel to a location outside your audit unit then answer ‘no‘"
     })
     S03ReviewKetogenicDiet = YesNoUncertainField(help_text={
         "question_number": "3.5ii",
@@ -236,20 +236,79 @@ class OrganisationalAuditSubmission(TimeStampAbstractBaseClass, UserStampAbstrac
     
     # 4. Investigations
 
-    S04LeadECG = YesNoUncertainField() # 4.1i
-    S04AwakeMRI = YesNoUncertainField() # 4.1ii
-    S04MriWithSedation = YesNoUncertainField() # 4.1iii
-    S04MriWithGeneralAnaesthetic = YesNoUncertainField() # 4.1iv
-    S04StandardEeg = YesNoUncertainField() # 4.1v
-    S04SleepDeprivedEeg = YesNoUncertainField() # 4.1vi
-    S04MelatoninInducedEeg = YesNoUncertainField() # 4.1vii
-    S04SedatedEeg = YesNoUncertainField() # 4.1viii
-    S042448HAmbulatoryEeg = YesNoUncertainField() # 4.1ix
-    S04InpatientVideoTelemetry = YesNoUncertainField() # 4.1x
-    S04OutpatientVideoTelemetry = YesNoUncertainField() # 4.1xi
-    S04HomeVideoTelemetry = YesNoUncertainField() # 4.1xii
-    S04PortableEEGOnWardAreaWithinTrust = YesNoUncertainField() # 4.1xiii
-    # TODO MRB: do we need an entry for requesting and consenting of Whole Genome Sequencing?
+    S04LeadECG = YesNoUncertainField(help_text={
+        "question_number": "4.1i",
+        "label": "12 lead ECG",
+        # 4 itself has no representation in the model, we construct it from the help text alone
+        "parent_question_number": "4",
+        "parent_question_label": "Which of the following investigations can be obtained?",
+        "parent_question_reference": "If the child would have to travel to a location outside your audit unit then answer ‘no‘"
+    })
+    S04AwakeMRI = YesNoUncertainField(help_text={
+        "question_number": "4.1ii",
+        "label": "'awake' MRI",
+        "parent_question_number": "4",
+    })
+    S04MriWithSedation = YesNoUncertainField(help_text={
+        "question_number": "4.1iii",
+        "label": "MRI with sedation",
+        "parent_question_number": "4",
+    })
+    S04MriWithGeneralAnaesthetic = YesNoUncertainField(help_text={
+        "question_number": "4.1iv",
+        "label": "MRI with general anaesthetic",
+        "parent_question_number": "4",
+    })
+    S04StandardEeg = YesNoUncertainField(help_text={
+        "question_number": "4.1v",
+        "label": "Standard EEG",
+        "parent_question_number": "4",
+    })
+    S04SleepDeprivedEeg = YesNoUncertainField(help_text={
+        "question_number": "4.1vi",
+        "label": "Sleep deprived EEG",
+        "parent_question_number": "4",
+    })
+    S04MelatoninInducedEeg = YesNoUncertainField(help_text={
+        "question_number": "4.1vii",
+        "label": "Melatonin induced EEG",
+        "parent_question_number": "4",
+    })
+    S04SedatedEeg = YesNoUncertainField(help_text={
+        "question_number": "4.1viii",
+        "label": "Sedated EEG",
+        "parent_question_number": "4",
+    })
+    S042448HAmbulatoryEeg = YesNoUncertainField(help_text={
+        "question_number": "4.1ix",
+        "label": "24/48h ambulatory EEG",
+        "parent_question_number": "4",
+    })
+    S04InpatientVideoTelemetry = YesNoUncertainField(help_text={
+        "question_number": "4.1x",
+        "label": "Inpatient video telemetry",
+        "parent_question_number": "4",
+    })
+    S04OutpatientVideoTelemetry = YesNoUncertainField(help_text={
+        "question_number": "4.1xi",
+        "label": "Outpatient video telemetry",
+        "parent_question_number": "4",
+    })
+    S04HomeVideoTelemetry = YesNoUncertainField(help_text={
+        "question_number": "4.1xii",
+        "label": "Home video telemetry",
+        "parent_question_number": "4",
+    }) # 4.1xii
+    S04PortableEEGOnWardAreaWithinTrust = YesNoUncertainField(help_text={
+        "question_number": "4.1xiii",
+        "label": "Portable EEG on ward area within Trust",
+        "parent_question_number": "4",
+    })
+    S04WholeGenomeSequencing = YesNoUncertainField(help_text={
+        "question_number": "4.1xiv",
+        "label": "Requesting and consenting of Whole Genome Sequencing (WGS)",
+        "parent_question_number": "4",
+    })
 
 
     # 5. Service Contact
