@@ -400,25 +400,58 @@ class OrganisationalAuditSubmission(TimeStampAbstractBaseClass, UserStampAbstrac
         "section": "5. Service Contact",
         "parent_question_number": "5.3",
         "label": "Other"
-    }) # 5.3
-    S05evidenceclearpointofcontact = YesNoField() # 5.4
+    })
+
+    S05evidenceclearpointofcontact = YesNoField(help_text={
+        "section": "5. Service Contact",
+        "question_number": "5.4",
+        "label": "Do you have evidence of a clear point of contact for non‐paediatric professionals seeking paediatric epilepsy support?",
+        "reference": "(e.g. school, social care, CAMHS, adult services)"
+    })
 
 
     # 6. Young People and Transition
 
-    S06AgreeedReferralPathwaysAdultServices = YesNoField() # 6.1
+    S06AgreedReferralPathwaysAdultServices = YesNoField(help_text={
+        "section": "6. Young People and Transition",
+        "question_number": "6.1",
+        "label": "Do you have agreed referral pathways to adult services?"
+    })
 
-    S06OutpatientClinicYoungPeopleEpilepsies = YesNoField() # 6.2
-    S06WhatAgeDoesThisClinicAcceptYoungPeople = PositiveIntegerField() # 6.2i
+    S06OutpatientClinicYoungPeopleEpilepsies = YesNoField(help_text={
+        "section": "6. Young People and Transition",
+        "question_number": "6.2",
+        "label": "Do you have a specific outpatient clinic for 'young people' with epilepsies that supports transition?"
+    })
+    S06WhatAgeDoesThisClinicAcceptYoungPeople = PositiveIntegerField(help_text={
+        "section": "6. Young People and Transition",
+        "question_number": "6.2i",
+        "parent_question_number": "6.2",
+        "label": "From what age does this clinic typically accept young people?"
+    })
 
-    S06ServiceForEpilepsyBopthAdultAndPaed = YesNoField() # 6.3
-    S06IsThisUsually = ChoiceField({
+    S06ServiceForEpilepsyBothAdultAndPaed = YesNoField(help_text={
+        "section": "6. Young People and Transition",
+        "question_number": "6.3",
+        "label": "Do you have an outpatient service for epilepsy where there is a presence of both adult and paediatric professionals??"
+    })
+    S06IsThisUsually = ChoiceField(choices={
         1: 'A single joint appointment',
         2: 'A series of several joint appointments',
-        3: 'A flexible appraoch including mixture of joint or individual reviews',
+        3: 'A flexible approach including mixture of joint or individual reviews',
         4: 'Other'
+    }, help_text={
+        "section": "6. Young People and Transition",
+        "question_number": "6.3i",
+        "parent_question_number": "6.3",
+        "label": "Is this usually:"
+    })
+    S06IsThisUsuallyOther = TextField(help_text={
+        "section": "6. Young People and Transition",
+        "parent_question_number": "6.3i",
+        "label": "Other"
     }) # 6.3i
-    S06IsThisUsuallyOther = TextField() # 6.3i
+
     S06PercentageOfYoungPeopleTransferred = models.PositiveIntegerField(null=True, blank=True, validators=[
         MaxValueValidator(100)
     ]) # 6.3ii

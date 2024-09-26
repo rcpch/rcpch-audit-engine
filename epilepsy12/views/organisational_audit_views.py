@@ -29,6 +29,45 @@ def is_child_field_hidden(parent):
 
     return not parent_field.value()
 
+def get_question_by_number(question_number, fields_by_question_number):
+    def _get_question_by_number(question):
+        if question["question_number"] == question_number:
+            return question
+        
+        for child in question.get("children", []):
+            result = _get_question_by_number(child)
+            if result:
+                return result
+
+    for question in fields_by_question_number.values():
+        result = _get_question_by_number(question)
+        if result:
+            return result
+
+def group_by_section(fields_by_question_number):
+    questions_by_section = {}
+
+    for question in fields_by_question_number.values():
+        section = question["section"]
+
+        if not section in questions_by_section:
+            questions_by_section[section] = []
+
+        questions_by_section[section].append(question)
+
+    return questions_by_section
+
+def hoist_nested_children(fields_by_question_number):
+    def _accumulate_nested_children(question, children):
+        for child in question.get("children", []):
+            children.append(child)
+            _accumulate_nested_children(child, children)
+        
+        return children
+
+    for question in fields_by_question_number.values():
+        question["children"] = _accumulate_nested_children(question, [])
+
 def group_form_fields(form):
     fields_by_question_number = {}
 
@@ -44,7 +83,7 @@ def group_form_fields(form):
         question_number = help_text.get("question_number", ix)
         parent_question_number = help_text.get("parent_question_number", None)
         
-        parent = fields_by_question_number.get(parent_question_number, None)
+        parent = get_question_by_number(parent_question_number, fields_by_question_number)
 
         # Some questions like 3.5 don't have a direct representation in the model so construct them
         # from help text defined on the first child
@@ -63,9 +102,11 @@ def group_form_fields(form):
             parent["children"].append({
                 "section": section,
                 "field": field,
+                "question_number": question_number,
                 "label": help_text.get("label", field.name),
                 "reference": help_text.get("reference", None),
-                "hidden": is_child_field_hidden(parent)
+                "hidden": is_child_field_hidden(parent),
+                "children": []
             })
         else:
             fields_by_question_number[question_number] = {
@@ -79,15 +120,8 @@ def group_form_fields(form):
         
         ix += 1
 
-    questions_by_section = {}
-
-    for question in fields_by_question_number.values():
-        section = question["section"]
-
-        if not section in questions_by_section:
-            questions_by_section[section] = []
-
-        questions_by_section[section].append(question)
+    hoist_nested_children(fields_by_question_number)
+    questions_by_section = group_by_section(fields_by_question_number)
 
     return questions_by_section
 
