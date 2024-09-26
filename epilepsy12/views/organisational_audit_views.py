@@ -165,6 +165,10 @@ def _organisational_audit(request, group_id, group_model, group_field):
     form = OrganisationalAuditSubmissionForm(instance=submission)
     context["questions_by_section"] = group_form_fields(form)
 
+    for _, questions in context["questions_by_section"].items():
+        for question in questions:
+            print(f"!! {question['question_number']} {question.get('field', None)}")
+
     return render(request, "epilepsy12/organisational_audit.html", context)
 
 @login_and_otp_required()

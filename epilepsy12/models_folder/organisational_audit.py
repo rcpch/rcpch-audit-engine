@@ -450,22 +450,40 @@ class OrganisationalAuditSubmission(TimeStampAbstractBaseClass, UserStampAbstrac
         "section": "6. Young People and Transition",
         "parent_question_number": "6.3i",
         "label": "Other"
-    }) # 6.3i
-
+    })
     S06PercentageOfYoungPeopleTransferred = models.PositiveIntegerField(null=True, blank=True, validators=[
         MaxValueValidator(100)
-    ]) # 6.3ii
+    ], help_text={
+        "section": "6. Young People and Transition",
+        "question_number": "6.3ii",
+        "parent_question_number": "6.3",
+        "label": "What percentage of young people transferred to adult services are transitioned through this process?",
+        "reference": "Please provide an estimate"
+    })
 
-    S06ProfessionalsRoutinelyInvolvedInTransitionAdultESN = ChoiceField({
+    S06ProfessionalsRoutinelyInvolvedInTransitionAdultESN = MultiSelectField(choices={
         1: 'Adult ESN',
         2: 'Adult Learning difficulty ESN',
         3: 'Adult Neurologist',
         4: 'Youth Worker',
         5: 'Other'
-    }) # 6.4
-    S06ProfessionalsRoutinelyInvolvedInTransitionAdultESNOther = TextField() # 6.4
+    }, null=True, blank=True, help_text={
+        "section": "6. Young People and Transition",
+        "question_number": "6.4",
+        "label": "Which adult professionals are routinely involved in transition or transfer to adult services?"
+    })
+    S06ProfessionalsRoutinelyInvolvedInTransitionAdultESNOther = TextField(help_text={
+        "section": "6. Young People and Transition",
+        "parent_question_number": "6.4",
+        "label": "Other"
+    })
 
-    S06StructuredResourcesToSupportTransition = YesNoField() # 6.5
+    S06StructuredResourcesToSupportTransition = YesNoField(help_text={
+        "section": "6. Young People and Transition",
+        "question_number": "6.5",
+        "label": "Do you use structured resources to support transition?",
+        "reference": "e.g. Ready Steady Go"
+    })
 
 
     # 7. Mental health
