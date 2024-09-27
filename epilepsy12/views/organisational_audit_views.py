@@ -1,5 +1,7 @@
 from django.shortcuts import render
 
+from multiselectfield.utils import MSFList
+
 from ..models import Trust, LocalHealthBoard, OrganisationalAuditSubmissionPeriod, OrganisationalAuditSubmission
 from ..forms_folder import OrganisationalAuditSubmissionForm
 
@@ -8,26 +10,35 @@ from ..decorator import (
     user_may_view_organisational_audit
 )
 
-def is_child_field_hidden(parent):
+
+# On page load values are integers.
+# For Mutiselect they're an multiselectfield.utils.MSFList.
+# On POST values are strings (for multiselect a list of strings).
+def get_selected_choice_indices_as_strings(field):
+    if type(field.value()) == str:
+        return [field.value()]
+    elif type(field.value()) == int:
+        return [str(field.value())]
+    elif type(field.value()) in [list, MSFList]:
+        return [str(value) for value in field.value()]
+        
+    return []
+
+def is_child_hidden(parent, child):
     if not "field" in parent:
         return False
     
-    parent_field = parent["field"]
-    parent_model_field = OrganisationalAuditSubmission._meta.get_field(parent_field.name)
+    field = parent["field"]
+    model_field = OrganisationalAuditSubmission._meta.get_field(field.name)
 
-    if parent_model_field.choices:
-        # Field values can be integers on page load but strings in request.POST
-        field_value_str = str(parent_field.value())
+    # For normal fields, is the field set at all? (eg children dependent on a yes/no parent)
+    if not model_field.choices:
+        return not field.value()
 
-        for (choice_id, choice_name) in parent_model_field.choices:
-            choice_id_str = str(choice_id)
+    selected_choices = get_selected_choice_indices_as_strings(field)
+    other_choice_index = str(child.help_text.get("parent_question_option", None))
 
-            if(choice_id_str == field_value_str):
-                return choice_name != "Other"
-        
-        return False
-
-    return not parent_field.value()
+    return not other_choice_index in selected_choices
 
 def get_question_by_number(question_number, fields_by_question_number):
     def _get_question_by_number(question):
@@ -105,7 +116,7 @@ def group_form_fields(form):
                 "question_number": question_number,
                 "label": help_text.get("label", field.name),
                 "reference": help_text.get("reference", None),
-                "hidden": is_child_field_hidden(parent),
+                "hidden": is_child_hidden(parent, field),
                 "children": []
             })
         else:
@@ -156,18 +167,14 @@ def _organisational_audit(request, group_id, group_model, group_field):
             submission = OrganisationalAuditSubmission.objects.create(**submission_args)
 
         form = OrganisationalAuditSubmissionForm(request.POST, instance=submission)
+        submission = form.save()
 
         context["questions_by_section"] = group_form_fields(form)
-        form.save()
 
         return render(request, "epilepsy12/partials/organisational_audit_form.html", context)
     
     form = OrganisationalAuditSubmissionForm(instance=submission)
     context["questions_by_section"] = group_form_fields(form)
-
-    for _, questions in context["questions_by_section"].items():
-        for question in questions:
-            print(f"!! {question['question_number']} {question.get('field', None)}")
 
     return render(request, "epilepsy12/organisational_audit.html", context)
 

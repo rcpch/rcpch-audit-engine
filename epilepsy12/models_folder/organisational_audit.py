@@ -31,6 +31,7 @@ def PositiveIntegerField(help_text=None):
 def ChoiceField(choices, help_text=None):
     return models.PositiveIntegerField(choices=choices, null=True, blank=True, help_text=help_text)
 
+# TODO MRB: re-use the existing yes/no constants
 def YesNoUncertainField(help_text=None):
     return models.PositiveIntegerField(choices=YES_NO_UNCERTAIN, null=True, blank=True, help_text=help_text)
 
@@ -399,6 +400,7 @@ class OrganisationalAuditSubmission(TimeStampAbstractBaseClass, UserStampAbstrac
     S05WhoProvidesSpecialistAdviceOther = TextField(help_text={
         "section": "5. Service Contact",
         "parent_question_number": "5.3",
+        "parent_question_option": 5,
         "label": "Other"
     })
 
@@ -449,6 +451,7 @@ class OrganisationalAuditSubmission(TimeStampAbstractBaseClass, UserStampAbstrac
     S06IsThisUsuallyOther = TextField(help_text={
         "section": "6. Young People and Transition",
         "parent_question_number": "6.3i",
+        "parent_question_option": 4,
         "label": "Other"
     })
     S06PercentageOfYoungPeopleTransferred = models.PositiveIntegerField(null=True, blank=True, validators=[
@@ -475,6 +478,7 @@ class OrganisationalAuditSubmission(TimeStampAbstractBaseClass, UserStampAbstrac
     S06ProfessionalsRoutinelyInvolvedInTransitionAdultESNOther = TextField(help_text={
         "section": "6. Young People and Transition",
         "parent_question_number": "6.4",
+        "parent_question_option": 5,
         "label": "Other"
     })
 
