@@ -24,21 +24,27 @@ def get_selected_choice_indices_as_strings(field):
         
     return []
 
-def is_child_hidden(parent, child):
+def show_child_field(parent, child):
     if not "field" in parent:
-        return False
+        return True
     
     field = parent["field"]
     model_field = OrganisationalAuditSubmission._meta.get_field(field.name)
 
+    parent_value = field.value()
+    required_parent_value = child.help_text.get("parent_question_value", True)
+
     # For normal fields, is the field set at all? (eg children dependent on a yes/no parent)
     if not model_field.choices:
-        return not field.value()
+        print(f"!! {field.name} {parent_value} == {required_parent_value}")
+        return parent_value == required_parent_value
 
     selected_choices = get_selected_choice_indices_as_strings(field)
-    other_choice_index = str(child.help_text.get("parent_question_option", None))
+    other_choice_index = str(required_parent_value)
 
-    return not other_choice_index in selected_choices
+    print(f"!! {field.name} {other_choice_index} in {selected_choices}")
+
+    return other_choice_index in selected_choices
 
 def get_question_by_number(question_number, fields_by_question_number):
     def _get_question_by_number(question):
@@ -109,6 +115,8 @@ def group_form_fields(form):
 
             fields_by_question_number[parent_question_number] = parent
 
+        print(f"!! {question_number} - parent: {parent}")
+
         if parent:
             parent["children"].append({
                 "section": section,
@@ -116,7 +124,7 @@ def group_form_fields(form):
                 "question_number": question_number,
                 "label": help_text.get("label", field.name),
                 "reference": help_text.get("reference", None),
-                "hidden": is_child_hidden(parent, field),
+                "hidden": not show_child_field(parent, field),
                 "children": []
             })
         else:

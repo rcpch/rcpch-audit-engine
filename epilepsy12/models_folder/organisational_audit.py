@@ -402,7 +402,7 @@ class OrganisationalAuditSubmission(TimeStampAbstractBaseClass, UserStampAbstrac
     S05WhoProvidesSpecialistAdviceOther = TextField(help_text={
         "section": "5. Service Contact",
         "parent_question_number": "5.3",
-        "parent_question_option": 5,
+        "parent_question_value": 5,
         "label": "Other"
     })
 
@@ -453,7 +453,7 @@ class OrganisationalAuditSubmission(TimeStampAbstractBaseClass, UserStampAbstrac
     S06IsThisUsuallyOther = TextField(help_text={
         "section": "6. Young People and Transition",
         "parent_question_number": "6.3i",
-        "parent_question_option": 4,
+        "parent_question_value": 4,
         "label": "Other"
     })
     S06PercentageOfYoungPeopleTransferred = models.PositiveIntegerField(null=True, blank=True, validators=[
@@ -480,7 +480,7 @@ class OrganisationalAuditSubmission(TimeStampAbstractBaseClass, UserStampAbstrac
     S06ProfessionalsRoutinelyInvolvedInTransitionAdultESNOther = TextField(help_text={
         "section": "6. Young People and Transition",
         "parent_question_number": "6.4",
-        "parent_question_option": 5,
+        "parent_question_value": 5,
         "label": "Other"
     })
 
@@ -522,7 +522,7 @@ class OrganisationalAuditSubmission(TimeStampAbstractBaseClass, UserStampAbstrac
     S07MentalHealthQuestionnaireOther = TextField(help_text={
         "section": "7. Mental health",
         "parent_question_number": "7.1i",
-        "parent_question_option": 12,
+        "parent_question_value": 12,
     })
 
     S07MentalHealthAgreedPathway = ChoiceField(choices={
@@ -540,7 +540,8 @@ class OrganisationalAuditSubmission(TimeStampAbstractBaseClass, UserStampAbstrac
     S07MentalHealthAgreedPathwayOther = TextField(help_text={
         "section": "7. Mental health",
         "parent_question_number": "7.2",
-        "parent_question_option": 5,
+        "parent_question_value": 5,
+        "label": "Other"
     })
 
     S07MentalHealthProvisionEpilepsyClinics = YesNoField(help_text={
@@ -554,17 +555,23 @@ class OrganisationalAuditSubmission(TimeStampAbstractBaseClass, UserStampAbstrac
         3: 'Other'
     }, help_text={
         "section": "7. Mental health",
-        "question_number": "7.3i",
+        "question_number": "7.3.1",
         "parent_question_number": "7.3",
         "label": "Does this comprise:"
     })
     S07DoesThisCompriseOther = TextField(help_text={
         "section": "7. Mental health",
-        "parent_question_number": "7.3i",
-        "parent_question_option": 3,
+        "parent_question_number": "7.3.1",
+        "parent_question_value": 3,
     })
+
     S07CurrentTrustActionPlanCoLocatedMentalHealth = YesNoField(help_text={
-        
+        "section": "7. Mental health",
+        "question_number": "7.3.2",
+        "parent_question_number": "7.3",
+        # If no to question 7.3
+        "parent_question_value": False,
+        "label": "Is there a current action plan describing steps towards co-located mental health provision within epilepsy clinics?",
     })
 
     S07TrustAchieve = ChoiceField({
