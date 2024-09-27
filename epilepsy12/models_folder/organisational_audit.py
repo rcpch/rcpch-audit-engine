@@ -2,7 +2,7 @@ from django.core.validators import MaxValueValidator
 from django.contrib.gis.db import models
 
 from simple_history.models import HistoricalRecords
-from multiselectfield import MultiSelectField
+import multiselectfield
 
 from .entities.trust import Trust
 from .entities.local_health_board import LocalHealthBoard
@@ -35,6 +35,8 @@ def ChoiceField(choices, help_text=None):
 def YesNoUncertainField(help_text=None):
     return models.PositiveIntegerField(choices=YES_NO_UNCERTAIN, null=True, blank=True, help_text=help_text)
 
+def MultiSelectField(choices, help_text=None):
+    return multiselectfield.MultiSelectField(choices=choices, null=True, blank=True, help_text=help_text)
 
 class OrganisationalAuditSubmissionPeriod(models.Model):
     year = models.PositiveIntegerField()
@@ -138,7 +140,7 @@ class OrganisationalAuditSubmission(TimeStampAbstractBaseClass, UserStampAbstrac
         8: 'School meetings',
         9: 'Ward visits',
         10: 'None of the above'
-    }, null=True, blank=True, help_text={
+    }, help_text={
         "section": "1. Workforce",
         "parent_question_number": "1.4",
         "question_number": "1.4i",
@@ -470,7 +472,7 @@ class OrganisationalAuditSubmission(TimeStampAbstractBaseClass, UserStampAbstrac
         3: 'Adult Neurologist',
         4: 'Youth Worker',
         5: 'Other'
-    }, null=True, blank=True, help_text={
+    }, help_text={
         "section": "6. Young People and Transition",
         "question_number": "6.4",
         "label": "Which adult professionals are routinely involved in transition or transfer to adult services?"
@@ -493,8 +495,12 @@ class OrganisationalAuditSubmission(TimeStampAbstractBaseClass, UserStampAbstrac
     # 7. Mental health
 
     # TODO MRB: in the CSV it references ADHD, ASD, Mental Health and None but in the docs it's Yes/No
-    S07ScreenForIssuesMentalHealth = YesNoField() # 7.1
-    S07MentalHealthQuestionnaire = ChoiceField({
+    S07ScreenForIssuesMentalHealth = YesNoField(help_text={
+        "section": "7. Mental health",
+        "question_number": "7.1",
+        "label": "In the paediatric epilepsy service do you routinely formally screen for mental health disorders?"
+    })
+    S07MentalHealthQuestionnaire = MultiSelectField(choices={
         1: 'BDI - Beck Depression Inventory',
         2: "Connor's Questionnaire",
         3: 'Emotional Thermometers Tool',
@@ -507,26 +513,59 @@ class OrganisationalAuditSubmission(TimeStampAbstractBaseClass, UserStampAbstrac
         10: 'PHQ - Patient Health Questionnaire, PHQ 2, PHQ 9',
         11: 'SDQ (Strengths and Difficulties Questionnaire)',
         12: 'Other'
-    }) # 7.1i
-    S07MentalHealthQuestionnaireOther = TextField() # 7.1i
+    }, help_text={
+        "section": "7. Mental health",
+        "question_number": "7.1i",
+        "parent_question_number": "7.1",
+        "label": "Which questionnaires do you use?",
+    })
+    S07MentalHealthQuestionnaireOther = TextField(help_text={
+        "section": "7. Mental health",
+        "parent_question_number": "7.1i",
+        "parent_question_option": 12,
+    })
 
-    S07MentalHealthAgreedPathway =ChoiceField({
+    S07MentalHealthAgreedPathway = ChoiceField(choices={
         1: 'Anxiety',
+        # TODO MRB: not in the word doc but in the source CSV
         2: 'Depression',
         3: 'Mood Disorders',
         4: 'Non-epileptic attack disorders',
         5: 'Other'
-    }) # 7.2
-    S07MentalHealthAgreedPathwayOther = TextField() # 7.2
+    }, help_text={
+        "section": "7. Mental health",
+        "question_number": "7.2",
+        "label": "Do you have agreed referral pathways for children with any of the following mental health concerns?",
+    })
+    S07MentalHealthAgreedPathwayOther = TextField(help_text={
+        "section": "7. Mental health",
+        "parent_question_number": "7.2",
+        "parent_question_option": 5,
+    })
 
-    S07MentalHealthProvisionEpilepsyClinics = YesNoField() # 7.3
-    S07DoesThisCompromise = ChoiceField({
+    S07MentalHealthProvisionEpilepsyClinics = YesNoField(help_text={
+        "section": "7. Mental health",
+        "question_number": "7.3",
+        "label": "Do you facilitate mental health provision within epilepsy clinics?"
+    })
+    S07DoesThisComprise = ChoiceField(choices={
         1: 'Epilepsy Clinics where mental health professionals can provide direct co-located clinical care',
         2: 'MDT meetings where epilepsy and mental health professionals discuss individual patients',
         3: 'Other'
-    }) # 7.3i
-    S07DoesThisCompromiseOther = TextField() # 7.3.1
-    S07CurrentTrustActionPlanCoLocatedMentalHealth = YesNoField() # 7.3.2
+    }, help_text={
+        "section": "7. Mental health",
+        "question_number": "7.3i",
+        "parent_question_number": "7.3",
+        "label": "Does this comprise:"
+    })
+    S07DoesThisCompriseOther = TextField(help_text={
+        "section": "7. Mental health",
+        "parent_question_number": "7.3i",
+        "parent_question_option": 3,
+    })
+    S07CurrentTrustActionPlanCoLocatedMentalHealth = YesNoField(help_text={
+        
+    })
 
     S07TrustAchieve = ChoiceField({
         1: 'Clinical psychology assessment',
