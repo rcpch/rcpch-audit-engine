@@ -1,3 +1,6 @@
+# Logging setup
+import logging
+
 # Django
 from django.utils import timezone
 from django.contrib.auth.decorators import permission_required
@@ -54,6 +57,8 @@ from ..constants import (
     AUDIT_CENTRE_ROLES,
     EPILEPSY12_AUDIT_TEAM_FULL_ACCESS,
 )
+
+logger = logging.getLogger(__name__)
 
 
 @login_and_otp_required()
@@ -605,7 +610,7 @@ class ResetPasswordConfirmView(PasswordResetConfirmView):
     def form_valid(self, form):
         # Store the user's email in the session
         self.request.session["user_email"] = form.user.email
-        print(f"Password reset requested for {form.user.email}")
+        logging.info(f"Password reset requested for {form.user.email}")
         return super().form_valid(form)
 
 
