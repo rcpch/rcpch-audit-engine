@@ -523,6 +523,7 @@ class OrganisationalAuditSubmission(TimeStampAbstractBaseClass, UserStampAbstrac
         "section": "7. Mental health",
         "parent_question_number": "7.1i",
         "parent_question_value": 12,
+        "label": "Other"
     })
 
     S07MentalHealthAgreedPathway = ChoiceField(choices={
@@ -613,6 +614,7 @@ class OrganisationalAuditSubmission(TimeStampAbstractBaseClass, UserStampAbstrac
     })
     S08AgreedReferralCriteriaChildrenNeurodevelopmentalOther = TextField(help_text={
         "section": "8. Neurodevelopmental support",
+        "label": "Other",
         "parent_question_number": "8.2",
         "parent_question_value": 7
     })
@@ -620,13 +622,22 @@ class OrganisationalAuditSubmission(TimeStampAbstractBaseClass, UserStampAbstrac
 
     # 9. Care Planning
 
-    S09ComprehensiveCarePlanningChildrenEpilepsy = YesNoField() # 9.1
+    S09ComprehensiveCarePlanningChildrenEpilepsy = YesNoField(help_text={
+        "section": "9. Care Planning",
+        "question_number": "9.1",
+        "label": "Do you undertake comprehensive care planning for children with epilepsy?"
+    })
 
 
     # 10. Patient Database/Register
 
-    S10TrustMaintainADatabaseOfChildrenWithEpilepsy = ChoiceField({
+    S10TrustMaintainADatabaseOfChildrenWithEpilepsy = ChoiceField(choices={
         1: 'Yes, for all children',
         2: 'Yes, for some children',
         3: 'No'
-    }) # 10.1
+    }, help_text={
+        "section": "10. Patient Database/Register",
+        "question_number": "10.1",
+        "label": "Does you maintain a database or register of children with epilepsies?",
+        "reference": "Other than the epilepsy12 audit itself"
+    })
