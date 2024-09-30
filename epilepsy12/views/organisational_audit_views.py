@@ -36,13 +36,10 @@ def show_child_field(parent, child):
 
     # For normal fields, is the field set at all? (eg children dependent on a yes/no parent)
     if not model_field.choices:
-        print(f"!! {field.name} {parent_value} == {required_parent_value}")
         return parent_value == required_parent_value
 
     selected_choices = get_selected_choice_indices_as_strings(field)
     other_choice_index = str(required_parent_value)
-
-    print(f"!! {field.name} {other_choice_index} in {selected_choices}")
 
     return other_choice_index in selected_choices
 
@@ -114,8 +111,6 @@ def group_form_fields(form):
             }
 
             fields_by_question_number[parent_question_number] = parent
-
-        print(f"!! {question_number} - parent: {parent}")
 
         if parent:
             parent["children"].append({

@@ -574,14 +574,18 @@ class OrganisationalAuditSubmission(TimeStampAbstractBaseClass, UserStampAbstrac
         "label": "Is there a current action plan describing steps towards co-located mental health provision within epilepsy clinics?",
     })
 
-    S07TrustAchieve = ChoiceField({
+    S07TrustAchieve = MultiSelectField(choices={
         1: 'Clinical psychology assessment',
         2: 'Educational psychology assessment',
         3: 'Formal developmental assessment',
         4: 'Neurospsychology assessment',
         5: 'Psychiatric assessment',
         6: 'Cannot achieve any of the above'
-    }) # 7.4
+    }, help_text={
+        "section": "7. Mental health",
+        "question_number": "7.4",
+        "label": "Can you refer to any of the following where required, either within or outside of your audit unit?"
+    })
 
 
     # 8. Neurodevelopmental support
