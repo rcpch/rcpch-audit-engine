@@ -591,8 +591,13 @@ class OrganisationalAuditSubmission(TimeStampAbstractBaseClass, UserStampAbstrac
     # 8. Neurodevelopmental support
 
     # TODO MRB: this is not in the CSV?
-    S08ScreenForNeurodevelopmentalConditions = YesNoField() # 8.1
-    S08AgreedReferralCriteriaChildrenNeurodevelopmental = ChoiceField({
+    S08ScreenForNeurodevelopmentalConditions = YesNoField(help_text={
+        "section": "8. Neurodevelopmental support",
+        "question_number": "8.1",
+        "label": "Do you routinely formalling screen for neurodevelopmental conditions?"
+    })
+
+    S08AgreedReferralCriteriaChildrenNeurodevelopmental = MultiSelectField(choices={
         1: 'ADHD',
         2: 'ASD',
         3: 'Behavioural difficulties',
@@ -601,8 +606,16 @@ class OrganisationalAuditSubmission(TimeStampAbstractBaseClass, UserStampAbstrac
         6: 'Learning disabilities',
         8: 'None of the above',
         7: 'Other'
-    })  # 8.1
-    S08AgreedReferralCriteriaChildrenNeurodevelopmentalOther = TextField() # 8.1
+    }, help_text={
+        "section": "8. Neurodevelopmental support",
+        "question_number": "8.2",
+        "label": "Do you have agreed referral criteria for children with any of the following neurodevelopmental conditions?"
+    })
+    S08AgreedReferralCriteriaChildrenNeurodevelopmentalOther = TextField(help_text={
+        "section": "8. Neurodevelopmental support",
+        "parent_question_number": "8.2",
+        "parent_question_value": 7
+    })
 
 
     # 9. Care Planning
