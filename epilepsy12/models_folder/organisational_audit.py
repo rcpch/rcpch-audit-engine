@@ -526,7 +526,7 @@ class OrganisationalAuditSubmission(TimeStampAbstractBaseClass, UserStampAbstrac
         "label": "Other"
     })
 
-    S07MentalHealthAgreedPathway = ChoiceField(choices={
+    S07MentalHealthAgreedPathway = MultiSelectField(choices={
         1: 'Anxiety',
         # TODO MRB: not in the word doc but in the source CSV
         2: 'Depression',
