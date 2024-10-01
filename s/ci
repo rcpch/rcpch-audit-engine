@@ -18,7 +18,7 @@ s/get-build-info > build_info.json
 docker compose build
 
 # Build the docs
-docker compose run --env ENABLE_GIT_COMMITTERS=false mkdocs /bin/bash -c 'mkdocs build --config-file documentation/mkdocs.yml'
+docker compose run mkdocs /bin/bash -c 'mkdocs build --config-file documentation/mkdocs.yml'
 
 # HOTFIX: Build again to embed the docs
 docker compose build

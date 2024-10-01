@@ -45,10 +45,10 @@ pytest-django==4.8.0
 pytest-factoryboy==2.7.0
 rapidfuzz==3.9.6
 
-mkdocs-material==9.5.32
+mkdocs-material==9.5.39
 mkdocs-git-committers-plugin-2==2.3.0 # displays authors at the bottom of the page
-mkdocs-git-revision-date-localized-plugin==1.2.7 # displays last edit date at the bottom of the page
-mkdocs-macros-plugin==1.0.5 # enables 'foldable' admonition text (used for large code blocks)
+mkdocs-git-revision-date-localized-plugin==1.2.9 # displays last edit date at the bottom of the page
+mkdocs-macros-plugin==1.2.0 # enables 'foldable' admonition text (used for large code blocks)
 mkdocs-with-pdf==0.9.3 # PDF export feature
 
 # for colored logs
