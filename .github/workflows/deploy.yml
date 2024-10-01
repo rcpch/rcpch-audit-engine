@@ -1,9 +1,10 @@
-name: Deploy on push to test ACA branch
+name: Deploy on push to live ACA branch
 
 on:
   push:
     branches:
       - live
+      - mbarton/debug-ci
 
 permissions:
   id-token: write

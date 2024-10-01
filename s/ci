@@ -18,7 +18,7 @@ s/get-build-info > build_info.json
 docker compose build
 
 # Build the docs
-docker compose run mkdocs /bin/bash -c 'mkdocs build --config-file documentation/mkdocs.yml'
+# docker compose run mkdocs /bin/bash -c 'mkdocs build --config-file documentation/mkdocs.yml'
 
 # HOTFIX: Build again to embed the docs
 docker compose build
@@ -40,9 +40,9 @@ az containerapp revision copy \
     --image ${azure_tag} \
     --query 'properties.provisioningState'
 
-# Deploy to production
-az containerapp revision copy \
-    --name ${AZURE_LIVE_APP_NAME} \
-    --resource-group ${AZURE_RESOURCE_GROUP} \
-    --image ${azure_tag} \
-    --query 'properties.provisioningState'
+# # Deploy to production
+# az containerapp revision copy \
+#     --name ${AZURE_LIVE_APP_NAME} \
+#     --resource-group ${AZURE_RESOURCE_GROUP} \
+#     --image ${azure_tag} \
+#     --query 'properties.provisioningState'
