@@ -254,4 +254,50 @@ class OrganisationalAuditSubmissionForm(forms.ModelForm):
                 "label": "Requesting and consenting of Whole Genome Sequencing (WGS)",
                 "parent_question_number": "4",
             },
+            "S05ContactEpilepsyServiceForSpecialistAdvice": {
+                "section": "5. Service Contact",
+                "question_number": "5.1",
+                "label": "Can patients contact the Epilepsy service for specialist advice?",
+                "reference": "e.g. from a paediatrician with expertise, paediatric neurologist or ESN) between scheduled reviews?"
+            },
+            "S05AdviceAvailableAllWeekdays": {
+                "section": "5. Service Contact",
+                "question_number": "5.1.1",
+                "parent_question_number": "5.1",
+                "label": "Is this available all weekdays?"
+            },
+            "S05AdviceAvailableAllOutOfHours": {
+                "section": "5. Service Contact",
+                "question_number": "5.1.2",
+                "parent_question_number": "5.1",
+                "label": "Is this available out of hours?"
+            },
+            "S05AdviceAvailable52WeeksPerYear": {
+                "section": "5. Service Contact",
+                "question_number": "5.1.3",
+                "parent_question_number": "5.1",
+                "label": "Is this available 52 weeks per year?"
+            },
+            "S05TypicalTimeToAchieveSpecialistAdvice": {
+                "section": "5. Service Contact",
+                "question_number": "5.2",
+                "label": "What would your service describe as a typical time for a parent or young person to achieve specialist advice?"
+            },
+            "S05WhoProvidesSpecialistAdvice": {
+                "section": "5. Service Contact",
+                "question_number": "5.3",
+                "label": "Who typically provides the initial ‘specialist advice’?"   
+            },
+            "S05WhoProvidesSpecialistAdviceOther": {
+                "section": "5. Service Contact",
+                "parent_question_number": "5.3",
+                "parent_question_value": 5,
+                "label": "Other"
+            },
+            "S05evidenceclearpointofcontact": {
+                "section": "5. Service Contact",
+                "question_number": "5.4",
+                "label": "Do you have evidence of a clear point of contact for non‐paediatric professionals seeking paediatric epilepsy support?",
+                "reference": "(e.g. school, social care, CAMHS, adult services)"
+            }
         }
