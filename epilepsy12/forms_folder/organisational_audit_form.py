@@ -415,4 +415,31 @@ class OrganisationalAuditSubmissionForm(forms.ModelForm):
                 "question_number": "7.4",
                 "label": "Can you refer to any of the following where required, either within or outside of your audit unit?"
             },
+            "S08ScreenForNeurodevelopmentalConditions": {
+                "section": "8. Neurodevelopmental support",
+                "question_number": "8.1",
+                "label": "Do you routinely formalling screen for neurodevelopmental conditions?"
+            },
+            "S08AgreedReferralCriteriaChildrenNeurodevelopmental": {
+                "section": "8. Neurodevelopmental support",
+                "question_number": "8.2",
+                "label": "Do you have agreed referral criteria for children with any of the following neurodevelopmental conditions?"
+            },
+            "S08AgreedReferralCriteriaChildrenNeurodevelopmentalOther": {
+                "section": "8. Neurodevelopmental support",
+                "label": "Other",
+                "parent_question_number": "8.2",
+                "parent_question_value": 7
+            },
+            "S09ComprehensiveCarePlanningChildrenEpilepsy": {
+                "section": "9. Care Planning",
+                "question_number": "9.1",
+                "label": "Do you undertake comprehensive care planning for children with epilepsy?"
+            },
+            "S10TrustMaintainADatabaseOfChildrenWithEpilepsy": {
+                "section": "10. Patient Database/Register",
+                "question_number": "10.1",
+                "label": "Does you maintain a database or register of children with epilepsies?",
+                "reference": "Other than the epilepsy12 audit itself"
+            }
         }

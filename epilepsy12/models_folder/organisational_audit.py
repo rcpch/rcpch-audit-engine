@@ -259,11 +259,7 @@ class OrganisationalAuditSubmission(TimeStampAbstractBaseClass, UserStampAbstrac
     # 8. Neurodevelopmental support
 
     # TODO MRB: this is not in the CSV?
-    S08ScreenForNeurodevelopmentalConditions = YesNoField(help_text={
-        "section": "8. Neurodevelopmental support",
-        "question_number": "8.1",
-        "label": "Do you routinely formalling screen for neurodevelopmental conditions?"
-    })
+    S08ScreenForNeurodevelopmentalConditions = YesNoField() # 8.1
 
     S08AgreedReferralCriteriaChildrenNeurodevelopmental = MultiSelectField(choices={
         1: 'ADHD',
@@ -274,26 +270,13 @@ class OrganisationalAuditSubmission(TimeStampAbstractBaseClass, UserStampAbstrac
         6: 'Learning disabilities',
         8: 'None of the above',
         7: 'Other'
-    }, help_text={
-        "section": "8. Neurodevelopmental support",
-        "question_number": "8.2",
-        "label": "Do you have agreed referral criteria for children with any of the following neurodevelopmental conditions?"
     })
-    S08AgreedReferralCriteriaChildrenNeurodevelopmentalOther = TextField(help_text={
-        "section": "8. Neurodevelopmental support",
-        "label": "Other",
-        "parent_question_number": "8.2",
-        "parent_question_value": 7
-    })
+    S08AgreedReferralCriteriaChildrenNeurodevelopmentalOther = TextField() # 8.2
 
 
     # 9. Care Planning
 
-    S09ComprehensiveCarePlanningChildrenEpilepsy = YesNoField(help_text={
-        "section": "9. Care Planning",
-        "question_number": "9.1",
-        "label": "Do you undertake comprehensive care planning for children with epilepsy?"
-    })
+    S09ComprehensiveCarePlanningChildrenEpilepsy = YesNoField() # 9.1
 
 
     # 10. Patient Database/Register
@@ -302,9 +285,4 @@ class OrganisationalAuditSubmission(TimeStampAbstractBaseClass, UserStampAbstrac
         1: 'Yes, for all children',
         2: 'Yes, for some children',
         3: 'No'
-    }, help_text={
-        "section": "10. Patient Database/Register",
-        "question_number": "10.1",
-        "label": "Does you maintain a database or register of children with epilepsies?",
-        "reference": "Other than the epilepsy12 audit itself"
-    })
+    }) # 10.1
