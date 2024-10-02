@@ -173,55 +173,22 @@ class OrganisationalAuditSubmission(TimeStampAbstractBaseClass, UserStampAbstrac
 
     # 6. Young People and Transition
 
-    S06AgreedReferralPathwaysAdultServices = YesNoField(help_text={
-        "section": "6. Young People and Transition",
-        "question_number": "6.1",
-        "label": "Do you have agreed referral pathways to adult services?"
-    })
+    S06AgreedReferralPathwaysAdultServices = YesNoField() # 6.1
 
-    S06OutpatientClinicYoungPeopleEpilepsies = YesNoField(help_text={
-        "section": "6. Young People and Transition",
-        "question_number": "6.2",
-        "label": "Do you have a specific outpatient clinic for 'young people' with epilepsies that supports transition?"
-    })
-    S06WhatAgeDoesThisClinicAcceptYoungPeople = PositiveIntegerField(help_text={
-        "section": "6. Young People and Transition",
-        "question_number": "6.2i",
-        "parent_question_number": "6.2",
-        "label": "From what age does this clinic typically accept young people?"
-    })
+    S06OutpatientClinicYoungPeopleEpilepsies = YesNoField() # 6.2
+    S06WhatAgeDoesThisClinicAcceptYoungPeople = PositiveIntegerField() # 6.2i
 
-    S06ServiceForEpilepsyBothAdultAndPaed = YesNoField(help_text={
-        "section": "6. Young People and Transition",
-        "question_number": "6.3",
-        "label": "Do you have an outpatient service for epilepsy where there is a presence of both adult and paediatric professionals??"
-    })
+    S06ServiceForEpilepsyBothAdultAndPaed = YesNoField() # 6.3
     S06IsThisUsually = ChoiceField(choices={
         1: 'A single joint appointment',
         2: 'A series of several joint appointments',
         3: 'A flexible approach including mixture of joint or individual reviews',
         4: 'Other'
-    }, help_text={
-        "section": "6. Young People and Transition",
-        "question_number": "6.3i",
-        "parent_question_number": "6.3",
-        "label": "Is this usually:"
     })
-    S06IsThisUsuallyOther = TextField(help_text={
-        "section": "6. Young People and Transition",
-        "parent_question_number": "6.3i",
-        "parent_question_value": 4,
-        "label": "Other"
-    })
+    S06IsThisUsuallyOther = TextField() # 6.3i
     S06PercentageOfYoungPeopleTransferred = models.PositiveIntegerField(null=True, blank=True, validators=[
         MaxValueValidator(100)
-    ], help_text={
-        "section": "6. Young People and Transition",
-        "question_number": "6.3ii",
-        "parent_question_number": "6.3",
-        "label": "What percentage of young people transferred to adult services are transitioned through this process?",
-        "reference": "Please provide an estimate"
-    })
+    ]) # 6.3ii
 
     S06ProfessionalsRoutinelyInvolvedInTransitionAdultESN = MultiSelectField(choices={
         1: 'Adult ESN',
@@ -229,24 +196,10 @@ class OrganisationalAuditSubmission(TimeStampAbstractBaseClass, UserStampAbstrac
         3: 'Adult Neurologist',
         4: 'Youth Worker',
         5: 'Other'
-    }, help_text={
-        "section": "6. Young People and Transition",
-        "question_number": "6.4",
-        "label": "Which adult professionals are routinely involved in transition or transfer to adult services?"
     })
-    S06ProfessionalsRoutinelyInvolvedInTransitionAdultESNOther = TextField(help_text={
-        "section": "6. Young People and Transition",
-        "parent_question_number": "6.4",
-        "parent_question_value": 5,
-        "label": "Other"
-    })
+    S06ProfessionalsRoutinelyInvolvedInTransitionAdultESNOther = TextField() # 6.4
 
-    S06StructuredResourcesToSupportTransition = YesNoField(help_text={
-        "section": "6. Young People and Transition",
-        "question_number": "6.5",
-        "label": "Do you use structured resources to support transition?",
-        "reference": "e.g. Ready Steady Go"
-    })
+    S06StructuredResourcesToSupportTransition = YesNoField() # 6.5
 
 
     # 7. Mental health

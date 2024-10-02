@@ -299,5 +299,62 @@ class OrganisationalAuditSubmissionForm(forms.ModelForm):
                 "question_number": "5.4",
                 "label": "Do you have evidence of a clear point of contact for non‐paediatric professionals seeking paediatric epilepsy support?",
                 "reference": "(e.g. school, social care, CAMHS, adult services)"
+            },
+            "S06AgreedReferralPathwaysAdultServices": {
+                "section": "6. Young People and Transition",
+                "question_number": "6.1",
+                "label": "Do you have agreed referral pathways to adult services?"
+            },
+            "S06OutpatientClinicYoungPeopleEpilepsies": {
+                "section": "6. Young People and Transition",
+                "question_number": "6.2",
+                "label": "Do you have a specific outpatient clinic for 'young people' with epilepsies that supports transition?"
+            },
+            "S06WhatAgeDoesThisClinicAcceptYoungPeople": {
+                "section": "6. Young People and Transition",
+                "question_number": "6.2i",
+                "parent_question_number": "6.2",
+                "label": "From what age does this clinic typically accept young people?"
+            },
+            "S06ServiceForEpilepsyBothAdultAndPaed": {
+                "section": "6. Young People and Transition",
+                "question_number": "6.3",
+                "label": "Do you have an outpatient service for epilepsy where there is a presence of both adult and paediatric professionals??"
+            },
+            "S06IsThisUsually": {
+                "section": "6. Young People and Transition",
+                "question_number": "6.3i",
+                "parent_question_number": "6.3",
+                "label": "Is this usually:"
+            },
+            "S06IsThisUsuallyOther": {
+                "section": "6. Young People and Transition",
+                "parent_question_number": "6.3i",
+                "parent_question_value": 4,
+                "label": "Other"
+            },
+            "S06PercentageOfYoungPeopleTransferred": {
+                "section": "6. Young People and Transition",
+                "question_number": "6.3ii",
+                "parent_question_number": "6.3",
+                "label": "What percentage of young people transferred to adult services are transitioned through this process?",
+                "reference": "Please provide an estimate"
+            },
+            "S06ProfessionalsRoutinelyInvolvedInTransitionAdultESN": {
+                "section": "6. Young People and Transition",
+                "question_number": "6.4",
+                "label": "Which adult professionals are routinely involved in transition or transfer to adult services?"
+            },
+            "S06ProfessionalsRoutinelyInvolvedInTransitionAdultESNOther": {
+                "section": "6. Young People and Transition",
+                "parent_question_number": "6.4",
+                "parent_question_value": 5,
+                "label": "Other"
+            },
+            "S06StructuredResourcesToSupportTransition": {
+                "section": "6. Young People and Transition",
+                "question_number": "6.5",
+                "label": "Do you use structured resources to support transition?",
+                "reference": "e.g. Ready Steady Go"
             }
         }
