@@ -32,58 +32,53 @@ def show_child_field(parent, child):
     model_field = OrganisationalAuditSubmission._meta.get_field(field.name)
 
     parent_value = field.value()
-    required_parent_value = child.help_text.get("parent_question_value", True)
+    required_parent_value = child.help_text.get("parent_question_value", None)
 
     # For normal fields, is the field set at all? (eg children dependent on a yes/no parent)
     if not model_field.choices:
-        return parent_value == required_parent_value
+        if required_parent_value:
+            return parent_value == required_parent_value
+        elif parent_value == '0':
+            return False
+        else:
+            return bool(parent_value)
 
     selected_choices = get_selected_choice_indices_as_strings(field)
     other_choice_index = str(required_parent_value)
 
     return other_choice_index in selected_choices
 
-def group_by_section(fields_by_question_number):
+def accumulate_children(question, parent_hidden):
+    ret = []
+
+    # If the parent is hidden the children should be too (for example nested Other options in 6.3 and 7.3)
+    question["hidden"] = parent_hidden or question.get("hidden", parent_hidden)
+    children = question.get("children", [])
+
+    for child in children:
+        ret.append(child)
+        ret.extend(accumulate_children(child, parent_hidden=question["hidden"]))
+    
+    return ret
+
+def group_questions(fields_by_question_number):
     questions_by_section = {}
 
     for question in fields_by_question_number.values():
-        section = question["section"]
+        if question.get("is_child", False):
+            continue
+
+        section = question.get("section", "XX. Other")
 
         if not section in questions_by_section:
             questions_by_section[section] = []
 
+        # Avoid writing recursive rendering code by bringing every child question up to their top level parent
+        question["children"] = accumulate_children(question, parent_hidden=False)
+
         questions_by_section[section].append(question)
 
     return questions_by_section
-
-# Avoid writing recursive rendering code by bringing every child question up to their top level parent
-def hoist_children_to_top_level_parent_and_remove_from_top_level(fields_by_question_number):
-    children_to_delete_at_top_level = []
-
-    def _accumulate_nested_children(question, children, parent_hidden, remove_question_number):
-        for child in question.get("children", []):
-            if parent_hidden:
-                child["hidden"] = True
-
-            children.append(child)
-            children_to_delete_at_top_level.append(child["question_number"])
-
-            if remove_question_number:
-                del child["question_number"]
-
-            parent_hidden = child.get("hidden", False)
-
-            _accumulate_nested_children(child, children, parent_hidden, remove_question_number=True)
-        
-        return children
-
-    for question in fields_by_question_number.values():
-        parent_hidden = question.get("hidden", False)
-        question["children"] = _accumulate_nested_children(question, [], parent_hidden, remove_question_number=False)
-    
-    for child_question_number in children_to_delete_at_top_level:
-        if child_question_number in fields_by_question_number:
-            del fields_by_question_number[child_question_number]
 
 def group_form_fields(form):
     fields_by_question_number = {}
@@ -97,10 +92,15 @@ def group_form_fields(form):
         help_text = model_field.help_text or {}
         
         section = help_text.get("section", "Other")
-        question_number = help_text.get("question_number", ix)
         parent_question_number = help_text.get("parent_question_number", None)
-        
         parent = fields_by_question_number.get(parent_question_number, None)
+
+        question_number = help_text.get("question_number", None)
+        hide_question_number = False
+
+        if not question_number:
+            question_number = f"XX.{ix}"
+            hide_question_number = True
 
         # Some questions like 3.5 don't have a direct representation in the model so construct them
         # from help text defined on the first child
@@ -120,9 +120,11 @@ def group_form_fields(form):
                 "section": section,
                 "field": field,
                 "question_number": question_number,
+                "hide_question_number": hide_question_number,
                 "label": help_text.get("label", field.name),
                 "reference": help_text.get("reference", None),
                 "hidden": not show_child_field(parent, field),
+                "is_child": True,
                 "children": []
             }
 
@@ -133,6 +135,7 @@ def group_form_fields(form):
                 "section": section,
                 "field": field,
                 "question_number": question_number,
+                "hide_question_number": hide_question_number,
                 "label": help_text.get("label", field.name),
                 "reference": help_text.get("reference", None),
                 "children": []
@@ -140,8 +143,7 @@ def group_form_fields(form):
         
         ix += 1
     
-    hoist_children_to_top_level_parent_and_remove_from_top_level(fields_by_question_number)
-    questions_by_section = group_by_section(fields_by_question_number)
+    questions_by_section = group_questions(fields_by_question_number)
 
     return questions_by_section
 

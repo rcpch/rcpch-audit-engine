@@ -32,7 +32,9 @@
                         {% else %}
                             <div class="field">
                                 <label>
-                                    <em>{{child.question_number}}</em>
+                                    {% if not child.hide_question_number %}
+                                        <em>{{child.question_number}}</em>
+                                    {% endif %}
                                     {{child.label}}
                                 </label>
                                 <div class="field">
