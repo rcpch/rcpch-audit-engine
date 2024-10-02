@@ -158,6 +158,8 @@ admin.site.register(Trust)
 admin.site.register(LocalHealthBoard)
 admin.site.register(OPENUKNetwork)
 
+admin.site.register(OrganisationalAuditSubmission)
+admin.site.register(OrganisationalAuditSubmissionPeriod)
 
 admin.site.site_header = "Epilepsy12 admin"
 admin.site.site_title = "Epilepsy12 admin"
