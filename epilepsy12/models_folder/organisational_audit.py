@@ -564,6 +564,7 @@ class OrganisationalAuditSubmission(TimeStampAbstractBaseClass, UserStampAbstrac
         "section": "7. Mental health",
         "parent_question_number": "7.3.1",
         "parent_question_value": 3,
+        "label": "Other"
     })
 
     S07CurrentTrustActionPlanCoLocatedMentalHealth = YesNoField(help_text={

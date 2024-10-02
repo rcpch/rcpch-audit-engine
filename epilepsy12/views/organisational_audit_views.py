@@ -56,27 +56,34 @@ def group_by_section(fields_by_question_number):
 
     return questions_by_section
 
-def hoist_nested_children(fields_by_question_number):
+# Avoid writing recursive rendering code by bringing every child question up to their top level parent
+def hoist_children_to_top_level_parent_and_remove_from_top_level(fields_by_question_number):
     children_to_delete_at_top_level = []
 
-    def _accumulate_nested_children(question, children, parent_hidden):
+    def _accumulate_nested_children(question, children, parent_hidden, remove_question_number):
         for child in question.get("children", []):
             if parent_hidden:
                 child["hidden"] = True
 
             children.append(child)
-            children_to_delete_at_top_level.append(child)
+            children_to_delete_at_top_level.append(child["question_number"])
 
-            _accumulate_nested_children(child, children, child.get("hidden", False))
+            if remove_question_number:
+                del child["question_number"]
+
+            parent_hidden = child.get("hidden", False)
+
+            _accumulate_nested_children(child, children, parent_hidden, remove_question_number=True)
         
         return children
 
     for question in fields_by_question_number.values():
-        question["children"] = _accumulate_nested_children(question, [], question.get("hidden", False))
+        parent_hidden = question.get("hidden", False)
+        question["children"] = _accumulate_nested_children(question, [], parent_hidden, remove_question_number=False)
     
-    for child in children_to_delete_at_top_level:
-        if child["question_number"] in fields_by_question_number:
-            del fields_by_question_number[child["question_number"]]
+    for child_question_number in children_to_delete_at_top_level:
+        if child_question_number in fields_by_question_number:
+            del fields_by_question_number[child_question_number]
 
 def group_form_fields(form):
     fields_by_question_number = {}
@@ -133,7 +140,7 @@ def group_form_fields(form):
         
         ix += 1
     
-    hoist_nested_children(fields_by_question_number)
+    hoist_children_to_top_level_parent_and_remove_from_top_level(fields_by_question_number)
     questions_by_section = group_by_section(fields_by_question_number)
 
     return questions_by_section
