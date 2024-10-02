@@ -89,7 +89,7 @@ def group_form_fields(form):
         model_field = OrganisationalAuditSubmission._meta.get_field(field.name)
 
         # TODO MRB: put the help text on the form to avoid migrations every time it changes?
-        help_text = model_field.help_text or {}
+        help_text = field.help_text or model_field.help_text or {}
         
         section = help_text.get("section", "Other")
         parent_question_number = help_text.get("parent_question_number", None)
