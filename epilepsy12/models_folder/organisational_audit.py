@@ -97,106 +97,33 @@ class OrganisationalAuditSubmission(TimeStampAbstractBaseClass, UserStampAbstrac
 
     # 2. Epilepsy Clinic configuration
 
-    S02DefinedEpilepsyClinics = YesNoField(help_text={
-        "section": "2. Epilepsy Clinic configuration",
-        "question_number": "2.1",
-        "label": "Does the Health Board/Trust have defined epilepsy clinics seeing patients at a secondary level?",
-        "reference": "A secondary level 'epilepsy clinic' is a clinic run just for children with seizures or epilepsy that takes referrals direct from GPs or emergency department (decimal answers are allowed). An ‘Epilepsy Clinic’ is defined as a paediatric clinic where all the children and young people attending have epilepsy or possible epileptic seizures."
-    })
-    S02EpilepsyClinicsPerWeek = DecimalField(help_text={
-        "section": "2. Epilepsy Clinic configuration",
-        "parent_question_number": "2.1",
-        "question_number": "2.1i",
-        "label": "On average, how many consultant (or associate specialist) led secondary level ‘epilepsy clinics’ for children or young people take place within your Health Board/Trust per week?"
-    })
-    S02Consultant20Mins = YesNoField(help_text={
-        "section": "2. Epilepsy Clinic configuration",
-       "parent_question_number": "2.1",
-       "question_number": "2.1ii",
-       "label": "Within the epilepsy clinics, does the clinic booking time allow at least 20 minutes of time with a consultant with expertise in epilepsy and an ESN? (This might be 20 min with the doctor and nurse at the same time or 20 mins each in succession)"
-    })
+    S02DefinedEpilepsyClinics = YesNoField() # 2.1
+    S02EpilepsyClinicsPerWeek = DecimalField() # 2.1i
+    S02Consultant20Mins = YesNoField() # 2.1ii
 
     S02TFC223 = ChoiceField(choices={
         1: 'Not applicable',
         2: 'Yes',
         3: 'No, not at all',
         4: 'No, in development'
-    }, help_text={
-        "section": "2. Epilepsy Clinic configuration",
-        "question_number": "2.2",
-        # TODO MRB: hide this question for Wales
-        "label": "Does the Trust currently run TFC 223 Epilepsy Best Practice Criteria (BPC) clinics?",
-        "reference": "For Trusts in England only"
-    })
+    }) # 2.2
 
 
     # 3. Tertiary provision
 
-    S03WTEPaediatricNeurologists = DecimalField(help_text={
-        "section": "3. Tertiary provision",
-        "question_number": "3.1",
-        "label": "How many whole-time equivalent (WTE) paediatric neurologists who manage children with epilepsy do you employ?",
-        "reference": """
-            <p>
-                Acutely and or non-acutely.
-            </p>
-            <p>
-                This should not include visiting neurologists who are primarily employed by another trust 
-            </p>
-        """
-    })
-    S03PathwaysTertiaryPaedNeurology = YesNoField(help_text={
-        "section": "3. Tertiary provision",
-        "question_number": "3.2",
-        "label": "Does you have agreed referral pathways to tertiary paediatric neurology services?"
-    })
-    S03PaedNeurologistsDirectReferrals = YesNoField(help_text={
-        "section": "3. Tertiary provision",
-        "question_number": "3.3",
-        "label": "Can paediatric neurologists receive direct referrals from general practice or emergency services to assess children with possible epilepsy?"
-    })
-    S03SatellitePaediatricNeurologyClinics = YesNoField(help_text={
-        "section": "3. Tertiary provision",
-        "question_number": "3.4",
-        "label": "Do you host satellite paediatric neurology clinics?",
-        "reference": """
-            <p>
-                e.g. a paediatric neurologist visits a site within the trust to undertake paediatric neurology clinics
-            </p>
-            <p>
-                A satellite clinic is where a neurologist supports a clinic outside their base hospital. This might be another hospital or clinic location in their trust or another hospital or clinic location in another trust. 
-            </p>
-        """
-    })
+    S03WTEPaediatricNeurologists = DecimalField() # 3.1
 
-    S03CommenceKetogenicDiet = YesNoUncertainField(help_text={
-        "section": "3. Tertiary provision",
-        "question_number": "3.5i",
-        "label": "Commence ketogenic diet",
-        # 3.5 itself has no representation in the model, we construct it from the help text alone
-        "parent_question_number": "3.5",
-        "parent_question_label": "Which of the following services can be obtained?",
-        "parent_question_reference": "If the child would have to travel to a location outside your audit unit then answer ‘no‘"
-    })
-    S03ReviewKetogenicDiet = YesNoUncertainField(help_text={
-        "section": "3. Tertiary provision",
-        "question_number": "3.5ii",
-        "label": "Ongoing dietetic review of ketogenic diet",
-        "parent_question_number": "3.5",
-        # no need to repeat the label and reference, we can use them from above
-    })
-    S03VNSInsertion = YesNoUncertainField(help_text={
-        "section": "3. Tertiary provision",
-        "question_number": "3.5iii",
-        "label": "Vagal Nerve Stimulator (VNS) Insertion",
-        "parent_question_number": "3.5",
-    })
-    S03VNSReview = YesNoUncertainField(help_text={
-        "section": "3. Tertiary provision",
-        "question_number": "3.5iv",
-        "label": "VNS review",
-        "parent_question_number": "3.5"
-    })
+    S03PathwaysTertiaryPaedNeurology = YesNoField() # 3.2
+
+    S03PaedNeurologistsDirectReferrals = YesNoField() # 3.3
+
+    S03SatellitePaediatricNeurologyClinics = YesNoField() # 3.4
+
+    # 3.5 itself has no representation in the model, we construct it from the help text alone
+    S03CommenceKetogenicDiet = YesNoUncertainField() # 3.5i
+    S03ReviewKetogenicDiet = YesNoUncertainField() # 3.5ii
+    S03VNSInsertion = YesNoUncertainField() # 3.5iii
+    S03VNSReview = YesNoUncertainField() # 3.5iv
 
     
     # 4. Investigations

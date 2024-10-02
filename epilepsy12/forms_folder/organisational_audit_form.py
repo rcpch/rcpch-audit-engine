@@ -105,5 +105,67 @@ class OrganisationalAuditSubmissionForm(forms.ModelForm):
                 # TODO MRB: hide this question for Wales
                 "label": "Does the Trust currently run TFC 223 Epilepsy Best Practice Criteria (BPC) clinics?",
                 "reference": "For Trusts in England only"
+            },
+            "S03WTEPaediatricNeurologists": {
+                "section": "3. Tertiary provision",
+                "question_number": "3.1",
+                "label": "How many whole-time equivalent (WTE) paediatric neurologists who manage children with epilepsy do you employ?",
+                "reference": """
+                    <p>
+                        Acutely and or non-acutely.
+                    </p>
+                    <p>
+                        This should not include visiting neurologists who are primarily employed by another trust 
+                    </p>
+                """
+            },
+            "S03PathwaysTertiaryPaedNeurology": {
+                "section": "3. Tertiary provision",
+                "question_number": "3.2",
+                "label": "Does you have agreed referral pathways to tertiary paediatric neurology services?"
+            },
+            "S03PaedNeurologistsDirectReferrals": {
+                "section": "3. Tertiary provision",
+                "question_number": "3.3",
+                "label": "Can paediatric neurologists receive direct referrals from general practice or emergency services to assess children with possible epilepsy?"
+            },
+            "S03SatellitePaediatricNeurologyClinics": {
+                "section": "3. Tertiary provision",
+                "question_number": "3.4",
+                "label": "Do you host satellite paediatric neurology clinics?",
+                "reference": """
+                    <p>
+                        e.g. a paediatric neurologist visits a site within the trust to undertake paediatric neurology clinics
+                    </p>
+                    <p>
+                        A satellite clinic is where a neurologist supports a clinic outside their base hospital. This might be another hospital or clinic location in their trust or another hospital or clinic location in another trust. 
+                    </p>
+                """
+            },
+            "S03CommenceKetogenicDiet": {
+                "section": "3. Tertiary provision",
+                "question_number": "3.5i",
+                "label": "Commence ketogenic diet",
+                "parent_question_number": "3.5",
+                "parent_question_label": "Which of the following services can be obtained?",
+                "parent_question_reference": "If the child would have to travel to a location outside your audit unit then answer ‘no‘"
+            },
+            "S03ReviewKetogenicDiet": {
+                "section": "3. Tertiary provision",
+                "question_number": "3.5ii",
+                "label": "Ongoing dietetic review of ketogenic diet",
+                "parent_question_number": "3.5",
+            },
+            "S03VNSInsertion": {
+                "section": "3. Tertiary provision",
+                "question_number": "3.5iii",
+                "label": "Vagal Nerve Stimulator (VNS) Insertion",
+                "parent_question_number": "3.5",
+            },
+            "S03VNSReview": {
+                "section": "3. Tertiary provision",
+                "question_number": "3.5iv",
+                "label": "VNS review",
+                "parent_question_number": "3.5"
             }
         }
