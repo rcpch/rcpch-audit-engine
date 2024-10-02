@@ -356,5 +356,63 @@ class OrganisationalAuditSubmissionForm(forms.ModelForm):
                 "question_number": "6.5",
                 "label": "Do you use structured resources to support transition?",
                 "reference": "e.g. Ready Steady Go"
-            }
+            },
+            "S07ScreenForIssuesMentalHealth": {
+                "section": "7. Mental health",
+                "question_number": "7.1",
+                "label": "In the paediatric epilepsy service do you routinely formally screen for mental health disorders?"
+            },
+            "S07MentalHealthQuestionnaire": {
+                "section": "7. Mental health",
+                "question_number": "7.1i",
+                "parent_question_number": "7.1",
+                "label": "Which questionnaires do you use?",
+            },
+            "S07MentalHealthQuestionnaireOther": {
+                "section": "7. Mental health",
+                "parent_question_number": "7.1i",
+                "parent_question_value": 12,
+                "label": "Other"
+            },
+            "S07MentalHealthAgreedPathway": {
+                "section": "7. Mental health",
+                "question_number": "7.2",
+                "label": "Do you have agreed referral pathways for children with any of the following mental health concerns?",
+            },
+            "S07MentalHealthAgreedPathwayOther": {
+                "section": "7. Mental health",
+                "parent_question_number": "7.2",
+                "parent_question_value": 5,
+                "label": "Other"
+            },
+            "S07MentalHealthProvisionEpilepsyClinics": {
+                "section": "7. Mental health",
+                "question_number": "7.3",
+                "label": "Do you facilitate mental health provision within epilepsy clinics?"
+            },
+            "S07DoesThisComprise": {
+                "section": "7. Mental health",
+                "question_number": "7.3.1",
+                "parent_question_number": "7.3",
+                "label": "Does this comprise:"
+            },
+            "S07DoesThisCompriseOther": {
+                "section": "7. Mental health",
+                "parent_question_number": "7.3.1",
+                "parent_question_value": 3,
+                "label": "Other"
+            },
+            "S07CurrentTrustActionPlanCoLocatedMentalHealth": {
+                "section": "7. Mental health",
+                "question_number": "7.3.2",
+                "parent_question_number": "7.3",
+                # If no to question 7.3
+                "parent_question_value": False,
+                "label": "Is there a current action plan describing steps towards co-located mental health provision within epilepsy clinics?",
+            },
+            "S07TrustAchieve": {
+                "section": "7. Mental health",
+                "question_number": "7.4",
+                "label": "Can you refer to any of the following where required, either within or outside of your audit unit?"
+            },
         }

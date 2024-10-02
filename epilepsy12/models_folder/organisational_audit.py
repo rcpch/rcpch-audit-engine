@@ -205,11 +205,7 @@ class OrganisationalAuditSubmission(TimeStampAbstractBaseClass, UserStampAbstrac
     # 7. Mental health
 
     # TODO MRB: in the CSV it references ADHD, ASD, Mental Health and None but in the docs it's Yes/No
-    S07ScreenForIssuesMentalHealth = YesNoField(help_text={
-        "section": "7. Mental health",
-        "question_number": "7.1",
-        "label": "In the paediatric epilepsy service do you routinely formally screen for mental health disorders?"
-    })
+    S07ScreenForIssuesMentalHealth = YesNoField() # 7.1
     S07MentalHealthQuestionnaire = MultiSelectField(choices={
         1: 'BDI - Beck Depression Inventory',
         2: "Connor's Questionnaire",
@@ -223,18 +219,8 @@ class OrganisationalAuditSubmission(TimeStampAbstractBaseClass, UserStampAbstrac
         10: 'PHQ - Patient Health Questionnaire, PHQ 2, PHQ 9',
         11: 'SDQ (Strengths and Difficulties Questionnaire)',
         12: 'Other'
-    }, help_text={
-        "section": "7. Mental health",
-        "question_number": "7.1i",
-        "parent_question_number": "7.1",
-        "label": "Which questionnaires do you use?",
-    })
-    S07MentalHealthQuestionnaireOther = TextField(help_text={
-        "section": "7. Mental health",
-        "parent_question_number": "7.1i",
-        "parent_question_value": 12,
-        "label": "Other"
-    })
+    }) 
+    S07MentalHealthQuestionnaireOther = TextField() # 7.1i
 
     S07MentalHealthAgreedPathway = MultiSelectField(choices={
         1: 'Anxiety',
@@ -248,43 +234,17 @@ class OrganisationalAuditSubmission(TimeStampAbstractBaseClass, UserStampAbstrac
         "question_number": "7.2",
         "label": "Do you have agreed referral pathways for children with any of the following mental health concerns?",
     })
-    S07MentalHealthAgreedPathwayOther = TextField(help_text={
-        "section": "7. Mental health",
-        "parent_question_number": "7.2",
-        "parent_question_value": 5,
-        "label": "Other"
-    })
+    S07MentalHealthAgreedPathwayOther = TextField() # 7.2
 
-    S07MentalHealthProvisionEpilepsyClinics = YesNoField(help_text={
-        "section": "7. Mental health",
-        "question_number": "7.3",
-        "label": "Do you facilitate mental health provision within epilepsy clinics?"
-    })
+    S07MentalHealthProvisionEpilepsyClinics = YesNoField() # 7.3
     S07DoesThisComprise = ChoiceField(choices={
         1: 'Epilepsy Clinics where mental health professionals can provide direct co-located clinical care',
         2: 'MDT meetings where epilepsy and mental health professionals discuss individual patients',
         3: 'Other'
-    }, help_text={
-        "section": "7. Mental health",
-        "question_number": "7.3.1",
-        "parent_question_number": "7.3",
-        "label": "Does this comprise:"
     })
-    S07DoesThisCompriseOther = TextField(help_text={
-        "section": "7. Mental health",
-        "parent_question_number": "7.3.1",
-        "parent_question_value": 3,
-        "label": "Other"
-    })
+    S07DoesThisCompriseOther = TextField() # 7.3.1
 
-    S07CurrentTrustActionPlanCoLocatedMentalHealth = YesNoField(help_text={
-        "section": "7. Mental health",
-        "question_number": "7.3.2",
-        "parent_question_number": "7.3",
-        # If no to question 7.3
-        "parent_question_value": False,
-        "label": "Is there a current action plan describing steps towards co-located mental health provision within epilepsy clinics?",
-    })
+    S07CurrentTrustActionPlanCoLocatedMentalHealth = YesNoField() # 7.3.2
 
     S07TrustAchieve = MultiSelectField(choices={
         1: 'Clinical psychology assessment',
@@ -293,11 +253,7 @@ class OrganisationalAuditSubmission(TimeStampAbstractBaseClass, UserStampAbstrac
         4: 'Neurospsychology assessment',
         5: 'Psychiatric assessment',
         6: 'Cannot achieve any of the above'
-    }, help_text={
-        "section": "7. Mental health",
-        "question_number": "7.4",
-        "label": "Can you refer to any of the following where required, either within or outside of your audit unit?"
-    })
+    }) # 7.4
 
 
     # 8. Neurodevelopmental support
