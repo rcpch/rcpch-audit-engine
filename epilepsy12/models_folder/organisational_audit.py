@@ -7,36 +7,34 @@ import multiselectfield
 from .entities.trust import Trust
 from .entities.local_health_board import LocalHealthBoard
 
-from .help_text_mixin import HelpTextMixin
 from .time_and_user_abstract_base_classes import TimeStampAbstractBaseClass, UserStampAbstractBaseClass
 
-YES_NO_UNCERTAIN = {
-    1: 'Yes',
-    2: 'No',
-    3: 'Uncertain'
-}
 
-def DecimalField(help_text=None):
-    return models.DecimalField(null=True, blank=True, max_digits=7, decimal_places=3, help_text=help_text)
+def DecimalField():
+    return models.DecimalField(null=True, blank=True, max_digits=7, decimal_places=3)
 
-def YesNoField(help_text=None):
-    return models.BooleanField(null=True, blank=True, help_text=help_text)
+def YesNoField():
+    return models.BooleanField(null=True, blank=True)
 
-def TextField(help_text=None):
-    return models.CharField(null=True, blank=True, help_text=help_text)
+def TextField():
+    return models.CharField(null=True, blank=True)
 
-def PositiveIntegerField(help_text=None):
-    return models.PositiveIntegerField(null=True, blank=True, help_text=help_text)
+def PositiveIntegerField():
+    return models.PositiveIntegerField(null=True, blank=True)
 
-def ChoiceField(choices, help_text=None):
-    return models.PositiveIntegerField(choices=choices, null=True, blank=True, help_text=help_text)
+def ChoiceField(choices):
+    return models.PositiveIntegerField(choices=choices, null=True, blank=True)
 
-# TODO MRB: re-use the existing yes/no constants
 def YesNoUncertainField(help_text=None):
-    return models.PositiveIntegerField(choices=YES_NO_UNCERTAIN, null=True, blank=True, help_text=help_text)
+    return ChoiceField(choices={
+        1: 'Yes',
+        2: 'No',
+        3: 'Uncertain'
+    })
 
 def MultiSelectField(choices, help_text=None):
-    return multiselectfield.MultiSelectField(choices=choices, null=True, blank=True, help_text=help_text)
+    return multiselectfield.MultiSelectField(choices=choices, null=True, blank=True)
+
 
 class OrganisationalAuditSubmissionPeriod(models.Model):
     year = models.PositiveIntegerField()
@@ -46,8 +44,8 @@ class OrganisationalAuditSubmissionPeriod(models.Model):
         return f"Organisational Audit Submission Period {self.year}"
 
 
-class OrganisationalAuditSubmission(TimeStampAbstractBaseClass, UserStampAbstractBaseClass, HelpTextMixin):
-    submission_period = models.ForeignKey(OrganisationalAuditSubmissionPeriod, on_delete=models.CASCADE)
+class OrganisationalAuditSubmission(TimeStampAbstractBaseClass, UserStampAbstractBaseClass):
+    submission_period = models.ForeignKey(OrganisationalAuditSubmissionPeriod, on_delete=models.PROTECT)
 
     # Either
     trust = models.ForeignKey(Trust, null=True, on_delete=models.SET_NULL)
@@ -229,10 +227,6 @@ class OrganisationalAuditSubmission(TimeStampAbstractBaseClass, UserStampAbstrac
         3: 'Mood Disorders',
         4: 'Non-epileptic attack disorders',
         5: 'Other'
-    }, help_text={
-        "section": "7. Mental health",
-        "question_number": "7.2",
-        "label": "Do you have agreed referral pathways for children with any of the following mental health concerns?",
     })
     S07MentalHealthAgreedPathwayOther = TextField() # 7.2
 
