@@ -167,5 +167,91 @@ class OrganisationalAuditSubmissionForm(forms.ModelForm):
                 "question_number": "3.5iv",
                 "label": "VNS review",
                 "parent_question_number": "3.5"
-            }
+            },
+            "S04LeadECG": {
+                "section": "4. Investigations",
+                "question_number": "4.1i",
+                "label": "12 lead ECG",
+                "parent_question_number": "4",
+                "parent_question_label": "Which of the following investigations can be obtained?",
+                "parent_question_reference": "If the child would have to travel to a location outside your audit unit then answer ‘no‘"
+            },
+            "S04AwakeMRI": {
+                "section": "4. Investigations",
+                "question_number": "4.1ii",
+                "label": "'awake' MRI",
+                "parent_question_number": "4",
+            },
+            "S04MriWithSedation": {
+                "section": "4. Investigations",
+                "question_number": "4.1iii",
+                "label": "MRI with sedation",
+                "parent_question_number": "4",
+            },
+            "S04MriWithGeneralAnaesthetic": {
+                "section": "4. Investigations",
+                "question_number": "4.1iv",
+                "label": "MRI with general anaesthetic",
+                "parent_question_number": "4",
+            },
+            "S04StandardEeg": {
+                "section": "4. Investigations",
+                "question_number": "4.1v",
+                "label": "Standard EEG",
+                "parent_question_number": "4",
+            },
+            "S04SleepDeprivedEeg": {
+                "section": "4. Investigations",
+                "question_number": "4.1vi",
+                "label": "Sleep deprived EEG",
+                "parent_question_number": "4",
+            },
+            "S04MelatoninInducedEeg": {
+                "section": "4. Investigations",
+                "question_number": "4.1vii",
+                "label": "Melatonin induced EEG",
+                "parent_question_number": "4",
+            },
+            "S04SedatedEeg": {
+                "section": "4. Investigations",
+                "question_number": "4.1viii",
+                "label": "Sedated EEG",
+                "parent_question_number": "4",
+            },
+            "S042448HAmbulatoryEeg": {
+                "section": "4. Investigations",
+                "question_number": "4.1ix",
+                "label": "24/48h ambulatory EEG",
+                "parent_question_number": "4",
+            },
+            "S04InpatientVideoTelemetry": {
+                "section": "4. Investigations",
+                "question_number": "4.1x",
+                "label": "Inpatient video telemetry",
+                "parent_question_number": "4",
+            },
+            "S04OutpatientVideoTelemetry": {
+                "section": "4. Investigations",
+                "question_number": "4.1xi",
+                "label": "Outpatient video telemetry",
+                "parent_question_number": "4",
+            },
+            "S04HomeVideoTelemetry": {
+                "section": "4. Investigations",
+                "question_number": "4.1xii",
+                "label": "Home video telemetry",
+                "parent_question_number": "4",
+            },
+            "S04PortableEEGOnWardAreaWithinTrust": {
+                "section": "4. Investigations",
+                "question_number": "4.1xiii",
+                "label": "Portable EEG on ward area within Trust",
+                "parent_question_number": "4",
+            },
+            "S04WholeGenomeSequencing": {
+                "section": "4. Investigations",
+                "question_number": "4.1xiv",
+                "label": "Requesting and consenting of Whole Genome Sequencing (WGS)",
+                "parent_question_number": "4",
+            },
         }
