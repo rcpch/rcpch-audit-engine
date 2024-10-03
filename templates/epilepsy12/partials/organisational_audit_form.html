@@ -18,9 +18,13 @@
                         <div class="field icon-text">
                             <span class="inline-icon-text">
                                 {% if parent.completed %}
-                                    <i class="rcpch_pink check circle outline icon"></i>
+                                    <span data-tooltip="Scored field">
+                                        <i class="rcpch_pink check circle outline icon"></i>
+                                    </span>
                                 {% else %}
-                                    <i class="rcpch_light_blue dot circle outline icon" ></i>
+                                    <span data-tooltip="Unscored field">
+                                        <i class="rcpch_light_blue dot circle outline icon"></i>
+                                    </span>
                                 {% endif %}
                                 {{parent.field}}
                             </span>
@@ -50,9 +54,13 @@
                                 <div class="field">
                                     <span class="inline-icon-text">
                                         {% if child.completed %}
-                                            <i class="rcpch_pink check circle outline icon"></i>
+                                            <span data-tooltip="Scored field">
+                                                <i class="rcpch_pink check circle outline icon"></i>
+                                            </span>
                                         {% else %}
-                                            <i class="rcpch_light_blue dot circle outline icon" ></i>
+                                            <span data-tooltip="Unscored field">
+                                                <i class="rcpch_light_blue dot circle outline icon"></i>
+                                            </span>
                                         {% endif %}
                                         {{child.field}}
                                     </span>
