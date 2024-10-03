@@ -31,6 +31,8 @@ from .logging_settings import (
 
 logger = logging.getLogger(__name__)
 
+load_dotenv("envs/.env")
+
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
 BASE_DIR = Path(__file__).resolve().parent.parent
 
@@ -194,15 +196,11 @@ database_config = {
 password_file = os.environ.get("E12_POSTGRES_DB_PASSWORD_FILE")
 
 if password_file:
-    database_config["OPTIONS"] = {
-        "passfile": password_file
-    }
+    database_config["OPTIONS"] = {"passfile": password_file}
 else:
     database_config["PASSWORD"] = os.environ.get("E12_POSTGRES_DB_PASSWORD")
 
-DATABASES = {
-    "default": database_config
-}
+DATABASES = {"default": database_config}
 
 # Password validation
 # https://docs.djangoproject.com/en/3.2/ref/settings/#auth-password-validators
@@ -257,6 +255,10 @@ if SMTP_EMAIL_ENABLED is True:
 else:
     EMAIL_BACKEND = "django.core.mail.backends.console.EmailBackend"
 logger.info("EMAIL_BACKEND: %s", EMAIL_BACKEND)
+
+# PASSWORD_RESET_TIMEOUT = os.environ.get(
+#     "PASSWORD_RESET_TIMEOUT", 120
+# )  # Default: 259200 (2 minutes, in seconds) - 2 minutes for testing
 
 PASSWORD_RESET_TIMEOUT = os.environ.get(
     "PASSWORD_RESET_TIMEOUT", 259200

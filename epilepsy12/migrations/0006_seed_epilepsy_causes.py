@@ -91,6 +91,8 @@ def seed_epilepsy_causes(apps, schema_editor):
     # 14q32 deletion syndrome (disorder) SCTID: 879939002
     # 16p11.2 deletion syndrome is 699307007
     # 16p11.2 microduplication syndrome 765142003
+    # Mesial temporal lobe epilepsy with hippocampal sclerosis 770643005
+    # Interstitial heterozygous deletion 2q13 to 2q14.1 1196837008 - NOTE THIS DOES NOT EXIST IN CURRENT SNOMED TERMINOLOGY SERVER: ADD MANUALLY
     # POLG mitochondrial disorder - NOTE THIS NEEDS ADDING TO THE DATABASE MANUALLY AS THERE IS NO SNOMED CODE
     # PPRT2 associated disorder - NOTE THIS NEEDS ADDING TO THE DATABASE MANUALLY AS THERE IS NO SNOMED CODE
     # 10p 15.3 microdeletion syndrome - NOTE THIS NEEDS ADDING TO THE DATABASE MANUALLY AS THERE IS NO SNOMED CODE
@@ -139,6 +141,7 @@ def seed_epilepsy_causes(apps, schema_editor):
         879939002,
         699307007,
         765142003,
+        770643005,
         28781004,
         699254009,
     ]

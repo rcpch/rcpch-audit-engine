@@ -1,3 +1,6 @@
+# Logging setup
+import logging
+
 # Django
 from django.utils import timezone
 from django.contrib.auth.decorators import permission_required
@@ -36,6 +39,7 @@ from ..models import Epilepsy12User, Organisation, VisitActivity, Site
 from epilepsy12.forms_folder.epilepsy12_user_form import (
     Epilepsy12UserAdminCreationForm,
     CaptchaAuthenticationForm,
+    Epilepsy12PasswordResetForm,
 )
 from ..general_functions import (
     construct_confirm_email,
@@ -53,6 +57,8 @@ from ..constants import (
     AUDIT_CENTRE_ROLES,
     EPILEPSY12_AUDIT_TEAM_FULL_ACCESS,
 )
+
+logger = logging.getLogger(__name__)
 
 
 @login_and_otp_required()
@@ -580,6 +586,7 @@ class ResetPasswordView(SuccessMessageMixin, PasswordResetView):
         + timedelta(seconds=int(settings.PASSWORD_RESET_TIMEOUT))
     }
     success_url = reverse_lazy("index")
+    form_class = Epilepsy12PasswordResetForm
 
     # extend form_valid to set user.password_last_set
     def form_valid(self, form):
@@ -598,11 +605,12 @@ class ResetPasswordView(SuccessMessageMixin, PasswordResetView):
 
 
 class ResetPasswordConfirmView(PasswordResetConfirmView):
-    # overridden custom django password reset work flow. User has submitted a valide password for reset
+    # overridden custom django password reset work flow. User has submitted a valid password for reset
     # their email is stored in session for use later to update logs if they are successful
     def form_valid(self, form):
         # Store the user's email in the session
         self.request.session["user_email"] = form.user.email
+        logging.info(f"Password reset requested for {form.user.email}")
         return super().form_valid(form)
 
 

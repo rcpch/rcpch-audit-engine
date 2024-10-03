@@ -1,3 +1,4 @@
+from collections.abc import Iterator
 from typing import Any
 import logging
 
@@ -5,7 +6,11 @@ from django import forms
 from django.conf import settings
 from django.core import validators
 from django.core.exceptions import ValidationError
-from django.contrib.auth.forms import AuthenticationForm, SetPasswordForm
+from django.contrib.auth.forms import (
+    AuthenticationForm,
+    SetPasswordForm,
+    PasswordResetForm,
+)
 from django.utils.translation import gettext as _
 from django.utils import timezone
 
@@ -343,3 +348,17 @@ class CaptchaAuthenticationForm(AuthenticationForm):
                         "You have failed to login 5 or more consecutive times. You have been locked out for 10 minutes"
                     )
             return email.lower()
+
+
+class Epilepsy12PasswordResetForm(PasswordResetForm):
+    """
+    This is a standard Django form to be used by users to reset their password
+    It is not possible in standard Django for users to reset their passwords if their account is inactive or they have an unusable password.
+    Since new accounts are created with unusable passwords, if a user fails to confirm their email address they will be unable to reset their password.
+    This form is overridden to allow users to reset their password if their account has an unusable password. This still have to be active users
+    """
+
+    def get_users(self, email: str):
+        return Epilepsy12User.objects.filter(
+            email__iexact=email, is_active=True
+        )  # only return active users including those with unusable passwords
