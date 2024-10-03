@@ -87,12 +87,25 @@ def group_questions(fields_by_question_number):
 
 
 def group_form_fields(form):
+    # Loops trough the form fields and groups them by section and question number
+    # The question number is taken from the help text of the field
+    # This function is called with every field updated in the form and rerenders the form partial
+
     fields_by_question_number = {}
 
     ix = 0
 
     for field in form:
         model_field = OrganisationalAuditSubmission._meta.get_field(field.name)
+
+        submission = OrganisationalAuditSubmission.objects.filter(
+            pk=form.instance.pk
+        ).get()  # from should always be bound to an instance
+
+        if getattr(submission, field.name):
+            completed = True
+        else:
+            completed = False
 
         # TODO MRB: put the help text on the form to avoid migrations every time it changes?
         help_text = field.help_text or model_field.help_text or {}
@@ -117,6 +130,7 @@ def group_form_fields(form):
                 "label": help_text.get("parent_question_label", None),
                 "reference": help_text.get("parent_question_reference", None),
                 "children": [],
+                "completed": completed,
             }
 
             fields_by_question_number[parent_question_number] = parent
@@ -132,10 +146,11 @@ def group_form_fields(form):
                 "hidden": not show_child_field(parent, field),
                 "is_child": True,
                 "children": [],
+                "completed": completed,
             }
-
             fields_by_question_number[question_number] = child
             parent["children"].append(child)
+
         else:
             fields_by_question_number[question_number] = {
                 "section": section,
@@ -145,6 +160,7 @@ def group_form_fields(form):
                 "label": help_text.get("label", field.name),
                 "reference": help_text.get("reference", None),
                 "children": [],
+                "completed": completed,
             }
 
         ix += 1
