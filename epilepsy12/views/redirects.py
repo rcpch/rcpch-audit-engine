@@ -52,7 +52,7 @@ def redirect_403(request):
 def rcpch_404(request, exception):
     # return the custom 404 template. There is no context to add.
     return render(
-        request, template_name="epilepsy12/error_pages/rcpch_404.html", context={}
+        request, template_name="epilepsy12/error_pages/rcpch_404.html", status=404, context={}
     )
 
 

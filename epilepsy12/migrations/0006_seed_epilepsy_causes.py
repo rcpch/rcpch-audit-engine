@@ -93,6 +93,13 @@ def seed_epilepsy_causes(apps, schema_editor):
     # 16p11.2 microduplication syndrome 765142003
     # Mesial temporal lobe epilepsy with hippocampal sclerosis 770643005
     # Interstitial heterozygous deletion 2q13 to 2q14.1 1196837008 - NOTE THIS DOES NOT EXIST IN CURRENT SNOMED TERMINOLOGY SERVER: ADD MANUALLY
+    # POLG mitochondrial disorder - NOTE THIS NEEDS ADDING TO THE DATABASE MANUALLY AS THERE IS NO SNOMED CODE
+    # PPRT2 associated disorder - NOTE THIS NEEDS ADDING TO THE DATABASE MANUALLY AS THERE IS NO SNOMED CODE
+    # 10p 15.3 microdeletion syndrome - NOTE THIS NEEDS ADDING TO THE DATABASE MANUALLY AS THERE IS NO SNOMED CODE
+    #  16q 24.3 microdeletion syndrome - NOTE THIS NEEDS ADDING TO THE DATABASE MANUALLY AS THERE IS NO SNOMED CODE
+    # Usmani-Riazuddin syndrome  - NOTE THIS NEEDS ADDING TO THE DATABASE MANUALLY AS THERE IS NO SNOMED CODE
+    #  Craniopharyngioma SCTID: 189179009
+    # 15q 13.3 microdeletion syndrome SCTID: 699254009
 
     extra_concept_ids = [
         764946008,
@@ -135,6 +142,8 @@ def seed_epilepsy_causes(apps, schema_editor):
         699307007,
         765142003,
         770643005,
+        28781004,
+        699254009,
     ]
     add_epilepsy_cause_list_by_sctid(extra_concept_ids=extra_concept_ids)
 

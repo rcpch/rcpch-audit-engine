@@ -1,0 +1,44 @@
+.org-audit-field {
+    padding: 1em;
+}
+
+.org-audit-field:not(:last-child) {
+    border-bottom: 1px solid var(--rcpch_light_grey);
+}
+
+.org-audit-parent-field {
+    display: flex;
+}
+
+.org-audit-child-fields {
+    padding-left: 2em;
+    padding-top: .5em;
+    font-size: 0.85em;
+}
+
+.org-audit-field em {
+    font-style: normal;
+    font-size: 1.3em;
+}
+
+.org-audit-field label {
+    /* !important to override Semantic UI font-size */
+    font-size: 1.2em !important;
+    display: block;
+    margin-bottom: 1em;
+}
+
+.org-audit-cell {
+    padding: .5em;
+    flex: 50%;
+}
+
+.org-audit-reference {
+    background-color: var(--rcpch_lightest_grey);
+}
+
+.org-audit-section-title {
+    background-color: var(--rcpch_light_blue);
+    color: var(--rcpch_white);
+    padding: 1em;
+}

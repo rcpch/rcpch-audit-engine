@@ -21,6 +21,9 @@ from dotenv import load_dotenv
 # third party imports
 from django.core.management.utils import get_random_secret_key
 
+# Must be above importing logging settigns as we read environment variables there
+load_dotenv('envs/.env')
+
 # RCPCH imports
 from .logging_settings import (
     LOGGING,
