@@ -94,6 +94,7 @@ def group_form_fields(form):
     fields_by_question_number = {}
 
     ix = 0
+    number_completed = 0
 
     for field in form:
         model_field = OrganisationalAuditSubmission._meta.get_field(field.name)
@@ -104,6 +105,7 @@ def group_form_fields(form):
 
         if getattr(submission, field.name):
             completed = True
+            number_completed += 1
         else:
             completed = False
 
@@ -167,7 +169,7 @@ def group_form_fields(form):
 
     questions_by_section = group_questions(fields_by_question_number)
 
-    return questions_by_section
+    return questions_by_section, number_completed, ix
 
 
 def _organisational_audit(request, group_id, group_model, group_field):
@@ -203,14 +205,27 @@ def _organisational_audit(request, group_id, group_model, group_field):
         form = OrganisationalAuditSubmissionForm(request.POST, instance=submission)
         submission = form.save()
 
-        context["questions_by_section"] = group_form_fields(form)
+        questions_by_section, number_completed, total_questions = group_form_fields(
+            form
+        )
+        context["questions_by_section"] = questions_by_section
+        context["number_completed"] = number_completed
+        context["total_questions"] = total_questions
+        context["percentage_completed"] = int(
+            (number_completed / total_questions) * 100
+        )
 
         return render(
             request, "epilepsy12/partials/organisational_audit_form.html", context
         )
 
     form = OrganisationalAuditSubmissionForm(instance=submission)
-    context["questions_by_section"] = group_form_fields(form)
+
+    questions_by_section, number_completed, total_questions = group_form_fields(form)
+    context["questions_by_section"] = questions_by_section
+    context["number_completed"] = number_completed
+    context["total_questions"] = total_questions
+    context["percentage_completed"] = int((number_completed / total_questions) * 100)
     context["form"] = form
 
     return render(request, "epilepsy12/organisational_audit.html", context)

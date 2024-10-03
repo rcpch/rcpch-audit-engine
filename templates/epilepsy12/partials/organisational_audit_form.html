@@ -1,6 +1,7 @@
 {% load epilepsy12_template_tags %}
 
 {% csrf_token %}
+{% include 'epilepsy12/partials/charts/progress.html' with numerator=number_completed denominator=total_questions percentage=percentage_completed title="Progress" pie_size='small' %}
 {% for section, questions in questions_by_section.items %}
     <div>
         <h3 class="org-audit-section-title">{{section}}</h3>
