@@ -52,5 +52,7 @@ mkdocs-git-revision-date-localized-plugin==1.2.7 # displays last edit date at th
 mkdocs-macros-plugin==1.0.5 # enables 'foldable' admonition text (used for large code blocks)
 mkdocs-with-pdf==0.9.3 # PDF export feature
 
+django-multiselectfield==0.1.13
+
 # for colored logs
 colorlog==6.8.2
