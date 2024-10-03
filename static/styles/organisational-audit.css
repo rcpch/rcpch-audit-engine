@@ -66,3 +66,8 @@
     color: var(--rcpch_white);
     padding: 1em;
 }
+
+.left-progress {
+    display: flex;
+    align-items: start;
+}
