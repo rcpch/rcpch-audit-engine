@@ -958,7 +958,7 @@ def create_KPI_aggregation_dataframe(
     return pd.DataFrame.from_dict(final_list)
 
 
-def create_reference_dataframe(trusts, health_boards, networks, icbs):
+def create_reference_dataframe(trusts, health_boards, networks, icbs, totals=False):
     """
     INPUTS:
     - trusts: TRUSTS should be passed in. Contains a list of trust objects
@@ -1027,3 +1027,73 @@ def create_reference_dataframe(trusts, health_boards, networks, icbs):
         final_list.append(item)
 
     return pd.DataFrame.from_dict(final_list)
+
+def create_totals_dataframe(cohort, abstraction_level):
+    """
+    create a dataframe for all organisations with totals of all registered cases vs cases included in aggregation
+    """
+    
+    from ..common_view_functions import all_registered_cases_for_cohort_and_abstraction_level
+    Organisation = apps.get_model("epilepsy12", "Organisation")
+    Trust = apps.get_model("epilepsy12", "Trust")
+    LocalHealthBoard = apps.get_model("epilepsy12", "LocalHealthBoard")
+    IntegratedCareBoard = apps.get_model("epilepsy12", "IntegratedCareBoard")
+    NHSEnglandRegion = apps.get_model("epilepsy12", "NHSEnglandRegion")
+    OPENUKNetwork = apps.get_model("epilepsy12", "OPENUKNetwork")
+    Country = apps.get_model("epilepsy12", "Country")
+    
+    abs_level = []
+
+
+    if abstraction_level == "trust":
+        query_set = Trust.objects.annotate(organisation_count=Count('organisation')).filter(organisation_count__gt=0)
+    elif abstraction_level == "local_health_board":
+        query_set = LocalHealthBoard.objects.annotate(organisation_count=Count('organisation')).filter(organisation_count__gt=0)
+    elif abstraction_level == "icb":
+        query_set = IntegratedCareBoard.objects.annotate(organisation_count=Count('organisation')).filter(organisation_count__gt=0)
+    elif abstraction_level == "nhs_england_region":
+        query_set = NHSEnglandRegion.objects.annotate(organisation_count=Count('organisation')).filter(organisation_count__gt=0)
+    elif abstraction_level == "open_uk":
+        query_set = OPENUKNetwork.objects.annotate(organisation_count=Count('organisation')).filter(organisation_count__gt=0)
+    elif abstraction_level == "country":
+        query_set = Country.objects.annotate(organisation_count=Count('organisation')).filter(organisation_count__gt=0)
+
+
+    for abstraction_item in query_set:
+        if abstraction_level == "trust":
+            organisation_instance = Organisation.objects.filter(trust=abstraction_item).first()
+        elif abstraction_level == "local_health_board":
+            organisation_instance = Organisation.objects.filter(local_health_board=abstraction_item).first()
+        elif abstraction_level == "icb":
+            organisation_instance = Organisation.objects.filter(integrated_care_board=abstraction_item).first()
+        elif abstraction_level == "nhs_england_region":
+            organisation_instance = Organisation.objects.filter(nhs_england_region=abstraction_item).first()
+        elif abstraction_level == "open_uk":
+            organisation_instance = Organisation.objects.filter(openuk_network=abstraction_item).first()
+        elif abstraction_level == "country":
+            organisation_instance = Organisation.objects.filter(country=abstraction_item).first()
+        
+        all_cases = all_registered_cases_for_cohort_and_abstraction_level(
+            organisation_instance=organisation_instance,
+            cohort=cohort, 
+            case_complete=False, 
+            abstraction_level=abstraction_level
+        ).count()
+        all_registered_cases = all_registered_cases_for_cohort_and_abstraction_level(
+            organisation_instance=organisation_instance,
+            cohort=cohort, 
+            case_complete=True, 
+            abstraction_level=abstraction_level
+        ).count()
+
+        abs_level.append({
+            "name": abstraction_item.name,
+            "all_cases": all_cases,
+            "all_registered_cases": all_registered_cases,
+        })
+    
+    return pd.DataFrame.from_dict(abs_level)
+
+        
+
+

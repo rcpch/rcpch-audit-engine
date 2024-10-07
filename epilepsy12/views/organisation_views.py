@@ -536,6 +536,12 @@ def kpi_download_file(request):
         network_df,
         national_df,
         reference_df,
+        trust_totals_df,
+        local_health_board_totals_df,
+        icb_totals_df,
+        nhs_england_region_totals_df,
+        openuk_network_totals_df,
+        country_totals_df,
     ) = download_kpi_summary_as_csv(cohort=6)
 
     with pd.ExcelWriter("kpi_export.xlsx") as writer:
@@ -546,6 +552,24 @@ def kpi_download_file(request):
         network_df.to_excel(writer, sheet_name="Network_level", index=False)
         national_df.to_excel(writer, sheet_name="National_level", index=False)
         reference_df.to_excel(writer, sheet_name="Reference", index=False)
+        trust_totals_df.to_excel(
+            writer, sheet_name="Registered vs Total - Trust", index=False
+        )
+        local_health_board_totals_df.to_excel(
+            writer, sheet_name="Registered vs Total - LHB", index=False
+        )
+        icb_totals_df.to_excel(
+            writer, sheet_name="Registered vs Total - ICB", index=False
+        )
+        nhs_england_region_totals_df.to_excel(
+            writer, sheet_name="Registered vs Total - NHSregion", index=False
+        )
+        openuk_network_totals_df.to_excel(
+            writer, sheet_name="Registered vs Total - Network", index=False
+        )
+        country_totals_df.to_excel(
+            writer, sheet_name="Registered vs Total - Country", index=False
+        )
 
     with open("kpi_export.xlsx", "rb") as file:
         excel_data = file.read()

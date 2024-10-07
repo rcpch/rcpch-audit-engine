@@ -136,7 +136,7 @@ def all_registered_cases_for_cohort_and_abstraction_level(
         )
     else:
         raise ValueError(
-            f"Incorrect or invalid abstraction error f{abstraction_level} supplied."
+            f"Incorrect or invalid abstraction error {abstraction_level} supplied."
         )
 
     return all_cases_for_cohort.filter(q_filter)
