@@ -349,12 +349,12 @@ class OrganisationalAuditSubmissionForm(forms.ModelForm):
                 "reference": "Please provide an estimate"
             },
 
-            "S06ProfessionalsRoutinelyInvolvedInTransitionAdultESN": {
+            "S06ProfessionalsRoutinelyInvolvedInTransition": {
                 "section": "6. Young People and Transition",
                 "question_number": "6.4",
                 "label": "Which adult professionals are routinely involved in transition or transfer to adult services?"
             },
-            "S06ProfessionalsRoutinelyInvolvedInTransitionAdultESNOther": {
+            "S06ProfessionalsRoutinelyInvolvedInTransitionOtherDetails": {
                 "parent_question_number": "6.4",
                 "parent_question_value": 5,
                 "label": "Other"

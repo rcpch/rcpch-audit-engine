@@ -191,14 +191,14 @@ class OrganisationalAuditSubmission(TimeStampAbstractBaseClass, UserStampAbstrac
         MaxValueValidator(100)
     ]) # 6.3ii
 
-    S06ProfessionalsRoutinelyInvolvedInTransitionAdultESN = MultiSelectField(choices={
+    S06ProfessionalsRoutinelyInvolvedInTransition = MultiSelectField(choices={
         1: 'Adult ESN',
         2: 'Adult Learning difficulty ESN',
         3: 'Adult Neurologist',
         4: 'Youth Worker',
         5: 'Other'
     })
-    S06ProfessionalsRoutinelyInvolvedInTransitionAdultESNOther = TextField() # 6.4
+    S06ProfessionalsRoutinelyInvolvedInTransitionOtherDetails = TextField() # 6.4
 
     S06StructuredResourcesToSupportTransition = YesNoField() # 6.5
 

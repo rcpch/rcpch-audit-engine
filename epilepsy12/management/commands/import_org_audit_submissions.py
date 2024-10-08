@@ -88,6 +88,15 @@ class Command(BaseCommand):
                 10: 'S01ESNNoneOfTheAbove'
             })
 
+            submission.S06ProfessionalsRoutinelyInvolvedInTransitionAdultESN = adapt_multiselect_field(row, {
+                1: 'S06ProfessionalsRoutinelyInvolvedInTransitionAdultESN',
+                2: 'S06ProfessionalsRoutinelyInvolvedInTransitionAdultLDESN',
+                3: 'S06ProfessionalsRoutinelyInvolvedInTransitionAdultNeuro',
+                4: 'S06ProfessionalsRoutinelyInvolvedInTransitionYouthWorker',
+                5: 'S06ProfessionalsRoutinelyInvolvedInTransitionOther'
+                # The other free text field is handled as a normal single value field earlier
+            })
+
             print(submission.S01ESNFunctions)
 
             submission.save()
