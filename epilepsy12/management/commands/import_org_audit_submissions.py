@@ -14,6 +14,13 @@ def yes_no(value):
         case "Y": return True
         case "N": return False
 
+def tfc_223(value):
+    match value:
+        case "NA": return 1
+        case "Y": return 2
+        case "N": return 3
+        case "NID": return 4
+
 CONVERTERS = {
     "S01WTEConsultants": None,
     "S01WTEConsultantsEpilepsy": None,
@@ -25,7 +32,7 @@ CONVERTERS = {
     "S02DefinedEpilepsyClinics": yes_no,
     "S02EpilepsyClinicsPerWeek": None,
     "S02Consultant20Mins": yes_no,
-
+    "S02TFC223": tfc_223
 }
 
 class Command(BaseCommand):
@@ -69,20 +76,18 @@ class Command(BaseCommand):
             for column, raw_value in row.to_dict().items():
                 if column in CONVERTERS:
                     value = None
-                    converter = CONVERTERS[column]
 
-                    if not pd.isnull(raw_value) and converter:
-                        value = converter(raw_value)
-                    else:
-                        value = raw_value
+                    if not pd.isnull(raw_value):
+                        converter = CONVERTERS[column]
+                        value = converter(raw_value) if converter else raw_value
 
-                    if value is None:
-                        raise ValueError(f"Could not convert {column} {raw_value}")
+                        if value is None:
+                            raise ValueError(f"Could not convert {column} {raw_value}")
 
                     print(f"!! {column} {raw_value} -> {value}")
                     setattr(submission, column, value)
 
-            submission.save()
+            # submission.save()
             
             break
 
