@@ -318,7 +318,7 @@ class KPI(models.Model, HelpTextMixin):
     """
     school_individual_healthcare_plan = models.IntegerField(
         help_text={
-            "label": "10. School Individual Healthcare Plan",
+            "label": "10. School Individual Health Care Plan",
             "reference": "Percentage of children and young people with epilepsy aged 4 years and above with evidence of a school individual healthcare plan by 1 year after first paediatric assessment.",
         },
         default=None,
