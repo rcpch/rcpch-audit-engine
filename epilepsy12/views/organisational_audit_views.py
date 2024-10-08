@@ -95,22 +95,16 @@ def group_form_fields(form):
 
     ix = 0
     number_completed = 0
+    total_questions = 0
 
     for field in form:
-        model_field = OrganisationalAuditSubmission._meta.get_field(field.name)
-
-        submission = OrganisationalAuditSubmission.objects.filter(
-            pk=form.instance.pk
-        ).get()  # from should always be bound to an instance
-
-        if getattr(submission, field.name):
+        if field.value() is not None and field.value() != "" and field.value() != []:
             completed = True
             number_completed += 1
         else:
             completed = False
 
-        # TODO MRB: put the help text on the form to avoid migrations every time it changes?
-        help_text = field.help_text or model_field.help_text or {}
+        help_text = field.help_text or {}
 
         section = help_text.get("section", "Other")
         parent_question_number = help_text.get("parent_question_number", None)
@@ -132,12 +126,17 @@ def group_form_fields(form):
                 "label": help_text.get("parent_question_label", None),
                 "reference": help_text.get("parent_question_reference", None),
                 "children": [],
-                "completed": completed,
+                # don't show a completed status
             }
 
             fields_by_question_number[parent_question_number] = parent
 
         if parent:
+            hidden = not show_child_field(parent, field)
+
+            if not hidden:
+                total_questions += 1
+
             child = {
                 "section": section,
                 "field": field,
@@ -145,7 +144,7 @@ def group_form_fields(form):
                 "hide_question_number": hide_question_number,
                 "label": help_text.get("label", field.name),
                 "reference": help_text.get("reference", None),
-                "hidden": not show_child_field(parent, field),
+                "hidden": hidden,
                 "is_child": True,
                 "children": [],
                 "completed": completed,
@@ -154,6 +153,8 @@ def group_form_fields(form):
             parent["children"].append(child)
 
         else:
+            total_questions += 1
+
             fields_by_question_number[question_number] = {
                 "section": section,
                 "field": field,
@@ -169,7 +170,7 @@ def group_form_fields(form):
 
     questions_by_section = group_questions(fields_by_question_number)
 
-    return questions_by_section, number_completed, ix
+    return questions_by_section, number_completed, total_questions
 
 
 def _organisational_audit(request, group_id, group_model, group_field):

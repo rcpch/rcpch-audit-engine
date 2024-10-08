@@ -67,7 +67,22 @@
     padding: 1em;
 }
 
-.left-progress {
-    display: flex;
-    align-items: start;
+.org-audit-header {
+    margin: 0 0 1em 0;
+    position: absolute;
+}
+
+.org-audit-progress {
+    position: sticky;
+    top: 0;
+    z-index: 999;
+    text-align: right;
+    padding-bottom: 5em;
+}
+
+.org-audit-progress--label {
+    background-color: var(--rcpch_purple_dark_tint);
+    color: white;
+    padding: 1em;
+    float: right;
 }
