@@ -14,6 +14,12 @@ def yes_no(value):
         case "Y": return True
         case "N": return False
 
+def yes_no_uncertain(value):
+    match value:
+        case "Y": return 1
+        case "N": return 2
+        case "U": return 3
+
 def tfc_223(value):
     match value:
         case "NA": return 1
@@ -32,7 +38,34 @@ CONVERTERS = {
     "S02DefinedEpilepsyClinics": yes_no,
     "S02EpilepsyClinicsPerWeek": None,
     "S02Consultant20Mins": yes_no,
-    "S02TFC223": tfc_223
+    "S02TFC223": tfc_223,
+    "S03WTEPaediatricNeurologists": None,
+    "S03PathwaysTertiaryPaedNeurology": yes_no,
+    # TODO MRB: do we need an N/A option in the model?
+    "S03PaedNeurologistsDirectReferrals": yes_no,
+    "S03SatellitePaediatricNeurologyClinics": yes_no,
+    "S03CommenceKetogenicDiet": yes_no_uncertain,
+    "S03ReviewKetogenicDiet": yes_no_uncertain,
+    "S03VNSInsertion": yes_no_uncertain,
+    "S03VNSReview": yes_no_uncertain,
+    "S04LeadECG": yes_no_uncertain,
+    "S04AwakeMRI": yes_no_uncertain,
+    "S04MriWithSedation": yes_no_uncertain,
+    "S04MriWithGeneralAnaesthetic": yes_no_uncertain,
+    "S04StandardEeg": yes_no_uncertain,
+    "S04SleepDeprivedEeg": yes_no_uncertain,
+    "S04MelatoninInducedEeg": yes_no_uncertain,
+    "S04SedatedEeg": yes_no_uncertain,
+    "S042448HAmbulatoryEeg": yes_no_uncertain,
+    "S04InpatientVideoTelemetry": yes_no_uncertain,
+    "S04OutpatientVideoTelemetry": yes_no_uncertain,
+    "S04HomeVideoTelemetry": yes_no_uncertain,
+    "S04PortableEEGOnWardAreaWithinTrust": yes_no_uncertain,
+    "S05ContactEpilepsyServiceForSpecialistAdvice": yes_no,
+    "S05AdviceAvailableAllWeekdays": yes_no,
+    "S05AdviceAvailableOutOfHours": yes_no,
+    "S05AdviceAvailable52WeeksPerYear": yes_no
+
 }
 
 class Command(BaseCommand):
