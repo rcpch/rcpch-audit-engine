@@ -9,6 +9,25 @@ from ...models import (
     LocalHealthBoard
 )
 
+def yes_no(value):
+    match value:
+        case "Y": return True
+        case "N": return False
+
+CONVERTERS = {
+    "S01WTEConsultants": None,
+    "S01WTEConsultantsEpilepsy": None,
+    "S01EpilepsyClinicalLead": yes_no,
+    "S01EpilepsyClinicalLeadTitle": None,
+    "S01EpilepsyClinicalLeadFirstName": None,
+    "S01EpilepsyClinicalLeadSurname": None,
+    "S01WTEEpilepsySpecialistNurses": None,
+    "S02DefinedEpilepsyClinics": yes_no,
+    "S02EpilepsyClinicsPerWeek": None,
+    "S02Consultant20Mins": yes_no,
+
+}
+
 class Command(BaseCommand):
     help = "Import organisational audit submissions from CSV export"
 
@@ -40,19 +59,27 @@ class Command(BaseCommand):
             ods_code = row["SiteCode"]
 
             submission = OrganisationalAuditSubmission()
+            submission.submission_period = submission_period
 
             try:
                 submission.trust = Trust.objects.get(ods_code=row["SiteCode"])
             except Trust.DoesNotExist:
                 submission.local_health_board = LocalHealthBoard.objects.get(ods_code=row["SiteCode"])
             
-            for column, value in row.to_dict().items():
-                if column.startswith("S"):
-                    if value == "Y":
-                        value = True
-                    elif value == "N":
-                        value = False
+            for column, raw_value in row.to_dict().items():
+                if column in CONVERTERS:
+                    value = None
+                    converter = CONVERTERS[column]
 
+                    if not pd.isnull(raw_value) and converter:
+                        value = converter(raw_value)
+                    else:
+                        value = raw_value
+
+                    if value is None:
+                        raise ValueError(f"Could not convert {column} {raw_value}")
+
+                    print(f"!! {column} {raw_value} -> {value}")
                     setattr(submission, column, value)
 
             submission.save()
