@@ -1,11 +1,15 @@
 {% load epilepsy12_template_tags %}
 
 {% csrf_token %}
+
+<div class="org-audit-progress">
+    <div class="org-audit-progress--label">
+        {{number_completed}} of {{total_questions}} complete
+    </div>
+</div>
+
 {% for section, questions in questions_by_section.items %}
     <div>
-        <div class="left-progress">
-            {% include 'epilepsy12/partials/charts/progress.html' with numerator=number_completed denominator=total_questions percentage=percentage_completed title="Progress" pie_size='small' %}
-        </div>
         <h3 class="org-audit-section-title">
             {{section}}
         </h3>
@@ -26,7 +30,7 @@
                                     <span data-tooltip="Scored field">
                                         <i class="rcpch_pink check circle outline icon"></i>
                                     </span>
-                                {% else %}
+                                {% elif "completed" in parent %}
                                     <span data-tooltip="Unscored field">
                                         <i class="rcpch_light_blue dot circle outline icon"></i>
                                     </span>
