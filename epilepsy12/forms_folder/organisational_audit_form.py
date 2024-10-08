@@ -380,7 +380,7 @@ class OrganisationalAuditSubmissionForm(forms.ModelForm):
                 "parent_question_number": "7.1",
                 "label": "Which questionnaires do you use?",
             },
-            "S07MentalHealthQuestionnaireOther": {
+            "S07MentalHealthQuestionnaireOtherDetails": {
                 "parent_question_number": "7.1i",
                 "parent_question_value": 12,
                 "label": "Other"
@@ -391,7 +391,7 @@ class OrganisationalAuditSubmissionForm(forms.ModelForm):
                 "question_number": "7.2",
                 "label": "Do you have agreed referral pathways for children with any of the following mental health concerns?",
             },
-            "S07MentalHealthAgreedPathwayOther": {
+            "S07MentalHealthAgreedPathwayOtherDetails": {
                 "parent_question_number": "7.2",
                 "parent_question_value": 5,
                 "label": "Other"
@@ -440,7 +440,7 @@ class OrganisationalAuditSubmissionForm(forms.ModelForm):
                 "question_number": "8.2",
                 "label": "Do you have agreed referral criteria for children with any of the following neurodevelopmental conditions?"
             },
-            "S08AgreedReferralCriteriaChildrenNeurodevelopmentalOther": {
+            "S08AgreedReferralCriteriaChildrenNeurodevelopmentalOtherDetails": {
                 "label": "Other",
                 "parent_question_number": "8.2",
                 "parent_question_value": 7

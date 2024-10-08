@@ -221,17 +221,16 @@ class OrganisationalAuditSubmission(TimeStampAbstractBaseClass, UserStampAbstrac
         11: 'SDQ (Strengths and Difficulties Questionnaire)',
         12: 'Other'
     }) 
-    S07MentalHealthQuestionnaireOther = TextField() # 7.1i
+    S07MentalHealthQuestionnaireOtherDetails = TextField() # 7.1i
 
     S07MentalHealthAgreedPathway = MultiSelectField(choices={
         1: 'Anxiety',
-        # TODO MRB: not in the word doc but in the source CSV
         2: 'Depression',
         3: 'Mood Disorders',
         4: 'Non-epileptic attack disorders',
         5: 'Other'
     })
-    S07MentalHealthAgreedPathwayOther = TextField() # 7.2
+    S07MentalHealthAgreedPathwayOtherDetails = TextField() # 7.2
 
     S07MentalHealthProvisionEpilepsyClinics = YesNoField() # 7.3
     S07DoesThisComprise = MultiSelectField(choices={
@@ -268,7 +267,7 @@ class OrganisationalAuditSubmission(TimeStampAbstractBaseClass, UserStampAbstrac
         8: 'None of the above',
         7: 'Other'
     })
-    S08AgreedReferralCriteriaChildrenNeurodevelopmentalOther = TextField() # 8.2
+    S08AgreedReferralCriteriaChildrenNeurodevelopmentalOtherDetails = TextField() # 8.2
 
 
     # 9. Care Planning

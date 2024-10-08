@@ -97,7 +97,48 @@ class Command(BaseCommand):
                 # The other free text field is handled as a normal single value field earlier
             })
 
-            print(submission.S06ProfessionalsRoutinelyInvolvedInTransition)
+            # TODO MRB: should there be an explicit none option?
+            submission.S07MentalHealthQuestionnaire = adapt_multiselect_field(row, {
+                1: 'S07MentalHealthQuestionnaireBDI',
+                2: "S07MentalHealthQuestionnaireConnors",
+                3: 'S07MentalHealthQuestionnaireETT',
+                4: 'S07MentalHealthQuestionnaireGAD',
+                5: 'S07MentalHealthQuestionnaireGAD2',
+                6: 'S07MentalHealthQuestionnaireGAD7',
+                7: 'S07MentalHealthQuestionnaireHADS',
+                8: 'S07MentalHealthQuestionnaireMFQ',
+                9: 'S07MentalHealthQuestionnaireNDDI',
+                10: 'S07MentalHealthQuestionnairePHQ',
+                11: 'S07MentalHealthQuestionnaireSDQ',
+                12: 'S07MentalHealthQuestionnaireOther'
+            })
+
+            submission.S07MentalHealthAgreedPathway = adapt_multiselect_field(row, {
+                1: 'S07MentalHealthAgreedPathwayAnxiety',
+                2: 'S07MentalHealthAgreedPathwayDepression',
+                3: 'S07MentalHealthAgreedPathwayMoodDisorders',
+                4: 'S07MentalHealthAgreedPathwayNonEpilepticAttackDisorders',
+                5: 'Other'
+            })
+
+            submission.S07TrustAchieve = adapt_multiselect_field(row, {
+                1: 'S07TrustAchieveClinicalPsychology',
+                2: 'S07TrustAchieveEducationalPsychology',
+                3: 'S07TrustAchieveFormalDevelopmental',
+                4: 'S07TrustAchieveNeuropyschology',
+                5: 'S07TrustAchievePsychiatricAssessment',
+                6: 'S07TrustAchieveNone'
+            })
+
+            submission.S08AgreedReferralCriteriaChildrenNeurodevelopmental = adapt_multiselect_field(row, {
+                1: 'S08AgreedReferralCriteriaChildrenNeurodevelopmentalADHD',
+                2: 'S08AgreedReferralCriteriaChildrenNeurodevelopmentalASD',
+                3: 'S08AgreedReferralCriteriaChildrenNeurodevelopmentalBehaviour',
+                4: 'S08AgreedReferralCriteriaChildrenNeurodevelopmentalDCD',
+                5: 'S08AgreedReferralCriteriaChildrenNeurodevelopmentalIntellectualDisability',
+                # 6: 'Learning disabilities' doesn't appear to have a corresponding column in the CSV,
+                7: 'Other'
+            })
 
             submission.save()
             
