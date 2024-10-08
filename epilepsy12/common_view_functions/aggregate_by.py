@@ -1087,9 +1087,10 @@ def create_totals_dataframe(cohort, abstraction_level):
         ).count()
 
         abs_level.append({
-            "name": abstraction_item.name,
-            "all_cases": all_cases,
-            "all_registered_cases": all_registered_cases,
+            "Name": abstraction_item.name,
+            "All Registered Cases": all_registered_cases,
+            "All Cases": all_cases,
+            "Percentage": round((all_registered_cases/all_cases)*100,1) if all_cases > 0 else 0
         })
     
     return pd.DataFrame.from_dict(abs_level)
