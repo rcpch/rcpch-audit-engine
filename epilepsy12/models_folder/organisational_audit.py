@@ -150,7 +150,7 @@ class OrganisationalAuditSubmission(TimeStampAbstractBaseClass, UserStampAbstrac
 
     S05ContactEpilepsyServiceForSpecialistAdvice = YesNoField() # 5.1
     S05AdviceAvailableAllWeekdays = YesNoField() # 5.1.1
-    S05AdviceAvailableAllOutOfHours = YesNoField() # 5.1.2
+    S05AdviceAvailableOutOfHours = YesNoField() # 5.1.2
     S05AdviceAvailable52WeeksPerYear = YesNoField() # 5.1.3
 
     S05TypicalTimeToAchieveSpecialistAdvice = ChoiceField(choices={
@@ -206,7 +206,7 @@ class OrganisationalAuditSubmission(TimeStampAbstractBaseClass, UserStampAbstrac
     # 7. Mental health
 
     # TODO MRB: in the CSV it references ADHD, ASD, Mental Health and None but in the docs it's Yes/No
-    S07ScreenForIssuesMentalHealth = YesNoField() # 7.1
+    S07ScreenForIssues = YesNoField() # 7.1
     S07MentalHealthQuestionnaire = MultiSelectField(choices={
         1: 'BDI - Beck Depression Inventory',
         2: "Connor's Questionnaire",
@@ -238,7 +238,7 @@ class OrganisationalAuditSubmission(TimeStampAbstractBaseClass, UserStampAbstrac
         2: 'MDT meetings where epilepsy and mental health professionals discuss individual patients',
         3: 'Other'
     })
-    S07DoesThisCompriseOther = TextField() # 7.3.1
+    S07DoesThisCompriseOtherSpecify = TextField() # 7.3.1
 
     S07CurrentTrustActionPlanCoLocatedMentalHealth = YesNoField() # 7.3.2
 
@@ -277,7 +277,7 @@ class OrganisationalAuditSubmission(TimeStampAbstractBaseClass, UserStampAbstrac
 
     # 10. Patient Database/Register
 
-    S10TrustMaintainADatabaseOfChildrenWithEpilepsy = ChoiceField(choices={
+    S10TrustMaintainADatabaseOfChildrenWithEpilepsies = ChoiceField(choices={
         'Y': 'Yes, for all children',
         'YS': 'Yes, for some children',
         'N': 'No'

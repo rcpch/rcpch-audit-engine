@@ -1,7 +1,9 @@
 import pandas as pd
-from multiselectfield.forms.fields import MultiSelectFormField 
 
 from django.core.management.base import BaseCommand
+from django.forms.fields import TypedChoiceField
+
+from multiselectfield.forms.fields import MultiSelectFormField 
 
 from ...models import (
     OrganisationalAuditSubmissionPeriod,
@@ -53,17 +55,24 @@ class Command(BaseCommand):
             except Trust.DoesNotExist:
                 submission.local_health_board = LocalHealthBoard.objects.get(ods_code=row["SiteCode"])
             
-            single_value_fields = [field.name for field in OrganisationalAuditSubmissionForm() if not type(field.field) == MultiSelectFormField]
+            field_types = { field.name: type(field.field) for field in OrganisationalAuditSubmissionForm() }
 
             #######################
             # Single value fields #
             #######################
 
             for column, raw_value in row.to_dict().items():
-                # Multiselect fields handled below
-                if column in single_value_fields:
+                if column in field_types and field_types[column] is not MultiSelectFormField:
                     value = None if pd.isnull(raw_value) else raw_value
-                    print(f"!!! {column} = {value}")
+
+                    # Special case - choice fields need integer values not decimal
+                    if type(value) == float and field_types[column] == TypedChoiceField:
+                        value = int(value)
+
+                    # Special case - NA parses as NaN
+                    if column == "S02TFC223" and pd.isna(raw_value):
+                        value = 'NA'
+
                     setattr(submission, column, value)
 
             ######################
@@ -114,6 +123,12 @@ class Command(BaseCommand):
                 3: 'S07MentalHealthAgreedPathwayMoodDisorders',
                 4: 'S07MentalHealthAgreedPathwayNonEpilepticAttackDisorders',
                 5: 'S07MentalHealthAgreedPathwayOtherDetails'
+            })
+
+            submission.S07DoesThisComprise = adapt_multiselect_field(row, {
+                1: 'S07DoesThisCompriseEpilepsyClinics',
+                2: 'S07DoesThisCompriseMDT',
+                3: 'S07DoesThisCompriseOther'
             })
 
             submission.S07TrustAchieve = adapt_multiselect_field(row, {
