@@ -160,21 +160,35 @@ def group_form_fields(form):
     return questions_by_section, number_completed, total_questions
 
 
+def get_submission(submission_period, group, group_field):
+    submission_filter = {"submission_period": submission_period}
+    submission_filter[group_field] = group
+
+    return OrganisationalAuditSubmission.objects.filter(
+        **submission_filter
+    ).first()
+
+
 def _organisational_audit(request, group_id, group_model, group_field):
-    submission_period = (
-        OrganisationalAuditSubmissionPeriod.objects.filter(is_open=True)
+    submission_periods = (
+        OrganisationalAuditSubmissionPeriod.objects
         .order_by("-year")
-        .first()
+        .all()
     )
+
+    if not submission_periods:
+        submission_period = None
+    elif len(submission_periods) == 1:
+        submission_period = submission_periods[0]
+        last_submission_period = None
+    else:
+        submission_period = submission_periods[0]
+        last_submission_period = submission_periods[1]
 
     group = group_model.objects.get(id=group_id)
 
-    submission_filter = {"submission_period": submission_period}
-
-    submission_filter[group_field] = group
-    submission = OrganisationalAuditSubmission.objects.filter(
-        **submission_filter
-    ).first()
+    submission = get_submission(submission_period, group, group_field)
+    last_submission = get_submission(last_submission_period, group, group_field)
 
     form = OrganisationalAuditSubmissionForm(instance=submission)
 
