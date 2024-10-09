@@ -115,10 +115,10 @@ class Command(BaseCommand):
 
             submission.S07MentalHealthAgreedPathway = adapt_multiselect_field(row, {
                 1: 'S07MentalHealthAgreedPathwayAnxiety',
-                2: 'S07MentalHealthAgreedPathwayDepression',
+                # 2: 'S07MentalHealthAgreedPathwayDepression' doesn't appear to have a corresponding column in the CSV,
                 3: 'S07MentalHealthAgreedPathwayMoodDisorders',
                 4: 'S07MentalHealthAgreedPathwayNonEpilepticAttackDisorders',
-                5: 'Other'
+                5: 'S07MentalHealthAgreedPathwayOtherDetails'
             })
 
             submission.S07TrustAchieve = adapt_multiselect_field(row, {
@@ -136,8 +136,8 @@ class Command(BaseCommand):
                 3: 'S08AgreedReferralCriteriaChildrenNeurodevelopmentalBehaviour',
                 4: 'S08AgreedReferralCriteriaChildrenNeurodevelopmentalDCD',
                 5: 'S08AgreedReferralCriteriaChildrenNeurodevelopmentalIntellectualDisability',
-                # 6: 'Learning disabilities' doesn't appear to have a corresponding column in the CSV,
-                7: 'Other'
+                6: 'S08AgreedReferralCriteriaChildrenNeurodevelopmentalLearningDisabilities',
+                7: 'S08AgreedReferralCriteriaChildrenNeurodevelopmentalOtherDetails'
             })
 
             submission.save()
