@@ -1,4 +1,5 @@
 import pandas as pd
+from multiselectfield.forms.fields import MultiSelectFormField 
 
 from django.core.management.base import BaseCommand
 
@@ -8,6 +9,8 @@ from ...models import (
     Trust,
     LocalHealthBoard
 )
+
+from ...forms_folder import OrganisationalAuditSubmissionForm
 
 def adapt_multiselect_field(row, choices_to_column):
     return [key for key, value in choices_to_column.items() if row[value] == 1]
@@ -50,26 +53,18 @@ class Command(BaseCommand):
             except Trust.DoesNotExist:
                 submission.local_health_board = LocalHealthBoard.objects.get(ods_code=row["SiteCode"])
             
+            single_value_fields = [field.name for field in OrganisationalAuditSubmissionForm() if not type(field.field) == MultiSelectFormField]
+
             #######################
             # Single value fields #
             #######################
 
             for column, raw_value in row.to_dict().items():
                 # Multiselect fields handled below
-                if column.startswith("S01ESN") or \
-                    column.startswith("S06Professionals") or \
-                    column.startswith("S07ScreenForIssues") or \
-                    column.startswith("S07MentalHealthQuestionnaire") or \
-                    column.startswith("S07MentalHealthAgreedPathway") or \
-                    column.startswith("S07DoesThisCompromise") or \
-                    column.startswith("S07TrustAchieve") or \
-                    column.startswith("S08AgreedReferral") or \
-                    not column.startswith("S0") or \
-                    not column.startswith("S01"):
-                        continue
-                
-                value = None if pd.isnull(raw_value) else raw_value
-                setattr(submission, column, value)
+                if column in single_value_fields:
+                    value = None if pd.isnull(raw_value) else raw_value
+                    print(f"!!! {column} = {value}")
+                    setattr(submission, column, value)
 
             ######################
             # Multiselect fields #
