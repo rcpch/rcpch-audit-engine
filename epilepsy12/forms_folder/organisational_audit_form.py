@@ -272,7 +272,7 @@ class OrganisationalAuditSubmissionForm(forms.ModelForm):
                 "parent_question_number": "5.1",
                 "label": "Is this available all weekdays?"
             },
-            "S05AdviceAvailableAllOutOfHours": {
+            "S05AdviceAvailableOutOfHours": {
                 "question_number": "5.1.2",
                 "parent_question_number": "5.1",
                 "label": "Is this available out of hours?"
@@ -349,12 +349,12 @@ class OrganisationalAuditSubmissionForm(forms.ModelForm):
                 "reference": "Please provide an estimate"
             },
 
-            "S06ProfessionalsRoutinelyInvolvedInTransitionAdultESN": {
+            "S06ProfessionalsRoutinelyInvolvedInTransition": {
                 "section": "6. Young People and Transition",
                 "question_number": "6.4",
                 "label": "Which adult professionals are routinely involved in transition or transfer to adult services?"
             },
-            "S06ProfessionalsRoutinelyInvolvedInTransitionAdultESNOther": {
+            "S06ProfessionalsRoutinelyInvolvedInTransitionOtherDetails": {
                 "parent_question_number": "6.4",
                 "parent_question_value": 5,
                 "label": "Other"
@@ -370,7 +370,7 @@ class OrganisationalAuditSubmissionForm(forms.ModelForm):
 
             # 7. Mental health
 
-            "S07ScreenForIssuesMentalHealth": {
+            "S07ScreenForIssues": {
                 "section": "7. Mental health",
                 "question_number": "7.1",
                 "label": "In the paediatric epilepsy service do you routinely formally screen for mental health disorders?"
@@ -380,7 +380,7 @@ class OrganisationalAuditSubmissionForm(forms.ModelForm):
                 "parent_question_number": "7.1",
                 "label": "Which questionnaires do you use?",
             },
-            "S07MentalHealthQuestionnaireOther": {
+            "S07MentalHealthQuestionnaireOtherDetails": {
                 "parent_question_number": "7.1i",
                 "parent_question_value": 12,
                 "label": "Other"
@@ -391,7 +391,7 @@ class OrganisationalAuditSubmissionForm(forms.ModelForm):
                 "question_number": "7.2",
                 "label": "Do you have agreed referral pathways for children with any of the following mental health concerns?",
             },
-            "S07MentalHealthAgreedPathwayOther": {
+            "S07MentalHealthAgreedPathwayOtherDetails": {
                 "parent_question_number": "7.2",
                 "parent_question_value": 5,
                 "label": "Other"
@@ -407,7 +407,7 @@ class OrganisationalAuditSubmissionForm(forms.ModelForm):
                 "parent_question_number": "7.3",
                 "label": "Does this comprise:"
             },
-            "S07DoesThisCompriseOther": {
+            "S07DoesThisCompriseOtherSpecify": {
                 "parent_question_number": "7.3.1",
                 "parent_question_value": 3,
                 "label": "Other"
@@ -440,7 +440,7 @@ class OrganisationalAuditSubmissionForm(forms.ModelForm):
                 "question_number": "8.2",
                 "label": "Do you have agreed referral criteria for children with any of the following neurodevelopmental conditions?"
             },
-            "S08AgreedReferralCriteriaChildrenNeurodevelopmentalOther": {
+            "S08AgreedReferralCriteriaChildrenNeurodevelopmentalOtherDetails": {
                 "label": "Other",
                 "parent_question_number": "8.2",
                 "parent_question_value": 7
@@ -458,7 +458,7 @@ class OrganisationalAuditSubmissionForm(forms.ModelForm):
 
             # 10. Patient Database/Register
 
-            "S10TrustMaintainADatabaseOfChildrenWithEpilepsy": {
+            "S10TrustMaintainADatabaseOfChildrenWithEpilepsies": {
                 "section": "10. Patient Database/Register",
                 "question_number": "10.1",
                 "label": "Does you maintain a database or register of children with epilepsies?",

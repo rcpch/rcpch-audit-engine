@@ -13,9 +13,6 @@ from .time_and_user_abstract_base_classes import TimeStampAbstractBaseClass, Use
 def DecimalField():
     return models.DecimalField(null=True, blank=True, max_digits=7, decimal_places=3)
 
-def YesNoField():
-    return models.BooleanField(null=True, blank=True)
-
 def TextField():
     return models.CharField(null=True, blank=True)
 
@@ -23,16 +20,22 @@ def PositiveIntegerField():
     return models.PositiveIntegerField(null=True, blank=True)
 
 def ChoiceField(choices):
-    return models.PositiveIntegerField(choices=choices, null=True, blank=True)
+    return models.TextField(choices=choices, null=True, blank=True)
 
-def YesNoUncertainField(help_text=None):
+def YesNoField():
     return ChoiceField(choices={
-        1: 'Yes',
-        2: 'No',
-        3: 'Uncertain'
+        'Y': 'Yes',
+        'N': 'No'
     })
 
-def MultiSelectField(choices, help_text=None):
+def YesNoUncertainField():
+    return ChoiceField(choices={
+        'Y': 'Yes',
+        'N': 'No',
+        'U': 'Uncertain'
+    })
+
+def MultiSelectField(choices):
     return multiselectfield.MultiSelectField(choices=choices, null=True, blank=True)
 
 
@@ -100,10 +103,10 @@ class OrganisationalAuditSubmission(TimeStampAbstractBaseClass, UserStampAbstrac
     S02Consultant20Mins = YesNoField() # 2.1ii
 
     S02TFC223 = ChoiceField(choices={
-        1: 'Not applicable',
-        2: 'Yes',
-        3: 'No, not at all',
-        4: 'No, in development'
+        'NA': 'Not applicable',
+        'Y': 'Yes',
+        'N': 'No, not at all',
+        'NID': 'No, in development'
     }) # 2.2
 
 
@@ -147,7 +150,7 @@ class OrganisationalAuditSubmission(TimeStampAbstractBaseClass, UserStampAbstrac
 
     S05ContactEpilepsyServiceForSpecialistAdvice = YesNoField() # 5.1
     S05AdviceAvailableAllWeekdays = YesNoField() # 5.1.1
-    S05AdviceAvailableAllOutOfHours = YesNoField() # 5.1.2
+    S05AdviceAvailableOutOfHours = YesNoField() # 5.1.2
     S05AdviceAvailable52WeeksPerYear = YesNoField() # 5.1.3
 
     S05TypicalTimeToAchieveSpecialistAdvice = ChoiceField(choices={
@@ -178,24 +181,24 @@ class OrganisationalAuditSubmission(TimeStampAbstractBaseClass, UserStampAbstrac
 
     S06ServiceForEpilepsyBothAdultAndPaed = YesNoField() # 6.3
     S06IsThisUsually = ChoiceField(choices={
-        1: 'A single joint appointment',
-        2: 'A series of several joint appointments',
-        3: 'A flexible approach including mixture of joint or individual reviews',
-        4: 'Other'
+        'SJA': 'A single joint appointment',
+        'SSA': 'A series of several joint appointments',
+        'FAM': 'A flexible approach including mixture of joint or individual reviews',
+        'Oth': 'Other'
     })
     S06IsThisUsuallyOther = TextField() # 6.3i
     S06PercentageOfYoungPeopleTransferred = models.PositiveIntegerField(null=True, blank=True, validators=[
         MaxValueValidator(100)
     ]) # 6.3ii
 
-    S06ProfessionalsRoutinelyInvolvedInTransitionAdultESN = MultiSelectField(choices={
+    S06ProfessionalsRoutinelyInvolvedInTransition = MultiSelectField(choices={
         1: 'Adult ESN',
         2: 'Adult Learning difficulty ESN',
         3: 'Adult Neurologist',
         4: 'Youth Worker',
         5: 'Other'
     })
-    S06ProfessionalsRoutinelyInvolvedInTransitionAdultESNOther = TextField() # 6.4
+    S06ProfessionalsRoutinelyInvolvedInTransitionOtherDetails = TextField() # 6.4
 
     S06StructuredResourcesToSupportTransition = YesNoField() # 6.5
 
@@ -203,7 +206,7 @@ class OrganisationalAuditSubmission(TimeStampAbstractBaseClass, UserStampAbstrac
     # 7. Mental health
 
     # TODO MRB: in the CSV it references ADHD, ASD, Mental Health and None but in the docs it's Yes/No
-    S07ScreenForIssuesMentalHealth = YesNoField() # 7.1
+    S07ScreenForIssues = YesNoField() # 7.1
     S07MentalHealthQuestionnaire = MultiSelectField(choices={
         1: 'BDI - Beck Depression Inventory',
         2: "Connor's Questionnaire",
@@ -218,25 +221,24 @@ class OrganisationalAuditSubmission(TimeStampAbstractBaseClass, UserStampAbstrac
         11: 'SDQ (Strengths and Difficulties Questionnaire)',
         12: 'Other'
     }) 
-    S07MentalHealthQuestionnaireOther = TextField() # 7.1i
+    S07MentalHealthQuestionnaireOtherDetails = TextField() # 7.1i
 
     S07MentalHealthAgreedPathway = MultiSelectField(choices={
         1: 'Anxiety',
-        # TODO MRB: not in the word doc but in the source CSV
         2: 'Depression',
         3: 'Mood Disorders',
         4: 'Non-epileptic attack disorders',
         5: 'Other'
     })
-    S07MentalHealthAgreedPathwayOther = TextField() # 7.2
+    S07MentalHealthAgreedPathwayOtherDetails = TextField() # 7.2
 
     S07MentalHealthProvisionEpilepsyClinics = YesNoField() # 7.3
-    S07DoesThisComprise = ChoiceField(choices={
+    S07DoesThisComprise = MultiSelectField(choices={
         1: 'Epilepsy Clinics where mental health professionals can provide direct co-located clinical care',
         2: 'MDT meetings where epilepsy and mental health professionals discuss individual patients',
         3: 'Other'
     })
-    S07DoesThisCompriseOther = TextField() # 7.3.1
+    S07DoesThisCompriseOtherSpecify = TextField() # 7.3.1
 
     S07CurrentTrustActionPlanCoLocatedMentalHealth = YesNoField() # 7.3.2
 
@@ -265,7 +267,7 @@ class OrganisationalAuditSubmission(TimeStampAbstractBaseClass, UserStampAbstrac
         8: 'None of the above',
         7: 'Other'
     })
-    S08AgreedReferralCriteriaChildrenNeurodevelopmentalOther = TextField() # 8.2
+    S08AgreedReferralCriteriaChildrenNeurodevelopmentalOtherDetails = TextField() # 8.2
 
 
     # 9. Care Planning
@@ -275,8 +277,8 @@ class OrganisationalAuditSubmission(TimeStampAbstractBaseClass, UserStampAbstrac
 
     # 10. Patient Database/Register
 
-    S10TrustMaintainADatabaseOfChildrenWithEpilepsy = ChoiceField(choices={
-        1: 'Yes, for all children',
-        2: 'Yes, for some children',
-        3: 'No'
+    S10TrustMaintainADatabaseOfChildrenWithEpilepsies = ChoiceField(choices={
+        'Y': 'Yes, for all children',
+        'YS': 'Yes, for some children',
+        'N': 'No'
     }) # 10.1
