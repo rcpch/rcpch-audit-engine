@@ -152,6 +152,3 @@ class Command(BaseCommand):
 
             submission.save()
             
-            break
-
-            

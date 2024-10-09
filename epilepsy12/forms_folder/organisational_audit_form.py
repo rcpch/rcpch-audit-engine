@@ -272,7 +272,7 @@ class OrganisationalAuditSubmissionForm(forms.ModelForm):
                 "parent_question_number": "5.1",
                 "label": "Is this available all weekdays?"
             },
-            "S05AdviceAvailableAllOutOfHours": {
+            "S05AdviceAvailableOutOfHours": {
                 "question_number": "5.1.2",
                 "parent_question_number": "5.1",
                 "label": "Is this available out of hours?"
@@ -370,7 +370,7 @@ class OrganisationalAuditSubmissionForm(forms.ModelForm):
 
             # 7. Mental health
 
-            "S07ScreenForIssuesMentalHealth": {
+            "S07ScreenForIssues": {
                 "section": "7. Mental health",
                 "question_number": "7.1",
                 "label": "In the paediatric epilepsy service do you routinely formally screen for mental health disorders?"
@@ -407,7 +407,7 @@ class OrganisationalAuditSubmissionForm(forms.ModelForm):
                 "parent_question_number": "7.3",
                 "label": "Does this comprise:"
             },
-            "S07DoesThisCompriseOther": {
+            "S07DoesThisCompriseOtherSpecify": {
                 "parent_question_number": "7.3.1",
                 "parent_question_value": 3,
                 "label": "Other"
@@ -458,7 +458,7 @@ class OrganisationalAuditSubmissionForm(forms.ModelForm):
 
             # 10. Patient Database/Register
 
-            "S10TrustMaintainADatabaseOfChildrenWithEpilepsy": {
+            "S10TrustMaintainADatabaseOfChildrenWithEpilepsies": {
                 "section": "10. Patient Database/Register",
                 "question_number": "10.1",
                 "label": "Does you maintain a database or register of children with epilepsies?",
