@@ -254,8 +254,7 @@ class OrganisationalAuditSubmission(TimeStampAbstractBaseClass, UserStampAbstrac
 
     # 8. Neurodevelopmental support
 
-    # TODO MRB: this is not in the CSV?
-    S08ScreenForNeurodevelopmentalConditions = YesNoField() # 8.1
+    S08RoutinelyFormallyScreenForNeurodevelopmental = YesNoField() # 8.1
 
     S08AgreedReferralCriteriaChildrenNeurodevelopmental = MultiSelectField(choices={
         1: 'ADHD',
@@ -278,7 +277,7 @@ class OrganisationalAuditSubmission(TimeStampAbstractBaseClass, UserStampAbstrac
     # 10. Patient Database/Register
 
     S10TrustMaintainADatabaseOfChildrenWithEpilepsies = ChoiceField(choices={
-        'Y': 'Yes, for all children',
+        'YA': 'Yes, for all children',
         'YS': 'Yes, for some children',
         'N': 'No'
     }) # 10.1
