@@ -154,18 +154,18 @@ class OrganisationalAuditSubmission(TimeStampAbstractBaseClass, UserStampAbstrac
     S05AdviceAvailable52WeeksPerYear = YesNoField() # 5.1.3
 
     S05TypicalTimeToAchieveSpecialistAdvice = ChoiceField(choices={
-        1: 'Same working day',
-        2: 'By next working day',
-        3: 'Within 3-4 working days',
-        4: 'Within a working week'
+        "1": 'Same working day',
+        "2": 'By next working day',
+        "3": 'Within 3-4 working days',
+        "4": 'Within a working week'
     }) # 5.2
 
     S05WhoProvidesSpecialistAdvice = ChoiceField(choices={
-        1: 'ESN',
-        2: 'Consultant Paediatrician with expertise in epilepsy',
-        3: 'Paediatric neurologist',
-        4: 'Trainee paediatric neurologist',
-        5: 'Other'
+        "1": 'ESN',
+        "2": 'Consultant Paediatrician with expertise in epilepsy',
+        "3": 'Paediatric neurologist',
+        "4": 'Trainee paediatric neurologist',
+        "5": 'Other'
     })
     S05WhoProvidesSpecialistAdviceOther = TextField() # 5.3
 

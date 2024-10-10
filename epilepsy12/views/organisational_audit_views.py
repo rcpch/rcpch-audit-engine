@@ -1,6 +1,6 @@
-from django.shortcuts import render
+from collections.abc import Iterable
 
-from multiselectfield.utils import MSFList
+from django.shortcuts import render
 
 from ..models import (
     Trust,
@@ -13,43 +13,26 @@ from ..forms_folder import OrganisationalAuditSubmissionForm
 from ..decorator import login_and_otp_required, user_may_view_organisational_audit
 
 
-# On page load values are integers.
-# For Mutiselect they're an multiselectfield.utils.MSFList.
-# On POST values are strings (for multiselect a list of strings).
-def get_selected_choice_indices_as_strings(field):
-    if type(field.value()) == str:
-        return [field.value()]
-    elif type(field.value()) == int:
-        return [str(field.value())]
-    elif type(field.value()) in [list, MSFList]:
-        return [str(value) for value in field.value()]
-
-    return []
-
-
 def show_child_field(parent, child):
-    if not "field" in parent:
-        return True
+    parent_value = parent.value()
+    parent_choices = getattr(parent.field, "choices", None)
 
-    field = parent["field"]
-    model_field = OrganisationalAuditSubmission._meta.get_field(field.name)
+    if parent_choices:
+        required_parent_value = child.help_text.get("parent_question_value", 'Y')
 
-    parent_value = field.value()
-    required_parent_value = child.help_text.get("parent_question_value", None)
-
-    # For normal fields, is the field set at all? (eg children dependent on a yes/no parent)
-    if not model_field.choices:
-        if required_parent_value:
-            return parent_value == required_parent_value
-        elif parent_value == "0":
-            return False
+        if isinstance(parent_value, Iterable) and not type(parent_value) == str:
+            # Multiselect - on page load is a MSFList, on POST is a list of strings
+            parent_values = [str(value) for value in parent_value]
+            return required_parent_value in parent_values
         else:
-            return bool(parent_value)
-
-    selected_choices = get_selected_choice_indices_as_strings(field)
-    other_choice_index = str(required_parent_value)
-
-    return other_choice_index in selected_choices
+            # Single value choice
+            return str(parent_value) == required_parent_value
+    else:
+        # Special case for 1.4 S01WTEEpilepsySpecialistNurses
+        if parent_value == "0":
+            return False
+        
+        return bool(parent_value)
 
 
 def accumulate_children(question, parent_hidden):
@@ -132,7 +115,11 @@ def group_form_fields(form):
             fields_by_question_number[parent_question_number] = parent
 
         if parent:
-            hidden = not show_child_field(parent, field)
+            # Synthesised parent question (Eg 3.5)
+            if not "field" in parent:
+                hidden = False
+            else:
+                hidden = not show_child_field(parent["field"], field)
 
             if not hidden:
                 total_questions += 1
