@@ -8,6 +8,10 @@
     </div>
 </div>
 
+{% if errors %}
+    {{errors}}
+{% endif %}
+
 {% for section, questions in questions_by_section.items %}
     <div>
         <h3 class="org-audit-section-title">

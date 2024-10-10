@@ -221,7 +221,6 @@ def _organisational_audit(request, group_id, group_model, group_field):
             submission = OrganisationalAuditSubmission.objects.create(**submission_args)
 
         form = OrganisationalAuditSubmissionForm(request.POST, instance=submission)
-        submission = form.save()
 
         questions_by_section, number_completed, total_questions = group_form_fields(
             form
@@ -232,6 +231,11 @@ def _organisational_audit(request, group_id, group_model, group_field):
         context["percentage_completed"] = int(
             (number_completed / total_questions) * 100
         )
+
+        if not form.errors:
+            form.save()
+        else:
+            context["errors"] = form.errors
 
         return render(
             request, "epilepsy12/partials/organisational_audit_form.html", context
