@@ -296,7 +296,7 @@ class OrganisationalAuditSubmissionForm(forms.ModelForm):
             },
             "S05WhoProvidesSpecialistAdviceOther": {
                 "parent_question_number": "5.3",
-                "parent_question_value": 5,
+                "parent_question_value": "5",
                 "label": "Other"
             },
 
@@ -339,7 +339,7 @@ class OrganisationalAuditSubmissionForm(forms.ModelForm):
             },
             "S06IsThisUsuallyOther": {
                 "parent_question_number": "6.3i",
-                "parent_question_value": 4,
+                "parent_question_value": "Oth",
                 "label": "Other"
             },
             "S06PercentageOfYoungPeopleTransferred": {
@@ -356,7 +356,7 @@ class OrganisationalAuditSubmissionForm(forms.ModelForm):
             },
             "S06ProfessionalsRoutinelyInvolvedInTransitionOtherDetails": {
                 "parent_question_number": "6.4",
-                "parent_question_value": 5,
+                "parent_question_value": "5",
                 "label": "Other"
             },
 
@@ -382,7 +382,7 @@ class OrganisationalAuditSubmissionForm(forms.ModelForm):
             },
             "S07MentalHealthQuestionnaireOtherDetails": {
                 "parent_question_number": "7.1i",
-                "parent_question_value": 12,
+                "parent_question_value": "12",
                 "label": "Other"
             },
 
@@ -393,7 +393,7 @@ class OrganisationalAuditSubmissionForm(forms.ModelForm):
             },
             "S07MentalHealthAgreedPathwayOtherDetails": {
                 "parent_question_number": "7.2",
-                "parent_question_value": 5,
+                "parent_question_value": "5",
                 "label": "Other"
             },
 
@@ -409,14 +409,13 @@ class OrganisationalAuditSubmissionForm(forms.ModelForm):
             },
             "S07DoesThisCompriseOtherSpecify": {
                 "parent_question_number": "7.3.1",
-                "parent_question_value": 3,
+                "parent_question_value": "3",
                 "label": "Other"
             },
             "S07CurrentTrustActionPlanCoLocatedMentalHealth": {
                 "question_number": "7.3.2",
                 "parent_question_number": "7.3",
-                # If no to question 7.3
-                "parent_question_value": False,
+                "parent_question_value": "N",
                 "label": "Is there a current action plan describing steps towards co-located mental health provision within epilepsy clinics?",
             },
 
@@ -443,7 +442,7 @@ class OrganisationalAuditSubmissionForm(forms.ModelForm):
             "S08AgreedReferralCriteriaChildrenNeurodevelopmentalOtherDetails": {
                 "label": "Other",
                 "parent_question_number": "8.2",
-                "parent_question_value": 7
+                "parent_question_value": "7"
             },
 
 
