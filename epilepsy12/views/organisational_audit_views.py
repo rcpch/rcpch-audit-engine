@@ -1,6 +1,9 @@
 from collections.abc import Iterable
 
 from django.shortcuts import render
+from django.forms import model_to_dict
+
+from django.shortcuts import render
 
 from ..models import (
     Trust,
@@ -169,6 +172,21 @@ def get_submission(submission_period, group, group_field):
     ).first()
 
 
+def get_submission_form(submission, last_submission):
+    submission = submission or OrganisationalAuditSubmission()
+    
+    if last_submission:
+        for field in OrganisationalAuditSubmission._meta.fields:
+            if field.name != "id" and not field.name in OrganisationalAuditSubmissionForm.Meta.exclude:
+                current_field_value = getattr(submission, field.name)
+                last_field_value = getattr(last_submission, field.name)
+                
+                if not current_field_value and last_field_value:
+                    setattr(submission, field.name, last_field_value)
+    
+    return OrganisationalAuditSubmissionForm(instance=submission)
+
+
 def _organisational_audit(request, group_id, group_model, group_field):
     submission_periods = (
         OrganisationalAuditSubmissionPeriod.objects
@@ -189,8 +207,6 @@ def _organisational_audit(request, group_id, group_model, group_field):
 
     submission = get_submission(submission_period, group, group_field)
     last_submission = get_submission(last_submission_period, group, group_field)
-
-    form = OrganisationalAuditSubmissionForm(instance=submission)
 
     context = {"group_name": group.name, "submission_period": submission_period}
 
@@ -221,7 +237,7 @@ def _organisational_audit(request, group_id, group_model, group_field):
             request, "epilepsy12/partials/organisational_audit_form.html", context
         )
 
-    form = OrganisationalAuditSubmissionForm(instance=submission)
+    form = get_submission_form(submission, last_submission)
 
     questions_by_section, number_completed, total_questions = group_form_fields(form)
     context["questions_by_section"] = questions_by_section
