@@ -177,15 +177,15 @@ def get_submission(submission_period, group, group_field):
 def get_submission_form(submission, last_submission):
     data = {}
     
-    if submission:
-        for field in OrganisationalAuditSubmission._meta.fields:
-            if field.name != "id" and not field.name in OrganisationalAuditSubmissionForm.Meta.exclude:
-                field_value = getattr(submission, field.name)
-                
-                if not field_value and last_submission:
-                    field_value = getattr(last_submission, field.name)
+    for field in OrganisationalAuditSubmission._meta.fields:
+        if field.name != "id" and not field.name in OrganisationalAuditSubmissionForm.Meta.exclude:
+            field_value = getattr(submission, field.name) if submission else None
+            
+            if not field_value and last_submission:
+                field_value = getattr(last_submission, field.name)
 
-                data[field.name] = field_value
+            data[field.name] = field_value
+        
 
     return OrganisationalAuditSubmissionForm(data, instance=submission)
 
