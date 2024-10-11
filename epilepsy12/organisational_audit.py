@@ -5,7 +5,6 @@ from django.forms.fields import TypedChoiceField
 from multiselectfield.forms.fields import MultiSelectFormField 
 
 from .models import (
-    OrganisationalAuditSubmissionPeriod,
     OrganisationalAuditSubmission,
     Trust,
     LocalHealthBoard

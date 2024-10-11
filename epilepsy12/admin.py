@@ -118,6 +118,10 @@ class CaseAdmin(SimpleHistoryAdmin):
     search_fields = ["first_name", "surname", "nhs_number", "date_of_birth"]
 
 
+class OrganisationalAuditSubmissionAdmin(SimpleHistoryAdmin):
+    search_fields = ["trust__name", "local_health_board__name", "trust__ods_code", "local_health_board__ods_code"]
+    list_filter = ["submission_period"]
+
 class OrganisationalAuditSubmissionPeriodAdmin(SimpleHistoryAdmin):
     actions = ["download"]
 
@@ -181,7 +185,7 @@ admin.site.register(Trust)
 admin.site.register(LocalHealthBoard)
 admin.site.register(OPENUKNetwork)
 
-admin.site.register(OrganisationalAuditSubmission)
+admin.site.register(OrganisationalAuditSubmission, OrganisationalAuditSubmissionAdmin)
 admin.site.register(OrganisationalAuditSubmissionPeriod, OrganisationalAuditSubmissionPeriodAdmin)
 
 admin.site.site_header = "Epilepsy12 admin"

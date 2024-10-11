@@ -1,5 +1,7 @@
 from django.core.management.base import BaseCommand
-from ...epilepsy12.organisational_audit import import_submissions_from_csv
+
+from ...models import OrganisationalAuditSubmissionPeriod
+from ...organisational_audit import import_submissions_from_csv
 
 class Command(BaseCommand):
     help = "Import organisational audit submissions from CSV export"

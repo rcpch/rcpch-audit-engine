@@ -65,6 +65,9 @@ class OrganisationalAuditSubmission(TimeStampAbstractBaseClass, UserStampAbstrac
     def _history_user(self, value):
         self.updated_by = value
 
+    def __str__(self) -> str:
+        return f"Organisational Audit Submission for {self.trust or self.local_health_board} in {self.submission_period.year}"
+
     # These field names mostly match the CSV export format from the old system for convenience
 
     # 1. Workforce
