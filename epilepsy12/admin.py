@@ -1,6 +1,7 @@
 from typing import Any
 from django.contrib import admin
 from django.contrib.auth.admin import UserAdmin
+from django.http import HttpResponse
 from simple_history.admin import SimpleHistoryAdmin
 
 # Register your models here.
@@ -115,6 +116,17 @@ class CaseAdmin(SimpleHistoryAdmin):
     search_fields = ["first_name", "surname", "nhs_number", "date_of_birth"]
 
 
+class OrganisationalAuditSubmissionPeriodAdmin(SimpleHistoryAdmin):
+    actions = ["download"]
+
+    @admin.action(description="Download submissions as CSV")
+    def download(self, request, queryset):
+        response = HttpResponse("", content_type="text/csv")
+        response['Content-Disposition']="attachment; filename=org-audit-export.csv"
+
+        return response
+
+
 admin.site.register(Epilepsy12User, Epilepsy12UserAdmin)
 admin.site.register(AntiEpilepsyMedicine, SimpleHistoryAdmin)
 admin.site.register(Assessment, SimpleHistoryAdmin)
@@ -159,7 +171,7 @@ admin.site.register(LocalHealthBoard)
 admin.site.register(OPENUKNetwork)
 
 admin.site.register(OrganisationalAuditSubmission)
-admin.site.register(OrganisationalAuditSubmissionPeriod)
+admin.site.register(OrganisationalAuditSubmissionPeriod, OrganisationalAuditSubmissionPeriodAdmin)
 
 admin.site.site_header = "Epilepsy12 admin"
 admin.site.site_title = "Epilepsy12 admin"
