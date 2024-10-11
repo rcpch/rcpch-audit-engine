@@ -1,10 +1,13 @@
 from typing import Any
+from django.http import HttpResponse
+from django.contrib import messages
 from django.contrib import admin
 from django.contrib.auth.admin import UserAdmin
 from simple_history.admin import SimpleHistoryAdmin
 
 # Register your models here.
 from .models import *
+from .organisational_audit import export_submission_period_as_csv
 
 
 class Epilepsy12UserAdmin(UserAdmin, SimpleHistoryAdmin):
@@ -115,6 +118,30 @@ class CaseAdmin(SimpleHistoryAdmin):
     search_fields = ["first_name", "surname", "nhs_number", "date_of_birth"]
 
 
+class OrganisationalAuditSubmissionAdmin(SimpleHistoryAdmin):
+    search_fields = ["trust__name", "local_health_board__name", "trust__ods_code", "local_health_board__ods_code"]
+    list_filter = ["submission_period"]
+
+class OrganisationalAuditSubmissionPeriodAdmin(SimpleHistoryAdmin):
+    actions = ["download"]
+
+    @admin.action(description="Download submissions as CSV")
+    def download(self, request, queryset):
+        if queryset.count() > 1:
+            self.message_user(request, "Please select only one submission period to download", messages.ERROR)
+        else:
+            submission_period = queryset.first()
+            
+            filename = f"e12-org-audit-{submission_period.year}.csv"
+            
+            data = export_submission_period_as_csv(submission_period)
+
+            response = HttpResponse(data, content_type="text/csv")
+            response['Content-Disposition'] = f"attachment; filename={filename}"
+
+            return response
+
+
 admin.site.register(Epilepsy12User, Epilepsy12UserAdmin)
 admin.site.register(AntiEpilepsyMedicine, SimpleHistoryAdmin)
 admin.site.register(Assessment, SimpleHistoryAdmin)
@@ -158,8 +185,8 @@ admin.site.register(Trust)
 admin.site.register(LocalHealthBoard)
 admin.site.register(OPENUKNetwork)
 
-admin.site.register(OrganisationalAuditSubmission)
-admin.site.register(OrganisationalAuditSubmissionPeriod)
+admin.site.register(OrganisationalAuditSubmission, OrganisationalAuditSubmissionAdmin)
+admin.site.register(OrganisationalAuditSubmissionPeriod, OrganisationalAuditSubmissionPeriodAdmin)
 
 admin.site.site_header = "Epilepsy12 admin"
 admin.site.site_title = "Epilepsy12 admin"
