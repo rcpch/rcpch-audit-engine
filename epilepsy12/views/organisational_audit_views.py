@@ -84,7 +84,7 @@ def group_form_fields(form):
     total_questions = 0
 
     for field in form:
-        if field.value() is not None and field.value() != "" and field.value() != []:
+        if field.value() is not None and field.value() != "" and field.value() != [] and not field.errors:
             completed = True
             number_completed += 1
         else:
