@@ -8,10 +8,6 @@
     </div>
 </div>
 
-{% if errors %}
-    {{errors}}
-{% endif %}
-
 {% for section, questions in questions_by_section.items %}
     <div>
         <h3 class="org-audit-section-title">
@@ -23,14 +19,13 @@
                     <div class="org-audit-cell">
                         <label>
                             <em>{{parent.question_number}}</em>
-                            <span data-tooltip="Some helpful information will be found here...">
-                                {{parent.label}}
-                                <i class="rcpch question circle icon"></i>
-                            </span>
+                            {{parent.label}}
                         </label>
                         <div class="field icon-text">
                             <span class="inline-icon-text">
-                                {% if parent.completed %}
+                                {% if parent.field.errors %}
+                                    <i class="rcpch_red exclamation circle icon"></i>
+                                {% elif parent.completed %}
                                     <span data-tooltip="Scored field">
                                         <i class="rcpch_pink check circle outline icon"></i>
                                     </span>
@@ -42,6 +37,9 @@
                                 {{parent.field}}
                             </span>
                         </div>
+                        {% if parent.field.errors %}
+                            {{parent.field.errors}}
+                        {% endif %}
                     </div>
                     {% if parent.reference %}
                         <dfn class="org-audit-cell org-audit-reference">
@@ -66,11 +64,13 @@
                                 </label>
                                 <div class="field">
                                     <span class="inline-icon-text">
-                                        {% if child.completed %}
+                                        {% if child.field.errors %}
+                                            <i class="rcpch_red exclamation circle icon"></i>
+                                        {% elif child.completed %}
                                             <span data-tooltip="Scored field">
                                                 <i class="rcpch_pink check circle outline icon"></i>
                                             </span>
-                                        {% else %}
+                                        {% elif "completed" in child %}
                                             <span data-tooltip="Unscored field">
                                                 <i class="rcpch_light_blue dot circle outline icon"></i>
                                             </span>
@@ -78,6 +78,9 @@
                                         {{child.field}}
                                     </span>
                                 </div>
+                                {% if child.field.errors %}
+                                    {{child.field.errors}}
+                                {% endif %}
                             </div>
                         {% endif %}
                     {% endfor %}

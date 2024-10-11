@@ -84,7 +84,7 @@ def group_form_fields(form):
     total_questions = 0
 
     for field in form:
-        if field.value() is not None and field.value() != "" and field.value() != []:
+        if field.value() is not None and field.value() != "" and field.value() != [] and not field.errors:
             completed = True
             number_completed += 1
         else:
@@ -172,19 +172,22 @@ def get_submission(submission_period, group, group_field):
     ).first()
 
 
+# Avoid saving errors to the DB by reconstructing the form from the data
+# Allows us to also mix in answers from the previous years submission
 def get_submission_form(submission, last_submission):
-    submission = submission or OrganisationalAuditSubmission()
+    data = {}
     
-    if last_submission:
-        for field in OrganisationalAuditSubmission._meta.fields:
-            if field.name != "id" and not field.name in OrganisationalAuditSubmissionForm.Meta.exclude:
-                current_field_value = getattr(submission, field.name)
-                last_field_value = getattr(last_submission, field.name)
-                
-                if not current_field_value and last_field_value:
-                    setattr(submission, field.name, last_field_value)
-    
-    return OrganisationalAuditSubmissionForm(instance=submission)
+    for field in OrganisationalAuditSubmission._meta.fields:
+        if field.name != "id" and not field.name in OrganisationalAuditSubmissionForm.Meta.exclude:
+            field_value = getattr(submission, field.name) if submission else None
+            
+            if not field_value and last_submission:
+                field_value = getattr(last_submission, field.name)
+
+            data[field.name] = field_value
+        
+
+    return OrganisationalAuditSubmissionForm(data, instance=submission)
 
 
 def _organisational_audit(request, group_id, group_model, group_field):
@@ -231,11 +234,12 @@ def _organisational_audit(request, group_id, group_model, group_field):
         context["percentage_completed"] = int(
             (number_completed / total_questions) * 100
         )
+        context["form"] = form
 
-        if not form.errors:
-            form.save()
-        else:
-            context["errors"] = form.errors
+        # Validate all the data to pull through the values
+        form.is_valid()
+        # but save regardless of errors - we save as we go
+        form.instance.save()
 
         return render(
             request, "epilepsy12/partials/organisational_audit_form.html", context

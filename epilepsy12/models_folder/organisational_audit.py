@@ -1,4 +1,4 @@
-from django.core.validators import MaxValueValidator
+from django.core.validators import MinValueValidator, MaxValueValidator
 from django.contrib.gis.db import models
 
 from simple_history.models import HistoricalRecords
@@ -11,7 +11,13 @@ from .time_and_user_abstract_base_classes import TimeStampAbstractBaseClass, Use
 
 
 def DecimalField():
-    return models.DecimalField(null=True, blank=True, max_digits=7, decimal_places=3)
+    return models.DecimalField(
+        null=True, 
+        blank=True,
+        max_digits=7,
+        decimal_places=3,
+        validators=[MinValueValidator(0)]
+    )
 
 def TextField():
     return models.CharField(null=True, blank=True)
