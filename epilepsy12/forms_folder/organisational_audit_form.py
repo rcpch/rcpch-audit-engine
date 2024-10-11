@@ -10,7 +10,9 @@ class OrganisationalAuditSubmissionForm(forms.ModelForm):
             "trust",
             "local_health_board",
             "created_by",
-            "updated_by"
+            "updated_by",
+            "created_at",
+            "updated_at"
         ]
 
         help_texts = {
@@ -428,7 +430,7 @@ class OrganisationalAuditSubmissionForm(forms.ModelForm):
 
             # 8. Neurodevelopmental support
 
-            "S08ScreenForNeurodevelopmentalConditions": {
+            "S08RoutinelyFormallyScreenForNeurodevelopmental": {
                 "section": "8. Neurodevelopmental support",
                 "question_number": "8.1",
                 "label": "Do you routinely formalling screen for neurodevelopmental conditions?"
