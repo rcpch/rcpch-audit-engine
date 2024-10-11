@@ -125,13 +125,7 @@ def import_submissions_from_csv(submission_period, df):
         submission.save()
 
 def export_submission_period_as_csv(submission_period):
-    header = ['SiteName', "SiteCode"]
     rows = []
-
-    for field in OrganisationalAuditSubmissionForm():
-        if type(field.field) is not MultiSelectFormField:
-            header.append(field.name)
-
     submissions = OrganisationalAuditSubmission.objects.filter(submission_period=submission_period)
 
     for submission in submissions:
@@ -142,9 +136,15 @@ def export_submission_period_as_csv(submission_period):
             site_name = submission.trust.name
             site_code = submission.trust.ods_code
 
-        rows.append({
+        row = {
             'SiteName': site_name,
             'SiteCode': site_code
-        })
+        }
+
+        for field in OrganisationalAuditSubmissionForm():
+            if type(field.field) is not MultiSelectFormField:
+                row[field.name] = getattr(submission, field.name)
+
+        rows.append(row)
 
     return rows
