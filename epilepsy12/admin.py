@@ -5,8 +5,6 @@ from django.contrib import admin
 from django.contrib.auth.admin import UserAdmin
 from simple_history.admin import SimpleHistoryAdmin
 
-import pandas as pd
-
 # Register your models here.
 from .models import *
 from .organisational_audit import export_submission_period_as_csv
@@ -132,10 +130,7 @@ class OrganisationalAuditSubmissionPeriodAdmin(SimpleHistoryAdmin):
             
             filename = f"e12-org-audit-{submission_period.year}.csv"
             
-            rows = export_submission_period_as_csv(submission_period)
-            data = pd.DataFrame.from_dict(rows).to_csv(index=False)
-
-            print(f"!! {data}")
+            data = export_submission_period_as_csv(submission_period)
 
             response = HttpResponse(data, content_type="text/csv")
             response['Content-Disposition'] = f"attachment; filename={filename}"

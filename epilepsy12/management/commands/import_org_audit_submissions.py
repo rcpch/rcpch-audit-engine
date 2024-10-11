@@ -1,5 +1,3 @@
-import pandas as pd
-
 from django.core.management.base import BaseCommand
 from ...epilepsy12.organisational_audit import import_submissions_from_csv
 
@@ -24,11 +22,10 @@ class Command(BaseCommand):
 
     def handle(self, *args, **options):
         file = options["file"]
-        data = pd.read_csv(file)
 
         submission_period = OrganisationalAuditSubmissionPeriod.objects.get(
             id=options["submission_period"]
         )
 
-        import_submissions_from_csv(submission_period, data)
+        import_submissions_from_csv(submission_period, file)
             

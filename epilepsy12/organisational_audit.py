@@ -1,3 +1,5 @@
+import pandas as pd
+
 from django.forms.fields import TypedChoiceField
 
 from multiselectfield.forms.fields import MultiSelectFormField 
@@ -11,11 +13,79 @@ from .models import (
 
 from .forms_folder import OrganisationalAuditSubmissionForm
 
+MULTISELECT_FIELD_MAPPINGS = {
+    'S01ESNFunctions': {
+        "1": 'S01ESNEDVisit',
+        "2": 'S01ESNHomeVisit',
+        "3": 'S01ESNIndividualHealthcare',
+        "4": 'S01ESNNurseLedClinic',
+        "5": 'S01ESNNursePrescribing',
+        "6": 'S01ESNRescueMedicationParent',
+        "7": 'S01ESNRescueMedicationSchool',
+        "8": 'S01ESNSchoolMeetings',
+        "9": 'S01ESNWardVisits',
+        "10": 'S01ESNNoneOfTheAbove'
+    },
+    'S06ProfessionalsRoutinelyInvolvedInTransition': {
+        "1": 'S06ProfessionalsRoutinelyInvolvedInTransitionAdultESN',
+        "2": 'S06ProfessionalsRoutinelyInvolvedInTransitionAdultLDESN',
+        "3": 'S06ProfessionalsRoutinelyInvolvedInTransitionAdultNeuro',
+        "4": 'S06ProfessionalsRoutinelyInvolvedInTransitionYouthWorker',
+        "5": 'S06ProfessionalsRoutinelyInvolvedInTransitionOther'
+        # The "other" free text field is handled as a normal single value field
+    },
+    # TODO MRB: should there be an explicit none option?
+    'S07MentalHealthQuestionnaire': {
+        "1": 'S07MentalHealthQuestionnaireBDI',
+        "2": "S07MentalHealthQuestionnaireConnors",
+        "3": 'S07MentalHealthQuestionnaireETT',
+        "4": 'S07MentalHealthQuestionnaireGAD',
+        "5": 'S07MentalHealthQuestionnaireGAD2',
+        "6": 'S07MentalHealthQuestionnaireGAD7',
+        "7": 'S07MentalHealthQuestionnaireHADS',
+        "8": 'S07MentalHealthQuestionnaireMFQ',
+        "9": 'S07MentalHealthQuestionnaireNDDI',
+        "10": 'S07MentalHealthQuestionnairePHQ',
+        "11": 'S07MentalHealthQuestionnaireSDQ',
+        "12": 'S07MentalHealthQuestionnaireOther'
+    },
+    "S07MentalHealthAgreedPathway": {
+        "1": 'S07MentalHealthAgreedPathwayAnxiety',
+        # 2: 'S07MentalHealthAgreedPathwayDepression' doesn't appear to have a corresponding column in the CSV,
+        "3": 'S07MentalHealthAgreedPathwayMoodDisorders',
+        "4": 'S07MentalHealthAgreedPathwayNonEpilepticAttackDisorders',
+        "5": 'S07MentalHealthAgreedPathwayOtherDetails'
+    },
+    "S07DoesThisComprise": {
+        "1": 'S07DoesThisCompriseEpilepsyClinics',
+        "2": 'S07DoesThisCompriseMDT',
+        "3": 'S07DoesThisCompriseOther'
+    },
+    "S07TrustAchieve": {
+        "1": 'S07TrustAchieveClinicalPsychology',
+        "2": 'S07TrustAchieveEducationalPsychology',
+        "3": 'S07TrustAchieveFormalDevelopmental',
+        "4": 'S07TrustAchieveNeuropyschology',
+        "5": 'S07TrustAchievePsychiatricAssessment',
+        "6": 'S07TrustAchieveNone'
+    },
+    "S08AgreedReferralCriteriaChildrenNeurodevelopmental": {
+        "1": 'S08AgreedReferralCriteriaChildrenNeurodevelopmentalADHD',
+        "2": 'S08AgreedReferralCriteriaChildrenNeurodevelopmentalASD',
+        "3": 'S08AgreedReferralCriteriaChildrenNeurodevelopmentalBehaviour',
+        "4": 'S08AgreedReferralCriteriaChildrenNeurodevelopmentalDCD',
+        "5": 'S08AgreedReferralCriteriaChildrenNeurodevelopmentalIntellectualDisability',
+        "6": 'S08AgreedReferralCriteriaChildrenNeurodevelopmentalLearningDisabilities',
+        "7": 'S08AgreedReferralCriteriaChildrenNeurodevelopmentalOtherDetails'
+    }
+}
 
 def adapt_multiselect_field(row, choices_to_column):
     return [key for key, value in choices_to_column.items() if row[value] == 1]
 
-def import_submissions_from_csv(submission_period, df):
+def import_submissions_from_csv(submission_period, file):
+    data = pd.read_csv(file)
+
     for _, row in data.iterrows():
         ods_code = row["SiteCode"]
 
@@ -51,81 +121,24 @@ def import_submissions_from_csv(submission_period, df):
         # Multiselect fields #
         ######################      
 
-        submission.S01ESNFunctions = adapt_multiselect_field(row, {
-            1: 'S01ESNEDVisit',
-            2: 'S01ESNHomeVisit',
-            3: 'S01ESNIndividualHealthcare',
-            4: 'S01ESNNurseLedClinic',
-            5: 'S01ESNNursePrescribing',
-            6: 'S01ESNRescueMedicationParent',
-            7: 'S01ESNRescueMedicationSchool',
-            8: 'S01ESNSchoolMeetings',
-            9: 'S01ESNWardVisits',
-            10: 'S01ESNNoneOfTheAbove'
-        })
-
-        submission.S06ProfessionalsRoutinelyInvolvedInTransition = adapt_multiselect_field(row, {
-            1: 'S06ProfessionalsRoutinelyInvolvedInTransitionAdultESN',
-            2: 'S06ProfessionalsRoutinelyInvolvedInTransitionAdultLDESN',
-            3: 'S06ProfessionalsRoutinelyInvolvedInTransitionAdultNeuro',
-            4: 'S06ProfessionalsRoutinelyInvolvedInTransitionYouthWorker',
-            5: 'S06ProfessionalsRoutinelyInvolvedInTransitionOther'
-            # The other free text field is handled as a normal single value field earlier
-        })
-
-        # TODO MRB: should there be an explicit none option?
-        submission.S07MentalHealthQuestionnaire = adapt_multiselect_field(row, {
-            1: 'S07MentalHealthQuestionnaireBDI',
-            2: "S07MentalHealthQuestionnaireConnors",
-            3: 'S07MentalHealthQuestionnaireETT',
-            4: 'S07MentalHealthQuestionnaireGAD',
-            5: 'S07MentalHealthQuestionnaireGAD2',
-            6: 'S07MentalHealthQuestionnaireGAD7',
-            7: 'S07MentalHealthQuestionnaireHADS',
-            8: 'S07MentalHealthQuestionnaireMFQ',
-            9: 'S07MentalHealthQuestionnaireNDDI',
-            10: 'S07MentalHealthQuestionnairePHQ',
-            11: 'S07MentalHealthQuestionnaireSDQ',
-            12: 'S07MentalHealthQuestionnaireOther'
-        })
-
-        submission.S07MentalHealthAgreedPathway = adapt_multiselect_field(row, {
-            1: 'S07MentalHealthAgreedPathwayAnxiety',
-            # 2: 'S07MentalHealthAgreedPathwayDepression' doesn't appear to have a corresponding column in the CSV,
-            3: 'S07MentalHealthAgreedPathwayMoodDisorders',
-            4: 'S07MentalHealthAgreedPathwayNonEpilepticAttackDisorders',
-            5: 'S07MentalHealthAgreedPathwayOtherDetails'
-        })
-
-        submission.S07DoesThisComprise = adapt_multiselect_field(row, {
-            1: 'S07DoesThisCompriseEpilepsyClinics',
-            2: 'S07DoesThisCompriseMDT',
-            3: 'S07DoesThisCompriseOther'
-        })
-
-        submission.S07TrustAchieve = adapt_multiselect_field(row, {
-            1: 'S07TrustAchieveClinicalPsychology',
-            2: 'S07TrustAchieveEducationalPsychology',
-            3: 'S07TrustAchieveFormalDevelopmental',
-            4: 'S07TrustAchieveNeuropyschology',
-            5: 'S07TrustAchievePsychiatricAssessment',
-            6: 'S07TrustAchieveNone'
-        })
-
-        submission.S08AgreedReferralCriteriaChildrenNeurodevelopmental = adapt_multiselect_field(row, {
-            1: 'S08AgreedReferralCriteriaChildrenNeurodevelopmentalADHD',
-            2: 'S08AgreedReferralCriteriaChildrenNeurodevelopmentalASD',
-            3: 'S08AgreedReferralCriteriaChildrenNeurodevelopmentalBehaviour',
-            4: 'S08AgreedReferralCriteriaChildrenNeurodevelopmentalDCD',
-            5: 'S08AgreedReferralCriteriaChildrenNeurodevelopmentalIntellectualDisability',
-            6: 'S08AgreedReferralCriteriaChildrenNeurodevelopmentalLearningDisabilities',
-            7: 'S08AgreedReferralCriteriaChildrenNeurodevelopmentalOtherDetails'
-        })
+        for field, mapping in MULTISELECT_FIELD_MAPPINGS.items():
+            values = adapt_multiselect_field(row, mapping)
+            setattr(submission, field, values)
 
         submission.save()
 
 def export_submission_period_as_csv(submission_period):
+    columns = ['SiteName', 'SiteCode']
     rows = []
+
+    for field in OrganisationalAuditSubmissionForm():
+        if type(field.field) is MultiSelectFormField:
+            columns.extend(MULTISELECT_FIELD_MAPPINGS[field.name].values())
+        else:
+            columns.append(field.name)
+
+    rows = []
+
     submissions = OrganisationalAuditSubmission.objects.filter(submission_period=submission_period)
 
     for submission in submissions:
@@ -142,9 +155,19 @@ def export_submission_period_as_csv(submission_period):
         }
 
         for field in OrganisationalAuditSubmissionForm():
-            if type(field.field) is not MultiSelectFormField:
-                row[field.name] = getattr(submission, field.name)
+            value = getattr(submission, field.name)
+
+            if type(field.field) is MultiSelectFormField:
+                selected_choices = list(value)
+
+                for choice, column in MULTISELECT_FIELD_MAPPINGS[field.name].items():
+                    row[column] = "1" if choice in selected_choices else "2"
+            else:
+                row[field.name] = value
 
         rows.append(row)
 
-    return rows
+    df = pd.DataFrame(data=rows, columns=columns)
+    csv = df.to_csv(index=False)
+
+    return csv
