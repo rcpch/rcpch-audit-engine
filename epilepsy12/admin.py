@@ -1,11 +1,13 @@
 from typing import Any
+from django.http import HttpResponse
+from django.contrib import messages
 from django.contrib import admin
 from django.contrib.auth.admin import UserAdmin
-from django.http import HttpResponse
 from simple_history.admin import SimpleHistoryAdmin
 
 # Register your models here.
 from .models import *
+from .organisational_audit import export_submission_period_as_csv
 
 
 class Epilepsy12UserAdmin(UserAdmin, SimpleHistoryAdmin):
@@ -121,10 +123,18 @@ class OrganisationalAuditSubmissionPeriodAdmin(SimpleHistoryAdmin):
 
     @admin.action(description="Download submissions as CSV")
     def download(self, request, queryset):
-        response = HttpResponse("", content_type="text/csv")
-        response['Content-Disposition']="attachment; filename=org-audit-export.csv"
+        if queryset.count() > 1:
+            self.message_user(request, "Please select only one submission period to download", messages.ERROR)
+        else:
+            submission_period = queryset.first()
+            
+            filename = f"e12-org-audit-{submission_period.year}.csv"
+            data = export_submission_period_as_csv(submission_period)
 
-        return response
+            response = HttpResponse("", content_type="text/csv")
+            response['Content-Disposition'] = f"attachment; filename={filename}"
+
+            return response
 
 
 admin.site.register(Epilepsy12User, Epilepsy12UserAdmin)
