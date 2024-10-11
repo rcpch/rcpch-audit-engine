@@ -8,8 +8,8 @@
     </div>
 </div>
 
-{% if errors %}
-    {{errors}}
+{% if form.errors %}
+    {{form.errors}}
 {% endif %}
 
 {% for section, questions in questions_by_section.items %}
