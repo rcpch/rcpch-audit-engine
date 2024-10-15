@@ -89,3 +89,12 @@
         {% endfor %}
     </div>
 {% endfor %}
+
+<script type="text/javascript">
+    // HACK: fix focus jumping to the start of a text field after form submit causes a re-render
+    if(document.activeElement.value) {
+        const oldValue = document.activeElement.value;
+        document.activeElement.value = '';
+        document.activeElement.value = oldValue;
+    }
+</script>
