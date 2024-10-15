@@ -32,6 +32,8 @@ Or to show the banner on the org audit page for a local health board *or* trust:
 
 You can then enter arbitrary HTML that will appear on the page. This can include hyperlinks, `strong` tags etc.
 
+**NB: banners may take up to 10 seconds to appear on the site once created or changed**
+
 The `disabled` flag is used to retain the banner definition but not display it on the page.
 This is helpful so we don't have to recreate the regular expressions each time.
 
