@@ -199,6 +199,7 @@ def _organisational_audit(request, group_id, group_model, group_field):
 
     if not submission_periods:
         submission_period = None
+        last_submission_period = None
     elif len(submission_periods) == 1:
         submission_period = submission_periods[0]
         last_submission_period = None
