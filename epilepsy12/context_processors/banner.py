@@ -15,6 +15,10 @@ def banner(request):
         url_matcher = re.compile(banner.url_matcher)
 
         if url_matcher.match(request.path) and not banner.disabled:
-            return { "banner": banner }
+            if banner.user_role_to_target and request.user:
+                if request.user.role == banner.user_role_to_target or request.user.is_rcpch_audit_team_member:
+                    return { "banner": banner }
+            elif not banner.user_role_to_target:
+                return { "banner": banner }
 
     return {}
