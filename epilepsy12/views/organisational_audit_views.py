@@ -1,6 +1,6 @@
 from collections.abc import Iterable
 
-from django.shortcuts import render
+from django.shortcuts import render, redirect
 from django.forms import model_to_dict
 
 from django.shortcuts import render
@@ -267,3 +267,15 @@ def organisational_audit_trust(request, id):
 @user_may_view_organisational_audit(LocalHealthBoard, "local_health_board")
 def organisational_audit_local_health_board(request, id):
     return _organisational_audit(request, id, LocalHealthBoard, "local_health_board")
+
+
+@login_and_otp_required()
+def organisational_audit(request):
+    organisation = request.user.organisation_employer
+
+    if organisation.local_health_board:
+        return redirect("organisational_audit_local_health_board", id=organisation.local_health_board.id)
+    elif organisation.trust:
+        return redirect("organisational_audit_trust", id=organisation.trust.id)
+    else:
+        raise ValueError("Organisation has no local health board or trust")

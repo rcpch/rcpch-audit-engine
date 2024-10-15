@@ -23,10 +23,6 @@
 
 <body id="root">
 
-  <textarea style="display: none">
-    {% debug %}
-  </textarea>
-
   {% block nav %}
   {% include 'epilepsy12/nav.html' %}
   {% endblock %}
@@ -36,7 +32,7 @@
       <div class="rcpch_padding">
         <div class="ui rcpch_info icon message">
           <i class="info icon"></i>
-          {{banner.html}}
+          {{banner.html|safe}}
         </div>
       </div>
     </div>
