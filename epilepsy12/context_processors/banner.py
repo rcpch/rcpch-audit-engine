@@ -14,7 +14,7 @@ def banner(request):
     for banner in banners:
         url_matcher = re.compile(banner.url_matcher)
 
-        if url_matcher.match(request.path):
+        if url_matcher.match(request.path) and not banner.disabled:
             return { "banner": banner }
 
     return {}
