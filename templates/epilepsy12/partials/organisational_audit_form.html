@@ -4,10 +4,22 @@
 
 <div class="org-audit-progress">
     <div class="org-audit-progress--label">
-        {{number_completed}} of {{total_questions}} complete
+        <div>
+            {% if submitted %}
+                <i class="rcpch_strong_green check circle outline icon"></i> Complete
+            {% else %}
+                {{number_completed}} of {{total_questions}} complete
+            {% endif %}
+        </div>
+        <div>
+            {% if not submitted and number_completed == total_questions %}
+                <input type="hidden" value="true" name="submitted" />
+                <input class="ui rcpch_primary button" type="submit" value="Submit">
+            {% endif %}
+        </div>
     </div>
 </div>
-
+    
 {% for section, questions in questions_by_section.items %}
     <div>
         <h3 class="org-audit-section-title">
