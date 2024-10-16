@@ -205,7 +205,7 @@ def user_may_view_organisational_audit(parent_model, parent_type):
             user = request.user
         
             requested_id = kwargs.get("id")
-            parent = getattr(user.organisation_employer, parent_type)
+            parent = getattr(user.organisation_employer, parent_type) if user.organisation_employer else None
 
             can_view_parent = parent and parent.id == requested_id
             is_lead_clinican = user.role == AUDIT_CENTRE_LEAD_CLINICIAN
