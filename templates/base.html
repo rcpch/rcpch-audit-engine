@@ -27,6 +27,19 @@
   {% include 'epilepsy12/nav.html' %}
   {% endblock %}
 
+  {% if banner %}
+    <div class='ui container'>
+      <div class="rcpch_padding">
+        <div class="ui rcpch_info icon message">
+          <i class="info icon"></i>
+          <div>
+            {{banner.html|safe}}
+          </div>
+        </div>
+      </div>
+    </div>
+  {% endif %}
+
   {% if messages %}
   <div class='ui container' id="message">
     <div class="rcpch_padding">
