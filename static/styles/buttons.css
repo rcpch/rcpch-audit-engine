@@ -300,6 +300,10 @@ a.ui.button {
   color: var(--rcpch_pink);
 }
 
+.rcpch_strong_green.icon {
+  color: var(--rcpch_strong_green);
+}
+
 .rcpch_red.icon {
   color: var(--rcpch_red_light_tint2);
 }

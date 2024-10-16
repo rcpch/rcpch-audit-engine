@@ -3,7 +3,7 @@
 <div class="ui rcpch container main_content">
     {% if submission_period.is_open %}
         <h2 class="org-audit-header">Organisational Audit {{submission_period.year}} - {{group_name}}</h2>
-        <form class="ui rcpch form" method="POST" hx-post="{{ request.path }}" hx-trigger="input delay:0.5s">
+        <form class="ui rcpch form" method="POST" hx-post="{{ request.path }}" hx-trigger="input delay:0.5s,submit">
             {% include 'epilepsy12/partials/organisational_audit_form.html' %}
         </form>
     {% else %}

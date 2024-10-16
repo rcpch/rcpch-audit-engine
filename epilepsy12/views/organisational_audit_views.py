@@ -84,6 +84,9 @@ def group_form_fields(form):
     total_questions = 0
 
     for field in form:
+        if field.name == "submitted":
+            continue
+
         if field.value() is not None and field.value() != "" and field.value() != [] and not field.errors:
             completed = True
             number_completed += 1
@@ -229,9 +232,14 @@ def _organisational_audit(request, group_id, group_model, group_field):
         questions_by_section, number_completed, total_questions = group_form_fields(
             form
         )
+
+        if number_completed != total_questions:
+            form.instance.submitted = False
+
         context["questions_by_section"] = questions_by_section
         context["number_completed"] = number_completed
         context["total_questions"] = total_questions
+        context["submitted"] = submission.submitted if submission else False
         context["percentage_completed"] = int(
             (number_completed / total_questions) * 100
         )
@@ -249,9 +257,11 @@ def _organisational_audit(request, group_id, group_model, group_field):
     form = get_submission_form(submission, last_submission)
 
     questions_by_section, number_completed, total_questions = group_form_fields(form)
+
     context["questions_by_section"] = questions_by_section
     context["number_completed"] = number_completed
     context["total_questions"] = total_questions
+    context["submitted"] = submission.submitted if submission else False
     context["percentage_completed"] = int((number_completed / total_questions) * 100)
     context["form"] = form
 

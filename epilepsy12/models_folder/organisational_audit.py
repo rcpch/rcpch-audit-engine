@@ -63,6 +63,8 @@ class OrganisationalAuditSubmission(TimeStampAbstractBaseClass, UserStampAbstrac
 
     history = HistoricalRecords()
 
+    submitted = models.BooleanField(default=False)
+
     @property
     def _history_user(self):
         return self.updated_by
