@@ -83,7 +83,8 @@ class OrganisationalAuditSubmissionForm(forms.ModelForm):
             "S01JobPlannedHoursPerWeekLeadershipQIActivities": {
                 "section": "1. Workforce",
                 "question_number": "1.5",
-                "label": "How many job planned hours are there per week (ESN and/or paediatrician) specified for epilepsy leadership and/or QI activities?",
+                "label": "What is the total number of hours per week for your Health Board/Trust specified towards local epilepsy audit and quality improvement?",
+                "reference": "For example in nurse, doctor or allied professionals job plans"            
             },
 
 
