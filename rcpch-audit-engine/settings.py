@@ -174,6 +174,7 @@ TEMPLATES = [
                 "django.contrib.messages.context_processors.messages",
                 "django_auto_logout.context_processors.auto_logout_client",  # auto logout
                 "rcpch-audit-engine.build_info.get_build_info",
+                "epilepsy12.context_processors.banner"
             ]
         },
     },

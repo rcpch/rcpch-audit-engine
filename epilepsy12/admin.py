@@ -187,6 +187,7 @@ admin.site.register(OPENUKNetwork)
 
 admin.site.register(OrganisationalAuditSubmission, OrganisationalAuditSubmissionAdmin)
 admin.site.register(OrganisationalAuditSubmissionPeriod, OrganisationalAuditSubmissionPeriodAdmin)
+admin.site.register(Banner)
 
 admin.site.site_header = "Epilepsy12 admin"
 admin.site.site_title = "Epilepsy12 admin"

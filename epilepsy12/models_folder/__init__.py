@@ -73,3 +73,4 @@ from .entities.trust import Trust
 from .entities.local_health_board import LocalHealthBoard
 
 from .organisational_audit import OrganisationalAuditSubmissionPeriod, OrganisationalAuditSubmission
+from .banner import Banner

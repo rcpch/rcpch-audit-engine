@@ -247,6 +247,10 @@ a.ui.button {
   align-items: center;
 }
 
+a.ui.button--inline {
+  display: inline;
+}
+
 .ui.rcpch_positive.button:hover {
   border-radius: 0% !important;
   color: white;
