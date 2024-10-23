@@ -199,7 +199,7 @@ class OrganisationalAuditSubmissionForm(forms.ModelForm):
                 "question_number": "4.1i",
                 "label": "12 lead ECG",
                 "parent_question_number": "4",
-                "parent_question_label": "Which of the following investigations can be obtained?",
+                "parent_question_label": "Which of the following investigations can be obtained locally?",
                 "parent_question_reference": "If the child would have to travel to a location outside your audit unit then answer ‘no‘"
             },
             "S04AwakeMRI": {
@@ -275,7 +275,7 @@ class OrganisationalAuditSubmissionForm(forms.ModelForm):
                 "section": "5. Service Contact",
                 "question_number": "5.1",
                 "label": "Can patients contact the Epilepsy service for specialist advice?",
-                "reference": "e.g. from a paediatrician with expertise, paediatric neurologist or ESN) between scheduled reviews?"
+                "reference": "e.g. from a paediatrician with expertise, paediatric neurologist or ESN between scheduled reviews?"
             },
             "S05AdviceAvailableAllWeekdays": {
                 "question_number": "5.1.1",
@@ -471,6 +471,6 @@ class OrganisationalAuditSubmissionForm(forms.ModelForm):
                 "section": "10. Patient Database/Register",
                 "question_number": "10.1",
                 "label": "Does you maintain a database or register of children with epilepsies?",
-                "reference": "Other than the epilepsy12 audit itself"
+                "reference": "Other than the Epilepsy12 audit itself"
             }
         }
