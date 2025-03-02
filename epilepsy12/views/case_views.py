@@ -41,6 +41,39 @@ logger = logging.getLogger(__name__)
 
 @login_and_otp_required()
 @user_may_view_this_organisation()
+def search_bar(request, organisation_id):
+    """
+    POST request from search bar in case_list template
+    """
+
+    button_list = [
+        "cohort_active",
+        "name_active",
+        "unique_identifier_active",
+        "case_id_active",
+        "reset_active",
+    ]
+
+    selected_button_name = request.POST.get("button_name")
+
+    context = {
+        "organisation_id": organisation_id,
+    }
+    for button in button_list:
+        context[f"{button}_active"] = ""
+        if selected_button_name == button:
+            context[f"{button}_active"] = "active"
+
+    organisation = Organisation.objects.get(pk=organisation_id)
+
+    print(context)
+
+    template = "epilepsy12/partials/cases/search_bar.html"
+    return render(request=request, template_name=template, context=context)
+
+
+@login_and_otp_required()
+@user_may_view_this_organisation()
 def case_list(request, organisation_id):
     """
     Returns a list of all children registered under the user's service.

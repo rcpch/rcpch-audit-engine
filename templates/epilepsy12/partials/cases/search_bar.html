@@ -1,0 +1,59 @@
+<div class="ui rcpch icon fluid input" data-tooltip="Start typing to Filter by name, NHS Number or case ID.">
+    <input type="text" class='prompt' placeholder="Search..." name='filtered_case_list' hx-target="#case_table" hx-trigger="keyup" hx-get="{% url 'filter_case_list' organisation_id=organisation.pk %}" hx-swap="innerHTML">
+    
+    <div 
+        class="ui rcpch_light_blue buttons" 
+        hx-headers='{"X-CSRFToken": "{{ csrf_token }}"}'
+        hx-target="#rcpch_search_bar"
+        hx-swap="innerHTML"
+        id="button-container"
+    >
+
+        <button name="reset" class="ui rcpch_negative button" data-active="false" onclick="toggleButton(this)">Reset</button>
+        <button name="cohort" class="ui {{ cohort_active }} button" data-active="{{ cohort_active|lower }}" onclick="toggleButton(this)">Cohort</button>
+        <button name="unique_identifier" class="ui {{ unique_identifier_active }} button" data-active="{{ unique_identifier_active|lower }}" onclick="toggleButton(this)">NHS Number</button>
+        <button name="case_id" class="ui {{ case_active }} button" data-active="{{ case_active|lower }}" onclick="toggleButton(this)">Case ID</button>
+        <button name="name" class="ui {{ name_active }} button" data-active="{{ name_active|lower }}" onclick="toggleButton(this)">Name</button>
+        <div class="ui floating labeled icon dropdown button">
+            <i class="filter icon"></i>
+            <span class="text">KPIs</span>
+            <div class="menu">
+                <div class="header">
+                    <i class="tags icon"></i>
+                    Filter by Incomplete KPI
+                </div>
+                <div class="item" data-active="false" onclick="toggleButton(this)">KPI 1</div>
+                <div class="item" data-active="false" onclick="toggleButton(this)">KPI 2</div>
+                <div class="item" data-active="false" onclick="toggleButton(this)">KPI 3</div>
+                <div class="item" data-active="false" onclick="toggleButton(this)">KPI 4</div>
+                <div class="item" data-active="false" onclick="toggleButton(this)">KPI 5</div>
+                <div class="item" data-active="false" onclick="toggleButton(this)">KPI 6</div>
+                <div class="item" data-active="false" onclick="toggleButton(this)">KPI 7</div>
+                <div class="item" data-active="false" onclick="toggleButton(this)">KPI 8</div>
+                <div class="item" data-active="false" onclick="toggleButton(this)">KPI 9</div>
+                <div class="item" data-active="false" onclick="toggleButton(this)">KPI 10</div>
+                <div class="item" data-active="false" onclick="toggleButton(this)">KPI 11</div>
+                <div class="item" data-active="false" onclick="toggleButton(this)">KPI 12</div>
+            </div>
+        </div>
+        <button hx-post="{% url 'search_bar' organisation_id=organisation_id %}" hx-vals="js:getButtonStates()" hx-trigger="click" style="display:none;" id="submitButton">Submit</button>
+    </div>
+</div>
+
+<script>
+    function toggleButton(button) {
+        const isActive = button.getAttribute('data-active') === 'true';
+        button.setAttribute('data-active', !isActive);
+        button.classList.toggle('active', !isActive); // Optional: add/remove 'active' class for styling
+        document.getElementById("submitButton").click();
+    }
+
+    function getButtonStates() {
+        const buttons = document.querySelectorAll('#button-container button, #button-container .item');
+        const states = {};
+        buttons.forEach(button => {
+            states[button.name || button.textContent.trim()] = button.getAttribute('data-active') === 'true';
+        });
+        return states;
+    }
+</script>
