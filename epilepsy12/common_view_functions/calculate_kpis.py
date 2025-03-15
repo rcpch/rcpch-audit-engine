@@ -78,8 +78,6 @@ def calculate_kpis(registration_instance):
         calculate_age_at_first_paediatric_assessment_in_years(registration_instance)
     )
 
-    print(f"age_at_first_paediatric_assessment: {age_at_first_paediatric_assessment}")
-
     # child must be registered in the audit for the KPI to be counted
     if not check_is_registered(registration_instance):
         # cannot proceed any further if registration incomplete.

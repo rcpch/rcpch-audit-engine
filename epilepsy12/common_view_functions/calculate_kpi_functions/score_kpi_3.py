@@ -101,7 +101,7 @@ def score_kpi_3b(registration_instance) -> int:
     Calculation Method
 
     Calculation Method
-    Numerator = Number of children and young people diagnosed with epilepsy AND met [CESS criteria] at first year AND had [evidence of referral of CESS]
+    Numerator = Number of children and young people diagnosed with epilepsy AND met [CESS criteria] at first year AND had [evidence of referral of CESS] within 1 year of First Paediatric Assessment date
 
     Denominator =Number of children and young people diagnosed with epilepsy AND met CESS criteria at first year
     """
@@ -116,22 +116,22 @@ def score_kpi_3b(registration_instance) -> int:
     if assessment.childrens_epilepsy_surgical_service_referral_criteria_met is False:
         return KPI_SCORE["INELIGIBLE"]
 
-    # not scored
-    if (
-        assessment.childrens_epilepsy_surgical_service_referral_date is None
-        and assessment.paediatric_neurologist_input_date is None
-    ):
+    # by this point, we know the referral criteria were met
+    if assessment.childrens_epilepsy_surgical_service_referral_made is False:
+        # if no referral made but meets criteria then fail. However, the referral_made field was introduced
+        # after the initial data collection so if this field is None, we can't be sure the referral was not made
+        # without checking the date field. However, if this field is False, we can be sure the referral was not made
+        return KPI_SCORE["FAIL"]
+
+    # not scored if referral made but no date
+    if assessment.childrens_epilepsy_surgical_service_referral_date is None:
         return KPI_SCORE["NOT_SCORED"]
+
+    # by this point the referral date is not None
 
     # score KPI
     if (
-        assessment.paediatric_neurologist_input_date is not None
-        and assessment.paediatric_neurologist_input_date
-        <= registration_instance.first_paediatric_assessment_date
-        + relativedelta(years=1)
-    ) or (
-        assessment.childrens_epilepsy_surgical_service_referral_date is not None
-        and assessment.childrens_epilepsy_surgical_service_referral_date
+        assessment.childrens_epilepsy_surgical_service_referral_date
         <= registration_instance.first_paediatric_assessment_date
         + relativedelta(years=1)
     ):
