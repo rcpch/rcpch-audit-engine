@@ -5,17 +5,17 @@ author: Dr Marcus Baw
 
 ## 10 key performance indicators
 
-1. Paediatrician with expertise in epilepsies
-2. Epilepsy specialist nurse
+1. Paediatrician with expertise in epilepsy within 2 weeks
+2. Access to Epilepsy Specialist Nurse
 3. a. Tertiary input
    b. Epilepsy surgery referral
 4. ECG
-5. MRI brain
+5. MRI within 6 weeks
 6. Assessment of mental health issues
 7. Mental health support
 8. Sodium valproate
 9. a.  Care planning agreement
-   b. Care planning content
+   b. Care planning components
 10. School individual health care plan
 
 ## Quality Improvement
