@@ -180,7 +180,7 @@ class AntiEpilepsyMedicine(
                 "label": "Has the Annual Risk Acknowledgment Form been completed?",
                 "reference": "Have the risks related to the antiseizure medicine been discussed with the child/young person and their family?",
             }
-        return None  # Fall back to default help text
+        return None
 
     def get_is_a_pregnancy_prevention_programme_in_place_conditional_help_text(self):
         """

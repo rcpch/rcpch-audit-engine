@@ -15,7 +15,9 @@ class HelpTextMixin(object):
         if hasattr(self, conditional_method):
             # If we have a conditional help text method, call it
             # and return the result.
-            return getattr(self, conditional_method)()["label"]
+            conditional_result = getattr(self, conditional_method)()
+            if conditional_result:
+                return getattr(self, conditional_method)()["label"]
 
         # Otherwise, return the default help text.
         # This is the help text that is defined in the model field.
@@ -33,7 +35,9 @@ class HelpTextMixin(object):
         if hasattr(self, conditional_method):
             # If we have a conditional help text method, call it
             # and return the result.
-            return getattr(self, conditional_method)()["reference"]
+            conditional_result = getattr(self, conditional_method)()
+            if conditional_result:
+                return getattr(self, conditional_method)()["reference"]
 
         # Otherwise, return the default help text.
         # This is the help text that is defined in the model field.
