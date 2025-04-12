@@ -93,36 +93,74 @@ def score_kpi_8_topiramate(
     male = registration_instance.case.sex == 1
     female = registration_instance.case.sex == 2
     age_12_or_above = age_at_first_paediatric_assessment >= 12
-    age_below_12 = age_at_first_paediatric_assessment < 12
-    valproate = AntiEpilepsyMedicine.objects.filter(
+
+    valproate_prescribed = AntiEpilepsyMedicine.objects.filter(
         management=registration_instance.management,
         medicine_entity=Medicine.objects.get(conceptId="387481005"),  # valproate
     ).exists()
-    topiramate = AntiEpilepsyMedicine.objects.filter(
+    topiramate_prescribed = AntiEpilepsyMedicine.objects.filter(
         management=registration_instance.management,
-        medicine_entity=Medicine.objects.get(conceptId="387481005"),  # topiramate
+        medicine_entity=Medicine.objects.get(conceptId="777808008"),  # topiramate
     ).exists()
+    a_pregnancy_prevention_programme_is_in_place = False
+    a_valproate_annual_risk_acknowledgement_form_been_completed = False
 
-    # ineligible - Not on valproate and not ( >12 and on topiramate) or male
-    if male or not (valproate and (age_below_12 and topiramate)):
+    print(
+        f"in the function male: {male}, female: {female}, >12: {age_12_or_above}, valp: {valproate_prescribed}, top: {topiramate_prescribed}"
+    )
+
+    if valproate_prescribed:
+        valproate = AntiEpilepsyMedicine.objects.filter(
+            management=registration_instance.management,
+            medicine_entity=Medicine.objects.get(conceptId="387481005"),  # valproate
+        ).first()
+        a_pregnancy_prevention_programme_is_in_place = (
+            valproate.is_a_pregnancy_prevention_programme_in_place
+        )
+        a_valproate_annual_risk_acknowledgement_form_been_completed = (
+            valproate.has_a_valproate_annual_risk_acknowledgement_form_been_completed
+        )
+    elif topiramate_prescribed:
+        topiramate = AntiEpilepsyMedicine.objects.filter(
+            management=registration_instance.management,
+            medicine_entity=Medicine.objects.get(conceptId="777808008"),  # topiramate
+        ).first()
+        a_pregnancy_prevention_programme_is_in_place = (
+            topiramate.is_a_pregnancy_prevention_programme_in_place
+        )
+        if female:
+            a_valproate_annual_risk_acknowledgement_form_been_completed = (
+                topiramate.has_a_valproate_annual_risk_acknowledgement_form_been_completed
+            )
+
+    # ineligible - exclude boys
+    if male:
+        return KPI_SCORE["INELIGIBLE"]
+
+    #  ineligible - exclude those  not on valproate and not ( >12 and on topiramate)
+    if not valproate_prescribed and not (age_12_or_above and topiramate_prescribed):
+        return KPI_SCORE["INELIGIBLE"]
+
+    # ineligible - no AED has been given
+    if not registration_instance.management.has_an_aed_been_given:
         return KPI_SCORE["INELIGIBLE"]
 
     # not scored
     if registration_instance.management.has_an_aed_been_given is None:
         return KPI_SCORE["NOT_SCORED"]
 
-    # not scored
-    if (
-        valproate.is_a_pregnancy_prevention_programme_in_place is None
-        or valproate.has_a_valproate_annual_risk_acknowledgement_form_been_completed
-        is None
+    # by this point an AED has been given, either valproate or topiramate and female is True
+    # not scored if a girl any age on valproate or a girl >= 12 on topiramate and either of risk acknowledgement form or pregnancy prevention programme is None
+    if a_valproate_annual_risk_acknowledgement_form_been_completed is None or (
+        age_12_or_above and a_pregnancy_prevention_programme_is_in_place is None
     ):
         return KPI_SCORE["NOT_SCORED"]
 
-    if (
-        valproate.is_a_pregnancy_prevention_programme_in_place
-        or valproate.has_a_valproate_annual_risk_acknowledgement_form_been_completed
-    ) and (female and (age_12_or_above and topiramate) or valproate):
-        return KPI_SCORE["PASS"]
-    else:
-        return KPI_SCORE["FAIL"]
+    if (age_12_or_above and topiramate_prescribed) or valproate_prescribed:
+        if a_pregnancy_prevention_programme_is_in_place or (
+            a_valproate_annual_risk_acknowledgement_form_been_completed
+        ):
+            return KPI_SCORE["PASS"]
+
+    # any other combination of conditions will fail the measure
+    return KPI_SCORE["FAIL"]
