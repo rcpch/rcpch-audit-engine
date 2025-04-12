@@ -105,10 +105,6 @@ def score_kpi_8_topiramate(
     a_pregnancy_prevention_programme_is_in_place = False
     a_valproate_annual_risk_acknowledgement_form_been_completed = False
 
-    print(
-        f"in the function male: {male}, female: {female}, >12: {age_12_or_above}, valp: {valproate_prescribed}, top: {topiramate_prescribed}"
-    )
-
     if valproate_prescribed:
         valproate = AntiEpilepsyMedicine.objects.filter(
             management=registration_instance.management,
