@@ -214,7 +214,19 @@ class Epilepsy12User(AbstractUser, PermissionsMixin):
     objects = Epilepsy12UserManager()
 
     organisation_employer = models.ForeignKey(
-        "epilepsy12.Organisation", on_delete=models.CASCADE, blank=True, null=True
+        "epilepsy12.Organisation",
+        on_delete=models.CASCADE,
+        blank=True,
+        null=True,
+        related_name="organisation_employees",
+    )
+
+    employer_organisation = models.ManyToManyField(
+        "epilepsy12.Organisation",
+        through="epilepsy12.OrganisationEmployer",
+        through_fields=("epilepsy12_user", "employer_organisation"),
+        blank=True,
+        help_text=_("Please select the organisation trust you are affiliated with."),
     )
 
     def get_full_name(self):
@@ -255,3 +267,40 @@ class Epilepsy12User(AbstractUser, PermissionsMixin):
 
     def __str__(self) -> str:
         return self.get_full_name()
+
+    """
+    Methods for moving users between employers
+    """
+
+    # @property
+    # def organisation_employer(self):
+    #     """Return the primary organisation for backward compatibility"""
+    #     try:
+    #         return (
+    #             self.organisation_employments.filter(is_primary=True, is_active=True)
+    #             .first()
+    #             .organisation
+    #         )
+    #     except AttributeError:
+    #         return None
+
+    def set_organisation_employer(
+        self, organisation_employer, is_primary=True, created_by=None
+    ):
+        """Set a user's organisation, maintaining backward compatibility"""
+        if organisation_employer:
+            OrganisationEmployer = apps.get_model("epilepsy12", "OrganisationEmployer")
+            org_emp, created = OrganisationEmployer.objects.update_or_create(
+                user=self,
+                organisation=organisation_employer,
+                defaults={
+                    "is_primary": is_primary,
+                    "is_active": True,
+                    "created_by": created_by or self,
+                },
+            )
+            # If this is the new primary, make sure no other employments are primary
+            if is_primary:
+                OrganisationEmployer.objects.filter(user=self, is_primary=True).exclude(
+                    pk=org_emp.pk
+                ).update(is_primary=False)

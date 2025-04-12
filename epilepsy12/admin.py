@@ -22,7 +22,6 @@ class Epilepsy12UserAdmin(UserAdmin, SimpleHistoryAdmin):
     list_filter = (
         "is_active",
         "role",
-        "organisation_employer",
     )
     fieldsets = (
         (
@@ -35,7 +34,6 @@ class Epilepsy12UserAdmin(UserAdmin, SimpleHistoryAdmin):
                 )
             },
         ),
-        ("Epilepsy12 Centre", {"fields": ("organisation_employer", "role")}),
         ("Contacts", {"fields": ("email",)}),
         (
             "Permissions",
@@ -87,7 +85,6 @@ class Epilepsy12UserAdmin(UserAdmin, SimpleHistoryAdmin):
                     "is_active",
                     "is_rcpch_audit_team_member",
                     "role",
-                    "organisation_employer",
                     "is_superuser",
                     "groups",
                 ),
@@ -97,7 +94,6 @@ class Epilepsy12UserAdmin(UserAdmin, SimpleHistoryAdmin):
 
     def get_form(self, request, obj=None, **kwargs):
         form = super().get_form(request, obj, **kwargs)
-        form.base_fields["organisation_employer"].required = False
         if not request.user.is_superuser:
             self.exclude = ["is_superuser"]
         else:
