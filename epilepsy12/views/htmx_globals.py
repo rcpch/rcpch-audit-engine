@@ -4,18 +4,12 @@ import csv
 # django
 from django.apps import apps
 from django.shortcuts import render
-from django.http import HttpResponse
 
 # e12
 from epilepsy12.models import (
     Registration,
     Site,
-    Case,
-    FirstPaediatricAssessment,
-    EpilepsyContext,
-    MultiaxialDiagnosis,
 )
-from epilepsy12.decorator import rcpch_full_access_only, login_and_otp_required
 
 
 # HTMX generic partials

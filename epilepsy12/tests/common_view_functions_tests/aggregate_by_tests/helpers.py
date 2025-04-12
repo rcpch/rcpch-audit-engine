@@ -24,7 +24,7 @@ def _register_cases_in_organisation(
 ) -> list:
     for code in ods_codes:
         # Community Paediatrics Org returning with the actual org so need to do filter.first()
-        org = Organisation.objects.filter(ods_code=code).first()
+        org = Organisation.objects.filter(ods_code=code, active=True).first()
 
         e12_case_factory.create_batch(
             n_cases,

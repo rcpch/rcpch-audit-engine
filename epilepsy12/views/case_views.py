@@ -65,12 +65,14 @@ def case_list(request, organisation_id):
     if organisation.country.boundary_identifier == "W92000004":
         parent_trust = organisation.local_health_board
         organisation_children = Organisation.objects.filter(
-            local_health_board=parent_trust
+            local_health_board=parent_trust, active=True
         ).all()
     else:
         parent_trust = organisation.trust
         # get all organisations which are in the same parent trust
-        organisation_children = Organisation.objects.filter(trust=parent_trust).all()
+        organisation_children = Organisation.objects.filter(
+            trust=parent_trust, active=True
+        ).all()
 
     if filter_term:
         # filter_term is called if filtering by search box
@@ -615,7 +617,7 @@ def create_case(request, organisation_id):
     Django function based - returns django form to create a new case, or saves a new case if a
     POST request. The only instance where htmx not used.
     """
-    organisation = Organisation.objects.filter(pk=organisation_id).get()
+    organisation = Organisation.objects.filter(pk=organisation_id, active=True).get()
 
     # set select boxes for situations when postcode unknown
     country_choice = ("ZZ993CZ", "Address unspecified - England")
@@ -682,7 +684,7 @@ def update_case(request, organisation_id, case_id):
     """
     Django function based view. Receives POST request to update view or delete
     """
-    organisation = Organisation.objects.filter(pk=organisation_id).get()
+    organisation = Organisation.objects.filter(pk=organisation_id, active=True).get()
     case = get_object_or_404(Case, pk=case_id)
     form = CaseForm(instance=case, organisation_id=organisation_id)
 

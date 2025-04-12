@@ -163,7 +163,7 @@ def run_dummy_cases_seed(cases, organisations, noskip, verbose=True):
         cases = 50
 
     organisations_list = Organisation.objects.filter(
-        ods_code__in=organisations
+        ods_code__in=organisations, active=True
     ).order_by("name")
     for org in organisations_list:
         num_cases_to_seed_in_org = int(cases / len(organisations))

@@ -33,8 +33,6 @@ from ..common_view_functions import (
 )
 from epilepsy12.common_view_functions.render_charts import update_all_data_with_charts
 from ..general_functions import (
-    cohort_number_from_first_paediatric_assessment_date,
-    dates_for_cohort,
     value_from_key,
     cohorts_and_dates,
 )
@@ -82,7 +80,7 @@ def selected_organisation_summary(request, organisation_id):
     # Where dashboard data is filtered by cohort, which cohort?
     # Users still want to see dashboard data even when data collection is complete.
     requested_cohort_number = request.GET.get("cohort")
-    
+
     if requested_cohort_number:
         cohort_number = int(requested_cohort_number)
     else:
@@ -217,15 +215,17 @@ def selected_organisation_summary(request, organisation_id):
         or request.user.is_rcpch_staff
     ):
         # select any organisations except currently selected organisation
-        organisation_list = Organisation.objects.all().order_by("name")
+        organisation_list = Organisation.objects.filter(active=True).order_by("name")
     else:
         if selected_organisation.country.boundary_identifier == "W92000004":  # Wales
             organisation_list = Organisation.objects.filter(
-                local_health_board=selected_organisation.local_health_board
+                local_health_board=selected_organisation.local_health_board,
+                active=True,
             )
         else:
             organisation_list = Organisation.objects.filter(
-                trust=selected_organisation.trust
+                trust=selected_organisation.trust,
+                active=True,
             )
 
     context = {
@@ -356,7 +356,7 @@ def selected_trust_kpis(request, organisation_id, access):
         cohort_number = int(requested_cohort_number)
     else:
         cohort_number = submitting_cohort_number
-    
+
     organisation = Organisation.objects.get(pk=organisation_id)
 
     if logged_in_user_may_access_this_organisation(request.user, organisation):
@@ -405,13 +405,13 @@ def selected_trust_kpis(request, organisation_id, access):
         "kpis": kpi_instance,
         "kpi_names_list": kpi_names_list,
         "open": access == "open",
-        "organisation_list": Organisation.objects.all().order_by(
+        "organisation_list": Organisation.objects.filter(active=True).order_by(
             "name"
         ),  # for public view dropdown
         "last_published_date": last_published_date,
         "publish_success": False,
         "cohort_number": cohort_number,
-        "submitting_cohort_number": submitting_cohort_number
+        "submitting_cohort_number": submitting_cohort_number,
     }
 
     return render(
@@ -486,7 +486,7 @@ def selected_trust_select_kpi(request, organisation_id):
         # on page load there may be no kpi_name - default to paediatrician_with_experise_in_epilepsy
         kpi_name = INDIVIDUAL_KPI_MEASURES[0][0]
     kpi_name_title_case = value_from_key(key=kpi_name, choices=INDIVIDUAL_KPI_MEASURES)
-    
+
     requested_cohort_number = request.POST.get("cohort")
 
     if requested_cohort_number:

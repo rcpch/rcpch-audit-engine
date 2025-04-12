@@ -82,12 +82,14 @@ def epilepsy12_user_list(request, organisation_id):
         parent_trust = organisation.local_health_board
         # Wales - get all organisations which are in the same local health board
         organisation_children = Organisation.objects.filter(
-            local_health_board=parent_trust
+            local_health_board=parent_trust, active=True
         ).all()
     else:
         parent_trust = organisation.trust
         # England - get all organisations which are in the same parent trust
-        organisation_children = Organisation.objects.filter(trust=parent_trust).all()
+        organisation_children = Organisation.objects.filter(
+            trust=parent_trust, active=True
+        ).all()
 
     if filter_term:
         filter_term_Q = (

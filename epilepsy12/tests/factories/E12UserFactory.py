@@ -11,6 +11,7 @@ The following parameters must be specified:
     - role 
 
 """
+
 # standard imports
 
 # third-party imports
@@ -35,7 +36,7 @@ class E12UserFactory(factory.django.DjangoModelFactory):
     is_superuser = False
     email_confirmed = True
     organisation_employer = factory.LazyFunction(
-        lambda: Organisation.objects.filter(ods_code="RP401").first()
+        lambda: Organisation.objects.filter(ods_code="RP401", active=True).first()
     )
 
     # Add Groups

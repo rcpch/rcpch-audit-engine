@@ -1,6 +1,7 @@
 """
 Django Rest Framework Registration Viewset
 """
+
 # python
 from datetime import datetime
 
@@ -71,7 +72,9 @@ class RegistrationViewSet(
         if serializer.is_valid(raise_exception=True):
             # validate parameters relating to related models
             if lead_centre_id:
-                if Organisation.objects.filter(ods_code=lead_centre_id).exists():
+                if Organisation.objects.filter(
+                    ods_code=lead_centre_id, active=True
+                ).exists():
                     lead_centre = Organisation.objects.get(ods_code=lead_centre_id)
                 else:
                     raise serializers.ValidationError(

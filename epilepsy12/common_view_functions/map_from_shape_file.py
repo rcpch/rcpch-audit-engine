@@ -258,23 +258,23 @@ def all_organisations_within_a_level_of_abstraction(
     level_abstraction_organisations = None
     if abstraction_level == EnumAbstractionLevel.TRUST:
         level_abstraction_organisations = Organisation.objects.filter(
-            trust=abstraction_level_member
+            trust=abstraction_level_member, active=True
         )
     elif abstraction_level == EnumAbstractionLevel.ICB:
         level_abstraction_organisations = Organisation.objects.filter(
-            integrated_care_board=abstraction_level_member
+            integrated_care_board=abstraction_level_member, active=True
         )
     elif abstraction_level == EnumAbstractionLevel.LOCAL_HEALTH_BOARD:
         level_abstraction_organisations = Organisation.objects.filter(
-            local_health_board=abstraction_level_member
+            local_health_board=abstraction_level_member, active=True
         )
     elif abstraction_level == EnumAbstractionLevel.NHS_ENGLAND_REGION:
         level_abstraction_organisations = Organisation.objects.filter(
-            nhs_england_region=abstraction_level_member
+            nhs_england_region=abstraction_level_member, active=True
         )
     elif abstraction_level == EnumAbstractionLevel.COUNTRY:
         level_abstraction_organisations = Organisation.objects.filter(
-            country=abstraction_level_member
+            country=abstraction_level_member, active=True
         )
     else:  # pragma: no cover
         raise ValueError("Invalid abstraction level")

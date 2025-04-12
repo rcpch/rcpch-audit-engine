@@ -134,13 +134,13 @@ def get_default_org_from_record(record):
         if record_ods_code in lhb_ods_codes:
             record_parent_org = LocalHealthBoard.objects.get(ods_code=record_ods_code)
             default_organisation = Organisation.objects.filter(
-                local_health_board=record_parent_org
+                local_health_board=record_parent_org, active=True
             ).first()
 
         else:
             record_parent_org = Trust.objects.get(ods_code=record_ods_code)
             default_organisation = Organisation.objects.filter(
-                trust=record_parent_org
+                trust=record_parent_org, active=True
             ).first()
 
     except Exception as e:

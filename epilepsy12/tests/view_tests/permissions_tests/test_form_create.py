@@ -201,15 +201,17 @@ def test_lead_clinician_can_create_a_user_in_the_same_local_health_board(client)
     TEMP_CREATED_USER_FIRST_NAME = "TEMP_CREATED_USER_FIRST_NAME"
 
     OTHER_ORGANISATION_SAME_LOCAL_HEALTH_BOARD = Organisation.objects.get(
-        pk=37
-    )  # Chepstow Community Hospital - same trust as Ysbyty Ystrad Fawr
+        ods_code="7A6BJ",  # Chepstow Community Hospital
+    )  # Chepstow Community Hospital - same Local Health Board as Ysbyty Ystrad Fawr
 
     test_user = Epilepsy12User.objects.create(
         surname="leadclinician",
         title=1,
         email=f"welsh.leadclinician@test.com",
         role=1,
-        organisation_employer=Organisation.objects.get(pk=334),  # Ysbyty Ystrad Fawr
+        organisation_employer=Organisation.objects.get(
+            ods_code="7A6AV"
+        ),  # Ysbyty Ystrad Fawr
         first_name="welsh",
         is_rcpch_audit_team_member=False,
         is_rcpch_staff=False,

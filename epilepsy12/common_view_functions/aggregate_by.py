@@ -1137,27 +1137,27 @@ def create_totals_dataframe(cohort, abstraction_level):
     for abstraction_item in query_set:
         if abstraction_level == "trust":
             organisation_instance = Organisation.objects.filter(
-                trust=abstraction_item
+                trust=abstraction_item, active=True
             ).first()
         elif abstraction_level == "local_health_board":
             organisation_instance = Organisation.objects.filter(
-                local_health_board=abstraction_item
+                local_health_board=abstraction_item, active=True
             ).first()
         elif abstraction_level == "icb":
             organisation_instance = Organisation.objects.filter(
-                integrated_care_board=abstraction_item
+                integrated_care_board=abstraction_item, active=True
             ).first()
         elif abstraction_level == "nhs_england_region":
             organisation_instance = Organisation.objects.filter(
-                nhs_england_region=abstraction_item
+                nhs_england_region=abstraction_item, active=True
             ).first()
         elif abstraction_level == "open_uk":
             organisation_instance = Organisation.objects.filter(
-                openuk_network=abstraction_item
+                openuk_network=abstraction_item, active=True
             ).first()
         elif abstraction_level == "country":
             organisation_instance = Organisation.objects.filter(
-                country=abstraction_item
+                country=abstraction_item, active=True
             ).first()
 
         all_cases = all_registered_cases_for_cohort_and_abstraction_level(
