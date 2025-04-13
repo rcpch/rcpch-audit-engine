@@ -21,7 +21,7 @@ from epilepsy12.tests.UserDataClasses import (
 
 
 @pytest.mark.django_db
-def test_tranfer_centre(
+def test_transfer_centre(
     client,
     e12_case_factory,
     e12_site_factory,
@@ -78,6 +78,7 @@ def test_tranfer_centre(
     test_user = Epilepsy12User.objects.get(
         first_name=test_user_rcpch_audit_team_data.role_str
     )
+    test_user.set_organisation_employer(organisation_employer=GOSH, is_primary=True)
 
     client.force_login(test_user)
 

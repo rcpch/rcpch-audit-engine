@@ -43,6 +43,11 @@ def test_download_button_access(
         # Log in Test User
         client.force_login(test_user)
 
+        test_user.set_organisation_employer(
+            organisation_employer=TEST_USER_ORGANISATION,
+            is_primary=True,
+        )
+
         # 2fa enable
         twofactor_signin(client, test_user)
 

@@ -83,7 +83,7 @@ def seed_users_fixture(django_db_setup, django_db_blocker):
                         is_staff=is_staff,
                         is_rcpch_audit_team_member=is_rcpch_audit_team_member,
                         is_rcpch_staff=is_rcpch_staff,
-                        organisation_employer=[org],
+                        employer_organisations=[org],
                         groups=[user.group_name],
                     )
         else:

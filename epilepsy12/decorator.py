@@ -203,24 +203,30 @@ def user_may_view_organisational_audit(parent_model, parent_type):
     def decorator(view):
         def wrapper(request, *args, **kwargs):
             user = request.user
-        
+
             requested_id = kwargs.get("id")
-            parent = getattr(user.organisation_employer, parent_type) if user.organisation_employer else None
+            parent = (
+                getattr(user.organisation_employer, parent_type)
+                if user.organisation_employer
+                else None
+            )
 
             can_view_parent = parent and parent.id == requested_id
             is_lead_clinican = user.role == AUDIT_CENTRE_LEAD_CLINICIAN
 
-            if user.is_rcpch_audit_team_member or (can_view_parent and is_lead_clinican):
+            if user.is_rcpch_audit_team_member or (
+                can_view_parent and is_lead_clinican
+            ):
                 if not parent_model.objects.filter(id=requested_id).exists():
                     raise Http404
 
                 return view(request, *args, **kwargs)
-            
+
             raise PermissionDenied()
 
         return wrapper
 
-    return decorator 
+    return decorator
 
 
 def user_may_view_this_child():
@@ -400,8 +406,12 @@ def login_and_otp_required():
             # Prevent unverified users
             if not user.is_verified():
                 user_list = user.__dict__
-                epilepsy12_user = user_list['_wrapped']
-                logger.info("User %s is unverified. Tried accessing %s", epilepsy12_user , view.__qualname__)
+                epilepsy12_user = user_list["_wrapped"]
+                logger.info(
+                    "User %s is unverified. Tried accessing %s",
+                    epilepsy12_user,
+                    view.__qualname__,
+                )
                 raise PermissionDenied()
 
             return view(request, *args, **kwargs)

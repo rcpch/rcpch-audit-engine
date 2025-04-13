@@ -302,6 +302,7 @@ def test_lead_clinician_cannot_create_an_RCPCH_audit_team_member(client):
         "email_confirmed": False,
         "is_staff": False,
         "is_child_or_carer": False,
+        "organisation_employer": TEST_USER_ORGANISATION,
     }
 
     form = Epilepsy12UserAdminCreationForm(

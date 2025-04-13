@@ -515,7 +515,7 @@ def transfer_response(request, organisation_id, case_id, organisation_response):
     outcome = f"{organisation_response.upper()}ED"
     if Epilepsy12User.objects.filter(
         (
-            Q(organisation_employer=origin_organisation)
+            Q(employer_organisations__employer_organisation=origin_organisation)
             & Q(is_active=True)
             & Q(role=1)  # Audit Centre Lead Clinician
         )
@@ -523,7 +523,7 @@ def transfer_response(request, organisation_id, case_id, organisation_response):
         recipients = list(
             Epilepsy12User.objects.filter(
                 (
-                    Q(organisation_employer=origin_organisation)
+                    Q(employer_organisations__employer_organisation=origin_organisation)
                     & Q(is_active=True)
                     & Q(role=1)  # Audit Centre Lead Clinician
                 )
