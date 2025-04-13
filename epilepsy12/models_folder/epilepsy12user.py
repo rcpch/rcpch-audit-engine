@@ -55,6 +55,10 @@ class Epilepsy12UserManager(BaseUserManager):
         if not role:
             raise ValueError(_("You must provide your role in the Epilepsy12 audit."))
 
+        organisation_employer = extra_fields.get("organisation_employer")
+        # now remove the organisation_employer from extra_fields
+        del extra_fields["organisation_employer"]
+
         email = self.normalize_email(str(email))
         user = self.model(
             email=email,
@@ -76,6 +80,15 @@ class Epilepsy12UserManager(BaseUserManager):
         user.password_last_set = timezone.now()
         logger.info(f"{user} password updated")
         user.save()
+
+        """
+        Allocate Primary Organisation
+        """
+        user.set_organisation_employer(
+            organisation_employer=organisation_employer,
+            is_primary=True,
+            created_by=extra_fields.get("created_by"),
+        )
 
         """
         Allocate Groups - the groups already have permissions allocated
