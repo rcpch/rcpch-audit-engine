@@ -233,7 +233,9 @@ def test_lead_clinician_can_create_a_user_in_the_same_local_health_board(client)
     )
 
     test_user.set_organisation_employer(
-        organisation_employer=Organisation.objects.get(pk=334),  # Ysbyty Ystrad Fawr
+        organisation_employer=Organisation.objects.get(
+            ods_code="7A6AV"
+        ),  # Ysbyty Ystrad Fawr
         is_primary=True,
     )
 
