@@ -415,6 +415,12 @@ def create_epilepsy12_user(request, organisation_id, user_type, epilepsy12_user_
             new_user.view_preference = 0
             try:
                 new_user.save()
+                # add the organisation to the user as a primary organisation
+                new_user.set_organisation_employer(
+                    organisation_employer=organisation,
+                    created_by=request.user,
+                )
+
             except Exception as error:
                 messages.error(
                     request,

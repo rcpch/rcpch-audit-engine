@@ -285,8 +285,8 @@ class Epilepsy12User(AbstractUser, PermissionsMixin):
         if organisation_employer:
             OrganisationEmployer = apps.get_model("epilepsy12", "OrganisationEmployer")
             org_emp, created = OrganisationEmployer.objects.update_or_create(
-                user=self,
-                organisation=organisation_employer,
+                epilepsy12_user=self,
+                employer_organisation=organisation_employer,
                 defaults={
                     "is_primary": is_primary,
                     "is_active": True,
@@ -295,6 +295,6 @@ class Epilepsy12User(AbstractUser, PermissionsMixin):
             )
             # If this is the new primary, make sure no other employments are primary
             if is_primary:
-                OrganisationEmployer.objects.filter(user=self, is_primary=True).exclude(
-                    pk=org_emp.pk
-                ).update(is_primary=False)
+                OrganisationEmployer.objects.filter(
+                    epilepsy12_user=self, is_primary=True
+                ).exclude(pk=org_emp.pk).update(is_primary=False)
