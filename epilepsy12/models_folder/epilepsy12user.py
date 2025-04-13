@@ -213,14 +213,6 @@ class Epilepsy12User(AbstractUser, PermissionsMixin):
 
     objects = Epilepsy12UserManager()
 
-    organisation_employer = models.ForeignKey(
-        "epilepsy12.Organisation",
-        on_delete=models.CASCADE,
-        blank=True,
-        null=True,
-        related_name="organisation_employees",
-    )
-
     employer_organisation = models.ManyToManyField(
         "epilepsy12.Organisation",
         through="epilepsy12.OrganisationEmployer",
@@ -272,17 +264,19 @@ class Epilepsy12User(AbstractUser, PermissionsMixin):
     Methods for moving users between employers
     """
 
-    # @property
-    # def organisation_employer(self):
-    #     """Return the primary organisation for backward compatibility"""
-    #     try:
-    #         return (
-    #             self.organisation_employments.filter(is_primary=True, is_active=True)
-    #             .first()
-    #             .organisation
-    #         )
-    #     except AttributeError:
-    #         return None
+    @property
+    def organisation_employer(self):
+        """Return the primary organisation for backward compatibility"""
+        try:
+            return (
+                self.employer_organisation.objects.filter(
+                    epilepsy12_user=self, is_primary=True, is_active=True
+                )
+                .first()
+                .organisation
+            )
+        except AttributeError:
+            return None
 
     def set_organisation_employer(
         self, organisation_employer, is_primary=True, created_by=None

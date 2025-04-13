@@ -49,10 +49,10 @@ class OrganisationEmployer(models.Model):
     class Meta:
         constraints = [
             models.UniqueConstraint(
-                fields=["epilepsy12_user", "organisation", "is_active"],
+                fields=["epilepsy12_user", "employer_organisation", "is_active"],
                 name="unique_active_employment",
             )
         ]
 
     def __str__(self):
-        return f"{self.epilepsy12_user} at {self.organisation_employers}"
+        return f"{self.epilepsy12_user} at {self.employer_organisation} (Primary: {self.is_primary})"
