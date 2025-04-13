@@ -7,7 +7,7 @@ from django.contrib.auth.decorators import permission_required
 from django.contrib.auth import logout
 from django.shortcuts import render, redirect, get_object_or_404
 from django.urls import reverse
-from django.contrib.gis.db.models import Q
+from django.contrib.gis.db.models import Q, OuterRef, Exists, Subquery
 from django.core.paginator import Paginator
 from django.contrib import messages
 from django.conf import settings
@@ -35,7 +35,13 @@ import pandas as pd
 from datetime import datetime, timedelta
 
 # epilepsy12
-from ..models import Epilepsy12User, Organisation, VisitActivity, Site
+from ..models import (
+    Epilepsy12User,
+    Organisation,
+    OrganisationEmployer,
+    VisitActivity,
+    Site,
+)
 from epilepsy12.forms_folder.epilepsy12_user_form import (
     Epilepsy12UserAdminCreationForm,
     CaptchaAuthenticationForm,
@@ -93,21 +99,34 @@ def epilepsy12_user_list(request, organisation_id):
         filter_term_Q = (
             Q(first_name__icontains=filter_term)
             | Q(surname__icontains=filter_term)
-            | Q(organisation_employer=organisation)
+            | Q(
+                employer_organisations__employer_organisation=organisation,
+                employer_organisations__is_active=True,
+            )
             | Q(email__icontains=filter_term)
         )
 
         # filter_term is called if filtering by search box
         if request.user.view_preference == 0:
             # user has requested organisation level view
-            basic_filter = Q(organisation_employer=organisation)
+            basic_filter = Q(
+                employer_organisations__employer_organisation=organisation,
+                employer_organisations__is_active=True,
+            )
         elif request.user.view_preference == 1:
             # user has requested trust level view
             if organisation.country.boundary_identifier == "W92000004":
                 parent_trust = organisation.local_health_board
+                basic_filter = Q(
+                    employer_organisations__employer_organisation__local_health_board=parent_trust,
+                    employer_organisations__is_active=True,
+                )
             else:
                 parent_trust = organisation.trust
-            basic_filter = Q(organisation_employer__trust=parent_trust)
+                basic_filter = Q(
+                    employer_organisations__employer_organisation__trust=parent_trust,
+                    employer_organisations__is_active=True,
+                )
         elif request.user.view_preference == 2:
             # user has requested national level view
             basic_filter = None
@@ -125,7 +144,12 @@ def epilepsy12_user_list(request, organisation_id):
                 epilepsy12_user_list = (
                     Epilepsy12User.objects.filter(
                         basic_filter
-                        | Q(organisation_employer__isnull=True) & filter_term_Q
+                        | ~Exists(
+                            OrganisationEmployer.objects.filter(
+                                epilepsy12_user=OuterRef("pk"), is_active=True
+                            )
+                        )
+                        & filter_term_Q
                     )
                     .order_by("surname")
                     .all()
@@ -158,14 +182,18 @@ def epilepsy12_user_list(request, organisation_id):
             # filters all primary Trust level centres, irrespective of if active or inactive
             if organisation.country.boundary_identifier == "W92000004":
                 parent_trust = organisation.local_health_board
-                basic_filter = Q(organisation_employer__local_health_board=parent_trust)
+                basic_filter = Q(
+                    employer_organisations__employer_organisation__local_health_board=parent_trust
+                )
             else:
                 parent_trust = organisation.trust
-                basic_filter = Q(organisation_employer__trust__name=parent_trust)
+                basic_filter = Q(
+                    employer_organisations__employer_organisation__trust__name=parent_trust
+                )
 
         elif request.user.view_preference == 0:
             # filters all primary centres at organisation level, irrespective of if active or inactive
-            basic_filter = Q(organisation_employer=organisation)
+            basic_filter = Q(employer_organisations__employer_organisation=organisation)
         else:
             raise Exception("No View Preference supplied")
 
@@ -176,9 +204,15 @@ def epilepsy12_user_list(request, organisation_id):
         ):
             if basic_filter:
                 # organisational or trust view
+                print("basic_filter", basic_filter)
                 filtered_epilepsy12_users = (
                     Epilepsy12User.objects.filter(
-                        basic_filter | Q(organisation_employer__isnull=True)
+                        basic_filter
+                        | ~Exists(
+                            OrganisationEmployer.objects.filter(
+                                epilepsy12_user=OuterRef("pk"), is_active=True
+                            )
+                        )
                     )
                     .order_by("surname")
                     .all()
@@ -245,9 +279,19 @@ def epilepsy12_user_list(request, organisation_id):
             or request.GET.get("sort_flag")
             == "sort_epilepsy12_users_by_organisation_employer_up"
         ):
-            epilepsy12_user_list = filtered_epilepsy12_users.order_by(
-                "organisation_employer"
-            ).all()
+            epilepsy12_user_list = (
+                filtered_epilepsy12_users.annotate(
+                    primary_org=Subquery(
+                        OrganisationEmployer.objects.filter(
+                            epilepsy12_user=OuterRef("pk"),
+                            is_primary=True,
+                            is_active=True,
+                        ).values("employer_organisation__name")[:1]
+                    )
+                )
+                .order_by("primary_org")
+                .all()
+            )
             sort_flag = "sort_epilepsy12_users_by_organisation_employer_up"
         elif (
             request.htmx.trigger_name
@@ -255,9 +299,19 @@ def epilepsy12_user_list(request, organisation_id):
             or request.GET.get("sort_flag")
             == "sort_epilepsy12_users_by_organisation_employer_down"
         ):
-            epilepsy12_user_list = filtered_epilepsy12_users.order_by(
-                "-organisation_employer"
-            ).all()
+            epilepsy12_user_list = (
+                filtered_epilepsy12_users.annotate(
+                    primary_org=Subquery(
+                        OrganisationEmployer.objects.filter(
+                            epilepsy12_user=OuterRef("pk"),
+                            is_primary=True,
+                            is_active=True,
+                        ).values("employer_organisation__name")[:1]
+                    )
+                )
+                .order_by("-primary_org")
+                .all()
+            )
             sort_flag = "sort_epilepsy12_users_by_organisation_employer_down"
         else:
             epilepsy12_user_list = filtered_epilepsy12_users.order_by("surname").all()
