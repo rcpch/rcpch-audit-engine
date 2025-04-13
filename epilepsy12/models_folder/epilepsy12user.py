@@ -269,11 +269,11 @@ class Epilepsy12User(AbstractUser, PermissionsMixin):
         """Return the primary organisation for backward compatibility"""
         try:
             return (
-                self.employer_organisation.objects.filter(
+                self.employer_organisations.filter(
                     epilepsy12_user=self, is_primary=True, is_active=True
                 )
                 .first()
-                .organisation
+                .employer_organisation
             )
         except AttributeError:
             return None

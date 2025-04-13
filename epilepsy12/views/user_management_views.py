@@ -204,7 +204,6 @@ def epilepsy12_user_list(request, organisation_id):
         ):
             if basic_filter:
                 # organisational or trust view
-                print("basic_filter", basic_filter)
                 filtered_epilepsy12_users = (
                     Epilepsy12User.objects.filter(
                         basic_filter
