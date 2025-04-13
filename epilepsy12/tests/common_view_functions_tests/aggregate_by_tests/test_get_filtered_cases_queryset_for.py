@@ -188,7 +188,9 @@ def test_get_filtered_cases_queryset_for_orgs_with_null_ICB(
 
     for ods_code in ods_codes_where_icb_null:
         # Community Paediatrics Org returning with the actual org so need to do filter.first()
-        organisation = Organisation.objects.filter(ods_code=ods_code).first()
+        organisation = Organisation.objects.filter(
+            ods_code=ods_code, active=True
+        ).first()
 
         output = get_filtered_cases_queryset_for(
             organisation=organisation,

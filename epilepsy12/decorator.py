@@ -114,6 +114,7 @@ def group_required(*group_names):
                         cases=child,
                         site__site_is_actively_involved_in_epilepsy_care=True,
                         site__site_is_primary_centre_of_epilepsy_care=True,
+                        active=True,
                     )
                 else:
                     # filter for object where trust (not just organisation) where case is registered is the same as that of user
@@ -122,6 +123,7 @@ def group_required(*group_names):
                         site__site_is_actively_involved_in_epilepsy_care=True,
                         site__site_is_primary_centre_of_epilepsy_care=True,
                         trust=request.user.organisation_employer.trust,
+                        active=True,
                     )
 
                 if organisation.exists() or user.is_rcpch_audit_team_member:

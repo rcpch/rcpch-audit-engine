@@ -1,6 +1,7 @@
 """
 Django Rest Framework Case Viewset
 """
+
 # python
 
 # django rest framework
@@ -93,10 +94,10 @@ class CaseViewSet(
                 if odsCode:
                     if serializer.is_valid(raise_exception=True):
                         if Organisation.objects.filter(
-                            ods_code=request.POST.get("ods_code")
+                            ods_code=request.POST.get("ods_code"), active=True
                         ).exists():
                             organisation = Organisation.objects.filter(
-                                ods_code=request.POST.get("ods_code")
+                                ods_code=request.POST.get("ods_code"), active=True
                             ).get()
                         else:
                             raise serializers.ValidationError(

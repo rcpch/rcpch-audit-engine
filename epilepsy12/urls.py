@@ -346,11 +346,11 @@ organisation_patterns = [
         view=case_statistics,
         name="case_statistics",
     ),
-    path(
-        "organisation/<int:organisation_id>/open_access",
-        view=open_access,
-        name="open_access",
-    ),
+    # path(
+    #     "organisation/<int:organisation_id>/open_access",
+    #     view=open_access,
+    #     name="open_access",
+    # ),
     path(
         "organisation/<int:organisation_id>/kpi_download",
         view=kpi_download,
