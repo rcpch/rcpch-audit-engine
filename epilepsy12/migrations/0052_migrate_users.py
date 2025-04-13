@@ -11,22 +11,33 @@ def forward_migrate_organisations(apps, schema_editor):
     Epilepsy12User = apps.get_model("epilepsy12", "Epilepsy12User")
     OrganisationEmployer = apps.get_model("epilepsy12", "OrganisationEmployer")
 
-    # Loop through each user
-    for user in Epilepsy12User.objects.filter(
-        organisation_employer__isnull=False
-    ).all():
-        # Create an entry in the through table
-        user.employer_organisation.add(user.organisation_employer)
-        user.save()
-        OrganisationEmployer.objects.filter(
-            epilepsy12_user=user, employer_organisation=user.organisation_employer
-        ).update(
-            is_primary=True,
-            is_active=True,
-        )
-        logger.info(
-            f"Created OrganisationEmployer for user {user.username} with organisation {user.employer_organisation.all()}"
-        )
+    try:
+        # Loop through each user
+        for user in Epilepsy12User.objects.filter(
+            organisation_employer__isnull=False
+        ).all():
+            try:
+                # Create an entry in the through table
+                user.employer_organisations.add(user.organisation_employer)
+                user.save()
+                OrganisationEmployer.objects.filter(
+                    epilepsy12_user=user,
+                    employer_organisation=user.organisation_employer,
+                ).update(
+                    is_primary=True,
+                    is_active=True,
+                )
+                logger.info(
+                    f"Created OrganisationEmployer for user {user.email} with organisation {user.employer_organisation.all()}"
+                )
+            except Exception as e:
+                logger.error(
+                    f"Error creating OrganisationEmployer for user {user.email}: {e}"
+                )
+                continue
+    except Exception as e:
+        logger.error(f"Error in forward migration: {e}")
+        return
 
 
 class Migration(migrations.Migration):

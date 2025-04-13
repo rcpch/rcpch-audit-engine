@@ -46,6 +46,12 @@ def test_lead_clinician_cannot_create_a_user_in_another_trust(client):
     test_user = Epilepsy12User.objects.get(
         first_name=test_user_audit_centre_lead_clinician_data.role_str
     )
+    test_user.set_organisation_employer(
+        organisation_employer=Organisation.objects.get(
+            ods_code="RP401", trust__ods_code="RP4"
+        ),
+        is_primary=True,
+    )
 
     OTHER_ORGANISATION_OTHER_TRUST = Organisation.objects.get(pk=139)  # King's
 
@@ -90,6 +96,12 @@ def test_lead_clinician_can_create_a_user_in_the_same_trust(client):
 
     test_user = Epilepsy12User.objects.get(
         first_name=test_user_audit_centre_lead_clinician_data.role_str
+    )
+    test_user.set_organisation_employer(
+        organisation_employer=Organisation.objects.get(
+            ods_code="RP401", trust__ods_code="RP4"
+        ),
+        is_primary=True,
     )
 
     OTHER_ORGANISATION_SAME_TRUST = Organisation.objects.get(
@@ -146,7 +158,6 @@ def test_lead_clinician_cannot_create_a_user_in_another_local_health_board(clien
         title=1,
         email=f"welsh.leadclinician@test.com",
         role=1,
-        organisation_employer=Organisation.objects.get(pk=333),
         first_name="welsh",
         is_rcpch_audit_team_member=False,
         is_rcpch_staff=False,
@@ -154,6 +165,9 @@ def test_lead_clinician_cannot_create_a_user_in_another_local_health_board(clien
         email_confirmed=False,
         is_staff=False,
         is_patient_or_carer=False,
+    )
+    test_user.set_organisation_employer(
+        Organisation.objects.get(pk=333), is_primary=True
     )
 
     data = {
@@ -209,7 +223,6 @@ def test_lead_clinician_can_create_a_user_in_the_same_local_health_board(client)
         title=1,
         email=f"welsh.leadclinician@test.com",
         role=1,
-        organisation_employer=Organisation.objects.get(pk=334),  # Ysbyty Ystrad Fawr
         first_name="welsh",
         is_rcpch_audit_team_member=False,
         is_rcpch_staff=False,
@@ -217,6 +230,11 @@ def test_lead_clinician_can_create_a_user_in_the_same_local_health_board(client)
         email_confirmed=False,
         is_staff=False,
         is_patient_or_carer=False,
+    )
+
+    test_user.set_organisation_employer(
+        organisation_employer=Organisation.objects.get(pk=334),  # Ysbyty Ystrad Fawr
+        is_primary=True,
     )
 
     data = {
@@ -266,6 +284,9 @@ def test_lead_clinician_cannot_create_an_RCPCH_audit_team_member(client):
     test_user = Epilepsy12User.objects.get(
         first_name=test_user_audit_centre_lead_clinician_data.role_str
     )
+    test_user.set_organisation_employer(
+        organisation_employer=TEST_USER_ORGANISATION, is_primary=True
+    )
 
     OTHER_ORGANISATION_OTHER_TRUST = Organisation.objects.get(pk=139)  # King's
 
@@ -273,7 +294,6 @@ def test_lead_clinician_cannot_create_an_RCPCH_audit_team_member(client):
         "title": 1,
         "email": f"{test_user.first_name}@test.com",
         "role": 1,
-        "organisation_employer": TEST_USER_ORGANISATION,
         "first_name": TEMP_CREATED_USER_FIRST_NAME,
         "surname": "User",
         "is_rcpch_audit_team_member": True,
@@ -312,6 +332,10 @@ def test_lead_clinician_cannot_create_an_RCPCH_staff_member(client):
 
     test_user = Epilepsy12User.objects.get(
         first_name=test_user_audit_centre_lead_clinician_data.role_str
+    )
+
+    test_user.set_organisation_employer(
+        organisation_employer=TEST_USER_ORGANISATION, is_primary=True
     )
 
     OTHER_ORGANISATION_OTHER_TRUST = Organisation.objects.get(pk=139)  # King's
@@ -359,6 +383,10 @@ def test_lead_clinician_cannot_create_a_superuser(client):
 
     test_user = Epilepsy12User.objects.get(
         first_name=test_user_audit_centre_lead_clinician_data.role_str
+    )
+
+    test_user.set_organisation_employer(
+        organisation_employer=TEST_USER_ORGANISATION, is_primary=True
     )
 
     OTHER_ORGANISATION_OTHER_TRUST = Organisation.objects.get(pk=139)  # King's

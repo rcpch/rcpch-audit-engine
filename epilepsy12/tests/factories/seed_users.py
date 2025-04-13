@@ -42,7 +42,9 @@ def seed_users_fixture(django_db_setup, django_db_blocker):
         if not Epilepsy12User.objects.exists():
             GOSH = Organisation.objects.get(ods_code="RP401", trust__ods_code="RP4")
             KINGS = Organisation.objects.get(ods_code="RJZ01", trust__ods_code="RJZ")
-            NOAHS_ARK = Organisation.objects.get(ods_code="7A4H1", local_health_board__ods_code="7A4")
+            NOAHS_ARK = Organisation.objects.get(
+                ods_code="7A4H1", local_health_board__ods_code="7A4"
+            )
             JERSEY = Organisation.objects.get(ods_code="RGT1W", trust__ods_code="RGT1W")
 
             for org in [GOSH, KINGS, NOAHS_ARK, JERSEY]:
@@ -56,7 +58,9 @@ def seed_users_fixture(django_db_setup, django_db_blocker):
                     # HACK: a lot of tests assume there is only one organisation and so look up the user
                     # user by name. To avoid changing all the tests, for GOSH only) set this as it was before
                     # we added multiple organisations in test
-                    first_name = user.role_str if org == GOSH else f"{org.name}_{user.role_str}"
+                    first_name = (
+                        user.role_str if org == GOSH else f"{org.name}_{user.role_str}"
+                    )
 
                     # set RCPCH AUDIT TEAM MEMBER ATTRIBUTE
                     if user.role == RCPCH_AUDIT_TEAM:
@@ -65,7 +69,11 @@ def seed_users_fixture(django_db_setup, django_db_blocker):
 
                     if user.is_clinical_audit_team:
                         is_rcpch_audit_team_member = True
-                        first_name = "CLINICAL_AUDIT_TEAM" if org == GOSH else f"{org.name}_CLINICAL_AUDIT_TEAM"
+                        first_name = (
+                            "CLINICAL_AUDIT_TEAM"
+                            if org == GOSH
+                            else f"{org.name}_CLINICAL_AUDIT_TEAM"
+                        )
 
                     E12UserFactory(
                         first_name=first_name,
@@ -75,7 +83,7 @@ def seed_users_fixture(django_db_setup, django_db_blocker):
                         is_staff=is_staff,
                         is_rcpch_audit_team_member=is_rcpch_audit_team_member,
                         is_rcpch_staff=is_rcpch_staff,
-                        organisation_employer=org,
+                        organisation_employer=[org],
                         groups=[user.group_name],
                     )
         else:
