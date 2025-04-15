@@ -561,12 +561,12 @@ def view_preference(request, organisation_id, template_name):
 
 @login_and_otp_required()
 @permission_required("epilepsy12.can_publish_epilepsy12_data")
-def kpi_download(request, organisation_id):
+def kpi_download(request, organisation_id, cohort):
     """
     GET: Loads the page necessary for downloading KPIs
     """
 
-    context = {"organisation_id": organisation_id}
+    context = {"organisation_id": organisation_id, "cohort": cohort}
 
     template_name = "epilepsy12/partials/kpis/kpi_download.html"
 
@@ -575,7 +575,7 @@ def kpi_download(request, organisation_id):
 
 @login_and_otp_required()
 @permission_required("epilepsy12.can_publish_epilepsy12_data")
-def kpi_download_file(request):
+def kpi_download_file(request, cohort):
 
     (
         country_df,
@@ -591,7 +591,7 @@ def kpi_download_file(request):
         nhs_england_region_totals_df,
         openuk_network_totals_df,
         country_totals_df,
-    ) = download_kpi_summary_as_csv(cohort=6)
+    ) = download_kpi_summary_as_csv(cohort)
 
     with pd.ExcelWriter("kpi_export.xlsx") as writer:
         country_df.to_excel(writer, sheet_name="Country_level", index=False)
@@ -627,5 +627,6 @@ def kpi_download_file(request):
         excel_data,
         content_type="application/vnd.openxmlformats-officedocument.spreadsheetml.sheet",
     )
-    response["Content-Disposition"] = "attachment; filename=kpi_export.xlsx"
+    # cohort should be validated by Django as an integer 
+    response["Content-Disposition"] = f"attachment; filename=kpi_export_cohort_{cohort}.xlsx"
     return response
