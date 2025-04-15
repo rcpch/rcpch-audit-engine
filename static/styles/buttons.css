@@ -235,12 +235,6 @@
   align-items: center;
 }
 
-.download.link {
-  display: flex;
-  justify-content: right;
-  align-items: center;
-}
-
 a.ui.button {
   display: flex;
   justify-content: center;
