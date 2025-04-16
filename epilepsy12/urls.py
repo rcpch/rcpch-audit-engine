@@ -352,12 +352,12 @@ organisation_patterns = [
     #     name="open_access",
     # ),
     path(
-        "organisation/<int:organisation_id>/kpi_download",
+        "organisation/<int:organisation_id>/kpi_download/<int:cohort>",
         view=kpi_download,
         name="kpi_download",
     ),
     path(
-        "kpi_download_file",
+        "kpi_download_file/<int:cohort>",
         view=kpi_download_file,
         name="kpi_download_file",
     ),
