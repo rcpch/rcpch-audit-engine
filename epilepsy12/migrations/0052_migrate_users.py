@@ -30,11 +30,11 @@ def forward_migrate_organisations(apps, schema_editor):
                 employer_organisation=organisation,
             )
             logger.info(
-                f"Created OrganisationEmployer for user {user.email} with organisation {user.employer_organisation.all()}"
+                f"Created OrganisationEmployer for user {user.email} with organisation {organisation.name}"
             )
         except Exception as e:
             logger.error(
-                f"Error creating OrganisationEmployer for user {user.email}: {e} from {user.organisation_employer}"
+                f"Error creating OrganisationEmployer for user {user.email}: {e} from {organisation.name}"
             )
             continue
 
