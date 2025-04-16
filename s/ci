@@ -31,6 +31,7 @@ docker push ${azure_tag}
 # Tests (against local Postgres)
 docker compose up -d
 s/test
+s/test -m 'slow'
 docker compose down
 
 # Deploy to staging

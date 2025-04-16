@@ -1,0 +1,6 @@
+#!/bin/bash -e
+
+docker compose up -d --wait
+s/test -m 'not slow'
+s/test -m 'slow'
+docker compose down
