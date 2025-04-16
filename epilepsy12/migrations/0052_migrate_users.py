@@ -9,17 +9,25 @@ logger = logging.getLogger(__name__)
 def forward_migrate_organisations(apps, schema_editor):
     """Migrate existing organisation_employer relationships to the new model"""
     Epilepsy12User = apps.get_model("epilepsy12", "Epilepsy12User")
+    OrganisationEmployer = apps.get_model("epilepsy12", "OrganisationEmployer")
+    Organisation = apps.get_model("epilepsy12", "Organisation")
 
     # Loop through each user
     for user in Epilepsy12User.objects.filter(
         organisation_employer__isnull=False
     ).all():
+        if user.organisation_employer._meta.model == OrganisationEmployer:
+            # If the user already has an OrganisationEmployer, skip them
+            logger.info(
+                f"User {user.email} already has an OrganisationEmployer, skipping."
+            )
+            continue
+        organisation = user.organisation_employer
         try:
             # Create an entry in the through table
-            user.set_organisation_employer(
-                organisation_employer=user.organisation_employer,
-                is_primary=True,
-                is_active=True,
+            OrganisationEmployer.objects.create(
+                epilepsy12_user=user,
+                employer_organisation=organisation,
             )
             logger.info(
                 f"Created OrganisationEmployer for user {user.email} with organisation {user.employer_organisation.all()}"
