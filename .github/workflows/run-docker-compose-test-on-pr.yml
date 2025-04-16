@@ -22,22 +22,10 @@ jobs:
           echo -e "${{ secrets.ENVIRONMENT }}" | base64 -d > envs/.env
           cat envs/.env
 
-      - name: Install Docker Compose
-        run: |
-          sudo apt-get install -y docker-compose
-
       - name: Show Docker environment info
         run: |
           docker compose config
 
-      - name: Build Docker images and run containers with compose
+      - name: Run PR check script
         run: |
-          docker compose up -d
-
-      - name: Run tests
-        run: |
-          s/test
-          s/test -m 'slow'
-
-
-
+          s/pr-check
