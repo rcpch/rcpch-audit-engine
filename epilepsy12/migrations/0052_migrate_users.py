@@ -9,7 +9,6 @@ logger = logging.getLogger(__name__)
 def forward_migrate_organisations(apps, schema_editor):
     """Migrate existing organisation_employer relationships to the new model"""
     Epilepsy12User = apps.get_model("epilepsy12", "Epilepsy12User")
-    OrganisationEmployer = apps.get_model("epilepsy12", "OrganisationEmployer")
 
     # Loop through each user
     for user in Epilepsy12User.objects.filter(
@@ -17,12 +16,8 @@ def forward_migrate_organisations(apps, schema_editor):
     ).all():
         try:
             # Create an entry in the through table
-            user.employer_organisations.add(user.organisation_employer)
-            user.save()
-            OrganisationEmployer.objects.filter(
-                epilepsy12_user=user,
-                employer_organisation=user.organisation_employer,
-            ).update(
+            user.set_organisation_employer(
+                organisation_employer=user.organisation_employer,
                 is_primary=True,
                 is_active=True,
             )
