@@ -147,8 +147,9 @@ def score_kpi_8_topiramate(
 
     # by this point an AED has been given, either valproate or topiramate and female is True
     # not scored if a girl any age on valproate or a girl >= 12 on topiramate and either of risk acknowledgement form or pregnancy prevention programme is None
-    if a_valproate_annual_risk_acknowledgement_form_been_completed is None or (
-        age_12_or_above and a_pregnancy_prevention_programme_is_in_place is None
+    if (
+        a_pregnancy_prevention_programme_is_in_place is None
+        and a_valproate_annual_risk_acknowledgement_form_been_completed is None
     ):
         return KPI_SCORE["NOT_SCORED"]
 

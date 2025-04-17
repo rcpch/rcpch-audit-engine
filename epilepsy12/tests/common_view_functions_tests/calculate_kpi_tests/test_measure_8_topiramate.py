@@ -100,6 +100,14 @@ from epilepsy12.models import (
             True,
             KPI_SCORE["PASS"],
         ),  # <12yo female on valproate with unknown prevention programme
+        (
+            False,
+            True,
+            False,
+            True,
+            None,
+            KPI_SCORE["PASS"],
+        ),  # <12yo female on valproate with unknown risk form
         # FAIL scenarios
         (
             True,
@@ -125,23 +133,6 @@ from epilepsy12.models import (
             False,
             KPI_SCORE["FAIL"],
         ),  # >=12yo female on valproate with no prevention measures
-        # NOT_SCORED scenarios
-        (
-            True,
-            False,
-            True,
-            None,
-            True,
-            KPI_SCORE["NOT_SCORED"],
-        ),  # >=12yo female on topiramate with unknown prevention programme
-        (
-            True,
-            False,
-            True,
-            True,
-            None,
-            KPI_SCORE["NOT_SCORED"],
-        ),  # >=12yo female on topiramate with unknown risk form
         (
             True,
             False,
@@ -154,34 +145,10 @@ from epilepsy12.models import (
             False,
             True,
             False,
-            True,
-            None,
-            KPI_SCORE["NOT_SCORED"],
-        ),  # <12yo female on valproate with unknown risk form
-        (
-            False,
-            True,
-            False,
             None,
             None,
             KPI_SCORE["NOT_SCORED"],
         ),  # <12yo female on valproate with both unknown
-        (
-            True,
-            True,
-            False,
-            None,
-            True,
-            KPI_SCORE["NOT_SCORED"],
-        ),  # >=12yo female on valproate with unknown prevention programme
-        (
-            True,
-            True,
-            False,
-            True,
-            None,
-            KPI_SCORE["NOT_SCORED"],
-        ),  # >=12yo female on valproate with unknown risk form
         (
             True,
             True,
