@@ -108,6 +108,30 @@ from epilepsy12.models import (
             None,
             KPI_SCORE["PASS"],
         ),  # <12yo female on valproate with unknown risk form
+        (
+            False,
+            True,
+            True,
+            True,
+            None,
+            KPI_SCORE["PASS"],
+        ),  # <12yo female on valproate and topiramate with unknown risk form
+        (
+            False,
+            True,
+            True,
+            True,
+            True,
+            KPI_SCORE["PASS"],
+        ),  # <12yo female on valproate and topiramate with  risk form and prevention programme
+        (
+            True,
+            True,
+            True,
+            True,
+            None,
+            KPI_SCORE["PASS"],
+        ),  # >12yo female on valproate and topiramate with unknown risk form
         # FAIL scenarios
         (
             True,
@@ -116,7 +140,7 @@ from epilepsy12.models import (
             False,
             False,
             KPI_SCORE["FAIL"],
-        ),  # >=12yo female on topiramate with no prevention measures
+        ),  # >=12yo female on topiramate with no prevention measures or risk form
         (
             False,
             True,
@@ -124,7 +148,7 @@ from epilepsy12.models import (
             False,
             False,
             KPI_SCORE["FAIL"],
-        ),  # <12yo female on valproate with no prevention measures
+        ),  # <12yo female on valproate with no prevention measures or risk form
         (
             True,
             True,
@@ -132,7 +156,15 @@ from epilepsy12.models import (
             False,
             False,
             KPI_SCORE["FAIL"],
-        ),  # >=12yo female on valproate with no prevention measures
+        ),  # >=12yo female on valproate with no prevention measures or risk form
+        (
+            True,
+            True,
+            True,
+            False,
+            False,
+            KPI_SCORE["FAIL"],
+        ),  # >=12yo female on valproate and topiramate with no prevention measures and no risk form
         (
             True,
             False,
@@ -270,6 +302,17 @@ def test_measure_8_sodium_valproate_risk_eligible_cohort_7_and_above(
         is_a_pregnancy_prevention_programme_in_place=is_a_pregnancy_prevention_programme_in_place,
         has_a_valproate_annual_risk_acknowledgement_form_been_completed=has_a_valproate_annual_risk_acknowledgement_form_been_completed,
     )
+
+    if valproate and topiramate:
+        # create and save an extra valproate AEM entry
+        AntiEpilepsyMedicine.objects.create(
+            management=management,
+            is_rescue_medicine=False,
+            medicine_entity=Medicine.objects.get(conceptId="387481005"),  # valproate
+            antiepilepsy_medicine_risk_discussed=True,
+            is_a_pregnancy_prevention_programme_in_place=is_a_pregnancy_prevention_programme_in_place,
+            has_a_valproate_annual_risk_acknowledgement_form_been_completed=has_a_valproate_annual_risk_acknowledgement_form_been_completed,
+        )
 
     # get registration for the saved case model
     registration = Registration.objects.get(case=case)

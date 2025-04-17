@@ -116,7 +116,7 @@ def score_kpi_8_topiramate(
         a_valproate_annual_risk_acknowledgement_form_been_completed = (
             valproate.has_a_valproate_annual_risk_acknowledgement_form_been_completed
         )
-    elif topiramate_prescribed:
+    if topiramate_prescribed:
         topiramate = AntiEpilepsyMedicine.objects.filter(
             management=registration_instance.management,
             medicine_entity=Medicine.objects.get(conceptId="777808008"),  # topiramate
@@ -156,6 +156,18 @@ def score_kpi_8_topiramate(
     if (age_12_or_above and topiramate_prescribed) or valproate_prescribed:
         if a_pregnancy_prevention_programme_is_in_place or (
             a_valproate_annual_risk_acknowledgement_form_been_completed
+        ):
+            return KPI_SCORE["PASS"]
+
+    # Edge case if on both valproate and topiramate  - only need one of the two conditions to be true
+    if valproate_prescribed and topiramate_prescribed:
+        if any(
+            [
+                topiramate.has_a_valproate_annual_risk_acknowledgement_form_been_completed,
+                topiramate.is_a_pregnancy_prevention_programme_in_place,
+                valproate.has_a_valproate_annual_risk_acknowledgement_form_been_completed,
+                valproate.is_a_pregnancy_prevention_programme_in_place,
+            ]
         ):
             return KPI_SCORE["PASS"]
 
