@@ -43,9 +43,8 @@ def test_non_leads_cannot_access_organisational_audit_for_their_trust(
     gosh_org = Organisation.objects.get(ods_code="RP401")
     gosh_trust = Trust.objects.get(ods_code="RP4")
 
-    gosh_user = Epilepsy12User.objects.get(
-        role=role, organisation_employer__ods_code="RP401"
-    )
+    gosh_user = Epilepsy12User.objects.filter(role=role).first()
+    gosh_user.set_organisation_employer(organisation_employer=gosh_org, is_primary=True)
 
     client.force_login(gosh_user)
     twofactor_signin(client, gosh_user)
@@ -68,8 +67,10 @@ def test_non_leads_cannot_access_organisational_audit_for_their_local_health_boa
     client, seed_groups_fixture, seed_users_fixture, role
 ):
     noahs_ark_org = Organisation.objects.get(ods_code="7A4H1")
-    noahs_ark_user = Epilepsy12User.objects.get(
-        role=role, organisation_employer__ods_code="7A4H1"
+    noahs_ark_user = Epilepsy12User.objects.filter(role=role).first()
+
+    noahs_ark_user.set_organisation_employer(
+        organisation_employer=noahs_ark_org, is_primary=True
     )
 
     noahs_ark_local_health_board = LocalHealthBoard.objects.get(ods_code="7A4")
@@ -103,9 +104,9 @@ def test_lead_clinician_can_access_organisational_audit_for_their_trust(
         trust=gosh_trust,
     )
 
-    gosh_user = Epilepsy12User.objects.filter(
-        role=AUDIT_CENTRE_LEAD_CLINICIAN, organisation_employer__ods_code="RP401"
-    ).first()
+    gosh_user = Epilepsy12User.objects.filter(role=AUDIT_CENTRE_LEAD_CLINICIAN).first()
+
+    gosh_user.set_organisation_employer(organisation_employer=gosh_org, is_primary=True)
 
     client.force_login(gosh_user)
     twofactor_signin(client, gosh_user)
@@ -122,8 +123,11 @@ def test_lead_clinician_can_access_organisational_audit_for_their_local_health_b
 ):
     noahs_ark_org = Organisation.objects.get(ods_code="7A4H1")
     noahs_ark_user = Epilepsy12User.objects.filter(
-        role=AUDIT_CENTRE_LEAD_CLINICIAN, organisation_employer__ods_code="7A4H1"
+        role=AUDIT_CENTRE_LEAD_CLINICIAN
     ).first()
+    noahs_ark_user.set_organisation_employer(
+        organisation_employer=noahs_ark_org, is_primary=True
+    )
 
     noahs_ark_local_health_board = LocalHealthBoard.objects.get(ods_code="7A4")
 
@@ -161,9 +165,9 @@ def test_users_cannot_access_organisational_audit_for_a_trust_that_isnt_theirs(
     client, seed_groups_fixture, seed_users_fixture, role
 ):
     gosh_org = Organisation.objects.get(ods_code="RP401")
-    gosh_user = Epilepsy12User.objects.filter(
-        role=role, organisation_employer__ods_code="RP401"
-    ).first()
+    gosh_user = Epilepsy12User.objects.filter(role=role).first()
+
+    gosh_user.set_organisation_employer(organisation_employer=gosh_org, is_primary=True)
 
     client.force_login(gosh_user)
     twofactor_signin(client, gosh_user)
@@ -189,9 +193,8 @@ def test_users_cannot_access_organisational_audit_for_a_local_health_board_that_
     client, seed_groups_fixture, seed_users_fixture, role
 ):
     gosh_org = Organisation.objects.get(ods_code="RP401")
-    gosh_user = Epilepsy12User.objects.filter(
-        role=role, organisation_employer__ods_code="RP401"
-    ).first()
+    gosh_user = Epilepsy12User.objects.filter(role=role).first()
+    gosh_user.set_organisation_employer(organisation_employer=gosh_org, is_primary=True)
 
     client.force_login(gosh_user)
     twofactor_signin(client, gosh_user)

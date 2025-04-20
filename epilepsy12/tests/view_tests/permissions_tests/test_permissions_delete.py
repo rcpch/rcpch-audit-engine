@@ -10,15 +10,15 @@
     [x] Assert an Audit Centre Administrator CANNOT deactivate users - HTTPStatus.FORBIDDEN
     [x] Assert an audit centre clinician CANNOT deactivate users - HTTPStatus.FORBIDDEN
     [x] Assert an Audit Centre Lead Clinician CANNOT deactivate users outside own Trust - HTTPStatus.FORBIDDEN
-    
-    
+
+
 
     [x] Assert an Audit Centre Lead Clinician can deactivate patients inside own Trust - HTTPStatus.OK
     [x] Assert RCPCH Audit Team can deactivate patients inside own Trust - HTTPStatus.OK
     [x] Assert RCPCH Audit Team can deactivate patients outside own Trust - HTTPStatus.OK
     [x] Assert Clinical Audit Team can deactivate patients inside own Trust - HTTPStatus.OK
     [x] Assert Clinical Audit Team can deactivate patients outside own Trust - HTTPStatus.OK
-    
+
     [x] Assert an Audit Centre Administrator CANNOT deactivate patients - HTTPStatus.FORBIDDEN
     [x] Assert an audit centre clinician CANNOT deactivate patients outside own Trust - HTTPStatus.FORBIDDEN
     [x] Assert an Audit Centre Lead Clinician CANNOT deactivate patients outside own Trust - HTTPStatus.FORBIDDEN
@@ -31,7 +31,7 @@
     [x] Assert RCPCH Audit Team can 'remove_episode' outside own Trust - HTTPStatus.OK
     [x] Assert Clinical Audit Team can 'remove_episode' inside own Trust - HTTPStatus.OK
     [x] Assert Clinical Audit Team can 'remove_episode' outside own Trust - HTTPStatus.OK
-    
+
     [x] Assert an Audit Centre Administrator CANNOT  'remove_episode' - HTTPStatus.FORBIDDEN
     [x] Assert an audit centre clinician CANNOT  'remove_episode' outside own Trust - HTTPStatus.FORBIDDEN
     [x] Assert an Audit Centre Lead Clinician CANNOT  'remove_episode' outside own Trust - HTTPStatus.FORBIDDEN
@@ -43,7 +43,7 @@
     [x] Assert RCPCH Audit Team can 'remove_syndrome' outside own Trust - HTTPStatus.OK
     [x] Assert Clinical Audit Team can 'remove_syndrome' inside own Trust - HTTPStatus.OK
     [x] Assert Clinical Audit Team can 'remove_syndrome' outside own Trust - HTTPStatus.OK
-    
+
     [x] Assert an Audit Centre Administrator CANNOT  'remove_syndrome' - HTTPStatus.FORBIDDEN
     [x] Assert an audit centre clinician CANNOT  'remove_syndrome' outside own Trust - HTTPStatus.FORBIDDEN
     [x] Assert an Audit Centre Lead Clinician CANNOT  'remove_syndrome' outside own Trust - HTTPStatus.FORBIDDEN
@@ -55,11 +55,11 @@
     [x] Assert RCPCH Audit Team can 'remove_comorbidity' outside own Trust - HTTPStatus.OK
     [x] Assert Clinical Audit Team can 'remove_comorbidity' inside own Trust - HTTPStatus.OK
     [x] Assert Clinical Audit Team can 'remove_comorbidity' outside own Trust - HTTPStatus.OK
-    
+
     [x] Assert an Audit Centre Administrator CANNOT  'remove_comorbidity' - HTTPStatus.FORBIDDEN
     [x] Assert an audit centre clinician CANNOT  'remove_comorbidity' outside own Trust - HTTPStatus.FORBIDDEN
     [x] Assert an Audit Centre Lead Clinician CANNOT  'remove_comorbidity' outside own Trust - HTTPStatus.FORBIDDEN
-    
+
 
 # Antiepilepsy Medicine
 
@@ -68,7 +68,7 @@
     [x] Assert RCPCH Audit Team can 'remove_antiepilepsy_medicine' outside own Trust - HTTPStatus.OK
     [x] Assert Clinical Audit Team can 'remove_antiepilepsy_medicine' inside own Trust - HTTPStatus.OK
     [x] Assert Clinical Audit Team can 'remove_antiepilepsy_medicine' outside own Trust - HTTPStatus.OK
-    
+
     [x] Assert an Audit Centre Administrator CANNOT  'remove_antiepilepsy_medicine' - HTTPStatus.FORBIDDEN
     [x] Assert an audit centre clinician CANNOT  'remove_antiepilepsy_medicine' outside own Trust - HTTPStatus.FORBIDDEN
     [x] Assert an Audit Centre Lead Clinician CANNOT  'remove_antiepilepsy_medicine' outside own Trust - HTTPStatus.FORBIDDEN
@@ -147,6 +147,11 @@ def test_user_deactivate_success(
     for test_user in users:
         client.force_login(test_user)
 
+        test_user.set_organisation_employer(
+            organisation_employer=TEST_USER_ORGANISATION,
+            is_primary=True,
+        )
+
         # 2fa enable
         twofactor_signin(client, test_user)
 
@@ -156,7 +161,7 @@ def test_user_deactivate_success(
             email=f"temp_{test_user.first_name}@temp.com",
             role=test_user.role,
             is_active=1,
-            organisation_employer=TEST_USER_ORGANISATION,
+            employer_organisations=[TEST_USER_ORGANISATION],
             groups=[test_user_audit_centre_administrator_data.group_name],
         )
 
@@ -168,7 +173,10 @@ def test_user_deactivate_success(
             },
         )
 
-        response = client.get(url)
+        response = client.post(
+            url,
+            headers={"Hx-Trigger-Name": url, "Hx-Request": "true"},
+        )
 
         # test 200 response that user correctly deactivates temp_user_same_org
         assert (
@@ -223,7 +231,7 @@ def test_user_deactivate_forbidden(
         email=f"temp_user_same_org@temp.com",
         role=test_user_audit_centre_administrator_data.role,
         is_active=1,
-        organisation_employer=TEST_USER_ORGANISATION,
+        employer_organisations=[TEST_USER_ORGANISATION],
         groups=[test_user_audit_centre_administrator_data.group_name],
     )
     # Seed a temp User to be deactivated
@@ -232,12 +240,17 @@ def test_user_deactivate_forbidden(
         email=f"temp_user_diff_org@temp.com",
         role=test_user_audit_centre_administrator_data.role,
         is_active=1,
-        organisation_employer=DIFF_TRUST_DIFF_ORGANISATION,
+        employer_organisations=[DIFF_TRUST_DIFF_ORGANISATION],
         groups=[test_user_audit_centre_administrator_data.group_name],
     )
 
     for test_user in users:
         client.force_login(test_user)
+
+        test_user.set_organisation_employer(
+            organisation_employer=TEST_USER_ORGANISATION,
+            is_primary=True,
+        )
 
         # 2fa enable
         twofactor_signin(client, test_user)
@@ -327,6 +340,11 @@ def test_patient_delete_success(
 
     for test_user in users:
         client.force_login(test_user)
+
+        test_user.set_organisation_employer(
+            organisation_employer=TEST_USER_ORGANISATION,
+            is_primary=True,
+        )
 
         # 2fa enable
         twofactor_signin(client, test_user)
@@ -429,6 +447,11 @@ def test_patient_delete_forbidden(
     for test_user in users:
         client.force_login(test_user)
 
+        test_user.set_organisation_employer(
+            organisation_employer=TEST_USER_ORGANISATION,
+            is_primary=True,
+        )
+
         # 2fa enable
         twofactor_signin(client, test_user)
 
@@ -503,6 +526,11 @@ def test_episode_delete_success(
 
     for test_user in users:
         client.force_login(test_user)
+
+        test_user.set_organisation_employer(
+            organisation_employer=TEST_USER_ORGANISATION,
+            is_primary=True,
+        )
 
         # 2fa enable
         twofactor_signin(client, test_user)

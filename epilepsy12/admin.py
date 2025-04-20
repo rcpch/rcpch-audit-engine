@@ -13,6 +13,16 @@ from .organisational_audit import export_submission_period_as_csv
 class Epilepsy12UserAdmin(UserAdmin, SimpleHistoryAdmin):
     ordering = ["email"]
     model = Epilepsy12User
+    list_display = [
+        "email",
+        "first_name",
+        "surname",
+        "is_active",
+        "is_staff",
+        "is_rcpch_staff",
+        "is_rcpch_audit_team_member",
+        "role",
+    ]
     search_fields = (
         "email",
         "surname",
@@ -22,7 +32,6 @@ class Epilepsy12UserAdmin(UserAdmin, SimpleHistoryAdmin):
     list_filter = (
         "is_active",
         "role",
-        "organisation_employer",
     )
     fieldsets = (
         (
@@ -35,7 +44,6 @@ class Epilepsy12UserAdmin(UserAdmin, SimpleHistoryAdmin):
                 )
             },
         ),
-        ("Epilepsy12 Centre", {"fields": ("organisation_employer", "role")}),
         ("Contacts", {"fields": ("email",)}),
         (
             "Permissions",
@@ -58,6 +66,8 @@ class Epilepsy12UserAdmin(UserAdmin, SimpleHistoryAdmin):
                     "last_login",
                     "date_joined",
                     "password_last_set",
+                    # "employer_organisation",
+                    # "organisation_employer",
                 )
             },
         ),
@@ -87,9 +97,10 @@ class Epilepsy12UserAdmin(UserAdmin, SimpleHistoryAdmin):
                     "is_active",
                     "is_rcpch_audit_team_member",
                     "role",
-                    "organisation_employer",
                     "is_superuser",
                     "groups",
+                    # "employer_organisation",
+                    # "organisation_employer",
                 ),
             },
         ),
@@ -97,7 +108,6 @@ class Epilepsy12UserAdmin(UserAdmin, SimpleHistoryAdmin):
 
     def get_form(self, request, obj=None, **kwargs):
         form = super().get_form(request, obj, **kwargs)
-        form.base_fields["organisation_employer"].required = False
         if not request.user.is_superuser:
             self.exclude = ["is_superuser"]
         else:
@@ -158,6 +168,39 @@ class OrganisationalAuditSubmissionPeriodAdmin(SimpleHistoryAdmin):
             return response
 
 
+class OrganisationEmployerAdmin(SimpleHistoryAdmin):
+    model = OrganisationEmployer
+    list_display = [
+        "epilepsy12_user",
+        "employer_organisation",
+        "is_primary",
+        "is_active",
+        "date_joined",
+    ]
+    list_filter = [
+        "is_active",
+        "is_primary",
+        "employer_organisation",
+    ]
+    search_fields = [
+        "epilepsy12_user__email",
+        "epilepsy12_user__first_name",
+        "epilepsy12_user__surname",
+        "employer_organisation__name",
+    ]
+    raw_id_fields = ["epilepsy12_user", "employer_organisation"]
+    autocomplete_fields = ["epilepsy12_user", "employer_organisation"]
+
+
+class OrganisationAdmin(SimpleHistoryAdmin):
+    search_fields = ["name", "ods_code"]
+
+
+class TrustAdmin(SimpleHistoryAdmin):
+    search_fields = ["name", "ods_code"]
+
+
+# register all models
 admin.site.register(Epilepsy12User, Epilepsy12UserAdmin)
 admin.site.register(AntiEpilepsyMedicine, SimpleHistoryAdmin)
 admin.site.register(Assessment, SimpleHistoryAdmin)
@@ -165,10 +208,7 @@ admin.site.register(Case, CaseAdmin)
 admin.site.register(Comorbidity, SimpleHistoryAdmin)
 admin.site.register(EpilepsyContext, SimpleHistoryAdmin)
 admin.site.register(Investigations, SimpleHistoryAdmin)
-
-
-class OrganisationAdmin(SimpleHistoryAdmin):
-    search_fields = ["name", "ods_code"]
+admin.site.register(OrganisationEmployer, OrganisationEmployerAdmin)
 
 
 admin.site.register(Organisation, OrganisationAdmin)
@@ -204,11 +244,6 @@ admin.site.register(LondonBorough)
 admin.site.register(IntegratedCareBoard)
 admin.site.register(NHSEnglandRegion)
 
-
-class TrustAdmin(SimpleHistoryAdmin):
-    search_fields = ["name", "ods_code"]
-
-
 admin.site.register(Trust, TrustAdmin)
 admin.site.register(LocalHealthBoard)
 admin.site.register(OPENUKNetwork)
@@ -219,6 +254,8 @@ admin.site.register(
 )
 admin.site.register(Banner)
 
+
+# Customise the admin site
 admin.site.site_header = "Epilepsy12 admin"
 admin.site.site_title = "Epilepsy12 admin"
 admin.site.index_title = "Epilepsy12"

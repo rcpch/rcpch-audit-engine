@@ -55,6 +55,10 @@ class Epilepsy12UserManager(BaseUserManager):
         if not role:
             raise ValueError(_("You must provide your role in the Epilepsy12 audit."))
 
+        organisation_employer = extra_fields.get("organisation_employer")
+        # now remove the organisation_employer from extra_fields
+        del extra_fields["organisation_employer"]
+
         email = self.normalize_email(str(email))
         user = self.model(
             email=email,
@@ -76,6 +80,15 @@ class Epilepsy12UserManager(BaseUserManager):
         user.password_last_set = timezone.now()
         logger.info(f"{user} password updated")
         user.save()
+
+        """
+        Allocate Primary Organisation
+        """
+        user.set_organisation_employer(
+            organisation_employer=organisation_employer,
+            is_primary=True,
+            created_by=extra_fields.get("created_by"),
+        )
 
         """
         Allocate Groups - the groups already have permissions allocated
@@ -213,8 +226,12 @@ class Epilepsy12User(AbstractUser, PermissionsMixin):
 
     objects = Epilepsy12UserManager()
 
-    organisation_employer = models.ForeignKey(
-        "epilepsy12.Organisation", on_delete=models.CASCADE, blank=True, null=True
+    employer_organisation = models.ManyToManyField(
+        "epilepsy12.Organisation",
+        through="epilepsy12.OrganisationEmployer",
+        through_fields=("epilepsy12_user", "employer_organisation"),
+        blank=True,
+        help_text=_("Please select the organisation trust you are affiliated with."),
     )
 
     def get_full_name(self):
@@ -255,3 +272,42 @@ class Epilepsy12User(AbstractUser, PermissionsMixin):
 
     def __str__(self) -> str:
         return self.get_full_name()
+
+    """
+    Methods for moving users between employers
+    """
+
+    @property
+    def organisation_employer(self):
+        """Return the primary organisation for backward compatibility"""
+        try:
+            return (
+                self.employer_organisations.filter(
+                    epilepsy12_user=self, is_primary=True, is_active=True
+                )
+                .first()
+                .employer_organisation
+            )
+        except AttributeError:
+            return None
+
+    def set_organisation_employer(
+        self, organisation_employer, is_primary=True, created_by=None
+    ):
+        """Set a user's organisation, maintaining backward compatibility"""
+        if organisation_employer:
+            OrganisationEmployer = apps.get_model("epilepsy12", "OrganisationEmployer")
+            org_emp, created = OrganisationEmployer.objects.update_or_create(
+                epilepsy12_user=self,
+                employer_organisation=organisation_employer,
+                defaults={
+                    "is_primary": is_primary,
+                    "is_active": True,
+                    "created_by": created_by or self,
+                },
+            )
+            # If this is the new primary, make sure no other employments are primary
+            if is_primary:
+                OrganisationEmployer.objects.filter(
+                    epilepsy12_user=self, is_primary=True
+                ).exclude(pk=org_emp.pk).update(is_primary=False)

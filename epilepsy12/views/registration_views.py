@@ -443,13 +443,15 @@ def update_lead_site(request, registration_id, site_id, update):
 
         # find clinical lead of organisation to which child transfered
         if Epilepsy12User.objects.filter(
-            organisation_employer=new_organisation
+            employer_organisations__employer_organisation=new_organisation
         ).exists():
             # send to all Clinical Leads of new organisation
             recipients = list(
                 Epilepsy12User.objects.filter(
                     (
-                        Q(organisation_employer=new_organisation)
+                        Q(
+                            employer_organisations__employer_organisation=new_organisation
+                        )
                         & Q(is_active=True)
                         & Q(role=1)  # Audit Centre Lead Clinician
                     )

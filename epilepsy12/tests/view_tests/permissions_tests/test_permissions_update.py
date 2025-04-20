@@ -5,9 +5,9 @@
     [ ] Assert an Audit Centre Lead Clinician CANNOT make themselves is_rcpch_audit_team_member
     [ ] Assert an Audit Centre Lead Clinician CANNOT make themselves is_rcpch_staff
     [x] Assert an Audit Centre Administrator CANNOT update users inside own Trust
-    [x] Assert an Audit Centre Administrator CANNOT update users from outside own Trust 
+    [x] Assert an Audit Centre Administrator CANNOT update users from outside own Trust
     [x] Assert an audit centre clinician CANNOT update users inside own Trust
-    [x] Assert an audit centre clinician CANNOT update users from outside own Trust 
+    [x] Assert an audit centre clinician CANNOT update users from outside own Trust
     [x] Assert an Audit Centre Lead Clinician CANNOT update users outside own Trust
 
     [x] Assert an Audit Centre Lead Clinician can update users inside own Trust
@@ -39,7 +39,7 @@
     [x] Assert an Audit Centre Administrator cannot change 'field' inside a different Trust - response.status_code == HTTPStatus.FORBIDDEN
     [x] Assert an Audit Centre Clinician cannot change 'field' inside a different Trust - response.status_code == HTTPStatus.FORBIDDEN
     [x] Assert an Audit Centre Lead Clinician cannot change 'field' inside a different Trust - response.status_code == HTTPStatus.FORBIDDEN
-    
+
     [x] Assert an Audit Centre Clinician can change 'field' inside own Trust - response.status_code == HTTPStatus.OK
     [x] Assert an Audit Centre Lead Clinician can change 'field' inside own Trust - response.status_code == HTTPStatus.OK
     [x] Assert RCPCH Audit Team can change 'field' - response.status_code == HTTPStatus.OK
@@ -61,7 +61,7 @@
     [x] Assert an Audit Centre Administrator cannot change 'field' inside a different Trust - response.status_code == HTTPStatus.FORBIDDEN
     [x] Assert an Audit Centre Clinician cannot change 'field' inside a different Trust - response.status_code == HTTPStatus.FORBIDDEN
     [x] Assert an Audit Centre Lead Clinician cannot change 'field' inside a different Trust - response.status_code == HTTPStatus.FORBIDDEN
-    
+
     [x] Assert an Audit Centre Clinician can change 'field' inside own Trust - response.status_code == HTTPStatus.OK
     [x] Assert an Audit Centre Lead Clinician can change 'field' inside own Trust - response.status_code == HTTPStatus.OK
     [x] Assert RCPCH Audit Team can change 'field' - response.status_code == HTTPStatus.OK
@@ -86,7 +86,7 @@
     [x] Assert an Audit Centre Administrator cannot change 'field' inside a different Trust - response.status_code == HTTPStatus.FORBIDDEN
     [x] Assert an Audit Centre Clinician cannot change 'field' inside a different Trust - response.status_code == HTTPStatus.FORBIDDEN
     [x] Assert an Audit Centre Lead Clinician cannot change 'field' inside a different Trust - response.status_code == HTTPStatus.FORBIDDEN
-    
+
     [x] Assert an Audit Centre Clinician can change 'field' inside own Trust - response.status_code == HTTPStatus.OK
     [x] Assert an Audit Centre Lead Clinician can change 'field' inside own Trust - response.status_code == HTTPStatus.OK
     [x] Assert RCPCH Audit Team can change 'field' - response.status_code == HTTPStatus.OK
@@ -112,7 +112,7 @@
     [x] Assert an Audit Centre Administrator cannot change 'field' inside a different Trust - response.status_code == HTTPStatus.FORBIDDEN
     [x] Assert an Audit Centre Clinician cannot change 'field' inside a different Trust - response.status_code == HTTPStatus.FORBIDDEN
     [x] Assert an Audit Centre Lead Clinician cannot change 'field' inside a different Trust - response.status_code == HTTPStatus.FORBIDDEN
-    
+
     [x] Assert an Audit Centre Clinician can change 'field' inside own Trust - response.status_code == HTTPStatus.OK
     [x] Assert an Audit Centre Lead Clinician can change 'field' inside own Trust - response.status_code == HTTPStatus.OK
     [x] Assert RCPCH Audit Team can change 'field' - response.status_code == HTTPStatus.OK
@@ -127,7 +127,7 @@
     [x] Assert an Audit Centre Administrator cannot change 'field' inside a different Trust - response.status_code == HTTPStatus.FORBIDDEN
     [x] Assert an Audit Centre Clinician cannot change 'field' inside a different Trust - response.status_code == HTTPStatus.FORBIDDEN
     [x] Assert an Audit Centre Lead Clinician cannot change 'field' inside a different Trust - response.status_code == HTTPStatus.FORBIDDEN
-    
+
     [x] Assert an Audit Centre Clinician can change 'field' inside own Trust - response.status_code == HTTPStatus.OK
     [x] Assert an Audit Centre Lead Clinician can change 'field' inside own Trust - response.status_code == HTTPStatus.OK
     [x] Assert RCPCH Audit Team can change 'field' - response.status_code == HTTPStatus.OK
@@ -145,24 +145,24 @@
         'paediatric_neurologist_referral_date',                                 date_field
         'paediatric_neurologist_input_date',                                    date_field
         'paediatric_neurology_centre',                                          button click
-        'edit_paediatric_neurology_centre',                                     button click    
+        'edit_paediatric_neurology_centre',                                     button click
         'update_paediatric_neurology_centre_pressed',                           button click (action:edit/cancel)
-        'childrens_epilepsy_surgical_service_referral_criteria_met',            toggle_button                
-        'childrens_epilepsy_surgical_service_referral_made',                    toggle_button        
-        'childrens_epilepsy_surgical_service_referral_date',                    date_field    
+        'childrens_epilepsy_surgical_service_referral_criteria_met',            toggle_button
+        'childrens_epilepsy_surgical_service_referral_made',                    toggle_button
+        'childrens_epilepsy_surgical_service_referral_date',                    date_field
         'childrens_epilepsy_surgical_service_input_date',                       date_field
         'epilepsy_surgery_centre',                                              button click
         'edit_epilepsy_surgery_centre',                                         button click
-        'update_epilepsy_surgery_centre_pressed',                               button click (action:edit/cancel)            
+        'update_epilepsy_surgery_centre_pressed',                               button click (action:edit/cancel)
         'epilepsy_specialist_nurse_referral_made',                              toggle_button
-        'epilepsy_specialist_nurse_referral_date',                              date_field    
+        'epilepsy_specialist_nurse_referral_date',                              date_field
         'epilepsy_specialist_nurse_input_date',                                 date_field
     ]
     [x] Assert an Audit Centre Administrator cannot change 'field' inside own Trust - response.status_code == HTTPStatus.FORBIDDEN
     [x] Assert an Audit Centre Administrator cannot change 'field' inside a different Trust - response.status_code == HTTPStatus.FORBIDDEN
     [x] Assert an Audit Centre Clinician cannot change 'field' inside a different Trust - response.status_code == HTTPStatus.FORBIDDEN
     [x] Assert an Audit Centre Lead Clinician cannot change 'field' inside a different Trust - response.status_code == HTTPStatus.FORBIDDEN
-    
+
     [x] Assert an Audit Centre Clinician can change 'field' inside own Trust - response.status_code == HTTPStatus.OK
     [x] Assert an Audit Centre Lead Clinician can change 'field' inside own Trust - response.status_code == HTTPStatus.OK
     [x] Assert RCPCH Audit Team can change 'field' - response.status_code == HTTPStatus.OK
@@ -172,10 +172,10 @@
     for field in fields: [
         'eeg_indicated',                                                        toggle_button
         'eeg_request_date',                                                     date_field
-        'eeg_performed_date',                                                   date_field    
+        'eeg_performed_date',                                                   date_field
         'eeg_declined',                                                         button click (confirm:edit/decline)
-        'twelve_lead_ecg_status',                                               toggle_button        
-        'ct_head_scan_status',                                                  toggle_button    
+        'twelve_lead_ecg_status',                                               toggle_button
+        'ct_head_scan_status',                                                  toggle_button
         'mri_indicated',                                                        toggle_button
         'mri_brain_requested_date',                                             date_field
         'mri_brain_reported_date',                                              date_field
@@ -185,7 +185,7 @@
     [x] Assert an Audit Centre Administrator cannot change 'field' inside a different Trust - response.status_code == HTTPStatus.FORBIDDEN
     [x] Assert an Audit Centre Clinician cannot change 'field' inside a different Trust - response.status_code == HTTPStatus.FORBIDDEN
     [x] Assert an Audit Centre Lead Clinician cannot change 'field' inside a different Trust - response.status_code == HTTPStatus.FORBIDDEN
-    
+
     [x] Assert an Audit Centre Clinician can change 'field' inside own Trust - response.status_code == HTTPStatus.OK
     [x] Assert an Audit Centre Lead Clinician can change 'field' inside own Trust - response.status_code == HTTPStatus.OK
     [x] Assert RCPCH Audit Team can change 'field' - response.status_code == HTTPStatus.OK
@@ -201,10 +201,10 @@
         'individualised_care_plan_parental_prolonged_seizure_care',             toggle_button
         'individualised_care_plan_includes_general_participation_risk',         toggle_button
         'individualised_care_plan_addresses_water_safety',                      toggle_button
-        'individualised_care_plan_addresses_sudep',                             toggle_button    
-        'individualised_care_plan_includes_ehcp',                               toggle_button    
-        'has_individualised_care_plan_been_updated_in_the_last_year',           toggle_button                        
-        'has_been_referred_for_mental_health_support',                          toggle_button        
+        'individualised_care_plan_addresses_sudep',                             toggle_button
+        'individualised_care_plan_includes_ehcp',                               toggle_button
+        'has_individualised_care_plan_been_updated_in_the_last_year',           toggle_button
+        'has_been_referred_for_mental_health_support',                          toggle_button
         'has_support_for_mental_health_support',                                toggle_button
         'has_an_aed_been_given',                                                toggle_button
         'has_rescue_medication_been_prescribed',                                toggle_button
@@ -213,7 +213,7 @@
     [x] Assert an Audit Centre Administrator cannot change 'field' inside a different Trust - response.status_code == HTTPStatus.FORBIDDEN
     [x] Assert an Audit Centre Clinician cannot change 'field' inside a different Trust - response.status_code == HTTPStatus.FORBIDDEN
     [x] Assert an Audit Centre Lead Clinician cannot change 'field' inside a different Trust - response.status_code == HTTPStatus.FORBIDDEN
-    
+
     [x] Assert an Audit Centre Clinician can change 'field' inside own Trust - response.status_code == HTTPStatus.OK
     [x] Assert an Audit Centre Lead Clinician can change 'field' inside own Trust - response.status_code == HTTPStatus.OK
     [x] Assert RCPCH Audit Team can change 'field' - response.status_code == HTTPStatus.OK
@@ -235,7 +235,7 @@
     [x] Assert an Audit Centre Administrator cannot change 'field' inside a different Trust - response.status_code == HTTPStatus.FORBIDDEN
     [x] Assert an Audit Centre Clinician cannot change 'field' inside a different Trust - response.status_code == HTTPStatus.FORBIDDEN
     [x] Assert an Audit Centre Lead Clinician cannot change 'field' inside a different Trust - response.status_code == HTTPStatus.FORBIDDEN
-    
+
     [x] Assert an Audit Centre Clinician can change 'field' inside own Trust - response.status_code == HTTPStatus.OK
     [x] Assert an Audit Centre Lead Clinician can change 'field' inside own Trust - response.status_code == HTTPStatus.OK
     [x] Assert RCPCH Audit Team can change 'field' - response.status_code == HTTPStatus.OK
@@ -322,7 +322,7 @@ def test_users_update_users_forbidden(
         is_staff=test_user_audit_centre_administrator_data.is_staff,
         is_rcpch_audit_team_member=test_user_audit_centre_administrator_data.is_rcpch_audit_team_member,
         is_rcpch_staff=test_user_audit_centre_administrator_data.is_rcpch_staff,
-        organisation_employer=TEST_USER_ORGANISATION,
+        employer_organisations=[TEST_USER_ORGANISATION],
         groups=[
             Group.objects.get(name=test_user_audit_centre_administrator_data.group_name)
         ],
@@ -342,6 +342,10 @@ def test_users_update_users_forbidden(
     for test_user in users:
         # Log in Test User
         client.force_login(test_user)
+
+        test_user.set_organisation_employer(
+            organisation_employer=TEST_USER_ORGANISATION, is_primary=True
+        )
 
         # 2fa enable
         twofactor_signin(client, test_user)
@@ -412,7 +416,7 @@ def test_user_cant_change_rcpch_or_superuser_flag(
         is_staff=test_user_audit_centre_administrator_data.is_staff,
         is_rcpch_audit_team_member=test_user_audit_centre_administrator_data.is_rcpch_audit_team_member,
         is_rcpch_staff=test_user_audit_centre_administrator_data.is_rcpch_staff,
-        organisation_employer=TEST_USER_ORGANISATION,
+        employer_organisations=[TEST_USER_ORGANISATION],
         groups=[
             Group.objects.get(name=test_user_audit_centre_administrator_data.group_name)
         ],
@@ -432,6 +436,10 @@ def test_user_cant_change_rcpch_or_superuser_flag(
     for test_user in users:
         # Log in Test User
         client.force_login(test_user)
+
+        test_user.set_organisation_employer(
+            organisation_employer=TEST_USER_ORGANISATION, is_primary=True
+        )
 
         # 2fa enable
         twofactor_signin(client, test_user)
@@ -507,7 +515,7 @@ def test_user_cannot_see_rcpch_or_superuser_flag_in_template(
         is_staff=test_user_audit_centre_administrator_data.is_staff,
         is_rcpch_audit_team_member=test_user_audit_centre_administrator_data.is_rcpch_audit_team_member,
         is_rcpch_staff=test_user_audit_centre_administrator_data.is_rcpch_staff,
-        organisation_employer=TEST_USER_ORGANISATION,
+        employer_organisations=[TEST_USER_ORGANISATION],
         groups=[
             Group.objects.get(name=test_user_audit_centre_administrator_data.group_name)
         ],
@@ -527,6 +535,10 @@ def test_user_cannot_see_rcpch_or_superuser_flag_in_template(
     for test_user in users:
         # Log in Test User
         client.force_login(test_user)
+
+        test_user.set_organisation_employer(
+            organisation_employer=TEST_USER_ORGANISATION, is_primary=True
+        )
 
         # 2fa enable
         twofactor_signin(client, test_user)
@@ -579,7 +591,22 @@ def test_users_update_users_success(
         is_staff=test_user_audit_centre_administrator_data.is_staff,
         is_rcpch_audit_team_member=test_user_audit_centre_administrator_data.is_rcpch_audit_team_member,
         is_rcpch_staff=test_user_audit_centre_administrator_data.is_rcpch_staff,
-        organisation_employer=DIFF_TRUST_DIFF_ORGANISATION,
+        employer_organisations=[DIFF_TRUST_DIFF_ORGANISATION],
+        groups=[
+            Group.objects.get(name=test_user_audit_centre_administrator_data.group_name)
+        ],
+    )
+
+    ANOTHER_USER_FROM_SAME_ORG = E12UserFactory(
+        email=f"{TEST_USER_ORGANISATION}_ADMINISTRATOR@email.com",
+        first_name=f"{TEST_USER_ORGANISATION}_ADMINISTRATOR",
+        role=test_user_audit_centre_administrator_data.role,
+        # Assign flags based on user role
+        is_active=test_user_audit_centre_administrator_data.is_active,
+        is_staff=test_user_audit_centre_administrator_data.is_staff,
+        is_rcpch_audit_team_member=test_user_audit_centre_administrator_data.is_rcpch_audit_team_member,
+        is_rcpch_staff=test_user_audit_centre_administrator_data.is_rcpch_staff,
+        employer_organisations=[TEST_USER_ORGANISATION],
         groups=[
             Group.objects.get(name=test_user_audit_centre_administrator_data.group_name)
         ],
@@ -602,15 +629,19 @@ def test_users_update_users_success(
         # Log in Test User
         client.force_login(test_user)
 
+        test_user.set_organisation_employer(
+            organisation_employer=TEST_USER_ORGANISATION, is_primary=True
+        )
+
         # 2fa enable
         twofactor_signin(client, test_user)
 
-        response = client.get(
+        response = client.post(
             reverse(
                 "edit_epilepsy12_user",
                 kwargs={
                     "organisation_id": TEST_USER_ORGANISATION.id,
-                    "epilepsy12_user_id": test_user.id,
+                    "epilepsy12_user_id": ANOTHER_USER_FROM_SAME_ORG.id,
                 },
             )
         )
@@ -623,7 +654,7 @@ def test_users_update_users_success(
             test_user_rcpch_audit_team_data,
             test_user_clinicial_audit_team_data,
         ]:
-            response = client.get(
+            response = client.post(
                 reverse(
                     "edit_epilepsy12_user",
                     kwargs={
@@ -680,6 +711,10 @@ def test_users_update_cases_forbidden(
         # Log in Test User
         client.force_login(test_user)
 
+        test_user.set_organisation_employer(
+            organisation_employer=TEST_USER_ORGANISATION, is_primary=True
+        )
+
         # 2fa enable
         twofactor_signin(client, test_user)
 
@@ -733,6 +768,10 @@ def test_users_update_cases_success(
         # Log in Test User
         client.force_login(test_user)
 
+        test_user.set_organisation_employer(
+            organisation_employer=TEST_USER_ORGANISATION, is_primary=True
+        )
+
         # 2fa enable
         twofactor_signin(client, test_user)
 
@@ -761,6 +800,10 @@ def test_users_update_first_paediatric_assessment_forbidden(client):
 
     # set up constants
     # GOSH
+    TEST_USER_ORGANISATION = Organisation.objects.get(
+        ods_code="RP401",
+        trust__ods_code="RP4",
+    )
 
     DIFF_TRUST_DIFF_ORGANISATION = Organisation.objects.get(
         ods_code="RGT01",
@@ -794,6 +837,11 @@ def test_users_update_first_paediatric_assessment_forbidden(client):
     for test_user in users:
         # Log in Test User
         client.force_login(test_user)
+
+        test_user.set_organisation_employer(
+            organisation_employer=TEST_USER_ORGANISATION,
+            is_primary=True,
+        )
 
         # 2fa enable
         twofactor_signin(client, test_user)
@@ -855,6 +903,11 @@ def test_users_update_first_paediatric_assessment_success(client):
         # Log in Test User
         client.force_login(test_user)
 
+        test_user.set_organisation_employer(
+            organisation_employer=TEST_USER_ORGANISATION,
+            is_primary=True,
+        )
+
         # 2fa enable
         twofactor_signin(client, test_user)
 
@@ -896,6 +949,10 @@ def test_users_update_first_epilepsy_context_forbidden(client):
     """
 
     # set up constants
+    TEST_USER_ORGANISATION = Organisation.objects.get(
+        ods_code="RP401",
+        trust__ods_code="RP4",
+    )
 
     DIFF_TRUST_DIFF_ORGANISATION = Organisation.objects.get(
         ods_code="RGT01",
@@ -931,6 +988,11 @@ def test_users_update_first_epilepsy_context_forbidden(client):
     for test_user in users:
         # Log in Test User
         client.force_login(test_user)
+
+        test_user.set_organisation_employer(
+            organisation_employer=TEST_USER_ORGANISATION,
+            is_primary=True,
+        )
 
         # 2fa enable
         twofactor_signin(client, test_user)
@@ -1003,6 +1065,11 @@ def test_users_update_epilepsy_context_success(client):
         # Log in Test User
         client.force_login(test_user)
 
+        test_user.set_organisation_employer(
+            organisation_employer=TEST_USER_ORGANISATION,
+            is_primary=True,
+        )
+
         # 2fa enable
         twofactor_signin(client, test_user)
 
@@ -1044,6 +1111,10 @@ def test_users_update_first_multiaxial_diagnosis_forbidden(client):
     """
 
     # set up constants
+    TEST_USER_ORGANISATION = Organisation.objects.get(
+        ods_code="RP401",
+        trust__ods_code="RP4",
+    )
 
     DIFF_TRUST_DIFF_ORGANISATION = Organisation.objects.get(
         ods_code="RGT01",
@@ -1081,6 +1152,11 @@ def test_users_update_first_multiaxial_diagnosis_forbidden(client):
     for test_user in users:
         # Log in Test User
         client.force_login(test_user)
+
+        test_user.set_organisation_employer(
+            organisation_employer=TEST_USER_ORGANISATION,
+            is_primary=True,
+        )
 
         # 2fa enable
         twofactor_signin(client, test_user)
@@ -1165,6 +1241,11 @@ def test_users_update_multiaxial_diagnosis_success(client):
     for test_user in users:
         # Log in Test User
         client.force_login(test_user)
+
+        test_user.set_organisation_employer(
+            organisation_employer=TEST_USER_ORGANISATION,
+            is_primary=True,
+        )
 
         # 2fa enable
         twofactor_signin(client, test_user)
@@ -1251,6 +1332,11 @@ def test_update_multiaxial_diagnosis_cause_success(client):
     for test_user in users:
         client.force_login(test_user)
 
+        test_user.set_organisation_employer(
+            organisation_employer=TEST_USER_ORGANISATION,
+            is_primary=True,
+        )
+
         # 2fa enable
         twofactor_signin(client, test_user)
 
@@ -1324,6 +1410,10 @@ def test_users_update_episode_forbidden(client):
     """
 
     # set up constants
+    TEST_USER_ORGANISATION = Organisation.objects.get(
+        ods_code="RP401",
+        trust__ods_code="RP4",
+    )
 
     DIFF_TRUST_DIFF_ORGANISATION = Organisation.objects.get(
         ods_code="RGT01",
@@ -1370,6 +1460,11 @@ def test_users_update_episode_forbidden(client):
     for test_user in users:
         # Log in Test User
         client.force_login(test_user)
+
+        test_user.set_organisation_employer(
+            organisation_employer=TEST_USER_ORGANISATION,
+            is_primary=True,
+        )
 
         # 2fa enable
         twofactor_signin(client, test_user)
@@ -1472,6 +1567,11 @@ def test_users_update_episode_success(client):
     for test_user in users:
         # Log in Test User
         client.force_login(test_user)
+
+        test_user.set_organisation_employer(
+            organisation_employer=TEST_USER_ORGANISATION,
+            is_primary=True,
+        )
 
         # 2fa enable
         twofactor_signin(client, test_user)
@@ -1582,6 +1682,10 @@ def test_users_update_comorbidity_forbidden(client):
     """
 
     # set up constants
+    TEST_USER_ORGANISATION = Organisation.objects.get(
+        ods_code="RP401",
+        trust__ods_code="RP4",
+    )
 
     DIFF_TRUST_DIFF_ORGANISATION = Organisation.objects.get(
         ods_code="RGT01",
@@ -1611,6 +1715,11 @@ def test_users_update_comorbidity_forbidden(client):
     for test_user in users:
         # Log in Test User
         client.force_login(test_user)
+
+        test_user.set_organisation_employer(
+            organisation_employer=TEST_USER_ORGANISATION,
+            is_primary=True,
+        )
 
         # 2fa enable
         twofactor_signin(client, test_user)
@@ -1689,6 +1798,11 @@ def test_users_update_comorbidity_success(client):
         # Log in Test User
         client.force_login(test_user)
 
+        test_user.set_organisation_employer(
+            organisation_employer=TEST_USER_ORGANISATION,
+            is_primary=True,
+        )
+
         # 2fa enable
         twofactor_signin(client, test_user)
 
@@ -1737,6 +1851,10 @@ def test_users_update_assessment_forbidden(client):
     """
 
     # set up constants
+    TEST_USER_ORGANISATION = Organisation.objects.get(
+        ods_code="RP401",
+        trust__ods_code="RP4",
+    )
 
     DIFF_TRUST_DIFF_ORGANISATION = Organisation.objects.get(
         ods_code="RGT01",
@@ -1807,6 +1925,11 @@ def test_users_update_assessment_forbidden(client):
     for test_user in users:
         # Log in Test User
         client.force_login(test_user)
+
+        test_user.set_organisation_employer(
+            organisation_employer=TEST_USER_ORGANISATION,
+            is_primary=True,
+        )
 
         # 2fa enable
         twofactor_signin(client, test_user)
@@ -2000,6 +2123,11 @@ def test_users_update_assessment_success(client):
         # Log in Test User
         client.force_login(test_user)
 
+        test_user.set_organisation_employer(
+            organisation_employer=TEST_USER_ORGANISATION,
+            is_primary=True,
+        )
+
         # 2fa enable
         twofactor_signin(client, test_user)
 
@@ -2180,6 +2308,11 @@ def test_users_update_investigations_forbidden(client):
         # Log in Test User
         client.force_login(test_user)
 
+        test_user.set_organisation_employer(
+            organisation_employer=TEST_USER_ORGANISATION,
+            is_primary=True,
+        )
+
         # 2fa enable
         twofactor_signin(client, test_user)
 
@@ -2300,6 +2433,11 @@ def test_users_update_investigations_success(client):
         # Log in Test User
         client.force_login(test_user)
 
+        test_user.set_organisation_employer(
+            organisation_employer=TEST_USER_ORGANISATION,
+            is_primary=True,
+        )
+
         # 2fa enable
         twofactor_signin(client, test_user)
 
@@ -2368,6 +2506,10 @@ def test_users_update_management_forbidden(client):
     """
 
     # set up constants
+    TEST_USER_ORGANISATION = Organisation.objects.get(
+        ods_code="RP401",
+        trust__ods_code="RP4",
+    )
 
     DIFF_TRUST_DIFF_ORGANISATION = Organisation.objects.get(
         ods_code="RGT01",
@@ -2413,6 +2555,11 @@ def test_users_update_management_forbidden(client):
     for test_user in users:
         # Log in Test User
         client.force_login(test_user)
+
+        test_user.set_organisation_employer(
+            organisation_employer=TEST_USER_ORGANISATION,
+            is_primary=True,
+        )
 
         # 2fa enable
         twofactor_signin(client, test_user)
@@ -2500,6 +2647,11 @@ def test_users_update_management_success(client):
         # Log in Test User
         client.force_login(test_user)
 
+        test_user.set_organisation_employer(
+            organisation_employer=TEST_USER_ORGANISATION,
+            is_primary=True,
+        )
+
         # 2fa enable
         twofactor_signin(client, test_user)
 
@@ -2541,6 +2693,10 @@ def test_users_update_antiepilepsymedicine_forbidden(client):
     """
 
     # set up constants
+    TEST_USER_ORGANISATION = Organisation.objects.get(
+        ods_code="RP401",
+        trust__ods_code="RP4",
+    )
 
     DIFF_TRUST_DIFF_ORGANISATION = Organisation.objects.get(
         ods_code="RGT01",
@@ -2589,6 +2745,11 @@ def test_users_update_antiepilepsymedicine_forbidden(client):
     for test_user in users:
         # Log in Test User
         client.force_login(test_user)
+
+        test_user.set_organisation_employer(
+            organisation_employer=TEST_USER_ORGANISATION,
+            is_primary=True,
+        )
 
         # 2fa enable
         twofactor_signin(client, test_user)
@@ -2706,6 +2867,11 @@ def test_users_update_antiepilepsymedicine_success(client):
     for test_user in users:
         # Log in Test User
         client.force_login(test_user)
+
+        test_user.set_organisation_employer(
+            organisation_employer=TEST_USER_ORGANISATION,
+            is_primary=True,
+        )
 
         # 2fa enable
         twofactor_signin(client, test_user)

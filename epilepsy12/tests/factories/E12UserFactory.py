@@ -8,11 +8,13 @@ The following parameters must be specified:
 
     - is_staff
     - is_rcpch_audit_team_member
-    - role 
+    - role
 
 """
 
 # standard imports
+
+from django.apps import apps
 
 # third-party imports
 import factory
@@ -35,9 +37,32 @@ class E12UserFactory(factory.django.DjangoModelFactory):
     is_active = True
     is_superuser = False
     email_confirmed = True
-    organisation_employer = factory.LazyFunction(
-        lambda: Organisation.objects.filter(ods_code="RP401", active=True).first()
-    )
+
+    # add orgsanisation
+    @factory.post_generation
+    def employer_organisations(self, create, extracted, **kwargs):
+        if not create:
+            return
+
+        #  get default organisation employer
+        OrganisationEmployer = apps.get_model("epilepsy12", "OrganisationEmployer")
+        default_organisation = Organisation.objects.filter(ods_code="RP401").first()
+        if extracted:
+            for org in extracted:
+
+                OrganisationEmployer.objects.create(
+                    epilepsy12_user=self,
+                    employer_organisation=org,
+                    is_primary=True,
+                    is_active=True,
+                )
+        else:
+            OrganisationEmployer.objects.create(
+                epilepsy12_user=self,
+                employer_organisation=default_organisation,
+                is_primary=True,
+                is_active=True,
+            )
 
     # Add Groups
     @factory.post_generation

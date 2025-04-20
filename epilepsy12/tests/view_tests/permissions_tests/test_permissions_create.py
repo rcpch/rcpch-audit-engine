@@ -43,7 +43,7 @@
     [x] Assert Clinical Audit Team can 'add_episode' inside own Trust - response.status_code == HTTPStatus.OK
     [x] Assert RCPCH Audit Team can 'add_episode' inside different Trust - response.status_code == HTTPStatus.OK
     [x] Assert Clinical Audit Team can 'add_episode' inside different Trust - response.status_code == HTTPStatus.OK
-    
+
     [x] Assert an Audit Centre Administrator CANNOT 'add_episode' - response.status_code == HTTPStatus.FORBIDDEN
     [x] Assert an Audit Centre Clinician CANNOT 'add_episode' outside own Trust - response.status_code == HTTPStatus.FORBIDDEN
     [x] Assert an Audit Centre Lead Clinician CANNOT 'add_episode' outside own Trust - response.status_code == HTTPStatus.FORBIDDEN
@@ -56,7 +56,7 @@
     [x] Assert Clinical Audit Team can 'add_comorbidity' inside own Trust - response.status_code == HTTPStatus.OK
     [x] Assert RCPCH Audit Team can 'add_comorbidity' inside different Trust - response.status_code == HTTPStatus.OK
     [x] Assert Clinical Audit Team can 'add_comorbidity' inside different Trust - response.status_code == HTTPStatus.OK
-    
+
     [x] Assert an Audit Centre Administrator CANNOT 'add_comorbidity' - response.status_code == HTTPStatus.FORBIDDEN
     [x] Assert an Audit Centre Clinician CANNOT 'add_comorbidity' outside own Trust - response.status_code == HTTPStatus.FORBIDDEN
     [x] Assert an Audit Centre Lead Clinician CANNOT 'add_comorbidity' outside own Trust - response.status_code == HTTPStatus.FORBIDDEN
@@ -69,7 +69,7 @@
     [x] Assert Clinical Audit Team can 'add_syndrome' inside own Trust - response.status_code == HTTPStatus.OK
     [x] Assert RCPCH Audit Team can 'add_syndrome' inside different Trust - response.status_code == HTTPStatus.OK
     [x] Assert Clinical Audit Team can 'add_syndrome' inside different Trust - response.status_code == HTTPStatus.OK
-    
+
     [x] Assert an Audit Centre Administrator CANNOT 'add_syndrome' - response.status_code == HTTPStatus.FORBIDDEN
     [x] Assert an Audit Centre Clinician CANNOT 'add_syndrome' outside own Trust - response.status_code == HTTPStatus.FORBIDDEN
     [x] Assert an Audit Centre Lead Clinician CANNOT 'add_syndrome' outside own Trust - response.status_code == HTTPStatus.FORBIDDEN
@@ -83,7 +83,7 @@
     [x] Assert Clinical Audit Team can 'add_antiepilepsy_medicine' inside own Trust - response.status_code == HTTPStatus.OK
     [x] Assert RCPCH Audit Team can 'add_antiepilepsy_medicine' inside different Trust - response.status_code == HTTPStatus.OK
     [x] Assert Clinical Audit Team can 'add_antiepilepsy_medicine' inside different Trust - response.status_code == HTTPStatus.OK
-    
+
     [x] Assert an Audit Centre Administrator CANNOT 'add_antiepilepsy_medicine' - response.status_code == HTTPStatus.FORBIDDEN
     [x] Assert an Audit Centre Clinician CANNOT 'add_antiepilepsy_medicine' outside own Trust - response.status_code == HTTPStatus.FORBIDDEN
     [x] Assert an Audit Centre Lead Clinician CANNOT 'add_antiepilepsy_medicine' outside own Trust - response.status_code == HTTPStatus.FORBIDDEN
@@ -152,6 +152,10 @@ def test_user_create_same_org_success(
 
     for test_user in users:
         client.force_login(test_user)
+
+        test_user.set_organisation_employer(
+            organisation_employer=TEST_USER_ORGANISATION, is_primary=True
+        )
 
         # OTP ENABLE
         twofactor_signin(client, test_user)
@@ -230,6 +234,11 @@ def test_user_create_diff_org_success(
     for test_user in users:
         client.force_login(test_user)
 
+        test_user.set_organisation_employer(
+            organisation_employer=Organisation.objects.get(ods_code="RP401"),
+            is_primary=True,
+        )
+
         # OTP ENABLE
         twofactor_signin(client, test_user)
 
@@ -302,6 +311,11 @@ def test_user_creation_forbidden(
 
     for test_user in users:
         client.force_login(test_user)
+
+        test_user.set_organisation_employer(
+            organisation_employer=Organisation.objects.get(ods_code="RP401"),
+            is_primary=True,
+        )
 
         # OTP ENABLE
         twofactor_signin(client, test_user)
@@ -388,6 +402,10 @@ def test_patient_create_success(
 
     for test_user in users:
         client.force_login(test_user)
+
+        test_user.set_organisation_employer(
+            organisation_employer=TEST_USER_ORGANISATION, is_primary=True
+        )
 
         # OTP ENABLE
         twofactor_signin(client, test_user)
@@ -509,6 +527,11 @@ def test_patient_creation_forbidden(
     for test_user in users:
         client.force_login(test_user)
 
+        test_user.set_organisation_employer(
+            organisation_employer=Organisation.objects.get(ods_code="RP401"),
+            is_primary=True,
+        )
+
         # OTP ENABLE
         twofactor_signin(client, test_user)
 
@@ -600,6 +623,10 @@ def test_add_episode_comorbidity_syndrome_aem_success(client):
 
     for test_user in users:
         client.force_login(test_user)
+
+        test_user.set_organisation_employer(
+            organisation_employer=TEST_USER_ORGANISATION, is_primary=True
+        )
 
         # OTP ENABLE
         twofactor_signin(client, test_user)
@@ -693,6 +720,10 @@ def test_add_episode_comorbidity_syndrome_aem_forbidden(client):
 
     for test_user in users:
         client.force_login(test_user)
+
+        test_user.set_organisation_employer(
+            organisation_employer=TEST_USER_ORGANISATION, is_primary=True
+        )
 
         URLS = [
             "add_episode",

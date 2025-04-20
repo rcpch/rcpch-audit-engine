@@ -28,6 +28,7 @@ from .epilepsy12user import Epilepsy12User
 from .episode import Episode
 from .syndrome import Syndrome
 from .multiaxial_diagnosis import MultiaxialDiagnosis
+from .organisation_employer import OrganisationEmployer
 
 # These are models which store progress, either of each child in the audit,
 # or each child's performance indicator score

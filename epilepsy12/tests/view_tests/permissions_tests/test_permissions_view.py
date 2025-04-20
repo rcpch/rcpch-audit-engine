@@ -6,7 +6,7 @@ NOTE: if you wish to quickly seed test users inside the shell, see the `misc_py_
 
 ## View Tests
 
-### E12 Users 
+### E12 Users
 
     [x] Assert an Audit Centre Administrator can view users inside own Trust - response.status_code == HTTPStatus.OK
     [x] Assert an Audit Centre Clinician can view users inside own Trust - response.status_code == HTTPStatus.OK
@@ -14,7 +14,7 @@ NOTE: if you wish to quickly seed test users inside the shell, see the `misc_py_
     [x] Assert Clinician who is also an RCPCH Audit Team can view users inside own Trust - response.status_code == HTTPStatus.OK
 
     [x] Assert RCPCH Audit Team can view users inside a different Trust - response.status_code == HTTPStatus.OK
-    [x] Assert Clinical Audit Team can view users inside a different Trust - response.status_code == HTTPStatus.OK 
+    [x] Assert Clinical Audit Team can view users inside a different Trust - response.status_code == HTTPStatus.OK
 
 
 ### E12 Patient Records
@@ -23,7 +23,7 @@ NOTE: if you wish to quickly seed test users inside the shell, see the `misc_py_
     [x] Assert an audit centre clinician can view patients inside own Trust - response.status_code == HTTPStatus.OK
     [x] Assert an Audit Centre Lead Clinician can view patients inside own Trust - response.status_code == HTTPStatus.OK
     [x] Assert RCPCH Audit Team can view patients within all Trusts - response.status_code == HTTPStatus.OK
-    [x] Assert Clinical Audit Team can view patients inside a different Trust - response.status_code == HTTPStatus.OK 
+    [x] Assert Clinical Audit Team can view patients inside a different Trust - response.status_code == HTTPStatus.OK
 
     [x] Assert an Audit Centre Administrator CANNOT view patients outside own Trust - response.status_code == HTTPStatus.FORBIDDEN
     [x] Assert an audit centre clinician CANNOT view patients outside own Trust - response.status_code == HTTPStatus.FORBIDDEN
@@ -109,7 +109,7 @@ for each field in fields ['edit_syndrome', 'close_syndrome']
         [x] Assert an Audit Centre Lead Clinician can view field inside own Trust - response.status_code == HTTPStatus.OK
         [x] Assert RCPCH Audit Team can view field inside own and different Trust - response.status_code == HTTPStatus.OK
         [x] Assert Clinical Audit Team can view field inside own and different Trust - response.status_code == HTTPStatus.OK
-        
+
 
         [x] Assert an Audit Centre Administrator cannot view field inside a different Trust - response.status_code == HTTPStatus.FORBIDDEN
         [x] Assert an Audit Centre Clinician cannot view field inside a different Trust - response.status_code == HTTPStatus.FORBIDDEN
@@ -123,8 +123,8 @@ for each field in fields ['edit_antiepilepsy_medicine', 'close_antiepilepsy_medi
     [x] Assert an Audit Centre Lead Clinician can view field inside own Trust - response.status_code == HTTPStatus.OK
     [x] Assert RCPCH Audit Team can view inside own and different Trust - response.status_code == HTTPStatus.OK
     [x] Assert Clinical Audit Team can view inside own and different Trust - response.status_code == HTTPStatus.OK
-    
-    
+
+
     [x] Assert an Audit Centre Administrator cannot view field inside a different Trust - response.status_code == HTTPStatus.FORBIDDEN
     [x] Assert an Audit Centre Clinician cannot view field inside a different Trust - response.status_code == HTTPStatus.FORBIDDEN
     [x] Assert an Audit Centre Lead Clinician cannot view field inside a different Trust - response.status_code == HTTPStatus.FORBIDDEN
@@ -136,7 +136,7 @@ for each field in fields ['edit_comorbidity', 'close_comorbidity', 'comorbiditie
         [x] Assert an Audit Centre Lead Clinician can view field inside own Trust - response.status_code == HTTPStatus.OK
         [x] Assert RCPCH Audit Team can view field inside own and different Trust - response.status_code == HTTPStatus.FORBIDDEN
         [x] Assert Clinical Audit Team can view field inside own and different Trust - response.status_code == HTTPStatus.OK
-    
+
         [x] Assert an Audit Centre Administrator cannot view field inside a different Trust - response.status_code == HTTPStatus.FORBIDDEN
         [x] Assert an Audit Centre Clinician cannot view field inside a different Trust - response.status_code == HTTPStatus.FORBIDDEN
         [x] Assert an Audit Centre Lead Clinician cannot view field inside a different Trust - response.status_code == HTTPStatus.FORBIDDEN
@@ -149,7 +149,7 @@ for each field in fields ['edit_comorbidity', 'close_comorbidity', 'comorbiditie
     [x] Assert an Audit Centre Lead Clinician can view 'assessment' inside own Trust - response.status_code == HTTPStatus.OK
     [x] Assert RCPCH Audit Team can view inside own and different Trust - response.status_code == HTTPStatus.FORBIDDEN
     [x] Assert Clinical Audit Team can view field inside own and different Trust - response.status_code == HTTPStatus.OK
-    
+
     [x] Assert an Audit Centre Administrator cannot view 'assessment' inside a different Trust - response.status_code == HTTPStatus.FORBIDDEN
     [x] Assert an Audit Centre Clinician cannot view 'assessment' inside a different Trust - response.status_code == HTTPStatus.FORBIDDEN
     [x] Assert an Audit Centre Lead Clinician cannot view 'assessment' inside a different Trust - response.status_code == HTTPStatus.FORBIDDEN
@@ -161,19 +161,19 @@ for each field in fields ['edit_comorbidity', 'close_comorbidity', 'comorbiditie
     [x] Assert an Audit Centre Lead Clinician can view 'investigations' inside own Trust - response.status_code == HTTPStatus.OK
     [x] Assert RCPCH Audit Team can view inside own and different Trust - response.status_code == HTTPStatus.FORBIDDEN
     [x] Assert Clinical Audit Team can view field inside own and different Trust - response.status_code == HTTPStatus.OK
-    
+
     [x] Assert an Audit Centre Administrator cannot view 'investigations' inside a different Trust - response.status_code == HTTPStatus.FORBIDDEN
     [x] Assert an Audit Centre Clinician cannot view 'investigations' inside a different Trust - response.status_code == HTTPStatus.FORBIDDEN
     [x] Assert an Audit Centre Lead Clinician cannot view 'investigations' inside a different Trust - response.status_code == HTTPStatus.FORBIDDEN
 
 ## Management
-    
+
     [x] Assert an Audit Centre Administrator can view 'management' inside own Trust - response.status_code == HTTPStatus.OK
     [x] Assert an Audit Centre Clinician can view 'management' inside own Trust - response.status_code == HTTPStatus.OK
     [x] Assert an Audit Centre Lead Clinician can view 'management' inside own Trust - response.status_code == HTTPStatus.OK
     [x] Assert RCPCH Audit Team can view inside own and different Trust - response.status_code == HTTPStatus.FORBIDDEN
     [x] Assert Clinical Audit Team can view field inside own and different Trust - response.status_code == HTTPStatus.OK
-    
+
     [x] Assert an Audit Centre Administrator cannot view 'management' inside a different Trust - response.status_code == HTTPStatus.FORBIDDEN
     [x] Assert an Audit Centre Clinician cannot view 'management' inside a different Trust - response.status_code == HTTPStatus.FORBIDDEN
     [x] Assert an Audit Centre Lead Clinician cannot view 'management' inside a different Trust - response.status_code == HTTPStatus.FORBIDDEN
@@ -207,7 +207,9 @@ from epilepsy12.models import (
     AntiEpilepsyMedicine,
     Medicine,
 )
-from epilepsy12.tests.view_tests.permissions_tests.perm_tests_utils import twofactor_signin
+from epilepsy12.tests.view_tests.permissions_tests.perm_tests_utils import (
+    twofactor_signin,
+)
 
 
 @pytest.mark.parametrize(
@@ -249,7 +251,9 @@ def test_users_and_case_list_views_permissions_success(
     )
 
     users = Epilepsy12User.objects.filter(
-        organisation_employer__ods_code="RP401"
+        employer_organisations__employer_organisation__ods_code="RP401",
+        is_active=True,
+        employer_organisations__is_primary=True,
     )
 
     for test_user in users:
@@ -310,7 +314,8 @@ def test_users_and_cases_list_view_permissions_forbidden(
 
     Assert these users CAN'T view the List of a different Trust.
     """
-
+    # GOS
+    GOSH = Organisation.objects.get(ods_code="RP401")
     # ADDENBROOKE'S - DIFFERENT TRUST
     DIFF_TRUST_DIFF_ORGANISATION = Organisation.objects.get(
         ods_code="RGT01",
@@ -327,13 +332,16 @@ def test_users_and_cases_list_view_permissions_forbidden(
     )
 
     for test_user in users:
+
+        test_user.set_organisation_employer(organisation_employer=GOSH, is_primary=True)
+
         client.force_login(test_user)
 
         # 2fa enable
         twofactor_signin(client, test_user)
 
         kwargs = {"organisation_id": DIFF_TRUST_DIFF_ORGANISATION.id}
-                
+
         # Request e12 user list endpoint url diff org
         e12_user_list_response_different_organisation = client.get(
             reverse(
@@ -366,11 +374,16 @@ def test_registration_view_permissions_success(client):
     )
 
     users = Epilepsy12User.objects.filter(
-        organisation_employer__ods_code="RP401"
+        employer_organisations__employer_organisation__ods_code="RP401",
+        employer_organisations__is_primary=True,
     )
 
     for test_user in users:
         client.force_login(test_user)
+
+        test_user.set_organisation_employer(
+            organisation_employer=TEST_USER_ORGANISATION, is_primary=True
+        )
 
         # 2fa enable
         twofactor_signin(client, test_user)
@@ -415,6 +428,7 @@ def test_registration_view_permissions_forbidden(client):
     """
     Assert these users CANT view registration for different Trust.
     """
+    USER_ORG = Organisation.objects.get(ods_code="RP401")
 
     # GOSH
     DIFF_TRUST_DIFF_ORGANISATION = Organisation.objects.get(
@@ -436,6 +450,10 @@ def test_registration_view_permissions_forbidden(client):
 
     for test_user in users:
         client.force_login(test_user)
+
+        test_user.set_organisation_employer(
+            organisation_employer=USER_ORG, is_primary=True
+        )
 
         # 2fa enable
         twofactor_signin(client, test_user)
@@ -475,8 +493,11 @@ def test_episode_syndrome_aem_view_permissions_success(client):
     )
 
     users = Epilepsy12User.objects.filter(
-        organisation_employer__ods_code="RP401"
+        employer_organisations__employer_organisation__ods_code="RP401",
+        employer_organisations__is_primary=True,
     )
+
+    print(users)
 
     # Create objs to search for
     episode = Episode.objects.create(
@@ -617,6 +638,11 @@ def test_episode_view_permissions_forbidden(client, URL):
     for test_user in users:
         client.force_login(test_user)
 
+        test_user.set_organisation_employer(
+            organisation_employer=Organisation.objects.get(ods_code="RP401"),
+            is_primary=True,
+        )
+
         # 2fa enable
         twofactor_signin(client, test_user)
 
@@ -663,6 +689,11 @@ def test_syndrome_view_permissions_forbidden(client, URL):
 
     for test_user in users:
         client.force_login(test_user)
+
+        test_user.set_organisation_employer(
+            organisation_employer=Organisation.objects.get(ods_code="RP401"),
+            is_primary=True,
+        )
 
         # 2fa enable
         twofactor_signin(client, test_user)
@@ -714,6 +745,11 @@ def test_antiepilepsy_medicine_view_permissions_forbidden(client, URL):
     for test_user in users:
         client.force_login(test_user)
 
+        test_user.set_organisation_employer(
+            organisation_employer=Organisation.objects.get(ods_code="RP401"),
+            is_primary=True,
+        )
+
         # 2fa enable
         twofactor_signin(client, test_user)
 
@@ -763,11 +799,16 @@ def test_comborbidity_view_permissions_success(client, URL):
     )
 
     users = Epilepsy12User.objects.filter(
-        organisation_employer__ods_code="RP401"
+        employer_organisations__employer_organisation__ods_code="RP401",
+        employer_organisations__is_primary=True,
     )
 
     for test_user in users:
         client.force_login(test_user)
+
+        test_user.set_organisation_employer(
+            organisation_employer=TEST_USER_ORGANISATION, is_primary=True
+        )
 
         # 2fa enable
         twofactor_signin(client, test_user)
@@ -873,6 +914,11 @@ def test_comborbidity_view_permissions_forbidden(client, URL):
     for test_user in users:
         client.force_login(test_user)
 
+        test_user.set_organisation_employer(
+            organisation_employer=Organisation.objects.get(ods_code="RP401"),
+            is_primary=True,
+        )
+
         # 2fa enable
         twofactor_signin(client, test_user)
 
@@ -924,11 +970,16 @@ def test_multiple_views_permissions_success(client):
     )
 
     users = Epilepsy12User.objects.filter(
-        organisation_employer__ods_code="RP401"
+        employer_organisations__employer_organisation__ods_code="RP401",
+        employer_organisations__is_primary=True,
     )
 
     for test_user in users:
         client.force_login(test_user)
+
+        test_user.set_organisation_employer(
+            organisation_employer=TEST_USER_ORGANISATION, is_primary=True
+        )
 
         # 2fa enable
         twofactor_signin(client, test_user)
@@ -1011,6 +1062,11 @@ def test_multiple_views_permissions_forbidden(client):
 
     for test_user in users:
         client.force_login(test_user)
+
+        test_user.set_organisation_employer(
+            organisation_employer=Organisation.objects.get(ods_code="RP401"),
+            is_primary=True,
+        )
 
         # 2fa enable
         twofactor_signin(client, test_user)
