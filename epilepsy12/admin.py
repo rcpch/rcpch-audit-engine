@@ -6,27 +6,29 @@ from django.contrib import messages
 from django.contrib.auth.admin import UserAdmin
 from django.http import HttpResponse
 from django.db.models import Count, Prefetch
-from django.utils import timezone
 
 # Third-party
-from dateutil.relativedelta import relativedelta
 from simple_history.admin import SimpleHistoryAdmin
 
-# Register your models here.
+
 from .models import *
 from .organisational_audit import export_submission_period_as_csv
-
+from .filtersets import *
 
 """
 Facets and filters for the Epilepsy12 admin site
 """
 
 
-class OrganisationFilter(admin.SimpleListFilter):
+class OrganisationCaseFilter(admin.SimpleListFilter):
     title = "Organisation"
     parameter_name = "organisation"
 
     def lookups(self, request, model_admin):
+        """
+        Returns a list of Organisations for the dropdown filter.
+        The list only contains organisations that are actively involved in epilepsy care.
+        """
         organisations = (
             Organisation.objects.filter(
                 site__site_is_actively_involved_in_epilepsy_care=True,
@@ -38,7 +40,7 @@ class OrganisationFilter(admin.SimpleListFilter):
             .distinct()
             .order_by("name")
         )  # populates the dropdown with organisations
-        return [(org.pk, org.name) for org in organisations]
+        return [(org.pk, f"{org.name}") for org in organisations]
 
     def queryset(self, request, queryset):
         if not self.value():
@@ -48,10 +50,8 @@ class OrganisationFilter(admin.SimpleListFilter):
 
         # If this is a Case admin view, filter by cases that have this organisation as their primary centre
         if queryset.model == Case:
-            return queryset.filter(
-                site__organisation_id=organisation_id,
-                site__site_is_primary_centre_of_epilepsy_care=True,
-                site__site_is_actively_involved_in_epilepsy_care=True,
+            return CaseFilterMethods.filter_by_organisation(
+                queryset=queryset, organisation_id=organisation_id
             )
 
         # If this is for another model that has a direct relation to organisation
@@ -83,6 +83,10 @@ class TrustOrLocalHealthBoardFilter(admin.SimpleListFilter):
     parameter_name = "trust_or_local_health_board"
 
     def lookups(self, request, model_admin):
+        """
+        Returns a list of tuples for the dropdown filter.
+        The list only contains trusts and health boards that are actively involved in epilepsy care.
+        """
         trusts = (
             Trust.objects.filter(
                 organisation__site__site_is_primary_centre_of_epilepsy_care=True,
@@ -113,27 +117,96 @@ class TrustOrLocalHealthBoardFilter(admin.SimpleListFilter):
         if not self.value():
             return queryset
 
-        value_type, value_id = self.value().split("_", 1)
+        return CaseFilterMethods.filter_by_trust_or_health_board(
+            queryset=queryset, value=self.value()
+        )
 
-        if self.value().startswith("t_"):
-            # Filter by Trust
-            return queryset.filter(
-                site__site_is_primary_centre_of_epilepsy_care=True,
-                site__site_is_actively_involved_in_epilepsy_care=True,
-                site__case__isnull=False,
-                site__case__registration__isnull=False,
-                site__organisation__trust__id=value_id,
+
+class IntegratedCareBoardFilter(admin.SimpleListFilter):
+    title = "Integrated Care Board"
+    parameter_name = "integrated_care_board"
+
+    def lookups(self, request, model_admin):
+        """
+        Returns a list of Integrated Care Boards for the dropdown filter.
+        The list only contains integrated care boards that are actively involved in epilepsy care.
+        """
+        icbs = (
+            IntegratedCareBoard.objects.filter(
+                organisation__site__site_is_primary_centre_of_epilepsy_care=True,
+                organisation__site__site_is_actively_involved_in_epilepsy_care=True,
+                organisation__site__case__isnull=False,
             )
-        elif self.value().startswith("h_"):
-            # Filter by Local Health Board
-            return queryset.filter(
-                site__site_is_primary_centre_of_epilepsy_care=True,
-                site__site_is_actively_involved_in_epilepsy_care=True,
-                site__case__isnull=False,
-                site__case__registration__isnull=False,
-                site__organisation__local_health_board__id=value_id,
+            .distinct()
+            .order_by("name")
+        )
+        return [(f"i_{icb.id}", f"{icb.name}") for icb in icbs]
+
+    def queryset(self, request, queryset):
+        if not self.value():
+            return queryset
+
+        return CaseFilterMethods.filter_by_integrated_care_board(
+            queryset=queryset, value=self.value()
+        )
+
+
+class NHSEnglandRegionFilter(admin.SimpleListFilter):
+    title = "NHS England Region"
+    parameter_name = "nhs_england_region"
+
+    def lookups(self, request, model_admin):
+        """
+        Returns a list of NHS England Regions for the dropdown filter.
+        The list only contains NHS England regions that are actively involved in epilepsy care.
+        """
+        regions = (
+            NHSEnglandRegion.objects.filter(
+                organisation__site__site_is_primary_centre_of_epilepsy_care=True,
+                organisation__site__site_is_actively_involved_in_epilepsy_care=True,
+                organisation__site__case__isnull=False,
             )
-        return queryset
+            .distinct()
+            .order_by("name")
+        )
+        return [(f"r_{region.id}", f"{region.name}") for region in regions]
+
+    def queryset(self, request, queryset):
+        if not self.value():
+            return queryset
+
+        return CaseFilterMethods.filter_by_nhs_england_region(
+            queryset=queryset, value=self.value()
+        )
+
+
+class CountryFilter(admin.SimpleListFilter):
+    title = "Country"
+    parameter_name = "country"
+
+    def lookups(self, request, model_admin):
+        """
+        Returns a list of countries for the dropdown filter.
+        The list only contains countries that are actively involved in epilepsy care.
+        """
+        countries = (
+            Country.objects.filter(
+                organisation__site__site_is_primary_centre_of_epilepsy_care=True,
+                organisation__site__site_is_actively_involved_in_epilepsy_care=True,
+                organisation__site__case__isnull=False,
+            )
+            .distinct()
+            .order_by("name")
+        )
+        return [(f"c_{country.id}", f"{country.name}") for country in countries]
+
+    def queryset(self, request, queryset):
+        if not self.value():
+            return queryset
+
+        return CaseFilterMethods.filter_by_country(
+            queryset=queryset, value=self.value()
+        )
 
 
 class AgeRangeFilter(admin.SimpleListFilter):
@@ -141,6 +214,10 @@ class AgeRangeFilter(admin.SimpleListFilter):
     parameter_name = "age_range"
 
     def lookups(self, request, model_admin):
+        """
+        Returns a list of tuples for the dropdown filter.
+        The list contains two options: "Under 12 years" and "12 years and over".
+        """
         return [
             ("under_12", "Under 12 years"),
             ("12_and_over", "12 years and over"),
@@ -150,14 +227,9 @@ class AgeRangeFilter(admin.SimpleListFilter):
         if not self.value():
             return queryset
 
-        # Calculate the date for 12 years ago
-        twelve_years_ago = timezone.now().date() - relativedelta(years=12)
-
-        if self.value() == "under_12":
-            return queryset.filter(date_of_birth__gt=twelve_years_ago)
-        elif self.value() == "12_and_over":
-            return queryset.filter(date_of_birth__lte=twelve_years_ago)
-        return queryset
+        return CaseFilterMethods.filter_by_age_range(
+            queryset=queryset, age_range=self.value()
+        )
 
 
 """
@@ -363,8 +435,11 @@ class CaseAdmin(SimpleHistoryAdmin):
     list_filter = [
         AgeRangeFilter,
         "registration__cohort",
-        OrganisationFilter,
+        OrganisationCaseFilter,
         TrustOrLocalHealthBoardFilter,
+        IntegratedCareBoardFilter,
+        NHSEnglandRegionFilter,
+        CountryFilter,
     ]
 
     list_display = [
