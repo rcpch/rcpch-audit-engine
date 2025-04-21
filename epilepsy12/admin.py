@@ -6,8 +6,10 @@ from django.contrib import messages
 from django.contrib.auth.admin import UserAdmin
 from django.http import HttpResponse
 from django.db.models import Count, Prefetch
+from django.utils import timezone
 
 # Third-party
+from dateutil.relativedelta import relativedelta
 from simple_history.admin import SimpleHistoryAdmin
 
 # Register your models here.
@@ -30,6 +32,8 @@ class OrganisationFilter(admin.SimpleListFilter):
                 site__site_is_actively_involved_in_epilepsy_care=True,
                 site__site_is_primary_centre_of_epilepsy_care=True,
                 site__organisation__isnull=False,
+                site__case__isnull=False,
+                site__case__registration__isnull=False,
             )
             .distinct()
             .order_by("name")
@@ -37,8 +41,40 @@ class OrganisationFilter(admin.SimpleListFilter):
         return [(org.pk, org.name) for org in organisations]
 
     def queryset(self, request, queryset):
-        if self.value():
-            return queryset.filter(organisation__pk=self.value())
+        if not self.value():
+            return queryset
+        # Filter by organisation
+        organisation_id = self.value()
+
+        # If this is a Case admin view, filter by cases that have this organisation as their primary centre
+        if queryset.model == Case:
+            return queryset.filter(
+                site__organisation_id=organisation_id,
+                site__site_is_primary_centre_of_epilepsy_care=True,
+                site__site_is_actively_involved_in_epilepsy_care=True,
+            )
+
+        # If this is for another model that has a direct relation to organisation
+        elif hasattr(queryset.model, "organisation"):
+            return queryset.filter(organisation_id=organisation_id)
+
+        # For models related to Case, such as Registration, MultiaxialDiagnosis, etc.
+        elif hasattr(queryset.model, "case"):
+            return queryset.filter(
+                case__site__organisation_id=organisation_id,
+                case__site__site_is_primary_centre_of_epilepsy_care=True,
+                case__site__site_is_actively_involved_in_epilepsy_care=True,
+            )
+
+        # Handle Registration model
+        elif queryset.model == Registration:
+            return queryset.filter(
+                case__site__organisation_id=organisation_id,
+                case__site__site_is_primary_centre_of_epilepsy_care=True,
+                case__site__site_is_actively_involved_in_epilepsy_care=True,
+            ).distinct()
+
+        # Default fallback for other models
         return queryset
 
 
@@ -97,6 +133,30 @@ class TrustOrLocalHealthBoardFilter(admin.SimpleListFilter):
                 site__case__registration__isnull=False,
                 site__organisation__local_health_board__id=value_id,
             )
+        return queryset
+
+
+class AgeRangeFilter(admin.SimpleListFilter):
+    title = "Age Range"
+    parameter_name = "age_range"
+
+    def lookups(self, request, model_admin):
+        return [
+            ("under_12", "Under 12 years"),
+            ("12_and_over", "12 years and over"),
+        ]
+
+    def queryset(self, request, queryset):
+        if not self.value():
+            return queryset
+
+        # Calculate the date for 12 years ago
+        twelve_years_ago = timezone.now().date() - relativedelta(years=12)
+
+        if self.value() == "under_12":
+            return queryset.filter(date_of_birth__gt=twelve_years_ago)
+        elif self.value() == "12_and_over":
+            return queryset.filter(date_of_birth__lte=twelve_years_ago)
         return queryset
 
 
@@ -301,6 +361,7 @@ class CaseAdmin(SimpleHistoryAdmin):
     ]
 
     list_filter = [
+        AgeRangeFilter,
         "registration__cohort",
         OrganisationFilter,
         TrustOrLocalHealthBoardFilter,
