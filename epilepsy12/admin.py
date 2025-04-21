@@ -40,7 +40,22 @@ class OrganisationCaseFilter(admin.SimpleListFilter):
             .distinct()
             .order_by("name")
         )  # populates the dropdown with organisations
-        return [(org.pk, f"{org.name}") for org in organisations]
+
+        # Get the base queryset for counting
+        base_queryset = model_admin.get_queryset(request)
+        # Apply all active filters to the base queryset
+        # to get the counts for each organisation
+        filtered_queryset = CaseFilterMethods.apply_all_active_filters(
+            base_queryset, request, exclude_params=self.parameter_name
+        )
+
+        return [
+            (
+                org.pk,
+                f"{org.name} ({CaseFilterMethods.get_organisation_counts(queryset=filtered_queryset, organisation_id=org.id)})",
+            )
+            for org in organisations
+        ]
 
     def queryset(self, request, queryset):
         if not self.value():
@@ -98,7 +113,7 @@ class TrustOrLocalHealthBoardFilter(admin.SimpleListFilter):
         )
 
         # Get health boards with active registered cases
-        health_boards = (
+        local_health_boards = (
             LocalHealthBoard.objects.filter(
                 organisation__site__site_is_primary_centre_of_epilepsy_care=True,
                 organisation__site__site_is_actively_involved_in_epilepsy_care=True,
@@ -109,8 +124,31 @@ class TrustOrLocalHealthBoardFilter(admin.SimpleListFilter):
             .order_by("name")
         )
 
-        result = [(f"t_{trust.id}", f"Trust: {trust.name}") for trust in trusts]
-        result += [(f"h_{hb.id}", f"Health Board: {hb.name}") for hb in health_boards]
+        # Get the base queryset for counting
+        base_queryset = model_admin.get_queryset(request)
+        # Apply all active filters to the base queryset
+        # to get the counts for each trust and health board
+        filtered_queryset = CaseFilterMethods.apply_all_active_filters(
+            base_queryset, request, exclude_params=self.parameter_name
+        )
+        result = []
+        # Get counts for trusts
+        for trust in trusts:
+            trust_counts = CaseFilterMethods.get_trust_or_local_health_board_counts(
+                queryset=filtered_queryset, value=f"t_{trust.id}"
+            )
+            result.append((f"t_{trust.id}", f"Trust: {trust.name} ({trust_counts})"))
+        # Get counts for health boards
+        for hb in local_health_boards:
+            local_health_board_counts = (
+                CaseFilterMethods.get_trust_or_local_health_board_counts(
+                    queryset=filtered_queryset, value=f"h_{hb.id}"
+                )
+            )
+            result.append(
+                (f"h_{hb.id}", f"Health Board: {hb.name} ({local_health_board_counts})")
+            )
+
         return result
 
     def queryset(self, request, queryset):
@@ -140,7 +178,22 @@ class IntegratedCareBoardFilter(admin.SimpleListFilter):
             .distinct()
             .order_by("name")
         )
-        return [(f"i_{icb.id}", f"{icb.name}") for icb in icbs]
+
+        # Get the base queryset for counting
+        base_queryset = model_admin.get_queryset(request)
+        # Apply all active filters to the base queryset
+        # to get the counts for each integrated care board
+        filtered_queryset = CaseFilterMethods.apply_all_active_filters(
+            base_queryset, request, exclude_params=self.parameter_name
+        )
+
+        return [
+            (
+                f"i_{icb.id}",
+                f"{icb.name} ({CaseFilterMethods.get_integrated_care_board_counts(queryset=filtered_queryset, value=f'i_{icb.id}')})",
+            )
+            for icb in icbs
+        ]
 
     def queryset(self, request, queryset):
         if not self.value():
@@ -169,7 +222,22 @@ class NHSEnglandRegionFilter(admin.SimpleListFilter):
             .distinct()
             .order_by("name")
         )
-        return [(f"r_{region.id}", f"{region.name}") for region in regions]
+        # Get the base queryset for counting
+        base_queryset = model_admin.get_queryset(request)
+        # Apply all active filters to the base queryset
+        # to get the counts for each NHS England region
+        filtered_queryset = CaseFilterMethods.apply_all_active_filters(
+            base_queryset, request, exclude_params=self.parameter_name
+        )
+        # Get counts for NHS England regions
+
+        return [
+            (
+                f"nhs_{region.id}",
+                f"{region.name} ({CaseFilterMethods.get_nhs_england_region_counts(queryset=filtered_queryset, value=f'nhs_{region.id}')})",
+            )
+            for region in regions
+        ]
 
     def queryset(self, request, queryset):
         if not self.value():
@@ -198,7 +266,22 @@ class CountryFilter(admin.SimpleListFilter):
             .distinct()
             .order_by("name")
         )
-        return [(f"c_{country.id}", f"{country.name}") for country in countries]
+        # Get the base queryset for counting
+        base_queryset = model_admin.get_queryset(request)
+        # Apply all active filters to the base queryset
+        # to get the counts for each country
+        filtered_queryset = CaseFilterMethods.apply_all_active_filters(
+            base_queryset, request, exclude_params=self.parameter_name
+        )
+        # Get counts for countries
+
+        return [
+            (
+                f"c_{country.id}",
+                f"{country.name} ({CaseFilterMethods.get_country_counts(queryset=filtered_queryset, value=f'c_{country.id}')})",
+            )
+            for country in countries
+        ]
 
     def queryset(self, request, queryset):
         if not self.value():
@@ -216,11 +299,19 @@ class AgeRangeFilter(admin.SimpleListFilter):
     def lookups(self, request, model_admin):
         """
         Returns a list of tuples for the dropdown filter.
-        The list contains two options: "Under 12 years" and "12 years and over".
+        The list contains two options: "Under 12 years" and "12 years and over",
+        as well as the total counts of each.
         """
+        base_queryset = model_admin.get_queryset(request)
+        filtered_queryset = CaseFilterMethods.apply_all_active_filters(
+            base_queryset, request, exclude_params=self.parameter_name
+        )
+        # Get counts for age ranges
+        counts = CaseFilterMethods.get_age_counts(filtered_queryset)
+
         return [
-            ("under_12", "Under 12 years"),
-            ("12_and_over", "12 years and over"),
+            ("under_12", f"Under 12 years ({counts['under_12']})"),
+            ("12_and_over", f"12 years and over ({counts['12_and_over']})"),
         ]
 
     def queryset(self, request, queryset):
