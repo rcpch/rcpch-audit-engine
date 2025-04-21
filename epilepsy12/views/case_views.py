@@ -938,9 +938,8 @@ def consent_confirmation(request, case_id, consent_type):
 class CaseListView(LoginRequiredMixin, ListView):
     """
     View to display a list of cases for a given organisation.
-    This is different for the case_table:
     This view uses a faceted search for certain key metrics such as KPI
-    and audit progress
+    and audit progress.
     """
 
     model = Case
@@ -956,74 +955,152 @@ class CaseListView(LoginRequiredMixin, ListView):
         and apply the filterset.
         """
         organisation_id = self.kwargs.get("organisation_id")
-        organisation = Organisation.objects.get(pk=organisation_id)
 
-        # Base queryset filtered by organisation
-        queryset = Case.objects.filter(
-            site__organisation=organisation,
-            site__site_is_primary_centre_of_epilepsy_care=True,
-            site__site_is_actively_involved_in_epilepsy_care=True,
-        ).distinct()
+        # Base queryset - all cases
+        base_queryset = Case.objects.all()
 
-        # Apply the filterset
-        self.filterset = self.filterset_class(self.request.GET, queryset=queryset)
-        return self.filterset.qs.order_by(self.ordering)
+        # First filter by the organization from the URL parameter
+        filtered_queryset = CaseFilterMethods.filter_by_organisation(
+            base_queryset, organisation_id
+        )
+
+        # Apply the filterset for the form filters
+        self.filterset = self.filterset_class(
+            self.request.GET, queryset=filtered_queryset
+        )
+
+        # Apply any additional filters from the request that might not be in the filterset
+        queryset = self.filterset.qs
+
+        # Apply KPI failed filter if present
+        if "kpi_failed" in self.request.GET and self.request.GET["kpi_failed"]:
+            # Assuming cohort is also in the request, otherwise use a default
+            cohort = self.request.GET.get("cohort", "6")  # Default to cohort 6
+            queryset = CaseFilterMethods.filter_by_kpi_failed(
+                queryset,
+                kpi_number=self.request.GET.get("kpi_number", "1"),  # Default to KPI 1
+                cohort=cohort,
+                value=self.request.GET["kpi_failed"],
+            )
+
+        # Apply complete audit progress filter if present
+        if (
+            "complete_audit_progress" in self.request.GET
+            and self.request.GET["complete_audit_progress"]
+        ):
+            queryset = CaseFilterMethods.filter_by_complete_audit_progress(
+                queryset, self.request.GET["complete_audit_progress"]
+            )
+
+        # Apply incomplete audit progress filter if present
+        if (
+            "incomplete_audit_progress" in self.request.GET
+            and self.request.GET["incomplete_audit_progress"]
+        ):
+            queryset = CaseFilterMethods.filter_by_audit_progress_incomplete(
+                queryset, self.request.GET["incomplete_audit_progress"]
+            )
+
+        # Apply registration cohort filter if present
+        if (
+            "registration_cohort" in self.request.GET
+            and self.request.GET["registration_cohort"]
+        ):
+            queryset = CaseFilterMethods.filter_by_registration_cohort(
+                queryset, self.request.GET["registration_cohort"]
+            )
+
+        # Apply all the active filters that might not be handled explicitly
+        # Exclude parameters we've already handled
+        exclude_params = [
+            "page",
+            "kpi_failed",
+            "complete_audit_progress",
+            "incomplete_audit_progress",
+            "registration_cohort",
+        ]
+        queryset = CaseFilterMethods.apply_all_active_filters(
+            queryset, self.request, exclude_params=exclude_params
+        )
+
+        return queryset.order_by(self.ordering)
 
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
+
         # Add the filterset to the context
         context["filterset"] = self.filterset
         context["organisation_id"] = self.kwargs.get("organisation_id")
-        context["organisation"] = Organisation.objects.get(
-            pk=self.kwargs.get("organisation_id")
+
+        # Get the current organisation
+        organisation = Organisation.objects.get(pk=self.kwargs.get("organisation_id"))
+        context["organisation"] = organisation
+
+        # Get the unfiltered queryset for this organisation
+        unfiltered_queryset = CaseFilterMethods.filter_by_organisation(
+            Case.objects.all(), self.kwargs.get("organisation_id")
         )
 
-        # Count cases with different episode counts for faceted navigation
-        from django.db.models import Count, Q
+        # Get the filtered queryset (after all filters have been applied)
+        filtered_queryset = self.get_queryset()
 
-        # Get the filtered queryset
-        queryset = self.get_queryset()
+        # Add age distribution facets
+        context.update(CaseFilterMethods.get_age_counts(filtered_queryset))
 
-        # Add counts for faceted navigation
-        context["total_cases"] = queryset.count()
-        context["registered_cases"] = queryset.filter(
-            ~Q(registration__isnull=True)
+        # Total counts for the filtered results
+        context["total_cases"] = filtered_queryset.count()
+        context["registered_cases"] = filtered_queryset.filter(
+            registration__isnull=False
+        ).count()
+        context["unregistered_cases"] = filtered_queryset.filter(
+            registration__isnull=True
         ).count()
 
-        # Episode count facets
-        queryset_with_episodes = queryset.annotate(
-            episode_count=Count(
-                "registration__multiaxialdiagnosis__episodes", distinct=True
+        age_counts = CaseFilterMethods.get_age_counts(filtered_queryset)
+
+        context["under_12_count"] = age_counts["under_12"]
+        context["over_12_count"] = age_counts["12_and_over"]
+
+        # Add complete and incomplete audit progress counts
+        context["complete_cases"] = CaseFilterMethods.get_complete_audit_progress_count(
+            filtered_queryset, "audit_1"  # Using dummy value for the audit ID
+        )
+
+        context["incomplete_cases"] = (
+            CaseFilterMethods.get_audit_progress_incomplete_count(
+                filtered_queryset, "audit_1"  # Using dummy value for the audit ID
             )
         )
-        context["cases_no_episodes"] = queryset_with_episodes.filter(
-            episode_count=0
-        ).count()
-        context["cases_1_5_episodes"] = queryset_with_episodes.filter(
-            episode_count__gte=1, episode_count__lte=5
-        ).count()
-        context["cases_6_plus_episodes"] = queryset_with_episodes.filter(
-            episode_count__gt=5
-        ).count()
 
-        # Add audit progress facets
-        context["cases_incomplete"] = queryset.filter(
-            registration__audit_progress__registration_complete=True,
-            registration__audit_progress__first_paediatric_assessment_complete=True,
-            registration__audit_progress__epilepsy_context_complete=True,
-            registration__audit_progress__assessment_complete=True,
-            registration__audit_progress__multiaxial_diagnosis_complete=True,
-            registration__audit_progress__investigations_complete=True,
-            registration__audit_progress__management_complete=True,
-        ).count()
-        context["cases_complete"] = queryset.filter(
-            registration__audit_progress__registration_complete=False,
-            registration__audit_progress__first_paediatric_assessment_complete=False,
-            registration__audit_progress__epilepsy_context_complete=False,
-            registration__audit_progress__assessment_complete=False,
-            registration__audit_progress__multiaxial_diagnosis_complete=False,
-            registration__audit_progress__investigations_complete=False,
-            registration__audit_progress__management_complete=False,
-        ).count()
+        # Add cohort distribution - assuming cohorts 1-6
+        for cohort in range(5, 7):
+            cohort_key = f"cohort_{cohort}"
+            context[cohort_key] = CaseFilterMethods.get_registration_cohort_counts(
+                filtered_queryset, f"cohort_{cohort}"
+            )
+
+        # Add KPI facets - for KPIs 1-12
+        for kpi in range(1, 11):
+            kpi_key = f"kpi_{kpi}"
+            context[kpi_key] = CaseFilterMethods.get_kpi_failed_count(
+                filtered_queryset,
+                kpi_number=kpi,
+                cohort="6",  # Default to cohort 6
+                value=f"kpi_{kpi}",
+            )
+
+        context["total_episodes"] = CaseFilterMethods.get_total_episodes_count(
+            queryset=filtered_queryset,
+            value="total_episodes",
+        )
+
+        # Add comparison facets - unfiltered vs filtered
+        # This helps users understand how their filters affect the results
+        context["total_unfiltered_cases"] = unfiltered_queryset.count()
+        context["filtered_percentage"] = (
+            (filtered_queryset.count() / unfiltered_queryset.count()) * 100
+            if unfiltered_queryset.count() > 0
+            else 0
+        )
 
         return context

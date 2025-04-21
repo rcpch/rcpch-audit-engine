@@ -526,3 +526,23 @@ def subtract(value, arg):
         return int(value) - int(arg)
     except (ValueError, TypeError):
         return 0
+
+
+@register.filter
+def replace_underscores(value):
+    """Replaces underscores with spaces for better display"""
+    return value.replace("_", " ") if value else value
+
+
+@register.filter
+def get_item(dictionary, key):
+    value_type, value_id = key.split("_", 1)
+    """Get an item from a dictionary with the given key"""
+    if value_id:
+        return dictionary.get(value_id)
+
+
+@register.filter
+def make_list(value):
+    """Convert a string to a list of characters"""
+    return list(value)

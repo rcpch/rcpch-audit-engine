@@ -1,6 +1,6 @@
 from dateutil.relativedelta import relativedelta
 from django.utils import timezone
-from django.db.models import Q
+from django.db.models import Q, Count, Sum
 
 # Third-party imports
 import django_filters
@@ -47,6 +47,20 @@ class CaseFilter(django_filters.FilterSet):
 
     country = django_filters.CharFilter(method="filter_country", label="Country")
 
+    complete_audit_progress = django_filters.CharFilter(
+        method="filter_by_complete_audit_progress", label="Complete Audit Progress"
+    )
+
+    incomplete_audit_progress = django_filters.CharFilter(
+        method="filter_by_audit_progress_incomplete", label="Incomplete Audit Progress"
+    )
+    registration_cohort = django_filters.CharFilter(
+        method="filter_by_registration_cohort", label="Registration Cohort"
+    )
+    kpi_failed = django_filters.CharFilter(
+        method="filter_by_kpi_failed", label="KPI Failed"
+    )
+
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
 
@@ -84,6 +98,22 @@ class CaseFilter(django_filters.FilterSet):
     def filter_country(self, queryset, name, value):
         """Delegate to CaseFilterMethods for country filtering"""
         return CaseFilterMethods.filter_by_country(queryset, value)
+
+    def filter_by_complete_audit_progress(self, queryset, name, value):
+        """Delegate to CaseFilterMethods for complete audit progress filtering"""
+        return CaseFilterMethods.filter_by_complete_audit_progress(queryset, value)
+
+    def filter_by_incomplete_audit_progress(self, queryset, name, value):
+        """Delegate to CaseFilterMethods for incomplete audit progress filtering"""
+        return CaseFilterMethods.filter_by_audit_progress_incomplete(queryset, value)
+
+    def filter_by_registration_cohort(self, queryset, name, value):
+        """Delegate to CaseFilterMethods for registration cohort filtering"""
+        return CaseFilterMethods.filter_by_registration_cohort(queryset, value)
+
+    def filter_by_kpi_failed(self, queryset, name, value):
+        """Delegate to CaseFilterMethods for KPI failed filtering"""
+        return CaseFilterMethods.filter_by_kpi_failed(queryset, value)
 
     class Meta:
         model = Case
@@ -383,17 +413,20 @@ class CaseFilterMethods:
 
         if value_type == "kpi":
             # Filter by KPI failed status
+            filter_kwargs = {f"site__organisation__kpi__{kpi_field}": 2}
 
             return queryset.filter(
-                Q(f"site__organisation__kpi__{kpi_field}" == 2),
+                Q(**filter_kwargs),
                 site__site_is_primary_centre_of_epilepsy_care=True,
                 site__site_is_actively_involved_in_epilepsy_care=True,
                 site__case__isnull=False,
                 site__case__registration__isnull=False,
-                site__organisation__kpi__cohort=cohort,
+                registration__cohort=cohort,
             )
+
         return queryset
 
+    @staticmethod
     def get_kpi_failed_count(queryset, kpi_number, cohort, value):
         """
         Returns counts of case by KPI failed status - includes cases with no registration
@@ -411,19 +444,252 @@ class CaseFilterMethods:
 
         if value_type == "kpi":
             # Filter by KPI failed status
+            filter_kwargs = {f"registration__kpi__{kpi_field}": 2}
             return (
                 queryset.filter(
-                    Q(f"site__organisation__kpi__{kpi_field}" == 2),
+                    Q(**filter_kwargs),
                     site__site_is_primary_centre_of_epilepsy_care=True,
                     site__site_is_actively_involved_in_epilepsy_care=True,
                     site__case__isnull=False,
                     site__case__registration__isnull=False,
-                    site__organisation__kpi__cohort=cohort,
+                    registration__cohort=cohort,
                 )
                 .distinct()
                 .count()
             )
         return 0
+
+    @staticmethod
+    def filter_by_complete_audit_progress(queryset, value):
+        """
+        Filter cases by the complete audit progress status.
+        Acceptable values are:
+        - audit_<audit_id> for Audit
+        This method assumes that the value is a string formatted as "audit_id",
+        where audit_id is the ID of the audit.
+        """
+        # value_type and value_id would come from parsing the value parameter
+        value_type, value_id = value.split("_", 1)
+
+        if value_type == "audit":
+            # Filter by complete audit progress status
+            return queryset.filter(
+                site__site_is_primary_centre_of_epilepsy_care=True,
+                site__site_is_actively_involved_in_epilepsy_care=True,
+                site__case__isnull=False,
+                site__case__registration__isnull=False,
+                registration__audit_progress__registration_complete=True,
+                registration__audit_progress__first_paediatric_assessment_complete=True,
+                registration__audit_progress__epilepsy_context_complete=True,
+                registration__audit_progress__assessment_complete=True,
+                registration__audit_progress__multiaxial_diagnosis_complete=True,
+                registration__audit_progress__investigations_complete=True,
+                registration__audit_progress__management_complete=True,
+            )
+        return queryset
+
+    @staticmethod
+    def get_complete_audit_progress_count(queryset, value):
+        """
+        Returns counts of case by complete audit progress status - includes cases with no registration
+        Accepts a value in the format of "audit_<audit_id>"
+        """
+        if not value:
+            return 0
+        try:
+            value_type, value_id = value.split("_", 1)
+        except ValueError:
+            # Handle the case where value is not in the expected format
+            return 0
+
+        if value_type == "audit":
+            # Filter by complete audit progress status
+            return (
+                queryset.filter(
+                    site__site_is_primary_centre_of_epilepsy_care=True,
+                    site__site_is_actively_involved_in_epilepsy_care=True,
+                    site__case__isnull=False,
+                    site__case__registration__isnull=False,
+                    registration__audit_progress__registration_complete=True,
+                    registration__audit_progress__first_paediatric_assessment_complete=True,
+                    registration__audit_progress__epilepsy_context_complete=True,
+                    registration__audit_progress__assessment_complete=True,
+                    registration__audit_progress__multiaxial_diagnosis_complete=True,
+                    registration__audit_progress__investigations_complete=True,
+                    registration__audit_progress__management_complete=True,
+                )
+                .distinct()
+                .count()
+            )
+        return 0
+
+    @staticmethod
+    def filter_by_registration_cohort(queryset, cohort):
+        """
+        Filter cases by the registration cohort.
+        """
+        if not cohort:
+            return queryset
+        return queryset.filter(
+            site__site_is_primary_centre_of_epilepsy_care=True,
+            site__site_is_actively_involved_in_epilepsy_care=True,
+            site__case__isnull=False,
+            site__case__registration__isnull=False,
+            registration__cohort=cohort,
+        )
+
+    @staticmethod
+    def get_registration_cohort_counts(queryset, cohort):
+        """
+        Returns counts of case by registration cohort - includes cases with no registration
+        Accepts a value in the format of "cohort_<cohort_id>"
+        """
+        if not cohort:
+            return 0
+        try:
+            value_type, value_id = cohort.split("_", 1)
+        except ValueError:
+            # Handle the case where value is not in the expected format
+            return 0
+
+        if value_type == "cohort":
+            # Filter by registration cohort
+            return (
+                queryset.filter(
+                    site__site_is_primary_centre_of_epilepsy_care=True,
+                    site__site_is_actively_involved_in_epilepsy_care=True,
+                    site__case__isnull=False,
+                    site__case__registration__isnull=False,
+                    registration__cohort=value_id,
+                )
+                .distinct()
+                .count()
+            )
+        return 0
+
+    @staticmethod
+    def filter_by_audit_progress_incomplete(queryset, value):
+        """
+        Filter cases by the incomplete audit progress status.
+        Acceptable values are:
+        - audit_<audit_id> for Audit
+        This method assumes that the value is a string formatted as "audit_id",
+        where audit_id is the ID of the audit.
+        """
+        # value_type and value_id would come from parsing the value parameter
+        value_type, value_id = value.split("_", 1)
+
+        if value_type == "audit":
+            # Filter by incomplete audit progress status
+            return queryset.filter(
+                Q(
+                    Q(registration__audit_progress__registration_complete=False)
+                    | Q(
+                        registration__audit_progress__first_paediatric_assessment_complete=False
+                    )
+                    | Q(registration__audit_progress__epilepsy_context_complete=False)
+                    | Q(registration__audit_progress__assessment_complete=False)
+                    | Q(
+                        registration__audit_progress__multiaxial_diagnosis_complete=False
+                    )
+                    | Q(registration__audit_progress__investigations_complete=False)
+                    | Q(registration__audit_progress__management_complete=False)
+                ),
+                site__site_is_primary_centre_of_epilepsy_care=True,
+                site__site_is_actively_involved_in_epilepsy_care=True,
+                site__case__isnull=False,
+                site__case__registration__isnull=False,
+            )
+        return queryset
+
+    @staticmethod
+    def get_audit_progress_incomplete_count(queryset, value):
+        """
+        Returns counts of case by incomplete audit progress status - includes cases with no registration
+        Accepts a value in the format of "audit_<audit_id>"
+        """
+        if not value:
+            return 0
+        try:
+            value_type, value_id = value.split("_", 1)
+        except ValueError:
+            # Handle the case where value is not in the expected format
+            return 0
+
+        if value_type == "audit":
+            # Filter by incomplete audit progress status
+            return (
+                queryset.filter(
+                    Q(
+                        Q(registration__audit_progress__registration_complete=False)
+                        | Q(
+                            registration__audit_progress__first_paediatric_assessment_complete=False
+                        )
+                        | Q(
+                            registration__audit_progress__epilepsy_context_complete=False
+                        )
+                        | Q(registration__audit_progress__assessment_complete=False)
+                        | Q(
+                            registration__audit_progress__multiaxial_diagnosis_complete=False
+                        )
+                        | Q(registration__audit_progress__investigations_complete=False)
+                        | Q(registration__audit_progress__management_complete=False)
+                    ),
+                    site__site_is_primary_centre_of_epilepsy_care=True,
+                    site__site_is_actively_involved_in_epilepsy_care=True,
+                    site__case__isnull=False,
+                    site__case__registration__isnull=False,
+                )
+                .distinct()
+                .count()
+            )
+        return 0
+
+    @staticmethod
+    def get_total_episodes_count(queryset, value):
+        """
+        Returns the total count of episodes in the queryset.
+        """
+        if not value:
+            return 0
+        try:
+            value_type, value_id = value.split("_", 1)
+        except ValueError:
+            # Handle the case where value is not in the expected format
+            return 0
+
+        if value_type == "episodes":
+            # Filter by total episodes count
+            return queryset.filter(
+                site__site_is_primary_centre_of_epilepsy_care=True,
+                site__site_is_actively_involved_in_epilepsy_care=True,
+            ).annotate(
+                episode_count=Count(
+                    "registration__multiaxialdiagnosis__episodes", distinct=True
+                ).aggregate(total_episodes=Sum("episode_count"))["total_episodes"]
+            )
+        return 0
+
+    @staticmethod
+    def filter_episodes(queryset, value):
+        """
+        Filter cases by the total episodes count.
+        Acceptable values are:
+        - episodes_<episode_id> for Episodes
+        This method assumes that the value is a string formatted as "episode_id",
+        where episode_id is the ID of the episode.
+        """
+        # value_type and value_id would come from parsing the value parameter
+        value_type, value_id = value.split("_", 1)
+
+        if value_type == "episodes":
+            # Filter by total episodes count
+            return queryset.filter(
+                site__site_is_primary_centre_of_epilepsy_care=True,
+                site__site_is_actively_involved_in_epilepsy_care=True,
+                registration__multiaxialdiagnosis__episodes__id=value_id,
+            )
+        return queryset
 
     @staticmethod
     def apply_all_active_filters(queryset, request, exclude_params=None):

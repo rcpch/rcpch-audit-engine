@@ -16,42 +16,74 @@
         <!-- Faceted Navigation Sidebar -->
         <div class="four wide column">
             <div class="ui vertical fluid menu">
+                <!-- Case Registration Status -->
                 <div class="item">
                     <div class="header">Case Status</div>
                     <div class="menu">
-                        <a class="item {% if request.GET.registered == '' %}active{% endif %}" href="?registered">
+                        <a class="item {% if request.GET.registration_status == 'registered' %}active{% endif %}" 
+                           href="?registration_status=registered{% for key, value in request.GET.items %}{% if key != 'registration_status' and key != 'page' %}&{{ key }}={{ value }}{% endif %}{% endfor %}">
                             Registered <div class="ui label">{{ registered_cases }}</div>
                         </a>
-                        <a class="item {% if request.GET.unregistered == '' %}active{% endif %}" href="?unregistered">
-                            Unregistered <div class="ui label">{{ total_cases|subtract:registered_cases }}</div>
+                        <a class="item {% if request.GET.registration_status == 'unregistered' %}active{% endif %}" 
+                           href="?registration_status=unregistered{% for key, value in request.GET.items %}{% if key != 'registration_status' and key != 'page' %}&{{ key }}={{ value }}{% endif %}{% endfor %}">
+                            Unregistered <div class="ui label">{{ unregistered_cases }}</div>
                         </a>
                     </div>
                 </div>
                 
+                <!-- Age Ranges -->
                 <div class="item">
-                    <div class="header">Episodes</div>
+                    <div class="header">Age</div>
                     <div class="menu">
-                        <a class="item {% if request.GET.episodes_count == '0' %}active{% endif %}" href="?episodes_count=0">
-                            No Episodes <div class="ui label">{{ cases_no_episodes }}</div>
+                        <a class="item {% if request.GET.age_range == 'under_12' %}active{% endif %}" 
+                           href="?age_range=under_12{% for key, value in request.GET.items %}{% if key != 'age_range' and key != 'page' %}&{{ key }}={{ value }}{% endif %}{% endfor %}">
+                            Under 12 <div class="ui label">{{ under_12_count }}</div>
                         </a>
-                        <a class="item {% if request.GET.episodes_count == '1-5' %}active{% endif %}" href="?episodes_count=1-5">
-                            1-5 Episodes <div class="ui label">{{ cases_1_5_episodes }}</div>
-                        </a>
-                        <a class="item {% if request.GET.episodes_count == '6+' %}active{% endif %}" href="?episodes_count=6%2B">
-                            6+ Episodes <div class="ui label">{{ cases_6_plus_episodes }}</div>
+                        <a class="item {% if request.GET.age_range == 'over_12' %}active{% endif %}" 
+                           href="?age_range=over_12{% for key, value in request.GET.items %}{% if key != 'age_range' and key != 'page' %}&{{ key }}={{ value }}{% endif %}{% endfor %}">
+                            12 and Over <div class="ui label">{{ over_12_count }}</div>
                         </a>
                     </div>
                 </div>
                 
+                <!-- Audit Progress -->
                 <div class="item">
                     <div class="header">Audit Progress</div>
                     <div class="menu">
-                        <a class="item {% if request.GET.complete == '' %}active{% endif %}" href="?complete">
-                            Complete <div class="ui label">{{ cases_complete }}</div>
+                        <a class="item {% if request.GET.complete_audit_progress %}active{% endif %}" 
+                           href="?complete_audit_progress=audit_1{% for key, value in request.GET.items %}{% if key != 'complete_audit_progress' and key != 'incomplete_audit_progress' and key != 'page' %}&{{ key }}={{ value }}{% endif %}{% endfor %}">
+                            Complete <div class="ui label">{{ complete_cases }}</div>
                         </a>
-                        <a class="item {% if request.GET.incomplete == '' %}active{% endif %}" href="?incomplete">
-                            Incomplete <div class="ui label">{{ cases_incomplete }}</div>
+                        <a class="item {% if request.GET.incomplete_audit_progress %}active{% endif %}" 
+                           href="?incomplete_audit_progress=audit_1{% for key, value in request.GET.items %}{% if key != 'complete_audit_progress' and key != 'incomplete_audit_progress' and key != 'page' %}&{{ key }}={{ value }}{% endif %}{% endfor %}">
+                            Incomplete <div class="ui label">{{ incomplete_cases }}</div>
                         </a>
+                    </div>
+                </div>
+                
+                <!-- Cohort Filter -->
+                <div class="item">
+                    <div class="header">Cohort</div>
+                    <div class="menu">
+                        {% for cohort in cohort_counts %}
+                        <a class="item {% if request.GET.registration_cohort == 'cohort_'|add:cohort.registration__cohort|stringformat:'s' %}active{% endif %}" 
+                           href="?registration_cohort=cohort_{{ cohort.registration__cohort }}{% for key, value in request.GET.items %}{% if key != 'registration_cohort' and key != 'page' %}&{{ key }}={{ value }}{% endif %}{% endfor %}">
+                            Cohort {{ cohort.registration__cohort }} <div class="ui label">{{ cohort.count }}</div>
+                        </a>
+                        {% endfor %}
+                    </div>
+                </div>
+                
+                <!-- KPI Failures -->
+                <div class="item">
+                    <div class="header">KPI Status</div>
+                    <div class="menu">
+                        {% for kpi_num in '12345678910'|make_list %}
+                        <a class="item {% if request.GET.kpi_failed == 'kpi_'|add:kpi_num %}active{% endif %}" 
+                           href="?kpi_failed=kpi_{{ kpi_num }}&kpi_number={{ kpi_num }}{% for key, value in request.GET.items %}{% if key != 'kpi_failed' and key != 'kpi_number' and key != 'page' %}&{{ key }}={{ value }}{% endif %}{% endfor %}">
+                            KPI {{ kpi_num }} Failed <div class="ui label">{{ kpi_failed_counts|get_item:'kpi_'|add:kpi_num|default:'0' }}</div>
+                        </a>
+                        {% endfor %}
                     </div>
                 </div>
             </div>
@@ -63,7 +95,7 @@
             <form method="get" class="ui form">
                 <div class="ui segment">
                     <div class="fields">
-                        <div class="eight wide field">
+                        <div class="six wide field">
                             <label>Search</label>
                             <div class="ui icon input">
                                 <input type="text" name="search" placeholder="Search by name, NHS number..." value="{{ request.GET.search }}">
@@ -71,41 +103,82 @@
                             </div>
                         </div>
                         
-                        <div class="four wide field">
-                            <label>Cohort</label>
-                            {{ filterset.form.cohort }}
+                        <!-- Sex Filter -->
+                        <div class="five wide field">
+                            <label>{{ filterset.form.sex.label }}</label>
+                            <div class="ui fluid selection dropdown">
+                                <input type="hidden" name="{{ filterset.form.sex.html_name }}" value="{{ request.GET.sex|default:'' }}">
+                                <i class="dropdown icon"></i>
+                                <div class="default text">Select Sex</div>
+                                <div class="menu">
+                                    <div class="item" data-value="">All</div>
+                                    {% for choice_val, choice_label in filterset.form.sex.field.choices %}
+                                        {% if choice_val %}
+                                        <div class="item" data-value="{{ choice_val }}">
+                                            {{ choice_label }}
+                                        </div>
+                                        {% endif %}
+                                    {% endfor %}
+                                </div>
+                            </div>
                         </div>
                         
-                        <div class="four wide field">
-                            <label>Ethnicity</label>
-                            {{ filterset.form.ethnicity }}
+                        <!-- Ethnicity Filter -->
+                        <div class="five wide field">
+                            <label>{{ filterset.form.ethnicity.label }}</label>
+                            <div class="ui fluid selection dropdown">
+                                <input type="hidden" name="{{ filterset.form.ethnicity.html_name }}" value="{{ request.GET.ethnicity|default:'' }}">
+                                <i class="dropdown icon"></i>
+                                <div class="default text">Select Ethnicity</div>
+                                <div class="menu">
+                                    <div class="item" data-value="">All Ethnicities</div>
+                                    {% for choice_val, choice_label in filterset.form.ethnicity.field.choices %}
+                                        {% if choice_val %}
+                                        <div class="item" data-value="{{ choice_val }}">
+                                            {{ choice_label }}
+                                        </div>
+                                        {% endif %}
+                                    {% endfor %}
+                                </div>
+                            </div>
                         </div>
                     </div>
                     
                     <div class="fields">
-                        <div class="four wide field">
-                            <label>Sex</label>
-                            {{ filterset.form.sex }}
+                        <!-- Trust/Health Board Filter -->
+                        <div class="five wide field">
+                            <label>{{ filterset.form.trust_or_health_board.label|default:"Trust/Health Board" }}</label>
+                            <div class="ui fluid search selection dropdown">
+                                <input type="hidden" name="trust_or_health_board" value="{{ request.GET.trust_or_health_board|default:'' }}">
+                                <i class="dropdown icon"></i>
+                                <div class="default text">Select Trust/Health Board</div>
+                                <div class="menu">
+                                    <div class="item" data-value="">All</div>
+                                    {% if trusts_and_health_boards %}
+                                        {% for entity in trusts_and_health_boards %}
+                                            <div class="item" data-value="{{ entity.type }}_{{ entity.id }}">
+                                                {{ entity.name }}
+                                            </div>
+                                        {% endfor %}
+                                    {% endif %}
+                                </div>
+                            </div>
                         </div>
                         
-                        <div class="six wide field">
-                            <label>Submission Date Range</label>
-                            <div class="two fields">
-                                <div class="field">
-                                    <div class="ui calendar" id="start_date">
-                                        <div class="ui input left icon">
-                                            <i class="calendar icon"></i>
-                                            <input type="text" name="submission_date_after" placeholder="From" value="{{ request.GET.submission_date_after }}">
+                        <!-- NHS England Region Filter -->
+                        <div class="five wide field">
+                            <label>NHS England Region</label>
+                            <div class="ui fluid selection dropdown">
+                                <input type="hidden" name="nhs_england_region" value="{{ request.GET.nhs_england_region|default:'' }}">
+                                <i class="dropdown icon"></i>
+                                <div class="default text">Select Region</div>
+                                <div class="menu">
+                                    <div class="item" data-value="">All Regions</div>
+                                    {% for region in nhs_england_regions %}
+                                        <div class="item" data-value="{{ region.id }}">
+                                            {{ region.name }}
                                         </div>
-                                    </div>
-                                </div>
-                                <div class="field">
-                                    <div class="ui calendar" id="end_date">
-                                        <div class="ui input left icon">
-                                            <i class="calendar icon"></i>
-                                            <input type="text" name="submission_date_before" placeholder="To" value="{{ request.GET.submission_date_before }}">
-                                        </div>
-                                    </div>
+                                    {% endfor %}
                                 </div>
                             </div>
                         </div>
@@ -121,7 +194,44 @@
                         </div>
                     </div>
                 </div>
+                
+                <!-- Filter Summary -->
+                {% if request.GET %}
+                <div class="ui info message">
+                    <div class="header">Active Filters</div>
+                    <div class="ui horizontal list">
+                        {% for key, value in request.GET.items %}
+                            {% if key != 'page' and value %}
+                                <div class="item">
+                                    <div class="ui label">
+                                        {{ key|title|replace_underscores }}: {{ value|title|replace_underscores }}
+                                        <a href="?{% for k, v in request.GET.items %}{% if k != key and k != 'page' %}{{ k }}={{ v }}&{% endif %}{% endfor %}">
+                                            <i class="delete icon"></i>
+                                        </a>
+                                    </div>
+                                </div>
+                            {% endif %}
+                        {% endfor %}
+                    </div>
+                </div>
+                {% endif %}
             </form>
+            
+            <!-- Results Stats -->
+            <div class="ui statistics">
+                <div class="statistic">
+                    <div class="value">{{ total_cases }}</div>
+                    <div class="label">Total Cases</div>
+                </div>
+                <div class="statistic">
+                    <div class="value">{{ registered_cases }}</div>
+                    <div class="label">Registered</div>
+                </div>
+                <div class="statistic">
+                    <div class="value">{{ total_episodes|default:"0" }}</div>
+                    <div class="label">Total Episodes</div>
+                </div>
+            </div>
             
             <!-- Results Table -->
             <div class="ui segment">
@@ -132,7 +242,6 @@
                             <th>ID</th>
                             <th>NHS Number</th>
                             <th>Date of Birth</th>
-                            <th>Episodes</th>
                             <th>Cohort</th>
                             <th>Status</th>
                             <th>Actions</th>
@@ -152,15 +261,6 @@
                             <td>{{ case.id }}</td>
                             <td>{{ case.nhs_number|default:"—" }}</td>
                             <td>{{ case.date_of_birth|date:"d/m/Y" }}</td>
-                            <td class="center aligned">
-                                {% with episode_count=case.registration.multiaxialdiagnosis.episodes.count %}
-                                    {% if episode_count > 0 %}
-                                        <div class="ui teal circular label">{{ episode_count }}</div>
-                                    {% else %}
-                                        <div class="ui grey circular label">0</div>
-                                    {% endif %}
-                                {% endwith %}
-                            </td>
                             <td>
                                 {% if case.registration %}
                                     <div class="ui label">Cohort {{ case.registration.cohort }}</div>
@@ -204,13 +304,13 @@
                         </tr>
                         {% empty %}
                         <tr>
-                            <td colspan="8" class="center aligned">
+                            <td colspan="7" class="center aligned">
                                 <div class="ui placeholder segment">
                                     <div class="ui icon header">
                                         <i class="search icon"></i>
                                         No cases found matching your criteria
                                     </div>
-                                    <a href="{% url 'cases_filter' organisation_id %}" class="ui primary button">Clear Filters</a>
+                                    <a href="{% url 'case_filter_list' organisation_id %}" class="ui primary button">Clear Filters</a>
                                 </div>
                             </td>
                         </tr>
@@ -247,6 +347,40 @@
                                 <i class="angle double right icon"></i>
                             </a>
                         {% endif %}
-                        {% endif %}
                     </div>
-                    {% endblock %}
+                </div>
+                {% endif %}
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block extra_js %}
+<script>
+$(document).ready(function() {
+    // Initialize dropdowns with current values from URL
+    $('.ui.dropdown').dropdown();
+    
+    // Set dropdown values based on URL parameters
+    const urlParams = new URLSearchParams(window.location.search);
+    
+    // For each dropdown, set the value from URL if it exists
+    if (urlParams.has('sex')) {
+        $('input[name="sex"]').parent().dropdown('set selected', urlParams.get('sex'));
+    }
+    
+    if (urlParams.has('ethnicity')) {
+        $('input[name="ethnicity"]').parent().dropdown('set selected', urlParams.get('ethnicity'));
+    }
+    
+    if (urlParams.has('trust_or_health_board')) {
+        $('input[name="trust_or_health_board"]').parent().dropdown('set selected', urlParams.get('trust_or_health_board'));
+    }
+    
+    if (urlParams.has('nhs_england_region')) {
+        $('input[name="nhs_england_region"]').parent().dropdown('set selected', urlParams.get('nhs_england_region'));
+    }
+});
+</script>
+{% endblock %}
