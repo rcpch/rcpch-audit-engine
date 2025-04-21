@@ -1,0 +1,40 @@
+{% load static %}
+{% load epilepsy12_template_tags  %}
+{% load i18n %}
+{% load humanize %}
+
+{% extends 'base.html' %}
+
+<form method="get">
+    {{ filter.form.as_p }}
+    <button type="submit">Filter</button>
+</form>
+<ul>
+    {% for case in filter.qs %}
+        <li>{{ case }}</li>
+    {% endfor %}
+</ul>
+{% if filter.qs.has_other_pages %}
+    <div class="pagination">
+        <span class="step-links">
+            {% if filter.qs.has_previous %}
+                <a href="?page=1">&laquo; first</a>
+                <a href="?page={{ filter.qs.previous_page_number }}">previous</a>
+            {% endif %}
+            <span class="current">
+                Page {{ filter.qs.number }} of {{ filter.qs.paginator.num_pages }}.
+            </span>
+            {% if filter.qs.has_next %}
+                <a href="?page={{ filter.qs.next_page_number }}">next</a>
+                <a href="?page={{ filter.qs.paginator.num_pages }}">last &raquo;</a>
+            {% endif %}
+        </span>
+        <span class="step-links">
+            {% if filter.qs.paginator.count %}
+                Showing {{ filter.qs.start_index }} to {{ filter.qs.end_index }} of {{ filter.qs.paginator.count }} cases.
+            {% else %}
+                No cases found.
+            {% endif %}
+        </span>
+    </div>
+{% endif %}

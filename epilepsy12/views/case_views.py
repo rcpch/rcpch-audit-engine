@@ -8,10 +8,12 @@ from django.core.exceptions import PermissionDenied
 from django.utils import timezone
 from django.shortcuts import get_object_or_404, redirect, render
 from django.urls import reverse
+from django.conf import settings
 from django.contrib.auth.decorators import permission_required
 from django.contrib.gis.db.models import Q
 from django.contrib import messages
 from django.core.paginator import Paginator
+from django.views.generic import ListView
 
 # third party imports
 from django_htmx.http import trigger_client_event, HttpResponseClientRedirect
@@ -28,7 +30,7 @@ from ..decorator import (
     login_and_otp_required,
 )
 
-from django.conf import settings
+from ..filtersets import *
 
 from ..general_functions import (
     construct_transfer_epilepsy12_site_outcome_email,
@@ -930,3 +932,30 @@ def consent_confirmation(request, case_id, consent_type):
     )  # reloads the form to show the active steps
 
     return response
+
+
+@login_and_otp_required()
+@user_may_view_this_organisation()
+@permission_required("epilepsy12.view_case")
+class CaseListView(ListView):
+    """
+    View to display a list of cases for a given organisation.
+    This is different for the case_table:
+    This view uses a faceted search for certain key metrics such as KPI
+    and audit progress
+    """
+
+    model = Case
+    template_name = "epilepsy12/cases/case_filter_table.html"
+    context_object_name = "case_filter_list"
+    paginate_by = 50
+    filterset_class = CaseFilter
+    ordering = "surname"
+
+    def get_queryset(self):
+        """
+        Override the get_queryset method to filter cases based on the organisation.
+        """
+        organisation_id = self.kwargs.get("organisation_id")
+        organisation = Organisation.objects.get(pk=organisation_id)
+        return Case.objects.filter(organisations__name=organisation)
