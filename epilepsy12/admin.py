@@ -11,6 +11,23 @@ from .organisational_audit import export_submission_period_as_csv
 
 
 class Epilepsy12UserAdmin(UserAdmin, SimpleHistoryAdmin):
+
+    def get_employer_organisations(self, obj):
+        if obj:
+            return ", ".join(
+                [
+                    (
+                        str(org.employer_organisation) + " (Primary)"
+                        if org.is_primary
+                        else str(org.employer_organisation)
+                    )
+                    for org in obj.employer_organisations.all()
+                ]
+            )
+        return ""
+
+    get_employer_organisations.short_description = "Employer Organisations"
+
     ordering = ["email"]
     model = Epilepsy12User
     list_display = [
@@ -22,6 +39,7 @@ class Epilepsy12UserAdmin(UserAdmin, SimpleHistoryAdmin):
         "is_rcpch_staff",
         "is_rcpch_audit_team_member",
         "role",
+        "get_employer_organisations",
     ]
     search_fields = (
         "email",
@@ -66,8 +84,6 @@ class Epilepsy12UserAdmin(UserAdmin, SimpleHistoryAdmin):
                     "last_login",
                     "date_joined",
                     "password_last_set",
-                    # "employer_organisation",
-                    # "organisation_employer",
                 )
             },
         ),
@@ -99,8 +115,6 @@ class Epilepsy12UserAdmin(UserAdmin, SimpleHistoryAdmin):
                     "role",
                     "is_superuser",
                     "groups",
-                    # "employer_organisation",
-                    # "organisation_employer",
                 ),
             },
         ),
@@ -121,7 +135,9 @@ class Epilepsy12UserAdmin(UserAdmin, SimpleHistoryAdmin):
             form.base_fields["is_staff"].disabled = True
             form.base_fields["is_rcpch_staff"].disabled = True
             form.base_fields["is_rcpch_audit_team_member"].disabled = True
-        return form
+            return form
+
+        get_employer_organisations.short_description = "Employer Organisations"
 
 
 class CaseAdmin(SimpleHistoryAdmin):
