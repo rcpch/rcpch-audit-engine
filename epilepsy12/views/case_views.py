@@ -9,6 +9,7 @@ from django.utils import timezone
 from django.shortcuts import get_object_or_404, redirect, render
 from django.urls import reverse
 from django.conf import settings
+from django.contrib.auth.mixins import LoginRequiredMixin
 from django.contrib.auth.decorators import permission_required
 from django.contrib.gis.db.models import Q
 from django.contrib import messages
@@ -934,10 +935,7 @@ def consent_confirmation(request, case_id, consent_type):
     return response
 
 
-@login_and_otp_required()
-@user_may_view_this_organisation()
-@permission_required("epilepsy12.view_case")
-class CaseListView(ListView):
+class CaseListView(LoginRequiredMixin, ListView):
     """
     View to display a list of cases for a given organisation.
     This is different for the case_table:
@@ -954,8 +952,78 @@ class CaseListView(ListView):
 
     def get_queryset(self):
         """
-        Override the get_queryset method to filter cases based on the organisation.
+        Override the get_queryset method to filter cases based on the organisation
+        and apply the filterset.
         """
         organisation_id = self.kwargs.get("organisation_id")
         organisation = Organisation.objects.get(pk=organisation_id)
-        return Case.objects.filter(organisations__name=organisation)
+
+        # Base queryset filtered by organisation
+        queryset = Case.objects.filter(
+            site__organisation=organisation,
+            site__site_is_primary_centre_of_epilepsy_care=True,
+            site__site_is_actively_involved_in_epilepsy_care=True,
+        ).distinct()
+
+        # Apply the filterset
+        self.filterset = self.filterset_class(self.request.GET, queryset=queryset)
+        return self.filterset.qs.order_by(self.ordering)
+
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        # Add the filterset to the context
+        context["filterset"] = self.filterset
+        context["organisation_id"] = self.kwargs.get("organisation_id")
+        context["organisation"] = Organisation.objects.get(
+            pk=self.kwargs.get("organisation_id")
+        )
+
+        # Count cases with different episode counts for faceted navigation
+        from django.db.models import Count, Q
+
+        # Get the filtered queryset
+        queryset = self.get_queryset()
+
+        # Add counts for faceted navigation
+        context["total_cases"] = queryset.count()
+        context["registered_cases"] = queryset.filter(
+            ~Q(registration__isnull=True)
+        ).count()
+
+        # Episode count facets
+        queryset_with_episodes = queryset.annotate(
+            episode_count=Count(
+                "registration__multiaxialdiagnosis__episodes", distinct=True
+            )
+        )
+        context["cases_no_episodes"] = queryset_with_episodes.filter(
+            episode_count=0
+        ).count()
+        context["cases_1_5_episodes"] = queryset_with_episodes.filter(
+            episode_count__gte=1, episode_count__lte=5
+        ).count()
+        context["cases_6_plus_episodes"] = queryset_with_episodes.filter(
+            episode_count__gt=5
+        ).count()
+
+        # Add audit progress facets
+        context["cases_incomplete"] = queryset.filter(
+            registration__audit_progress__registration_complete=True,
+            registration__audit_progress__first_paediatric_assessment_complete=True,
+            registration__audit_progress__epilepsy_context_complete=True,
+            registration__audit_progress__assessment_complete=True,
+            registration__audit_progress__multiaxial_diagnosis_complete=True,
+            registration__audit_progress__investigations_complete=True,
+            registration__audit_progress__management_complete=True,
+        ).count()
+        context["cases_complete"] = queryset.filter(
+            registration__audit_progress__registration_complete=False,
+            registration__audit_progress__first_paediatric_assessment_complete=False,
+            registration__audit_progress__epilepsy_context_complete=False,
+            registration__audit_progress__assessment_complete=False,
+            registration__audit_progress__multiaxial_diagnosis_complete=False,
+            registration__audit_progress__investigations_complete=False,
+            registration__audit_progress__management_complete=False,
+        ).count()
+
+        return context

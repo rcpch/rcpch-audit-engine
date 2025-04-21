@@ -1,40 +1,252 @@
-{% load static %}
-{% load epilepsy12_template_tags  %}
-{% load i18n %}
-{% load humanize %}
-
 {% extends 'base.html' %}
+{% load epilepsy12_template_tags %}
+{% load static %}
 
-<form method="get">
-    {{ filter.form.as_p }}
-    <button type="submit">Filter</button>
-</form>
-<ul>
-    {% for case in filter.qs %}
-        <li>{{ case }}</li>
-    {% endfor %}
-</ul>
-{% if filter.qs.has_other_pages %}
-    <div class="pagination">
-        <span class="step-links">
-            {% if filter.qs.has_previous %}
-                <a href="?page=1">&laquo; first</a>
-                <a href="?page={{ filter.qs.previous_page_number }}">previous</a>
-            {% endif %}
-            <span class="current">
-                Page {{ filter.qs.number }} of {{ filter.qs.paginator.num_pages }}.
-            </span>
-            {% if filter.qs.has_next %}
-                <a href="?page={{ filter.qs.next_page_number }}">next</a>
-                <a href="?page={{ filter.qs.paginator.num_pages }}">last &raquo;</a>
-            {% endif %}
-        </span>
-        <span class="step-links">
-            {% if filter.qs.paginator.count %}
-                Showing {{ filter.qs.start_index }} to {{ filter.qs.end_index }} of {{ filter.qs.paginator.count }} cases.
-            {% else %}
-                No cases found.
-            {% endif %}
-        </span>
-    </div>
-{% endif %}
+{% block content %}
+<div class="ui container">
+    <h1 class="ui header">
+        <i class="users icon"></i>
+        <div class="content">
+            Cases for {{ organisation.name }}
+            <div class="sub header">Manage cases and view audit progress</div>
+        </div>
+    </h1>
+
+    <div class="ui stackable grid">
+        <!-- Faceted Navigation Sidebar -->
+        <div class="four wide column">
+            <div class="ui vertical fluid menu">
+                <div class="item">
+                    <div class="header">Case Status</div>
+                    <div class="menu">
+                        <a class="item {% if request.GET.registered == '' %}active{% endif %}" href="?registered">
+                            Registered <div class="ui label">{{ registered_cases }}</div>
+                        </a>
+                        <a class="item {% if request.GET.unregistered == '' %}active{% endif %}" href="?unregistered">
+                            Unregistered <div class="ui label">{{ total_cases|subtract:registered_cases }}</div>
+                        </a>
+                    </div>
+                </div>
+                
+                <div class="item">
+                    <div class="header">Episodes</div>
+                    <div class="menu">
+                        <a class="item {% if request.GET.episodes_count == '0' %}active{% endif %}" href="?episodes_count=0">
+                            No Episodes <div class="ui label">{{ cases_no_episodes }}</div>
+                        </a>
+                        <a class="item {% if request.GET.episodes_count == '1-5' %}active{% endif %}" href="?episodes_count=1-5">
+                            1-5 Episodes <div class="ui label">{{ cases_1_5_episodes }}</div>
+                        </a>
+                        <a class="item {% if request.GET.episodes_count == '6+' %}active{% endif %}" href="?episodes_count=6%2B">
+                            6+ Episodes <div class="ui label">{{ cases_6_plus_episodes }}</div>
+                        </a>
+                    </div>
+                </div>
+                
+                <div class="item">
+                    <div class="header">Audit Progress</div>
+                    <div class="menu">
+                        <a class="item {% if request.GET.complete == '' %}active{% endif %}" href="?complete">
+                            Complete <div class="ui label">{{ cases_complete }}</div>
+                        </a>
+                        <a class="item {% if request.GET.incomplete == '' %}active{% endif %}" href="?incomplete">
+                            Incomplete <div class="ui label">{{ cases_incomplete }}</div>
+                        </a>
+                    </div>
+                </div>
+            </div>
+        </div>
+        
+        <!-- Main Content -->
+        <div class="twelve wide column">
+            <!-- Filter Form -->
+            <form method="get" class="ui form">
+                <div class="ui segment">
+                    <div class="fields">
+                        <div class="eight wide field">
+                            <label>Search</label>
+                            <div class="ui icon input">
+                                <input type="text" name="search" placeholder="Search by name, NHS number..." value="{{ request.GET.search }}">
+                                <i class="search icon"></i>
+                            </div>
+                        </div>
+                        
+                        <div class="four wide field">
+                            <label>Cohort</label>
+                            {{ filterset.form.cohort }}
+                        </div>
+                        
+                        <div class="four wide field">
+                            <label>Ethnicity</label>
+                            {{ filterset.form.ethnicity }}
+                        </div>
+                    </div>
+                    
+                    <div class="fields">
+                        <div class="four wide field">
+                            <label>Sex</label>
+                            {{ filterset.form.sex }}
+                        </div>
+                        
+                        <div class="six wide field">
+                            <label>Submission Date Range</label>
+                            <div class="two fields">
+                                <div class="field">
+                                    <div class="ui calendar" id="start_date">
+                                        <div class="ui input left icon">
+                                            <i class="calendar icon"></i>
+                                            <input type="text" name="submission_date_after" placeholder="From" value="{{ request.GET.submission_date_after }}">
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="field">
+                                    <div class="ui calendar" id="end_date">
+                                        <div class="ui input left icon">
+                                            <i class="calendar icon"></i>
+                                            <input type="text" name="submission_date_before" placeholder="To" value="{{ request.GET.submission_date_before }}">
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <div class="six wide field">
+                            <label>&nbsp;</label>
+                            <button type="submit" class="ui primary button">
+                                <i class="filter icon"></i> Apply Filters
+                            </button>
+                            <a href="{% url 'case_filter_list' organisation_id %}" class="ui button">
+                                <i class="undo icon"></i> Reset
+                            </a>
+                        </div>
+                    </div>
+                </div>
+            </form>
+            
+            <!-- Results Table -->
+            <div class="ui segment">
+                <table class="ui celled striped table">
+                    <thead>
+                        <tr>
+                            <th>Name</th>
+                            <th>ID</th>
+                            <th>NHS Number</th>
+                            <th>Date of Birth</th>
+                            <th>Episodes</th>
+                            <th>Cohort</th>
+                            <th>Status</th>
+                            <th>Actions</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for case in case_filter_list %}
+                        <tr>
+                            <td>
+                                <h4 class="ui header">
+                                    <div class="content">
+                                        {{ case.first_name }} {{ case.surname }}
+                                        <div class="sub header">{{ case.get_sex_display }}</div>
+                                    </div>
+                                </h4>
+                            </td>
+                            <td>{{ case.id }}</td>
+                            <td>{{ case.nhs_number|default:"—" }}</td>
+                            <td>{{ case.date_of_birth|date:"d/m/Y" }}</td>
+                            <td class="center aligned">
+                                {% with episode_count=case.registration.multiaxialdiagnosis.episodes.count %}
+                                    {% if episode_count > 0 %}
+                                        <div class="ui teal circular label">{{ episode_count }}</div>
+                                    {% else %}
+                                        <div class="ui grey circular label">0</div>
+                                    {% endif %}
+                                {% endwith %}
+                            </td>
+                            <td>
+                                {% if case.registration %}
+                                    <div class="ui label">Cohort {{ case.registration.cohort }}</div>
+                                {% else %}
+                                    <div class="ui grey label">Unregistered</div>
+                                {% endif %}
+                            </td>
+                            <td>
+                                {% if case.registration %}
+                                    {% if case.registration.audit_progress.all_forms_complete %}
+                                        <div class="ui green label">
+                                            <i class="check icon"></i> Complete
+                                        </div>
+                                    {% else %}
+                                        <div class="ui orange label">
+                                            <i class="clock icon"></i> Incomplete
+                                        </div>
+                                    {% endif %}
+                                {% else %}
+                                    <div class="ui grey label">
+                                        <i class="minus icon"></i> N/A
+                                    </div>
+                                {% endif %}
+                            </td>
+                            <td class="center aligned">
+                                <div class="ui icon buttons">
+                                    <a href="{% url 'update_case' organisation_id=organisation_id case_id=case.id %}" class="ui blue button">
+                                        <i class="edit icon"></i>
+                                    </a>
+                                    {% if case.registration %}
+                                        <a href="{% url 'case_performance_summary' case_id=case.id %}" class="ui teal button">
+                                            <i class="chart bar icon"></i>
+                                        </a>
+                                    {% else %}
+                                        <a href="{% url 'register_case' organisation_id=organisation_id case_id=case.id %}" class="ui green button">
+                                            <i class="plus icon"></i>
+                                        </a>
+                                    {% endif %}
+                                </div>
+                            </td>
+                        </tr>
+                        {% empty %}
+                        <tr>
+                            <td colspan="8" class="center aligned">
+                                <div class="ui placeholder segment">
+                                    <div class="ui icon header">
+                                        <i class="search icon"></i>
+                                        No cases found matching your criteria
+                                    </div>
+                                    <a href="{% url 'cases_filter' organisation_id %}" class="ui primary button">Clear Filters</a>
+                                </div>
+                            </td>
+                        </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+                
+                <!-- Pagination -->
+                {% if is_paginated %}
+                <div class="ui center aligned container">
+                    <div class="ui pagination menu">
+                        {% if page_obj.has_previous %}
+                            <a class="item" href="?page=1{% for key, value in request.GET.items %}{% if key != 'page' %}&{{ key }}={{ value }}{% endif %}{% endfor %}">
+                                <i class="angle double left icon"></i>
+                            </a>
+                            <a class="item" href="?page={{ page_obj.previous_page_number }}{% for key, value in request.GET.items %}{% if key != 'page' %}&{{ key }}={{ value }}{% endif %}{% endfor %}">
+                                <i class="angle left icon"></i>
+                            </a>
+                        {% endif %}
+                        
+                        {% for num in page_obj.paginator.page_range %}
+                            {% if page_obj.number == num %}
+                                <a class="active item">{{ num }}</a>
+                            {% elif num > page_obj.number|add:'-3' and num < page_obj.number|add:'3' %}
+                                <a class="item" href="?page={{ num }}{% for key, value in request.GET.items %}{% if key != 'page' %}&{{ key }}={{ value }}{% endif %}{% endfor %}">{{ num }}</a>
+                            {% endif %}
+                        {% endfor %}
+                        
+                        {% if page_obj.has_next %}
+                            <a class="item" href="?page={{ page_obj.next_page_number }}{% for key, value in request.GET.items %}{% if key != 'page' %}&{{ key }}={{ value }}{% endif %}{% endfor %}">
+                                <i class="angle right icon"></i>
+                            </a>
+                            <a class="item" href="?page={{ page_obj.paginator.num_pages }}{% for key, value in request.GET.items %}{% if key != 'page' %}&{{ key }}={{ value }}{% endif %}{% endfor %}">
+                                <i class="angle double right icon"></i>
+                            </a>
+                        {% endif %}
+                        {% endif %}
+                    </div>
+                    {% endblock %}

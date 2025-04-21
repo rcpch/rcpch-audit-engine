@@ -517,3 +517,12 @@ def lead_site_for_case(case):
         return site
     else:
         return None
+
+
+@register.filter
+def subtract(value, arg):
+    """Subtracts the arg from the value."""
+    try:
+        return int(value) - int(arg)
+    except (ValueError, TypeError):
+        return 0
