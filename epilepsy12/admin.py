@@ -1,13 +1,108 @@
 from typing import Any
-from django.http import HttpResponse
-from django.contrib import messages
+
+# Django
 from django.contrib import admin
+from django.contrib import messages
 from django.contrib.auth.admin import UserAdmin
+from django.http import HttpResponse
+from django.db.models import Count, Prefetch
+
+# Third-party
 from simple_history.admin import SimpleHistoryAdmin
 
 # Register your models here.
 from .models import *
 from .organisational_audit import export_submission_period_as_csv
+
+
+"""
+Facets and filters for the Epilepsy12 admin site
+"""
+
+
+class OrganisationFilter(admin.SimpleListFilter):
+    title = "Organisation"
+    parameter_name = "organisation"
+
+    def lookups(self, request, model_admin):
+        organisations = (
+            Organisation.objects.filter(
+                site__site_is_actively_involved_in_epilepsy_care=True,
+                site__site_is_primary_centre_of_epilepsy_care=True,
+                site__organisation__isnull=False,
+            )
+            .distinct()
+            .order_by("name")
+        )  # populates the dropdown with organisations
+        return [(org.pk, org.name) for org in organisations]
+
+    def queryset(self, request, queryset):
+        if self.value():
+            return queryset.filter(organisation__pk=self.value())
+        return queryset
+
+
+class TrustOrLocalHealthBoardFilter(admin.SimpleListFilter):
+    title = "Trust or Local Health Board"
+    parameter_name = "trust_or_local_health_board"
+
+    def lookups(self, request, model_admin):
+        trusts = (
+            Trust.objects.filter(
+                organisation__site__site_is_primary_centre_of_epilepsy_care=True,
+                organisation__site__site_is_actively_involved_in_epilepsy_care=True,
+                organisation__site__case__isnull=False,
+            )
+            .distinct()
+            .order_by("name")
+        )
+
+        # Get health boards with active registered cases
+        health_boards = (
+            LocalHealthBoard.objects.filter(
+                organisation__site__site_is_primary_centre_of_epilepsy_care=True,
+                organisation__site__site_is_actively_involved_in_epilepsy_care=True,
+                organisation__site__case__isnull=False,
+                organisation__site__case__registration__isnull=False,
+            )
+            .distinct()
+            .order_by("name")
+        )
+
+        result = [(f"t_{trust.id}", f"Trust: {trust.name}") for trust in trusts]
+        result += [(f"h_{hb.id}", f"Health Board: {hb.name}") for hb in health_boards]
+        return result
+
+    def queryset(self, request, queryset):
+        if not self.value():
+            return queryset
+
+        value_type, value_id = self.value().split("_", 1)
+
+        if self.value().startswith("t_"):
+            # Filter by Trust
+            return queryset.filter(
+                site__site_is_primary_centre_of_epilepsy_care=True,
+                site__site_is_actively_involved_in_epilepsy_care=True,
+                site__case__isnull=False,
+                site__case__registration__isnull=False,
+                site__organisation__trust__id=value_id,
+            )
+        elif self.value().startswith("h_"):
+            # Filter by Local Health Board
+            return queryset.filter(
+                site__site_is_primary_centre_of_epilepsy_care=True,
+                site__site_is_actively_involved_in_epilepsy_care=True,
+                site__case__isnull=False,
+                site__case__registration__isnull=False,
+                site__organisation__local_health_board__id=value_id,
+            )
+        return queryset
+
+
+"""
+Admin customisation for Epilepsy12 models
+"""
 
 
 class Epilepsy12UserAdmin(UserAdmin, SimpleHistoryAdmin):
@@ -137,16 +232,91 @@ class Epilepsy12UserAdmin(UserAdmin, SimpleHistoryAdmin):
             form.base_fields["is_rcpch_audit_team_member"].disabled = True
             return form
 
-        get_employer_organisations.short_description = "Employer Organisations"
-
 
 class CaseAdmin(SimpleHistoryAdmin):
+    def get_registration(self, obj):
+        if obj.registration:
+            return f"{obj.registration.first_paediatric_assessment_date}"
+        return "Unregistered"
+
+    def get_unique_identifier(self, obj):
+        if obj.nhs_number:
+            return f"{obj.nhs_number}"
+        elif obj.unique_reference_number:
+            return f"{obj.unique_reference_number}"
+        else:
+            return "No Unique Identifier"
+
+    def get_e12_id(self, obj):
+        if obj.registration:
+            return f"{obj.registration.pk}"
+        return "No E12 ID"
+
+    def get_lead_e12_site(self, obj):
+        site = Site.objects.filter(
+            site_is_primary_centre_of_epilepsy_care=True,
+            site_is_actively_involved_in_epilepsy_care=True,
+            case=obj,
+        ).get()
+        if site:
+            if site.organisation.country.boundary_identifier == "W92000004":
+                return (
+                    f"{site.organisation.name} ({site.organisation.local_health_board})"
+                )
+            else:
+                return f"{site.organisation.name} ({site.organisation.trust})"
+
+    def episode_count_display(self, obj):
+        """Display the episode count in the admin list"""
+        return obj.episode_count
+
+    def get_queryset(self, request):
+        queryset = super().get_queryset(request)
+        return (
+            queryset.annotate(
+                episode_count=Count("registration__multiaxialdiagnosis__episodes")
+            )
+            .select_related("registration")
+            .prefetch_related(
+                Prefetch(
+                    "registration__multiaxialdiagnosis",
+                    queryset=MultiaxialDiagnosis.objects.prefetch_related("episodes"),
+                )
+            )
+        )
+
+    get_registration.short_description = "First Paediatric Assessment"
+    get_e12_id.short_description = "E12 ID"
+    get_unique_identifier.short_description = "Unique Identifier"
+    get_lead_e12_site.short_description = "Lead E12 Site"
+    episode_count_display.short_description = "Seizure Episodes"
+
+    ordering = ["surname"]
     search_fields = [
         "first_name",
         "surname",
         "nhs_number",
         "unique_reference_number",
         "date_of_birth",
+    ]
+
+    list_filter = [
+        "registration__cohort",
+        OrganisationFilter,
+        TrustOrLocalHealthBoardFilter,
+    ]
+
+    list_display = [
+        "get_e12_id",
+        "first_name",
+        "surname",
+        "get_unique_identifier",
+        "date_of_birth",
+        "age",
+        "get_registration",
+        "get_lead_e12_site",
+        "episode_count_display",
+        "registration__cohort",
     ]
 
 
