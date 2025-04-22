@@ -308,13 +308,11 @@
                             <td>
                                 {% if case.registration %}
                                     {% if case.registration.audit_progress.audit_complete %}
-                                        <div class="ui green label">
-                                            <i class="check icon"></i> Complete
+                                    <i class="rcpch_pink check circle outline icon"></i>
+                                             Complete
                                         </div>
                                     {% else %}
-                                        <div class="ui orange label">
-                                            <i class="clock icon"></i> Incomplete
-                                        </div>
+                                        <i class="rcpch_light_blue dot circle outline icon"></i> Incomplete
                                     {% endif %}
                                 {% else %}
                                     <div class="ui grey label">
