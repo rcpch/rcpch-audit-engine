@@ -94,19 +94,19 @@
                         <!-- Sex Filter -->
                         <div class="five wide field">
                             <label>{{ filterset.form.sex.label }}</label>
-                            <div class="ui fluid selection dropdown">
-                                <input type="hidden" name="{{ filterset.form.sex.html_name }}" value="{{ request.GET.sex|default:'' }}">
+                            <div class="ui fluid search selection dropdown">
+                                <input type="hidden" name="sex" value="{{ request.GET.sex|default:'' }}">
                                 <i class="dropdown icon"></i>
                                 <div class="default text">Select Sex</div>
                                 <div class="menu">
                                     <div class="item" data-value="">All</div>
-                                    {% for choice_val, choice_label in filterset.form.sex.field.choices %}
-                                        {% if choice_val %}
-                                        <div class="item" data-value="{{ choice_val }}">
-                                            {{ choice_label }}
-                                        </div>
-                                        {% endif %}
-                                    {% endfor %}
+                                    {% if sexes %}
+                                        {% for sex in sexes %}
+                                            <div class="item" data-value="{{ sex.0 }}">
+                                                {{ sex.1 }}
+                                            </div>
+                                        {% endfor %}
+                                    {% endif %}
                                 </div>
                             </div>
                         </div>

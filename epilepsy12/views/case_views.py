@@ -1088,6 +1088,14 @@ class CaseListView(LoginRequiredMixin, ListView):
             )
         context["ethnicities"] = ethnicity_choices
 
+        # Add sex facets
+        sex_counts = CaseFilterMethods.get_sex_counts(filtered_queryset)
+        sex_choices = [("", "All")]
+        for sex_code, label in SEX_TYPE:
+            count = sex_counts.get(sex_code, 0)
+            sex_choices.append((f"sex_{sex_code}", f"{label} ({count})"))
+        context["sexes"] = sex_choices
+
         # Add cohort distribution - assuming cohorts 5-7
         for cohort in range(5, 8):
             context["cohort_counts"] = CaseFilterMethods.get_registration_cohort_counts(

@@ -119,21 +119,6 @@ class CaseFilter(django_filters.FilterSet):
                 ("under_12", f"Under 12 years ({age_counts['under_12']})"),
                 ("12_and_over", f"12 years and over ({age_counts['12_and_over']})"),
             ]
-            # Update sex choices with counts
-            sex_counts = CaseFilterMethods.get_sex_counts(self.queryset)
-            sex_choices = [("", "---------")]
-            for code, label in SEX_TYPE:
-                sex_choices.append((code, f"{label} ({sex_counts[code]})"))
-            self.form.fields["sex"].choices = sex_choices
-
-            # Update cohort choices with counts
-            cohort_counts = CaseFilterMethods.get_registration_cohort_counts(
-                self.queryset, self.data.get("registration_cohort")
-            )
-            cohort_choices = [("", "---------")]
-            for code in range(5, 9):
-                cohort_choices.append((code, f"{code} ({cohort_counts})"))
-            self.form.fields["registration_cohort"].choices = cohort_choices
 
     def filter_age_range(self, queryset, name, value):
         """Delegate to CaseFilterMethods for age range filtering"""
