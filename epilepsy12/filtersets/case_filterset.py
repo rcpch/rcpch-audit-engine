@@ -173,6 +173,10 @@ class CaseFilter(django_filters.FilterSet):
         """Delegate to CaseFilterMethods for KPI failed filtering"""
         return CaseFilterMethods.filter_by_kpi_failed(queryset, value)
 
+    def filter_by_age_range(self, queryset, name, value):
+        """Delegate to CaseFilterMethods for age range filtering"""
+        return CaseFilterMethods.filter_by_age_range(queryset, value)
+
     def filter_by_sex(self, queryset, name, value):
         """Delegate to CaseFilterMethods for sex"""
         return CaseFilterMethods.filter_by_sex(queryset, value)
@@ -275,6 +279,44 @@ class CaseFilterMethods:
         over_12_count = queryset.filter(date_of_birth__lte=twelve_years_ago).count()
 
         return {"under_12": under_12_count, "12_and_over": over_12_count}
+
+    @staticmethod
+    def filter_by_registration_status(queryset, value):
+        """
+        Filter cases by registration status
+        """
+        if value == "registered":
+            return queryset.filter(
+                site__site_is_primary_centre_of_epilepsy_care=True,
+                site__site_is_actively_involved_in_epilepsy_care=True,
+                registration__isnull=False,
+            )
+        elif value == "unregistered":
+            return queryset.filter(
+                site__site_is_primary_centre_of_epilepsy_care=True,
+                site__site_is_actively_involved_in_epilepsy_care=True,
+                registration__isnull=True,
+            )
+        return queryset
+
+    @staticmethod
+    def get_registration_status_counts(queryset, value):
+        """
+        Returns counts of cases by registration status
+        """
+        if value == "registered":
+            return queryset.filter(
+                site__site_is_primary_centre_of_epilepsy_care=True,
+                site__site_is_actively_involved_in_epilepsy_care=True,
+                registration__isnull=False,
+            ).count()
+        elif value == "unregistered":
+            return queryset.filter(
+                site__site_is_primary_centre_of_epilepsy_care=True,
+                site__site_is_actively_involved_in_epilepsy_care=True,
+                registration__isnull=True,
+            ).count()
+        return 0
 
     @staticmethod
     def filter_by_organisation(queryset, organisation_id):
@@ -999,17 +1041,23 @@ class CaseFilterMethods:
             ):
                 continue
 
+            print(f"Applying filter: {key} with value: {value}")
+
             # Apply standard filters through explicit cases
             if key == "organisation":
                 queryset = CaseFilterMethods.filter_by_organisation(
                     queryset=queryset, organisation_id=value
                 )
+            elif key == "sex":
+                queryset = CaseFilterMethods.filter_by_sex(
+                    queryset=queryset, value=value
+                )
             elif key == "age_range":
                 queryset = CaseFilterMethods.filter_by_age_range(
                     queryset=queryset, age_range=value
                 )
-            elif key == "sex":
-                queryset = CaseFilterMethods.filter_by_sex(
+            elif key == "registration_status":
+                queryset = CaseFilterMethods.filter_by_registration_status(
                     queryset=queryset, value=value
                 )
 

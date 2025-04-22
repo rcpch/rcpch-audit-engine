@@ -1025,12 +1025,14 @@ class CaseListView(LoginRequiredMixin, ListView):
 
         # Total counts for the filtered results
         context["total_cases"] = filtered_queryset.count()
-        context["registered_cases"] = filtered_queryset.filter(
-            registration__isnull=False
-        ).count()
-        context["unregistered_cases"] = filtered_queryset.filter(
-            registration__isnull=True
-        ).count()
+        context["registered_cases"] = CaseFilterMethods.get_registration_status_counts(
+            filtered_queryset, "registered"
+        )
+        context["unregistered_cases"] = (
+            CaseFilterMethods.get_registration_status_counts(
+                filtered_queryset, "unregistered"
+            )
+        )
 
         age_counts = CaseFilterMethods.get_age_counts(filtered_queryset)
 

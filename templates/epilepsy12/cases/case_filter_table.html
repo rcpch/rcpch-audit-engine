@@ -40,8 +40,8 @@
                            href="?age_range=under_12{% for key, value in request.GET.items %}{% if key != 'age_range' and key != 'page' %}&{{ key }}={{ value }}{% endif %}{% endfor %}">
                             Under 12 <div class="ui label">{{ under_12_count }}</div>
                         </a>
-                        <a class="item {% if request.GET.age_range == 'over_12' %}active{% endif %}" 
-                           href="?age_range=over_12{% for key, value in request.GET.items %}{% if key != 'age_range' and key != 'page' %}&{{ key }}={{ value }}{% endif %}{% endfor %}">
+                        <a class="item {% if request.GET.age_range == '12_and_over' %}active{% endif %}" 
+                           href="?age_range=12_and_over{% for key, value in request.GET.items %}{% if key != 'age_range' and key != 'page' %}&{{ key }}={{ value }}{% endif %}{% endfor %}">
                             12 and Over <div class="ui label">{{ over_12_count }}</div>
                         </a>
                     </div>
