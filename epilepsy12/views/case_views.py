@@ -975,11 +975,8 @@ class CaseListView(LoginRequiredMixin, ListView):
         # Apply KPI failed filter if present
         if "kpi_failed" in self.request.GET and self.request.GET["kpi_failed"]:
             # Assuming cohort is also in the request, otherwise use a default
-            cohort = self.request.GET.get("cohort", "6")  # Default to cohort 6
             queryset = CaseFilterMethods.filter_by_kpi_failed(
                 queryset,
-                kpi_number=self.request.GET.get("kpi_number", "1"),  # Default to KPI 1
-                cohort=cohort,
                 value=self.request.GET["kpi_failed"],
             )
 
@@ -1014,6 +1011,7 @@ class CaseListView(LoginRequiredMixin, ListView):
         # Exclude parameters we've already handled
         exclude_params = [
             "page",
+            "ethnicity",
             "kpi_failed",
             "complete_audit_progress",
             "incomplete_audit_progress",
@@ -1072,6 +1070,15 @@ class CaseListView(LoginRequiredMixin, ListView):
             )
         )
 
+        # Add ethnicity facets
+        context.update(
+            {
+                "ethnicity_counts": CaseFilterMethods.get_ethnicity_counts(
+                    filtered_queryset
+                )
+            }
+        )
+
         # Add cohort distribution - assuming cohorts 1-6
         for cohort in range(5, 7):
             cohort_key = f"cohort_{cohort}"
@@ -1083,10 +1090,7 @@ class CaseListView(LoginRequiredMixin, ListView):
         for kpi in range(1, 11):
             kpi_key = f"kpi_{kpi}"
             context[kpi_key] = CaseFilterMethods.get_kpi_failed_count(
-                filtered_queryset,
-                kpi_number=kpi,
-                cohort="6",  # Default to cohort 6
-                value=f"kpi_{kpi}",
+                filtered_queryset, value=kpi_key
             )
 
         context["total_episodes"] = CaseFilterMethods.get_total_episodes_count(

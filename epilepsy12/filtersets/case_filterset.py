@@ -5,8 +5,8 @@ from django.db.models import Q, Count, Sum
 # Third-party imports
 import django_filters
 
-from ..constants import KPI_MAP
-from epilepsy12.models import Organisation, Case, Site
+from ..constants import KPI_MAP, ETHNICITIES, SEX_TYPE
+from epilepsy12.models import Organisation, Case
 
 
 class CaseFilter(django_filters.FilterSet):
@@ -15,6 +15,29 @@ class CaseFilter(django_filters.FilterSet):
     Note that this is used in views that require filtering of cases, not the admin.
     It leverages the CaseFilterMethods utility class for consistent filtering logic.
     """
+
+    # simple filters for fields on the Case model
+    # Simple field filters
+    first_name = django_filters.CharFilter(lookup_expr="icontains")
+    surname = django_filters.CharFilter(lookup_expr="icontains")
+    nhs_number = django_filters.CharFilter(lookup_expr="icontains")
+    unique_reference_number = django_filters.CharFilter(
+        field_name="registration__unique_reference_number", lookup_expr="icontains"
+    )
+    ethnicity = django_filters.ChoiceFilter(choices=ETHNICITIES)
+    sex = django_filters.ChoiceFilter(choices=SEX_TYPE)
+    date_of_birth = django_filters.DateFilter()
+    date_of_birth_range = django_filters.DateFromToRangeFilter(
+        field_name="date_of_birth"
+    )
+    index_of_multiple_deprivation_quintile = django_filters.ChoiceFilter(
+        field_name="index_of_multiple_deprivation_quintile"
+    )
+
+    # For related fields
+    first_paediatric_assessment_date = django_filters.DateFilter(
+        field_name="registration__first_paediatric_assessment_date"
+    )
 
     AGE_CHOICES = (
         ("under_12", "Under 12 years"),
@@ -25,6 +48,9 @@ class CaseFilter(django_filters.FilterSet):
         choices=AGE_CHOICES, method="filter_by_age_range", label="Age Range"
     )
 
+    """
+    Abstraction levels - only visible to the audit team
+    """
     organisation = django_filters.ModelChoiceFilter(
         queryset=Organisation.objects.filter(
             site__site_is_actively_involved_in_epilepsy_care=True,
@@ -47,6 +73,9 @@ class CaseFilter(django_filters.FilterSet):
 
     country = django_filters.CharFilter(method="filter_country", label="Country")
 
+    """
+    Progress and Audit level filters
+    """
     complete_audit_progress = django_filters.CharFilter(
         method="filter_by_complete_audit_progress", label="Complete Audit Progress"
     )
@@ -61,19 +90,33 @@ class CaseFilter(django_filters.FilterSet):
         method="filter_by_kpi_failed", label="KPI Failed"
     )
 
+    # Other filters to implement
+    # All patients with learning disabilities
+    # All patients with autism
+    # All patients referred to CAMHS
+    # All patients with generalised epilepsy
+    # All patients with focal epilepsy
+    # Filter by epilepsy cause
+    # Filter by epilepsy syndrome
+
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
 
         # Add counts to the age range filter choices if we have a queryset
         if hasattr(self, "queryset") and self.queryset is not None:
-            counts = CaseFilterMethods.get_age_counts(self.queryset)
-
+            age_counts = CaseFilterMethods.get_age_counts(self.queryset)
             # Update age_range choices with counts
             self.form.fields["age_range"].choices = [
                 ("", "---------"),  # Keep the empty choice
-                ("under_12", f"Under 12 years ({counts['under_12']})"),
-                ("12_and_over", f"12 years and over ({counts['12_and_over']})"),
+                ("under_12", f"Under 12 years ({age_counts['under_12']})"),
+                ("12_and_over", f"12 years and over ({age_counts['12_and_over']})"),
             ]
+            # Update sex choices with counts
+            sex_counts = CaseFilterMethods.get_sex_counts(self.queryset)
+            sex_choices = [("", "---------")]
+            for code, label in SEX_TYPE:
+                sex_choices.append((code, f"{label} ({sex_counts[code]})"))
+            self.form.fields["sex"].choices = sex_choices
 
     def filter_age_range(self, queryset, name, value):
         """Delegate to CaseFilterMethods for age range filtering"""
@@ -103,7 +146,7 @@ class CaseFilter(django_filters.FilterSet):
         """Delegate to CaseFilterMethods for complete audit progress filtering"""
         return CaseFilterMethods.filter_by_complete_audit_progress(queryset, value)
 
-    def filter_by_incomplete_audit_progress(self, queryset, name, value):
+    def filter_by_audit_progress_incomplete(self, queryset, name, value):
         """Delegate to CaseFilterMethods for incomplete audit progress filtering"""
         return CaseFilterMethods.filter_by_audit_progress_incomplete(queryset, value)
 
@@ -118,6 +161,17 @@ class CaseFilter(django_filters.FilterSet):
     class Meta:
         model = Case
         fields = [
+            # simple filters for fields on the Case model
+            "first_name",
+            "surname",
+            "nhs_number",
+            "unique_reference_number",
+            "sex",
+            "ethnicity",
+            "date_of_birth",
+            "date_of_birth_range",
+            "first_paediatric_assessment_date",
+            # custom filters
             "age_range",
             "organisation",
             "trust_or_health_board",
@@ -134,6 +188,24 @@ class CaseFilterMethods:
     to be used in the CaseFilter class and in the admin.
     """
 
+    # Simple facet counts for fields on the Case model
+    @staticmethod
+    def get_ethnicity_counts(queryset):
+        """Return counts of each ethnicity in the queryset"""
+        ethnicity_counts = {}
+        for code, label in ETHNICITIES:
+            ethnicity_counts[code] = queryset.filter(ethnicity=code).count()
+        return ethnicity_counts
+
+    @staticmethod
+    def get_sex_counts(queryset):
+        """Return counts by sex"""
+        sex_counts = {}
+        for code, label in SEX_TYPE:
+            sex_counts[code] = queryset.filter(sex=code).count()
+        return sex_counts
+
+    # Custom filter methods for filtering cases based on various criteria
     @staticmethod
     def filter_by_age_range(queryset, age_range):
         twelve_years_ago = timezone.now().date() - relativedelta(years=12)
@@ -402,14 +474,17 @@ class CaseFilterMethods:
         return 0
 
     @staticmethod
-    def filter_by_kpi_failed(queryset, kpi_number, cohort, value):
+    def filter_by_kpi_failed(queryset, value):
         """
         Filter cases by the KPI failed status.
+        The string has to be split into value_type and value_id
+        The value_type is "kpi" and the value_id is the KPI number.
+        The KPI number is used to get the field name from the KPI_MAP dictionary.
         """
         # value_type and value_id would come from parsing the value parameter
         value_type, value_id = value.split("_", 1)
 
-        kpi_field = KPI_MAP.get(kpi_number)
+        kpi_field = KPI_MAP.get(int(value_id))
 
         if value_type == "kpi":
             # Filter by KPI failed status
@@ -421,16 +496,18 @@ class CaseFilterMethods:
                 site__site_is_actively_involved_in_epilepsy_care=True,
                 site__case__isnull=False,
                 site__case__registration__isnull=False,
-                registration__cohort=cohort,
             )
 
         return queryset
 
     @staticmethod
-    def get_kpi_failed_count(queryset, kpi_number, cohort, value):
+    def get_kpi_failed_count(queryset, value):
         """
         Returns counts of case by KPI failed status - includes cases with no registration
         Accepts a value in the format of "kpi_<kpi_number>"
+        The string has to be split into value_type and value_id
+        The value_type is "kpi" and the value_id is the KPI number.
+        The KPI number is used to get the field name from the KPI_MAP dictionary.
         """
         if not value:
             return 0
@@ -440,7 +517,7 @@ class CaseFilterMethods:
             # Handle the case where value is not in the expected format
             return 0
 
-        kpi_field = KPI_MAP.get(kpi_number)
+        kpi_field = KPI_MAP.get(int(value_id))
 
         if value_type == "kpi":
             # Filter by KPI failed status
@@ -452,7 +529,6 @@ class CaseFilterMethods:
                     site__site_is_actively_involved_in_epilepsy_care=True,
                     site__case__isnull=False,
                     site__case__registration__isnull=False,
-                    registration__cohort=cohort,
                 )
                 .distinct()
                 .count()
