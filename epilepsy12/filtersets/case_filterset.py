@@ -6,7 +6,15 @@ from django.db.models import Q, Count, Sum
 import django_filters
 
 from ..constants import KPI_MAP, ETHNICITIES, SEX_TYPE
-from epilepsy12.models import Organisation, Case
+from epilepsy12.models import (
+    Organisation,
+    Case,
+    Country,
+    IntegratedCareBoard,
+    LocalHealthBoard,
+    NHSEnglandRegion,
+    Trust,
+)
 
 
 class CaseFilter(django_filters.FilterSet):
@@ -71,7 +79,7 @@ class CaseFilter(django_filters.FilterSet):
         method="filter_by_nhs_england_region", label="NHS England Region"
     )
 
-    country = django_filters.CharFilter(method="filter_country", label="Country")
+    country = django_filters.CharFilter(method="filter_by_country", label="Country")
 
     """
     Progress and Audit level filters
@@ -118,6 +126,15 @@ class CaseFilter(django_filters.FilterSet):
                 sex_choices.append((code, f"{label} ({sex_counts[code]})"))
             self.form.fields["sex"].choices = sex_choices
 
+            # Update cohort choices with counts
+            cohort_counts = CaseFilterMethods.get_registration_cohort_counts(
+                self.queryset, self.data.get("registration_cohort")
+            )
+            cohort_choices = [("", "---------")]
+            for code in range(5, 9):
+                cohort_choices.append((code, f"{code} ({cohort_counts})"))
+            self.form.fields["registration_cohort"].choices = cohort_choices
+
     def filter_age_range(self, queryset, name, value):
         """Delegate to CaseFilterMethods for age range filtering"""
         return CaseFilterMethods.filter_by_age_range(queryset, value)
@@ -126,19 +143,19 @@ class CaseFilter(django_filters.FilterSet):
         """Delegate to CaseFilterMethods for organisation filtering"""
         return CaseFilterMethods.filter_by_organisation(queryset, value.id)
 
-    def filter_trust_or_health_board(self, queryset, name, value):
+    def filter_by_trust_or_health_board(self, queryset, name, value):
         """Delegate to CaseFilterMethods for trust/health board filtering"""
         return CaseFilterMethods.filter_by_trust_or_health_board(queryset, value)
 
-    def filter_integrated_care_board(self, queryset, name, value):
+    def filter_by_integrated_care_board(self, queryset, name, value):
         """Delegate to CaseFilterMethods for ICB filtering"""
         return CaseFilterMethods.filter_by_integrated_care_board(queryset, value)
 
-    def filter_nhs_england_region(self, queryset, name, value):
+    def filter_by_nhs_england_region(self, queryset, name, value):
         """Delegate to CaseFilterMethods for NHS England region filtering"""
         return CaseFilterMethods.filter_by_nhs_england_region(queryset, value)
 
-    def filter_country(self, queryset, name, value):
+    def filter_by_country(self, queryset, name, value):
         """Delegate to CaseFilterMethods for country filtering"""
         return CaseFilterMethods.filter_by_country(queryset, value)
 
@@ -359,7 +376,7 @@ class CaseFilterMethods:
     def get_integrated_care_board_counts(queryset, value):
         """
         Returns counts of case by integrated care board - includes cases with no registration
-        Accepts a value in the format of "i_<integrated_care_board_id>"
+        Accepts a value in the format of "icb_<integrated_care_board_id>"
         """
         if not value:
             return 0
@@ -369,7 +386,7 @@ class CaseFilterMethods:
             # Handle the case where value is not in the expected format
             return 0
 
-        if value_type == "i":
+        if value_type == "icb":
             # Filter by Integrated Care Board
             return (
                 queryset.filter(
@@ -404,7 +421,7 @@ class CaseFilterMethods:
     def get_nhs_england_region_counts(queryset, value):
         """
         Returns counts of case by NHS England region - includes cases with no registration
-        Accepts a value in the format of "nhs_<nhs_england_region_id>"
+        Accepts a value in the format of "nhsenglandregion_<nhs_england_region_id>"
         """
         if not value:
             return 0
@@ -414,7 +431,7 @@ class CaseFilterMethods:
             # Handle the case where value is not in the expected format
             return 0
 
-        if value_type == "nhs":
+        if value_type == "nhsenglandregion":
             # Filter by NHS England Region
             return (
                 queryset.filter(
@@ -450,7 +467,7 @@ class CaseFilterMethods:
     def get_country_counts(queryset, value):
         """
         Returns counts of case by country - includes cases with no registration
-        Accepts a value in the format of "c_<country_id>"
+        Accepts a value in the format of "country_<country_id>"
         """
         if not value:
             return 0
@@ -460,7 +477,7 @@ class CaseFilterMethods:
             # Handle the case where value is not in the expected format
             return 0
 
-        if value_type == "c":
+        if value_type == "country":
             # Filter by Country
             return (
                 queryset.filter(
@@ -615,15 +632,15 @@ class CaseFilterMethods:
         )
 
     @staticmethod
-    def get_registration_cohort_counts(queryset, cohort):
+    def get_registration_cohort_counts(queryset, value):
         """
         Returns counts of case by registration cohort - includes cases with no registration
         Accepts a value in the format of "cohort_<cohort_id>"
         """
-        if not cohort:
+        if not value:
             return 0
         try:
-            value_type, value_id = cohort.split("_", 1)
+            value_type, value_id = value.split("_", 1)
         except ValueError:
             # Handle the case where value is not in the expected format
             return 0
@@ -817,3 +834,124 @@ class CaseFilterMethods:
                     )
 
         return queryset
+
+    @staticmethod
+    def all_trusts_and_local_health_boards(queryset):
+        """
+        Returns all trusts and local health boards in the queryset.
+        This method assumes that the queryset is already filtered to include only cases
+        that are part of a site that is a primary centre of epilepsy care and is actively involved in epilepsy care.
+        """
+        trusts = (
+            Trust.objects.filter(
+                organisation__site__site_is_primary_centre_of_epilepsy_care=True,
+                organisation__site__site_is_actively_involved_in_epilepsy_care=True,
+                organisation__site__case__isnull=False,
+            )
+            .distinct()
+            .order_by("name")
+        )
+
+        # Get health boards with active registered cases
+        local_health_boards = (
+            LocalHealthBoard.objects.filter(
+                organisation__site__site_is_primary_centre_of_epilepsy_care=True,
+                organisation__site__site_is_actively_involved_in_epilepsy_care=True,
+                organisation__site__case__isnull=False,
+                organisation__site__case__registration__isnull=False,
+            )
+            .distinct()
+            .order_by("name")
+        )
+
+        result = []
+        # Get counts for trusts
+        for trust in trusts:
+            trust_counts = CaseFilterMethods.get_trust_or_local_health_board_counts(
+                queryset=queryset, value=f"t_{trust.id}"
+            )
+            result.append((f"t_{trust.id}", f"Trust: {trust.name} ({trust_counts})"))
+        # Get counts for health boards
+        for hb in local_health_boards:
+            local_health_board_counts = (
+                CaseFilterMethods.get_trust_or_local_health_board_counts(
+                    queryset=queryset, value=f"h_{hb.id}"
+                )
+            )
+            result.append(
+                (
+                    f"h_{hb.id}",
+                    f"Local Health Board: {hb.name} ({local_health_board_counts})",
+                )
+            )
+
+        return result
+
+    @staticmethod
+    def all_integrated_care_boards(queryset):
+        """
+        Returns all integrated care boards in the queryset.
+        This method assumes that the queryset is already filtered to include only cases
+        that are part of a site that is a primary centre of epilepsy care and is actively involved in epilepsy care.
+        """
+        integrated_care_boards = (
+            IntegratedCareBoard.objects.filter(
+                organisation__site__site_is_primary_centre_of_epilepsy_care=True,
+                organisation__site__site_is_actively_involved_in_epilepsy_care=True,
+                organisation__site__case__isnull=False,
+            )
+            .distinct()
+            .order_by("name")
+        )
+
+        return [
+            (
+                f"icb_{icb.id}",
+                f"{icb.name} ({CaseFilterMethods.get_integrated_care_board_counts(queryset=queryset, value=f'icb_{icb.id}')})",
+            )
+            for icb in integrated_care_boards
+        ]
+
+    @staticmethod
+    def all_nhs_england_regions(queryset):
+        """
+        Returns all NHS England regions in the queryset.
+        """
+        regions = (
+            NHSEnglandRegion.objects.filter(
+                organisation__site__site_is_primary_centre_of_epilepsy_care=True,
+                organisation__site__site_is_actively_involved_in_epilepsy_care=True,
+                organisation__site__case__isnull=False,
+            )
+            .distinct()
+            .order_by("name")
+        )
+
+        return [
+            (
+                f"nhsenglandregion_{region.id}",
+                f"{region.name} ({CaseFilterMethods.get_nhs_england_region_counts(queryset=queryset, value=f'nhsenglandregion_{region.id}')})",
+            )
+            for region in regions
+        ]
+
+    @staticmethod
+    def all_countries(queryset):
+        countries = (
+            Country.objects.filter(
+                organisation__site__site_is_primary_centre_of_epilepsy_care=True,
+                organisation__site__site_is_actively_involved_in_epilepsy_care=True,
+                organisation__site__case__isnull=False,
+            )
+            .distinct()
+            .order_by("name")
+        )
+        # Get counts for countries
+
+        return [
+            (
+                f"country_{country.id}",
+                f"{country.name} ({CaseFilterMethods.get_country_counts(queryset=queryset, value=f'country_{country.id}')})",
+            )
+            for country in countries
+        ]

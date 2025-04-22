@@ -5,7 +5,14 @@ import json
 from django import template
 from django.utils.safestring import mark_safe
 from django.conf import settings
-from ..models import Site
+from ..models import (
+    Country,
+    IntegratedCareBoard,
+    LocalHealthBoard,
+    NHSEnglandRegion,
+    Site,
+    Trust,
+)
 
 register = template.Library()
 
@@ -531,6 +538,19 @@ def subtract(value, arg):
 @register.filter
 def replace_underscores(value):
     """Replaces underscores with spaces for better display"""
+    if "_" in value:
+        value_str, value_id = value.split("_", 1)
+        if value_str == "country":
+            return Country.objects.get(id=int(value_id)).name
+        elif value_str == "nhsenglandregion":
+            return NHSEnglandRegion.objects.get(id=int(value_id)).name
+        elif value_str == "icb":
+            return IntegratedCareBoard.objects.get(id=int(value_id)).name
+        elif value_str == "t":
+            return Trust.objects.get(id=int(value_id)).name
+        elif value_str == "h":
+            return LocalHealthBoard.objects.get(id=int(value_id)).name
+
     return value.replace("_", " ") if value else value
 
 

@@ -4,6 +4,7 @@
 
 {% block content %}
 <div class="ui fluid container" style="padding: 50px;">
+    
     <h1 class="ui header">
         <i class="users icon"></i>
         <div class="content">
@@ -61,19 +62,6 @@
                     </div>
                 </div>
                 
-                <!-- Cohort Filter -->
-                <div class="item">
-                    <div class="header">Cohort</div>
-                    <div class="menu">
-                        {% for cohort in cohort_counts %}
-                        <a class="item {% if request.GET.registration_cohort == 'cohort_'|add:cohort.registration__cohort|stringformat:'s' %}active{% endif %}" 
-                           href="?registration_cohort=cohort_{{ cohort.registration__cohort }}{% for key, value in request.GET.items %}{% if key != 'registration_cohort' and key != 'page' %}&{{ key }}={{ value }}{% endif %}{% endfor %}">
-                            Cohort {{ cohort.registration__cohort }} <div class="ui label">{{ cohort.count }}</div>
-                        </a>
-                        {% endfor %}
-                    </div>
-                </div>
-                
                 <!-- KPI Failures -->
                 <div class="item">
                     <div class="header">KPI Status</div>
@@ -87,7 +75,7 @@
                     </div>
                 </div>
             </div>
-        </div>
+        </div> <!-- four wide column -->
         
         <!-- Main Content -->
         <div class="twelve wide column">
@@ -144,56 +132,105 @@
                         </div>
                     </div>
                     
-                    <div class="fields">
+                    {% if perms.epilepsy12.can_publish_epilepsy12_data %}
+                    <div class="row">
+                        <div class="ui horizontal divider">National View</div>
+                    
+                        <div class="fields">
                         <!-- Trust/Health Board Filter -->
-                        <div class="five wide field">
-                            <label>{{ filterset.form.trust_or_health_board.label|default:"Trust/Health Board" }}</label>
-                            <div class="ui fluid search selection dropdown">
-                                <input type="hidden" name="trust_or_health_board" value="{{ request.GET.trust_or_health_board|default:'' }}">
-                                <i class="dropdown icon"></i>
-                                <div class="default text">Select Trust/Health Board</div>
-                                <div class="menu">
-                                    <div class="item" data-value="">All</div>
-                                    {% if trusts_and_health_boards %}
-                                        {% for entity in trusts_and_health_boards %}
-                                            <div class="item" data-value="{{ entity.type }}_{{ entity.id }}">
-                                                {{ entity.name }}
+                            <div class="four wide field">
+                                <label>{{ filterset.form.trust_or_health_board.label|default:"Trust/Health Board" }}</label>
+                                <div class="ui fluid search selection dropdown">
+                                    <input type="hidden" name="trust_or_health_board" value="{{ request.GET.trust_or_health_board|default:'' }}">
+                                    <i class="dropdown icon"></i>
+                                    <div class="default text">Select Trust/Health Board</div>
+                                    <div class="menu">
+                                        <div class="item" data-value="">All</div>
+                                        {% if trusts_and_local_health_boards %}
+                                            {% for entity in trusts_and_local_health_boards %}
+                                                <div class="item" data-value="{{ entity.0 }}">
+                                                    {{ entity.1 }}
+                                                </div>
+                                            {% endfor %}
+                                        {% endif %}
+                                    </div>
+                                </div>
+                            </div>
+                            
+                            <!--- Integrated Care Boards -->
+                            <div class="four wide field">
+                                <label>{{ filterset.form.integrated_care_board.label|default:"Trust/Health Board" }}</label>
+                                <div class="ui fluid search selection dropdown">
+                                    <input type="hidden" name="integrated_care_board" value="{{ request.GET.integrated_care_board|default:'' }}">
+                                    <i class="dropdown icon"></i>
+                                    <div class="default text">Select Integrated Care Board</div>
+                                    <div class="menu">
+                                        <div class="item" data-value="">All</div>
+                                        {% if integrated_care_boards %}
+                                            {% for icb in integrated_care_boards %}
+                                                <div class="item" data-value="{{ icb.0 }}">
+                                                    {{ icb.1 }}
+                                                </div>
+                                            {% endfor %}
+                                        {% endif %}
+                                    </div>
+                                </div>
+                            </div>
+
+                        
+                            <!-- NHS England Region Filter -->
+                            <div class="four wide field">
+                                <label>NHS England Region</label>
+                                <div class="ui fluid selection dropdown">
+                                    <input type="hidden" name="nhs_england_region" value="{{ request.GET.nhs_england_region|default:'' }}">
+                                    <i class="dropdown icon"></i>
+                                    <div class="default text">Select Region</div>
+                                    <div class="menu">
+                                        <div class="item" data-value="">All Regions</div>
+                                        {% for region in nhs_england_regions %}
+                                            <div class="item" data-value="{{ region.0 }}">
+                                                {{ region.1 }}
                                             </div>
                                         {% endfor %}
-                                    {% endif %}
+                                    </div>
                                 </div>
                             </div>
-                        </div>
-                        
-                        <!-- NHS England Region Filter -->
-                        <div class="five wide field">
-                            <label>NHS England Region</label>
-                            <div class="ui fluid selection dropdown">
-                                <input type="hidden" name="nhs_england_region" value="{{ request.GET.nhs_england_region|default:'' }}">
-                                <i class="dropdown icon"></i>
-                                <div class="default text">Select Region</div>
-                                <div class="menu">
-                                    <div class="item" data-value="">All Regions</div>
-                                    {% for region in nhs_england_regions %}
-                                        <div class="item" data-value="{{ region.id }}">
-                                            {{ region.name }}
-                                        </div>
-                                    {% endfor %}
+                            
+                        <!-- Country Filter -->
+                            <div class="four wide field">
+                                <label>Country</label>
+                                <div class="ui fluid selection dropdown">
+                                    <input type="hidden" name="country" value="{{ request.GET.country|default:'' }}">
+                                    <i class="dropdown icon"></i>
+                                    <div class="default text">Select Country</div>
+                                    <div class="menu">
+                                        <div class="item" data-value="">All Countries</div>
+                                        {% for country in countries %}
+                                            <div class="item" data-value="{{ country.0 }}">
+                                                {{ country.1 }}
+                                            </div>
+                                        {% endfor %}
+                                    </div>
                                 </div>
                             </div>
-                        </div>
-                        
-                        <div class="six wide field">
-                            <label>&nbsp;</label>
-                            <button type="submit" class="ui primary button">
-                                <i class="filter icon"></i> Apply Filters
-                            </button>
-                            <a href="{% url 'case_filter_list' organisation_id %}" class="ui button">
-                                <i class="undo icon"></i> Reset
-                            </a>
+
                         </div>
                     </div>
-                </div>
+                    {% endif %}
+
+                            <div class="fields">
+                                <button type="submit" class="ui rcpch_light_blue button">
+                                    <i class="filter icon"></i> Apply Filters
+                                </button>
+                                <a href="{% url 'case_filter_list' organisation_id %}" class="ui rcpch_light_blue button">
+                                    <i class="undo icon"></i> Reset
+                                </a>
+                            </div><!--fields-->
+
+                        </div><!--fields-->
+
+                    </div><!--fields-->
+                </div><!--segment-->
                 
                 <!-- Filter Summary -->
                 {% if request.GET %}
@@ -204,7 +241,7 @@
                             {% if key != 'page' and value %}
                                 <div class="item">
                                     <div class="ui label">
-                                        {{ key|title|replace_underscores }}: {{ value|title|replace_underscores }}
+                                        {{ key|title|replace_underscores }}: {{ value|replace_underscores }}
                                         <a href="?{% for k, v in request.GET.items %}{% if k != key and k != 'page' %}{{ k }}={{ v }}&{% endif %}{% endfor %}">
                                             <i class="delete icon"></i>
                                         </a>
@@ -270,7 +307,7 @@
                             </td>
                             <td>
                                 {% if case.registration %}
-                                    {% if case.registration.audit_progress.all_forms_complete %}
+                                    {% if case.registration.audit_progress.audit_complete %}
                                         <div class="ui green label">
                                             <i class="check icon"></i> Complete
                                         </div>
@@ -351,36 +388,250 @@
                 </div>
                 {% endif %}
             </div>
-        </div>
-    </div>
-</div>
+        </div> <!-- twelve wide column -->
+
+    
+</div> <!-- fluid container -->
 {% endblock %}
 
 {% block extra_js %}
 <script>
-$(document).ready(function() {
-    // Initialize dropdowns with current values from URL
-    $('.ui.dropdown').dropdown();
+    $(document).ready(function() {
+        // Initialize all dropdown elements
+        initializeDropdowns();
+        
+        // Set up filter removal from active filters display
+        setupFilterRemoval();
+        
+        // Handle responsive behavior
+        handleResponsiveBehavior();
+        
+        // Set up search input behavior
+        setupSearchInput();
+    });
     
-    // Set dropdown values based on URL parameters
-    const urlParams = new URLSearchParams(window.location.search);
-    
-    // For each dropdown, set the value from URL if it exists
-    if (urlParams.has('sex')) {
-        $('input[name="sex"]').parent().dropdown('set selected', urlParams.get('sex'));
+    /**
+     * Initialize all Semantic UI dropdowns with proper configuration
+     */
+    function initializeDropdowns() {
+        $('.ui.dropdown').dropdown({
+            fullTextSearch: true,
+            match: 'text',
+            selectOnKeydown: false,
+            forceSelection: false,
+            hideDividers: 'empty',
+            clearable: true,
+            onChange: function(value, text, $choice) {
+                console.log('Dropdown changed:', $(this).find('input').attr('name'), value);
+                
+                // Submit the form when dropdown value changes
+                $(this).closest('form').submit();
+                
+                // Optional: Add analytics tracking for filter changes
+                if (typeof gtag !== 'undefined') {
+                    gtag('event', 'filter_changed', {
+                        'filter_name': $(this).find('input').attr('name'),
+                        'filter_value': value,
+                        'filter_text': text
+                    });
+                }
+            }
+        });
+        
+        // Set dropdown values based on URL parameters
+        const urlParams = new URLSearchParams(window.location.search);
+        
+        // Create a list of all dropdown inputs to set from URL params
+        const dropdownInputs = [
+            'sex', 'ethnicity', 'trust_or_health_board', 'nhs_england_region',
+            'integrated_care_board', 'country', 'cohort'
+        ];
+        
+        // Set each dropdown value if it exists in URL params
+        dropdownInputs.forEach(function(inputName) {
+            if (urlParams.has(inputName)) {
+                const value = urlParams.get(inputName);
+                if (value) {
+                    $(`input[name="${inputName}"]`).parent().dropdown('set selected', value);
+                }
+            }
+        });
+        
+        // Special handling for search dropdowns
+        $('.ui.search.dropdown').dropdown({
+            fullTextSearch: true,
+            match: 'both',
+            showOnFocus: false,
+            allowAdditions: false,
+            onChange: function(value, text, $choice) {
+                console.log('Search dropdown changed:', $(this).find('input').attr('name'), value);
+                // Submit the form when dropdown value changes
+                $(this).closest('form').submit();
+            }
+        });
     }
     
-    if (urlParams.has('ethnicity')) {
-        $('input[name="ethnicity"]').parent().dropdown('set selected', urlParams.get('ethnicity'));
+    /**
+     * Set up filter removal functionality from the active filters section
+     */
+    function setupFilterRemoval() {
+        // When a filter deletion icon is clicked
+        $('.ui.label .delete.icon').on('click', function(e) {
+            e.preventDefault();
+            const href = $(this).parent('a').attr('href');
+            if (href) {
+                window.location.href = href;
+            }
+        });
+        
+        // Clear all filters button
+        $('.reset-filters-button').on('click', function(e) {
+            e.preventDefault();
+            const baseUrl = window.location.pathname;
+            window.location.href = baseUrl;
+        });
     }
     
-    if (urlParams.has('trust_or_health_board')) {
-        $('input[name="trust_or_health_board"]').parent().dropdown('set selected', urlParams.get('trust_or_health_board'));
+    /**
+     * Handle responsive behavior for mobile vs desktop
+     */
+    function handleResponsiveBehavior() {
+        // For small screens, make facet menu toggleable
+        if ($(window).width() < 768) {
+            // Create toggle button for facet menu
+            const $facetMenu = $('.four.wide.column .ui.vertical.menu');
+            const $toggleButton = $('<button class="ui fluid rcpch_light_blue button"><i class="filter icon"></i> Show/Hide Filters</button>');
+            
+            $facetMenu.before($toggleButton);
+            $facetMenu.hide();
+            
+            $toggleButton.on('click', function() {
+                $facetMenu.slideToggle(200);
+            });
+            
+            // Show facet menu if any filters are active
+            if (window.location.search && window.location.search !== '?page=1') {
+                $facetMenu.show();
+            }
+        }
+        
+        // Add sticky behavior to the filter form on desktop
+        if ($(window).width() >= 992) {
+            $('.ui.form').sticky({
+                context: '.twelve.wide.column',
+                offset: 20
+            });
+        }
     }
     
-    if (urlParams.has('nhs_england_region')) {
-        $('input[name="nhs_england_region"]').parent().dropdown('set selected', urlParams.get('nhs_england_region'));
+    /**
+     * Helper function to update URL parameters without page refresh
+     * @param {string} key - The parameter name
+     * @param {string} value - The parameter value
+     */
+    function updateUrlParam(key, value) {
+        const urlParams = new URLSearchParams(window.location.search);
+        
+        // Remove page parameter to reset to first page when filtering
+        if (urlParams.has('page')) {
+            urlParams.delete('page');
+        }
+        
+        if (value) {
+            urlParams.set(key, value);
+        } else {
+            urlParams.delete(key);
+        }
+        
+        // Update URL without reloading page
+        const newUrl = window.location.pathname + (urlParams.toString() ? '?' + urlParams.toString() : '');
+        window.history.pushState({ path: newUrl }, '', newUrl);
     }
-});
+    
+    /**
+     * Set up real-time filtering for the search field
+     */
+    function setupSearchInput() {
+        const $searchInput = $('input[name="search"]');
+        let searchTimer;
+        
+        $searchInput.on('input', function() {
+            const searchValue = $(this).val().trim();
+            
+            // Clear previous timer
+            clearTimeout(searchTimer);
+            
+            // Set a timer to prevent too many requests while typing
+            searchTimer = setTimeout(function() {
+                if (searchValue.length >= 3 || searchValue.length === 0) {
+                    // Update URL and trigger form submission
+                    updateUrlParam('search', searchValue);
+                    
+                    // Submit the form after updating URL
+                    $searchInput.closest('form').submit();
+                }
+            }, 500);
+        });
+    }
+    
+    /**
+     * Implement AJAX search to avoid full page reload (optional)
+     */
+    function sendSearchRequest(searchValue) {
+        $.ajax({
+            url: window.location.pathname,
+            method: 'GET',
+            data: $('.ui.form').serialize(),
+            success: function(response) {
+                // Update just the table body with new results
+                const $newResults = $(response).find('table tbody');
+                $('table tbody').html($newResults.html());
+                
+                // Update statistics
+                const $newStats = $(response).find('.ui.statistics');
+                $('.ui.statistics').html($newStats.html());
+                
+                // Update facet counts
+                $(response).find('.ui.vertical.menu .item .menu a').each(function() {
+                    const href = $(this).attr('href');
+                    const $facetItem = $('.ui.vertical.menu .item .menu a[href="' + href + '"]');
+                    const $label = $(this).find('.ui.label');
+                    
+                    if ($facetItem.length && $label.length) {
+                        $facetItem.find('.ui.label').text($label.text());
+                    }
+                });
+            }
+        });
+    }
+    
+    // Add keyboard navigation for accessibility
+    $(document).keydown(function(e) {
+        // Enable keyboard navigation for facet filters with Alt+Number keys
+        if (e.altKey && e.keyCode >= 49 && e.keyCode <= 57) { // Alt + 1-9
+            const index = e.keyCode - 49; // 0-based index
+            const $facetLinks = $('.four.wide.column .ui.vertical.menu .item .menu a');
+            
+            if ($facetLinks.length > index) {
+                window.location.href = $facetLinks.eq(index).attr('href');
+            }
+        }
+    });
+
+    // Add this to your document ready function
+    $('.ui.dropdown').each(function() {
+        const $dropdown = $(this);
+        const $input = $dropdown.find('input[type="hidden"]');
+        const name = $input.attr('name');
+        
+        console.log('Setting up dropdown for:', name);
+        
+        $dropdown.find('.menu .item').on('click', function() {
+            console.log('Item clicked in dropdown:', name);
+            const value = $(this).data('value');
+            $input.val(value);
+            $dropdown.closest('form').submit();
+        });
+    });
 </script>
 {% endblock %}

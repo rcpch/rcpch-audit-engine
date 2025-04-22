@@ -21,7 +21,15 @@ from django_htmx.http import trigger_client_event, HttpResponseClientRedirect
 
 # RCPCH imports
 from epilepsy12.forms import CaseForm
-from epilepsy12.models import Organisation, Site, Case, AuditProgress, Epilepsy12User
+from epilepsy12.models import (
+    AuditProgress,
+    Case,
+    Country,
+    Epilepsy12User,
+    NHSEnglandRegion,
+    Organisation,
+    Site,
+)
 from ..constants import (
     UNKNOWN_POSTCODES_NO_SPACES,
 )
@@ -1079,11 +1087,10 @@ class CaseListView(LoginRequiredMixin, ListView):
             }
         )
 
-        # Add cohort distribution - assuming cohorts 1-6
-        for cohort in range(5, 7):
-            cohort_key = f"cohort_{cohort}"
-            context[cohort_key] = CaseFilterMethods.get_registration_cohort_counts(
-                filtered_queryset, f"cohort_{cohort}"
+        # Add cohort distribution - assuming cohorts 5-7
+        for cohort in range(5, 8):
+            context["cohort_counts"] = CaseFilterMethods.get_registration_cohort_counts(
+                filtered_queryset, value=f"cohort_{cohort}"
             )
 
         # Add KPI facets - for KPIs 1-12
@@ -1098,13 +1105,31 @@ class CaseListView(LoginRequiredMixin, ListView):
             value="total_episodes",
         )
 
-        # Add comparison facets - unfiltered vs filtered
-        # This helps users understand how their filters affect the results
         context["total_unfiltered_cases"] = unfiltered_queryset.count()
         context["filtered_percentage"] = (
             (filtered_queryset.count() / unfiltered_queryset.count()) * 100
             if unfiltered_queryset.count() > 0
             else 0
+        )
+
+        context["trusts_and_local_health_boards"] = (
+            CaseFilterMethods.all_trusts_and_local_health_boards(
+                queryset=filtered_queryset,
+            )
+        )
+
+        context["integrated_care_boards"] = (
+            CaseFilterMethods.all_integrated_care_boards(
+                queryset=filtered_queryset,
+            )
+        )
+
+        context["nhs_england_regions"] = CaseFilterMethods.all_nhs_england_regions(
+            queryset=filtered_queryset,
+        )
+
+        context["countries"] = CaseFilterMethods.all_countries(
+            queryset=filtered_queryset,
         )
 
         return context
