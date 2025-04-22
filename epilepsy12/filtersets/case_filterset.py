@@ -110,15 +110,22 @@ class CaseFilter(django_filters.FilterSet):
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
 
-        # Add counts to the age range filter choices if we have a queryset
-        if hasattr(self, "queryset") and self.queryset is not None:
-            age_counts = CaseFilterMethods.get_age_counts(self.queryset)
-            # Update age_range choices with counts
-            self.form.fields["age_range"].choices = [
-                ("", "---------"),  # Keep the empty choice
-                ("under_12", f"Under 12 years ({age_counts['under_12']})"),
-                ("12_and_over", f"12 years and over ({age_counts['12_and_over']})"),
-            ]
+    def filter_search(self, queryset, name, value):
+        """
+        Filter cases by the search term.
+        The search term can be first name, surname, NHS number, or unique reference number, or a combination of these.
+        The queryset is filtered to include only cases that match the search term.
+        """
+        if not value:
+            return queryset
+
+        # Split the search term into words
+        search_terms = value.split()
+
+        # Filter the queryset by first name and surname
+        return queryset.filter(
+            Q(first_name__icontains=first_name) | Q(surname__icontains=surname)
+        )
 
     def filter_age_range(self, queryset, name, value):
         """Delegate to CaseFilterMethods for age range filtering"""
