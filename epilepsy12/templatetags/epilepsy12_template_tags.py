@@ -13,6 +13,7 @@ from ..models import (
     Site,
     Trust,
 )
+from ..constants import ETHNICITIES, SEX_TYPE
 
 register = template.Library()
 
@@ -550,7 +551,10 @@ def replace_underscores(value):
             return Trust.objects.get(id=int(value_id)).name
         elif value_str == "h":
             return LocalHealthBoard.objects.get(id=int(value_id)).name
-
+        elif value_str == "ethnicity":
+            return dict(ETHNICITIES)[value_id]
+        elif value_str == "sex":
+            return dict(SEX_TYPE)[int(value_id)]
     return value.replace("_", " ") if value else value
 
 

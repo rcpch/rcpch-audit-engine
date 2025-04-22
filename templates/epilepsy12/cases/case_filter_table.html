@@ -114,19 +114,19 @@
                         <!-- Ethnicity Filter -->
                         <div class="five wide field">
                             <label>{{ filterset.form.ethnicity.label }}</label>
-                            <div class="ui fluid selection dropdown">
-                                <input type="hidden" name="{{ filterset.form.ethnicity.html_name }}" value="{{ request.GET.ethnicity|default:'' }}">
+                            <div class="ui fluid search selection dropdown">
+                                <input type="hidden" name="ethnicity" value="{{ request.GET.ethnicity|default:'' }}">
                                 <i class="dropdown icon"></i>
                                 <div class="default text">Select Ethnicity</div>
                                 <div class="menu">
-                                    <div class="item" data-value="">All Ethnicities</div>
-                                    {% for choice_val, choice_label in filterset.form.ethnicity.field.choices %}
-                                        {% if choice_val %}
-                                        <div class="item" data-value="{{ choice_val }}">
-                                            {{ choice_label }}
-                                        </div>
-                                        {% endif %}
-                                    {% endfor %}
+                                    <div class="item" data-value="">All</div>
+                                    {% if ethnicities %}
+                                        {% for ethnicity in ethnicities %}
+                                            <div class="item" data-value="{{ ethnicity.0 }}">
+                                                {{ ethnicity.1 }}
+                                            </div>
+                                        {% endfor %}
+                                    {% endif %}
                                 </div>
                             </div>
                         </div>

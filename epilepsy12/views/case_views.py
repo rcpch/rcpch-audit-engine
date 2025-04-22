@@ -1079,13 +1079,14 @@ class CaseListView(LoginRequiredMixin, ListView):
         )
 
         # Add ethnicity facets
-        context.update(
-            {
-                "ethnicity_counts": CaseFilterMethods.get_ethnicity_counts(
-                    filtered_queryset
-                )
-            }
-        )
+        ethnicity_counts = CaseFilterMethods.get_ethnicity_counts(filtered_queryset)
+        ethnicity_choices = [("", "All")]
+        for ethnicity_code, label in ETHNICITIES:
+            count = ethnicity_counts.get(ethnicity_code, 0)
+            ethnicity_choices.append(
+                (f"ethnicity_{ethnicity_code}", f"{label} ({count})")
+            )
+        context["ethnicities"] = ethnicity_choices
 
         # Add cohort distribution - assuming cohorts 5-7
         for cohort in range(5, 8):

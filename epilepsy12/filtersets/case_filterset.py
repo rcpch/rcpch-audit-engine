@@ -836,6 +836,23 @@ class CaseFilterMethods:
         return queryset
 
     @staticmethod
+    def all_ethnicities(queryset):
+
+        ethnicity_counts = CaseFilterMethods.get_ethnicity_counts(queryset=queryset)
+        return [
+            (
+                f"ethnicity_{ethnicity[0]}",
+                f"{ethnicity[1]} ({ethnicity_counts})",
+            )
+            for ethnicity in ETHNICITIES
+        ]
+
+    """
+    Methods to get all trusts, local health boards, integrated care boards, NHS England regions, and countries
+    in the queryset. For the dropdowns
+    """
+
+    @staticmethod
     def all_trusts_and_local_health_boards(queryset):
         """
         Returns all trusts and local health boards in the queryset.
