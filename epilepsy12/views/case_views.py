@@ -960,7 +960,7 @@ class CaseListView(LoginRequiredMixin, ListView):
     def get_queryset(self):
         """
         Override the get_queryset method to filter cases based on the organisation
-        and apply the filterset.
+        and apply all filters in one place using apply_all_active_filters.
         """
         organisation_id = self.kwargs.get("organisation_id")
 
@@ -977,56 +977,26 @@ class CaseListView(LoginRequiredMixin, ListView):
             self.request.GET, queryset=filtered_queryset
         )
 
-        # Apply any additional filters from the request that might not be in the filterset
-        queryset = self.filterset.qs
+        # Get the base filtered queryset from the filterset
+        base_filtered_queryset = self.filterset.qs
 
-        # Apply KPI failed filter if present
-        if "kpi_failed" in self.request.GET and self.request.GET["kpi_failed"]:
-            # Assuming cohort is also in the request, otherwise use a default
-            queryset = CaseFilterMethods.filter_by_kpi_failed(
-                queryset,
-                value=self.request.GET["kpi_failed"],
-            )
-
-        # Apply complete audit progress filter if present
-        if (
-            "complete_audit_progress" in self.request.GET
-            and self.request.GET["complete_audit_progress"]
-        ):
-            queryset = CaseFilterMethods.filter_by_complete_audit_progress(
-                queryset, self.request.GET["complete_audit_progress"]
-            )
-
-        # Apply incomplete audit progress filter if present
-        if (
-            "incomplete_audit_progress" in self.request.GET
-            and self.request.GET["incomplete_audit_progress"]
-        ):
-            queryset = CaseFilterMethods.filter_by_audit_progress_incomplete(
-                queryset, self.request.GET["incomplete_audit_progress"]
-            )
-
-        # Apply registration cohort filter if present
-        if (
-            "registration_cohort" in self.request.GET
-            and self.request.GET["registration_cohort"]
-        ):
-            queryset = CaseFilterMethods.filter_by_registration_cohort(
-                queryset, self.request.GET["registration_cohort"]
-            )
-
-        # Apply all the active filters that might not be handled explicitly
-        # Exclude parameters we've already handled
-        exclude_params = [
-            "page",
-            "ethnicity",
+        # Define parameters that require special handling with dedicated methods
+        special_filter_params = [
             "kpi_failed",
             "complete_audit_progress",
             "incomplete_audit_progress",
             "registration_cohort",
+            "trust_or_health_board",
+            "integrated_care_board",
+            "nhs_england_region",
+            "country",
         ]
-        queryset = CaseFilterMethods.apply_all_active_filters(
-            queryset, self.request, exclude_params=exclude_params
+
+        # Apply all the active filters including special filters at once
+        queryset = self.filterset.apply_all_filters(
+            base_filtered_queryset,
+            self.request,
+            special_filter_params=special_filter_params,
         )
 
         return queryset.order_by(self.ordering)
@@ -1083,9 +1053,7 @@ class CaseListView(LoginRequiredMixin, ListView):
         ethnicity_choices = [("", "All")]
         for ethnicity_code, label in ETHNICITIES:
             count = ethnicity_counts.get(ethnicity_code, 0)
-            ethnicity_choices.append(
-                (f"ethnicity_{ethnicity_code}", f"{label} ({count})")
-            )
+            ethnicity_choices.append((f"{ethnicity_code}", f"{label} ({count})"))
         context["ethnicities"] = ethnicity_choices
 
         # Add sex facets
@@ -1093,7 +1061,7 @@ class CaseListView(LoginRequiredMixin, ListView):
         sex_choices = [("", "All")]
         for sex_code, label in SEX_TYPE:
             count = sex_counts.get(sex_code, 0)
-            sex_choices.append((f"sex_{sex_code}", f"{label} ({count})"))
+            sex_choices.append((f"{sex_code}", f"{label} ({count})"))
         context["sexes"] = sex_choices
 
         # Add cohort distribution - assuming cohorts 5-7

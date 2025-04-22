@@ -26,6 +26,7 @@ class CaseFilter(django_filters.FilterSet):
 
     # simple filters for fields on the Case model
     # Simple field filters
+    search = django_filters.CharFilter(method="filter_search", label="Search")
     first_name = django_filters.CharFilter(lookup_expr="icontains")
     surname = django_filters.CharFilter(lookup_expr="icontains")
     nhs_number = django_filters.CharFilter(lookup_expr="icontains")
@@ -121,15 +122,20 @@ class CaseFilter(django_filters.FilterSet):
 
         # Split the search term into words
         search_terms = value.split()
+        for term in search_terms:
+            # Check if the term is a valid NHS number or unique reference number
+            if term.isdigit():
+                queryset = queryset.filter(
+                    Q(nhs_number__icontains=term)
+                    | Q(unique_reference_number__icontains=term)
+                )
+            else:
+                # Filter by first name or surname
+                queryset = queryset.filter(
+                    Q(first_name__icontains=term) | Q(surname__icontains=term)
+                )
 
-        # Filter the queryset by first name and surname
-        return queryset.filter(
-            Q(first_name__icontains=first_name) | Q(surname__icontains=surname)
-        )
-
-    def filter_age_range(self, queryset, name, value):
-        """Delegate to CaseFilterMethods for age range filtering"""
-        return CaseFilterMethods.filter_by_age_range(queryset, value)
+        return queryset
 
     def filter_organisation(self, queryset, name, value):
         """Delegate to CaseFilterMethods for organisation filtering"""
@@ -166,6 +172,25 @@ class CaseFilter(django_filters.FilterSet):
     def filter_by_kpi_failed(self, queryset, name, value):
         """Delegate to CaseFilterMethods for KPI failed filtering"""
         return CaseFilterMethods.filter_by_kpi_failed(queryset, value)
+
+    def filter_by_sex(self, queryset, name, value):
+        """Delegate to CaseFilterMethods for sex"""
+        return CaseFilterMethods.filter_by_sex(queryset, value)
+
+    def filter_by_ethnicity(self, queryset, name, value):
+        """Delegate to CaseFilterMethods for ethnicity"""
+        return CaseFilterMethods.filter_by_ethnicity(queryset, value)
+
+    def apply_all_filters(self, queryset, request, special_filter_params=None):
+        """
+        Apply all filters to the queryset, including special filters
+        """
+        return CaseFilterMethods.apply_all_active_filters(
+            queryset,
+            request,
+            special_filter_params=special_filter_params,
+            apply_special_filters=True,
+        )
 
     class Meta:
         model = Case
@@ -213,6 +238,20 @@ class CaseFilterMethods:
         for code, label in SEX_TYPE:
             sex_counts[code] = queryset.filter(sex=code).count()
         return sex_counts
+
+    @staticmethod
+    def filter_by_sex(queryset, value):
+        """
+        Filter cases by sex
+        """
+        return queryset.filter(sex=value)
+
+    @staticmethod
+    def filter_by_ethnicity(queryset, value):
+        """
+        Filter by ethnicity
+        """
+        return queryset.filter(ethnicity=value)
 
     # Custom filter methods for filtering cases based on various criteria
     @staticmethod
@@ -777,57 +816,6 @@ class CaseFilterMethods:
         return queryset
 
     @staticmethod
-    def apply_all_active_filters(queryset, request, exclude_params=None):
-        """
-        Apply all the active filters in the request.GET to the queryset.
-        Any paraments in the exclude_params list will be ignored.
-        This means that the counts for all queries will be applied
-        """
-        if exclude_params is None:
-            exclude_params = []
-
-        # Get all active filters from the request
-        for key, value in request.GET.items():
-            """
-            Check if the key is not in the exclude_params list and if the value is not empty.
-            If the key is "p", we skip it as it is used for pagination.
-            The keys "organisation", "age_range", "organisation", and "trust_or_local_health_board", "registration__cohort" are handled
-            """
-            if key not in ["p", exclude_params] and value:
-                if key == "organisation":
-                    queryset = CaseFilterMethods.filter_by_organisation(
-                        queryset=queryset, organisation_id=value
-                    )
-                elif key == "age_range":
-                    queryset = CaseFilterMethods.filter_by_age_range(
-                        queryset=queryset, age_range=value
-                    )
-                elif key == "trust_or_local_health_board":
-                    queryset = CaseFilterMethods.filter_by_trust_or_health_board(
-                        queryset=queryset, value=value
-                    )
-                elif key == "integrated_care_board":
-                    queryset = CaseFilterMethods.filter_by_integrated_care_board(
-                        queryset=queryset, value=value
-                    )
-                elif key == "nhs_england_region":
-                    queryset = CaseFilterMethods.filter_by_nhs_england_region(
-                        queryset=queryset, value=value
-                    )
-                elif key == "country":
-                    queryset = CaseFilterMethods.filter_by_country(
-                        queryset=queryset, value=value
-                    )
-                elif key == "registration__cohort":
-                    # Filter by registration cohort - includes cases with no registration
-                    queryset = queryset.filter(
-                        Q(registration__cohort=value)
-                        | Q(registration__cohort__isnull=True)
-                    )
-
-        return queryset
-
-    @staticmethod
     def all_ethnicities(queryset):
 
         ethnicity_counts = CaseFilterMethods.get_ethnicity_counts(queryset=queryset)
@@ -964,3 +952,65 @@ class CaseFilterMethods:
             )
             for country in countries
         ]
+
+    """
+    This final method is used to add all the filters to the filterset.
+    """
+
+    @staticmethod
+    def apply_all_active_filters(
+        queryset,
+        request,
+        exclude_params=None,
+        special_filter_params=None,
+        apply_special_filters=False,
+    ):
+        """
+        Apply all filters from request - both standard and special filters if needed
+        """
+        # Initialize empty lists if None
+        exclude_params = exclude_params or []
+        special_filter_params = special_filter_params or []
+
+        # Always exclude pagination parameter - handle both 'p' and 'page'
+        if "p" not in exclude_params:
+            exclude_params.append("p")
+        if "page" not in exclude_params:
+            exclude_params.append("page")
+
+        # First apply any special filters if requested
+        if apply_special_filters:
+            for param_name in special_filter_params:
+                if param_name in request.GET and request.GET[param_name]:
+                    # Call the appropriate filter method based on parameter name
+                    filter_method = getattr(
+                        CaseFilterMethods, f"filter_by_{param_name}", None
+                    )
+                    if filter_method:
+                        queryset = filter_method(queryset, request.GET[param_name])
+
+        # Then handle all remaining filters
+        for key, value in request.GET.items():
+            # Skip excluded params, empty values, and special params if they were already applied
+            if (
+                key in exclude_params
+                or not value
+                or (apply_special_filters and key in special_filter_params)
+            ):
+                continue
+
+            # Apply standard filters through explicit cases
+            if key == "organisation":
+                queryset = CaseFilterMethods.filter_by_organisation(
+                    queryset=queryset, organisation_id=value
+                )
+            elif key == "age_range":
+                queryset = CaseFilterMethods.filter_by_age_range(
+                    queryset=queryset, age_range=value
+                )
+            elif key == "sex":
+                queryset = CaseFilterMethods.filter_by_sex(
+                    queryset=queryset, value=value
+                )
+
+        return queryset

@@ -537,8 +537,15 @@ def subtract(value, arg):
 
 
 @register.filter
-def replace_underscores(value):
-    """Replaces underscores with spaces for better display"""
+def value_display(value, key):
+    """
+    Returns the display value for a given key in a dictionary
+    """
+    if key == "ethnicity":
+        return dict(ETHNICITIES)[value]
+    elif key == "sex":
+        return dict(SEX_TYPE)[int(value)]
+
     if "_" in value:
         value_str, value_id = value.split("_", 1)
         if value_str == "country":
@@ -551,10 +558,6 @@ def replace_underscores(value):
             return Trust.objects.get(id=int(value_id)).name
         elif value_str == "h":
             return LocalHealthBoard.objects.get(id=int(value_id)).name
-        elif value_str == "ethnicity":
-            return dict(ETHNICITIES)[value_id]
-        elif value_str == "sex":
-            return dict(SEX_TYPE)[int(value_id)]
     return value.replace("_", " ") if value else value
 
 
@@ -570,3 +573,12 @@ def get_item(dictionary, key):
 def make_list(value):
     """Convert a string to a list of characters"""
     return list(value)
+
+
+# @register.filter
+# def extract_filter_value(value, prefix):
+#     """Extracts the actual value from a prefixed filter value"""
+#     print(f"Extracting value from {value} with prefix {prefix}")
+#     if value and value.startswith(prefix):
+#         return value[len(prefix) :]
+#     return value

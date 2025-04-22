@@ -241,7 +241,7 @@
                             {% if key != 'page' and value %}
                                 <div class="item">
                                     <div class="ui label">
-                                        {{ key|title|replace_underscores }}: {{ value|replace_underscores }}
+                                        {{ key|title }}: {{ value|value_display:key }}
                                         <a href="?{% for k, v in request.GET.items %}{% if k != key and k != 'page' %}{{ k }}={{ v }}&{% endif %}{% endfor %}">
                                             <i class="delete icon"></i>
                                         </a>
