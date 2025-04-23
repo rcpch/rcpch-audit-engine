@@ -1147,4 +1147,32 @@ class CaseListView(LoginRequiredMixin, ListView):
             )
         )
 
+        context["syndrome_present_count"] = (
+            CaseFilterMethods.get_syndrome_present_counts(queryset=filtered_queryset)
+        )
+
+        context["epilepsy_cause_known_count"] = (
+            CaseFilterMethods.get_epilepsy_cause_known_counts(
+                queryset=filtered_queryset
+            )
+        )
+
+        context["global_developmental_delay_or_learning_difficulties_count"] = (
+            CaseFilterMethods.get_global_developmental_delay_or_learning_difficulties_counts(
+                queryset=filtered_queryset
+            )
+        )
+
+        context["autistic_spectrum_disorder_count"] = (
+            CaseFilterMethods.get_autistic_spectrum_disorder_counts(
+                queryset=filtered_queryset
+            )
+        )
+
+        context["mental_health_issue_identified_count"] = (
+            CaseFilterMethods.get_mental_health_issue_identified_counts(
+                queryset=filtered_queryset
+            )
+        )
+
         return context

@@ -231,12 +231,44 @@ class CaseFilter(django_filters.FilterSet):
     Custom filter methods for filtering on related fields
     """
 
-    def fitler_by_developmental_learning_or_schooling_problems(
+    def filter_by_developmental_learning_or_schooling_problems(
         self, queryset, name, value
     ):
         """Delegate to CaseFilterMethods for developmental learning or schooling problems"""
         return CaseFilterMethods.filter_by_developmental_learning_or_schooling_problems(
             queryset
+        )
+
+    def filter_by_behavioural_or_emotional_problems(self, queryset, name, value):
+        """Delegate to CaseFilterMethods for behavioural or emotional problems"""
+        return CaseFilterMethods.filter_by_behavioural_or_emotional_problems(
+            queryset, value
+        )
+
+    def filter_by_syndrome_present(self, queryset, name, value):
+        """Delegate to CaseFilterMethods for syndrome presence"""
+        return CaseFilterMethods.filter_by_syndrome_present(queryset, value)
+
+    def filter_by_epilepsy_cause_known(self, queryset, name, value):
+        """Delegate to CaseFilterMethods for epilepsy cause known"""
+        return CaseFilterMethods.filter_by_epilepsy_cause_known(queryset, value)
+
+    def filter_by_global_developmental_delay_or_learning_difficulties(
+        self, queryset, name, value
+    ):
+        """Delegate to CaseFilterMethods for global developmental delay or learning difficulties"""
+        return CaseFilterMethods.filter_by_global_developmental_delay_or_learning_difficulties(
+            queryset, value
+        )
+
+    def filter_by_autistic_spectrum_disorder(self, queryset, name, value):
+        """Delegate to CaseFilterMethods for autistic spectrum disorder"""
+        return CaseFilterMethods.filter_by_autistic_spectrum_disorder(queryset, value)
+
+    def filter_by_mental_health_issue_identified(self, queryset, name, value):
+        """Delegate to CaseFilterMethods for mental health issue identified"""
+        return CaseFilterMethods.filter_by_mental_health_issue_identified(
+            queryset, value
         )
 
     def apply_all_filters(self, queryset, request, special_filter_params=None):
@@ -427,6 +459,96 @@ class CaseFilterMethods:
         """
         return queryset.filter(
             registration__firstpaediatricassessment__behavioural_or_emotional_problems=True
+        ).count()
+
+    @staticmethod
+    def filter_by_syndrome_present(queryset, value=None):
+        """
+        Filter cases by syndrome presence
+        """
+        return queryset.filter(registration__multiaxialdiagnosis__syndrome_present=True)
+
+    @staticmethod
+    def get_syndrome_present_counts(queryset):
+        """
+        Returns counts of cases with syndrome present
+        """
+        return queryset.filter(
+            registration__multiaxialdiagnosis__syndrome_present=True
+        ).count()
+
+    @staticmethod
+    def filter_by_epilepsy_cause_known(queryset, value=None):
+        """
+        Filter cases where epilepsy cause is known
+        """
+        return queryset.filter(
+            registration__multiaxialdiagnosis__epilepsy_cause_known=True
+        )
+
+    @staticmethod
+    def get_epilepsy_cause_known_counts(queryset):
+        """
+        Returns counts of cases where epilepsy cause is known
+        """
+        return queryset.filter(
+            registration__multiaxialdiagnosis__epilepsy_cause_known=True
+        ).count()
+
+    @staticmethod
+    def filter_by_global_developmental_delay_or_learning_difficulties(
+        queryset, value=None
+    ):
+        """
+        Filter cases with global developmental delay or learning difficulties
+        """
+        return queryset.filter(
+            registration__multiaxialdiagnosis__global_developmental_delay_or_learning_difficulties=True
+        )
+
+    @staticmethod
+    def get_global_developmental_delay_or_learning_difficulties_counts(queryset):
+        """
+        Returns counts of cases with global developmental delay or learning difficulties
+        """
+        return queryset.filter(
+            registration__multiaxialdiagnosis__global_developmental_delay_or_learning_difficulties=True
+        ).count()
+
+    @staticmethod
+    def filter_by_autistic_spectrum_disorder(queryset, value=None):
+        """
+        Filter cases with autistic spectrum disorder
+        """
+        return queryset.filter(
+            registration__multiaxialdiagnosis__autistic_spectrum_disorder=True
+        )
+
+    @staticmethod
+    def get_autistic_spectrum_disorder_counts(queryset):
+        """
+        Returns counts of cases with autistic spectrum disorder
+        """
+        return queryset.filter(
+            registration__multiaxialdiagnosis__autistic_spectrum_disorder=True
+        ).count()
+
+    @staticmethod
+    def filter_by_mental_health_issue_identified(queryset, value=None):
+        """
+        Filter cases with identified mental health issues
+        """
+        return queryset.filter(
+            registration__multiaxialdiagnosis__mental_health_issue_identified=True
+        )
+
+    @staticmethod
+    def get_mental_health_issue_identified_counts(queryset):
+        """
+        Returns counts of cases with identified mental health issues
+        """
+        return queryset.filter(
+            registration__multiaxialdiagnosis__mental_health_issue_identified=True
         ).count()
 
     """
@@ -1133,6 +1255,11 @@ class CaseFilterMethods:
             # related fields
             "developmental_learning_or_schooling_problems"
             "behavioural_or_emotional_problems"
+            "syndrome_present"
+            "epilepsy_cause_known"
+            "global_developmental_delay_or_learning_difficulties"
+            "autistic_spectrum_disorder"
+            "mental_health_issue_identified"
             """
             for param_name in special_filter_params:
                 if param_name in request.GET and request.GET[param_name]:

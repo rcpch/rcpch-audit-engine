@@ -146,6 +146,68 @@
                     </div>
                 </div>
 
+                <!-- Multiaxial Diagnosis Section -->
+                <div class="item">
+                    <div class="header">Multiaxial Diagnosis</div>
+                    <div class="menu">
+                        <!-- Syndrome Present -->
+                        <a class="item {% if request.GET.syndrome_present == 'true' %}active{% endif %}" 
+                        href="{% if request.GET.syndrome_present == 'true' %}
+                                ?{% for key, value in request.GET.items %}{% if key != 'syndrome_present' and key != 'page' %}{% if not forloop.first %}&{% endif %}{{ key }}={{ value }}{% endif %}{% endfor %}
+                                {% else %}
+                                ?syndrome_present=true{% for key, value in request.GET.items %}{% if key != 'syndrome_present' and key != 'page' %}&{{ key }}={{ value }}{% endif %}{% endfor %}
+                                {% endif %}">
+                            Syndrome Present
+                            <div class="ui {% if request.GET.syndrome_present == 'true' %}left pointing{% endif %} label">{{ syndrome_present_count }}</div>
+                        </a>
+                        
+                        <!-- Epilepsy Cause Known -->
+                        <a class="item {% if request.GET.epilepsy_cause_known == 'true' %}active{% endif %}" 
+                            href="{% if request.GET.epilepsy_cause_known == 'true' %}
+                                    ?{% for key, value in request.GET.items %}{% if key != 'epilepsy_cause_known' and key != 'page' %}{% if not forloop.first %}&{% endif %}{{ key }}={{ value }}{% endif %}{% endfor %}
+                                    {% else %}
+                                    ?epilepsy_cause_known=true{% for key, value in request.GET.items %}{% if key != 'epilepsy_cause_known' and key != 'page' %}&{{ key }}={{ value }}{% endif %}{% endfor %}
+                                    {% endif %}">
+                                Epilepsy Cause Known
+                                <div class="ui {% if request.GET.epilepsy_cause_known == 'true' %}left pointing{% endif %} label">{{ epilepsy_cause_known_count }}</div>
+                            </a>
+                            
+                            <!-- Global Developmental Delay -->
+                            <a class="item {% if request.GET.global_developmental_delay_or_learning_difficulties == 'true' %}active{% endif %}" 
+                            href="{% if request.GET.global_developmental_delay_or_learning_difficulties == 'true' %}
+                                    ?{% for key, value in request.GET.items %}{% if key != 'global_developmental_delay_or_learning_difficulties' and key != 'page' %}{% if not forloop.first %}&{% endif %}{{ key }}={{ value }}{% endif %}{% endfor %}
+                                    {% else %}
+                                    ?global_developmental_delay_or_learning_difficulties=true{% for key, value in request.GET.items %}{% if key != 'global_developmental_delay_or_learning_difficulties' and key != 'page' %}&{{ key }}={{ value }}{% endif %}{% endfor %}
+                                    {% endif %}">
+                                Global Developmental Delay
+                                <div class="ui {% if request.GET.global_developmental_delay_or_learning_difficulties == 'true' %}left pointing{% endif %} label">{{ global_developmental_delay_or_learning_difficulties_count }}</div>
+                            </a>
+                            
+                            <!-- Autism Spectrum Disorder -->
+                            <a class="item {% if request.GET.autistic_spectrum_disorder == 'true' %}active{% endif %}" 
+                            href="{% if request.GET.autistic_spectrum_disorder == 'true' %}
+                                    ?{% for key, value in request.GET.items %}{% if key != 'autistic_spectrum_disorder' and key != 'page' %}{% if not forloop.first %}&{% endif %}{{ key }}={{ value }}{% endif %}{% endfor %}
+                                    {% else %}
+                                    ?autistic_spectrum_disorder=true{% for key, value in request.GET.items %}{% if key != 'autistic_spectrum_disorder' and key != 'page' %}&{{ key }}={{ value }}{% endif %}{% endfor %}
+                                    {% endif %}">
+                                Autism Spectrum Disorder
+                                <div class="ui {% if request.GET.autistic_spectrum_disorder == 'true' %}left pointing{% endif %} label">{{ autistic_spectrum_disorder_count }}</div>
+                            </a>
+                            
+                            <!-- Mental Health Issues -->
+                            <a class="item {% if request.GET.mental_health_issue_identified == 'true' %}active{% endif %}" 
+                            href="{% if request.GET.mental_health_issue_identified == 'true' %}
+                                    ?{% for key, value in request.GET.items %}{% if key != 'mental_health_issue_identified' and key != 'page' %}{% if not forloop.first %}&{% endif %}{{ key }}={{ value }}{% endif %}{% endfor %}
+                                    {% else %}
+                                    ?mental_health_issue_identified=true{% for key, value in request.GET.items %}{% if key != 'mental_health_issue_identified' and key != 'page' %}&{{ key }}={{ value }}{% endif %}{% endfor %}
+                                    {% endif %}">
+                                Mental Health Issues
+                                <div class="ui {% if request.GET.mental_health_issue_identified == 'true' %}left pointing{% endif %} label">{{ mental_health_issue_identified_count }}</div>
+                            </a>
+                        </div>
+                    </div>
+
+
             </div> <!-- vertical menu -->
         </div> <!-- four wide column -->
         
