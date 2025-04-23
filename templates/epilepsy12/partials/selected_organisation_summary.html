@@ -7,7 +7,8 @@
             <div class='back link'>
                 <button class="ui rcpch_positive button jump" _="on click go to top of #kpis">Jump to All KPI Metrics</button>
                 {% if perms.epilepsy12.can_publish_epilepsy12_data %}
-                <a class="ui rcpch_primary button bold" href="{% url 'case_filter_list' organisation_id=selected_organisation.pk %}">
+                <a class="ui rcpch_positive button" href="{% url 'case_filter_list' organisation_id=selected_organisation.pk %}">
+                    <i class="yellow wrench icon"></i>
                     Report Builder
                     <div class="ui yellow left pointing label" style="margin-left: 8px; padding: 4px 8px; font-size: 0.7em;">
                         NEW <i class="red star icon" style="margin: 0 0 0 4px;"></i>
