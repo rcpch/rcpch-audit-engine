@@ -1056,6 +1056,17 @@ class CaseFilterMethods:
 
         # First apply any special filters if requested
         if apply_special_filters:
+            """
+            Includes:
+            "kpi_failed",
+            "complete_audit_progress",
+            "incomplete_audit_progress",
+            "registration_cohort",
+            "trust_or_health_board",
+            "integrated_care_board",
+            "nhs_england_region",
+            "country",
+            """
             for param_name in special_filter_params:
                 if param_name in request.GET and request.GET[param_name]:
                     # Call the appropriate filter method based on parameter name
