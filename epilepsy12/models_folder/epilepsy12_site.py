@@ -57,7 +57,9 @@ class Site(TimeStampAbstractBaseClass, UserStampAbstractBaseClass):
     # Site is a link table between Case and Organisation in a many to many relationship
 
     organisation = models.ForeignKey(
-        to="epilepsy12.Organisation", related_name="site", on_delete=models.PROTECT
+        to="epilepsy12.Organisation",
+        related_name="patient_sites",
+        on_delete=models.PROTECT,
     )
 
     case = models.ForeignKey(
@@ -67,7 +69,7 @@ class Site(TimeStampAbstractBaseClass, UserStampAbstractBaseClass):
         # is false.
         "epilepsy12.Case",
         on_delete=models.CASCADE,
-        related_name="site",
+        related_name="epilepsy12_sites",
     )
 
     @property
@@ -89,4 +91,8 @@ class Site(TimeStampAbstractBaseClass, UserStampAbstractBaseClass):
         ]
 
     def __str__(self) -> str:
-        return self.organisation.trust.name if self.organisation.trust else self.organisation.local_health_board.name # Welsh orgs have no Trust
+        return (
+            self.organisation.trust.name
+            if self.organisation.trust
+            else self.organisation.local_health_board.name
+        )  # Welsh orgs have no Trust

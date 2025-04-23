@@ -226,7 +226,7 @@ class Epilepsy12User(AbstractUser, PermissionsMixin):
 
     objects = Epilepsy12UserManager()
 
-    employer_organisation = models.ManyToManyField(
+    employers = models.ManyToManyField(
         "epilepsy12.Organisation",
         through="epilepsy12.OrganisationEmployer",
         through_fields=("epilepsy12_user", "employer_organisation"),

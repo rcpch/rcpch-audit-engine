@@ -62,8 +62,8 @@ class CaseFilter(django_filters.FilterSet):
     """
     organisation = django_filters.ModelChoiceFilter(
         queryset=Organisation.objects.filter(
-            site__site_is_actively_involved_in_epilepsy_care=True,
-            site__site_is_primary_centre_of_epilepsy_care=True,
+            patient_sites__site_is_actively_involved_in_epilepsy_care=True,
+            patient_sites__site_is_primary_centre_of_epilepsy_care=True,
         ).distinct(),
         method="filter_by_organisation",
     )
@@ -385,14 +385,14 @@ class CaseFilterMethods:
         """
         if value == "registered":
             return queryset.filter(
-                site__site_is_primary_centre_of_epilepsy_care=True,
-                site__site_is_actively_involved_in_epilepsy_care=True,
+                epilepsy12_sites__site_is_primary_centre_of_epilepsy_care=True,
+                epilepsy12_sites__site_is_actively_involved_in_epilepsy_care=True,
                 registration__isnull=False,
             )
         elif value == "unregistered":
             return queryset.filter(
-                site__site_is_primary_centre_of_epilepsy_care=True,
-                site__site_is_actively_involved_in_epilepsy_care=True,
+                epilepsy12_sites__site_is_primary_centre_of_epilepsy_care=True,
+                epilepsy12_sites__site_is_actively_involved_in_epilepsy_care=True,
                 registration__isnull=True,
             )
         return queryset
@@ -404,14 +404,14 @@ class CaseFilterMethods:
         """
         if value == "registered":
             return queryset.filter(
-                site__site_is_primary_centre_of_epilepsy_care=True,
-                site__site_is_actively_involved_in_epilepsy_care=True,
+                epilepsy12_sites__site_is_primary_centre_of_epilepsy_care=True,
+                epilepsy12_sites__site_is_actively_involved_in_epilepsy_care=True,
                 registration__isnull=False,
             ).count()
         elif value == "unregistered":
             return queryset.filter(
-                site__site_is_primary_centre_of_epilepsy_care=True,
-                site__site_is_actively_involved_in_epilepsy_care=True,
+                epilepsy12_sites__site_is_primary_centre_of_epilepsy_care=True,
+                epilepsy12_sites__site_is_actively_involved_in_epilepsy_care=True,
                 registration__isnull=True,
             ).count()
         return 0
@@ -602,9 +602,9 @@ class CaseFilterMethods:
         if not organisation_id:
             return queryset
         return queryset.filter(
-            site__organisation_id=organisation_id,
-            site__site_is_primary_centre_of_epilepsy_care=True,
-            site__site_is_actively_involved_in_epilepsy_care=True,
+            epilepsy12_sites__organisation_id=organisation_id,
+            epilepsy12_sites__site_is_primary_centre_of_epilepsy_care=True,
+            epilepsy12_sites__site_is_actively_involved_in_epilepsy_care=True,
         )
 
     @staticmethod
@@ -615,9 +615,9 @@ class CaseFilterMethods:
         if not organisation_id:
             return queryset.count()
         return queryset.filter(
-            site__organisation_id=organisation_id,
-            site__site_is_primary_centre_of_epilepsy_care=True,
-            site__site_is_actively_involved_in_epilepsy_care=True,
+            epilepsy12_sites__organisation_id=organisation_id,
+            epilepsy12_sites__site_is_primary_centre_of_epilepsy_care=True,
+            epilepsy12_sites__site_is_actively_involved_in_epilepsy_care=True,
         ).count()
 
     @staticmethod
@@ -642,20 +642,20 @@ class CaseFilterMethods:
         if value_type == "t":
             # Filter by Trust
             return queryset.filter(
-                site__site_is_primary_centre_of_epilepsy_care=True,
-                site__site_is_actively_involved_in_epilepsy_care=True,
-                site__case__isnull=False,
-                site__case__registration__isnull=False,
-                site__organisation__trust__id=value_id,
+                epilepsy12_sites__site_is_primary_centre_of_epilepsy_care=True,
+                epilepsy12_sites__site_is_actively_involved_in_epilepsy_care=True,
+                epilepsy12_sites__case__isnull=False,
+                epilepsy12_sites__case__registration__isnull=False,
+                epilepsy12_sites__organisation__trust__id=value_id,
             )
         elif value_type == "h":
             # Filter by Local Health Board
             return queryset.filter(
-                site__site_is_primary_centre_of_epilepsy_care=True,
-                site__site_is_actively_involved_in_epilepsy_care=True,
-                site__case__isnull=False,
-                site__case__registration__isnull=False,
-                site__organisation__local_health_board__id=value_id,
+                epilepsy12_sites__site_is_primary_centre_of_epilepsy_care=True,
+                epilepsy12_sites__site_is_actively_involved_in_epilepsy_care=True,
+                epilepsy12_sites__case__isnull=False,
+                epilepsy12_sites__case__registration__isnull=False,
+                epilepsy12_sites__organisation__local_health_board__id=value_id,
             )
         return queryset
 
@@ -685,9 +685,9 @@ class CaseFilterMethods:
             # Filter by Trust
             return (
                 queryset.filter(
-                    site__site_is_primary_centre_of_epilepsy_care=True,
-                    site__site_is_actively_involved_in_epilepsy_care=True,
-                    site__organisation__trust__id=value_id,
+                    epilepsy12_sites__site_is_primary_centre_of_epilepsy_care=True,
+                    epilepsy12_sites__site_is_actively_involved_in_epilepsy_care=True,
+                    epilepsy12_sites__organisation__trust__id=value_id,
                 )
                 .distinct()
                 .count()
@@ -696,9 +696,9 @@ class CaseFilterMethods:
             # Filter by Local Health Board
             return (
                 queryset.filter(
-                    site__site_is_primary_centre_of_epilepsy_care=True,
-                    site__site_is_actively_involved_in_epilepsy_care=True,
-                    site__organisation__local_health_board__id=value_id,
+                    epilepsy12_sites__site_is_primary_centre_of_epilepsy_care=True,
+                    epilepsy12_sites__site_is_actively_involved_in_epilepsy_care=True,
+                    epilepsy12_sites__organisation__local_health_board__id=value_id,
                 )
                 .distinct()
                 .count()
@@ -716,11 +716,11 @@ class CaseFilterMethods:
         if value_type == "i":
             # Filter by Integrate Care Board
             return queryset.filter(
-                site__site_is_primary_centre_of_epilepsy_care=True,
-                site__site_is_actively_involved_in_epilepsy_care=True,
-                site__case__isnull=False,
-                site__case__registration__isnull=False,
-                site__organisation__integrated_care_board__id=value_id,
+                epilepsy12_sites__site_is_primary_centre_of_epilepsy_care=True,
+                epilepsy12_sites__site_is_actively_involved_in_epilepsy_care=True,
+                epilepsy12_sites__case__isnull=False,
+                epilepsy12_sites__case__registration__isnull=False,
+                epilepsy12_sites__organisation__integrated_care_board__id=value_id,
             )
         return queryset
 
@@ -742,9 +742,9 @@ class CaseFilterMethods:
             # Filter by Integrated Care Board
             return (
                 queryset.filter(
-                    site__site_is_primary_centre_of_epilepsy_care=True,
-                    site__site_is_actively_involved_in_epilepsy_care=True,
-                    site__organisation__integrated_care_board__id=value_id,
+                    epilepsy12_sites__site_is_primary_centre_of_epilepsy_care=True,
+                    epilepsy12_sites__site_is_actively_involved_in_epilepsy_care=True,
+                    epilepsy12_sites__organisation__integrated_care_board__id=value_id,
                 )
                 .distinct()
                 .count()
@@ -762,11 +762,11 @@ class CaseFilterMethods:
         if value_type == "n":
             # Filter by NHS England Region
             return queryset.filter(
-                site__site_is_primary_centre_of_epilepsy_care=True,
-                site__site_is_actively_involved_in_epilepsy_care=True,
-                site__case__isnull=False,
-                site__case__registration__isnull=False,
-                site__organisation__nhs_england_region__id=value_id,
+                epilepsy12_sites__site_is_primary_centre_of_epilepsy_care=True,
+                epilepsy12_sites__site_is_actively_involved_in_epilepsy_care=True,
+                epilepsy12_sites__case__isnull=False,
+                epilepsy12_sites__case__registration__isnull=False,
+                epilepsy12_sites__organisation__nhs_england_region__id=value_id,
             )
         return queryset
 
@@ -787,9 +787,9 @@ class CaseFilterMethods:
             # Filter by NHS England Region
             return (
                 queryset.filter(
-                    site__site_is_primary_centre_of_epilepsy_care=True,
-                    site__site_is_actively_involved_in_epilepsy_care=True,
-                    site__organisation__nhs_england_region__id=value_id,
+                    epilepsy12_sites__site_is_primary_centre_of_epilepsy_care=True,
+                    epilepsy12_sites__site_is_actively_involved_in_epilepsy_care=True,
+                    epilepsy12_sites__organisation__nhs_england_region__id=value_id,
                 )
                 .distinct()
                 .count()
@@ -807,11 +807,11 @@ class CaseFilterMethods:
         if value_type == "c":
             # Filter by Country
             return queryset.filter(
-                site__site_is_primary_centre_of_epilepsy_care=True,
-                site__site_is_actively_involved_in_epilepsy_care=True,
-                site__case__isnull=False,
-                site__case__registration__isnull=False,
-                site__organisation__country__id=value_id,
+                epilepsy12_sites__site_is_primary_centre_of_epilepsy_care=True,
+                epilepsy12_sites__site_is_actively_involved_in_epilepsy_care=True,
+                epilepsy12_sites__case__isnull=False,
+                epilepsy12_sites__case__registration__isnull=False,
+                epilepsy12_sites__organisation__country__id=value_id,
             )
         return queryset
 
@@ -833,9 +833,9 @@ class CaseFilterMethods:
             # Filter by Country
             return (
                 queryset.filter(
-                    site__site_is_primary_centre_of_epilepsy_care=True,
-                    site__site_is_actively_involved_in_epilepsy_care=True,
-                    site__organisation__country__id=value_id,
+                    epilepsy12_sites__site_is_primary_centre_of_epilepsy_care=True,
+                    epilepsy12_sites__site_is_actively_involved_in_epilepsy_care=True,
+                    epilepsy12_sites__organisation__country__id=value_id,
                 )
                 .distinct()
                 .count()
@@ -856,9 +856,9 @@ class CaseFilterMethods:
         """
         trusts = (
             Trust.objects.filter(
-                organisation__site__site_is_primary_centre_of_epilepsy_care=True,
-                organisation__site__site_is_actively_involved_in_epilepsy_care=True,
-                organisation__site__case__isnull=False,
+                organisation__patient_sites__site_is_primary_centre_of_epilepsy_care=True,
+                organisation__patient_sites__site_is_actively_involved_in_epilepsy_care=True,
+                organisation__patient_sites__case__isnull=False,
             )
             .distinct()
             .order_by("name")
@@ -867,10 +867,10 @@ class CaseFilterMethods:
         # Get health boards with active registered cases
         local_health_boards = (
             LocalHealthBoard.objects.filter(
-                organisation__site__site_is_primary_centre_of_epilepsy_care=True,
-                organisation__site__site_is_actively_involved_in_epilepsy_care=True,
-                organisation__site__case__isnull=False,
-                organisation__site__case__registration__isnull=False,
+                organisation__patient_sites__site_is_primary_centre_of_epilepsy_care=True,
+                organisation__patient_sites__site_is_actively_involved_in_epilepsy_care=True,
+                organisation__patient_sites__case__isnull=False,
+                organisation__patient_sites__case__registration__isnull=False,
             )
             .distinct()
             .order_by("name")
@@ -908,9 +908,9 @@ class CaseFilterMethods:
         """
         integrated_care_boards = (
             IntegratedCareBoard.objects.filter(
-                organisation__site__site_is_primary_centre_of_epilepsy_care=True,
-                organisation__site__site_is_actively_involved_in_epilepsy_care=True,
-                organisation__site__case__isnull=False,
+                organisation__patient_sites__site_is_primary_centre_of_epilepsy_care=True,
+                organisation__patient_sites__site_is_actively_involved_in_epilepsy_care=True,
+                organisation__patient_sites__case__isnull=False,
             )
             .distinct()
             .order_by("name")
@@ -931,9 +931,9 @@ class CaseFilterMethods:
         """
         regions = (
             NHSEnglandRegion.objects.filter(
-                organisation__site__site_is_primary_centre_of_epilepsy_care=True,
-                organisation__site__site_is_actively_involved_in_epilepsy_care=True,
-                organisation__site__case__isnull=False,
+                organisation__patient_sites__site_is_primary_centre_of_epilepsy_care=True,
+                organisation__patient_sites__site_is_actively_involved_in_epilepsy_care=True,
+                organisation__patient_sites__case__isnull=False,
             )
             .distinct()
             .order_by("name")
@@ -951,9 +951,9 @@ class CaseFilterMethods:
     def all_countries(queryset):
         countries = (
             Country.objects.filter(
-                organisation__site__site_is_primary_centre_of_epilepsy_care=True,
-                organisation__site__site_is_actively_involved_in_epilepsy_care=True,
-                organisation__site__case__isnull=False,
+                organisation__patient_sites__site_is_primary_centre_of_epilepsy_care=True,
+                organisation__patient_sites__site_is_actively_involved_in_epilepsy_care=True,
+                organisation__patient_sites__case__isnull=False,
             )
             .distinct()
             .order_by("name")
@@ -989,10 +989,10 @@ class CaseFilterMethods:
 
         return queryset.filter(
             Q(**filter_kwargs),
-            site__site_is_primary_centre_of_epilepsy_care=True,
-            site__site_is_actively_involved_in_epilepsy_care=True,
-            site__case__isnull=False,
-            site__case__registration__isnull=False,
+            epilepsy12_sites__site_is_primary_centre_of_epilepsy_care=True,
+            epilepsy12_sites__site_is_actively_involved_in_epilepsy_care=True,
+            epilepsy12_sites__case__isnull=False,
+            epilepsy12_sites__case__registration__isnull=False,
         )
 
     @staticmethod
@@ -1015,10 +1015,10 @@ class CaseFilterMethods:
                 count = (
                     queryset.filter(
                         Q(**filter_kwargs),
-                        site__site_is_primary_centre_of_epilepsy_care=True,
-                        site__site_is_actively_involved_in_epilepsy_care=True,
-                        site__case__isnull=False,
-                        site__case__registration__isnull=False,
+                        epilepsy12_sites__site_is_primary_centre_of_epilepsy_care=True,
+                        epilepsy12_sites__site_is_actively_involved_in_epilepsy_care=True,
+                        epilepsy12_sites__case__isnull=False,
+                        epilepsy12_sites__case__registration__isnull=False,
                     )
                     .distinct()
                     .count()
@@ -1044,10 +1044,10 @@ class CaseFilterMethods:
         if value_type == "audit":
             # Filter by complete audit progress status
             return queryset.filter(
-                site__site_is_primary_centre_of_epilepsy_care=True,
-                site__site_is_actively_involved_in_epilepsy_care=True,
-                site__case__isnull=False,
-                site__case__registration__isnull=False,
+                epilepsy12_sites__site_is_primary_centre_of_epilepsy_care=True,
+                epilepsy12_sites__site_is_actively_involved_in_epilepsy_care=True,
+                epilepsy12_sites__case__isnull=False,
+                epilepsy12_sites__case__registration__isnull=False,
                 registration__audit_progress__registration_complete=True,
                 registration__audit_progress__first_paediatric_assessment_complete=True,
                 registration__audit_progress__epilepsy_context_complete=True,
@@ -1076,10 +1076,10 @@ class CaseFilterMethods:
             # Filter by complete audit progress status
             return (
                 queryset.filter(
-                    site__site_is_primary_centre_of_epilepsy_care=True,
-                    site__site_is_actively_involved_in_epilepsy_care=True,
-                    site__case__isnull=False,
-                    site__case__registration__isnull=False,
+                    epilepsy12_sites__site_is_primary_centre_of_epilepsy_care=True,
+                    epilepsy12_sites__site_is_actively_involved_in_epilepsy_care=True,
+                    epilepsy12_sites__case__isnull=False,
+                    epilepsy12_sites__case__registration__isnull=False,
                     registration__audit_progress__registration_complete=True,
                     registration__audit_progress__first_paediatric_assessment_complete=True,
                     registration__audit_progress__epilepsy_context_complete=True,
@@ -1101,10 +1101,10 @@ class CaseFilterMethods:
         if not cohort:
             return queryset
         return queryset.filter(
-            site__site_is_primary_centre_of_epilepsy_care=True,
-            site__site_is_actively_involved_in_epilepsy_care=True,
-            site__case__isnull=False,
-            site__case__registration__isnull=False,
+            epilepsy12_sites__site_is_primary_centre_of_epilepsy_care=True,
+            epilepsy12_sites__site_is_actively_involved_in_epilepsy_care=True,
+            epilepsy12_sites__case__isnull=False,
+            epilepsy12_sites__case__registration__isnull=False,
             registration__cohort=cohort,
         )
 
@@ -1119,10 +1119,10 @@ class CaseFilterMethods:
         # Filter by registration cohort
         return (
             queryset.filter(
-                site__site_is_primary_centre_of_epilepsy_care=True,
-                site__site_is_actively_involved_in_epilepsy_care=True,
-                site__case__isnull=False,
-                site__case__registration__isnull=False,
+                epilepsy12_sites__site_is_primary_centre_of_epilepsy_care=True,
+                epilepsy12_sites__site_is_actively_involved_in_epilepsy_care=True,
+                epilepsy12_sites__case__isnull=False,
+                epilepsy12_sites__case__registration__isnull=False,
                 registration__cohort=value,
             )
             .distinct()
@@ -1157,10 +1157,10 @@ class CaseFilterMethods:
                     | Q(registration__audit_progress__investigations_complete=False)
                     | Q(registration__audit_progress__management_complete=False)
                 ),
-                site__site_is_primary_centre_of_epilepsy_care=True,
-                site__site_is_actively_involved_in_epilepsy_care=True,
-                site__case__isnull=False,
-                site__case__registration__isnull=False,
+                epilepsy12_sites__site_is_primary_centre_of_epilepsy_care=True,
+                epilepsy12_sites__site_is_actively_involved_in_epilepsy_care=True,
+                epilepsy12_sites__case__isnull=False,
+                epilepsy12_sites__case__registration__isnull=False,
             )
         return queryset
 
@@ -1197,10 +1197,10 @@ class CaseFilterMethods:
                         | Q(registration__audit_progress__investigations_complete=False)
                         | Q(registration__audit_progress__management_complete=False)
                     ),
-                    site__site_is_primary_centre_of_epilepsy_care=True,
-                    site__site_is_actively_involved_in_epilepsy_care=True,
-                    site__case__isnull=False,
-                    site__case__registration__isnull=False,
+                    epilepsy12_sites__site_is_primary_centre_of_epilepsy_care=True,
+                    epilepsy12_sites__site_is_actively_involved_in_epilepsy_care=True,
+                    epilepsy12_sites__case__isnull=False,
+                    epilepsy12_sites__case__registration__isnull=False,
                 )
                 .distinct()
                 .count()
@@ -1223,8 +1223,8 @@ class CaseFilterMethods:
         if value_type == "episodes":
             # Filter by total episodes count
             return queryset.filter(
-                site__site_is_primary_centre_of_epilepsy_care=True,
-                site__site_is_actively_involved_in_epilepsy_care=True,
+                epilepsy12_sites__site_is_primary_centre_of_epilepsy_care=True,
+                epilepsy12_sites__site_is_actively_involved_in_epilepsy_care=True,
             ).annotate(
                 episode_count=Count(
                     "registration__multiaxialdiagnosis__episodes", distinct=True
@@ -1247,8 +1247,8 @@ class CaseFilterMethods:
         if value_type == "episodes":
             # Filter by total episodes count
             return queryset.filter(
-                site__site_is_primary_centre_of_epilepsy_care=True,
-                site__site_is_actively_involved_in_epilepsy_care=True,
+                epilepsy12_sites__site_is_primary_centre_of_epilepsy_care=True,
+                epilepsy12_sites__site_is_actively_involved_in_epilepsy_care=True,
                 registration__multiaxialdiagnosis__episodes__id=value_id,
             )
         return queryset

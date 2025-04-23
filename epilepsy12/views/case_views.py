@@ -91,9 +91,11 @@ def case_list(request, organisation_id):
             # user has requested organisation level view
             all_cases = (
                 Case.objects.filter(
-                    Q(site__organisation=organisation)
-                    & Q(site__site_is_primary_centre_of_epilepsy_care=True)
-                    & Q(site__site_is_actively_involved_in_epilepsy_care=True)
+                    Q(epilepsy12_sites__organisation=organisation)
+                    & Q(epilepsy12_sites__site_is_primary_centre_of_epilepsy_care=True)
+                    & Q(
+                        epilepsy12_sites__site_is_actively_involved_in_epilepsy_care=True
+                    )
                     & (
                         Q(first_name__icontains=filter_term)
                         | Q(surname__icontains=filter_term)
@@ -110,17 +112,21 @@ def case_list(request, organisation_id):
             if organisation.country.boundary_identifier == "W92000004":
                 # in Wales filter by health board
                 trust_filter = Q(
-                    site__organisation__local_health_board=organisation.local_health_board
+                    epilepsy12_sites__organisation__local_health_board=organisation.local_health_board
                 )
             else:
                 # England filter by Trust
-                trust_filter = Q(site__organisation__trust=organisation.trust)
+                trust_filter = Q(
+                    epilepsy12_sites__organisation__trust=organisation.trust
+                )
 
             all_cases = (
                 Case.objects.filter(
                     trust_filter
-                    & Q(site__site_is_primary_centre_of_epilepsy_care=True)
-                    & Q(site__site_is_actively_involved_in_epilepsy_care=True)
+                    & Q(epilepsy12_sites__site_is_primary_centre_of_epilepsy_care=True)
+                    & Q(
+                        epilepsy12_sites__site_is_actively_involved_in_epilepsy_care=True
+                    )
                     & (
                         Q(first_name__icontains=filter_term)
                         | Q(surname__icontains=filter_term)
@@ -136,8 +142,10 @@ def case_list(request, organisation_id):
             # user has requested national level view
             all_cases = (
                 Case.objects.filter(
-                    Q(site__site_is_primary_centre_of_epilepsy_care=True)
-                    & Q(site__site_is_actively_involved_in_epilepsy_care=True)
+                    Q(epilepsy12_sites__site_is_primary_centre_of_epilepsy_care=True)
+                    & Q(
+                        epilepsy12_sites__site_is_actively_involved_in_epilepsy_care=True
+                    )
                     & (
                         Q(first_name__icontains=filter_term)
                         | Q(surname__icontains=filter_term)
@@ -168,23 +176,23 @@ def case_list(request, organisation_id):
                 # welsh - select health boards
                 filtered_cases = Case.objects.filter(
                     organisations__local_health_board=parent_trust,
-                    site__site_is_primary_centre_of_epilepsy_care=True,
-                    site__site_is_actively_involved_in_epilepsy_care=True,
+                    epilepsy12_sites__site_is_primary_centre_of_epilepsy_care=True,
+                    epilepsy12_sites__site_is_actively_involved_in_epilepsy_care=True,
                 )
             else:
                 # England - select trusts
                 filtered_cases = Case.objects.filter(
                     organisations__trust=parent_trust,
-                    site__site_is_primary_centre_of_epilepsy_care=True,
-                    site__site_is_actively_involved_in_epilepsy_care=True,
+                    epilepsy12_sites__site_is_primary_centre_of_epilepsy_care=True,
+                    epilepsy12_sites__site_is_actively_involved_in_epilepsy_care=True,
                 )
 
         else:
             # filters all primary centres at organisation level, irrespective of if active or inactive
             filtered_cases = Case.objects.filter(
                 organisations__name=organisation,
-                site__site_is_primary_centre_of_epilepsy_care=True,
-                site__site_is_actively_involved_in_epilepsy_care=True,
+                epilepsy12_sites__site_is_primary_centre_of_epilepsy_care=True,
+                epilepsy12_sites__site_is_actively_involved_in_epilepsy_care=True,
             )
 
         if (
@@ -301,11 +309,11 @@ def case_list(request, organisation_id):
 
     registered_cases = all_cases.filter(
         ~Q(registration__isnull=True)
-        & Q(site__site_is_primary_centre_of_epilepsy_care=True)
-        & Q(site__site_is_actively_involved_in_epilepsy_care=True)
+        & Q(epilepsy12_sites__site_is_primary_centre_of_epilepsy_care=True)
+        & Q(epilepsy12_sites__site_is_actively_involved_in_epilepsy_care=True)
     ).all()
 
-    cases_in_transfer = registered_cases.filter(site__active_transfer=True)
+    cases_in_transfer = registered_cases.filter(epilepsy12_sites__active_transfer=True)
 
     paginator = Paginator(all_cases, 50)
     page_number = request.GET.get("page", 1)
@@ -838,7 +846,7 @@ def opt_out(request, organisation_id, case_id):
         case.registration.delete()
 
     # delete all related sites except the primary centre of care, which becomes inactive
-    all_sites = case.site.all()
+    all_sites = case.epilepsy12_sites.all()
     for site in all_sites:
         if site.site_is_primary_centre_of_epilepsy_care:
             site.site_is_actively_involved_in_epilepsy_care = False

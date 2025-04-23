@@ -6,6 +6,8 @@ from django.contrib import messages
 from django.contrib.auth.admin import UserAdmin
 from django.http import HttpResponse
 from django.db.models import Count, Prefetch
+from django.forms import forms
+
 
 # Third-party
 from simple_history.admin import SimpleHistoryAdmin
@@ -31,11 +33,11 @@ class OrganisationCaseFilter(admin.SimpleListFilter):
         """
         organisations = (
             Organisation.objects.filter(
-                site__site_is_actively_involved_in_epilepsy_care=True,
-                site__site_is_primary_centre_of_epilepsy_care=True,
-                site__organisation__isnull=False,
-                site__case__isnull=False,
-                site__case__registration__isnull=False,
+                patient_sites__site_is_actively_involved_in_epilepsy_care=True,
+                patient_sites__site_is_primary_centre_of_epilepsy_care=True,
+                patient_sites__organisation__isnull=False,
+                patient_sites__case__isnull=False,
+                patient_sites__case__registration__isnull=False,
             )
             .distinct()
             .order_by("name")
@@ -76,17 +78,17 @@ class OrganisationCaseFilter(admin.SimpleListFilter):
         # For models related to Case, such as Registration, MultiaxialDiagnosis, etc.
         elif hasattr(queryset.model, "case"):
             return queryset.filter(
-                case__site__organisation_id=organisation_id,
-                case__site__site_is_primary_centre_of_epilepsy_care=True,
-                case__site__site_is_actively_involved_in_epilepsy_care=True,
+                case__epilepsy12_sites__organisation_id=organisation_id,
+                case__epilepsy12_sites__site_is_primary_centre_of_epilepsy_care=True,
+                case__epilepsy12_sites__site_is_actively_involved_in_epilepsy_care=True,
             )
 
         # Handle Registration model
         elif queryset.model == Registration:
             return queryset.filter(
-                case__site__organisation_id=organisation_id,
-                case__site__site_is_primary_centre_of_epilepsy_care=True,
-                case__site__site_is_actively_involved_in_epilepsy_care=True,
+                case__epilepsy12_sites__organisation_id=organisation_id,
+                case__epilepsy12_sites__site_is_primary_centre_of_epilepsy_care=True,
+                case__epilepsy12_sites__site_is_actively_involved_in_epilepsy_care=True,
             ).distinct()
 
         # Default fallback for other models
@@ -104,9 +106,9 @@ class TrustOrLocalHealthBoardFilter(admin.SimpleListFilter):
         """
         trusts = (
             Trust.objects.filter(
-                organisation__site__site_is_primary_centre_of_epilepsy_care=True,
-                organisation__site__site_is_actively_involved_in_epilepsy_care=True,
-                organisation__site__case__isnull=False,
+                organisation__patient_sites__site_is_primary_centre_of_epilepsy_care=True,
+                organisation__patient_sites__site_is_actively_involved_in_epilepsy_care=True,
+                organisation__patient_sites__case__isnull=False,
             )
             .distinct()
             .order_by("name")
@@ -115,10 +117,10 @@ class TrustOrLocalHealthBoardFilter(admin.SimpleListFilter):
         # Get health boards with active registered cases
         local_health_boards = (
             LocalHealthBoard.objects.filter(
-                organisation__site__site_is_primary_centre_of_epilepsy_care=True,
-                organisation__site__site_is_actively_involved_in_epilepsy_care=True,
-                organisation__site__case__isnull=False,
-                organisation__site__case__registration__isnull=False,
+                organisation__patient_sites__site_is_primary_centre_of_epilepsy_care=True,
+                organisation__patient_sites__site_is_actively_involved_in_epilepsy_care=True,
+                organisation__patient_sites__case__isnull=False,
+                organisation__patient_sites__case__registration__isnull=False,
             )
             .distinct()
             .order_by("name")
@@ -171,9 +173,9 @@ class IntegratedCareBoardFilter(admin.SimpleListFilter):
         """
         icbs = (
             IntegratedCareBoard.objects.filter(
-                organisation__site__site_is_primary_centre_of_epilepsy_care=True,
-                organisation__site__site_is_actively_involved_in_epilepsy_care=True,
-                organisation__site__case__isnull=False,
+                organisation__patient_sites__site_is_primary_centre_of_epilepsy_care=True,
+                organisation__patient_sites__site_is_actively_involved_in_epilepsy_care=True,
+                organisation__patient_sites__case__isnull=False,
             )
             .distinct()
             .order_by("name")
@@ -215,9 +217,9 @@ class NHSEnglandRegionFilter(admin.SimpleListFilter):
         """
         regions = (
             NHSEnglandRegion.objects.filter(
-                organisation__site__site_is_primary_centre_of_epilepsy_care=True,
-                organisation__site__site_is_actively_involved_in_epilepsy_care=True,
-                organisation__site__case__isnull=False,
+                organisation__patient_sites__site_is_primary_centre_of_epilepsy_care=True,
+                organisation__patient_sites__site_is_actively_involved_in_epilepsy_care=True,
+                organisation__patient_sites__case__isnull=False,
             )
             .distinct()
             .order_by("name")
@@ -259,9 +261,9 @@ class CountryFilter(admin.SimpleListFilter):
         """
         countries = (
             Country.objects.filter(
-                organisation__site__site_is_primary_centre_of_epilepsy_care=True,
-                organisation__site__site_is_actively_involved_in_epilepsy_care=True,
-                organisation__site__case__isnull=False,
+                organisation__patient_sites__site_is_primary_centre_of_epilepsy_care=True,
+                organisation__patient_sites__site_is_actively_involved_in_epilepsy_care=True,
+                organisation__patient_sites__case__isnull=False,
             )
             .distinct()
             .order_by("name")
@@ -581,8 +583,15 @@ class OrganisationalAuditSubmissionPeriodAdmin(SimpleHistoryAdmin):
             return response
 
 
+class OrganisationAdmin(SimpleHistoryAdmin):
+    search_fields = ["name", "ods_code"]
+    list_display = ["name", "ods_code", "trust", "local_health_board", "country"]
+    list_filter = ["country", "nhs_england_region", "trust", "local_health_board"]
+
+
 class OrganisationEmployerAdmin(SimpleHistoryAdmin):
     model = OrganisationEmployer
+
     list_display = [
         "epilepsy12_user",
         "employer_organisation",
@@ -601,12 +610,6 @@ class OrganisationEmployerAdmin(SimpleHistoryAdmin):
         "epilepsy12_user__surname",
         "employer_organisation__name",
     ]
-    raw_id_fields = ["epilepsy12_user", "employer_organisation"]
-    autocomplete_fields = ["epilepsy12_user", "employer_organisation"]
-
-
-class OrganisationAdmin(SimpleHistoryAdmin):
-    search_fields = ["name", "ods_code"]
 
 
 class TrustAdmin(SimpleHistoryAdmin):
@@ -621,10 +624,10 @@ admin.site.register(Case, CaseAdmin)
 admin.site.register(Comorbidity, SimpleHistoryAdmin)
 admin.site.register(EpilepsyContext, SimpleHistoryAdmin)
 admin.site.register(Investigations, SimpleHistoryAdmin)
+admin.site.register(Organisation, OrganisationAdmin)
 admin.site.register(OrganisationEmployer, OrganisationEmployerAdmin)
 
 
-admin.site.register(Organisation, OrganisationAdmin)
 admin.site.register(FirstPaediatricAssessment, SimpleHistoryAdmin)
 admin.site.register(Management, SimpleHistoryAdmin)
 admin.site.register(Registration, SimpleHistoryAdmin)

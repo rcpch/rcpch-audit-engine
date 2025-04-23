@@ -112,16 +112,16 @@ def group_required(*group_names):
                 if user.is_rcpch_audit_team_member:
                     organisation = Organisation.objects.filter(
                         cases=child,
-                        site__site_is_actively_involved_in_epilepsy_care=True,
-                        site__site_is_primary_centre_of_epilepsy_care=True,
+                        patient_sites__site_is_actively_involved_in_epilepsy_care=True,
+                        patient_sites__site_is_primary_centre_of_epilepsy_care=True,
                         active=True,
                     )
                 else:
                     # filter for object where trust (not just organisation) where case is registered is the same as that of user
                     organisation = Organisation.objects.filter(
                         cases=child,
-                        site__site_is_actively_involved_in_epilepsy_care=True,
-                        site__site_is_primary_centre_of_epilepsy_care=True,
+                        patient_sites__site_is_actively_involved_in_epilepsy_care=True,
+                        patient_sites__site_is_primary_centre_of_epilepsy_care=True,
                         trust=request.user.organisation_employer.trust,
                         active=True,
                     )
@@ -296,15 +296,15 @@ def user_may_view_this_child():
                 if user.is_rcpch_audit_team_member:
                     organisation = Organisation.objects.filter(
                         cases=child,
-                        site__site_is_actively_involved_in_epilepsy_care=True,
-                        site__site_is_primary_centre_of_epilepsy_care=True,
+                        patient_sites__site_is_actively_involved_in_epilepsy_care=True,
+                        patient_sites__site_is_primary_centre_of_epilepsy_care=True,
                     )
                 else:
                     # filter for object where trust (not just organisation) where case is registered is the same as that of user
                     organisation = Organisation.objects.filter(
                         cases=child,
-                        site__site_is_actively_involved_in_epilepsy_care=True,
-                        site__site_is_primary_centre_of_epilepsy_care=True,
+                        patient_sites__site_is_actively_involved_in_epilepsy_care=True,
+                        patient_sites__site_is_primary_centre_of_epilepsy_care=True,
                         trust=request.user.organisation_employer.trust,
                     )
 

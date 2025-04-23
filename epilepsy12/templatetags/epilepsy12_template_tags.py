@@ -575,13 +575,7 @@ def make_list(value):
     return list(value)
 
 
-# @register.filter
-# def extract_filter_value(value, prefix):
-#     """Extracts the actual value from a prefixed filter value"""
-#     print(f"Extracting value from {value} with prefix {prefix}")
-#     if value and value.startswith(prefix):
-#         return value[len(prefix) :]
-#     return value
+@register.filter
 def show_topiramate_valproate_fields(
     antiepilepsy_medicine_instance, pregnancy_prevention=False
 ):

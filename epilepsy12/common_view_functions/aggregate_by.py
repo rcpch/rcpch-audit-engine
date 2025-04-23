@@ -52,9 +52,9 @@ def cases_aggregated_by_sex(selected_organisation):
 
     cases_aggregated_by_sex = (
         Case.objects.filter(
-            site__organisation=selected_organisation,
-            site__site_is_primary_centre_of_epilepsy_care=True,
-            site__site_is_actively_involved_in_epilepsy_care=True,
+            epilepsy12_sites__organisation=selected_organisation,
+            epilepsy12_sites__site_is_primary_centre_of_epilepsy_care=True,
+            epilepsy12_sites__site_is_actively_involved_in_epilepsy_care=True,
         )
         .values("sex")
         .annotate(sex_display=DJANGO_CASE(*sex_long_list, output_field=CharField()))
@@ -88,9 +88,9 @@ def cases_aggregated_by_age(selected_organisation):
 
     # Annotate each case with its age in days
     cases_with_age = Case.objects.filter(
-        site__organisation=selected_organisation,
-        site__site_is_primary_centre_of_epilepsy_care=True,
-        site__site_is_actively_involved_in_epilepsy_care=True,
+        epilepsy12_sites__organisation=selected_organisation,
+        epilepsy12_sites__site_is_primary_centre_of_epilepsy_care=True,
+        epilepsy12_sites__site_is_actively_involved_in_epilepsy_care=True,
     ).annotate(
         age_in_days=ExpressionWrapper(
             (ExtractYear(today) - ExtractYear(F("date_of_birth"))) * 365
@@ -165,9 +165,9 @@ def cases_aggregated_by_deprivation_score(selected_organisation):
     Case = apps.get_model("epilepsy12", "Case")
 
     cases_in_selected_organisation = Case.objects.filter(
-        site__organisation=selected_organisation,
-        site__site_is_primary_centre_of_epilepsy_care=True,
-        site__site_is_actively_involved_in_epilepsy_care=True,
+        epilepsy12_sites__organisation=selected_organisation,
+        epilepsy12_sites__site_is_primary_centre_of_epilepsy_care=True,
+        epilepsy12_sites__site_is_actively_involved_in_epilepsy_care=True,
     )
 
     cases_aggregated_by_deprivation = (
@@ -223,9 +223,9 @@ def cases_aggregated_by_ethnicity(selected_organisation):
 
     cases_aggregated_by_ethnicity = (
         Case.objects.filter(
-            site__organisation=selected_organisation,
-            site__site_is_primary_centre_of_epilepsy_care=True,
-            site__site_is_actively_involved_in_epilepsy_care=True,
+            epilepsy12_sites__organisation=selected_organisation,
+            epilepsy12_sites__site_is_primary_centre_of_epilepsy_care=True,
+            epilepsy12_sites__site_is_actively_involved_in_epilepsy_care=True,
         )
         .values("ethnicity")
         .annotate(
@@ -548,12 +548,12 @@ def filter_completed_cases_at_one_year_by_abstraction_level(
         abstraction_filter = None
     else:
         abstraction_filter = {
-            f"site__organisation__{abstraction_level.value}__isnull": False
+            f"epilepsy12_sites__organisation__{abstraction_level.value}__isnull": False
         }
 
     all_cases = Case.objects.filter(
-        site__site_is_actively_involved_in_epilepsy_care=True,
-        site__site_is_primary_centre_of_epilepsy_care=True,
+        epilepsy12_sites__site_is_actively_involved_in_epilepsy_care=True,
+        epilepsy12_sites__site_is_primary_centre_of_epilepsy_care=True,
         registration__id__isnull=False,
         registration__cohort=cohort,
         registration__completed_first_year_of_care_date__lte=date.today(),
@@ -606,9 +606,9 @@ def get_filtered_cases_queryset_for(
 
     cases = Case.objects.filter(
         **abstraction_filter,
-        # site__organisation__country__boundary_identifier="E92000001",
-        site__site_is_actively_involved_in_epilepsy_care=True,
-        site__site_is_primary_centre_of_epilepsy_care=True,
+        # epilepsy12_sites__organisation__country__boundary_identifier="E92000001",
+        epilepsy12_sites__site_is_actively_involved_in_epilepsy_care=True,
+        epilepsy12_sites__site_is_primary_centre_of_epilepsy_care=True,
         registration__cohort=cohort,
         registration__completed_first_year_of_care_date__lte=date.today(),
         registration__audit_progress__registration_complete=True,

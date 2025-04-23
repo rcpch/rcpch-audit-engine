@@ -24,7 +24,11 @@ def generate_distance_from_organisation_scatterplot_figure(
         go.Scattermapbox(
             lat=geo_df["latitude"] if not geo_df.empty else [],
             lon=geo_df["longitude"] if not geo_df.empty else [],
-            hovertext=geo_df["site__organisation__name"] if not geo_df.empty else None,
+            hovertext=(
+                geo_df["epilepsy12_sites__organisation__name"]
+                if not geo_df.empty
+                else None
+            ),
             mode="markers",
             marker=go.scattermapbox.Marker(
                 size=9,

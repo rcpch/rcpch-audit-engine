@@ -57,18 +57,18 @@ def all_registered_cases_for_cohort_and_abstraction_level(
 
     if abstraction_level == "organisation":
         q_filter = (
-            Q(site__organisation__pk=organisation_instance.pk)
-            & Q(site__site_is_actively_involved_in_epilepsy_care=True)
-            & Q(site__site_is_primary_centre_of_epilepsy_care=True)
+            Q(epilepsy12_sites__organisation__pk=organisation_instance.pk)
+            & Q(epilepsy12_sites__site_is_actively_involved_in_epilepsy_care=True)
+            & Q(epilepsy12_sites__site_is_primary_centre_of_epilepsy_care=True)
         )
     elif abstraction_level == "trust":
         if organisation_instance.trust is not None:
             q_filter = (
                 Q(
-                    site__organisation__trust__ods_code=organisation_instance.trust.ods_code
+                    epilepsy12_sites__organisation__trust__ods_code=organisation_instance.trust.ods_code
                 )
-                & Q(site__site_is_actively_involved_in_epilepsy_care=True)
-                & Q(site__site_is_primary_centre_of_epilepsy_care=True)
+                & Q(epilepsy12_sites__site_is_actively_involved_in_epilepsy_care=True)
+                & Q(epilepsy12_sites__site_is_primary_centre_of_epilepsy_care=True)
             )
         else:
             return all_cases_for_cohort
@@ -76,10 +76,10 @@ def all_registered_cases_for_cohort_and_abstraction_level(
         if organisation_instance.local_health_board is not None:
             q_filter = (
                 Q(
-                    site__organisation__local_health_board__ods_code=organisation_instance.local_health_board.ods_code
+                    epilepsy12_sites__organisation__local_health_board__ods_code=organisation_instance.local_health_board.ods_code
                 )
-                & Q(site__site_is_actively_involved_in_epilepsy_care=True)
-                & Q(site__site_is_primary_centre_of_epilepsy_care=True)
+                & Q(epilepsy12_sites__site_is_actively_involved_in_epilepsy_care=True)
+                & Q(epilepsy12_sites__site_is_primary_centre_of_epilepsy_care=True)
             )
         else:
             return all_cases_for_cohort
@@ -90,10 +90,10 @@ def all_registered_cases_for_cohort_and_abstraction_level(
             """
             q_filter = (
                 Q(
-                    site__organisation__integrated_care_board__ods_code=organisation_instance.integrated_care_board.ods_code
+                    epilepsy12_sites__organisation__integrated_care_board__ods_code=organisation_instance.integrated_care_board.ods_code
                 )
-                & Q(site__site_is_actively_involved_in_epilepsy_care=True)
-                & Q(site__site_is_primary_centre_of_epilepsy_care=True)
+                & Q(epilepsy12_sites__site_is_actively_involved_in_epilepsy_care=True)
+                & Q(epilepsy12_sites__site_is_primary_centre_of_epilepsy_care=True)
             )
         else:
             return all_cases_for_cohort
@@ -104,36 +104,36 @@ def all_registered_cases_for_cohort_and_abstraction_level(
         if organisation_instance.nhs_england_region is not None:
             q_filter = (
                 Q(
-                    site__organisation__nhs_england_region__region_code=organisation_instance.nhs_england_region.region_code
+                    epilepsy12_sites__organisation__nhs_england_region__region_code=organisation_instance.nhs_england_region.region_code
                 )
                 & Q(
-                    site__organisation__country__boundary_identifier=organisation_instance.country.boundary_identifier
+                    epilepsy12_sites__organisation__country__boundary_identifier=organisation_instance.country.boundary_identifier
                 )
-                & Q(site__site_is_actively_involved_in_epilepsy_care=True)
-                & Q(site__site_is_primary_centre_of_epilepsy_care=True)
+                & Q(epilepsy12_sites__site_is_actively_involved_in_epilepsy_care=True)
+                & Q(epilepsy12_sites__site_is_primary_centre_of_epilepsy_care=True)
             )
         else:
             return all_cases_for_cohort
     elif abstraction_level == "open_uk":
         q_filter = (
             Q(
-                site__organisation__openuk_network__boundary_identifier=organisation_instance.openuk_network.boundary_identifier
+                epilepsy12_sites__organisation__openuk_network__boundary_identifier=organisation_instance.openuk_network.boundary_identifier
             )
-            & Q(site__site_is_actively_involved_in_epilepsy_care=True)
-            & Q(site__site_is_primary_centre_of_epilepsy_care=True)
+            & Q(epilepsy12_sites__site_is_actively_involved_in_epilepsy_care=True)
+            & Q(epilepsy12_sites__site_is_primary_centre_of_epilepsy_care=True)
         )
     elif abstraction_level == "country":
         q_filter = (
             Q(
-                site__organisation__country__boundary_identifier=organisation_instance.country.boundary_identifier
+                epilepsy12_sites__organisation__country__boundary_identifier=organisation_instance.country.boundary_identifier
             )
-            & Q(site__site_is_actively_involved_in_epilepsy_care=True)
-            & Q(site__site_is_primary_centre_of_epilepsy_care=True)
+            & Q(epilepsy12_sites__site_is_actively_involved_in_epilepsy_care=True)
+            & Q(epilepsy12_sites__site_is_primary_centre_of_epilepsy_care=True)
         )
     elif abstraction_level == "national":
-        q_filter = Q(site__site_is_actively_involved_in_epilepsy_care=True) & Q(
-            site__site_is_primary_centre_of_epilepsy_care=True
-        )
+        q_filter = Q(
+            epilepsy12_sites__site_is_actively_involved_in_epilepsy_care=True
+        ) & Q(epilepsy12_sites__site_is_primary_centre_of_epilepsy_care=True)
     else:
         raise ValueError(
             f"Incorrect or invalid abstraction error {abstraction_level} supplied."
