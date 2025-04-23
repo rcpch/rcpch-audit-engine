@@ -982,7 +982,7 @@ class CaseListView(LoginRequiredMixin, ListView):
         # Get the base filtered queryset from the filterset
         base_filtered_queryset = self.filterset.qs
 
-        # Define parameters that require special handling with dedicated methods
+        # Parameters that require special handling with dedicated methods
         special_filter_params = [
             "kpi_failed",
             "complete_audit_progress",
@@ -1052,7 +1052,7 @@ class CaseListView(LoginRequiredMixin, ListView):
             )
         )
 
-        # Add ethnicity facets
+        # Add ethnicity facets to dropdowns
         ethnicity_counts = CaseFilterMethods.get_ethnicity_counts(filtered_queryset)
         ethnicity_choices = [("", "All")]
         for ethnicity_code, label in ETHNICITIES:
@@ -1060,7 +1060,7 @@ class CaseListView(LoginRequiredMixin, ListView):
             ethnicity_choices.append((f"{ethnicity_code}", f"{label} ({count})"))
         context["ethnicities"] = ethnicity_choices
 
-        # Add sex facets
+        # Add sex facets to dropdowns
         sex_counts = CaseFilterMethods.get_sex_counts(filtered_queryset)
         sex_choices = [("", "All")]
         for sex_code, label in SEX_TYPE:
@@ -1074,15 +1074,29 @@ class CaseListView(LoginRequiredMixin, ListView):
                 filtered_queryset, value=f"cohort_{cohort}"
             )
 
-        # Add KPI facets - for KPIs 1-12
-        # for kpi in range(1, 11):
-        #     context[f"kpi_{kpi}"] = CaseFilterMethods.get_kpi_failed_count(
-        #         filtered_queryset, value=kpi
-        #     )
+        # Gets all the KPI failed counts in one object to iterate over to produce labels in the template
         context["kpi_failed_counts"] = CaseFilterMethods.get_kpi_failed_counts(
             filtered_queryset
         )
-        print(context["kpi_failed_counts"])
+
+        # Add fact counts to index of multiple deprivation quintile dropdown
+        imd_counts = (
+            CaseFilterMethods.get_index_of_multiple_deprivation_quintile_counts(
+                filtered_queryset
+            )
+        )
+        imd_choices = [("", "All")]
+        for imd in range(1, 6):
+            count = imd_counts.get(imd, 0)
+            if imd == 1:
+                additional_label = " (most deprived)"
+            elif imd == 5:
+                additional_label = " (least deprived)"
+            else:
+                additional_label = ""
+
+            imd_choices.append((f"imd_{imd}", f"{imd} {additional_label} ({count})"))
+        context["imd_choices"] = imd_choices
 
         context["total_episodes"] = CaseFilterMethods.get_total_episodes_count(
             queryset=filtered_queryset,
