@@ -334,7 +334,7 @@
                                 {% for kpi_num, count in kpi_failed_counts.items %}
                                 <a class="item {% if request.GET.kpi_failed == kpi_num|stringformat:'i' %}active{% endif %}" 
                                 href="?kpi_failed={{ kpi_num }}{% for key, value in request.GET.items %}{% if key != 'kpi_failed' and key != 'kpi_number' and key != 'page' %}&{{ key }}={{ value }}{% endif %}{% endfor %}">
-                                    KPI {{ kpi_num }} Failed <div class="ui rcpch facets label">{{ count }}</div>
+                                    KPI {{ kpi_num }} Failed <div class="ui {% if request.GET.kpi_failed == kpi_num|stringformat:'i' %}left pointing{% endif %} rcpch facets label">{{ count }}</div>
                                 </a>
                                 {% endfor %}
                             </div>

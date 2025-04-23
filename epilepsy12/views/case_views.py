@@ -995,14 +995,14 @@ class CaseListView(LoginRequiredMixin, PermissionRequiredMixin, ListView):
             "nhs_england_region",
             "country",
             # related fields
-            "developmental_learning_or_schooling_problems"
-            "behavioural_or_emotional_problems"
-            "syndrome_present"
-            "epilepsy_cause_known"
-            "global_developmental_delay_or_learning_difficulties"
-            "autistic_spectrum_disorder"
-            "mental_health_issue_identified"
-            "has_been_referred_for_mental_health_support"
+            "developmental_learning_or_schooling_problems",
+            "behavioural_or_emotional_problems",
+            "syndrome_present",
+            "epilepsy_cause_known",
+            "global_developmental_delay_or_learning_difficulties",
+            "autistic_spectrum_disorder",
+            "mental_health_issue_identified",
+            "has_been_referred_for_mental_health_support",
             "has_support_for_mental_health_support",
         ]
 
@@ -1110,7 +1110,7 @@ class CaseListView(LoginRequiredMixin, PermissionRequiredMixin, ListView):
             else:
                 additional_label = ""
 
-            imd_choices.append((f"imd_{imd}", f"{imd} {additional_label} ({count})"))
+            imd_choices.append((imd, f"{imd} {additional_label} ({count})"))
         context["imd_choices"] = imd_choices
 
         context["total_episodes"] = CaseFilterMethods.get_total_episodes_count(

@@ -99,15 +99,6 @@ class CaseFilter(django_filters.FilterSet):
         method="filter_by_kpi_failed", label="KPI Failed"
     )
 
-    # Other filters to implement
-    # All patients with learning disabilities
-    # All patients with autism
-    # All patients referred to CAMHS
-    # All patients with generalised epilepsy
-    # All patients with focal epilepsy
-    # Filter by epilepsy cause
-    # Filter by epilepsy syndrome
-
     class Meta:
         model = Case
         fields = [
@@ -466,6 +457,7 @@ class CaseFilterMethods:
         """
         Filter cases by syndrome presence
         """
+        print("calling...")
         return queryset.filter(registration__multiaxialdiagnosis__syndrome_present=True)
 
     @staticmethod
@@ -1288,42 +1280,48 @@ class CaseFilterMethods:
 
         # First apply any special filters if requested
         if apply_special_filters:
-            """
-            These take no extra values and only filter by the value of the parameter
-            Includes:
-            "kpi_failed",
-            "complete_audit_progress",
-            "incomplete_audit_progress",
-            "registration_cohort",
+            # These take no extra values and only filter by the value of the parameter
+            # Includes:
+            # "kpi_failed",
+            # "complete_audit_progress",
+            # "incomplete_audit_progress",
+            # "registration_cohort",
 
-            # level of abstraction fields:
-            "trust_or_health_board",
-            "integrated_care_board",
-            "nhs_england_region",
-            "country",
+            # # level of abstraction fields:
+            # "trust_or_health_board",
+            # "integrated_care_board",
+            # "nhs_england_region",
+            # "country",
 
-            # related fields
-            "developmental_learning_or_schooling_problems"
-            "behavioural_or_emotional_problems"
-            "syndrome_present"
-            "epilepsy_cause_known"
-            "global_developmental_delay_or_learning_difficulties"
-            "autistic_spectrum_disorder"
-            "mental_health_issue_identified"
-            "has_been_referred_for_mental_health_support"
-            "has_support_for_mental_health_support"
-            """
+            # # related fields
+            # "developmental_learning_or_schooling_problems"
+            # "behavioural_or_emotional_problems"
+            # "syndrome_present"
+            # "epilepsy_cause_known"
+            # "global_developmental_delay_or_learning_difficulties"
+            # "autistic_spectrum_disorder"
+            # "mental_health_issue_identified"
+            # "has_been_referred_for_mental_health_support"
+            # "has_support_for_mental_health_support"
+
             for param_name in special_filter_params:
                 if param_name in request.GET and request.GET[param_name]:
                     # Call the appropriate filter method based on parameter name
-                    print(
-                        f"Applying special filter: {param_name}, with value {request.GET[param_name]}"
-                    )
+                    filter_value = request.GET[param_name]
+                    if filter_value == "true":
+                        filter_value = True
+                    elif filter_value == "false":
+                        filter_value = False
+                    else:
+                        filter_value = request.GET[param_name]
+
                     filter_method = getattr(
                         CaseFilterMethods, f"filter_by_{param_name}", None
                     )
+
                     if filter_method:
-                        queryset = filter_method(queryset, request.GET[param_name])
+                        # Apply the filter
+                        queryset = filter_method(queryset, filter_value)
 
         # Then handle all remaining filters
         for key, value in request.GET.items():
