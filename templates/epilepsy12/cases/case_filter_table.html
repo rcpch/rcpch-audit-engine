@@ -115,8 +115,26 @@
                         {% endfor %}
                     </div>
                 </div>
+                
+                <!-- First Paediatric Assessment -->
+                <!-- Developmental/Learning Problems -->
+                <div class="item">
+                    <div class="header">First Paediatric Assessment</div>
+                    <div class="menu">
+                        <!-- Toggle for developmental problems filter -->
+                        <a class="item {% if request.GET.developmental_learning_or_schooling_problems == 'true' %}active{% endif %}" 
+                        href="{% if request.GET.developmental_learning_or_schooling_problems == 'true' %}
+                                ?{% for key, value in request.GET.items %}{% if key != 'developmental_learning_or_schooling_problems' and key != 'page' %}{% if not forloop.first %}&{% endif %}{{ key }}={{ value }}{% endif %}{% endfor %}
+                                {% else %}
+                                ?developmental_learning_or_schooling_problems=true{% for key, value in request.GET.items %}{% if key != 'developmental_learning_or_schooling_problems' and key != 'page' %}&{{ key }}={{ value }}{% endif %}{% endfor %}
+                                {% endif %}">
+                            Developmental or Learning Problems
+                            <div class="ui {% if request.GET.developmental_learning_or_schooling_problems == 'true' %}left pointing{% endif %} label">{{ developmental_learning_or_schooling_problems_count }}</div>
+                        </a>
+                    </div>
+                </div>
 
-            </div>
+            </div> <!-- vertical menu -->
         </div> <!-- four wide column -->
         
         <!-- Main Content -->

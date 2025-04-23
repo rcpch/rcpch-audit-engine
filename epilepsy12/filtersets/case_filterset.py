@@ -161,6 +161,10 @@ class CaseFilter(django_filters.FilterSet):
 
         return queryset
 
+    """
+    Custom filter methods for filtering on levels of abstraction
+    """
+
     def filter_organisation(self, queryset, name, value):
         """Delegate to CaseFilterMethods for organisation filtering"""
         return CaseFilterMethods.filter_by_organisation(queryset, value.id)
@@ -180,6 +184,10 @@ class CaseFilter(django_filters.FilterSet):
     def filter_by_country(self, queryset, name, value):
         """Delegate to CaseFilterMethods for country filtering"""
         return CaseFilterMethods.filter_by_country(queryset, value)
+
+    """
+    Custom filter methods for filtering on audit progress, cohort, age range and KPI
+    """
 
     def filter_by_complete_audit_progress(self, queryset, name, value):
         """Delegate to CaseFilterMethods for complete audit progress filtering"""
@@ -201,6 +209,10 @@ class CaseFilter(django_filters.FilterSet):
         """Delegate to CaseFilterMethods for age range filtering"""
         return CaseFilterMethods.filter_by_age_range(queryset, value)
 
+    """
+    Custom filter methods for filtering on Case model fields
+    """
+
     def filter_by_sex(self, queryset, name, value):
         """Delegate to CaseFilterMethods for sex"""
         return CaseFilterMethods.filter_by_sex(queryset, value)
@@ -213,6 +225,18 @@ class CaseFilter(django_filters.FilterSet):
         """Delegate to CaseFilterMethods for index of multiple deprivation quintile"""
         return CaseFilterMethods.filter_by_index_of_multiple_deprivation_quintile(
             queryset, value
+        )
+
+    """
+    Custom filter methods for filtering on related fields
+    """
+
+    def fitler_by_developmental_learning_or_schooling_problems(
+        self, queryset, name, value
+    ):
+        """Delegate to CaseFilterMethods for developmental learning or schooling problems"""
+        return CaseFilterMethods.filter_by_developmental_learning_or_schooling_problems(
+            queryset
         )
 
     def apply_all_filters(self, queryset, request, special_filter_params=None):
@@ -368,6 +392,24 @@ class CaseFilterMethods:
                 registration__isnull=True,
             ).count()
         return 0
+
+    @staticmethod
+    def filter_by_developmental_learning_or_schooling_problems(queryset, value=None):
+        """
+        Filter cases by developmental learning or schooling problems
+        """
+        return queryset.filter(
+            registration__firstpaediatricassessment__developmental_learning_or_schooling_problems=True
+        )
+
+    @staticmethod
+    def get_developmental_learning_or_schooling_problems_counts(queryset):
+        """
+        Returns counts of cases by developmental learning or schooling problems
+        """
+        return queryset.filter(
+            registration__firstpaediatricassessment__developmental_learning_or_schooling_problems=True
+        ).count()
 
     """
     Methods to filter cases by organisation, trust, health board, integrated care board,
@@ -1057,20 +1099,28 @@ class CaseFilterMethods:
         # First apply any special filters if requested
         if apply_special_filters:
             """
+            These take no extra values and only filter by the value of the parameter
             Includes:
             "kpi_failed",
             "complete_audit_progress",
             "incomplete_audit_progress",
             "registration_cohort",
+
+            # level of abstraction fields:
             "trust_or_health_board",
             "integrated_care_board",
             "nhs_england_region",
             "country",
+
+            # related fields
+            "developmental_learning_or_schooling_problems"
             """
             for param_name in special_filter_params:
                 if param_name in request.GET and request.GET[param_name]:
                     # Call the appropriate filter method based on parameter name
-
+                    print(
+                        f"Applying special filter: {param_name}, with value {request.GET[param_name]}"
+                    )
                     filter_method = getattr(
                         CaseFilterMethods, f"filter_by_{param_name}", None
                     )
@@ -1114,5 +1164,4 @@ class CaseFilterMethods:
                         queryset=queryset, value=value
                     )
                 )
-
         return queryset

@@ -44,3 +44,5 @@ context["registered_cases"] = CaseFilterMethods.get_registration_status_counts(
             )
         )
 ```
+
+If you add the name of the field to the `special_filters` list in the `CaseListView` it must follow that pattern `filter_by_{field}` and `get_{field}_counts`

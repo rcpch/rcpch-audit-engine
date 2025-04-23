@@ -982,7 +982,7 @@ class CaseListView(LoginRequiredMixin, ListView):
         # Get the base filtered queryset from the filterset
         base_filtered_queryset = self.filterset.qs
 
-        # Parameters that require special handling with dedicated methods
+        # Parameters that require special handling with dedicated methods: These take no extra values and only filter by the value of the parameter
         special_filter_params = [
             "kpi_failed",
             "complete_audit_progress",
@@ -992,6 +992,8 @@ class CaseListView(LoginRequiredMixin, ListView):
             "integrated_care_board",
             "nhs_england_region",
             "country",
+            # related fields
+            "developmental_learning_or_schooling_problems",
         ]
 
         # Apply all the active filters including special filters at once
@@ -1131,6 +1133,13 @@ class CaseListView(LoginRequiredMixin, ListView):
 
         context["countries"] = CaseFilterMethods.all_countries(
             queryset=filtered_queryset,
+        )
+
+        # related fields
+        context["developmental_learning_or_schooling_problems_count"] = (
+            CaseFilterMethods.get_developmental_learning_or_schooling_problems_counts(
+                queryset=filtered_queryset
+            )
         )
 
         return context
