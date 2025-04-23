@@ -582,3 +582,46 @@ def make_list(value):
 #     if value and value.startswith(prefix):
 #         return value[len(prefix) :]
 #     return value
+def show_topiramate_valproate_fields(
+    antiepilepsy_medicine_instance, pregnancy_prevention=False
+):
+    """
+    Boolean function to show pregnancy prevention fields and risk acknowledgement form fields if
+    - the medicine is topiramate and the child is 12 years or older
+    - the medicine is sodium valproate and the child is a girl
+
+    Note this only applies if the cohort is 7 or above
+    """
+    # Check if the antiepilepsy_medicine_instance is valid
+    if antiepilepsy_medicine_instance.medicine_entity is None:
+        return False
+
+    # Get parameters from the antiepilepsy_medicine_instance
+    cohort = antiepilepsy_medicine_instance.management.registration.cohort
+    child_over_12 = (
+        antiepilepsy_medicine_instance.management.registration.case.age_days()
+        >= 365.25 * 12
+    )
+    is_valproate = (
+        antiepilepsy_medicine_instance.medicine_entity.conceptId == "387481005"
+    )  # Sodium valproate
+    is_topiramate = (
+        antiepilepsy_medicine_instance.medicine_entity.conceptId == "777808008"
+    )  # Topiramate
+    is_female = antiepilepsy_medicine_instance.management.registration.case.sex == 2
+
+    if cohort < 7:
+        if (
+            antiepilepsy_medicine_instance.is_a_pregnancy_prevention_programme_needed
+            or antiepilepsy_medicine_instance.has_a_valproate_annual_risk_acknowledgement_form_been_completed
+        ):
+            return True
+    elif cohort >= 7:
+        if is_topiramate or is_valproate:
+            if pregnancy_prevention:
+                if is_female and ((child_over_12 and is_topiramate) or is_valproate):
+                    return True
+            else:
+                return True
+
+    return False

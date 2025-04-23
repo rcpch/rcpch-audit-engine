@@ -154,3 +154,55 @@ class AntiEpilepsyMedicine(
             return f"{self.medicine_entity.medicine_name} for {self.management.registration.case}"
         else:
             return "No medicine supplied"
+
+    def get_has_a_valproate_annual_risk_acknowledgement_form_been_completed_conditional_help_text(
+        self,
+    ):
+        """
+        Return conditional help text based on cohort - works in conjunction with HelpTextMixin
+
+        Relates to KPI measure 8 amendment in issue #1215
+
+        This measure has changed to allow a risk acknowledgement form and pregnancy prevention programme to be in place
+        to be offered to all girls on valproate (any age) and all girls aged 12 and over on Topiramate.
+
+        This measure is only calculated for cohorts 7 and above, so the old calculation is retained.
+
+        In the user interface, the help text is updated to reflect the new measure, but only for cohorts 7 and above.
+        """
+        if (
+            hasattr(self, "management")
+            and self.management
+            and hasattr(self.management, "registration")
+            and self.management.registration.cohort > 6
+        ):
+            return {
+                "label": "Has the Annual Risk Acknowledgment Form been completed?",
+                "reference": "Have the risks related to the antiseizure medicine been discussed with the child/young person and their family?",
+            }
+        return None
+
+    def get_is_a_pregnancy_prevention_programme_in_place_conditional_help_text(self):
+        """
+        Return conditional help text based on cohort - works in conjunction with HelpTextMixin
+
+        Relates to KPI measure 8 amendment in issue #1215
+
+        This measure has changed to allow a risk acknowledgement form and pregnancy prevention programme to be in place
+        to be offered to all girls on valproate (any age) and all girls aged 12 and over on Topiramate.
+
+        This measure is only calculated for cohorts 7 and above, so the old calculation is retained.
+
+        In the user interface, the help text is updated to reflect the new measure, but only for cohorts 7 and above.
+        """
+        if (
+            hasattr(self, "management")
+            and self.management
+            and hasattr(self.management, "registration")
+            and self.management.registration.cohort > 6
+        ):
+            return {
+                "label": "Is a Pregnancy Prevention Programme in place?",
+                "reference": "For girls and young women who are prescribed sodium valproate or topiramate (if > 12y), it is recommended that pregnancy prevention is actively discussed and documented.",
+            }
+        return None  # Fall back to default help text

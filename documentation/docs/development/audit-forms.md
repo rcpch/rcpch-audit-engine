@@ -63,3 +63,42 @@ def registration_active(request, case_id, active_template):
 ```
 
 This function retrieves user progress from the ```AuditProgress``` model and passes this to the steps for it to render progress and rerender the ```steps.html``` partial with the updated data.
+
+## Labels and References
+
+The labels and associated references for each field in each model are stored in the `help_text` field of each model. This is done by overriding the `help_text` with a custom `HelpTextMixin`. Instead of returning a single string, it returns a python object with keys of `label` and `reference`. These are accessed in the templates to render the labels and tooltips.
+
+In #1215 the E12 team sought to change the wording and KPI 8 scoring only for cohort 7 and above. To retain the wording for previous cohorts therefore a new `conditional_help_text` was introduced which conditionally renders if present, otherwise the default label and reference in the model instead are returned.
+
+### Implementing conditional labels
+
+1. in the model add a new method using the syntax `get_(measure)__conditional_help_text`
+2. apply any conditional logic (for example comparison of cohort)
+3. return a python object with the keys `label` and `reference`
+
+```python
+def get_is_a_pregnancy_prevention_programme_in_place_conditional_help_text(self):
+        """
+        Return conditional help text based on cohort - works in conjunction with HelpTextMixin
+
+        Relates to KPI measure 8 amendment in issue #1215
+
+        This measure has changed to allow a risk acknowledgement form and pregnancy prevention programme to be in place
+        to be offered to all girls on valproate (any age) and all girls aged 12 and over on Topiramate.
+
+        This measure is only calculated for cohorts 7 and above, so the old calculation is retained.
+
+        In the user interface, the help text is updated to reflect the new measure, but only for cohorts 7 and above.
+        """
+        if (
+            hasattr(self, "management")
+            and self.management
+            and hasattr(self.management, "registration")
+            and self.management.registration.cohort > 6
+        ):
+            return {
+                "label": "Is a Pregnancy Prevention Programme in place?",
+                "reference": "For girls and young women who are prescribed sodium valproate or topiramate (if > 12y), it is recommended that pregnancy prevention is actively discussed and documented.",
+            }
+        return None  # Fall back to default help text
+```

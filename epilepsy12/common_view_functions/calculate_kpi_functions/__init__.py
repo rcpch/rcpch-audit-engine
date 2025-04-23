@@ -5,7 +5,7 @@ from .score_kpi_4 import score_kpi_4
 from .score_kpi_5 import score_kpi_5
 from .score_kpi_6 import score_kpi_6
 from .score_kpi_7 import score_kpi_7
-from .score_kpi_8 import score_kpi_8
+from .score_kpi_8 import score_kpi_8, score_kpi_8_topiramate
 from .score_kpi_9 import (
     score_kpi_9A,
     score_kpi_9Ai,
