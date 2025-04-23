@@ -9,7 +9,7 @@ from django.utils import timezone
 from django.shortcuts import get_object_or_404, redirect, render
 from django.urls import reverse
 from django.conf import settings
-from django.contrib.auth.mixins import LoginRequiredMixin
+from django.contrib.auth.mixins import LoginRequiredMixin, PermissionRequiredMixin
 from django.contrib.auth.decorators import permission_required
 from django.contrib.gis.db.models import Q
 from django.contrib import messages
@@ -943,7 +943,7 @@ def consent_confirmation(request, case_id, consent_type):
     return response
 
 
-class CaseListView(LoginRequiredMixin, ListView):
+class CaseListView(LoginRequiredMixin, PermissionRequiredMixin, ListView):
     """
     View to display a list of cases for a given organisation.
     This view uses a faceted search for certain key metrics such as KPI
@@ -956,6 +956,8 @@ class CaseListView(LoginRequiredMixin, ListView):
     paginate_by = 50
     filterset_class = CaseFilter
     ordering = "surname"
+    permission_required = "epilepsy12.can_publish_epilepsy12_data"
+    raise_exception = True
 
     def get_queryset(self):
         """
