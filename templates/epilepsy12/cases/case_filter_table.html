@@ -17,8 +17,8 @@
         <!-- Main Content - Now at the top -->
         <div class="sixteen wide column">
             <!-- Filter Form -->
-            <form method="get" class="ui form">
-                <div class="ui segment">
+            <form method="get" class="ui rcpch form">
+                <div class="ui rcpch segment">
                     <div class="fields">
                         <div class="four wide field">
                             <label>Search</label>
@@ -31,7 +31,7 @@
                         <!-- Sex Filter -->
                         <div class="four wide field">
                             <label>{{ filterset.form.sex.label }}</label>
-                            <div class="ui fluid search selection dropdown">
+                            <div class="ui fluid search selection rcpch dropdown">
                                 <input type="hidden" name="sex" value="{{ request.GET.sex|default:'' }}">
                                 <i class="dropdown icon"></i>
                                 <div class="default text">Select Sex</div>
@@ -51,7 +51,7 @@
                         <!-- Ethnicity Filter -->
                         <div class="four wide field">
                             <label>{{ filterset.form.ethnicity.label }}</label>
-                            <div class="ui fluid search selection dropdown">
+                            <div class="ui fluid search selection rcpch dropdown">
                                 <input type="hidden" name="ethnicity" value="{{ request.GET.ethnicity|default:'' }}">
                                 <i class="dropdown icon"></i>
                                 <div class="default text">Select Ethnicity</div>
@@ -71,7 +71,7 @@
                         <!-- index of multiple deprivation quintile filter -->
                         <div class="four wide field">
                             <label>{{ filterset.form.index_of_multiple_deprivation_quintile.label }}</label>
-                            <div class="ui fluid search selection dropdown">
+                            <div class="ui fluid search selection rcpch dropdown">
                                 <input type="hidden" name="index_of_multiple_deprivation_quintile" value="{{ request.GET.index_of_multiple_deprivation_quintile|default:'' }}">
                                 <i class="dropdown icon"></i>
                                 <div class="default text">Select Index of Multiple Deprivation Quintile</div>
@@ -97,7 +97,7 @@
                         <!-- Trust/Health Board Filter -->
                             <div class="four wide field">
                                 <label>{{ filterset.form.trust_or_health_board.label|default:"Trust/Health Board" }}</label>
-                                <div class="ui fluid search selection dropdown">
+                                <div class="ui fluid search selection rcpch dropdown">
                                     <input type="hidden" name="trust_or_health_board" value="{{ request.GET.trust_or_health_board|default:'' }}">
                                     <i class="dropdown icon"></i>
                                     <div class="default text">Select Trust/Health Board</div>
@@ -117,7 +117,7 @@
                             <!--- Integrated Care Boards -->
                             <div class="four wide field">
                                 <label>{{ filterset.form.integrated_care_board.label|default:"Trust/Health Board" }}</label>
-                                <div class="ui fluid search selection dropdown">
+                                <div class="ui fluid search selection rcpch dropdown">
                                     <input type="hidden" name="integrated_care_board" value="{{ request.GET.integrated_care_board|default:'' }}">
                                     <i class="dropdown icon"></i>
                                     <div class="default text">Select Integrated Care Board</div>
@@ -138,7 +138,7 @@
                             <!-- NHS England Region Filter -->
                             <div class="four wide field">
                                 <label>NHS England Region</label>
-                                <div class="ui fluid selection dropdown">
+                                <div class="ui fluid selection rcpch dropdown">
                                     <input type="hidden" name="nhs_england_region" value="{{ request.GET.nhs_england_region|default:'' }}">
                                     <i class="dropdown icon"></i>
                                     <div class="default text">Select Region</div>
@@ -156,7 +156,7 @@
                         <!-- Country Filter -->
                             <div class="four wide field">
                                 <label>Country</label>
-                                <div class="ui fluid selection dropdown">
+                                <div class="ui fluid selection rcpch dropdown">
                                     <input type="hidden" name="country" value="{{ request.GET.country|default:'' }}">
                                     <i class="dropdown icon"></i>
                                     <div class="default text">Select Country</div>
@@ -186,13 +186,13 @@
                 
                 <!-- Filter Summary -->
                 {% if request.GET %}
-                <div class="ui info message">
+                <div class="ui rcpch_info message">
                     <div class="header">Active Filters</div>
                     <div class="ui horizontal list">
                         {% for key, value in request.GET.items %}
                             {% if key != 'page' and value %}
                                 <div class="item">
-                                    <div class="ui label">
+                                    <div class="ui rcpch_light_blue label">
                                         {{ key|title }}: {{ value|value_display:key }}
                                         <a href="?{% for k, v in request.GET.items %}{% if k != key and k != 'page' %}{{ k }}={{ v }}&{% endif %}{% endfor %}">
                                             <i class="delete icon"></i>
@@ -228,7 +228,7 @@
             <div class="ui stackable three column stretched grid">
                 <!-- Column 1: Clinic Composition -->
                 <div class="column">
-                    <div class="ui vertical fluid menu" style="height: 100%">
+                    <div class="ui rcpch facets vertical fluid menu" style="height: 100%">
                         <div class="item">
                             <div class="header">Clinic Composition</div>
                         </div>
@@ -246,7 +246,7 @@
                                 {% for cohort, count in cohort_counts.items %}
                                 <a class="item {% if request.GET.registration_cohort == cohort|stringformat:'i' %}active{% endif %}" 
                                 href="?registration_cohort={{ cohort }}{% for key, value in request.GET.items %}{% if key != 'registration_cohort' and key != 'page' %}&{{ key }}={{ value }}{% endif %}{% endfor %}">
-                                    Cohort {{ cohort }} <div class="ui {% if request.GET.registration_cohort == cohort|stringformat:'i' %}left pointing{% endif %} label">{{ count }}</div>
+                                    Cohort {{ cohort }} <div class="ui {% if request.GET.registration_cohort == cohort|stringformat:'i' %}left pointing{% endif %} rcpch facets label">{{ count }}</div>
                                 </a>
                                 {% endfor %}
                             </div>
@@ -259,17 +259,17 @@
                                 <!-- All Registrations Status option -->
                                 <a class="item {% if not request.GET.registration_status %}active{% endif %}" 
                                 href="?{% for key, value in request.GET.items %}{% if key != 'registration_status' and key != 'page' %}{% if not forloop.first %}&{% endif %}{{ key }}={{ value }}{% endif %}{% endfor %}">
-                                    All Cases <div class="ui {% if not request.GET.registration_status %}left pointing{% endif %} label">{{ total_cases }}</div>
+                                    All Cases <div class="ui {% if not request.GET.registration_status %}left pointing{% endif %} rcpch facets label">{{ total_cases }}</div>
                                 </a>
                                 
                                 <a class="item {% if request.GET.registration_status == 'registered' %}active{% endif %}" 
                                 href="?registration_status=registered{% for key, value in request.GET.items %}{% if key != 'registration_status' and key != 'page' %}&{{ key }}={{ value }}{% endif %}{% endfor %}">
-                                    Registered <div class="ui {% if request.GET.registration_status == 'registered' %}left pointing{% endif %} label">{{ registered_cases }}</div>
+                                    Registered <div class="ui {% if request.GET.registration_status == 'registered' %}left pointing{% endif %} rcpch facets label">{{ registered_cases }}</div>
                                 </a>
                                 
                                 <a class="item {% if request.GET.registration_status == 'unregistered' %}active{% endif %}" 
                                 href="?registration_status=unregistered{% for key, value in request.GET.items %}{% if key != 'registration_status' and key != 'page' %}&{{ key }}={{ value }}{% endif %}{% endfor %}">
-                                    Unregistered <div class="ui {% if request.GET.registration_status == 'unregistered' %}left pointing{% endif %} label">{{ unregistered_cases }}</div>
+                                    Unregistered <div class="ui {% if request.GET.registration_status == 'unregistered' %}left pointing{% endif %} rcpch facets label">{{ unregistered_cases }}</div>
                                 </a>
                             </div>
                         </div>
@@ -281,17 +281,17 @@
                                 <!-- All Ages option -->
                                 <a class="item {% if not request.GET.age_range %}active{% endif %}" 
                                 href="?{% for key, value in request.GET.items %}{% if key != 'age_range' and key != 'page' %}{% if not forloop.first %}&{% endif %}{{ key }}={{ value }}{% endif %}{% endfor %}">
-                                    All Ages <div class="ui {% if not request.GET.age_range %}left pointing{% endif %} label">{{ total_cases }}</div>
+                                    All Ages <div class="ui {% if not request.GET.age_range %}left pointing{% endif %} rcpch facets label">{{ total_cases }}</div>
                                 </a>
                                 
                                 <a class="item {% if request.GET.age_range == 'under_12' %}active{% endif %}" 
                                 href="?age_range=under_12{% for key, value in request.GET.items %}{% if key != 'age_range' and key != 'page' %}&{{ key }}={{ value }}{% endif %}{% endfor %}">
-                                    Under 12 <div class="ui {% if request.GET.age_range == 'under_12' %}left pointing{% endif %} label">{{ under_12_count }}</div>
+                                    Under 12 <div class="ui {% if request.GET.age_range == 'under_12' %}left pointing{% endif %} rcpch facets label">{{ under_12_count }}</div>
                                 </a>
                                 
                                 <a class="item {% if request.GET.age_range == '12_and_over' %}active{% endif %}" 
                                 href="?age_range=12_and_over{% for key, value in request.GET.items %}{% if key != 'age_range' and key != 'page' %}&{{ key }}={{ value }}{% endif %}{% endfor %}">
-                                    12 and Over <div class="ui {% if request.GET.age_range == '12_and_over' %}left pointing{% endif %} label">{{ over_12_count }}</div>
+                                    12 and Over <div class="ui {% if request.GET.age_range == '12_and_over' %}left pointing{% endif %} rcpch facets label">{{ over_12_count }}</div>
                                 </a>
                             </div>
                         </div>
@@ -300,7 +300,7 @@
                 
                 <!-- Column 2: Audit Process and Completion -->
                 <div class="column">
-                    <div class="ui vertical fluid menu" style="height: 100%">
+                    <div class="ui rcpch facets vertical fluid menu" style="height: 100%">
                         <div class="item">
                             <div class="header">Audit Process and Completion</div>
                         </div>
@@ -312,17 +312,17 @@
                                 <!-- All Audit Progress option -->
                                 <a class="item {% if not request.GET.complete_audit_progress and not request.GET.incomplete_audit_progress %}active{% endif %}" 
                                 href="?{% for key, value in request.GET.items %}{% if key != 'complete_audit_progress' and key != 'incomplete_audit_progress' and key != 'page' %}{% if not forloop.first %}&{% endif %}{{ key }}={{ value }}{% endif %}{% endfor %}">
-                                    All Cases <div class="ui {% if not request.GET.complete_audit_progress and not request.GET.incomplete_audit_progress %}left pointing{% endif %} label">{{ total_cases }}</div>
+                                    All Cases <div class="ui {% if not request.GET.complete_audit_progress and not request.GET.incomplete_audit_progress %}left pointing{% endif %} rcpch facets label">{{ total_cases }}</div>
                                 </a>
                                 
                                 <a class="item {% if request.GET.complete_audit_progress %}active{% endif %}" 
                                 href="?complete_audit_progress=audit_1{% for key, value in request.GET.items %}{% if key != 'complete_audit_progress' and key != 'incomplete_audit_progress' and key != 'page' %}&{{ key }}={{ value }}{% endif %}{% endfor %}">
-                                    Complete <div class="ui {% if request.GET.complete_audit_progress %}left pointing{% endif %} label">{{ complete_cases }}</div>
+                                    Complete <div class="ui {% if request.GET.complete_audit_progress %}left pointing{% endif %} rcpch facets label">{{ complete_cases }}</div>
                                 </a>
                                 
                                 <a class="item {% if request.GET.incomplete_audit_progress %}active{% endif %}" 
                                 href="?incomplete_audit_progress=audit_1{% for key, value in request.GET.items %}{% if key != 'complete_audit_progress' and key != 'incomplete_audit_progress' and key != 'page' %}&{{ key }}={{ value }}{% endif %}{% endfor %}">
-                                    Incomplete <div class="ui {% if request.GET.incomplete_audit_progress %}left pointing{% endif %} label">{{ incomplete_cases }}</div>
+                                    Incomplete <div class="ui {% if request.GET.incomplete_audit_progress %}left pointing{% endif %} rcpch facets label">{{ incomplete_cases }}</div>
                                 </a>
                             </div>
                         </div>
@@ -334,7 +334,7 @@
                                 {% for kpi_num, count in kpi_failed_counts.items %}
                                 <a class="item {% if request.GET.kpi_failed == kpi_num|stringformat:'i' %}active{% endif %}" 
                                 href="?kpi_failed={{ kpi_num }}{% for key, value in request.GET.items %}{% if key != 'kpi_failed' and key != 'kpi_number' and key != 'page' %}&{{ key }}={{ value }}{% endif %}{% endfor %}">
-                                    KPI {{ kpi_num }} Failed <div class="ui label">{{ count }}</div>
+                                    KPI {{ kpi_num }} Failed <div class="ui rcpch facets label">{{ count }}</div>
                                 </a>
                                 {% endfor %}
                             </div>
@@ -344,7 +344,7 @@
                 
                 <!-- Column 3: Comorbidity and Complexity -->
                 <div class="column">
-                    <div class="ui vertical fluid menu" style="height: 100%">
+                    <div class="ui rcpch facets vertical fluid menu" style="height: 100%">
                         <div class="item">
                             <div class="header">Comorbidity and Complexity</div>
                         </div>
@@ -361,7 +361,7 @@
                                         ?syndrome_present=true{% for key, value in request.GET.items %}{% if key != 'syndrome_present' and key != 'page' %}&{{ key }}={{ value }}{% endif %}{% endfor %}
                                         {% endif %}">
                                     Syndrome Present
-                                    <div class="ui {% if request.GET.syndrome_present == 'true' %}left pointing{% endif %} label">{{ syndrome_present_count }}</div>
+                                    <div class="ui {% if request.GET.syndrome_present == 'true' %}left pointing{% endif %} rcpch facets label">{{ syndrome_present_count }}</div>
                                 </a>
                                 
                                 <!-- Epilepsy Cause Known -->
@@ -372,7 +372,7 @@
                                             ?epilepsy_cause_known=true{% for key, value in request.GET.items %}{% if key != 'epilepsy_cause_known' and key != 'page' %}&{{ key }}={{ value }}{% endif %}{% endfor %}
                                             {% endif %}">
                                         Epilepsy Cause Known
-                                        <div class="ui {% if request.GET.epilepsy_cause_known == 'true' %}left pointing{% endif %} label">{{ epilepsy_cause_known_count }}</div>
+                                        <div class="ui {% if request.GET.epilepsy_cause_known == 'true' %}left pointing{% endif %} rcpch facets label">{{ epilepsy_cause_known_count }}</div>
                                     </a>
                                     
                                     <!-- Global Developmental Delay -->
@@ -383,7 +383,7 @@
                                             ?global_developmental_delay_or_learning_difficulties=true{% for key, value in request.GET.items %}{% if key != 'global_developmental_delay_or_learning_difficulties' and key != 'page' %}&{{ key }}={{ value }}{% endif %}{% endfor %}
                                             {% endif %}">
                                         Global Developmental Delay
-                                        <div class="ui {% if request.GET.global_developmental_delay_or_learning_difficulties == 'true' %}left pointing{% endif %} label">{{ global_developmental_delay_or_learning_difficulties_count }}</div>
+                                        <div class="ui {% if request.GET.global_developmental_delay_or_learning_difficulties == 'true' %}left pointing{% endif %} rcpch facets label">{{ global_developmental_delay_or_learning_difficulties_count }}</div>
                                     </a>
 
                                     <!-- Toggle for developmental problems filter -->
@@ -394,7 +394,7 @@
                                                 ?developmental_learning_or_schooling_problems=true{% for key, value in request.GET.items %}{% if key != 'developmental_learning_or_schooling_problems' and key != 'page' %}&{{ key }}={{ value }}{% endif %}{% endfor %}
                                                 {% endif %}">
                                             Developmental or Learning Problems
-                                            <div class="ui {% if request.GET.developmental_learning_or_schooling_problems == 'true' %}left pointing{% endif %} label">{{ developmental_learning_or_schooling_problems_count }}</div>
+                                            <div class="ui {% if request.GET.developmental_learning_or_schooling_problems == 'true' %}left pointing{% endif %} rcpch facets label">{{ developmental_learning_or_schooling_problems_count }}</div>
                                     </a>
 
                                     <!-- Toggle for developmental problems filter -->
@@ -405,7 +405,7 @@
                                             ?behavioural_or_emotional_problems=true{% for key, value in request.GET.items %}{% if key != 'behavioural_or_emotional_problems' and key != 'page' %}&{{ key }}={{ value }}{% endif %}{% endfor %}
                                             {% endif %}">
                                         Behavioural or Emotional Problems
-                                        <div class="ui {% if request.GET.behavioural_or_emotional_problems == 'true' %}left pointing{% endif %} label">{{ behavioural_or_emotional_problems_count }}</div>
+                                        <div class="ui {% if request.GET.behavioural_or_emotional_problems == 'true' %}left pointing{% endif %} rcpch facets label">{{ behavioural_or_emotional_problems_count }}</div>
                                     </a>
                                     
                                     <!-- Autism Spectrum Disorder -->
@@ -416,7 +416,7 @@
                                             ?autistic_spectrum_disorder=true{% for key, value in request.GET.items %}{% if key != 'autistic_spectrum_disorder' and key != 'page' %}&{{ key }}={{ value }}{% endif %}{% endfor %}
                                             {% endif %}">
                                         Autism Spectrum Disorder
-                                        <div class="ui {% if request.GET.autistic_spectrum_disorder == 'true' %}left pointing{% endif %} label">{{ autistic_spectrum_disorder_count }}</div>
+                                        <div class="ui {% if request.GET.autistic_spectrum_disorder == 'true' %}left pointing{% endif %} rcpch facets label">{{ autistic_spectrum_disorder_count }}</div>
                                     </a>
                                     
                                     <!-- Mental Health Issues -->
@@ -427,7 +427,7 @@
                                             ?mental_health_issue_identified=true{% for key, value in request.GET.items %}{% if key != 'mental_health_issue_identified' and key != 'page' %}&{{ key }}={{ value }}{% endif %}{% endfor %}
                                             {% endif %}">
                                         Mental Health Issues Identified
-                                        <div class="ui {% if request.GET.mental_health_issue_identified == 'true' %}left pointing{% endif %} label">{{ mental_health_issue_identified_count }}</div>
+                                        <div class="ui {% if request.GET.mental_health_issue_identified == 'true' %}left pointing{% endif %} rcpch facets label">{{ mental_health_issue_identified_count }}</div>
                                     </a>
 
                                     <!-- Mental Health Referral Made -->
@@ -438,7 +438,7 @@
                                             ?has_been_referred_for_mental_health_support=true{% for key, value in request.GET.items %}{% if key != 'has_been_referred_for_mental_health_support' and key != 'page' %}&{{ key }}={{ value }}{% endif %}{% endfor %}
                                             {% endif %}">
                                         Mental Health Referral Made
-                                        <div class="ui {% if request.GET.has_been_referred_for_mental_health_support == 'true' %}left pointing{% endif %} label">{{ has_been_referred_for_mental_health_support_count }}</div>
+                                        <div class="ui {% if request.GET.has_been_referred_for_mental_health_support == 'true' %}left pointing{% endif %} rcpch facets label">{{ has_been_referred_for_mental_health_support_count }}</div>
                                     </a>
 
                                     <!-- Mental Health Support In Place -->
@@ -449,7 +449,7 @@
                                             ?has_support_for_mental_health_support=true{% for key, value in request.GET.items %}{% if key != 'has_support_for_mental_health_support' and key != 'page' %}&{{ key }}={{ value }}{% endif %}{% endfor %}
                                             {% endif %}">
                                         Mental Health Support In Place
-                                        <div class="ui {% if request.GET.has_support_for_mental_health_support == 'true' %}left pointing{% endif %} label">{{ has_support_for_mental_health_support_count }}</div>
+                                        <div class="ui {% if request.GET.has_support_for_mental_health_support == 'true' %}left pointing{% endif %} rcpch facets label">{{ has_support_for_mental_health_support_count }}</div>
                                     </a>
                             </div>
                         </div>
@@ -460,8 +460,8 @@
 
         <!-- Results Table (Full width below the filter columns) -->
         <div class="sixteen wide column">
-            <div class="ui segment">
-                <table class="ui celled striped table">
+            
+                <table class="ui celled rcpch table">
                     <thead>
                         <tr>
                             <th>Name</th>
@@ -489,7 +489,7 @@
                             <td>{{ case.date_of_birth|date:"d/m/Y" }}</td>
                             <td>
                                 {% if case.registration %}
-                                    <div class="ui label">Cohort {{ case.registration.cohort }}</div>
+                                    <div class="ui rcpch_light_blue label">Cohort {{ case.registration.cohort }}</div>
                                 {% else %}
                                     <div class="ui grey label">Unregistered</div>
                                 {% endif %}
@@ -510,15 +510,15 @@
                             </td>
                             <td class="center aligned">
                                 <div class="ui icon buttons">
-                                    <a href="{% url 'update_case' organisation_id=organisation_id case_id=case.id %}" class="ui blue button">
+                                    <a href="{% url 'update_case' organisation_id=organisation_id case_id=case.id %}" class="ui rcpch_primary button">
                                         <i class="edit icon"></i>
                                     </a>
                                     {% if case.registration %}
-                                        <a href="{% url 'case_performance_summary' case_id=case.id %}" class="ui teal button">
+                                        <a href="{% url 'case_performance_summary' case_id=case.id %}" class="ui rcpch_purple button">
                                             <i class="chart bar icon"></i>
                                         </a>
                                     {% else %}
-                                        <a href="{% url 'register_case' organisation_id=organisation_id case_id=case.id %}" class="ui green button">
+                                        <a href="{% url 'register_case' organisation_id=organisation_id case_id=case.id %}" class="ui rcpch_pink button">
                                             <i class="plus icon"></i>
                                         </a>
                                     {% endif %}
@@ -575,7 +575,7 @@
                 {% endif %}
             </div>
         </div>
-    </div>
+    
 </div>
 {% endblock %}
 
