@@ -892,26 +892,18 @@ class CaseFilterMethods:
         """
         if not value:
             return 0
-        try:
-            value_type, value_id = value.split("_", 1)
-        except ValueError:
-            # Handle the case where value is not in the expected format
-            return 0
-
-        if value_type == "cohort":
-            # Filter by registration cohort
-            return (
-                queryset.filter(
-                    site__site_is_primary_centre_of_epilepsy_care=True,
-                    site__site_is_actively_involved_in_epilepsy_care=True,
-                    site__case__isnull=False,
-                    site__case__registration__isnull=False,
-                    registration__cohort=value_id,
-                )
-                .distinct()
-                .count()
+        # Filter by registration cohort
+        return (
+            queryset.filter(
+                site__site_is_primary_centre_of_epilepsy_care=True,
+                site__site_is_actively_involved_in_epilepsy_care=True,
+                site__case__isnull=False,
+                site__case__registration__isnull=False,
+                registration__cohort=value,
             )
-        return 0
+            .distinct()
+            .count()
+        )
 
     @staticmethod
     def filter_by_audit_progress_incomplete(queryset, value):

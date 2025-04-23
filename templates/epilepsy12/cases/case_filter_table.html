@@ -17,32 +17,67 @@
         <!-- Faceted Navigation Sidebar -->
         <div class="four wide column">
             <div class="ui vertical fluid menu">
+
+                <!-- Cohort Status -->
+                <!-- Cohort Status (Radio-like behavior) -->
+                <div class="item">
+                    <div class="header">Cohort</div>
+                    <div class="menu">
+                        <!-- Add "All Cohorts" option first -->
+                        <a class="item {% if not request.GET.registration_cohort %}active{% endif %}" 
+                        href="{% url 'case_filter_list' organisation_id %}{% for key, value in request.GET.items %}{% if key != 'registration_cohort' and key != 'page' %}&{{ key }}={{ value }}{% endif %}{% endfor %}">
+                            All Cohorts <div class="ui {% if not request.GET.registration_cohort %}left pointing{% endif %} label">{{ total_cases }}</div>
+                        </a>
+                        
+                        {% for cohort, count in cohort_counts.items %}
+                        <a class="item {% if request.GET.registration_cohort == cohort|stringformat:'i' %}active{% endif %}" 
+                        href="?registration_cohort={{ cohort }}{% for key, value in request.GET.items %}{% if key != 'registration_cohort' and key != 'page' %}&{{ key }}={{ value }}{% endif %}{% endfor %}">
+                            Cohort {{ cohort }} <div class="ui {% if request.GET.registration_cohort == cohort|stringformat:'i' %}left pointing{% endif %} label">{{ count }}</div>
+                        </a>
+                        {% endfor %}
+                    </div>
+                </div>
+
                 <!-- Case Registration Status -->
                 <div class="item">
                     <div class="header">Case Status</div>
                     <div class="menu">
-                        <a class="item {% if request.GET.registration_status == 'registered' %}active{% endif %}" 
-                           href="?registration_status=registered{% for key, value in request.GET.items %}{% if key != 'registration_status' and key != 'page' %}&{{ key }}={{ value }}{% endif %}{% endfor %}">
-                            Registered <div class="ui label">{{ registered_cases }}</div>
+                        <!-- All Case Status option -->
+                        <a class="item {% if not request.GET.registration_status %}active{% endif %}" 
+                        href="{% url 'case_filter_list' organisation_id %}{% for key, value in request.GET.items %}{% if key != 'registration_status' and key != 'page' %}&{{ key }}={{ value }}{% endif %}{% endfor %}">
+                            All Cases <div class="ui {% if not request.GET.registration_status %}left pointing{% endif %} label">{{ total_cases }}</div>
                         </a>
+                        
+                        <a class="item {% if request.GET.registration_status == 'registered' %}active{% endif %}" 
+                        href="?registration_status=registered{% for key, value in request.GET.items %}{% if key != 'registration_status' and key != 'page' %}&{{ key }}={{ value }}{% endif %}{% endfor %}">
+                            Registered <div class="ui {% if request.GET.registration_status == 'registered' %}left pointing{% endif %} label">{{ registered_cases }}</div>
+                        </a>
+                        
                         <a class="item {% if request.GET.registration_status == 'unregistered' %}active{% endif %}" 
-                           href="?registration_status=unregistered{% for key, value in request.GET.items %}{% if key != 'registration_status' and key != 'page' %}&{{ key }}={{ value }}{% endif %}{% endfor %}">
-                            Unregistered <div class="ui label">{{ unregistered_cases }}</div>
+                        href="?registration_status=unregistered{% for key, value in request.GET.items %}{% if key != 'registration_status' and key != 'page' %}&{{ key }}={{ value }}{% endif %}{% endfor %}">
+                            Unregistered <div class="ui {% if request.GET.registration_status == 'unregistered' %}left pointing{% endif %} label">{{ unregistered_cases }}</div>
                         </a>
                     </div>
                 </div>
-                
+
                 <!-- Age Ranges -->
                 <div class="item">
                     <div class="header">Age</div>
                     <div class="menu">
-                        <a class="item {% if request.GET.age_range == 'under_12' %}active{% endif %}" 
-                           href="?age_range=under_12{% for key, value in request.GET.items %}{% if key != 'age_range' and key != 'page' %}&{{ key }}={{ value }}{% endif %}{% endfor %}">
-                            Under 12 <div class="ui label">{{ under_12_count }}</div>
+                        <!-- All Ages option -->
+                        <a class="item {% if not request.GET.age_range %}active{% endif %}" 
+                        href="{% url 'case_filter_list' organisation_id %}{% for key, value in request.GET.items %}{% if key != 'age_range' and key != 'page' %}&{{ key }}={{ value }}{% endif %}{% endfor %}">
+                            All Ages <div class="ui {% if not request.GET.age_range %}left pointing{% endif %} label">{{ total_cases }}</div>
                         </a>
+                        
+                        <a class="item {% if request.GET.age_range == 'under_12' %}active{% endif %}" 
+                        href="?age_range=under_12{% for key, value in request.GET.items %}{% if key != 'age_range' and key != 'page' %}&{{ key }}={{ value }}{% endif %}{% endfor %}">
+                            Under 12 <div class="ui {% if request.GET.age_range == 'under_12' %}left pointing{% endif %} label">{{ under_12_count }}</div>
+                        </a>
+                        
                         <a class="item {% if request.GET.age_range == '12_and_over' %}active{% endif %}" 
-                           href="?age_range=12_and_over{% for key, value in request.GET.items %}{% if key != 'age_range' and key != 'page' %}&{{ key }}={{ value }}{% endif %}{% endfor %}">
-                            12 and Over <div class="ui label">{{ over_12_count }}</div>
+                        href="?age_range=12_and_over{% for key, value in request.GET.items %}{% if key != 'age_range' and key != 'page' %}&{{ key }}={{ value }}{% endif %}{% endfor %}">
+                            12 and Over <div class="ui {% if request.GET.age_range == '12_and_over' %}left pointing{% endif %} label">{{ over_12_count }}</div>
                         </a>
                     </div>
                 </div>
@@ -51,13 +86,20 @@
                 <div class="item">
                     <div class="header">Audit Progress</div>
                     <div class="menu">
-                        <a class="item {% if request.GET.complete_audit_progress %}active{% endif %}" 
-                           href="?complete_audit_progress=audit_1{% for key, value in request.GET.items %}{% if key != 'complete_audit_progress' and key != 'incomplete_audit_progress' and key != 'page' %}&{{ key }}={{ value }}{% endif %}{% endfor %}">
-                            Complete <div class="ui label">{{ complete_cases }}</div>
+                        <!-- All Audit Progress option -->
+                        <a class="item {% if not request.GET.complete_audit_progress and not request.GET.incomplete_audit_progress %}active{% endif %}" 
+                        href="{% url 'case_filter_list' organisation_id %}{% for key, value in request.GET.items %}{% if key != 'complete_audit_progress' and key != 'incomplete_audit_progress' and key != 'page' %}&{{ key }}={{ value }}{% endif %}{% endfor %}">
+                            All Cases <div class="ui {% if not request.GET.complete_audit_progress and not request.GET.incomplete_audit_progress %}left pointing{% endif %} label">{{ total_cases }}</div>
                         </a>
+                        
+                        <a class="item {% if request.GET.complete_audit_progress %}active{% endif %}" 
+                        href="?complete_audit_progress=audit_1{% for key, value in request.GET.items %}{% if key != 'complete_audit_progress' and key != 'incomplete_audit_progress' and key != 'page' %}&{{ key }}={{ value }}{% endif %}{% endfor %}">
+                            Complete <div class="ui {% if request.GET.complete_audit_progress %}left pointing rcpch_pink{% endif %} label">{{ complete_cases }}</div>
+                        </a>
+                        
                         <a class="item {% if request.GET.incomplete_audit_progress %}active{% endif %}" 
-                           href="?incomplete_audit_progress=audit_1{% for key, value in request.GET.items %}{% if key != 'complete_audit_progress' and key != 'incomplete_audit_progress' and key != 'page' %}&{{ key }}={{ value }}{% endif %}{% endfor %}">
-                            Incomplete <div class="ui label">{{ incomplete_cases }}</div>
+                        href="?incomplete_audit_progress=audit_1{% for key, value in request.GET.items %}{% if key != 'complete_audit_progress' and key != 'incomplete_audit_progress' and key != 'page' %}&{{ key }}={{ value }}{% endif %}{% endfor %}">
+                            Incomplete <div class="ui {% if request.GET.incomplete_audit_progress %}left pointing rcpch_pink{% endif %} label">{{ incomplete_cases }}</div>
                         </a>
                     </div>
                 </div>
