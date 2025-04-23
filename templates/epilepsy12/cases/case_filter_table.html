@@ -115,40 +115,10 @@
                         {% endfor %}
                     </div>
                 </div>
-                
-                <!-- First Paediatric Assessment -->
-                <!-- Developmental/Learning Problems -->
-                <div class="item">
-                    <div class="header">First Paediatric Assessment</div>
-                    <div class="menu">
-                        <!-- Toggle for developmental problems filter -->
-                        <a class="item {% if request.GET.developmental_learning_or_schooling_problems == 'true' %}active{% endif %}" 
-                        href="{% if request.GET.developmental_learning_or_schooling_problems == 'true' %}
-                                ?{% for key, value in request.GET.items %}{% if key != 'developmental_learning_or_schooling_problems' and key != 'page' %}{% if not forloop.first %}&{% endif %}{{ key }}={{ value }}{% endif %}{% endfor %}
-                                {% else %}
-                                ?developmental_learning_or_schooling_problems=true{% for key, value in request.GET.items %}{% if key != 'developmental_learning_or_schooling_problems' and key != 'page' %}&{{ key }}={{ value }}{% endif %}{% endfor %}
-                                {% endif %}">
-                            Developmental or Learning Problems
-                            <div class="ui {% if request.GET.developmental_learning_or_schooling_problems == 'true' %}left pointing{% endif %} label">{{ developmental_learning_or_schooling_problems_count }}</div>
-                        </a>
-                    </div>
-                    <div class="menu">
-                        <!-- Toggle for developmental problems filter -->
-                        <a class="item {% if request.GET.behavioural_or_emotional_problems == 'true' %}active{% endif %}" 
-                        href="{% if request.GET.behavioural_or_emotional_problems == 'true' %}
-                                ?{% for key, value in request.GET.items %}{% if key != 'behavioural_or_emotional_problems' and key != 'page' %}{% if not forloop.first %}&{% endif %}{{ key }}={{ value }}{% endif %}{% endfor %}
-                                {% else %}
-                                ?behavioural_or_emotional_problems=true{% for key, value in request.GET.items %}{% if key != 'behavioural_or_emotional_problems' and key != 'page' %}&{{ key }}={{ value }}{% endif %}{% endfor %}
-                                {% endif %}">
-                            Behavioural or Emotional Problems
-                            <div class="ui {% if request.GET.behavioural_or_emotional_problems == 'true' %}left pointing{% endif %} label">{{ behavioural_or_emotional_problems_count }}</div>
-                        </a>
-                    </div>
-                </div>
 
                 <!-- Multiaxial Diagnosis Section -->
                 <div class="item">
-                    <div class="header">Multiaxial Diagnosis</div>
+                    <div class="header">Comorbidity and Complexity</div>
                     <div class="menu">
                         <!-- Syndrome Present -->
                         <a class="item {% if request.GET.syndrome_present == 'true' %}active{% endif %}" 
@@ -182,6 +152,28 @@
                                 Global Developmental Delay
                                 <div class="ui {% if request.GET.global_developmental_delay_or_learning_difficulties == 'true' %}left pointing{% endif %} label">{{ global_developmental_delay_or_learning_difficulties_count }}</div>
                             </a>
+
+                            <!-- Toggle for developmental problems filter -->
+                            <a class="item {% if request.GET.developmental_learning_or_schooling_problems == 'true' %}active{% endif %}" 
+                                href="{% if request.GET.developmental_learning_or_schooling_problems == 'true' %}
+                                        ?{% for key, value in request.GET.items %}{% if key != 'developmental_learning_or_schooling_problems' and key != 'page' %}{% if not forloop.first %}&{% endif %}{{ key }}={{ value }}{% endif %}{% endfor %}
+                                        {% else %}
+                                        ?developmental_learning_or_schooling_problems=true{% for key, value in request.GET.items %}{% if key != 'developmental_learning_or_schooling_problems' and key != 'page' %}&{{ key }}={{ value }}{% endif %}{% endfor %}
+                                        {% endif %}">
+                                    Developmental or Learning Problems
+                                    <div class="ui {% if request.GET.developmental_learning_or_schooling_problems == 'true' %}left pointing{% endif %} label">{{ developmental_learning_or_schooling_problems_count }}</div>
+                            </a>
+
+                            <!-- Toggle for developmental problems filter -->
+                            <a class="item {% if request.GET.behavioural_or_emotional_problems == 'true' %}active{% endif %}" 
+                            href="{% if request.GET.behavioural_or_emotional_problems == 'true' %}
+                                    ?{% for key, value in request.GET.items %}{% if key != 'behavioural_or_emotional_problems' and key != 'page' %}{% if not forloop.first %}&{% endif %}{{ key }}={{ value }}{% endif %}{% endfor %}
+                                    {% else %}
+                                    ?behavioural_or_emotional_problems=true{% for key, value in request.GET.items %}{% if key != 'behavioural_or_emotional_problems' and key != 'page' %}&{{ key }}={{ value }}{% endif %}{% endfor %}
+                                    {% endif %}">
+                                Behavioural or Emotional Problems
+                                <div class="ui {% if request.GET.behavioural_or_emotional_problems == 'true' %}left pointing{% endif %} label">{{ behavioural_or_emotional_problems_count }}</div>
+                            </a>
                             
                             <!-- Autism Spectrum Disorder -->
                             <a class="item {% if request.GET.autistic_spectrum_disorder == 'true' %}active{% endif %}" 
@@ -201,8 +193,30 @@
                                     {% else %}
                                     ?mental_health_issue_identified=true{% for key, value in request.GET.items %}{% if key != 'mental_health_issue_identified' and key != 'page' %}&{{ key }}={{ value }}{% endif %}{% endfor %}
                                     {% endif %}">
-                                Mental Health Issues
+                                Mental Health Issues Identified
                                 <div class="ui {% if request.GET.mental_health_issue_identified == 'true' %}left pointing{% endif %} label">{{ mental_health_issue_identified_count }}</div>
+                            </a>
+
+                            <!-- Mental Health Referral Made -->
+                            <a class="item {% if request.GET.has_been_referred_for_mental_health_support == 'true' %}active{% endif %}" 
+                            href="{% if request.GET.has_been_referred_for_mental_health_support == 'true' %}
+                                    ?{% for key, value in request.GET.items %}{% if key != 'has_been_referred_for_mental_health_support' and key != 'page' %}{% if not forloop.first %}&{% endif %}{{ key }}={{ value }}{% endif %}{% endfor %}
+                                    {% else %}
+                                    ?has_been_referred_for_mental_health_support=true{% for key, value in request.GET.items %}{% if key != 'has_been_referred_for_mental_health_support' and key != 'page' %}&{{ key }}={{ value }}{% endif %}{% endfor %}
+                                    {% endif %}">
+                                Mental Health Referral Made
+                                <div class="ui {% if request.GET.has_been_referred_for_mental_health_support == 'true' %}left pointing{% endif %} label">{{ has_been_referred_for_mental_health_support_count }}</div>
+                            </a>
+
+                            <!-- Mental Health Support In Place -->
+                            <a class="item {% if request.GET.has_support_for_mental_health_support == 'true' %}active{% endif %}" 
+                            href="{% if request.GET.has_support_for_mental_health_support == 'true' %}
+                                    ?{% for key, value in request.GET.items %}{% if key != 'has_support_for_mental_health_support' and key != 'page' %}{% if not forloop.first %}&{% endif %}{{ key }}={{ value }}{% endif %}{% endfor %}
+                                    {% else %}
+                                    ?has_support_for_mental_health_support=true{% for key, value in request.GET.items %}{% if key != 'has_support_for_mental_health_support' and key != 'page' %}&{{ key }}={{ value }}{% endif %}{% endfor %}
+                                    {% endif %}">
+                                Mental Health Support In Place
+                                <div class="ui {% if request.GET.has_support_for_mental_health_support == 'true' %}left pointing{% endif %} label">{{ has_support_for_mental_health_support_count }}</div>
                             </a>
                         </div>
                     </div>

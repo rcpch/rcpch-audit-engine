@@ -993,7 +993,15 @@ class CaseListView(LoginRequiredMixin, ListView):
             "nhs_england_region",
             "country",
             # related fields
-            "developmental_learning_or_schooling_problems",
+            "developmental_learning_or_schooling_problems"
+            "behavioural_or_emotional_problems"
+            "syndrome_present"
+            "epilepsy_cause_known"
+            "global_developmental_delay_or_learning_difficulties"
+            "autistic_spectrum_disorder"
+            "mental_health_issue_identified"
+            "has_been_referred_for_mental_health_support"
+            "has_support_for_mental_health_support",
         ]
 
         # Apply all the active filters including special filters at once
@@ -1171,6 +1179,18 @@ class CaseListView(LoginRequiredMixin, ListView):
 
         context["mental_health_issue_identified_count"] = (
             CaseFilterMethods.get_mental_health_issue_identified_counts(
+                queryset=filtered_queryset
+            )
+        )
+
+        context["has_been_referred_for_mental_health_support_count"] = (
+            CaseFilterMethods.get_has_been_referred_for_mental_health_support_counts(
+                queryset=filtered_queryset
+            )
+        )
+
+        context["has_support_for_mental_health_support_count"] = (
+            CaseFilterMethods.get_has_support_for_mental_health_support_counts(
                 queryset=filtered_queryset
             )
         )

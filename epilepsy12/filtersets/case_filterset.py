@@ -551,6 +551,56 @@ class CaseFilterMethods:
             registration__multiaxialdiagnosis__mental_health_issue_identified=True
         ).count()
 
+    @staticmethod
+    def filter_by_has_been_referred_for_mental_health_support(queryset, value=None):
+        """
+        Filter cases where patient has been referred for mental health support
+        """
+        return queryset.filter(
+            registration__management__has_been_referred_for_mental_health_support=True
+        )
+
+    @staticmethod
+    def get_has_been_referred_for_mental_health_support_counts(queryset):
+        """
+        Returns counts of cases where patient has been referred for mental health support
+        """
+        return queryset.filter(
+            registration__management__has_been_referred_for_mental_health_support=True
+        ).count()
+
+    @staticmethod
+    def filter_by_has_support_for_mental_health_support(queryset, value=None):
+        """
+        Filter cases where patient has mental health support in place
+        """
+        return queryset.filter(
+            registration__management__has_support_for_mental_health_support=True
+        )
+
+    @staticmethod
+    def get_has_support_for_mental_health_support_counts(queryset):
+        """
+        Returns counts of cases where patient has mental health support in place
+        """
+        return queryset.filter(
+            registration__management__has_support_for_mental_health_support=True
+        ).count()
+
+    def filter_by_has_been_referred_for_mental_health_support(
+        self, queryset, name, value
+    ):
+        """Delegate to CaseFilterMethods for mental health referral status"""
+        return CaseFilterMethods.filter_by_has_been_referred_for_mental_health_support(
+            queryset, value
+        )
+
+    def filter_by_has_support_for_mental_health_support(self, queryset, name, value):
+        """Delegate to CaseFilterMethods for mental health support status"""
+        return CaseFilterMethods.filter_by_has_support_for_mental_health_support(
+            queryset, value
+        )
+
     """
     Methods to filter cases by organisation, trust, health board, integrated care board,
     """
@@ -1260,6 +1310,8 @@ class CaseFilterMethods:
             "global_developmental_delay_or_learning_difficulties"
             "autistic_spectrum_disorder"
             "mental_health_issue_identified"
+            "has_been_referred_for_mental_health_support"
+            "has_support_for_mental_health_support"
             """
             for param_name in special_filter_params:
                 if param_name in request.GET and request.GET[param_name]:
