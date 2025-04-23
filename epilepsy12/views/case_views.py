@@ -967,10 +967,12 @@ class CaseListView(LoginRequiredMixin, ListView):
         # Base queryset - all cases
         base_queryset = Case.objects.all()
 
+        filtered_queryset = base_queryset
         # First filter by the organization from the URL parameter
-        filtered_queryset = CaseFilterMethods.filter_by_organisation(
-            base_queryset, organisation_id
-        )
+        if not self.request.user.is_rcpch_audit_team_member:
+            filtered_queryset = CaseFilterMethods.filter_by_organisation(
+                base_queryset, organisation_id
+            )
 
         # Apply the filterset for the form filters
         self.filterset = self.filterset_class(

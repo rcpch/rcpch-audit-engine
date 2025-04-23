@@ -66,14 +66,15 @@
                 <div class="item">
                     <div class="header">KPI Status</div>
                     <div class="menu">
-                        {% for kpi_num in '12345678910'|make_list %}
-                        <a class="item {% if request.GET.kpi_failed == kpi_num %}active{% endif %}" 
-                           href="?kpi_failed={{ kpi_num }}{% for key, value in request.GET.items %}{% if key != 'kpi_failed' and key != 'kpi_number' and key != 'page' %}&{{ key }}={{ value }}{% endif %}{% endfor %}">
-                            KPI {{ kpi_num }} Failed <div class="ui label">{{ kpi_failed_counts|get_item:'kpi_'|add:kpi_num|default:'0' }}</div>
+                        {% for kpi_num, count in kpi_failed_counts.items %}
+                        <a class="item {% if request.GET.kpi_failed == kpi_num|stringformat:'i' %}active{% endif %}" 
+                        href="?kpi_failed={{ kpi_num }}{% for key, value in request.GET.items %}{% if key != 'kpi_failed' and key != 'kpi_number' and key != 'page' %}&{{ key }}={{ value }}{% endif %}{% endfor %}">
+                            KPI {{ kpi_num }} Failed <div class="ui label">{{ count }}</div>
                         </a>
                         {% endfor %}
                     </div>
                 </div>
+
             </div>
         </div> <!-- four wide column -->
         

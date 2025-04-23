@@ -108,6 +108,29 @@ class CaseFilter(django_filters.FilterSet):
     # Filter by epilepsy cause
     # Filter by epilepsy syndrome
 
+    class Meta:
+        model = Case
+        fields = [
+            # simple filters for fields on the Case model
+            "first_name",
+            "surname",
+            "nhs_number",
+            "unique_reference_number",
+            "sex",
+            "ethnicity",
+            "date_of_birth",
+            "date_of_birth_range",
+            "first_paediatric_assessment_date",
+            # custom filters
+            "age_range",
+            "kpi_failed",
+            "organisation",
+            "trust_or_health_board",
+            "integrated_care_board",
+            "nhs_england_region",
+            "country",
+        ]
+
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
 
@@ -195,28 +218,6 @@ class CaseFilter(django_filters.FilterSet):
             special_filter_params=special_filter_params,
             apply_special_filters=True,
         )
-
-    class Meta:
-        model = Case
-        fields = [
-            # simple filters for fields on the Case model
-            "first_name",
-            "surname",
-            "nhs_number",
-            "unique_reference_number",
-            "sex",
-            "ethnicity",
-            "date_of_birth",
-            "date_of_birth_range",
-            "first_paediatric_assessment_date",
-            # custom filters
-            "age_range",
-            "organisation",
-            "trust_or_health_board",
-            "integrated_care_board",
-            "nhs_england_region",
-            "country",
-        ]
 
 
 class CaseFilterMethods:
@@ -589,32 +590,36 @@ class CaseFilterMethods:
     @staticmethod
     def get_kpi_failed_counts(queryset):
         """
-        Returns counts of case by KPI failed status - includes cases with no registration
-        Accepts a value in the format of "kpi_<kpi_number>"
-        The string has to be split into value_type and value_id
-        The value_type is "kpi" and the value_id is the KPI number.
-        The KPI number is used to get the field name from the KPI_MAP dictionary.
+        Returns a dictionary of KPI fields and counts of cases failing each KPI.
+
+        Returns:
+            dict: Keys are KPI numbers (1-10), values are the count of cases failing that KPI
         """
-        # if not value:
-        #     return 0
-        # if "_" in value:
-        #     value_type, value_id = value.split("_", 1)
-        # else:
-        #     value_id = value
-        filter_kwargs = Q()
+
+        kpi_counts = {}
+
+        # Loop through all KPIs (1-10)
         for i in range(1, 11):
-            term = {f"registration__kpi__{KPI_MAP.get(i)}": 0}
-            filter_kwargs |= Q(**term)
+            kpi_field = KPI_MAP.get(i)
+            if kpi_field:
+                # Count cases failing this KPI (value=0 means failed)
+                filter_kwargs = {f"registration__kpi__{kpi_field}": 0}
+                count = (
+                    queryset.filter(
+                        Q(**filter_kwargs),
+                        site__site_is_primary_centre_of_epilepsy_care=True,
+                        site__site_is_actively_involved_in_epilepsy_care=True,
+                        site__case__isnull=False,
+                        site__case__registration__isnull=False,
+                    )
+                    .distinct()
+                    .count()
+                )
 
-        # Filter by KPI failed status
+                # Store the count for this KPI
+                kpi_counts[i] = count
 
-        return queryset.filter(
-            filter_kwargs,
-            # site__site_is_primary_centre_of_epilepsy_care=True,
-            # site__site_is_actively_involved_in_epilepsy_care=True,
-            # site__case__isnull=False,
-            # site__case__registration__isnull=False,
-        ).count()
+        return kpi_counts
 
     @staticmethod
     def filter_by_complete_audit_progress(queryset, value):
