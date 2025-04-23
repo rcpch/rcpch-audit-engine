@@ -1141,5 +1141,10 @@ class CaseListView(LoginRequiredMixin, ListView):
                 queryset=filtered_queryset
             )
         )
+        context["behavioural_or_emotional_problems_count"] = (
+            CaseFilterMethods.get_behavioural_or_emotional_problems_counts(
+                queryset=filtered_queryset
+            )
+        )
 
         return context

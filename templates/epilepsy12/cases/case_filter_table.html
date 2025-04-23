@@ -132,6 +132,18 @@
                             <div class="ui {% if request.GET.developmental_learning_or_schooling_problems == 'true' %}left pointing{% endif %} label">{{ developmental_learning_or_schooling_problems_count }}</div>
                         </a>
                     </div>
+                    <div class="menu">
+                        <!-- Toggle for developmental problems filter -->
+                        <a class="item {% if request.GET.behavioural_or_emotional_problems == 'true' %}active{% endif %}" 
+                        href="{% if request.GET.behavioural_or_emotional_problems == 'true' %}
+                                ?{% for key, value in request.GET.items %}{% if key != 'behavioural_or_emotional_problems' and key != 'page' %}{% if not forloop.first %}&{% endif %}{{ key }}={{ value }}{% endif %}{% endfor %}
+                                {% else %}
+                                ?behavioural_or_emotional_problems=true{% for key, value in request.GET.items %}{% if key != 'behavioural_or_emotional_problems' and key != 'page' %}&{{ key }}={{ value }}{% endif %}{% endfor %}
+                                {% endif %}">
+                            Behavioural or Emotional Problems
+                            <div class="ui {% if request.GET.behavioural_or_emotional_problems == 'true' %}left pointing{% endif %} label">{{ behavioural_or_emotional_problems_count }}</div>
+                        </a>
+                    </div>
                 </div>
 
             </div> <!-- vertical menu -->

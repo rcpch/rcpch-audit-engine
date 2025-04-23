@@ -411,6 +411,24 @@ class CaseFilterMethods:
             registration__firstpaediatricassessment__developmental_learning_or_schooling_problems=True
         ).count()
 
+    @staticmethod
+    def filter_by_behavioural_or_emotional_problems(queryset, value=None):
+        """
+        Filter cases by behavioural or emotional problems
+        """
+        return queryset.filter(
+            registration__firstpaediatricassessment__behavioural_or_emotional_problems=True
+        )
+
+    @staticmethod
+    def get_behavioural_or_emotional_problems_counts(queryset):
+        """
+        Returns counts of cases by behavioural or emotional problems
+        """
+        return queryset.filter(
+            registration__firstpaediatricassessment__behavioural_or_emotional_problems=True
+        ).count()
+
     """
     Methods to filter cases by organisation, trust, health board, integrated care board,
     """
@@ -1114,6 +1132,7 @@ class CaseFilterMethods:
 
             # related fields
             "developmental_learning_or_schooling_problems"
+            "behavioural_or_emotional_problems"
             """
             for param_name in special_filter_params:
                 if param_name in request.GET and request.GET[param_name]:
