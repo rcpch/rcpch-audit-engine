@@ -16,6 +16,7 @@ from .calculate_kpi_functions import (
     score_kpi_6,
     score_kpi_7,
     score_kpi_8,
+    score_kpi_8_topiramate,
     score_kpi_9A,
     score_kpi_9Ai,
     score_kpi_9Aii,
@@ -73,6 +74,9 @@ def calculate_kpis(registration_instance):
     sudep = KPI_SCORE["NOT_SCORED"]
     school_individual_healthcare_plan = KPI_SCORE["NOT_SCORED"]
 
+    # Get cohort from registration_instance
+    cohort = registration_instance.cohort
+
     # important metric for calculations that follow
     age_at_first_paediatric_assessment = (
         calculate_age_at_first_paediatric_assessment_in_years(registration_instance)
@@ -116,10 +120,17 @@ def calculate_kpis(registration_instance):
     if has_all_attributes(registration_instance, ["multiaxialdiagnosis", "management"]):
         mental_health_support = score_kpi_7(registration_instance)
 
-    if hasattr(registration_instance, "management"):
-        sodium_valproate = score_kpi_8(
-            registration_instance, age_at_first_paediatric_assessment
-        )
+    # Sodium valproate is only relevant for cohort 6
+    if cohort < 7:
+        if hasattr(registration_instance, "management"):
+            sodium_valproate = score_kpi_8(
+                registration_instance, age_at_first_paediatric_assessment
+            )
+    else:
+        if hasattr(registration_instance, "management"):
+            sodium_valproate = score_kpi_8_topiramate(
+                registration_instance, age_at_first_paediatric_assessment
+            )
 
     if hasattr(registration_instance, "management"):
         comprehensive_care_planning_agreement = score_kpi_9A(registration_instance)

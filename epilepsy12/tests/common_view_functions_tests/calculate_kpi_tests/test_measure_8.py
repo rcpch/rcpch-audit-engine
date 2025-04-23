@@ -2,7 +2,7 @@
 Measure 8 `sodium_valproate` - Percentage of all females 12 years and above currently on valproate treatment with annual risk acknowledgement form completed
 
 Number of females >= 12yo diagnosed with epilepsy at first year AND on valproate AND (
-     annual risk acknowledgement forms completed 
+     annual risk acknowledgement forms completed
      OR
      pregnancy prevention programme in place
     )

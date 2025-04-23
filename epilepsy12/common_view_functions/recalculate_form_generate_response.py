@@ -278,22 +278,58 @@ def total_fields_expected(model_instance):
                         today, model_instance.registration.case.date_of_birth
                     )
 
-                    if (
-                        hasattr(medicine, "medicine_entity")
-                        and model_instance.registration.case.sex == 2
-                        and calculated_age.years >= 12
-                    ):
+                    """
+                     conditional logic introduced here where scoring depends on cohort number. as of #1215
+                    If cohort is 7 or above then:
+                    - the word 'Valproate' be removed from the both questions (this happens in the model)
+                    - both questions appear for all females on valproate
+                    - the Annual Risk Acknowledgment Form question appear for males on valproate (the pregnancy prevention programme doesn't apply to males)
+                    - Both questions appear for females aged 12 year and over and on topiramate
+                    - the Annual Risk Acknowledgment Form question appear for males on topiramate (the pregnancy prevention programme doesn't apply to males)
+                    """
+                    if model_instance.registration.cohort > 6:
                         if medicine.medicine_entity is not None:
                             if (
-                                medicine.medicine_entity.medicine_name
-                                == "Sodium valproate"
-                            ):
+                                medicine.medicine_entity.conceptId
+                                == "777808008"  # topiramate
+                            ) or medicine.medicine_entity.conceptId == "387481005":  # valproate
                                 # essential fields are:
-                                # 'is_a_pregnancy_prevention_programme_needed' - this is not scored
-                                if medicine.is_a_pregnancy_prevention_programme_needed:
+                                # has_a_valproate_annual_risk_acknowledgement_form_been_completed
+                                cumulative_score += 1
+
+                                if model_instance.registration.case.sex == 2:
+                                    # if patient is a girl and either she is on valproate or she is 12 years or older and on topiramate
                                     # essential fields are:
-                                    # 'is_a_pregnancy_prevention_programme_in_place, 'has_a_valproate_annual_risk_acknowledgement_form_been_completed'
-                                    cumulative_score += 2
+                                    # 'is_a_pregnancy_prevention_programme_in_place
+                                    cumulative_score += 1
+                                    if (
+                                        medicine.is_a_pregnancy_prevention_programme_needed
+                                    ):
+                                        # essential fields are:
+                                        # 'is_a_pregnancy_prevention_programme_in_place
+                                        cumulative_score += 1
+                    else:
+                        # cohort is 6 or below
+                        # essential fields are:
+                        # 'has_a_valproate_annual_risk_acknowledgement_form_been_completed'
+                        if (
+                            hasattr(medicine, "medicine_entity")
+                            and model_instance.registration.case.sex == 2
+                            and calculated_age.years >= 12
+                        ):
+                            if medicine.medicine_entity is not None:
+                                if (
+                                    medicine.medicine_entity.medicine_name
+                                    == "Sodium valproate"
+                                ):
+                                    # essential fields are:
+                                    # 'is_a_pregnancy_prevention_programme_needed' - this is not scored
+                                    if (
+                                        medicine.is_a_pregnancy_prevention_programme_needed
+                                    ):
+                                        # essential fields are:
+                                        # 'is_a_pregnancy_prevention_programme_in_place, 'has_a_valproate_annual_risk_acknowledgement_form_been_completed'
+                                        cumulative_score += 2
             else:
                 # user has said AED given but not scored yet
                 cumulative_score += scoreable_fields_for_model_class_name(
