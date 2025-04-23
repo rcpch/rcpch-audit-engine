@@ -567,31 +567,27 @@ class CaseFilterMethods:
     def filter_by_kpi_failed(queryset, value):
         """
         Filter cases by the KPI failed status.
-        The string has to be split into value_type and value_id
-        The value_type is "kpi" and the value_id is the KPI number.
-        The KPI number is used to get the field name from the KPI_MAP dictionary.
         """
-        # value_type and value_id would come from parsing the value parameter
-        value_type, value_id = value.split("_", 1)
+        if "_" in value:
+            value_type, value_id = value.split("_", 1)
+        else:
+            value_id = value
 
         kpi_field = KPI_MAP.get(int(value_id))
 
-        if value_type == "kpi":
-            # Filter by KPI failed status
-            filter_kwargs = {f"site__organisation__kpi__{kpi_field}": 2}
+        # Filter by KPI failed status
+        filter_kwargs = {f"registration__kpi__{kpi_field}": 0}
 
-            return queryset.filter(
-                Q(**filter_kwargs),
-                site__site_is_primary_centre_of_epilepsy_care=True,
-                site__site_is_actively_involved_in_epilepsy_care=True,
-                site__case__isnull=False,
-                site__case__registration__isnull=False,
-            )
-
-        return queryset
+        return queryset.filter(
+            Q(**filter_kwargs),
+            site__site_is_primary_centre_of_epilepsy_care=True,
+            site__site_is_actively_involved_in_epilepsy_care=True,
+            site__case__isnull=False,
+            site__case__registration__isnull=False,
+        )
 
     @staticmethod
-    def get_kpi_failed_count(queryset, value):
+    def get_kpi_failed_counts(queryset):
         """
         Returns counts of case by KPI failed status - includes cases with no registration
         Accepts a value in the format of "kpi_<kpi_number>"
@@ -599,31 +595,26 @@ class CaseFilterMethods:
         The value_type is "kpi" and the value_id is the KPI number.
         The KPI number is used to get the field name from the KPI_MAP dictionary.
         """
-        if not value:
-            return 0
-        try:
-            value_type, value_id = value.split("_", 1)
-        except ValueError:
-            # Handle the case where value is not in the expected format
-            return 0
+        # if not value:
+        #     return 0
+        # if "_" in value:
+        #     value_type, value_id = value.split("_", 1)
+        # else:
+        #     value_id = value
+        filter_kwargs = Q()
+        for i in range(1, 11):
+            term = {f"registration__kpi__{KPI_MAP.get(i)}": 0}
+            filter_kwargs |= Q(**term)
 
-        kpi_field = KPI_MAP.get(int(value_id))
+        # Filter by KPI failed status
 
-        if value_type == "kpi":
-            # Filter by KPI failed status
-            filter_kwargs = {f"registration__kpi__{kpi_field}": 2}
-            return (
-                queryset.filter(
-                    Q(**filter_kwargs),
-                    site__site_is_primary_centre_of_epilepsy_care=True,
-                    site__site_is_actively_involved_in_epilepsy_care=True,
-                    site__case__isnull=False,
-                    site__case__registration__isnull=False,
-                )
-                .distinct()
-                .count()
-            )
-        return 0
+        return queryset.filter(
+            filter_kwargs,
+            # site__site_is_primary_centre_of_epilepsy_care=True,
+            # site__site_is_actively_involved_in_epilepsy_care=True,
+            # site__case__isnull=False,
+            # site__case__registration__isnull=False,
+        ).count()
 
     @staticmethod
     def filter_by_complete_audit_progress(queryset, value):
@@ -1025,6 +1016,7 @@ class CaseFilterMethods:
             for param_name in special_filter_params:
                 if param_name in request.GET and request.GET[param_name]:
                     # Call the appropriate filter method based on parameter name
+
                     filter_method = getattr(
                         CaseFilterMethods, f"filter_by_{param_name}", None
                     )
@@ -1041,8 +1033,6 @@ class CaseFilterMethods:
             ):
                 continue
 
-            print(f"Applying filter: {key} with value: {value}")
-
             # Apply standard filters through explicit cases
             if key == "organisation":
                 queryset = CaseFilterMethods.filter_by_organisation(
@@ -1058,6 +1048,10 @@ class CaseFilterMethods:
                 )
             elif key == "registration_status":
                 queryset = CaseFilterMethods.filter_by_registration_status(
+                    queryset=queryset, value=value
+                )
+            elif key == "kpi_number":
+                queryset = CaseFilterMethods.filter_by_kpi_failed(
                     queryset=queryset, value=value
                 )
 

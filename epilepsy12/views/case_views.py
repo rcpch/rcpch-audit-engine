@@ -1073,11 +1073,14 @@ class CaseListView(LoginRequiredMixin, ListView):
             )
 
         # Add KPI facets - for KPIs 1-12
-        for kpi in range(1, 11):
-            kpi_key = f"kpi_{kpi}"
-            context[kpi_key] = CaseFilterMethods.get_kpi_failed_count(
-                filtered_queryset, value=kpi_key
-            )
+        # for kpi in range(1, 11):
+        #     context[f"kpi_{kpi}"] = CaseFilterMethods.get_kpi_failed_count(
+        #         filtered_queryset, value=kpi
+        #     )
+        context["kpi_failed_counts"] = CaseFilterMethods.get_kpi_failed_counts(
+            filtered_queryset
+        )
+        print(context["kpi_failed_counts"])
 
         context["total_episodes"] = CaseFilterMethods.get_total_episodes_count(
             queryset=filtered_queryset,
