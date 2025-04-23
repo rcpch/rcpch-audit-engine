@@ -14,219 +14,8 @@
     </h1>
 
     <div class="ui stackable grid">
-        <!-- Faceted Navigation Sidebar -->
-        <div class="four wide column">
-            <div class="ui vertical fluid menu">
-
-                <!-- Cohort Status (Radio-like behavior) -->
-                <div class="item">
-                    <div class="header">Cohort</div>
-                    <div class="menu">
-                        <!-- All Cohorts option -->
-                        <a class="item {% if not request.GET.registration_cohort %}active{% endif %}" 
-                        href="?{% for key, value in request.GET.items %}{% if key != 'registration_cohort' and key != 'page' %}&{{ key }}={{ value }}{% endif %}{% endfor %}">
-                            All Cohorts <div class="ui {% if not request.GET.registration_cohort %}left pointing{% endif %} label">{{ total_cases }}</div>
-                        </a>
-                        
-                        {% for cohort, count in cohort_counts.items %}
-                        <a class="item {% if request.GET.registration_cohort == cohort|stringformat:'i' %}active{% endif %}" 
-                        href="?registration_cohort={{ cohort }}{% for key, value in request.GET.items %}{% if key != 'registration_cohort' and key != 'page' %}&{{ key }}={{ value }}{% endif %}{% endfor %}">
-                            Cohort {{ cohort }} <div class="ui {% if request.GET.registration_cohort == cohort|stringformat:'i' %}left pointing{% endif %} label">{{ count }}</div>
-                        </a>
-                        {% endfor %}
-                    </div>
-                </div>
-
-                <!-- Case Registration Status -->
-                <div class="item">
-                    <div class="header">Case Status</div>
-                    <div class="menu">
-                        <!-- All Registrations Status option -->
-                        <a class="item {% if not request.GET.registration_status %}active{% endif %}" 
-                        href="?{% for key, value in request.GET.items %}{% if key != 'registration_status' and key != 'page' %}{% if not forloop.first %}&{% endif %}{{ key }}={{ value }}{% endif %}{% endfor %}">
-                            All Cases <div class="ui {% if not request.GET.registration_status %}left pointing{% endif %} label">{{ total_cases }}</div>
-                        </a>
-                        
-                        <a class="item {% if request.GET.registration_status == 'registered' %}active{% endif %}" 
-                        href="?registration_status=registered{% for key, value in request.GET.items %}{% if key != 'registration_status' and key != 'page' %}&{{ key }}={{ value }}{% endif %}{% endfor %}">
-                            Registered <div class="ui {% if request.GET.registration_status == 'registered' %}left pointing{% endif %} label">{{ registered_cases }}</div>
-                        </a>
-                        
-                        <a class="item {% if request.GET.registration_status == 'unregistered' %}active{% endif %}" 
-                        href="?registration_status=unregistered{% for key, value in request.GET.items %}{% if key != 'registration_status' and key != 'page' %}&{{ key }}={{ value }}{% endif %}{% endfor %}">
-                            Unregistered <div class="ui {% if request.GET.registration_status == 'unregistered' %}left pointing{% endif %} label">{{ unregistered_cases }}</div>
-                        </a>
-                    </div>
-                </div>
-
-                <!-- Age Ranges -->
-                <div class="item">
-                    <div class="header">Age</div>
-                    <div class="menu">
-                        <!-- All Ages option -->
-                        <a class="item {% if not request.GET.age_range %}active{% endif %}" 
-                        href="?{% for key, value in request.GET.items %}{% if key != 'age_range' and key != 'page' %}{% if not forloop.first %}&{% endif %}{{ key }}={{ value }}{% endif %}{% endfor %}">
-                            All Ages <div class="ui {% if not request.GET.age_range %}left pointing{% endif %} label">{{ total_cases }}</div>
-                        </a>
-                        
-                        <a class="item {% if request.GET.age_range == 'under_12' %}active{% endif %}" 
-                        href="?age_range=under_12{% for key, value in request.GET.items %}{% if key != 'age_range' and key != 'page' %}&{{ key }}={{ value }}{% endif %}{% endfor %}">
-                            Under 12 <div class="ui {% if request.GET.age_range == 'under_12' %}left pointing{% endif %} label">{{ under_12_count }}</div>
-                        </a>
-                        
-                        <a class="item {% if request.GET.age_range == '12_and_over' %}active{% endif %}" 
-                        href="?age_range=12_and_over{% for key, value in request.GET.items %}{% if key != 'age_range' and key != 'page' %}&{{ key }}={{ value }}{% endif %}{% endfor %}">
-                            12 and Over <div class="ui {% if request.GET.age_range == '12_and_over' %}left pointing{% endif %} label">{{ over_12_count }}</div>
-                        </a>
-                    </div>
-                </div>
-                
-                <!-- Audit Progress -->
-                <div class="item">
-                    <div class="header">Audit Progress</div>
-                    <div class="menu">
-                        <!-- All Audit Progress option -->
-                        <a class="item {% if not request.GET.complete_audit_progress and not request.GET.incomplete_audit_progress %}active{% endif %}" 
-                        href="?{% for key, value in request.GET.items %}{% if key != 'complete_audit_progress' and key != 'incomplete_audit_progress' and key != 'page' %}{% if not forloop.first %}&{% endif %}{{ key }}={{ value }}{% endif %}{% endfor %}">
-                            All Cases <div class="ui {% if not request.GET.complete_audit_progress and not request.GET.incomplete_audit_progress %}left pointing{% endif %} label">{{ total_cases }}</div>
-                        </a>
-                        
-                        <a class="item {% if request.GET.complete_audit_progress %}active{% endif %}" 
-                        href="?complete_audit_progress=audit_1{% for key, value in request.GET.items %}{% if key != 'complete_audit_progress' and key != 'incomplete_audit_progress' and key != 'page' %}&{{ key }}={{ value }}{% endif %}{% endfor %}">
-                            Complete <div class="ui {% if request.GET.complete_audit_progress %}left pointing{% endif %} label">{{ complete_cases }}</div>
-                        </a>
-                        
-                        <a class="item {% if request.GET.incomplete_audit_progress %}active{% endif %}" 
-                        href="?incomplete_audit_progress=audit_1{% for key, value in request.GET.items %}{% if key != 'complete_audit_progress' and key != 'incomplete_audit_progress' and key != 'page' %}&{{ key }}={{ value }}{% endif %}{% endfor %}">
-                            Incomplete <div class="ui {% if request.GET.incomplete_audit_progress %}left pointing{% endif %} label">{{ incomplete_cases }}</div>
-                        </a>
-                    </div>
-                </div>
-                
-                <!-- KPI Failures -->
-                <div class="item">
-                    <div class="header">KPI Status</div>
-                    <div class="menu">
-                        {% for kpi_num, count in kpi_failed_counts.items %}
-                        <a class="item {% if request.GET.kpi_failed == kpi_num|stringformat:'i' %}active{% endif %}" 
-                        href="?kpi_failed={{ kpi_num }}{% for key, value in request.GET.items %}{% if key != 'kpi_failed' and key != 'kpi_number' and key != 'page' %}&{{ key }}={{ value }}{% endif %}{% endfor %}">
-                            KPI {{ kpi_num }} Failed <div class="ui label">{{ count }}</div>
-                        </a>
-                        {% endfor %}
-                    </div>
-                </div>
-
-                <!-- Multiaxial Diagnosis Section -->
-                <div class="item">
-                    <div class="header">Comorbidity and Complexity</div>
-                    <div class="menu">
-                        <!-- Syndrome Present -->
-                        <a class="item {% if request.GET.syndrome_present == 'true' %}active{% endif %}" 
-                        href="{% if request.GET.syndrome_present == 'true' %}
-                                ?{% for key, value in request.GET.items %}{% if key != 'syndrome_present' and key != 'page' %}{% if not forloop.first %}&{% endif %}{{ key }}={{ value }}{% endif %}{% endfor %}
-                                {% else %}
-                                ?syndrome_present=true{% for key, value in request.GET.items %}{% if key != 'syndrome_present' and key != 'page' %}&{{ key }}={{ value }}{% endif %}{% endfor %}
-                                {% endif %}">
-                            Syndrome Present
-                            <div class="ui {% if request.GET.syndrome_present == 'true' %}left pointing{% endif %} label">{{ syndrome_present_count }}</div>
-                        </a>
-                        
-                        <!-- Epilepsy Cause Known -->
-                        <a class="item {% if request.GET.epilepsy_cause_known == 'true' %}active{% endif %}" 
-                            href="{% if request.GET.epilepsy_cause_known == 'true' %}
-                                    ?{% for key, value in request.GET.items %}{% if key != 'epilepsy_cause_known' and key != 'page' %}{% if not forloop.first %}&{% endif %}{{ key }}={{ value }}{% endif %}{% endfor %}
-                                    {% else %}
-                                    ?epilepsy_cause_known=true{% for key, value in request.GET.items %}{% if key != 'epilepsy_cause_known' and key != 'page' %}&{{ key }}={{ value }}{% endif %}{% endfor %}
-                                    {% endif %}">
-                                Epilepsy Cause Known
-                                <div class="ui {% if request.GET.epilepsy_cause_known == 'true' %}left pointing{% endif %} label">{{ epilepsy_cause_known_count }}</div>
-                            </a>
-                            
-                            <!-- Global Developmental Delay -->
-                            <a class="item {% if request.GET.global_developmental_delay_or_learning_difficulties == 'true' %}active{% endif %}" 
-                            href="{% if request.GET.global_developmental_delay_or_learning_difficulties == 'true' %}
-                                    ?{% for key, value in request.GET.items %}{% if key != 'global_developmental_delay_or_learning_difficulties' and key != 'page' %}{% if not forloop.first %}&{% endif %}{{ key }}={{ value }}{% endif %}{% endfor %}
-                                    {% else %}
-                                    ?global_developmental_delay_or_learning_difficulties=true{% for key, value in request.GET.items %}{% if key != 'global_developmental_delay_or_learning_difficulties' and key != 'page' %}&{{ key }}={{ value }}{% endif %}{% endfor %}
-                                    {% endif %}">
-                                Global Developmental Delay
-                                <div class="ui {% if request.GET.global_developmental_delay_or_learning_difficulties == 'true' %}left pointing{% endif %} label">{{ global_developmental_delay_or_learning_difficulties_count }}</div>
-                            </a>
-
-                            <!-- Toggle for developmental problems filter -->
-                            <a class="item {% if request.GET.developmental_learning_or_schooling_problems == 'true' %}active{% endif %}" 
-                                href="{% if request.GET.developmental_learning_or_schooling_problems == 'true' %}
-                                        ?{% for key, value in request.GET.items %}{% if key != 'developmental_learning_or_schooling_problems' and key != 'page' %}{% if not forloop.first %}&{% endif %}{{ key }}={{ value }}{% endif %}{% endfor %}
-                                        {% else %}
-                                        ?developmental_learning_or_schooling_problems=true{% for key, value in request.GET.items %}{% if key != 'developmental_learning_or_schooling_problems' and key != 'page' %}&{{ key }}={{ value }}{% endif %}{% endfor %}
-                                        {% endif %}">
-                                    Developmental or Learning Problems
-                                    <div class="ui {% if request.GET.developmental_learning_or_schooling_problems == 'true' %}left pointing{% endif %} label">{{ developmental_learning_or_schooling_problems_count }}</div>
-                            </a>
-
-                            <!-- Toggle for developmental problems filter -->
-                            <a class="item {% if request.GET.behavioural_or_emotional_problems == 'true' %}active{% endif %}" 
-                            href="{% if request.GET.behavioural_or_emotional_problems == 'true' %}
-                                    ?{% for key, value in request.GET.items %}{% if key != 'behavioural_or_emotional_problems' and key != 'page' %}{% if not forloop.first %}&{% endif %}{{ key }}={{ value }}{% endif %}{% endfor %}
-                                    {% else %}
-                                    ?behavioural_or_emotional_problems=true{% for key, value in request.GET.items %}{% if key != 'behavioural_or_emotional_problems' and key != 'page' %}&{{ key }}={{ value }}{% endif %}{% endfor %}
-                                    {% endif %}">
-                                Behavioural or Emotional Problems
-                                <div class="ui {% if request.GET.behavioural_or_emotional_problems == 'true' %}left pointing{% endif %} label">{{ behavioural_or_emotional_problems_count }}</div>
-                            </a>
-                            
-                            <!-- Autism Spectrum Disorder -->
-                            <a class="item {% if request.GET.autistic_spectrum_disorder == 'true' %}active{% endif %}" 
-                            href="{% if request.GET.autistic_spectrum_disorder == 'true' %}
-                                    ?{% for key, value in request.GET.items %}{% if key != 'autistic_spectrum_disorder' and key != 'page' %}{% if not forloop.first %}&{% endif %}{{ key }}={{ value }}{% endif %}{% endfor %}
-                                    {% else %}
-                                    ?autistic_spectrum_disorder=true{% for key, value in request.GET.items %}{% if key != 'autistic_spectrum_disorder' and key != 'page' %}&{{ key }}={{ value }}{% endif %}{% endfor %}
-                                    {% endif %}">
-                                Autism Spectrum Disorder
-                                <div class="ui {% if request.GET.autistic_spectrum_disorder == 'true' %}left pointing{% endif %} label">{{ autistic_spectrum_disorder_count }}</div>
-                            </a>
-                            
-                            <!-- Mental Health Issues -->
-                            <a class="item {% if request.GET.mental_health_issue_identified == 'true' %}active{% endif %}" 
-                            href="{% if request.GET.mental_health_issue_identified == 'true' %}
-                                    ?{% for key, value in request.GET.items %}{% if key != 'mental_health_issue_identified' and key != 'page' %}{% if not forloop.first %}&{% endif %}{{ key }}={{ value }}{% endif %}{% endfor %}
-                                    {% else %}
-                                    ?mental_health_issue_identified=true{% for key, value in request.GET.items %}{% if key != 'mental_health_issue_identified' and key != 'page' %}&{{ key }}={{ value }}{% endif %}{% endfor %}
-                                    {% endif %}">
-                                Mental Health Issues Identified
-                                <div class="ui {% if request.GET.mental_health_issue_identified == 'true' %}left pointing{% endif %} label">{{ mental_health_issue_identified_count }}</div>
-                            </a>
-
-                            <!-- Mental Health Referral Made -->
-                            <a class="item {% if request.GET.has_been_referred_for_mental_health_support == 'true' %}active{% endif %}" 
-                            href="{% if request.GET.has_been_referred_for_mental_health_support == 'true' %}
-                                    ?{% for key, value in request.GET.items %}{% if key != 'has_been_referred_for_mental_health_support' and key != 'page' %}{% if not forloop.first %}&{% endif %}{{ key }}={{ value }}{% endif %}{% endfor %}
-                                    {% else %}
-                                    ?has_been_referred_for_mental_health_support=true{% for key, value in request.GET.items %}{% if key != 'has_been_referred_for_mental_health_support' and key != 'page' %}&{{ key }}={{ value }}{% endif %}{% endfor %}
-                                    {% endif %}">
-                                Mental Health Referral Made
-                                <div class="ui {% if request.GET.has_been_referred_for_mental_health_support == 'true' %}left pointing{% endif %} label">{{ has_been_referred_for_mental_health_support_count }}</div>
-                            </a>
-
-                            <!-- Mental Health Support In Place -->
-                            <a class="item {% if request.GET.has_support_for_mental_health_support == 'true' %}active{% endif %}" 
-                            href="{% if request.GET.has_support_for_mental_health_support == 'true' %}
-                                    ?{% for key, value in request.GET.items %}{% if key != 'has_support_for_mental_health_support' and key != 'page' %}{% if not forloop.first %}&{% endif %}{{ key }}={{ value }}{% endif %}{% endfor %}
-                                    {% else %}
-                                    ?has_support_for_mental_health_support=true{% for key, value in request.GET.items %}{% if key != 'has_support_for_mental_health_support' and key != 'page' %}&{{ key }}={{ value }}{% endif %}{% endfor %}
-                                    {% endif %}">
-                                Mental Health Support In Place
-                                <div class="ui {% if request.GET.has_support_for_mental_health_support == 'true' %}left pointing{% endif %} label">{{ has_support_for_mental_health_support_count }}</div>
-                            </a>
-                        </div>
-                    </div>
-
-
-            </div> <!-- vertical menu -->
-        </div> <!-- four wide column -->
-        
-        <!-- Main Content -->
-        <div class="twelve wide column">
+        <!-- Main Content - Now at the top -->
+        <div class="sixteen wide column">
             <!-- Filter Form -->
             <form method="get" class="ui form">
                 <div class="ui segment">
@@ -298,7 +87,6 @@
                                 </div>
                             </div>
                         </div>
-                    
                     </div><!--fields-->
                     
                     {% if perms.epilepsy12.can_publish_epilepsy12_data %}
@@ -382,22 +170,17 @@
                                     </div>
                                 </div>
                             </div>
-
                         </div>
                     </div>
                     {% endif %}
 
-                            <div class="fields">
-                                <button type="submit" class="ui rcpch_light_blue button">
-                                    <i class="filter icon"></i> Apply Filters
-                                </button>
-                                <a href="{% url 'case_filter_list' organisation_id %}" class="ui rcpch_light_blue button">
-                                    <i class="undo icon"></i> Reset
-                                </a>
-                            </div><!--fields-->
-
-                        </div><!--fields-->
-
+                    <div class="fields">
+                        <button type="submit" class="ui rcpch_light_blue button">
+                            <i class="filter icon"></i> Apply Filters
+                        </button>
+                        <a href="{% url 'case_filter_list' organisation_id %}" class="ui rcpch_light_blue button">
+                            <i class="undo icon"></i> Reset
+                        </a>
                     </div><!--fields-->
                 </div><!--segment-->
                 
@@ -438,8 +221,245 @@
                     <div class="label">Total Episodes</div>
                 </div>
             </div>
-            
-            <!-- Results Table -->
+        </div>
+
+        <!-- Three columns for filter categories -->
+        <div class="sixteen wide column">
+            <div class="ui stackable three column stretched grid">
+                <!-- Column 1: Clinic Composition -->
+                <div class="column">
+                    <div class="ui vertical fluid menu" style="height: 100%">
+                        <div class="item">
+                            <div class="header">Clinic Composition</div>
+                        </div>
+
+                        <!-- Cohort Status (Radio-like behavior) -->
+                        <div class="item">
+                            <div class="header">Cohort</div>
+                            <div class="menu">
+                                <!-- All Cohorts option -->
+                                <a class="item {% if not request.GET.registration_cohort %}active{% endif %}" 
+                                href="?{% for key, value in request.GET.items %}{% if key != 'registration_cohort' and key != 'page' %}&{{ key }}={{ value }}{% endif %}{% endfor %}">
+                                    All Cohorts <div class="ui {% if not request.GET.registration_cohort %}left pointing{% endif %} label">{{ total_cases }}</div>
+                                </a>
+                                
+                                {% for cohort, count in cohort_counts.items %}
+                                <a class="item {% if request.GET.registration_cohort == cohort|stringformat:'i' %}active{% endif %}" 
+                                href="?registration_cohort={{ cohort }}{% for key, value in request.GET.items %}{% if key != 'registration_cohort' and key != 'page' %}&{{ key }}={{ value }}{% endif %}{% endfor %}">
+                                    Cohort {{ cohort }} <div class="ui {% if request.GET.registration_cohort == cohort|stringformat:'i' %}left pointing{% endif %} label">{{ count }}</div>
+                                </a>
+                                {% endfor %}
+                            </div>
+                        </div>
+
+                        <!-- Case Registration Status -->
+                        <div class="item">
+                            <div class="header">Case Status</div>
+                            <div class="menu">
+                                <!-- All Registrations Status option -->
+                                <a class="item {% if not request.GET.registration_status %}active{% endif %}" 
+                                href="?{% for key, value in request.GET.items %}{% if key != 'registration_status' and key != 'page' %}{% if not forloop.first %}&{% endif %}{{ key }}={{ value }}{% endif %}{% endfor %}">
+                                    All Cases <div class="ui {% if not request.GET.registration_status %}left pointing{% endif %} label">{{ total_cases }}</div>
+                                </a>
+                                
+                                <a class="item {% if request.GET.registration_status == 'registered' %}active{% endif %}" 
+                                href="?registration_status=registered{% for key, value in request.GET.items %}{% if key != 'registration_status' and key != 'page' %}&{{ key }}={{ value }}{% endif %}{% endfor %}">
+                                    Registered <div class="ui {% if request.GET.registration_status == 'registered' %}left pointing{% endif %} label">{{ registered_cases }}</div>
+                                </a>
+                                
+                                <a class="item {% if request.GET.registration_status == 'unregistered' %}active{% endif %}" 
+                                href="?registration_status=unregistered{% for key, value in request.GET.items %}{% if key != 'registration_status' and key != 'page' %}&{{ key }}={{ value }}{% endif %}{% endfor %}">
+                                    Unregistered <div class="ui {% if request.GET.registration_status == 'unregistered' %}left pointing{% endif %} label">{{ unregistered_cases }}</div>
+                                </a>
+                            </div>
+                        </div>
+
+                        <!-- Age Ranges -->
+                        <div class="item">
+                            <div class="header">Age</div>
+                            <div class="menu">
+                                <!-- All Ages option -->
+                                <a class="item {% if not request.GET.age_range %}active{% endif %}" 
+                                href="?{% for key, value in request.GET.items %}{% if key != 'age_range' and key != 'page' %}{% if not forloop.first %}&{% endif %}{{ key }}={{ value }}{% endif %}{% endfor %}">
+                                    All Ages <div class="ui {% if not request.GET.age_range %}left pointing{% endif %} label">{{ total_cases }}</div>
+                                </a>
+                                
+                                <a class="item {% if request.GET.age_range == 'under_12' %}active{% endif %}" 
+                                href="?age_range=under_12{% for key, value in request.GET.items %}{% if key != 'age_range' and key != 'page' %}&{{ key }}={{ value }}{% endif %}{% endfor %}">
+                                    Under 12 <div class="ui {% if request.GET.age_range == 'under_12' %}left pointing{% endif %} label">{{ under_12_count }}</div>
+                                </a>
+                                
+                                <a class="item {% if request.GET.age_range == '12_and_over' %}active{% endif %}" 
+                                href="?age_range=12_and_over{% for key, value in request.GET.items %}{% if key != 'age_range' and key != 'page' %}&{{ key }}={{ value }}{% endif %}{% endfor %}">
+                                    12 and Over <div class="ui {% if request.GET.age_range == '12_and_over' %}left pointing{% endif %} label">{{ over_12_count }}</div>
+                                </a>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                
+                <!-- Column 2: Audit Process and Completion -->
+                <div class="column">
+                    <div class="ui vertical fluid menu" style="height: 100%">
+                        <div class="item">
+                            <div class="header">Audit Process and Completion</div>
+                        </div>
+                    
+                        <!-- Audit Progress -->
+                        <div class="item">
+                            <div class="header">Audit Progress</div>
+                            <div class="menu">
+                                <!-- All Audit Progress option -->
+                                <a class="item {% if not request.GET.complete_audit_progress and not request.GET.incomplete_audit_progress %}active{% endif %}" 
+                                href="?{% for key, value in request.GET.items %}{% if key != 'complete_audit_progress' and key != 'incomplete_audit_progress' and key != 'page' %}{% if not forloop.first %}&{% endif %}{{ key }}={{ value }}{% endif %}{% endfor %}">
+                                    All Cases <div class="ui {% if not request.GET.complete_audit_progress and not request.GET.incomplete_audit_progress %}left pointing{% endif %} label">{{ total_cases }}</div>
+                                </a>
+                                
+                                <a class="item {% if request.GET.complete_audit_progress %}active{% endif %}" 
+                                href="?complete_audit_progress=audit_1{% for key, value in request.GET.items %}{% if key != 'complete_audit_progress' and key != 'incomplete_audit_progress' and key != 'page' %}&{{ key }}={{ value }}{% endif %}{% endfor %}">
+                                    Complete <div class="ui {% if request.GET.complete_audit_progress %}left pointing{% endif %} label">{{ complete_cases }}</div>
+                                </a>
+                                
+                                <a class="item {% if request.GET.incomplete_audit_progress %}active{% endif %}" 
+                                href="?incomplete_audit_progress=audit_1{% for key, value in request.GET.items %}{% if key != 'complete_audit_progress' and key != 'incomplete_audit_progress' and key != 'page' %}&{{ key }}={{ value }}{% endif %}{% endfor %}">
+                                    Incomplete <div class="ui {% if request.GET.incomplete_audit_progress %}left pointing{% endif %} label">{{ incomplete_cases }}</div>
+                                </a>
+                            </div>
+                        </div>
+                        
+                        <!-- KPI Failures -->
+                        <div class="item">
+                            <div class="header">KPI Status</div>
+                            <div class="menu">
+                                {% for kpi_num, count in kpi_failed_counts.items %}
+                                <a class="item {% if request.GET.kpi_failed == kpi_num|stringformat:'i' %}active{% endif %}" 
+                                href="?kpi_failed={{ kpi_num }}{% for key, value in request.GET.items %}{% if key != 'kpi_failed' and key != 'kpi_number' and key != 'page' %}&{{ key }}={{ value }}{% endif %}{% endfor %}">
+                                    KPI {{ kpi_num }} Failed <div class="ui label">{{ count }}</div>
+                                </a>
+                                {% endfor %}
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                
+                <!-- Column 3: Comorbidity and Complexity -->
+                <div class="column">
+                    <div class="ui vertical fluid menu" style="height: 100%">
+                        <div class="item">
+                            <div class="header">Comorbidity and Complexity</div>
+                        </div>
+                        
+                        <!-- Multiaxial Diagnosis Section -->
+                        <div class="item">
+                            <div class="header">Conditions</div>
+                            <div class="menu">
+                                <!-- Syndrome Present -->
+                                <a class="item {% if request.GET.syndrome_present == 'true' %}active{% endif %}" 
+                                href="{% if request.GET.syndrome_present == 'true' %}
+                                        ?{% for key, value in request.GET.items %}{% if key != 'syndrome_present' and key != 'page' %}{% if not forloop.first %}&{% endif %}{{ key }}={{ value }}{% endif %}{% endfor %}
+                                        {% else %}
+                                        ?syndrome_present=true{% for key, value in request.GET.items %}{% if key != 'syndrome_present' and key != 'page' %}&{{ key }}={{ value }}{% endif %}{% endfor %}
+                                        {% endif %}">
+                                    Syndrome Present
+                                    <div class="ui {% if request.GET.syndrome_present == 'true' %}left pointing{% endif %} label">{{ syndrome_present_count }}</div>
+                                </a>
+                                
+                                <!-- Epilepsy Cause Known -->
+                                <a class="item {% if request.GET.epilepsy_cause_known == 'true' %}active{% endif %}" 
+                                    href="{% if request.GET.epilepsy_cause_known == 'true' %}
+                                            ?{% for key, value in request.GET.items %}{% if key != 'epilepsy_cause_known' and key != 'page' %}{% if not forloop.first %}&{% endif %}{{ key }}={{ value }}{% endif %}{% endfor %}
+                                            {% else %}
+                                            ?epilepsy_cause_known=true{% for key, value in request.GET.items %}{% if key != 'epilepsy_cause_known' and key != 'page' %}&{{ key }}={{ value }}{% endif %}{% endfor %}
+                                            {% endif %}">
+                                        Epilepsy Cause Known
+                                        <div class="ui {% if request.GET.epilepsy_cause_known == 'true' %}left pointing{% endif %} label">{{ epilepsy_cause_known_count }}</div>
+                                    </a>
+                                    
+                                    <!-- Global Developmental Delay -->
+                                    <a class="item {% if request.GET.global_developmental_delay_or_learning_difficulties == 'true' %}active{% endif %}" 
+                                    href="{% if request.GET.global_developmental_delay_or_learning_difficulties == 'true' %}
+                                            ?{% for key, value in request.GET.items %}{% if key != 'global_developmental_delay_or_learning_difficulties' and key != 'page' %}{% if not forloop.first %}&{% endif %}{{ key }}={{ value }}{% endif %}{% endfor %}
+                                            {% else %}
+                                            ?global_developmental_delay_or_learning_difficulties=true{% for key, value in request.GET.items %}{% if key != 'global_developmental_delay_or_learning_difficulties' and key != 'page' %}&{{ key }}={{ value }}{% endif %}{% endfor %}
+                                            {% endif %}">
+                                        Global Developmental Delay
+                                        <div class="ui {% if request.GET.global_developmental_delay_or_learning_difficulties == 'true' %}left pointing{% endif %} label">{{ global_developmental_delay_or_learning_difficulties_count }}</div>
+                                    </a>
+
+                                    <!-- Toggle for developmental problems filter -->
+                                    <a class="item {% if request.GET.developmental_learning_or_schooling_problems == 'true' %}active{% endif %}" 
+                                        href="{% if request.GET.developmental_learning_or_schooling_problems == 'true' %}
+                                                ?{% for key, value in request.GET.items %}{% if key != 'developmental_learning_or_schooling_problems' and key != 'page' %}{% if not forloop.first %}&{% endif %}{{ key }}={{ value }}{% endif %}{% endfor %}
+                                                {% else %}
+                                                ?developmental_learning_or_schooling_problems=true{% for key, value in request.GET.items %}{% if key != 'developmental_learning_or_schooling_problems' and key != 'page' %}&{{ key }}={{ value }}{% endif %}{% endfor %}
+                                                {% endif %}">
+                                            Developmental or Learning Problems
+                                            <div class="ui {% if request.GET.developmental_learning_or_schooling_problems == 'true' %}left pointing{% endif %} label">{{ developmental_learning_or_schooling_problems_count }}</div>
+                                    </a>
+
+                                    <!-- Toggle for developmental problems filter -->
+                                    <a class="item {% if request.GET.behavioural_or_emotional_problems == 'true' %}active{% endif %}" 
+                                    href="{% if request.GET.behavioural_or_emotional_problems == 'true' %}
+                                            ?{% for key, value in request.GET.items %}{% if key != 'behavioural_or_emotional_problems' and key != 'page' %}{% if not forloop.first %}&{% endif %}{{ key }}={{ value }}{% endif %}{% endfor %}
+                                            {% else %}
+                                            ?behavioural_or_emotional_problems=true{% for key, value in request.GET.items %}{% if key != 'behavioural_or_emotional_problems' and key != 'page' %}&{{ key }}={{ value }}{% endif %}{% endfor %}
+                                            {% endif %}">
+                                        Behavioural or Emotional Problems
+                                        <div class="ui {% if request.GET.behavioural_or_emotional_problems == 'true' %}left pointing{% endif %} label">{{ behavioural_or_emotional_problems_count }}</div>
+                                    </a>
+                                    
+                                    <!-- Autism Spectrum Disorder -->
+                                    <a class="item {% if request.GET.autistic_spectrum_disorder == 'true' %}active{% endif %}" 
+                                    href="{% if request.GET.autistic_spectrum_disorder == 'true' %}
+                                            ?{% for key, value in request.GET.items %}{% if key != 'autistic_spectrum_disorder' and key != 'page' %}{% if not forloop.first %}&{% endif %}{{ key }}={{ value }}{% endif %}{% endfor %}
+                                            {% else %}
+                                            ?autistic_spectrum_disorder=true{% for key, value in request.GET.items %}{% if key != 'autistic_spectrum_disorder' and key != 'page' %}&{{ key }}={{ value }}{% endif %}{% endfor %}
+                                            {% endif %}">
+                                        Autism Spectrum Disorder
+                                        <div class="ui {% if request.GET.autistic_spectrum_disorder == 'true' %}left pointing{% endif %} label">{{ autistic_spectrum_disorder_count }}</div>
+                                    </a>
+                                    
+                                    <!-- Mental Health Issues -->
+                                    <a class="item {% if request.GET.mental_health_issue_identified == 'true' %}active{% endif %}" 
+                                    href="{% if request.GET.mental_health_issue_identified == 'true' %}
+                                            ?{% for key, value in request.GET.items %}{% if key != 'mental_health_issue_identified' and key != 'page' %}{% if not forloop.first %}&{% endif %}{{ key }}={{ value }}{% endif %}{% endfor %}
+                                            {% else %}
+                                            ?mental_health_issue_identified=true{% for key, value in request.GET.items %}{% if key != 'mental_health_issue_identified' and key != 'page' %}&{{ key }}={{ value }}{% endif %}{% endfor %}
+                                            {% endif %}">
+                                        Mental Health Issues Identified
+                                        <div class="ui {% if request.GET.mental_health_issue_identified == 'true' %}left pointing{% endif %} label">{{ mental_health_issue_identified_count }}</div>
+                                    </a>
+
+                                    <!-- Mental Health Referral Made -->
+                                    <a class="item {% if request.GET.has_been_referred_for_mental_health_support == 'true' %}active{% endif %}" 
+                                    href="{% if request.GET.has_been_referred_for_mental_health_support == 'true' %}
+                                            ?{% for key, value in request.GET.items %}{% if key != 'has_been_referred_for_mental_health_support' and key != 'page' %}{% if not forloop.first %}&{% endif %}{{ key }}={{ value }}{% endif %}{% endfor %}
+                                            {% else %}
+                                            ?has_been_referred_for_mental_health_support=true{% for key, value in request.GET.items %}{% if key != 'has_been_referred_for_mental_health_support' and key != 'page' %}&{{ key }}={{ value }}{% endif %}{% endfor %}
+                                            {% endif %}">
+                                        Mental Health Referral Made
+                                        <div class="ui {% if request.GET.has_been_referred_for_mental_health_support == 'true' %}left pointing{% endif %} label">{{ has_been_referred_for_mental_health_support_count }}</div>
+                                    </a>
+
+                                    <!-- Mental Health Support In Place -->
+                                    <a class="item {% if request.GET.has_support_for_mental_health_support == 'true' %}active{% endif %}" 
+                                    href="{% if request.GET.has_support_for_mental_health_support == 'true' %}
+                                            ?{% for key, value in request.GET.items %}{% if key != 'has_support_for_mental_health_support' and key != 'page' %}{% if not forloop.first %}&{% endif %}{{ key }}={{ value }}{% endif %}{% endfor %}
+                                            {% else %}
+                                            ?has_support_for_mental_health_support=true{% for key, value in request.GET.items %}{% if key != 'has_support_for_mental_health_support' and key != 'page' %}&{{ key }}={{ value }}{% endif %}{% endfor %}
+                                            {% endif %}">
+                                        Mental Health Support In Place
+                                        <div class="ui {% if request.GET.has_support_for_mental_health_support == 'true' %}left pointing{% endif %} label">{{ has_support_for_mental_health_support_count }}</div>
+                                    </a>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Results Table (Full width below the filter columns) -->
+        <div class="sixteen wide column">
             <div class="ui segment">
                 <table class="ui celled striped table">
                     <thead>
@@ -479,7 +499,6 @@
                                     {% if case.registration.audit_progress.audit_complete %}
                                     <i class="rcpch_pink check circle outline icon"></i>
                                              Complete
-                                        </div>
                                     {% else %}
                                         <i class="rcpch_light_blue dot circle outline icon"></i> Incomplete
                                     {% endif %}
@@ -555,10 +574,9 @@
                 </div>
                 {% endif %}
             </div>
-        </div> <!-- twelve wide column -->
-
-    
-</div> <!-- fluid container -->
+        </div>
+    </div>
+</div>
 {% endblock %}
 
 {% block extra_js %}
