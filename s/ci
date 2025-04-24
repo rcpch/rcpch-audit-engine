@@ -29,8 +29,8 @@ docker tag e12-django:built ${azure_tag}
 docker push ${azure_tag}
 
 # Tests (against local Postgres)
-docker compose up -d
-s/test
+docker compose up -d --wait
+s/test -m 'not slow'
 s/test -m 'slow'
 docker compose down
 
