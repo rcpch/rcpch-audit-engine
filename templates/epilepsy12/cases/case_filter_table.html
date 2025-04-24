@@ -18,6 +18,7 @@
         <div class="sixteen wide column">
             <!-- Filter Form -->
             <form method="get" class="ui rcpch form">
+                
                 <div class="ui rcpch segment">
                     <div class="fields">
                         <div class="four wide field">
@@ -191,14 +192,27 @@
                     <div class="ui horizontal list">
                         {% for key, value in request.GET.items %}
                             {% if key != 'page' and value %}
-                                <div class="item">
-                                    <div class="ui rcpch_light_blue label">
-                                        {{ key|title }}: {{ value|value_display:key }}
-                                        <a href="?{% for k, v in request.GET.items %}{% if k != key and k != 'page' %}{{ k }}={{ v }}&{% endif %}{% endfor %}">
-                                            <i class="delete icon"></i>
-                                        </a>
+                                {% if key == 'kpi_failed' %}
+                                    {% for val in selected_kpis %}
+                                        <div class="item">
+                                            <div class="ui rcpch_light_blue label">
+                                                {{ key|title }}: {{ val|value_display:key }}
+                                                <a href="?{% for k, v in request.GET.items %}{% if k != key and k != 'page' %}{{ k }}={{ v }}&{% endif %}{% endfor %}">
+                                                    <i class="delete icon"></i>
+                                                </a>
+                                            </div>
+                                        </div>
+                                    {% endfor %}
+                                {% else %}
+                                    <div class="item">
+                                        <div class="ui rcpch_light_blue label">
+                                            {{ key|title }}: {{ value|value_display:key }}
+                                            <a href="?{% for k, v in request.GET.items %}{% if k != key and k != 'page' %}{{ k }}={{ v }}&{% endif %}{% endfor %}">
+                                                <i class="delete icon"></i>
+                                            </a>
+                                        </div>
                                     </div>
-                                </div>
+                                {% endif %}
                             {% endif %}
                         {% endfor %}
                     </div>
@@ -238,17 +252,14 @@
                             <div class="header">Cohort</div>
                             <div class="menu">
                                 <!-- All Cohorts option -->
-                                <a class="item {% if not request.GET.registration_cohort %}active{% endif %}" 
-                                href="?{% for key, value in request.GET.items %}{% if key != 'registration_cohort' and key != 'page' %}&{{ key }}={{ value }}{% endif %}{% endfor %}">
-                                    All Cohorts <div class="ui {% if not request.GET.registration_cohort %}left pointing{% endif %} label">{{ total_cases }}</div>
-                                </a>
                                 
                                 {% for cohort, count in cohort_counts.items %}
-                                <a class="item {% if request.GET.registration_cohort == cohort|stringformat:'i' %}active{% endif %}" 
-                                href="?registration_cohort={{ cohort }}{% for key, value in request.GET.items %}{% if key != 'registration_cohort' and key != 'page' %}&{{ key }}={{ value }}{% endif %}{% endfor %}">
-                                    Cohort {{ cohort }} <div class="ui {% if request.GET.registration_cohort == cohort|stringformat:'i' %}left pointing{% endif %} rcpch facets label">{{ count }}</div>
-                                </a>
+                                    <a class="item {% if request.GET.registration_cohort == cohort|stringformat:'i' %}active{% endif %}" 
+                                        href="{% build_url_parameters request 'registration_cohort' selected_kpis cohort %}">
+                                        Cohort {{ cohort }} <div class="ui {% if request.GET.registration_cohort == cohort|stringformat:'i' %}left pointing{% endif %} rcpch facets label">{{ count }}</div>
+                                    </a>
                                 {% endfor %}
+
                             </div>
                         </div>
 
@@ -257,18 +268,14 @@
                             <div class="header">Case Status</div>
                             <div class="menu">
                                 <!-- All Registrations Status option -->
-                                <a class="item {% if not request.GET.registration_status %}active{% endif %}" 
-                                href="?{% for key, value in request.GET.items %}{% if key != 'registration_status' and key != 'page' %}{% if not forloop.first %}&{% endif %}{{ key }}={{ value }}{% endif %}{% endfor %}">
-                                    All Cases <div class="ui {% if not request.GET.registration_status %}left pointing{% endif %} rcpch facets label">{{ total_cases }}</div>
-                                </a>
                                 
                                 <a class="item {% if request.GET.registration_status == 'registered' %}active{% endif %}" 
-                                href="?registration_status=registered{% for key, value in request.GET.items %}{% if key != 'registration_status' and key != 'page' %}&{{ key }}={{ value }}{% endif %}{% endfor %}">
+                                href="{% build_url_parameters request 'registration_status' selected_kpis "registered" %}">
                                     Registered <div class="ui {% if request.GET.registration_status == 'registered' %}left pointing{% endif %} rcpch facets label">{{ registered_cases }}</div>
                                 </a>
                                 
                                 <a class="item {% if request.GET.registration_status == 'unregistered' %}active{% endif %}" 
-                                href="?registration_status=unregistered{% for key, value in request.GET.items %}{% if key != 'registration_status' and key != 'page' %}&{{ key }}={{ value }}{% endif %}{% endfor %}">
+                                href="{% build_url_parameters request 'registration_status' selected_kpis "unregistered" %}">
                                     Unregistered <div class="ui {% if request.GET.registration_status == 'unregistered' %}left pointing{% endif %} rcpch facets label">{{ unregistered_cases }}</div>
                                 </a>
                             </div>
@@ -279,18 +286,14 @@
                             <div class="header">Age</div>
                             <div class="menu">
                                 <!-- All Ages option -->
-                                <a class="item {% if not request.GET.age_range %}active{% endif %}" 
-                                href="?{% for key, value in request.GET.items %}{% if key != 'age_range' and key != 'page' %}{% if not forloop.first %}&{% endif %}{{ key }}={{ value }}{% endif %}{% endfor %}">
-                                    All Ages <div class="ui {% if not request.GET.age_range %}left pointing{% endif %} rcpch facets label">{{ total_cases }}</div>
-                                </a>
                                 
                                 <a class="item {% if request.GET.age_range == 'under_12' %}active{% endif %}" 
-                                href="?age_range=under_12{% for key, value in request.GET.items %}{% if key != 'age_range' and key != 'page' %}&{{ key }}={{ value }}{% endif %}{% endfor %}">
+                                href="{% build_url_parameters request 'age_range' selected_kpis 'under_12' %}">
                                     Under 12 <div class="ui {% if request.GET.age_range == 'under_12' %}left pointing{% endif %} rcpch facets label">{{ under_12_count }}</div>
                                 </a>
                                 
                                 <a class="item {% if request.GET.age_range == '12_and_over' %}active{% endif %}" 
-                                href="?age_range=12_and_over{% for key, value in request.GET.items %}{% if key != 'age_range' and key != 'page' %}&{{ key }}={{ value }}{% endif %}{% endfor %}">
+                                href="{% build_url_parameters request 'age_range' selected_kpis '12_and_over' %}">
                                     12 and Over <div class="ui {% if request.GET.age_range == '12_and_over' %}left pointing{% endif %} rcpch facets label">{{ over_12_count }}</div>
                                 </a>
                             </div>
@@ -310,10 +313,6 @@
                             <div class="header">Audit Progress</div>
                             <div class="menu">
                                 <!-- All Audit Progress option -->
-                                <a class="item {% if not request.GET.complete_audit_progress and not request.GET.incomplete_audit_progress %}active{% endif %}" 
-                                href="?{% for key, value in request.GET.items %}{% if key != 'complete_audit_progress' and key != 'incomplete_audit_progress' and key != 'page' %}{% if not forloop.first %}&{% endif %}{{ key }}={{ value }}{% endif %}{% endfor %}">
-                                    All Cases <div class="ui {% if not request.GET.complete_audit_progress and not request.GET.incomplete_audit_progress %}left pointing{% endif %} rcpch facets label">{{ total_cases }}</div>
-                                </a>
                                 
                                 <a class="item {% if request.GET.complete_audit_progress %}active{% endif %}" 
                                 href="?complete_audit_progress=audit_1{% for key, value in request.GET.items %}{% if key != 'complete_audit_progress' and key != 'incomplete_audit_progress' and key != 'page' %}&{{ key }}={{ value }}{% endif %}{% endfor %}">
@@ -331,16 +330,34 @@
                         <div class="item">
                             <div class="header">KPI Status</div>
                             <div class="menu">
-                                {% for kpi_num, count in kpi_failed_counts.items %}
-                                <a class="item {% if request.GET.kpi_failed == kpi_num|stringformat:'i' %}active{% endif %}" 
-                                href="?kpi_failed={{ kpi_num }}{% for key, value in request.GET.items %}{% if key != 'kpi_failed' and key != 'kpi_number' and key != 'page' %}&{{ key }}={{ value }}{% endif %}{% endfor %}">
-                                    KPI {{ kpi_num }} Failed <div class="ui {% if request.GET.kpi_failed == kpi_num|stringformat:'i' %}left pointing{% endif %} rcpch facets label">{{ count }}</div>
-                                </a>
+                                
+                                {% for kpi_key, count in kpi_failed_counts.items %}
+                                    {% with kpi_id=kpi_key.0 %}
+                                        {% if kpi_id|stringformat:"s" in selected_kpis %}
+                                            {# Remove this KPI from the selection #}
+                                            <a class="item active"
+                                            href="?{% for selected in selected_kpis %}{% if selected != kpi_id|stringformat:'s' %}&kpi_failed={{ selected }}{% endif %}{% endfor %}
+                                                    {% for key, value in request.GET.items %}{% if key != 'page' and key != 'kpi_failed' %}&{{ key|strip }}={{ value|strip }}{% endif %}{% endfor %}">
+                                                KPI {{ kpi_id }}: {{ kpi_key.1 }} Failed
+                                                <div class="ui left pointing rcpch facets label">{{ count }}</div>
+                                            </a>
+                                        {% else %}
+                                            {# Add this KPI to the selection #}
+                                            <a class="item"
+                                            href="?{% for selected in selected_kpis %}&kpi_failed={{ selected }}{% endfor %}&kpi_failed={{ kpi_id }}"
+                                                    {% for key, value in request.GET.items %}{% if key != 'page' and key != 'kpi_failed' %}&{{ key|strip }}={{ value }}{% endif %}{% endfor %}">
+                                                KPI {{ kpi_id }}: {{ kpi_key.1 }} Failed
+                                                <div class="ui rcpch facets label">{{ count }}</div>
+                                            </a>
+                                        {% endif %}
+                                    {% endwith %}
                                 {% endfor %}
+
                             </div>
                         </div>
-                    </div>
-                </div>
+
+                    </div><!--menu-->
+                </div><!--column-->
                 
                 <!-- Column 3: Comorbidity and Complexity -->
                 <div class="column">
@@ -355,10 +372,10 @@
                             <div class="menu">
                                 <!-- Syndrome Present -->
                                 <a class="item {% if request.GET.syndrome_present == 'true' %}active{% endif %}" 
-                                href="{% if request.GET.syndrome_present == 'true' %}
-                                        ?{% for key, value in request.GET.items %}{% if key != 'syndrome_present' and key != 'page' %}{% if not forloop.first %}&{% endif %}{{ key }}={{ value }}{% endif %}{% endfor %}
+                                     href="{% if request.GET.syndrome_present == 'true' %}
+                                        {% build_url_parameters request 'syndrome_present' selected_kpis %}
                                         {% else %}
-                                        ?syndrome_present=true{% for key, value in request.GET.items %}{% if key != 'syndrome_present' and key != 'page' %}&{{ key }}={{ value }}{% endif %}{% endfor %}
+                                            {% build_url_parameters request 'syndrome_present' selected_kpis 'true' %}
                                         {% endif %}">
                                     Syndrome Present
                                     <div class="ui {% if request.GET.syndrome_present == 'true' %}left pointing{% endif %} rcpch facets label">{{ syndrome_present_count }}</div>
@@ -367,9 +384,9 @@
                                 <!-- Epilepsy Cause Known -->
                                 <a class="item {% if request.GET.epilepsy_cause_known == 'true' %}active{% endif %}" 
                                     href="{% if request.GET.epilepsy_cause_known == 'true' %}
-                                            ?{% for key, value in request.GET.items %}{% if key != 'epilepsy_cause_known' and key != 'page' %}{% if not forloop.first %}&{% endif %}{{ key }}={{ value }}{% endif %}{% endfor %}
+                                                {% build_url_parameters request 'epilepsy_cause_known' selected_kpis %}
                                             {% else %}
-                                            ?epilepsy_cause_known=true{% for key, value in request.GET.items %}{% if key != 'epilepsy_cause_known' and key != 'page' %}&{{ key }}={{ value }}{% endif %}{% endfor %}
+                                                {% build_url_parameters request 'epilepsy_cause_known' selected_kpis 'true' %}
                                             {% endif %}">
                                         Epilepsy Cause Known
                                         <div class="ui {% if request.GET.epilepsy_cause_known == 'true' %}left pointing{% endif %} rcpch facets label">{{ epilepsy_cause_known_count }}</div>
@@ -378,9 +395,9 @@
                                     <!-- Global Developmental Delay -->
                                     <a class="item {% if request.GET.global_developmental_delay_or_learning_difficulties == 'true' %}active{% endif %}" 
                                     href="{% if request.GET.global_developmental_delay_or_learning_difficulties == 'true' %}
-                                            ?{% for key, value in request.GET.items %}{% if key != 'global_developmental_delay_or_learning_difficulties' and key != 'page' %}{% if not forloop.first %}&{% endif %}{{ key }}={{ value }}{% endif %}{% endfor %}
+                                            {% build_url_parameters request 'global_developmental_delay_or_learning_difficulties' selected_kpis %}
                                             {% else %}
-                                            ?global_developmental_delay_or_learning_difficulties=true{% for key, value in request.GET.items %}{% if key != 'global_developmental_delay_or_learning_difficulties' and key != 'page' %}&{{ key }}={{ value }}{% endif %}{% endfor %}
+                                                {% build_url_parameters request 'global_developmental_delay_or_learning_difficulties' selected_kpis 'true' %}
                                             {% endif %}">
                                         Global Developmental Delay
                                         <div class="ui {% if request.GET.global_developmental_delay_or_learning_difficulties == 'true' %}left pointing{% endif %} rcpch facets label">{{ global_developmental_delay_or_learning_difficulties_count }}</div>
@@ -389,9 +406,9 @@
                                     <!-- Toggle for developmental problems filter -->
                                     <a class="item {% if request.GET.developmental_learning_or_schooling_problems == 'true' %}active{% endif %}" 
                                         href="{% if request.GET.developmental_learning_or_schooling_problems == 'true' %}
-                                                ?{% for key, value in request.GET.items %}{% if key != 'developmental_learning_or_schooling_problems' and key != 'page' %}{% if not forloop.first %}&{% endif %}{{ key }}={{ value }}{% endif %}{% endfor %}
+                                                    {% build_url_parameters request 'developmental_learning_or_schooling_problems' selected_kpis %}
                                                 {% else %}
-                                                ?developmental_learning_or_schooling_problems=true{% for key, value in request.GET.items %}{% if key != 'developmental_learning_or_schooling_problems' and key != 'page' %}&{{ key }}={{ value }}{% endif %}{% endfor %}
+                                                    {% build_url_parameters request 'developmental_learning_or_schooling_problems' selected_kpis 'true' %}
                                                 {% endif %}">
                                             Developmental or Learning Problems
                                             <div class="ui {% if request.GET.developmental_learning_or_schooling_problems == 'true' %}left pointing{% endif %} rcpch facets label">{{ developmental_learning_or_schooling_problems_count }}</div>
@@ -400,9 +417,9 @@
                                     <!-- Toggle for developmental problems filter -->
                                     <a class="item {% if request.GET.behavioural_or_emotional_problems == 'true' %}active{% endif %}" 
                                     href="{% if request.GET.behavioural_or_emotional_problems == 'true' %}
-                                            ?{% for key, value in request.GET.items %}{% if key != 'behavioural_or_emotional_problems' and key != 'page' %}{% if not forloop.first %}&{% endif %}{{ key }}={{ value }}{% endif %}{% endfor %}
+                                                {% build_url_parameters request 'behavioural_or_emotional_problems' selected_kpis %}
                                             {% else %}
-                                            ?behavioural_or_emotional_problems=true{% for key, value in request.GET.items %}{% if key != 'behavioural_or_emotional_problems' and key != 'page' %}&{{ key }}={{ value }}{% endif %}{% endfor %}
+                                                {% build_url_parameters request 'behavioural_or_emotional_problems' selected_kpis 'true' %}
                                             {% endif %}">
                                         Behavioural or Emotional Problems
                                         <div class="ui {% if request.GET.behavioural_or_emotional_problems == 'true' %}left pointing{% endif %} rcpch facets label">{{ behavioural_or_emotional_problems_count }}</div>
@@ -411,46 +428,22 @@
                                     <!-- Autism Spectrum Disorder -->
                                     <a class="item {% if request.GET.autistic_spectrum_disorder == 'true' %}active{% endif %}" 
                                     href="{% if request.GET.autistic_spectrum_disorder == 'true' %}
-                                            ?{% for key, value in request.GET.items %}{% if key != 'autistic_spectrum_disorder' and key != 'page' %}{% if not forloop.first %}&{% endif %}{{ key }}={{ value }}{% endif %}{% endfor %}
+                                                {% build_url_parameters request 'autistic_spectrum_disorder' selected_kpis %}
                                             {% else %}
-                                            ?autistic_spectrum_disorder=true{% for key, value in request.GET.items %}{% if key != 'autistic_spectrum_disorder' and key != 'page' %}&{{ key }}={{ value }}{% endif %}{% endfor %}
+                                                {% build_url_parameters request 'autistic_spectrum_disorder' selected_kpis 'true' %}
                                             {% endif %}">
                                         Autism Spectrum Disorder
                                         <div class="ui {% if request.GET.autistic_spectrum_disorder == 'true' %}left pointing{% endif %} rcpch facets label">{{ autistic_spectrum_disorder_count }}</div>
                                     </a>
                                     
                                     <!-- Mental Health Issues -->
-                                    <a class="item {% if request.GET.mental_health_issue_identified == 'true' %}active{% endif %}" 
-                                    href="{% if request.GET.mental_health_issue_identified == 'true' %}
-                                            ?{% for key, value in request.GET.items %}{% if key != 'mental_health_issue_identified' and key != 'page' %}{% if not forloop.first %}&{% endif %}{{ key }}={{ value }}{% endif %}{% endfor %}
-                                            {% else %}
-                                            ?mental_health_issue_identified=true{% for key, value in request.GET.items %}{% if key != 'mental_health_issue_identified' and key != 'page' %}&{{ key }}={{ value }}{% endif %}{% endfor %}
-                                            {% endif %}">
-                                        Mental Health Issues Identified
-                                        <div class="ui {% if request.GET.mental_health_issue_identified == 'true' %}left pointing{% endif %} rcpch facets label">{{ mental_health_issue_identified_count }}</div>
-                                    </a>
-
-                                    <!-- Mental Health Referral Made -->
-                                    <a class="item {% if request.GET.has_been_referred_for_mental_health_support == 'true' %}active{% endif %}" 
-                                    href="{% if request.GET.has_been_referred_for_mental_health_support == 'true' %}
-                                            ?{% for key, value in request.GET.items %}{% if key != 'has_been_referred_for_mental_health_support' and key != 'page' %}{% if not forloop.first %}&{% endif %}{{ key }}={{ value }}{% endif %}{% endfor %}
-                                            {% else %}
-                                            ?has_been_referred_for_mental_health_support=true{% for key, value in request.GET.items %}{% if key != 'has_been_referred_for_mental_health_support' and key != 'page' %}&{{ key }}={{ value }}{% endif %}{% endfor %}
-                                            {% endif %}">
-                                        Mental Health Referral Made
-                                        <div class="ui {% if request.GET.has_been_referred_for_mental_health_support == 'true' %}left pointing{% endif %} rcpch facets label">{{ has_been_referred_for_mental_health_support_count }}</div>
-                                    </a>
-
-                                    <!-- Mental Health Support In Place -->
                                     <a class="item {% if request.GET.has_support_for_mental_health_support == 'true' %}active{% endif %}" 
-                                    href="{% if request.GET.has_support_for_mental_health_support == 'true' %}
-                                            ?{% for key, value in request.GET.items %}{% if key != 'has_support_for_mental_health_support' and key != 'page' %}{% if not forloop.first %}&{% endif %}{{ key }}={{ value }}{% endif %}{% endfor %}
-                                            {% else %}
-                                            ?has_support_for_mental_health_support=true{% for key, value in request.GET.items %}{% if key != 'has_support_for_mental_health_support' and key != 'page' %}&{{ key }}={{ value }}{% endif %}{% endfor %}
-                                            {% endif %}">
-                                        Mental Health Support In Place
+                                        href="{% if request.GET.has_support_for_mental_health_support == 'true' %}
+                                            {% build_url_parameters request 'has_support_for_mental_health_support' selected_kpis %}
+                                            {% else %}{% build_url_parameters request 'has_support_for_mental_health_support' selected_kpis 'true' %}{% endif %}">
+                                        Mental Health Support in place?{{ selected_kpis }}
                                         <div class="ui {% if request.GET.has_support_for_mental_health_support == 'true' %}left pointing{% endif %} rcpch facets label">{{ has_support_for_mental_health_support_count }}</div>
-                                    </a>
+                                    </a> 
                             </div>
                         </div>
                     </div>
@@ -593,6 +586,30 @@
         
         // Set up search input behavior
         setupSearchInput();
+
+        form.find('input[type="hidden"][name="kpi_failed"]').remove();
+
+        // Add hidden inputs for all current kpi_failed values
+        urlParams.getAll('kpi_failed').forEach(function(kpiValue) {
+            form.append($('<input>', {
+                type: 'hidden',
+                name: 'kpi_failed',
+                value: kpiValue
+            }));
+        });
+
+        // Add hidden inputs for other GET params not in the form (optional but good practice)
+        urlParams.forEach(function(value, key) {
+            // Add if not 'page', not 'kpi_failed' (already handled), and not already a field in the form
+            if (key !== 'page' && key !== 'kpi_failed' && form.find('[name="' + key + '"]').length === 0) {
+                form.append($('<input>', {
+                    type: 'hidden',
+                    name: key,
+                    value: value
+                }));
+            }
+        });
+
     });
     
     /**
@@ -766,7 +783,7 @@
         $.ajax({
             url: window.location.pathname,
             method: 'GET',
-            data: $('.ui.form').serialize(),
+            data: $('.ui.rcpch.form').serialize(),
             success: function(response) {
                 // Update just the table body with new results
                 const $newResults = $(response).find('table tbody');
@@ -803,7 +820,6 @@
         }
     });
 
-    // Add this to your document ready function
     $('.ui.dropdown').each(function() {
         const $dropdown = $(this);
         const $input = $dropdown.find('input[type="hidden"]');

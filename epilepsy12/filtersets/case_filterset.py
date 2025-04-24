@@ -457,7 +457,6 @@ class CaseFilterMethods:
         """
         Filter cases by syndrome presence
         """
-        print("calling...")
         return queryset.filter(registration__multiaxialdiagnosis__syndrome_present=True)
 
     @staticmethod
@@ -566,6 +565,10 @@ class CaseFilterMethods:
         """
         Filter cases where patient has mental health support in place
         """
+        print("Filtering by has support for mental health support", value)
+        if not value:
+            return queryset
+
         return queryset.filter(
             registration__management__has_support_for_mental_health_support=True
         )
@@ -579,17 +582,9 @@ class CaseFilterMethods:
             registration__management__has_support_for_mental_health_support=True
         ).count()
 
-    def filter_by_has_been_referred_for_mental_health_support(
-        self, queryset, name, value
-    ):
+    def filter_by_has_been_referred_for_mental_health_support(self, queryset, value):
         """Delegate to CaseFilterMethods for mental health referral status"""
         return CaseFilterMethods.filter_by_has_been_referred_for_mental_health_support(
-            queryset, value
-        )
-
-    def filter_by_has_support_for_mental_health_support(self, queryset, name, value):
-        """Delegate to CaseFilterMethods for mental health support status"""
-        return CaseFilterMethods.filter_by_has_support_for_mental_health_support(
             queryset, value
         )
 
@@ -973,22 +968,26 @@ class CaseFilterMethods:
     """
 
     @staticmethod
-    def filter_by_kpi_failed(queryset, value):
+    def filter_by_kpi_failed(queryset, values):
         """
-        Filter cases by the KPI failed status.
+        Filter cases by the KPI failed status. Differs from other filters as accepts a list of kpis
         """
-        if "_" in value:
-            value_type, value_id = value.split("_", 1)
-        else:
-            value_id = value
 
-        kpi_field = KPI_MAP.get(int(value_id))
+        kpi_fields = [
+            KPI_MAP[key] for key in values if key in KPI_MAP
+        ]  # converts the list of kpi keys to the corresponding field names
+        if not kpi_fields:
+            # If no matching KPI fields are found, return the original queryset
+            return queryset
+
+        filter_kwargs = Q()
+        for kpi_field in kpi_fields:
+            filter_kwargs &= Q(**{f"registration__kpi__{kpi_field}": 0})
 
         # Filter by KPI failed status
-        filter_kwargs = {f"registration__kpi__{kpi_field}": 0}
 
         return queryset.filter(
-            Q(**filter_kwargs),
+            filter_kwargs,
             epilepsy12_sites__site_is_primary_centre_of_epilepsy_care=True,
             epilepsy12_sites__site_is_actively_involved_in_epilepsy_care=True,
             epilepsy12_sites__case__isnull=False,
@@ -1006,9 +1005,9 @@ class CaseFilterMethods:
 
         kpi_counts = {}
 
-        # Loop through all KPIs (1-10)
-        for i in range(1, 11):
-            kpi_field = KPI_MAP.get(i)
+        kpi_items = [(key.strip(), value) for key, value in KPI_MAP.items()]
+        for i in kpi_items:
+            kpi_field = i[1]
             if kpi_field:
                 # Count cases failing this KPI (value=0 means failed)
                 filter_kwargs = {f"registration__kpi__{kpi_field}": 0}
@@ -1026,7 +1025,6 @@ class CaseFilterMethods:
 
                 # Store the count for this KPI
                 kpi_counts[i] = count
-
         return kpi_counts
 
     @staticmethod
@@ -1282,7 +1280,6 @@ class CaseFilterMethods:
         if apply_special_filters:
             # These take no extra values and only filter by the value of the parameter
             # Includes:
-            # "kpi_failed",
             # "complete_audit_progress",
             # "incomplete_audit_progress",
             # "registration_cohort",
@@ -1321,6 +1318,9 @@ class CaseFilterMethods:
 
                     if filter_method:
                         # Apply the filter
+                        print(
+                            f"Applying special filter: {param_name} with value: {filter_value}"
+                        )
                         queryset = filter_method(queryset, filter_value)
 
         # Then handle all remaining filters
@@ -1350,9 +1350,11 @@ class CaseFilterMethods:
                 queryset = CaseFilterMethods.filter_by_registration_status(
                     queryset=queryset, value=value
                 )
-            elif key == "kpi_number":
+            elif key == "kpi_failed":
+                # This is a special case where we need to handle the KPI failed status for a list of KPIs as a single query
+                values = request.GET.getlist(key)
                 queryset = CaseFilterMethods.filter_by_kpi_failed(
-                    queryset=queryset, value=value
+                    queryset=queryset, values=values
                 )
             elif key == "index_of_multiple_deprivation_quintile":
                 queryset = (

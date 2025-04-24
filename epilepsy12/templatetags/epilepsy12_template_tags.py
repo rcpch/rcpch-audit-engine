@@ -619,3 +619,33 @@ def show_topiramate_valproate_fields(
                 return True
 
     return False
+
+
+@register.filter
+def strip(value):
+    if isinstance(value, str):
+        return value.strip()
+    return value
+
+
+@register.simple_tag
+def build_url_parameters(request, field, selected_kpis, selected_field_value=None):
+    """
+    Build URL parameters from the request object
+    """
+    if selected_field_value:
+        # If selected_field_value is provided, use it to filter the URL parameters
+        url_string = f"?{field}={selected_field_value}&"
+    else:
+        url_string = "?"
+    url_parameters = request.GET.items()
+    for key, value in url_parameters:
+        if key == field or key == "page":
+            return
+        if key == "kpi_failed":
+            if selected_kpis:
+                for kpi in selected_kpis:
+                    url_string += f"{key}={kpi}&"
+        else:
+            url_string += f"{key}={value}&"
+    return url_string.rstrip("&")  # Remove the trailing '&' character

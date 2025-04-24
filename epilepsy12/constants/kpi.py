@@ -41,16 +41,27 @@ KPI_SCORE = {
 }
 
 KPI_MAP = {
-    1: "paediatrician_with_expertise_in_epilepsies",
-    2: "epilepsy_specialist_nurse",
-    3: "tertiary_input",
-    4: "ecg",
-    5: "mri",
-    6: "assessment_of_mental_health_issues",
-    7: "mental_health_support",
-    8: "sodium_valproate",
-    9: "comprehensive_care_planning_agreement",
-    10: "school_individual_healthcare_plan",
+    "1": "paediatrician_with_expertise_in_epilepsies",
+    "2": "epilepsy_specialist_nurse",
+    "3": "tertiary_input",
+    "3b": "epilepsy_surgery_referral",
+    "4": "ecg",
+    "5": "mri",
+    "6": "assessment_of_mental_health_issues",
+    "7": "mental_health_support",
+    "8": "sodium_valproate",
+    "9a": "comprehensive_care_planning_agreement",
+    "9aa": "patient_held_individualised_epilepsy_document",
+    "9ab": "patient_carer_parent_agreement_to_the_care_planning",
+    "9ac": "care_planning_has_been_updated_when_necessary",
+    "9b": "comprehensive_care_planning_content",
+    "9ba": "parental_prolonged_seizures_care_plan",
+    "9bb": "water_safety",
+    "9bc": "first_aid",
+    "9bd": "general_participation_and_risk",
+    "9be": "service_contact_details",
+    "9bf": "sudep",
+    "10": "school_individual_healthcare_plan",
 }
 
 """

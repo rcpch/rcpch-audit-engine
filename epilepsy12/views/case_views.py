@@ -973,7 +973,6 @@ class CaseListView(LoginRequiredMixin, PermissionRequiredMixin, ListView):
         and apply all filters in one place using apply_all_active_filters.
         """
         organisation_id = self.kwargs.get("organisation_id")
-
         # Base queryset - all cases
         base_queryset = Case.objects.all()
 
@@ -994,7 +993,6 @@ class CaseListView(LoginRequiredMixin, PermissionRequiredMixin, ListView):
 
         # Parameters that require special handling with dedicated methods: These take no extra values and only filter by the value of the parameter
         special_filter_params = [
-            "kpi_failed",
             "complete_audit_progress",
             "incomplete_audit_progress",
             "registration_cohort",
@@ -1099,7 +1097,7 @@ class CaseListView(LoginRequiredMixin, PermissionRequiredMixin, ListView):
 
         # Gets all the KPI failed counts in one object to iterate over to produce labels in the template
         context["kpi_failed_counts"] = CaseFilterMethods.get_kpi_failed_counts(
-            filtered_queryset
+            queryset=filtered_queryset
         )
 
         # Add fact counts to index of multiple deprivation quintile dropdown
@@ -1204,5 +1202,9 @@ class CaseListView(LoginRequiredMixin, PermissionRequiredMixin, ListView):
                 queryset=filtered_queryset
             )
         )
+
+        # deal with the KPIs
+        selected_kpis = [k.strip() for k in self.request.GET.getlist("kpi_failed")]
+        context["selected_kpis"] = selected_kpis  # returns a list of selected KPIs
 
         return context

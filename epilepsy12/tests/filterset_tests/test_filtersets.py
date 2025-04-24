@@ -9,7 +9,9 @@ from epilepsy12.tests.factories import E12CaseFactory
 from ..common_view_functions_tests.aggregate_by_tests.helpers import (
     _clean_cases_from_test_db,
     _register_cases_in_organisation,
+    _register_kpi_scored_cases,
 )
+from epilepsy12.constants import EnumAbstractionLevel
 from epilepsy12.models import Case, Organisation
 
 
@@ -256,3 +258,27 @@ def test_get_has_support_for_mental_health_support_counts(e12_case_factory):
         Case.objects.all()
     )
     assert count == 1
+
+
+@pytest.mark.django_db
+def test_get_kpi_failed_counts(e12_case_factory):
+    _clean_cases_from_test_db()
+    _register_kpi_scored_cases(
+        e12_case_factory,
+        ods_codes=["RJT01", "RGN90"],
+        num_cases=10,
+    )
+
+    total_failed = CaseFilterMethods.get_kpi_failed_counts(Case.objects.all())
+    assert total_failed[1] == 20, f"KPI 1 Expected 20 failed cases, got {total_failed}"
+    assert total_failed[2] == 20, f"KPI 2 Expected 20 failed cases, got {total_failed}"
+    assert total_failed[3] == 20, f"KPI 3 Expected 20 failed cases, got {total_failed}"
+    assert total_failed[4] == 20, f"KPI 4 Expected 20 failed cases, got {total_failed}"
+    assert total_failed[5] == 20, f"KPI 5 Expected 20 failed cases, got {total_failed}"
+    assert total_failed[6] == 20, f"KPI 6 Expected 20 failed cases, got {total_failed}"
+    assert total_failed[7] == 20, f"KPI 7 Expected 20 failed cases, got {total_failed}"
+    assert total_failed[8] == 20, f"KPI 8 Expected 20 failed cases, got {total_failed}"
+    assert total_failed[9] == 20, f"KPI 9 Expected 20 failed cases, got {total_failed}"
+    assert (
+        total_failed[10] == 20
+    ), f"KPI 10 Expected 20 failed cases, got {total_failed}"
