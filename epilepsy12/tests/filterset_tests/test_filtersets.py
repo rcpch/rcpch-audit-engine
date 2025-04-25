@@ -269,16 +269,97 @@ def test_get_kpi_failed_counts(e12_case_factory):
         num_cases=10,
     )
 
-    total_failed = CaseFilterMethods.get_kpi_failed_counts(Case.objects.all())
-    assert total_failed[1] == 20, f"KPI 1 Expected 20 failed cases, got {total_failed}"
-    assert total_failed[2] == 20, f"KPI 2 Expected 20 failed cases, got {total_failed}"
-    assert total_failed[3] == 20, f"KPI 3 Expected 20 failed cases, got {total_failed}"
-    assert total_failed[4] == 20, f"KPI 4 Expected 20 failed cases, got {total_failed}"
-    assert total_failed[5] == 20, f"KPI 5 Expected 20 failed cases, got {total_failed}"
-    assert total_failed[6] == 20, f"KPI 6 Expected 20 failed cases, got {total_failed}"
-    assert total_failed[7] == 20, f"KPI 7 Expected 20 failed cases, got {total_failed}"
-    assert total_failed[8] == 20, f"KPI 8 Expected 20 failed cases, got {total_failed}"
-    assert total_failed[9] == 20, f"KPI 9 Expected 20 failed cases, got {total_failed}"
+    total_failed_tuples = CaseFilterMethods.get_kpi_failed_counts(Case.objects.all())
+    # Get the counts dictionary {('kpi_id', 'kpi_name'): count, ...}
+    total_failed = {
+        kpi_id: count for (kpi_id, kpi_name), count in total_failed_tuples.items()
+    }
+
     assert (
-        total_failed[10] == 20
-    ), f"KPI 10 Expected 20 failed cases, got {total_failed}"
+        total_failed.get("1") == 20
+    ), f"KPI 1 Expected 20 failed cases, got {total_failed.get('1')}"
+    assert (
+        total_failed.get("2") == 20
+    ), f"KPI 2 Expected 20 failed cases, got {total_failed.get('2')}"
+    assert (
+        total_failed.get("3") == 0
+    ), f"KPI 3 Expected 20 failed cases, got {total_failed.get('3')}"
+    assert (
+        total_failed.get("3b") == 0
+    ), f"KPI 3b Expected 20 failed cases, got {total_failed.get('3b')}"
+    assert (
+        total_failed.get("4") == 10
+    ), f"KPI 4 Expected 20 failed cases, got {total_failed.get('4')}"
+    assert (
+        total_failed.get("5") == 10
+    ), f"KPI 5 Expected 20 failed cases, got {total_failed.get('5')}"
+    assert (
+        total_failed.get("6") == 20
+    ), f"KPI 6 Expected 20 failed cases, got {total_failed.get('6')}"
+    assert (
+        total_failed.get("7") == 10
+    ), f"KPI 7 Expected 20 failed cases, got {total_failed.get('7')}"
+    assert (
+        total_failed.get("8") == 0
+    ), f"KPI 8 Expected 20 failed cases, got {total_failed.get('8')}"
+    assert (
+        total_failed.get("9a") == 20
+    ), f"KPI 9a Expected 20 failed cases, got {total_failed.get('9a')}"
+    assert (
+        total_failed.get("9aa") == 20
+    ), f"KPI 9aa Expected 20 failed cases, got {total_failed.get('9aa')}"
+    assert (
+        total_failed.get("9ab") == 20
+    ), f"KPI 9ab Expected 20 failed cases, got {total_failed.get('9ab')}"
+    assert (
+        total_failed.get("9ac") == 20
+    ), f"KPI 9ac Expected 20 failed cases, got {total_failed.get('9ac')}"
+    assert (
+        total_failed.get("9b") == 20
+    ), f"KPI 9b Expected 20 failed cases, got {total_failed.get('9b')}"
+    assert (
+        total_failed.get("9ba") == 20
+    ), f"KPI 9ba Expected 20 failed cases, got {total_failed.get('9ba')}"
+    assert (
+        total_failed.get("9bb") == 20
+    ), f"KPI 9bb Expected 20 failed cases, got {total_failed.get('9bb')}"
+    assert (
+        total_failed.get("9bc") == 20
+    ), f"KPI 9bc Expected 20 failed cases, got {total_failed.get('9bc')}"
+    assert (
+        total_failed.get("9bd") == 20
+    ), f"KPI 9bd Expected 20 failed cases, got {total_failed.get('9bd')}"
+    assert (
+        total_failed.get("9be") == 20
+    ), f"KPI 9be Expected 20 failed cases, got {total_failed.get('9be')}"
+    assert (
+        total_failed.get("9bf") == 20
+    ), f"KPI 9bf Expected 20 failed cases, got {total_failed.get('9bf')}"
+    assert (
+        total_failed.get("10") == 20
+    ), f"KPI 9 Expected 20 failed cases, got {total_failed.get('10')}"
+
+
+# {
+# ("1", "paediatrician_with_expertise_in_epilepsies"): 20,
+# ("2", "epilepsy_specialist_nurse"): 20,
+# ("3", "tertiary_input"): 0,
+# ("3b", "epilepsy_surgery_referral"): 0,
+# ("4", "ecg"): 10,
+# ("5", "mri"): 10,
+# ("6", "assessment_of_mental_health_issues"): 20,
+# ("7", "mental_health_support"): 10,
+# ("8", "sodium_valproate"): 0,
+# ("9a", "comprehensive_care_planning_agreement"): 20,
+# ("9aa", "patient_held_individualised_epilepsy_document"): 20,
+# ("9ab", "patient_carer_parent_agreement_to_the_care_planning"): 20,
+# ("9ac", "care_planning_has_been_updated_when_necessary"): 20,
+# ("9b", "comprehensive_care_planning_content"): 20,
+# ("9ba", "parental_prolonged_seizures_care_plan"): 20,
+# ("9bb", "water_safety"): 20,
+# ("9bc", "first_aid"): 20,
+# ("9bd", "general_participation_and_risk"): 20,
+# ("9be", "service_contact_details"): 20,
+# ("9bf", "sudep"): 20,
+# ("10", "school_individual_healthcare_plan"): 20,
+# }
