@@ -255,7 +255,7 @@
                                 
                                 {% for cohort, count in cohort_counts.items %}
                                     <a class="item {% if request.GET.registration_cohort == cohort|stringformat:'i' %}active{% endif %}" 
-                                        href="{% build_url_parameters request 'registration_cohort' selected_kpis cohort %}">
+                                        href="{% build_url_parameters request 'registration_cohort' cohort %}">
                                         Cohort {{ cohort }} <div class="ui {% if request.GET.registration_cohort == cohort|stringformat:'i' %}left pointing{% endif %} rcpch facets label">{{ count }}</div>
                                     </a>
                                 {% endfor %}
@@ -270,12 +270,12 @@
                                 <!-- All Registrations Status option -->
                                 
                                 <a class="item {% if request.GET.registration_status == 'registered' %}active{% endif %}" 
-                                href="{% build_url_parameters request 'registration_status' selected_kpis "registered" %}">
+                                href="{% build_url_parameters request 'registration_status' "registered" %}">
                                     Registered <div class="ui {% if request.GET.registration_status == 'registered' %}left pointing{% endif %} rcpch facets label">{{ registered_cases }}</div>
                                 </a>
                                 
                                 <a class="item {% if request.GET.registration_status == 'unregistered' %}active{% endif %}" 
-                                href="{% build_url_parameters request 'registration_status' selected_kpis "unregistered" %}">
+                                href="{% build_url_parameters request 'registration_status' "unregistered" %}">
                                     Unregistered <div class="ui {% if request.GET.registration_status == 'unregistered' %}left pointing{% endif %} rcpch facets label">{{ unregistered_cases }}</div>
                                 </a>
                             </div>
@@ -288,12 +288,12 @@
                                 <!-- All Ages option -->
                                 
                                 <a class="item {% if request.GET.age_range == 'under_12' %}active{% endif %}" 
-                                href="{% build_url_parameters request 'age_range' selected_kpis 'under_12' %}">
+                                href="{% build_url_parameters request 'age_range' 'under_12' %}">
                                     Under 12 <div class="ui {% if request.GET.age_range == 'under_12' %}left pointing{% endif %} rcpch facets label">{{ under_12_count }}</div>
                                 </a>
                                 
                                 <a class="item {% if request.GET.age_range == '12_and_over' %}active{% endif %}" 
-                                href="{% build_url_parameters request 'age_range' selected_kpis '12_and_over' %}">
+                                href="{% build_url_parameters request 'age_range' '12_and_over' %}">
                                     12 and Over <div class="ui {% if request.GET.age_range == '12_and_over' %}left pointing{% endif %} rcpch facets label">{{ over_12_count }}</div>
                                 </a>
                             </div>
@@ -315,12 +315,12 @@
                                 <!-- All Audit Progress option -->
                                 
                                 <a class="item {% if request.GET.complete_audit_progress %}active{% endif %}" 
-                                href="?complete_audit_progress=audit_1{% for key, value in request.GET.items %}{% if key != 'complete_audit_progress' and key != 'incomplete_audit_progress' and key != 'page' %}&{{ key }}={{ value }}{% endif %}{% endfor %}">
+                                href="{% build_url_parameters request 'complete_audit_progress' 'true' %}">
                                     Complete <div class="ui {% if request.GET.complete_audit_progress %}left pointing{% endif %} rcpch facets label">{{ complete_cases }}</div>
                                 </a>
                                 
                                 <a class="item {% if request.GET.incomplete_audit_progress %}active{% endif %}" 
-                                href="?incomplete_audit_progress=audit_1{% for key, value in request.GET.items %}{% if key != 'complete_audit_progress' and key != 'incomplete_audit_progress' and key != 'page' %}&{{ key }}={{ value }}{% endif %}{% endfor %}">
+                                href="{% build_url_parameters request 'incomplete_audit_progress' "true" %}">
                                     Incomplete <div class="ui {% if request.GET.incomplete_audit_progress %}left pointing{% endif %} rcpch facets label">{{ incomplete_cases }}</div>
                                 </a>
                             </div>
@@ -336,16 +336,14 @@
                                         {% if kpi_id|stringformat:"s" in selected_kpis %}
                                             {# Remove this KPI from the selection #}
                                             <a class="item active"
-                                            href="?{% for selected in selected_kpis %}{% if selected != kpi_id|stringformat:'s' %}&kpi_failed={{ selected }}{% endif %}{% endfor %}
-                                                    {% for key, value in request.GET.items %}{% if key != 'page' and key != 'kpi_failed' %}&{{ key|strip }}={{ value|strip }}{% endif %}{% endfor %}">
+                                            href="{% build_url_parameters request 'kpi_failed' kpi_id %}">
                                                 KPI {{ kpi_id }}: {{ kpi_key.1 }} Failed
                                                 <div class="ui left pointing rcpch facets label">{{ count }}</div>
                                             </a>
                                         {% else %}
                                             {# Add this KPI to the selection #}
                                             <a class="item"
-                                            href="?{% for selected in selected_kpis %}&kpi_failed={{ selected }}{% endfor %}&kpi_failed={{ kpi_id }}"
-                                                    {% for key, value in request.GET.items %}{% if key != 'page' and key != 'kpi_failed' %}&{{ key|strip }}={{ value }}{% endif %}{% endfor %}">
+                                            href="{% build_url_parameters request 'kpi_failed' kpi_id %}">
                                                 KPI {{ kpi_id }}: {{ kpi_key.1 }} Failed
                                                 <div class="ui rcpch facets label">{{ count }}</div>
                                             </a>
@@ -373,9 +371,9 @@
                                 <!-- Syndrome Present -->
                                 <a class="item {% if request.GET.syndrome_present == 'true' %}active{% endif %}" 
                                      href="{% if request.GET.syndrome_present == 'true' %}
-                                        {% build_url_parameters request 'syndrome_present' selected_kpis %}
+                                        {% build_url_parameters request 'syndrome_present' %}
                                         {% else %}
-                                            {% build_url_parameters request 'syndrome_present' selected_kpis 'true' %}
+                                            {% build_url_parameters request 'syndrome_present' 'true' %}
                                         {% endif %}">
                                     Syndrome Present
                                     <div class="ui {% if request.GET.syndrome_present == 'true' %}left pointing{% endif %} rcpch facets label">{{ syndrome_present_count }}</div>
@@ -384,9 +382,9 @@
                                 <!-- Epilepsy Cause Known -->
                                 <a class="item {% if request.GET.epilepsy_cause_known == 'true' %}active{% endif %}" 
                                     href="{% if request.GET.epilepsy_cause_known == 'true' %}
-                                                {% build_url_parameters request 'epilepsy_cause_known' selected_kpis %}
+                                                {% build_url_parameters request 'epilepsy_cause_known' %}
                                             {% else %}
-                                                {% build_url_parameters request 'epilepsy_cause_known' selected_kpis 'true' %}
+                                                {% build_url_parameters request 'epilepsy_cause_known' 'true' %}
                                             {% endif %}">
                                         Epilepsy Cause Known
                                         <div class="ui {% if request.GET.epilepsy_cause_known == 'true' %}left pointing{% endif %} rcpch facets label">{{ epilepsy_cause_known_count }}</div>
@@ -395,9 +393,9 @@
                                     <!-- Global Developmental Delay -->
                                     <a class="item {% if request.GET.global_developmental_delay_or_learning_difficulties == 'true' %}active{% endif %}" 
                                     href="{% if request.GET.global_developmental_delay_or_learning_difficulties == 'true' %}
-                                            {% build_url_parameters request 'global_developmental_delay_or_learning_difficulties' selected_kpis %}
+                                            {% build_url_parameters request 'global_developmental_delay_or_learning_difficulties' %}
                                             {% else %}
-                                                {% build_url_parameters request 'global_developmental_delay_or_learning_difficulties' selected_kpis 'true' %}
+                                                {% build_url_parameters request 'global_developmental_delay_or_learning_difficulties' 'true' %}
                                             {% endif %}">
                                         Global Developmental Delay
                                         <div class="ui {% if request.GET.global_developmental_delay_or_learning_difficulties == 'true' %}left pointing{% endif %} rcpch facets label">{{ global_developmental_delay_or_learning_difficulties_count }}</div>
@@ -406,9 +404,9 @@
                                     <!-- Toggle for developmental problems filter -->
                                     <a class="item {% if request.GET.developmental_learning_or_schooling_problems == 'true' %}active{% endif %}" 
                                         href="{% if request.GET.developmental_learning_or_schooling_problems == 'true' %}
-                                                    {% build_url_parameters request 'developmental_learning_or_schooling_problems' selected_kpis %}
+                                                    {% build_url_parameters request 'developmental_learning_or_schooling_problems' %}
                                                 {% else %}
-                                                    {% build_url_parameters request 'developmental_learning_or_schooling_problems' selected_kpis 'true' %}
+                                                    {% build_url_parameters request 'developmental_learning_or_schooling_problems' 'true' %}
                                                 {% endif %}">
                                             Developmental or Learning Problems
                                             <div class="ui {% if request.GET.developmental_learning_or_schooling_problems == 'true' %}left pointing{% endif %} rcpch facets label">{{ developmental_learning_or_schooling_problems_count }}</div>
@@ -417,9 +415,9 @@
                                     <!-- Toggle for developmental problems filter -->
                                     <a class="item {% if request.GET.behavioural_or_emotional_problems == 'true' %}active{% endif %}" 
                                     href="{% if request.GET.behavioural_or_emotional_problems == 'true' %}
-                                                {% build_url_parameters request 'behavioural_or_emotional_problems' selected_kpis %}
+                                                {% build_url_parameters request 'behavioural_or_emotional_problems' %}
                                             {% else %}
-                                                {% build_url_parameters request 'behavioural_or_emotional_problems' selected_kpis 'true' %}
+                                                {% build_url_parameters request 'behavioural_or_emotional_problems' 'true' %}
                                             {% endif %}">
                                         Behavioural or Emotional Problems
                                         <div class="ui {% if request.GET.behavioural_or_emotional_problems == 'true' %}left pointing{% endif %} rcpch facets label">{{ behavioural_or_emotional_problems_count }}</div>
@@ -428,9 +426,9 @@
                                     <!-- Autism Spectrum Disorder -->
                                     <a class="item {% if request.GET.autistic_spectrum_disorder == 'true' %}active{% endif %}" 
                                     href="{% if request.GET.autistic_spectrum_disorder == 'true' %}
-                                                {% build_url_parameters request 'autistic_spectrum_disorder' selected_kpis %}
+                                                {% build_url_parameters request 'autistic_spectrum_disorder' %}
                                             {% else %}
-                                                {% build_url_parameters request 'autistic_spectrum_disorder' selected_kpis 'true' %}
+                                                {% build_url_parameters request 'autistic_spectrum_disorder' 'true' %}
                                             {% endif %}">
                                         Autism Spectrum Disorder
                                         <div class="ui {% if request.GET.autistic_spectrum_disorder == 'true' %}left pointing{% endif %} rcpch facets label">{{ autistic_spectrum_disorder_count }}</div>
@@ -439,9 +437,9 @@
                                     <!-- Mental Health Issues -->
                                     <a class="item {% if request.GET.has_support_for_mental_health_support == 'true' %}active{% endif %}" 
                                         href="{% if request.GET.has_support_for_mental_health_support == 'true' %}
-                                            {% build_url_parameters request 'has_support_for_mental_health_support' selected_kpis %}
-                                            {% else %}{% build_url_parameters request 'has_support_for_mental_health_support' selected_kpis 'true' %}{% endif %}">
-                                        Mental Health Support in place?{{ selected_kpis }}
+                                            {% build_url_parameters request 'has_support_for_mental_health_support' %}
+                                            {% else %}{% build_url_parameters request 'has_support_for_mental_health_support' 'true' %}{% endif %}">
+                                        Mental Health Support in place?
                                         <div class="ui {% if request.GET.has_support_for_mental_health_support == 'true' %}left pointing{% endif %} rcpch facets label">{{ has_support_for_mental_health_support_count }}</div>
                                     </a> 
                             </div>

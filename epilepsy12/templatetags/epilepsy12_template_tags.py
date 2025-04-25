@@ -628,24 +628,76 @@ def strip(value):
     return value
 
 
+# ... existing code ...
+from django.http import QueryDict
+
+
 @register.simple_tag
-def build_url_parameters(request, field, selected_kpis, selected_field_value=None):
+def build_url_parameters(request, field, selected_field_value=None):
     """
-    Build URL parameters from the request object
+    Build URL parameters, preserving existing ones, adding/removing/toggling
+    the specified field, and handling multi-value 'kpi_failed'.
+
+    Args:
+        request: The HttpRequest object containing current GET parameters.
+        field (str): The name of the parameter field to modify.
+        selected_kpis (list): The list of currently selected KPI IDs (strings).
+                                This argument is currently unused as logic relies
+                                on modifying request.GET directly.
+        selected_field_value (str, optional):
+            - If field == 'kpi_failed', this is the specific KPI ID (str/int) to toggle.
+            - If field != 'kpi_failed', this is the value to set for the field.
+              If None, the field should be removed.
+            Defaults to None.
     """
-    if selected_field_value:
-        # If selected_field_value is provided, use it to filter the URL parameters
-        url_string = f"?{field}={selected_field_value}&"
+    # Create a mutable copy of the current GET parameters
+    query_params = request.GET.copy()
+
+    # 1. Always remove 'page' parameter to reset pagination
+    if "page" in query_params:
+        del query_params["page"]
+
+    # 2. Handle the specified 'field'
+    if field == "kpi_failed":
+        # Handle multi-value KPI toggling
+        # Assumes selected_field_value is the specific KPI ID to add or remove
+        if selected_field_value is not None:
+            kpi_to_toggle = str(selected_field_value)  # Ensure string comparison
+            current_kpis = query_params.getlist("kpi_failed")
+
+            if kpi_to_toggle in current_kpis:
+                # KPI is currently selected, remove it
+                current_kpis.remove(kpi_to_toggle)
+            else:
+                # KPI is not selected, add it
+                current_kpis.append(kpi_to_toggle)
+
+            # Update the QueryDict with the modified list
+            if current_kpis:
+                query_params.setlist(
+                    "kpi_failed", sorted(list(set(current_kpis)))
+                )  # Use set for uniqueness, sort for consistency
+            elif "kpi_failed" in query_params:
+                # Remove the key entirely if the list becomes empty
+                del query_params["kpi_failed"]
+        # If selected_field_value is None for kpi_failed, we do nothing based on current template usage.
+        # The template always seems to pass the kpi_id to toggle.
+
     else:
-        url_string = "?"
-    url_parameters = request.GET.items()
-    for key, value in url_parameters:
-        if key == field or key == "page":
-            return
-        if key == "kpi_failed":
-            if selected_kpis:
-                for kpi in selected_kpis:
-                    url_string += f"{key}={kpi}&"
+        # Handle single-value fields
+        if selected_field_value is not None:
+            # Add or update the field with the new value
+            # Check if the value is already set to avoid redundant changes (optional)
+            # if query_params.get(field) != str(selected_field_value):
+            query_params[field] = selected_field_value
         else:
-            url_string += f"{key}={value}&"
-    return url_string.rstrip("&")  # Remove the trailing '&' character
+            # Remove the field if selected_field_value is None (signifying removal)
+            if field in query_params:
+                del query_params[field]
+
+    # 3. Encode the final query string
+    final_query_string = query_params.urlencode()
+
+    # Return the URL starting with '?'
+    # Return just '?' if the final query string is empty
+    return "?" + final_query_string if final_query_string else "?"
