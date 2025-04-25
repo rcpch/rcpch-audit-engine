@@ -578,7 +578,7 @@ class CaseFilterMethods:
         )
 
     @staticmethod
-    def get_has_been_referred_for_mental_health_support_counts(queryset):
+    def get_has_been_referred_for_mental_health_support_counts(queryset, value=None):
         """
         Returns counts of cases where patient has been referred for mental health support
         """
@@ -606,12 +606,6 @@ class CaseFilterMethods:
         return queryset.filter(
             registration__management__has_support_for_mental_health_support=True
         ).count()
-
-    def filter_by_has_been_referred_for_mental_health_support(self, queryset, value):
-        """Delegate to CaseFilterMethods for mental health referral status"""
-        return CaseFilterMethods.filter_by_has_been_referred_for_mental_health_support(
-            queryset, value
-        )
 
     """
     Methods to filter cases by organisation, trust, health board, integrated care board,
