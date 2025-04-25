@@ -197,7 +197,7 @@
                                         <div class="item">
                                             <div class="ui rcpch_light_blue label">
                                                 {# Display the key and the specific value #}
-                                                {{ key|title }}: {{ value|value_display:key }}
+                                                {{ key|field_key_to_readable_name }}: {{ value|field_value_to_readable_name:key }}
 
                                                 {# Use build_url_parameters to generate the removal link #}
                                                 {# Pass the key and the specific value to remove/toggle #}
@@ -326,7 +326,7 @@
                         
                         <!-- KPI Failures -->
                         <div class="item">
-                            <div class="header">KPI Status</div>
+                            <div class="header">KPI Measures not achieved</div>
                             <div class="menu">
                                 
                                 {% for kpi_key, count in kpi_failed_counts.items %}
@@ -335,14 +335,14 @@
                                             {# Remove this KPI from the selection #}
                                             <a class="item active"
                                             href="{% build_url_parameters request 'kpi_failed' kpi_id %}">
-                                                KPI {{ kpi_id }}: {{ kpi_key.1 }} Failed
+                                            <span data-tooltip="{{ kpi_id|kpi_key_to_readable_name }}" data-position="right center">KPI {{ kpi_id|kpi_key_formatted }} <i class="rcpch question circle icon"></i></span>
                                                 <div class="ui left pointing rcpch facets label">{{ count }}</div>
                                             </a>
                                         {% else %}
                                             {# Add this KPI to the selection #}
                                             <a class="item"
                                             href="{% build_url_parameters request 'kpi_failed' kpi_id %}">
-                                                KPI {{ kpi_id }}: {{ kpi_key.1 }} Failed
+                                                <span data-tooltip="{{ kpi_id|kpi_key_to_readable_name }}" data-position="right center">KPI {{ kpi_id|kpi_key_formatted }} <i class="rcpch question circle icon"></i></span>
                                                 <div class="ui rcpch facets label">{{ count }}</div>
                                             </a>
                                         {% endif %}

@@ -13,7 +13,7 @@ from ..models import (
     Site,
     Trust,
 )
-from ..constants import ETHNICITIES, SEX_TYPE
+from ..constants import ETHNICITIES, SEX_TYPE, KPI_LABEL_MAP
 
 register = template.Library()
 
@@ -701,3 +701,81 @@ def build_url_parameters(request, field, selected_field_value=None):
     # Return the URL starting with '?'
     # Return just '?' if the final query string is empty
     return "?" + final_query_string if final_query_string else "?"
+
+
+@register.filter
+def kpi_key_to_readable_name(kpi_key):
+    """
+    Convert a KPI key to a human-readable name.
+    """
+    label = KPI_LABEL_MAP.get(kpi_key)
+    return label if label else kpi_key
+
+
+@register.filter
+def field_key_to_readable_name(field_key):
+    """
+    Convert a field key to a human-readable name.
+    """
+    field_keys = {
+        "search": "Search (NHS Number/URN/First Name/Surname/Epilepsy12 ID)",
+        "ethnicity": "Ethnicity",
+        "sex": "Sex",
+        "index_of_multiple_deprivation_quintile": "Index of Multiple Deprivation Quintile",
+        "trust_or_health_board": "Trust or Local Health Board",
+        "integrated_care_board": "Integrated Care Board",
+        "nhs_england_region": "NHS England Region",
+        "country": "Country",
+        "kpi_failed": "KPI",
+        "audit_progress_complete": "Audit Progress Complete",
+        "audit_progress_incomplete": "Audit Progress Incomplete",
+        "registration_cohort": "Cohort",
+        "has_support_for_mental_health_support": "Has support for mental health",
+        "has_been_referred_for_mental_health_support": "Has been referred for mental health",
+        "developmental_learning_or_schooling_problems": "Has developmental, learning or schooling problems",
+        "behavioural_or_emotional_problems": "Has behavioural or emotional problems",
+        "syndrome_present": "Syndrome present",
+        "epilepsy_cause_known": "Epilepsy cause known",
+        "global_developmental_delay_or_learning_difficulties": "Global developmental delay or learning difficulties",
+        "autistic_spectrum_disorder": "Autistic spectrum disorder",
+        "mental_health_issue_identified": "Mental health issue identified",
+    }
+
+    return field_keys.get(field_key, field_key)
+
+
+@register.filter
+def field_value_to_readable_name(field_value, field_key):
+    """
+    Convert a field value to a human-readable name.
+    """
+    if field_key == "kpi_failed":
+        # Convert the field_value to a list of KPI keys
+        return [
+            f"{kpi_key_formatted(kpi_key=kpi_key)} - {kpi_key_to_readable_name(kpi_key)}"
+            for kpi_key in field_value.split(",")
+        ][0]
+    elif field_value == "true":
+        return ""
+    else:
+        # For other field keys, return the value as is
+        return field_value
+
+
+@register.filter
+def kpi_key_formatted(kpi_key):
+    """
+    Convert a KPI key to a human-readable name.
+    """
+    chars = list(kpi_key.strip())
+    last_two_chars = chars[-2:]
+    number_component = "".join(char for char in kpi_key if char.isdigit())
+
+    # iif one of the last two charts is a number, return the string untouched
+    if any(char.isdigit() for char in last_two_chars):
+        return kpi_key
+
+    final_chars = chars[-1:][0]
+    key_without_final_char = kpi_key[:-1]
+
+    return f"{key_without_final_char}({final_chars})"

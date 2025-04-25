@@ -204,7 +204,6 @@ class CaseFilter(django_filters.FilterSet):
 
     def filter_by_kpi_failed(self, queryset, name, value_list):
         """Delegate to CaseFilterMethods for KPI failed filtering"""
-        print(f"Filtering by KPI list: {value_list}")  # Debugging
         if not value_list:
             return queryset
         return CaseFilterMethods.filter_by_kpi_failed(queryset, value_list)
@@ -592,7 +591,6 @@ class CaseFilterMethods:
         """
         Filter cases where patient has mental health support in place
         """
-        print("Filtering by has support for mental health support", value)
         if not value:
             return queryset
 

@@ -63,6 +63,29 @@ KPI_MAP = {
     "9bf": "sudep",
     "10": "school_individual_healthcare_plan",
 }
+KPI_LABEL_MAP = {
+    "1": "Paediatrician with expertise in epilepsies",
+    "2": "Epilepsy specialist nurse",
+    "3": "Tertiary input",
+    "3b": "Epilepsy surgery referral",
+    "4": "ECG",
+    "5": "MRI",
+    "6": "Assessment of mental health issues",
+    "7": "Mental health support",
+    "8": "Sodium valproate and topiramate",
+    "9a": "Comprehensive care planning agreement",
+    "9aa": "Patient-held individualised epilepsy document",
+    "9ab": "Patient/Carer agreement to the care planning",
+    "9ac": "Care planning has been updated when necessary",
+    "9b": "Comprehensive care planning content",
+    "9ba": "Parental prolonged seizures care plan",
+    "9bb": "Water safety",
+    "9bc": "First aid",
+    "9bd": "General participation and risk",
+    "9be": "Service contact details",
+    "9bf": "SUDEP (sudden unexplained death in epilepsy)",
+    "10": "School individual healthcare plan",
+}
 
 """
 1. Paediatrician with expertise in Epilepsy within 2 weeks - % of children and young people with epilepsy, with input by a 'consultant paediatrician with expertise in epilepsies' within 2 weeks of initial referral
