@@ -314,14 +314,14 @@
                             <div class="menu">
                                 <!-- All Audit Progress option -->
                                 
-                                <a class="item {% if request.GET.complete_audit_progress %}active{% endif %}" 
-                                href="{% build_url_parameters request 'complete_audit_progress' 'true' %}">
-                                    Complete <div class="ui {% if request.GET.complete_audit_progress %}left pointing{% endif %} rcpch facets label">{{ complete_cases }}</div>
+                                <a class="item {% if request.GET.audit_progress_complete %}active{% endif %}" 
+                                href="{% if request.GET.audit_progress_complete == 'true' %}{% build_url_parameters request 'audit_progress_complete' None %}{% else %}{% build_url_parameters request 'audit_progress_complete' 'true' %}{% endif %}">
+                                    Complete <div class="ui {% if request.GET.audit_progress_complete %}left pointing{% endif %} rcpch facets label">{{ complete_cases }}</div>
                                 </a>
                                 
-                                <a class="item {% if request.GET.incomplete_audit_progress %}active{% endif %}" 
-                                href="{% build_url_parameters request 'incomplete_audit_progress' "true" %}">
-                                    Incomplete <div class="ui {% if request.GET.incomplete_audit_progress %}left pointing{% endif %} rcpch facets label">{{ incomplete_cases }}</div>
+                                <a class="item {% if request.GET.audit_progress_incomplete %}active{% endif %}" 
+                                href="{% if request.GET.audit_progress_incomplete == 'true' %}{% build_url_parameters request 'audit_progress_incomplete' None %}{% else %}{% build_url_parameters request 'audit_progress_incomplete' 'true' %}{% endif %}">
+                                    Incomplete <div class="ui {% if request.GET.audit_progress_incomplete %}left pointing{% endif %} rcpch facets label">{{ incomplete_cases }}</div>
                                 </a>
                             </div>
                         </div>

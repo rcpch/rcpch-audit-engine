@@ -993,8 +993,8 @@ class CaseListView(LoginRequiredMixin, PermissionRequiredMixin, ListView):
 
         # Parameters that require special handling with dedicated methods: These take no extra values and only filter by the value of the parameter
         special_filter_params = [
-            "complete_audit_progress",
-            "incomplete_audit_progress",
+            "audit_progress_complete",
+            "audit_progress_incomplete",
             "registration_cohort",
             "trust_or_health_board",
             "integrated_care_board",
@@ -1060,13 +1060,13 @@ class CaseListView(LoginRequiredMixin, PermissionRequiredMixin, ListView):
         context["over_12_count"] = age_counts["12_and_over"]
 
         # Add complete and incomplete audit progress counts
-        context["complete_cases"] = CaseFilterMethods.get_complete_audit_progress_count(
-            filtered_queryset, "audit_1"  # Using dummy value for the audit ID
+        context["complete_cases"] = CaseFilterMethods.get_audit_progress_complete_count(
+            filtered_queryset, True
         )
 
         context["incomplete_cases"] = (
             CaseFilterMethods.get_audit_progress_incomplete_count(
-                filtered_queryset, "audit_1"  # Using dummy value for the audit ID
+                filtered_queryset, True
             )
         )
 

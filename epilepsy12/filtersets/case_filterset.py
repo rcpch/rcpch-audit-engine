@@ -85,11 +85,11 @@ class CaseFilter(django_filters.FilterSet):
     """
     Progress and Audit level filters
     """
-    complete_audit_progress = django_filters.CharFilter(
-        method="filter_by_complete_audit_progress", label="Complete Audit Progress"
+    audit_progress_complete = django_filters.CharFilter(
+        method="filter_by_audit_progress_complete", label="Complete Audit Progress"
     )
 
-    incomplete_audit_progress = django_filters.CharFilter(
+    audit_progress_incomplete = django_filters.CharFilter(
         method="filter_by_audit_progress_incomplete", label="Incomplete Audit Progress"
     )
     registration_cohort = django_filters.CharFilter(
@@ -116,6 +116,9 @@ class CaseFilter(django_filters.FilterSet):
             # custom filters
             "age_range",
             "kpi_failed",
+            "audit_progress_complete",
+            "audit_progress_incomplete",
+            "registration_cohort",
             "organisation",
             "trust_or_health_board",
             "integrated_care_board",
@@ -180,9 +183,9 @@ class CaseFilter(django_filters.FilterSet):
     Custom filter methods for filtering on audit progress, cohort, age range and KPI
     """
 
-    def filter_by_complete_audit_progress(self, queryset, name, value):
+    def filter_by_audit_progress_complete(self, queryset, name, value):
         """Delegate to CaseFilterMethods for complete audit progress filtering"""
-        return CaseFilterMethods.filter_by_complete_audit_progress(queryset, value)
+        return CaseFilterMethods.filter_by_audit_progress_complete(queryset, value)
 
     def filter_by_audit_progress_incomplete(self, queryset, name, value):
         """Delegate to CaseFilterMethods for incomplete audit progress filtering"""
@@ -1028,18 +1031,13 @@ class CaseFilterMethods:
         return kpi_counts
 
     @staticmethod
-    def filter_by_complete_audit_progress(queryset, value):
+    def filter_by_audit_progress_complete(queryset, value):
         """
         Filter cases by the complete audit progress status.
-        Acceptable values are:
-        - audit_<audit_id> for Audit
-        This method assumes that the value is a string formatted as "audit_id",
-        where audit_id is the ID of the audit.
+        Accepts a boolean value
         """
         # value_type and value_id would come from parsing the value parameter
-        value_type, value_id = value.split("_", 1)
-
-        if value_type == "audit":
+        if value:
             # Filter by complete audit progress status
             return queryset.filter(
                 epilepsy12_sites__site_is_primary_centre_of_epilepsy_care=True,
@@ -1054,23 +1052,16 @@ class CaseFilterMethods:
                 registration__audit_progress__investigations_complete=True,
                 registration__audit_progress__management_complete=True,
             )
-        return queryset
+        else:
+            return queryset
 
     @staticmethod
-    def get_complete_audit_progress_count(queryset, value):
+    def get_audit_progress_complete_count(queryset, value):
         """
         Returns counts of case by complete audit progress status - includes cases with no registration
         Accepts a value in the format of "audit_<audit_id>"
         """
-        if not value:
-            return 0
-        try:
-            value_type, value_id = value.split("_", 1)
-        except ValueError:
-            # Handle the case where value is not in the expected format
-            return 0
-
-        if value_type == "audit":
+        if value:
             # Filter by complete audit progress status
             return (
                 queryset.filter(
@@ -1089,7 +1080,8 @@ class CaseFilterMethods:
                 .distinct()
                 .count()
             )
-        return 0
+        else:
+            return queryset.count()
 
     @staticmethod
     def filter_by_registration_cohort(queryset, cohort):
@@ -1132,14 +1124,10 @@ class CaseFilterMethods:
         """
         Filter cases by the incomplete audit progress status.
         Acceptable values are:
-        - audit_<audit_id> for Audit
-        This method assumes that the value is a string formatted as "audit_id",
-        where audit_id is the ID of the audit.
+        boolean value
         """
         # value_type and value_id would come from parsing the value parameter
-        value_type, value_id = value.split("_", 1)
-
-        if value_type == "audit":
+        if value:
             # Filter by incomplete audit progress status
             return queryset.filter(
                 Q(
@@ -1166,17 +1154,10 @@ class CaseFilterMethods:
     def get_audit_progress_incomplete_count(queryset, value):
         """
         Returns counts of case by incomplete audit progress status - includes cases with no registration
-        Accepts a value in the format of "audit_<audit_id>"
+        Accepts boolean value
         """
-        if not value:
-            return 0
-        try:
-            value_type, value_id = value.split("_", 1)
-        except ValueError:
-            # Handle the case where value is not in the expected format
-            return 0
 
-        if value_type == "audit":
+        if value:
             # Filter by incomplete audit progress status
             return (
                 queryset.filter(
@@ -1203,7 +1184,7 @@ class CaseFilterMethods:
                 .distinct()
                 .count()
             )
-        return 0
+        return queryset.count()
 
     @staticmethod
     def get_total_episodes_count(queryset, value):
@@ -1280,8 +1261,8 @@ class CaseFilterMethods:
         if apply_special_filters:
             # These take no extra values and only filter by the value of the parameter
             # Includes:
-            # "complete_audit_progress",
-            # "incomplete_audit_progress",
+            # "audit_progress_complete",
+            # "audit_progress_incomplete",
             # "registration_cohort",
 
             # # level of abstraction fields:
