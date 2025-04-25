@@ -218,6 +218,9 @@
                     </div>
                 </div>
                 {% endif %}
+                {% for name, value in hidden_field_params %}
+                    <input type="hidden" name="{{ name }}" value="{{ value }}">
+                {% endfor %}
             </form>
             
             <!-- Results Stats -->
@@ -573,41 +576,14 @@
 {% block extra_js %}
 <script>
     $(document).ready(function() {
-        // Initialize all dropdown elements
+    
+        // --- Call your other initialization functions here ---
+        // These likely already use jQuery based on your previous code
         initializeDropdowns();
-        
-        // Set up filter removal from active filters display
         setupFilterRemoval();
-        
-        // Handle responsive behavior
         handleResponsiveBehavior();
-        
-        // Set up search input behavior
         setupSearchInput();
-
-        form.find('input[type="hidden"][name="kpi_failed"]').remove();
-
-        // Add hidden inputs for all current kpi_failed values
-        urlParams.getAll('kpi_failed').forEach(function(kpiValue) {
-            form.append($('<input>', {
-                type: 'hidden',
-                name: 'kpi_failed',
-                value: kpiValue
-            }));
-        });
-
-        // Add hidden inputs for other GET params not in the form (optional but good practice)
-        urlParams.forEach(function(value, key) {
-            // Add if not 'page', not 'kpi_failed' (already handled), and not already a field in the form
-            if (key !== 'page' && key !== 'kpi_failed' && form.find('[name="' + key + '"]').length === 0) {
-                form.append($('<input>', {
-                    type: 'hidden',
-                    name: key,
-                    value: value
-                }));
-            }
-        });
-
+        // ---
     });
     
     /**

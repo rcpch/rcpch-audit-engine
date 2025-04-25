@@ -1,6 +1,8 @@
 from dateutil.relativedelta import relativedelta
+from django.http import QueryDict
 from django.utils import timezone
 from django.db.models import Q, Count, Sum
+from django import forms
 
 # Third-party imports
 import django_filters
@@ -27,25 +29,10 @@ class CaseFilter(django_filters.FilterSet):
     # simple filters for fields on the Case model
     # Simple field filters
     search = django_filters.CharFilter(method="filter_search", label="Search")
-    first_name = django_filters.CharFilter(lookup_expr="icontains")
-    surname = django_filters.CharFilter(lookup_expr="icontains")
-    nhs_number = django_filters.CharFilter(lookup_expr="icontains")
-    unique_reference_number = django_filters.CharFilter(
-        field_name="registration__unique_reference_number", lookup_expr="icontains"
-    )
     ethnicity = django_filters.ChoiceFilter(choices=ETHNICITIES)
     sex = django_filters.ChoiceFilter(choices=SEX_TYPE)
-    date_of_birth = django_filters.DateFilter()
-    date_of_birth_range = django_filters.DateFromToRangeFilter(
-        field_name="date_of_birth"
-    )
     index_of_multiple_deprivation_quintile = django_filters.ChoiceFilter(
         field_name="index_of_multiple_deprivation_quintile"
-    )
-
-    # For related fields
-    first_paediatric_assessment_date = django_filters.DateFilter(
-        field_name="registration__first_paediatric_assessment_date"
     )
 
     AGE_CHOICES = (
@@ -95,8 +82,43 @@ class CaseFilter(django_filters.FilterSet):
     registration_cohort = django_filters.CharFilter(
         method="filter_by_registration_cohort", label="Registration Cohort"
     )
-    kpi_failed = django_filters.CharFilter(
+    kpi_failed = django_filters.BaseInFilter(
         method="filter_by_kpi_failed", label="KPI Failed"
+    )
+    has_support_for_mental_health_support = django_filters.CharFilter(
+        method="filter_by_has_support_for_mental_health_support",
+        label="Support for Mental Health",
+    )
+    has_been_referred_for_mental_health_support = django_filters.CharFilter(
+        method="filter_by_has_been_referred_for_mental_health_support",
+        label="Referred for Mental Health Support",
+    )
+    # Custom filter methods for filtering on related fields
+    developmental_learning_or_schooling_problems = django_filters.CharFilter(
+        method="filter_by_developmental_learning_or_schooling_problems",
+        label="Developmental Learning or Schooling Problems",
+    )
+    behavioural_or_emotional_problems = django_filters.CharFilter(
+        method="filter_by_behavioural_or_emotional_problems",
+        label="Behavioural or Emotional Problems",
+    )
+    syndrome_present = django_filters.CharFilter(
+        method="filter_by_syndrome_present", label="Syndrome Present"
+    )
+    epilepsy_cause_known = django_filters.CharFilter(
+        method="filter_by_epilepsy_cause_known", label="Epilepsy Cause Known"
+    )
+    global_developmental_delay_or_learning_difficulties = django_filters.CharFilter(
+        method="filter_by_global_developmental_delay_or_learning_difficulties",
+        label="Global Developmental Delay or Learning Difficulties",
+    )
+    autistic_spectrum_disorder = django_filters.CharFilter(
+        method="filter_by_autistic_spectrum_disorder",
+        label="Autistic Spectrum Disorder",
+    )
+    mental_health_issue_identified = django_filters.CharFilter(
+        method="filter_by_mental_health_issue_identified",
+        label="Mental Health Issue Identified",
     )
 
     class Meta:
@@ -107,23 +129,8 @@ class CaseFilter(django_filters.FilterSet):
             "unique_reference_number",
             "first_name",
             "surname",
-            "sex",
-            "ethnicity",
             "index_of_multiple_deprivation_quintile",
             "date_of_birth",
-            "date_of_birth_range",
-            "first_paediatric_assessment_date",
-            # custom filters
-            "age_range",
-            "kpi_failed",
-            "audit_progress_complete",
-            "audit_progress_incomplete",
-            "registration_cohort",
-            "organisation",
-            "trust_or_health_board",
-            "integrated_care_board",
-            "nhs_england_region",
-            "country",
         ]
 
     def __init__(self, *args, **kwargs):
@@ -195,9 +202,12 @@ class CaseFilter(django_filters.FilterSet):
         """Delegate to CaseFilterMethods for registration cohort filtering"""
         return CaseFilterMethods.filter_by_registration_cohort(queryset, value)
 
-    def filter_by_kpi_failed(self, queryset, name, value):
+    def filter_by_kpi_failed(self, queryset, name, value_list):
         """Delegate to CaseFilterMethods for KPI failed filtering"""
-        return CaseFilterMethods.filter_by_kpi_failed(queryset, value)
+        print(f"Filtering by KPI list: {value_list}")  # Debugging
+        if not value_list:
+            return queryset
+        return CaseFilterMethods.filter_by_kpi_failed(queryset, value_list)
 
     def filter_by_age_range(self, queryset, name, value):
         """Delegate to CaseFilterMethods for age range filtering"""
@@ -224,6 +234,12 @@ class CaseFilter(django_filters.FilterSet):
     """
     Custom filter methods for filtering on related fields
     """
+
+    def filter_by_has_support_for_mental_health_support(self, queryset, name, value):
+        """Delegate to CaseFilterMethods for mental health support"""
+        return CaseFilterMethods.filter_by_has_support_for_mental_health_support(
+            queryset, value
+        )
 
     def filter_by_developmental_learning_or_schooling_problems(
         self, queryset, name, value
@@ -262,6 +278,14 @@ class CaseFilter(django_filters.FilterSet):
     def filter_by_mental_health_issue_identified(self, queryset, name, value):
         """Delegate to CaseFilterMethods for mental health issue identified"""
         return CaseFilterMethods.filter_by_mental_health_issue_identified(
+            queryset, value
+        )
+
+    def filter_by_has_been_referred_for_mental_health_support(
+        self, queryset, name, value
+    ):
+        """Delegate to CaseFilterMethods for mental health referral status"""
+        return CaseFilterMethods.filter_by_has_been_referred_for_mental_health_support(
             queryset, value
         )
 
@@ -971,13 +995,13 @@ class CaseFilterMethods:
     """
 
     @staticmethod
-    def filter_by_kpi_failed(queryset, values):
+    def filter_by_kpi_failed(queryset, value_list):
         """
         Filter cases by the KPI failed status. Differs from other filters as accepts a list of kpis
         """
 
         kpi_fields = [
-            KPI_MAP[key] for key in values if key in KPI_MAP
+            KPI_MAP[key] for key in value_list if key in KPI_MAP
         ]  # converts the list of kpi keys to the corresponding field names
         if not kpi_fields:
             # If no matching KPI fields are found, return the original queryset
@@ -1299,9 +1323,6 @@ class CaseFilterMethods:
 
                     if filter_method:
                         # Apply the filter
-                        print(
-                            f"Applying special filter: {param_name} with value: {filter_value}"
-                        )
                         queryset = filter_method(queryset, filter_value)
 
         # Then handle all remaining filters
@@ -1333,9 +1354,9 @@ class CaseFilterMethods:
                 )
             elif key == "kpi_failed":
                 # This is a special case where we need to handle the KPI failed status for a list of KPIs as a single query
-                values = request.GET.getlist(key)
+                value_list = request.GET.getlist(key)
                 queryset = CaseFilterMethods.filter_by_kpi_failed(
-                    queryset=queryset, values=values
+                    queryset=queryset, value_list=value_list
                 )
             elif key == "index_of_multiple_deprivation_quintile":
                 queryset = (

@@ -1203,8 +1203,43 @@ class CaseListView(LoginRequiredMixin, PermissionRequiredMixin, ListView):
             )
         )
 
-        # deal with the KPIs
+        # deal with the KPIs - this is a list of all the KPIs that have failed stored in kpi_failed
+        # the list is used to create labels in the filter summary in the template
         selected_kpis = [k.strip() for k in self.request.GET.getlist("kpi_failed")]
         context["selected_kpis"] = selected_kpis  # returns a list of selected KPIs
+
+        # --- Prepare data for hidden fields ---
+
+        hidden_field_params = []
+        # Define the names of your VISIBLE form fields that should NOT be duplicated as hidden
+        visible_form_fields = {
+            "search",
+            "ethnicity",
+            "sex",
+            "index_of_multiple_deprivation_quintile",
+            "trust_or_health_board",
+            "integrated_care_board",
+            "nhs_england_region",
+            "country",
+            # Add any others rendered visibly in the form
+        }
+        exclude_params = {"page", "submit"}  # Standard exclusions
+
+        for key in self.request.GET.keys():
+            # Skip fields in the form with the drop downs. Need to add the facet fields
+            # only as hidden fields to the form. So we pass a list of hidden fields here to
+            # the context to loop through at the bottom of the form so that their parameters are
+            # not lost when the form submits, since the form otherwise has no knowledge
+            # of the facet information
+            if key in visible_form_fields or key in exclude_params:
+                continue
+
+            # Add key-value pairs for hidden fields
+            # Use getlist for potential multi-value fields like kpi_failed
+            values = self.request.GET.getlist(key)
+            for value in values:
+                if value:
+                    hidden_field_params.append((key, value))
+            context["hidden_field_params"] = hidden_field_params
 
         return context
