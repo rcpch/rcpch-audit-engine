@@ -190,35 +190,30 @@
                 <div class="ui rcpch_info message">
                     <div class="header">Active Filters</div>
                     <div class="ui horizontal list">
-                        {% for key, value in request.GET.items %}
-                            {% if key != 'page' and value %}
-                                {% if key == 'kpi_failed' %}
-                                    {% for val in selected_kpis %}
+                        {% for key, value_list in request.GET.lists %} {# Iterate through .lists() to get all values #}
+                            {% if key != 'page' %}
+                                {% for value in value_list %} {# Loop through potentially multiple values for the key #}
+                                    {% if value %} {# Ensure value is not empty #}
                                         <div class="item">
                                             <div class="ui rcpch_light_blue label">
-                                                {{ key|title }}: {{ val|value_display:key }}
-                                                <a href="?{% for k, v in request.GET.items %}{% if k != key and k != 'page' %}{{ k }}={{ v }}&{% endif %}{% endfor %}">
+                                                {# Display the key and the specific value #}
+                                                {{ key|title }}: {{ value|value_display:key }}
+
+                                                {# Use build_url_parameters to generate the removal link #}
+                                                {# Pass the key and the specific value to remove/toggle #}
+                                                <a href="{% build_url_parameters request key value %}">
                                                     <i class="delete icon"></i>
                                                 </a>
                                             </div>
                                         </div>
-                                    {% endfor %}
-                                {% else %}
-                                    <div class="item">
-                                        <div class="ui rcpch_light_blue label">
-                                            {{ key|title }}: {{ value|value_display:key }}
-                                            <a href="?{% for k, v in request.GET.items %}{% if k != key and k != 'page' %}{{ k }}={{ v }}&{% endif %}{% endfor %}">
-                                                <i class="delete icon"></i>
-                                            </a>
-                                        </div>
-                                    </div>
-                                {% endif %}
+                                    {% endif %}
+                                {% endfor %}
                             {% endif %}
                         {% endfor %}
                     </div>
                 </div>
                 {% endif %}
-                {% for name, value in hidden_field_params %}
+                {% for name, value in hidden_field_params %} <!-- this adds the facets to the form as hidden fields so that their filters are not ignored when the form is submitted-->
                     <input type="hidden" name="{{ name }}" value="{{ value }}">
                 {% endfor %}
             </form>
