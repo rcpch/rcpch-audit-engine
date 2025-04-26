@@ -779,3 +779,33 @@ def kpi_key_formatted(kpi_key):
     key_without_final_char = kpi_key[:-1]
 
     return f"{key_without_final_char}({final_chars})"
+
+
+@register.filter
+def kpi_category_title(kpi_key):
+    """
+    Convert a KPI key to a human-readable name.
+    """
+    # Extract the category from the KPI key
+    # Extract the category from the KPI key
+    if kpi_key == "1":
+        return "Professional Input"
+    elif kpi_key == "4":
+        return "Appropriate Assessment"
+    elif kpi_key == "6":
+        return "Mental Health"
+    elif kpi_key == "9a":
+        return "Care Planning"
+    else:
+        return ""
+
+
+@register.simple_tag
+def kpi_has_category_title(kpi_key):
+    """
+    Convert a KPI key to a human-readable name.
+    """
+    if kpi_key == "1":
+        return True
+    else:
+        return False

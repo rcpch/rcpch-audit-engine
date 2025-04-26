@@ -331,10 +331,16 @@
                                 
                                 {% for kpi_key, count in kpi_failed_counts.items %}
                                     {% with kpi_id=kpi_key.0 %}
+                                        
+                                        {% if kpi_id|kpi_category_title %}
+                                                <div class='item'><div class="header">{{ kpi_id|kpi_category_title }}</div></div>
+                                        {% endif %}
+                                        
                                         {% if kpi_id|stringformat:"s" in selected_kpis %}
                                             {# Remove this KPI from the selection #}
                                             <a class="item active"
                                             href="{% build_url_parameters request 'kpi_failed' kpi_id %}">
+                                            
                                             <span data-tooltip="{{ kpi_id|kpi_key_to_readable_name }}" data-position="right center">KPI {{ kpi_id|kpi_key_formatted }} <i class="rcpch question circle icon"></i></span>
                                                 <div class="ui left pointing rcpch facets label">{{ count }}</div>
                                             </a>
