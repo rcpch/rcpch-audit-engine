@@ -85,21 +85,7 @@
                     <div class="eight wide  column">
                         <div class="eight wide column">
                             <a class="ui rcpch_primary button bold fluid" href="{% url 'cases' organisation_id=selected_organisation.pk %}">
-                                View All Children of 
-                                {% if selected_organisation.trust %}
-                                    {% with organisation_name=selected_organisation.trust.name|title %}
-                                    {{ organisation_name|capitalise_org_names }} 
-                                    {% endwith %}
-                                {% elif selected_organisation.local_health_board %}
-                                    {% with organisation_name=selected_organisation.local_health_board.name|title %}
-                                    {{ organisation_name|capitalise_org_names }} 
-                                    {% endwith %}
-                                {% endif %}
-                            </a>
-                        </div>
-                        <div class="eight wide column">
-                            <a class="ui rcpch_primary button bold fluid" href="{% url 'case-filter' organisation_id=selected_organisation.pk %}">
-                                Report Builder for
+                                View Clinical Audit entries for
                                 {% if selected_organisation.trust %}
                                     {% with organisation_name=selected_organisation.trust.name|title %}
                                     {{ organisation_name|capitalise_org_names }} 
