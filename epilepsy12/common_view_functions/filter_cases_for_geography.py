@@ -19,13 +19,13 @@ def filter_all_registered_cases_by_active_lead_site_and_cohort_and_level_of_abst
         Case.objects.filter(
             ~Q(postcode__in=UNKNOWN_POSTCODES_NO_SPACES),
             location_wgs84__isnull=False,  # Ensure location is not null
-            site__organisation__longitude__isnull=False,  # Ensure location is not null
-            site__organisation__latitude__isnull=False,  # Ensure location is not null
+            epilepsy12_sites__organisation__longitude__isnull=False,  # Ensure location is not null
+            epilepsy12_sites__organisation__latitude__isnull=False,  # Ensure location is not null
             registration__isnull=False,
             registration__cohort=cohort,
-            site__organisation=organisation,
-            site__site_is_actively_involved_in_epilepsy_care=True,
-            site__site_is_primary_centre_of_epilepsy_care=True,
+            epilepsy12_sites__organisation=organisation,
+            epilepsy12_sites__site_is_actively_involved_in_epilepsy_care=True,
+            epilepsy12_sites__site_is_primary_centre_of_epilepsy_care=True,
         )
         .annotate(
             distance_from_lead_organisation=Distance(
@@ -39,7 +39,7 @@ def filter_all_registered_cases_by_active_lead_site_and_cohort_and_level_of_abst
         )
         .values(
             "pk",
-            "site__organisation__name",
+            "epilepsy12_sites__organisation__name",
             "first_name",
             "surname",
             "location_bng",

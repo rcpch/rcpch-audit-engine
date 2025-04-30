@@ -5,7 +5,15 @@ import json
 from django import template
 from django.utils.safestring import mark_safe
 from django.conf import settings
-from ..models import Site
+from ..models import (
+    Country,
+    IntegratedCareBoard,
+    LocalHealthBoard,
+    NHSEnglandRegion,
+    Site,
+    Trust,
+)
+from ..constants import ETHNICITIES, SEX_TYPE, KPI_LABEL_MAP
 
 register = template.Library()
 
@@ -520,6 +528,54 @@ def lead_site_for_case(case):
 
 
 @register.filter
+def subtract(value, arg):
+    """Subtracts the arg from the value."""
+    try:
+        return int(value) - int(arg)
+    except (ValueError, TypeError):
+        return 0
+
+
+@register.filter
+def value_display(value, key):
+    """
+    Returns the display value for a given key in a dictionary
+    """
+    if key == "ethnicity":
+        return dict(ETHNICITIES)[value]
+    elif key == "sex":
+        return dict(SEX_TYPE)[int(value)]
+
+    if "_" in value:
+        value_str, value_id = value.split("_", 1)
+        if value_str == "country":
+            return Country.objects.get(id=int(value_id)).name
+        elif value_str == "nhsenglandregion":
+            return NHSEnglandRegion.objects.get(id=int(value_id)).name
+        elif value_str == "icb":
+            return IntegratedCareBoard.objects.get(id=int(value_id)).name
+        elif value_str == "t":
+            return Trust.objects.get(id=int(value_id)).name
+        elif value_str == "h":
+            return LocalHealthBoard.objects.get(id=int(value_id)).name
+    return value.replace("_", " ") if value else value
+
+
+@register.filter
+def get_item(dictionary, key):
+    value_type, value_id = key.split("_", 1)
+    """Get an item from a dictionary with the given key"""
+    if value_id:
+        return dictionary.get(value_id)
+
+
+@register.filter
+def make_list(value):
+    """Convert a string to a list of characters"""
+    return list(value)
+
+
+@register.filter
 def show_topiramate_valproate_fields(
     antiepilepsy_medicine_instance, pregnancy_prevention=False
 ):
@@ -563,3 +619,193 @@ def show_topiramate_valproate_fields(
                 return True
 
     return False
+
+
+@register.filter
+def strip(value):
+    if isinstance(value, str):
+        return value.strip()
+    return value
+
+
+# ... existing code ...
+from django.http import QueryDict
+
+
+@register.simple_tag
+def build_url_parameters(request, field, selected_field_value=None):
+    """
+    Build URL parameters, preserving existing ones, adding/removing/toggling
+    the specified field, and handling multi-value 'kpi_failed'.
+
+    Args:
+        request: The HttpRequest object containing current GET parameters.
+        field (str): The name of the parameter field to modify.
+        selected_kpis (list): The list of currently selected KPI IDs (strings).
+                                This argument is currently unused as logic relies
+                                on modifying request.GET directly.
+        selected_field_value (str, optional):
+            - If field == 'kpi_failed', this is the specific KPI ID (str/int) to toggle.
+            - If field != 'kpi_failed', this is the value to set for the field.
+              If None, the field should be removed.
+            Defaults to None.
+    """
+    # Create a mutable copy of the current GET parameters
+    query_params = request.GET.copy()
+
+    # 1. Always remove 'page' parameter to reset pagination
+    if "page" in query_params:
+        del query_params["page"]
+
+    # 2. Handle the specified 'field'
+    if field == "kpi_failed":
+        # Handle multi-value KPI toggling
+        # Assumes selected_field_value is the specific KPI ID to add or remove
+        if selected_field_value is not None:
+            kpi_to_toggle = str(selected_field_value)  # Ensure string comparison
+            current_kpis = query_params.getlist("kpi_failed")
+
+            if kpi_to_toggle in current_kpis:
+                # KPI is currently selected, remove it
+                current_kpis.remove(kpi_to_toggle)
+            else:
+                # KPI is not selected, add it
+                current_kpis.append(kpi_to_toggle)
+
+            # Update the QueryDict with the modified list
+            if current_kpis:
+                query_params.setlist(
+                    "kpi_failed", sorted(list(set(current_kpis)))
+                )  # Use set for uniqueness, sort for consistency
+            elif "kpi_failed" in query_params:
+                # Remove the key entirely if the list becomes empty
+                del query_params["kpi_failed"]
+        # If selected_field_value is None for kpi_failed, we do nothing based on current template usage.
+        # The template always seems to pass the kpi_id to toggle.
+
+    else:
+        # Handle single-value fields
+        if selected_field_value is not None:
+            # Add or update the field with the new value
+            # Check if the value is already set to avoid redundant changes (optional)
+            # if query_params.get(field) != str(selected_field_value):
+            query_params[field] = selected_field_value
+        else:
+            # Remove the field if selected_field_value is None (signifying removal)
+            if field in query_params:
+                del query_params[field]
+
+    # 3. Encode the final query string
+    final_query_string = query_params.urlencode()
+
+    # Return the URL starting with '?'
+    # Return just '?' if the final query string is empty
+    return "?" + final_query_string if final_query_string else "?"
+
+
+@register.filter
+def kpi_key_to_readable_name(kpi_key):
+    """
+    Convert a KPI key to a human-readable name.
+    """
+    label = KPI_LABEL_MAP.get(kpi_key)
+    return label if label else kpi_key
+
+
+@register.filter
+def field_key_to_readable_name(field_key):
+    """
+    Convert a field key to a human-readable name.
+    """
+    field_keys = {
+        "search": "Search (NHS Number/URN/First Name/Surname/Epilepsy12 ID)",
+        "ethnicity": "Ethnicity",
+        "sex": "Sex",
+        "index_of_multiple_deprivation_quintile": "Index of Multiple Deprivation Quintile",
+        "trust_or_health_board": "Trust or Local Health Board",
+        "integrated_care_board": "Integrated Care Board",
+        "nhs_england_region": "NHS England Region",
+        "country": "Country",
+        "kpi_failed": "KPI",
+        "audit_progress_complete": "Audit Progress Complete",
+        "audit_progress_incomplete": "Audit Progress Incomplete",
+        "registration_cohort": "Cohort",
+        "has_support_for_mental_health_support": "Has support for mental health",
+        "has_been_referred_for_mental_health_support": "Has been referred for mental health",
+        "developmental_learning_or_schooling_problems": "Has developmental, learning or schooling problems",
+        "behavioural_or_emotional_problems": "Has behavioural or emotional problems",
+        "syndrome_present": "Syndrome present",
+        "epilepsy_cause_known": "Epilepsy cause known",
+        "global_developmental_delay_or_learning_difficulties": "Global developmental delay or learning difficulties",
+        "autistic_spectrum_disorder": "Autistic spectrum disorder",
+        "mental_health_issue_identified": "Mental health issue identified",
+    }
+
+    return field_keys.get(field_key, field_key)
+
+
+@register.filter
+def field_value_to_readable_name(field_value, field_key):
+    """
+    Convert a field value to a human-readable name.
+    """
+    if field_key == "kpi_failed":
+        # Convert the field_value to a list of KPI keys
+        return [
+            f"{kpi_key_formatted(kpi_key=kpi_key)} - {kpi_key_to_readable_name(kpi_key)}"
+            for kpi_key in field_value.split(",")
+        ][0]
+    elif field_value == "true":
+        return ""
+    else:
+        # For other field keys, return the value as is
+        return field_value
+
+
+@register.filter
+def kpi_key_formatted(kpi_key):
+    """
+    Convert a KPI key to a human-readable name.
+    """
+    chars = list(kpi_key.strip())
+    last_two_chars = chars[-2:]
+    number_component = "".join(char for char in kpi_key if char.isdigit())
+
+    # iif one of the last two charts is a number, return the string untouched
+    if any(char.isdigit() for char in last_two_chars):
+        return kpi_key
+
+    final_chars = chars[-1:][0]
+    key_without_final_char = kpi_key[:-1]
+
+    return f"{key_without_final_char}({final_chars})"
+
+
+@register.filter
+def kpi_category_title(kpi_key):
+    """
+    Convert a KPI key to a human-readable name.
+    """
+    # Extract the category from the KPI key
+    # Extract the category from the KPI key
+    if kpi_key == "1":
+        return "Professional Input"
+    elif kpi_key == "4":
+        return "Appropriate Assessment"
+    elif kpi_key == "6":
+        return "Mental Health"
+    elif kpi_key == "9a":
+        return "Care Planning"
+    else:
+        return ""
+
+
+@register.simple_tag
+def kpi_has_category_title(kpi_key):
+    """
+    Convert a KPI key to a human-readable name.
+    """
+    if kpi_key == "1":
+        return True
+    else:
+        return False

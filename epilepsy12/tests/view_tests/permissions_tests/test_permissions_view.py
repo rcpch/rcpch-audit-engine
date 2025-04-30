@@ -497,8 +497,6 @@ def test_episode_syndrome_aem_view_permissions_success(client):
         employer_organisations__is_primary=True,
     )
 
-    print(users)
-
     # Create objs to search for
     episode = Episode.objects.create(
         episode_definition="a",

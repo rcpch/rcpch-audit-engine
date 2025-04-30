@@ -8,17 +8,28 @@ from django.core.exceptions import PermissionDenied
 from django.utils import timezone
 from django.shortcuts import get_object_or_404, redirect, render
 from django.urls import reverse
+from django.conf import settings
+from django.contrib.auth.mixins import LoginRequiredMixin, PermissionRequiredMixin
 from django.contrib.auth.decorators import permission_required
 from django.contrib.gis.db.models import Q
 from django.contrib import messages
 from django.core.paginator import Paginator
+from django.views.generic import ListView
 
 # third party imports
 from django_htmx.http import trigger_client_event, HttpResponseClientRedirect
 
 # RCPCH imports
 from epilepsy12.forms import CaseForm
-from epilepsy12.models import Organisation, Site, Case, AuditProgress, Epilepsy12User
+from epilepsy12.models import (
+    AuditProgress,
+    Case,
+    Country,
+    Epilepsy12User,
+    NHSEnglandRegion,
+    Organisation,
+    Site,
+)
 from ..constants import (
     UNKNOWN_POSTCODES_NO_SPACES,
 )
@@ -28,7 +39,7 @@ from ..decorator import (
     login_and_otp_required,
 )
 
-from django.conf import settings
+from ..filtersets import *
 
 from ..general_functions import (
     construct_transfer_epilepsy12_site_outcome_email,
@@ -80,9 +91,11 @@ def case_list(request, organisation_id):
             # user has requested organisation level view
             all_cases = (
                 Case.objects.filter(
-                    Q(site__organisation=organisation)
-                    & Q(site__site_is_primary_centre_of_epilepsy_care=True)
-                    & Q(site__site_is_actively_involved_in_epilepsy_care=True)
+                    Q(epilepsy12_sites__organisation=organisation)
+                    & Q(epilepsy12_sites__site_is_primary_centre_of_epilepsy_care=True)
+                    & Q(
+                        epilepsy12_sites__site_is_actively_involved_in_epilepsy_care=True
+                    )
                     & (
                         Q(first_name__icontains=filter_term)
                         | Q(surname__icontains=filter_term)
@@ -99,17 +112,21 @@ def case_list(request, organisation_id):
             if organisation.country.boundary_identifier == "W92000004":
                 # in Wales filter by health board
                 trust_filter = Q(
-                    site__organisation__local_health_board=organisation.local_health_board
+                    epilepsy12_sites__organisation__local_health_board=organisation.local_health_board
                 )
             else:
                 # England filter by Trust
-                trust_filter = Q(site__organisation__trust=organisation.trust)
+                trust_filter = Q(
+                    epilepsy12_sites__organisation__trust=organisation.trust
+                )
 
             all_cases = (
                 Case.objects.filter(
                     trust_filter
-                    & Q(site__site_is_primary_centre_of_epilepsy_care=True)
-                    & Q(site__site_is_actively_involved_in_epilepsy_care=True)
+                    & Q(epilepsy12_sites__site_is_primary_centre_of_epilepsy_care=True)
+                    & Q(
+                        epilepsy12_sites__site_is_actively_involved_in_epilepsy_care=True
+                    )
                     & (
                         Q(first_name__icontains=filter_term)
                         | Q(surname__icontains=filter_term)
@@ -125,8 +142,10 @@ def case_list(request, organisation_id):
             # user has requested national level view
             all_cases = (
                 Case.objects.filter(
-                    Q(site__site_is_primary_centre_of_epilepsy_care=True)
-                    & Q(site__site_is_actively_involved_in_epilepsy_care=True)
+                    Q(epilepsy12_sites__site_is_primary_centre_of_epilepsy_care=True)
+                    & Q(
+                        epilepsy12_sites__site_is_actively_involved_in_epilepsy_care=True
+                    )
                     & (
                         Q(first_name__icontains=filter_term)
                         | Q(surname__icontains=filter_term)
@@ -157,23 +176,23 @@ def case_list(request, organisation_id):
                 # welsh - select health boards
                 filtered_cases = Case.objects.filter(
                     organisations__local_health_board=parent_trust,
-                    site__site_is_primary_centre_of_epilepsy_care=True,
-                    site__site_is_actively_involved_in_epilepsy_care=True,
+                    epilepsy12_sites__site_is_primary_centre_of_epilepsy_care=True,
+                    epilepsy12_sites__site_is_actively_involved_in_epilepsy_care=True,
                 )
             else:
                 # England - select trusts
                 filtered_cases = Case.objects.filter(
                     organisations__trust=parent_trust,
-                    site__site_is_primary_centre_of_epilepsy_care=True,
-                    site__site_is_actively_involved_in_epilepsy_care=True,
+                    epilepsy12_sites__site_is_primary_centre_of_epilepsy_care=True,
+                    epilepsy12_sites__site_is_actively_involved_in_epilepsy_care=True,
                 )
 
         else:
             # filters all primary centres at organisation level, irrespective of if active or inactive
             filtered_cases = Case.objects.filter(
                 organisations__name=organisation,
-                site__site_is_primary_centre_of_epilepsy_care=True,
-                site__site_is_actively_involved_in_epilepsy_care=True,
+                epilepsy12_sites__site_is_primary_centre_of_epilepsy_care=True,
+                epilepsy12_sites__site_is_actively_involved_in_epilepsy_care=True,
             )
 
         if (
@@ -290,11 +309,11 @@ def case_list(request, organisation_id):
 
     registered_cases = all_cases.filter(
         ~Q(registration__isnull=True)
-        & Q(site__site_is_primary_centre_of_epilepsy_care=True)
-        & Q(site__site_is_actively_involved_in_epilepsy_care=True)
+        & Q(epilepsy12_sites__site_is_primary_centre_of_epilepsy_care=True)
+        & Q(epilepsy12_sites__site_is_actively_involved_in_epilepsy_care=True)
     ).all()
 
-    cases_in_transfer = registered_cases.filter(site__active_transfer=True)
+    cases_in_transfer = registered_cases.filter(epilepsy12_sites__active_transfer=True)
 
     paginator = Paginator(all_cases, 50)
     page_number = request.GET.get("page", 1)
@@ -827,7 +846,7 @@ def opt_out(request, organisation_id, case_id):
         case.registration.delete()
 
     # delete all related sites except the primary centre of care, which becomes inactive
-    all_sites = case.site.all()
+    all_sites = case.epilepsy12_sites.all()
     for site in all_sites:
         if site.site_is_primary_centre_of_epilepsy_care:
             site.site_is_actively_involved_in_epilepsy_care = False
@@ -930,3 +949,297 @@ def consent_confirmation(request, case_id, consent_type):
     )  # reloads the form to show the active steps
 
     return response
+
+
+class CaseListView(LoginRequiredMixin, PermissionRequiredMixin, ListView):
+    """
+    View to display a list of cases for a given organisation.
+    This view uses a faceted search for certain key metrics such as KPI
+    and audit progress.
+    """
+
+    model = Case
+    template_name = "epilepsy12/cases/case_filter_table.html"
+    context_object_name = "case_filter_list"
+    paginate_by = 50
+    filterset_class = CaseFilter
+    ordering = "surname"
+    permission_required = "epilepsy12.can_publish_epilepsy12_data"
+    raise_exception = True
+
+    def get_queryset(self):
+        """
+        Override the get_queryset method to filter cases based on the organisation
+        and apply all filters in one place using apply_all_active_filters.
+        """
+        organisation_id = self.kwargs.get("organisation_id")
+        # Base queryset - all cases
+        base_queryset = Case.objects.all()
+
+        filtered_queryset = base_queryset
+        # First filter by the organization from the URL parameter
+        if not self.request.user.is_rcpch_audit_team_member:
+            filtered_queryset = CaseFilterMethods.filter_by_organisation(
+                base_queryset, organisation_id
+            )
+
+        # Apply the filterset for the form filters
+        self.filterset = self.filterset_class(
+            self.request.GET, queryset=filtered_queryset
+        )
+
+        # Get the base filtered queryset from the filterset
+        base_filtered_queryset = self.filterset.qs
+
+        # Parameters that require special handling with dedicated methods: These take no extra values and only filter by the value of the parameter
+        special_filter_params = [
+            "audit_progress_complete",
+            "audit_progress_incomplete",
+            "registration_cohort",
+            "trust_or_health_board",
+            "integrated_care_board",
+            "nhs_england_region",
+            "country",
+            # related fields
+            "developmental_learning_or_schooling_problems",
+            "behavioural_or_emotional_problems",
+            "syndrome_present",
+            "epilepsy_cause_known",
+            "global_developmental_delay_or_learning_difficulties",
+            "autistic_spectrum_disorder",
+            "mental_health_issue_identified",
+            "has_been_referred_for_mental_health_support",
+            "has_support_for_mental_health_support",
+        ]
+
+        # Apply all the active filters including special filters at once
+        queryset = self.filterset.apply_all_filters(
+            base_filtered_queryset,
+            self.request,
+            special_filter_params=special_filter_params,
+        )
+
+        return queryset.order_by(self.ordering)
+
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+
+        # Add the filterset to the context
+        context["filterset"] = self.filterset
+        context["organisation_id"] = self.kwargs.get("organisation_id")
+
+        # Get the current organisation
+        organisation = Organisation.objects.get(pk=self.kwargs.get("organisation_id"))
+        context["organisation"] = organisation
+
+        # Get the unfiltered queryset for this organisation
+        unfiltered_queryset = CaseFilterMethods.filter_by_organisation(
+            Case.objects.all(), self.kwargs.get("organisation_id")
+        )
+
+        # Get the filtered queryset (after all filters have been applied)
+        filtered_queryset = self.get_queryset()
+
+        # Add age distribution facets
+        context.update(CaseFilterMethods.get_age_counts(filtered_queryset))
+
+        # Total counts for the filtered results
+        context["total_cases"] = filtered_queryset.count()
+        context["registered_cases"] = CaseFilterMethods.get_registration_status_counts(
+            filtered_queryset, "registered"
+        )
+        context["unregistered_cases"] = (
+            CaseFilterMethods.get_registration_status_counts(
+                filtered_queryset, "unregistered"
+            )
+        )
+
+        age_counts = CaseFilterMethods.get_age_counts(filtered_queryset)
+
+        context["under_12_count"] = age_counts["under_12"]
+        context["over_12_count"] = age_counts["12_and_over"]
+
+        # Add complete and incomplete audit progress counts
+        context["complete_cases"] = CaseFilterMethods.get_audit_progress_complete_count(
+            filtered_queryset, True
+        )
+
+        context["incomplete_cases"] = (
+            CaseFilterMethods.get_audit_progress_incomplete_count(
+                filtered_queryset, True
+            )
+        )
+
+        # Add ethnicity facets to dropdowns
+        ethnicity_counts = CaseFilterMethods.get_ethnicity_counts(filtered_queryset)
+        ethnicity_choices = [("", "All")]
+        for ethnicity_code, label in ETHNICITIES:
+            count = ethnicity_counts.get(ethnicity_code, 0)
+            ethnicity_choices.append((f"{ethnicity_code}", f"{label} ({count})"))
+        context["ethnicities"] = ethnicity_choices
+
+        # Add sex facets to dropdowns
+        sex_counts = CaseFilterMethods.get_sex_counts(filtered_queryset)
+        sex_choices = [("", "All")]
+        for sex_code, label in SEX_TYPE:
+            count = sex_counts.get(sex_code, 0)
+            sex_choices.append((f"{sex_code}", f"{label} ({count})"))
+        context["sexes"] = sex_choices
+
+        # Add cohort distribution - assuming cohorts 5-7
+        cohort_counts = {}
+        for cohort in range(5, 8):
+            count = CaseFilterMethods.get_registration_cohort_counts(
+                filtered_queryset, value=cohort
+            )
+            cohort_counts[cohort] = count
+        context["cohort_counts"] = cohort_counts
+
+        # Gets all the KPI failed counts in one object to iterate over to produce labels in the template
+        context["kpi_failed_counts"] = CaseFilterMethods.get_kpi_failed_counts(
+            queryset=filtered_queryset
+        )
+
+        # Add fact counts to index of multiple deprivation quintile dropdown
+        imd_counts = (
+            CaseFilterMethods.get_index_of_multiple_deprivation_quintile_counts(
+                filtered_queryset
+            )
+        )
+        imd_choices = [("", "All")]
+        for imd in range(1, 6):
+            count = imd_counts.get(imd, 0)
+            if imd == 1:
+                additional_label = " (most deprived)"
+            elif imd == 5:
+                additional_label = " (least deprived)"
+            else:
+                additional_label = ""
+
+            imd_choices.append((imd, f"{imd} {additional_label} ({count})"))
+        context["imd_choices"] = imd_choices
+
+        context["total_episodes"] = CaseFilterMethods.get_total_episodes_count(
+            queryset=filtered_queryset,
+            value="total_episodes",
+        )
+
+        context["total_unfiltered_cases"] = unfiltered_queryset.count()
+        context["filtered_percentage"] = (
+            (filtered_queryset.count() / unfiltered_queryset.count()) * 100
+            if unfiltered_queryset.count() > 0
+            else 0
+        )
+
+        context["trusts_and_local_health_boards"] = (
+            CaseFilterMethods.all_trusts_and_local_health_boards(
+                queryset=filtered_queryset,
+            )
+        )
+
+        context["integrated_care_boards"] = (
+            CaseFilterMethods.all_integrated_care_boards(
+                queryset=filtered_queryset,
+            )
+        )
+
+        context["nhs_england_regions"] = CaseFilterMethods.all_nhs_england_regions(
+            queryset=filtered_queryset,
+        )
+
+        context["countries"] = CaseFilterMethods.all_countries(
+            queryset=filtered_queryset,
+        )
+
+        # related fields
+        context["developmental_learning_or_schooling_problems_count"] = (
+            CaseFilterMethods.get_developmental_learning_or_schooling_problems_counts(
+                queryset=filtered_queryset
+            )
+        )
+        context["behavioural_or_emotional_problems_count"] = (
+            CaseFilterMethods.get_behavioural_or_emotional_problems_counts(
+                queryset=filtered_queryset
+            )
+        )
+
+        context["syndrome_present_count"] = (
+            CaseFilterMethods.get_syndrome_present_counts(queryset=filtered_queryset)
+        )
+
+        context["epilepsy_cause_known_count"] = (
+            CaseFilterMethods.get_epilepsy_cause_known_counts(
+                queryset=filtered_queryset
+            )
+        )
+
+        context["global_developmental_delay_or_learning_difficulties_count"] = (
+            CaseFilterMethods.get_global_developmental_delay_or_learning_difficulties_counts(
+                queryset=filtered_queryset
+            )
+        )
+
+        context["autistic_spectrum_disorder_count"] = (
+            CaseFilterMethods.get_autistic_spectrum_disorder_counts(
+                queryset=filtered_queryset
+            )
+        )
+
+        context["mental_health_issue_identified_count"] = (
+            CaseFilterMethods.get_mental_health_issue_identified_counts(
+                queryset=filtered_queryset
+            )
+        )
+
+        context["has_been_referred_for_mental_health_support_count"] = (
+            CaseFilterMethods.get_has_been_referred_for_mental_health_support_counts(
+                queryset=filtered_queryset
+            )
+        )
+
+        context["has_support_for_mental_health_support_count"] = (
+            CaseFilterMethods.get_has_support_for_mental_health_support_counts(
+                queryset=filtered_queryset
+            )
+        )
+
+        # deal with the KPIs - this is a list of all the KPIs that have failed stored in kpi_failed
+        # the list is used to create labels in the filter summary in the template
+        selected_kpis = [k.strip() for k in self.request.GET.getlist("kpi_failed")]
+        context["selected_kpis"] = selected_kpis  # returns a list of selected KPIs
+
+        # --- Prepare data for hidden fields ---
+
+        hidden_field_params = []
+        # Define the names of your VISIBLE form fields that should NOT be duplicated as hidden
+        visible_form_fields = {
+            "search",
+            "ethnicity",
+            "sex",
+            "index_of_multiple_deprivation_quintile",
+            "trust_or_health_board",
+            "integrated_care_board",
+            "nhs_england_region",
+            "country",
+            # Add any others rendered visibly in the form
+        }
+        exclude_params = {"page", "submit"}  # Standard exclusions
+
+        for key in self.request.GET.keys():
+            # Skip fields in the form with the drop downs. Need to add the facet fields
+            # only as hidden fields to the form. So we pass a list of hidden fields here to
+            # the context to loop through at the bottom of the form so that their parameters are
+            # not lost when the form submits, since the form otherwise has no knowledge
+            # of the facet information
+            if key in visible_form_fields or key in exclude_params:
+                continue
+
+            # Add key-value pairs for hidden fields
+            # Use getlist for potential multi-value fields like kpi_failed
+            values = self.request.GET.getlist(key)
+            for value in values:
+                if value:
+                    hidden_field_params.append((key, value))
+            context["hidden_field_params"] = hidden_field_params
+
+        return context

@@ -79,4 +79,33 @@ justify-content: flex-end;
     border-top-color: var(--rcpch_pink);
   }
   
-  
+/* report builder */
+.ui.rcpch.segment {
+    border-radius: 0%;
+    border-width: medium;
+    border-color: var(--rcpch_light_blue);
+    background-color: var(--rcpch_white);
+    color: var(--rcpch_dark_blue);
+}
+
+.ui.rcpch.facets.vertical.fluid.menu {
+    border-radius: 0%;
+    border-width: medium;
+    border-color: var(--rcpch_grey);
+    background-color: var(--rcpch_white);
+    color: var(--rcpch_dark_blue);
+}
+
+.ui.vertical.menu .item>.label {
+  color: white;
+  font-family: var(--rcpch_standard_font);
+  background: var(--rcpch_light_blue);
+  border-radius: 0%;
+}
+
+.ui.vertical.menu .item>.left.pointing.label {
+  color: white;
+  font-family: var(--rcpch_standard_font);
+  background: var(--rcpch_pink);
+  border-radius: 0%;
+}

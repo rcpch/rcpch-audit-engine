@@ -180,6 +180,11 @@ redirect_patterns = [
 home_page_patterns = [path("", index, name="index")]
 
 case_patterns = [
+    path(
+        "case-filter/<int:organisation_id>/",
+        view=CaseListView.as_view(),
+        name="case_filter_list",
+    ),
     path("organisation/<int:organisation_id>/cases/", view=case_list, name="cases"),
     path(
         "organisation/<int:organisation_id>/case/<int:case_id>/update",

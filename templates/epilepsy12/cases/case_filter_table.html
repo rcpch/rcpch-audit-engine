@@ -1,0 +1,813 @@
+{% extends 'base.html' %}
+{% load epilepsy12_template_tags %}
+{% load static %}
+
+{% block content %}
+<div class="ui fluid container" style="padding: 50px;">
+    
+    <h1 class="ui header">
+        <i class="users icon"></i>
+        <div class="content">
+            Report Builder for {{ organisation.name }}
+            <div class="sub header">Apply the filters to explore your clinic data</div>
+        </div>
+    </h1>
+
+    <div class="ui stackable grid">
+        <!-- Main Content - Now at the top -->
+        <div class="sixteen wide column">
+            <!-- Filter Form -->
+            <form method="get" class="ui rcpch form">
+                
+                <div class="ui rcpch segment">
+                    <div class="fields">
+                        <div class="four wide field">
+                            <label>Search</label>
+                            <div class="ui icon input">
+                                <input type="text" name="search" placeholder="Search by name, NHS number..." value="{{ request.GET.search }}">
+                                <i class="search icon"></i>
+                            </div>
+                        </div>
+                        
+                        <!-- Sex Filter -->
+                        <div class="four wide field">
+                            <label>{{ filterset.form.sex.label }}</label>
+                            <div class="ui fluid search selection rcpch dropdown">
+                                <input type="hidden" name="sex" value="{{ request.GET.sex|default:'' }}">
+                                <i class="dropdown icon"></i>
+                                <div class="default text">Select Sex</div>
+                                <div class="menu">
+                                    <div class="item" data-value="">All</div>
+                                    {% if sexes %}
+                                        {% for sex in sexes %}
+                                            <div class="item" data-value="{{ sex.0 }}">
+                                                {{ sex.1 }}
+                                            </div>
+                                        {% endfor %}
+                                    {% endif %}
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <!-- Ethnicity Filter -->
+                        <div class="four wide field">
+                            <label>{{ filterset.form.ethnicity.label }}</label>
+                            <div class="ui fluid search selection rcpch dropdown">
+                                <input type="hidden" name="ethnicity" value="{{ request.GET.ethnicity|default:'' }}">
+                                <i class="dropdown icon"></i>
+                                <div class="default text">Select Ethnicity</div>
+                                <div class="menu">
+                                    <div class="item" data-value="">All</div>
+                                    {% if ethnicities %}
+                                        {% for ethnicity in ethnicities %}
+                                            <div class="item" data-value="{{ ethnicity.0 }}">
+                                                {{ ethnicity.1 }}
+                                            </div>
+                                        {% endfor %}
+                                    {% endif %}
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <!-- index of multiple deprivation quintile filter -->
+                        <div class="four wide field">
+                            <label>{{ filterset.form.index_of_multiple_deprivation_quintile.label }}</label>
+                            <div class="ui fluid search selection rcpch dropdown">
+                                <input type="hidden" name="index_of_multiple_deprivation_quintile" value="{{ request.GET.index_of_multiple_deprivation_quintile|default:'' }}">
+                                <i class="dropdown icon"></i>
+                                <div class="default text">Select Index of Multiple Deprivation Quintile</div>
+                                <div class="menu">
+                                    <div class="item" data-value="">All</div>
+                                    {% if imd_choices %}
+                                        {% for index_of_multiple_deprivation_quintile in imd_choices %}
+                                            <div class="item" data-value="{{ index_of_multiple_deprivation_quintile.0 }}">
+                                                {{ index_of_multiple_deprivation_quintile.1 }}
+                                            </div>
+                                        {% endfor %}
+                                    {% endif %}
+                                </div>
+                            </div>
+                        </div>
+                    </div><!--fields-->
+                    
+                    {% if perms.epilepsy12.can_publish_epilepsy12_data %}
+                    <div class="row">
+                        <div class="ui horizontal divider">National View</div>
+                    
+                        <div class="fields">
+                        <!-- Trust/Health Board Filter -->
+                            <div class="four wide field">
+                                <label>{{ filterset.form.trust_or_health_board.label|default:"Trust/Health Board" }}</label>
+                                <div class="ui fluid search selection rcpch dropdown">
+                                    <input type="hidden" name="trust_or_health_board" value="{{ request.GET.trust_or_health_board|default:'' }}">
+                                    <i class="dropdown icon"></i>
+                                    <div class="default text">Select Trust/Health Board</div>
+                                    <div class="menu">
+                                        <div class="item" data-value="">All</div>
+                                        {% if trusts_and_local_health_boards %}
+                                            {% for entity in trusts_and_local_health_boards %}
+                                                <div class="item" data-value="{{ entity.0 }}">
+                                                    {{ entity.1 }}
+                                                </div>
+                                            {% endfor %}
+                                        {% endif %}
+                                    </div>
+                                </div>
+                            </div>
+                            
+                            <!--- Integrated Care Boards -->
+                            <div class="four wide field">
+                                <label>{{ filterset.form.integrated_care_board.label|default:"Trust/Health Board" }}</label>
+                                <div class="ui fluid search selection rcpch dropdown">
+                                    <input type="hidden" name="integrated_care_board" value="{{ request.GET.integrated_care_board|default:'' }}">
+                                    <i class="dropdown icon"></i>
+                                    <div class="default text">Select Integrated Care Board</div>
+                                    <div class="menu">
+                                        <div class="item" data-value="">All</div>
+                                        {% if integrated_care_boards %}
+                                            {% for icb in integrated_care_boards %}
+                                                <div class="item" data-value="{{ icb.0 }}">
+                                                    {{ icb.1 }}
+                                                </div>
+                                            {% endfor %}
+                                        {% endif %}
+                                    </div>
+                                </div>
+                            </div>
+
+                        
+                            <!-- NHS England Region Filter -->
+                            <div class="four wide field">
+                                <label>NHS England Region</label>
+                                <div class="ui fluid selection rcpch dropdown">
+                                    <input type="hidden" name="nhs_england_region" value="{{ request.GET.nhs_england_region|default:'' }}">
+                                    <i class="dropdown icon"></i>
+                                    <div class="default text">Select Region</div>
+                                    <div class="menu">
+                                        <div class="item" data-value="">All Regions</div>
+                                        {% for region in nhs_england_regions %}
+                                            <div class="item" data-value="{{ region.0 }}">
+                                                {{ region.1 }}
+                                            </div>
+                                        {% endfor %}
+                                    </div>
+                                </div>
+                            </div>
+                            
+                        <!-- Country Filter -->
+                            <div class="four wide field">
+                                <label>Country</label>
+                                <div class="ui fluid selection rcpch dropdown">
+                                    <input type="hidden" name="country" value="{{ request.GET.country|default:'' }}">
+                                    <i class="dropdown icon"></i>
+                                    <div class="default text">Select Country</div>
+                                    <div class="menu">
+                                        <div class="item" data-value="">All Countries</div>
+                                        {% for country in countries %}
+                                            <div class="item" data-value="{{ country.0 }}">
+                                                {{ country.1 }}
+                                            </div>
+                                        {% endfor %}
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    {% endif %}
+
+                    <div class="fields">
+                        <button type="submit" class="ui rcpch_light_blue button">
+                            <i class="filter icon"></i> Apply Filters
+                        </button>
+                        <a href="{% url 'case_filter_list' organisation_id %}" class="ui rcpch_light_blue button">
+                            <i class="undo icon"></i> Reset
+                        </a>
+                    </div><!--fields-->
+                </div><!--segment-->
+                
+                <!-- Filter Summary -->
+                {% if request.GET %}
+                <div class="ui rcpch_info message">
+                    <div class="header">Active Filters</div>
+                    <div class="ui horizontal list">
+                        {% for key, value_list in request.GET.lists %} {# Iterate through .lists() to get all values #}
+                            {% if key != 'page' %}
+                                {% for value in value_list %} {# Loop through potentially multiple values for the key #}
+                                    {% if value %} {# Ensure value is not empty #}
+                                        <div class="item">
+                                            <div class="ui rcpch_light_blue label">
+                                                {# Display the key and the specific value #}
+                                                {{ key|field_key_to_readable_name }}: {{ value|field_value_to_readable_name:key }}
+
+                                                {# Use build_url_parameters to generate the removal link #}
+                                                {# Pass the key and the specific value to remove/toggle #}
+                                                <a href="{% build_url_parameters request key value %}">
+                                                    <i class="delete icon"></i>
+                                                </a>
+                                            </div>
+                                        </div>
+                                    {% endif %}
+                                {% endfor %}
+                            {% endif %}
+                        {% endfor %}
+                    </div>
+                </div>
+                {% endif %}
+                {% for name, value in hidden_field_params %} <!-- this adds the facets to the form as hidden fields so that their filters are not ignored when the form is submitted-->
+                    <input type="hidden" name="{{ name }}" value="{{ value }}">
+                {% endfor %}
+            </form>
+            
+            <!-- Results Stats -->
+            <div class="ui statistics">
+                <div class="statistic">
+                    <div class="value">{{ total_cases }}</div>
+                    <div class="label">Total Cases</div>
+                </div>
+                <div class="statistic">
+                    <div class="value">{{ registered_cases }}</div>
+                    <div class="label">Registered</div>
+                </div>
+                <div class="statistic">
+                    <div class="value">{{ total_episodes|default:"0" }}</div>
+                    <div class="label">Total Episodes</div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Three columns for filter categories -->
+        <div class="sixteen wide column">
+            <div class="ui stackable three column stretched grid">
+                <!-- Column 1: Clinic Composition -->
+                <div class="column">
+                    <div class="ui rcpch facets vertical fluid menu" style="height: 100%">
+                        <div class="item">
+                            <div class="header">Clinic Composition</div>
+                        </div>
+
+                        <!-- Cohort Status (Radio-like behavior) -->
+                        <div class="item">
+                            <div class="header">Cohort</div>
+                            <div class="menu">
+                                <!-- All Cohorts option -->
+                                
+                                {% for cohort, count in cohort_counts.items %}
+                                    <a class="item {% if request.GET.registration_cohort == cohort|stringformat:'i' %}active{% endif %}" 
+                                        href="{% build_url_parameters request 'registration_cohort' cohort %}">
+                                        Cohort {{ cohort }} <div class="ui {% if request.GET.registration_cohort == cohort|stringformat:'i' %}left pointing{% endif %} rcpch facets label">{{ count }}</div>
+                                    </a>
+                                {% endfor %}
+
+                            </div>
+                        </div>
+
+                        <!-- Case Registration Status -->
+                        <div class="item">
+                            <div class="header">Case Status</div>
+                            <div class="menu">
+                                <!-- All Registrations Status option -->
+                                
+                                <a class="item {% if request.GET.registration_status == 'registered' %}active{% endif %}" 
+                                href="{% build_url_parameters request 'registration_status' "registered" %}">
+                                    Registered <div class="ui {% if request.GET.registration_status == 'registered' %}left pointing{% endif %} rcpch facets label">{{ registered_cases }}</div>
+                                </a>
+                                
+                                <a class="item {% if request.GET.registration_status == 'unregistered' %}active{% endif %}" 
+                                href="{% build_url_parameters request 'registration_status' "unregistered" %}">
+                                    Unregistered <div class="ui {% if request.GET.registration_status == 'unregistered' %}left pointing{% endif %} rcpch facets label">{{ unregistered_cases }}</div>
+                                </a>
+                            </div>
+                        </div>
+
+                        <!-- Age Ranges -->
+                        <div class="item">
+                            <div class="header">Age</div>
+                            <div class="menu">
+                                <!-- All Ages option -->
+                                
+                                <a class="item {% if request.GET.age_range == 'under_12' %}active{% endif %}" 
+                                href="{% build_url_parameters request 'age_range' 'under_12' %}">
+                                    Under 12 <div class="ui {% if request.GET.age_range == 'under_12' %}left pointing{% endif %} rcpch facets label">{{ under_12_count }}</div>
+                                </a>
+                                
+                                <a class="item {% if request.GET.age_range == '12_and_over' %}active{% endif %}" 
+                                href="{% build_url_parameters request 'age_range' '12_and_over' %}">
+                                    12 and Over <div class="ui {% if request.GET.age_range == '12_and_over' %}left pointing{% endif %} rcpch facets label">{{ over_12_count }}</div>
+                                </a>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                
+                <!-- Column 2: Audit Process and Completion -->
+                <div class="column">
+                    <div class="ui rcpch facets vertical fluid menu" style="height: 100%">
+                        <div class="item">
+                            <div class="header">Audit Process and Completion</div>
+                        </div>
+                    
+                        <!-- Audit Progress -->
+                        <div class="item">
+                            <div class="header">Audit Progress</div>
+                            <div class="menu">
+                                <!-- All Audit Progress option -->
+                                
+                                <a class="item {% if request.GET.audit_progress_complete %}active{% endif %}" 
+                                href="{% if request.GET.audit_progress_complete == 'true' %}{% build_url_parameters request 'audit_progress_complete' None %}{% else %}{% build_url_parameters request 'audit_progress_complete' 'true' %}{% endif %}">
+                                    Complete <div class="ui {% if request.GET.audit_progress_complete %}left pointing{% endif %} rcpch facets label">{{ complete_cases }}</div>
+                                </a>
+                                
+                                <a class="item {% if request.GET.audit_progress_incomplete %}active{% endif %}" 
+                                href="{% if request.GET.audit_progress_incomplete == 'true' %}{% build_url_parameters request 'audit_progress_incomplete' None %}{% else %}{% build_url_parameters request 'audit_progress_incomplete' 'true' %}{% endif %}">
+                                    Incomplete <div class="ui {% if request.GET.audit_progress_incomplete %}left pointing{% endif %} rcpch facets label">{{ incomplete_cases }}</div>
+                                </a>
+                            </div>
+                        </div>
+                        
+                        <!-- KPI Failures -->
+                        <div class="item">
+                            <div class="header">KPI Measures not achieved</div>
+                            <div class="menu">
+                                
+                                {% for kpi_key, count in kpi_failed_counts.items %}
+                                    {% with kpi_id=kpi_key.0 %}
+                                        
+                                        {% if kpi_id|kpi_category_title %}
+                                                <div class='item'><div class="header">{{ kpi_id|kpi_category_title }}</div></div>
+                                        {% endif %}
+                                        
+                                        {% if kpi_id|stringformat:"s" in selected_kpis %}
+                                            {# Remove this KPI from the selection #}
+                                            <a class="item active"
+                                            href="{% build_url_parameters request 'kpi_failed' kpi_id %}">
+                                            
+                                            <span data-tooltip="{{ kpi_id|kpi_key_to_readable_name }}" data-position="right center">KPI {{ kpi_id|kpi_key_formatted }} <i class="rcpch question circle icon"></i></span>
+                                                <div class="ui left pointing rcpch facets label">{{ count }}</div>
+                                            </a>
+                                        {% else %}
+                                            {# Add this KPI to the selection #}
+                                            <a class="item"
+                                            href="{% build_url_parameters request 'kpi_failed' kpi_id %}">
+                                                <span data-tooltip="{{ kpi_id|kpi_key_to_readable_name }}" data-position="right center">KPI {{ kpi_id|kpi_key_formatted }} <i class="rcpch question circle icon"></i></span>
+                                                <div class="ui rcpch facets label">{{ count }}</div>
+                                            </a>
+                                        {% endif %}
+                                    {% endwith %}
+                                {% endfor %}
+
+                            </div>
+                        </div>
+
+                    </div><!--menu-->
+                </div><!--column-->
+                
+                <!-- Column 3: Comorbidity and Complexity -->
+                <div class="column">
+                    <div class="ui rcpch facets vertical fluid menu" style="height: 100%">
+                        <div class="item">
+                            <div class="header">Comorbidity and Complexity</div>
+                        </div>
+                        
+                        <!-- Multiaxial Diagnosis Section -->
+                        <div class="item">
+                            <div class="header">Conditions</div>
+                            <div class="menu">
+                                <!-- Syndrome Present -->
+                                <a class="item {% if request.GET.syndrome_present == 'true' %}active{% endif %}" 
+                                     href="{% if request.GET.syndrome_present == 'true' %}
+                                        {% build_url_parameters request 'syndrome_present' %}
+                                        {% else %}
+                                            {% build_url_parameters request 'syndrome_present' 'true' %}
+                                        {% endif %}">
+                                    Syndrome Present
+                                    <div class="ui {% if request.GET.syndrome_present == 'true' %}left pointing{% endif %} rcpch facets label">{{ syndrome_present_count }}</div>
+                                </a>
+                                
+                                <!-- Epilepsy Cause Known -->
+                                <a class="item {% if request.GET.epilepsy_cause_known == 'true' %}active{% endif %}" 
+                                    href="{% if request.GET.epilepsy_cause_known == 'true' %}
+                                                {% build_url_parameters request 'epilepsy_cause_known' %}
+                                            {% else %}
+                                                {% build_url_parameters request 'epilepsy_cause_known' 'true' %}
+                                            {% endif %}">
+                                        Epilepsy Cause Known
+                                        <div class="ui {% if request.GET.epilepsy_cause_known == 'true' %}left pointing{% endif %} rcpch facets label">{{ epilepsy_cause_known_count }}</div>
+                                    </a>
+                                    
+                                    <!-- Global Developmental Delay -->
+                                    <a class="item {% if request.GET.global_developmental_delay_or_learning_difficulties == 'true' %}active{% endif %}" 
+                                    href="{% if request.GET.global_developmental_delay_or_learning_difficulties == 'true' %}
+                                            {% build_url_parameters request 'global_developmental_delay_or_learning_difficulties' %}
+                                            {% else %}
+                                                {% build_url_parameters request 'global_developmental_delay_or_learning_difficulties' 'true' %}
+                                            {% endif %}">
+                                        Global Developmental Delay
+                                        <div class="ui {% if request.GET.global_developmental_delay_or_learning_difficulties == 'true' %}left pointing{% endif %} rcpch facets label">{{ global_developmental_delay_or_learning_difficulties_count }}</div>
+                                    </a>
+
+                                    <!-- Toggle for developmental problems filter -->
+                                    <a class="item {% if request.GET.developmental_learning_or_schooling_problems == 'true' %}active{% endif %}" 
+                                        href="{% if request.GET.developmental_learning_or_schooling_problems == 'true' %}
+                                                    {% build_url_parameters request 'developmental_learning_or_schooling_problems' %}
+                                                {% else %}
+                                                    {% build_url_parameters request 'developmental_learning_or_schooling_problems' 'true' %}
+                                                {% endif %}">
+                                            Developmental or Learning Problems
+                                            <div class="ui {% if request.GET.developmental_learning_or_schooling_problems == 'true' %}left pointing{% endif %} rcpch facets label">{{ developmental_learning_or_schooling_problems_count }}</div>
+                                    </a>
+
+                                    <!-- Toggle for developmental problems filter -->
+                                    <a class="item {% if request.GET.behavioural_or_emotional_problems == 'true' %}active{% endif %}" 
+                                    href="{% if request.GET.behavioural_or_emotional_problems == 'true' %}
+                                                {% build_url_parameters request 'behavioural_or_emotional_problems' %}
+                                            {% else %}
+                                                {% build_url_parameters request 'behavioural_or_emotional_problems' 'true' %}
+                                            {% endif %}">
+                                        Behavioural or Emotional Problems
+                                        <div class="ui {% if request.GET.behavioural_or_emotional_problems == 'true' %}left pointing{% endif %} rcpch facets label">{{ behavioural_or_emotional_problems_count }}</div>
+                                    </a>
+                                    
+                                    <!-- Autism Spectrum Disorder -->
+                                    <a class="item {% if request.GET.autistic_spectrum_disorder == 'true' %}active{% endif %}" 
+                                    href="{% if request.GET.autistic_spectrum_disorder == 'true' %}
+                                                {% build_url_parameters request 'autistic_spectrum_disorder' %}
+                                            {% else %}
+                                                {% build_url_parameters request 'autistic_spectrum_disorder' 'true' %}
+                                            {% endif %}">
+                                        Autism Spectrum Disorder
+                                        <div class="ui {% if request.GET.autistic_spectrum_disorder == 'true' %}left pointing{% endif %} rcpch facets label">{{ autistic_spectrum_disorder_count }}</div>
+                                    </a>
+                                    
+                                    <!-- Mental Health Issues -->
+                                    <a class="item {% if request.GET.has_support_for_mental_health_support == 'true' %}active{% endif %}" 
+                                        href="{% if request.GET.has_support_for_mental_health_support == 'true' %}
+                                            {% build_url_parameters request 'has_support_for_mental_health_support' %}
+                                            {% else %}{% build_url_parameters request 'has_support_for_mental_health_support' 'true' %}{% endif %}">
+                                        Mental Health Support in place?
+                                        <div class="ui {% if request.GET.has_support_for_mental_health_support == 'true' %}left pointing{% endif %} rcpch facets label">{{ has_support_for_mental_health_support_count }}</div>
+                                    </a> 
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Results Table (Full width below the filter columns) -->
+        <div class="sixteen wide column">
+            
+                <table class="ui celled rcpch table">
+                    <thead>
+                        <tr>
+                            <th>Name</th>
+                            <th>ID</th>
+                            <th>NHS Number</th>
+                            <th>Date of Birth</th>
+                            <th>Cohort</th>
+                            <th>Status</th>
+                            <th>Actions</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for case in case_filter_list %}
+                        <tr>
+                            <td>
+                                <h4 class="ui header">
+                                    <div class="content">
+                                        {{ case.first_name }} {{ case.surname }}
+                                        <div class="sub header">{{ case.get_sex_display }}</div>
+                                    </div>
+                                </h4>
+                            </td>
+                            <td>{{ case.id }}</td>
+                            <td>{{ case.nhs_number|default:"—" }}</td>
+                            <td>{{ case.date_of_birth|date:"d/m/Y" }}</td>
+                            <td>
+                                {% if case.registration %}
+                                    <div class="ui rcpch_light_blue label">Cohort {{ case.registration.cohort }}</div>
+                                {% else %}
+                                    <div class="ui grey label">Unregistered</div>
+                                {% endif %}
+                            </td>
+                            <td>
+                                {% if case.registration %}
+                                    {% if case.registration.audit_progress.audit_complete %}
+                                    <i class="rcpch_pink check circle outline icon"></i>
+                                             Complete
+                                    {% else %}
+                                        <i class="rcpch_light_blue dot circle outline icon"></i> Incomplete
+                                    {% endif %}
+                                {% else %}
+                                    <div class="ui grey label">
+                                        <i class="minus icon"></i> N/A
+                                    </div>
+                                {% endif %}
+                            </td>
+                            <td class="center aligned">
+                                <div class="ui icon buttons">
+                                    <a href="{% url 'update_case' organisation_id=organisation_id case_id=case.id %}" class="ui rcpch_primary button">
+                                        <i class="edit icon"></i>
+                                    </a>
+                                    {% if case.registration %}
+                                        <a href="{% url 'case_performance_summary' case_id=case.id %}" class="ui rcpch_purple button">
+                                            <i class="chart bar icon"></i>
+                                        </a>
+                                    {% else %}
+                                        <a href="{% url 'register_case' organisation_id=organisation_id case_id=case.id %}" class="ui rcpch_pink button">
+                                            <i class="plus icon"></i>
+                                        </a>
+                                    {% endif %}
+                                </div>
+                            </td>
+                        </tr>
+                        {% empty %}
+                        <tr>
+                            <td colspan="7" class="center aligned">
+                                <div class="ui placeholder segment">
+                                    <div class="ui icon header">
+                                        <i class="search icon"></i>
+                                        No cases found matching your criteria
+                                    </div>
+                                    <a href="{% url 'case_filter_list' organisation_id %}" class="ui primary button">Clear Filters</a>
+                                </div>
+                            </td>
+                        </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+                
+                <!-- Pagination -->
+                {% if is_paginated %}
+                <div class="ui center aligned container">
+                    <div class="ui pagination menu">
+                        {% if page_obj.has_previous %}
+                            <a class="item" href="?page=1{% for key, value in request.GET.items %}{% if key != 'page' %}&{{ key }}={{ value }}{% endif %}{% endfor %}">
+                                <i class="angle double left icon"></i>
+                            </a>
+                            <a class="item" href="?page={{ page_obj.previous_page_number }}{% for key, value in request.GET.items %}{% if key != 'page' %}&{{ key }}={{ value }}{% endif %}{% endfor %}">
+                                <i class="angle left icon"></i>
+                            </a>
+                        {% endif %}
+                        
+                        {% for num in page_obj.paginator.page_range %}
+                            {% if page_obj.number == num %}
+                                <a class="active item">{{ num }}</a>
+                            {% elif num > page_obj.number|add:'-3' and num < page_obj.number|add:'3' %}
+                                <a class="item" href="?page={{ num }}{% for key, value in request.GET.items %}{% if key != 'page' %}&{{ key }}={{ value }}{% endif %}{% endfor %}">{{ num }}</a>
+                            {% endif %}
+                        {% endfor %}
+                        
+                        {% if page_obj.has_next %}
+                            <a class="item" href="?page={{ page_obj.next_page_number }}{% for key, value in request.GET.items %}{% if key != 'page' %}&{{ key }}={{ value }}{% endif %}{% endfor %}">
+                                <i class="angle right icon"></i>
+                            </a>
+                            <a class="item" href="?page={{ page_obj.paginator.num_pages }}{% for key, value in request.GET.items %}{% if key != 'page' %}&{{ key }}={{ value }}{% endif %}{% endfor %}">
+                                <i class="angle double right icon"></i>
+                            </a>
+                        {% endif %}
+                    </div>
+                </div>
+                {% endif %}
+            </div>
+        </div>
+    
+</div>
+{% endblock %}
+
+{% block extra_js %}
+<script>
+    $(document).ready(function() {
+    
+        // --- Call your other initialization functions here ---
+        // These likely already use jQuery based on your previous code
+        initializeDropdowns();
+        setupFilterRemoval();
+        handleResponsiveBehavior();
+        setupSearchInput();
+        // ---
+    });
+    
+    /**
+     * Initialize all Semantic UI dropdowns with proper configuration
+     */
+    function initializeDropdowns() {
+        $('.ui.dropdown').dropdown({
+            fullTextSearch: true,
+            match: 'text',
+            selectOnKeydown: false,
+            forceSelection: false,
+            hideDividers: 'empty',
+            clearable: true,
+            onChange: function(value, text, $choice) {
+                console.log('Dropdown changed:', $(this).find('input').attr('name'), value);
+                
+                // Submit the form when dropdown value changes
+                $(this).closest('form').submit();
+                
+                // Optional: Add analytics tracking for filter changes
+                if (typeof gtag !== 'undefined') {
+                    gtag('event', 'filter_changed', {
+                        'filter_name': $(this).find('input').attr('name'),
+                        'filter_value': value,
+                        'filter_text': text
+                    });
+                }
+            }
+        });
+        
+        // Set dropdown values based on URL parameters
+        const urlParams = new URLSearchParams(window.location.search);
+        
+        // Create a list of all dropdown inputs to set from URL params
+        const dropdownInputs = [
+            'sex', 'ethnicity', 'trust_or_health_board', 'nhs_england_region',
+            'integrated_care_board', 'country', 'cohort'
+        ];
+        
+        // Set each dropdown value if it exists in URL params
+        dropdownInputs.forEach(function(inputName) {
+            if (urlParams.has(inputName)) {
+                const value = urlParams.get(inputName);
+                if (value) {
+                    $(`input[name="${inputName}"]`).parent().dropdown('set selected', value);
+                }
+            }
+        });
+        
+        // Special handling for search dropdowns
+        $('.ui.search.dropdown').dropdown({
+            fullTextSearch: true,
+            match: 'both',
+            showOnFocus: false,
+            allowAdditions: false,
+            onChange: function(value, text, $choice) {
+                console.log('Search dropdown changed:', $(this).find('input').attr('name'), value);
+                // Submit the form when dropdown value changes
+                $(this).closest('form').submit();
+            }
+        });
+    }
+    
+    /**
+     * Set up filter removal functionality from the active filters section
+     */
+    function setupFilterRemoval() {
+        // When a filter deletion icon is clicked
+        $('.ui.label .delete.icon').on('click', function(e) {
+            e.preventDefault();
+            const href = $(this).parent('a').attr('href');
+            if (href) {
+                window.location.href = href;
+            }
+        });
+        
+        // Clear all filters button
+        $('.reset-filters-button').on('click', function(e) {
+            e.preventDefault();
+            const baseUrl = window.location.pathname;
+            window.location.href = baseUrl;
+        });
+    }
+    
+    /**
+     * Handle responsive behavior for mobile vs desktop
+     */
+    function handleResponsiveBehavior() {
+        // For small screens, make facet menu toggleable
+        if ($(window).width() < 768) {
+            // Create toggle button for facet menu
+            const $facetMenu = $('.four.wide.column .ui.vertical.menu');
+            const $toggleButton = $('<button class="ui fluid rcpch_light_blue button"><i class="filter icon"></i> Show/Hide Filters</button>');
+            
+            $facetMenu.before($toggleButton);
+            $facetMenu.hide();
+            
+            $toggleButton.on('click', function() {
+                $facetMenu.slideToggle(200);
+            });
+            
+            // Show facet menu if any filters are active
+            if (window.location.search && window.location.search !== '?page=1') {
+                $facetMenu.show();
+            }
+        }
+        
+        // Add sticky behavior to the filter form on desktop
+        if ($(window).width() >= 992) {
+            $('.ui.form').sticky({
+                context: '.twelve.wide.column',
+                offset: 20
+            });
+        }
+    }
+    
+    /**
+     * Helper function to update URL parameters without page refresh
+     * @param {string} key - The parameter name
+     * @param {string} value - The parameter value
+     */
+    function updateUrlParam(key, value) {
+        const urlParams = new URLSearchParams(window.location.search);
+        
+        // Remove page parameter to reset to first page when filtering
+        if (urlParams.has('page')) {
+            urlParams.delete('page');
+        }
+        
+        if (value) {
+            urlParams.set(key, value);
+        } else {
+            urlParams.delete(key);
+        }
+        
+        // Update URL without reloading page
+        const newUrl = window.location.pathname + (urlParams.toString() ? '?' + urlParams.toString() : '');
+        window.history.pushState({ path: newUrl }, '', newUrl);
+    }
+    
+    /**
+     * Set up real-time filtering for the search field
+     */
+    function setupSearchInput() {
+        const $searchInput = $('input[name="search"]');
+        let searchTimer;
+        
+        $searchInput.on('input', function() {
+            const searchValue = $(this).val().trim();
+            
+            // Clear previous timer
+            clearTimeout(searchTimer);
+            
+            // Set a timer to prevent too many requests while typing
+            searchTimer = setTimeout(function() {
+                if (searchValue.length >= 3 || searchValue.length === 0) {
+                    // Update URL and trigger form submission
+                    updateUrlParam('search', searchValue);
+                    
+                    // Submit the form after updating URL
+                    $searchInput.closest('form').submit();
+                }
+            }, 500);
+        });
+    }
+    
+    /**
+     * Implement AJAX search to avoid full page reload (optional)
+     */
+    function sendSearchRequest(searchValue) {
+        $.ajax({
+            url: window.location.pathname,
+            method: 'GET',
+            data: $('.ui.rcpch.form').serialize(),
+            success: function(response) {
+                // Update just the table body with new results
+                const $newResults = $(response).find('table tbody');
+                $('table tbody').html($newResults.html());
+                
+                // Update statistics
+                const $newStats = $(response).find('.ui.statistics');
+                $('.ui.statistics').html($newStats.html());
+                
+                // Update facet counts
+                $(response).find('.ui.vertical.menu .item .menu a').each(function() {
+                    const href = $(this).attr('href');
+                    const $facetItem = $('.ui.vertical.menu .item .menu a[href="' + href + '"]');
+                    const $label = $(this).find('.ui.label');
+                    
+                    if ($facetItem.length && $label.length) {
+                        $facetItem.find('.ui.label').text($label.text());
+                    }
+                });
+            }
+        });
+    }
+    
+    // Add keyboard navigation for accessibility
+    $(document).keydown(function(e) {
+        // Enable keyboard navigation for facet filters with Alt+Number keys
+        if (e.altKey && e.keyCode >= 49 && e.keyCode <= 57) { // Alt + 1-9
+            const index = e.keyCode - 49; // 0-based index
+            const $facetLinks = $('.four.wide.column .ui.vertical.menu .item .menu a');
+            
+            if ($facetLinks.length > index) {
+                window.location.href = $facetLinks.eq(index).attr('href');
+            }
+        }
+    });
+
+    $('.ui.dropdown').each(function() {
+        const $dropdown = $(this);
+        const $input = $dropdown.find('input[type="hidden"]');
+        const name = $input.attr('name');
+        
+        console.log('Setting up dropdown for:', name);
+        
+        $dropdown.find('.menu .item').on('click', function() {
+            console.log('Item clicked in dropdown:', name);
+            const value = $(this).data('value');
+            $input.val(value);
+            $dropdown.closest('form').submit();
+        });
+    });
+</script>
+{% endblock %}

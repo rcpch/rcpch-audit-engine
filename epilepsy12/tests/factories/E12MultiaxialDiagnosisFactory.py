@@ -1,5 +1,5 @@
-"""Factory fn to create new E12 Multiaxial diagnoses, related to a created Case.
-"""
+"""Factory fn to create new E12 Multiaxial diagnoses, related to a created Case."""
+
 # standard imports
 
 # third-party imports
@@ -13,11 +13,10 @@ from .E12EpisodeFactory import E12EpisodeFactory
 from .E12SyndromeFactory import E12SyndromeFactory
 
 
-
 class E12MultiaxialDiagnosisFactory(factory.django.DjangoModelFactory):
     class Meta:
         model = MultiaxialDiagnosis
-        skip_postgeneration_save=True
+        skip_postgeneration_save = True
 
     # Once Registration instance made, it will attach to this instance
     registration = None
@@ -49,15 +48,34 @@ class E12MultiaxialDiagnosisFactory(factory.django.DjangoModelFactory):
             mental_health_screen=True
         )
         fail_assessment_of_mental_health_issues = factory.Trait(
-             mental_health_screen=False
+            mental_health_screen=False
         )
-        
-        pass_mental_health_support = factory.Trait(
-            mental_health_issue_identified = True
-        )
-        fail_mental_health_support = factory.Trait(
-            mental_health_issue_identified = True
-        )
+
+        pass_mental_health_support = factory.Trait(mental_health_issue_identified=True)
+        fail_mental_health_support = factory.Trait(mental_health_issue_identified=True)
         ineligible_mental_health_support = factory.Trait(
-            mental_health_issue_identified = False
+            mental_health_issue_identified=False
+        )
+
+        pass_referral_for_mental_health_support = factory.Trait(
+            has_been_referred_for_mental_health_support=True
+        )
+        fail_referral_for_mental_health_support = factory.Trait(
+            has_been_referred_for_mental_health_support=False
+        )
+        pass_support_for_mental_health_support = factory.Trait(
+            has_support_for_mental_health_support=True
+        )
+        fail_support_for_mental_health_support = factory.Trait(
+            has_support_for_mental_health_support=False
+        )
+        pass_autistic_spectrum_disorder = factory.Trait(autistic_spectrum_disorder=True)
+        fail_autistic_spectrum_disorder = factory.Trait(
+            autistic_spectrum_disorder=False
+        )
+        pass_mental_health_issue_identified = factory.Trait(
+            mental_health_issue_identified=True
+        )
+        fail_mental_health_issue_identified = factory.Trait(
+            mental_health_issue_identified=False
         )
