@@ -13,14 +13,22 @@
       <label for="{{form.first_name_for_label}}">First Name</label>
       <div class="field">{{form.first_name}}</div>
       {% if form.first_name.errors %}
-      <div class="ui pointing red basic label">{{form.first_name.errors}}</div>
+      <div class="ui pointing rcpch_light_blue label">
+          {% for error in form.first_name.errors %}
+            {{ error }}
+          {% endfor %}
+      </div>
       {% endif %}
     </div>
     <div class="field">
       <label>Surname</label>
       <div class="field">{{form.surname}}</div>
       {% if form.surname.errors %}
-      <div class="ui pointing red basic label">{{form.surname.errors}}</div>
+      <div class="ui pointing rcpch_light_blue label">
+          {% for error in form.surname.errors %}
+            {{ error }}
+          {% endfor %}
+      </div>
       {% endif %}
     </div>
   </div>
@@ -28,18 +36,26 @@
     
     <div class="field">
       <label>Date of Birth</label>
-      {{form.date_of_birth}} {% if form.date_of_birth.errors %}
-      <div class="ui pointing red basic label">
-        {{form.date_of_birth.errors}}
-      </div>
+      {{form.date_of_birth}} 
+      {% if form.date_of_birth.errors %}
+        <div class="ui pointing rcpch_light_blue label">
+            {% for error in form.date_of_birth.errors %}
+              {{ error }}
+            {% endfor %}
+        </div>
       {% endif %}
     </div>
 
     <div class="field">
       <label>Sex</label>
-      {{form.sex}} {% if form.sex.errors %}
-      <div class="ui pointing red basic label">{{form.sex.errors}}</div>
-      {% endif %}
+      {{form.sex}} 
+      {% if form.sex.errors %}
+    <div class="ui pointing rcpch_light_blue label">
+        {% for error in form.sex.errors %}
+          {{ error }}
+        {% endfor %}
+    </div>
+    {% endif %}
     </div>
   </div>
 
@@ -55,9 +71,9 @@
         </label>
         {{form.postcode}} 
         {% if form.postcode.errors %}
-          <div class="ui pointing red basic label">
+          <div class="ui pointing rcpch_light_blue label">
               {% for error in form.postcode.errors %}
-                <div class="ui label">{{ error }}</div>
+                {{ error }}
               {% endfor %}
           </div>
         {% endif %}
@@ -72,27 +88,36 @@
   {% if organisation.country.boundary_identifier == "JEY" %}
     <div class="field">
       <label>Unique Reference Number</label>
-      {{form.unique_reference_number}} {% if form.unique_reference_number.errors %}
-      <div class="ui pointing red basic label">
+      {{form.unique_reference_number}} 
+      <div class="ui pointing rcpch_light_blue label">
         {% for error in form.unique_reference_number.errors %}
           {{ error }}
         {% endfor %}
-      </div>
-      {% endif %}
+    </div>
     </div>
   {% else %}
     <div class="field">
       <label>NHS Number</label>
-      {{form.nhs_number}} {% if form.nhs_number.errors %}
-      <div class="ui pointing red basic label">{{form.nhs_number.errors}}</div>
+      {{form.nhs_number}}
+      {% if form.nhs_number.errors %}
+      <div class="ui pointing rcpch_light_blue label">
+        {% for error in form.nhs_number.errors %}
+          {{ error }}
+        {% endfor %}
+      </div>
       {% endif %}
     </div>
   {% endif %}
 
   <div class="field">
     <label>Ethnicity</label>
-    {{form.ethnicity}} {% if form.ethnicity.errors %}
-    <div class="ui pointing red basic label">{{form.ethnicity.errors}}</div>
+    {{form.ethnicity}} 
+    {% if form.ethnicity.errors %}
+      <div class="ui pointing rcpch_light_blue label">
+          {% for error in form.ethnicity.errors %}
+            {{ error }}
+          {% endfor %}
+      </div>
     {% endif %}
   </div>
 
