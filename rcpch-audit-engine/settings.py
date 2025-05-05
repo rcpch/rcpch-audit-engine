@@ -22,7 +22,7 @@ from dotenv import load_dotenv
 from django.core.management.utils import get_random_secret_key
 
 # Must be above importing logging settigns as we read environment variables there
-load_dotenv('envs/.env')
+load_dotenv("envs/.env")
 
 # RCPCH imports
 from .logging_settings import (
@@ -71,7 +71,8 @@ RCPCH_CENSUS_PLATFORM_URL = os.getenv("RCPCH_CENSUS_PLATFORM_URL")
 RCPCH_CENSUS_PLATFORM_TOKEN = os.getenv("RCPCH_CENSUS_PLATFORM_TOKEN")
 
 # Postcode API
-POSTCODE_API_BASE_URL = os.getenv("POSTCODE_API_BASE_URL")
+POSTCODES_IO_API_URL = os.getenv("POSTCODES_IO_API_URL")
+POSTCODES_IO_API_KEY = os.getenv("POSTCODES_IO_API_KEY")
 
 NHS_ODS_API_URL = os.getenv("NHS_ODS_API_URL")
 NHS_ODS_API_KEY = os.getenv("NHS_ODS_API_KEY")
@@ -174,7 +175,7 @@ TEMPLATES = [
                 "django.contrib.messages.context_processors.messages",
                 "django_auto_logout.context_processors.auto_logout_client",  # auto logout
                 "rcpch-audit-engine.build_info.get_build_info",
-                "epilepsy12.context_processors.banner"
+                "epilepsy12.context_processors.banner",
             ]
         },
     },
@@ -268,9 +269,9 @@ PASSWORD_RESET_TIMEOUT = os.environ.get(
 
 SITE_CONTACT_EMAIL = os.environ.get("SITE_CONTACT_EMAIL")
 
-ADMINS = os.environ.get("ADMINS", '')
+ADMINS = os.environ.get("ADMINS", "")
 if ADMINS:
-    ADMINS = [e.split(":") for e in  ADMINS.split(",")]
+    ADMINS = [e.split(":") for e in ADMINS.split(",")]
 
 # Internationalization
 # https://docs.djangoproject.com/en/3.2/topics/i18n/
