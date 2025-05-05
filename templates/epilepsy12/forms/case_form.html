@@ -55,7 +55,11 @@
         </label>
         {{form.postcode}} 
         {% if form.postcode.errors %}
-        <div class="ui pointing red basic label">{{form.postcode.errors}}</div>
+          <div class="ui pointing red basic label">
+              {% for error in form.postcode.errors %}
+                <div class="ui label">{{ error }}</div>
+              {% endfor %}
+          </div>
         {% endif %}
       </div>
 
@@ -69,7 +73,11 @@
     <div class="field">
       <label>Unique Reference Number</label>
       {{form.unique_reference_number}} {% if form.unique_reference_number.errors %}
-      <div class="ui pointing red basic label">{{form.unique_reference_number.errors}}</div>
+      <div class="ui pointing red basic label">
+        {% for error in form.unique_reference_number.errors %}
+          {{ error }}
+        {% endfor %}
+      </div>
       {% endif %}
     </div>
   {% else %}
