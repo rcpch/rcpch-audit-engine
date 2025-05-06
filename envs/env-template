@@ -64,7 +64,9 @@ ENABLE_PDF_EXPORT=1 # Disables automatic PDF generation
 DOCS_URL="https://${SITE_DOMAIN}/docs" # URL of the documentation site
 
 # POSTCODES API
-POSTCODE_API_BASE_URL="https://findthatpostcode.uk"
+POSTCODE_API_BASE_URL="https://findthatpostcode.uk" # deprecated 5/5/25
+POSTCODES_IO_API_URL="https://api.rcpch.ac.uk/postcodes"
+POSTCODES_IO_API_KEY="ADD YOUR API KEY HERE" # alternatively you can use the free API at https://postcodes.io
 
 # POSTGRES SETUP
 POSTGRES_DB=epilepsy12db

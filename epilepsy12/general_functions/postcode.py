@@ -27,19 +27,21 @@ def is_valid_postcode(postcode: str, is_jersey=False) -> bool:
         return validate_jersey_postcode(value=postcode)
 
     # check against API
-    url = f"{settings.POSTCODE_API_BASE_URL}/postcodes/{postcode}"
+    url = f"{settings.POSTCODES_IO_API_URL}/postcodes/{postcode}/validate"
 
-    response = requests.get(url=url)
+    response = requests.get(
+        url=url,
+        headers={"Ocp-Apim-Subscription-Key": settings.POSTCODES_IO_API_KEY},
+        timeout=10,  # times out after 10 seconds)
+    )
 
     if response.status_code == 200:
-        return True
-    
+        return response.json()["result"]
+
     if response.status_code in [400, 404]:
         # Log this at error so we still email the admins about it.
         # This is to try and spot any examples where a correct postcode is marked as invalid.
-        logger.error(
-            f"Invalid postcode {postcode} from {url}. {response.status_code=}"
-        )
+        logger.error(f"Invalid postcode {postcode} from {url}. {response.status_code=}")
         return False
 
     # For anything else, log the error but say the postcode is valid.
@@ -76,13 +78,19 @@ def coordinates_for_postcode(postcode: str) -> bool:
         return True
 
     # check against API
-    url = f"{settings.POSTCODE_API_BASE_URL}/postcodes/{postcode}"
+    url = f"{settings.POSTCODES_IO_API_URL}/postcodes/{postcode}"
 
-    response = requests.get(url=url)
+    response = requests.get(
+        url=url,
+        headers={"Ocp-Apim-Subscription-Key": settings.POSTCODES_IO_API_KEY},
+        timeout=10,  # times out after 10 seconds)
+    )
 
     if response.status_code == 200:
-        location = response.json()["data"]["attributes"]["location"]
-        return location["lon"], location["lat"]
+        return (
+            response.json()["result"]["longitude"],
+            response.json()["result"]["latitude"],
+        )
 
     # Only other possibility should be 404, but handle any other status code
     logger.error(
@@ -156,17 +164,18 @@ def return_random_postcode(
     if is_jersey:
         return JERSEY_POSTCODES[randint(0, len(JERSEY_POSTCODES) - 1)]
 
-    url = f"{settings.POSTCODE_API_BASE_URL}/areas/{country_boundary_identifier}"
+    url = f"{settings.POSTCODES_IO_API_URL}/random/postcodes"
 
-    response = requests.get(url=url)
+    response = requests.get(
+        url=url,
+        headers={"Ocp-Apim-Subscription-Key": settings.POSTCODES_IO_API_KEY},
+        timeout=10,  # times out after 10 seconds)
+    )
 
     if response.status_code != 200:
-        logger.error(f"Postcode generation failure. Could not get random postcode for {country_boundary_identifier}. {response.status_code=}")
+        logger.error(
+            f"Postcode generation failure. Could not get random postcode for {country_boundary_identifier}. {response.status_code=}"
+        )
         return None
 
-    return response.json()["data"]["relationships"]["example_postcodes"]["data"][0][
-        "id"
-    ].replace(" ", "")
-
-
-0
+    return response.json()["result"]["postcode"]
