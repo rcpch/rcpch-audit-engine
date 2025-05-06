@@ -513,8 +513,8 @@
                                             <i class="chart bar icon"></i>
                                         </a>
                                     {% else %}
-                                        <a href="{% url 'register_case' organisation_id=organisation_id case_id=case.id %}" class="ui rcpch_pink button">
-                                            <i class="plus icon"></i>
+                                        <a href="{% url 'register' case_id=case.id %}" class="ui rcpch_pink button">
+                                            <i class="plus icon"></i>FLIP
                                         </a>
                                     {% endif %}
                                 </div>
