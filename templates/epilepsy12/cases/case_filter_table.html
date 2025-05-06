@@ -26,79 +26,13 @@
             <form method="get" class="ui rcpch form">
                 
                 <div class="ui rcpch segment">
-                    <div class="fields">
-                        <div class="four wide field">
-                            <label>Search</label>
-                            <div class="ui icon input">
-                                <input type="text" name="search" placeholder="Search by name, NHS number..." value="{{ request.GET.search }}">
-                                <i class="search icon"></i>
-                            </div>
-                        </div>
-                        
-                        <!-- Sex Filter -->
-                        <div class="four wide field">
-                            <label>{{ filterset.form.sex.label }}</label>
-                            <div class="ui fluid search selection rcpch dropdown">
-                                <input type="hidden" name="sex" value="{{ request.GET.sex|default:'' }}">
-                                <i class="dropdown icon"></i>
-                                <div class="default text">Select Sex</div>
-                                <div class="menu">
-                                    <div class="item" data-value="">All</div>
-                                    {% if sexes %}
-                                        {% for sex in sexes %}
-                                            <div class="item" data-value="{{ sex.0 }}">
-                                                {{ sex.1 }}
-                                            </div>
-                                        {% endfor %}
-                                    {% endif %}
-                                </div>
-                            </div>
-                        </div>
-                        
-                        <!-- Ethnicity Filter -->
-                        <div class="four wide field">
-                            <label>{{ filterset.form.ethnicity.label }}</label>
-                            <div class="ui fluid search selection rcpch dropdown">
-                                <input type="hidden" name="ethnicity" value="{{ request.GET.ethnicity|default:'' }}">
-                                <i class="dropdown icon"></i>
-                                <div class="default text">Select Ethnicity</div>
-                                <div class="menu">
-                                    <div class="item" data-value="">All</div>
-                                    {% if ethnicities %}
-                                        {% for ethnicity in ethnicities %}
-                                            <div class="item" data-value="{{ ethnicity.0 }}">
-                                                {{ ethnicity.1 }}
-                                            </div>
-                                        {% endfor %}
-                                    {% endif %}
-                                </div>
-                            </div>
-                        </div>
-                        
-                        <!-- index of multiple deprivation quintile filter -->
-                        <div class="four wide field">
-                            <label>{{ filterset.form.index_of_multiple_deprivation_quintile.label }}</label>
-                            <div class="ui fluid search selection rcpch dropdown">
-                                <input type="hidden" name="index_of_multiple_deprivation_quintile" value="{{ request.GET.index_of_multiple_deprivation_quintile|default:'' }}">
-                                <i class="dropdown icon"></i>
-                                <div class="default text">Select Index of Multiple Deprivation Quintile</div>
-                                <div class="menu">
-                                    <div class="item" data-value="">All</div>
-                                    {% if imd_choices %}
-                                        {% for index_of_multiple_deprivation_quintile in imd_choices %}
-                                            <div class="item" data-value="{{ index_of_multiple_deprivation_quintile.0 }}">
-                                                {{ index_of_multiple_deprivation_quintile.1 }}
-                                            </div>
-                                        {% endfor %}
-                                    {% endif %}
-                                </div>
-                            </div>
-                        </div>
-                    </div><!--fields-->
                     
                     {% if perms.epilepsy12.can_publish_epilepsy12_data %}
                     <div class="row">
-                        <div class="ui horizontal divider">National View</div>
+                        
+                        <h5 class="header">
+                            <span class="data-tooltip" data-tooltip="Apply filters by selecting the dropdowns and click `Apply Filters`" data-position="right center">National View <i class="rcpch question circle icon"></i></span>
+                        </h5>
                     
                         <div class="fields">
                         <!-- Trust/Health Board Filter -->
@@ -181,16 +115,24 @@
                     </div>
                     {% endif %}
 
-                    <div class="fields">
-                        <button type="submit" class="ui rcpch_light_blue button">
-                            <i class="filter icon"></i> Apply Filters
-                        </button>
-                        <a href="{% url 'case_filter_list' organisation_id %}" class="ui rcpch_light_blue button">
-                            <i class="undo icon"></i> Reset
-                        </a>
-                    </div><!--fields-->
                 </div><!--segment-->
-                
+
+                <!-- Results Stats -->
+                <div class="ui statistics">
+                    <div class="statistic">
+                        <div class="value">{{ total_cases }}</div>
+                        <div class="label">Total Cases</div>
+                    </div>
+                    <div class="statistic">
+                        <div class="value">{{ registered_cases }}</div>
+                        <div class="label">Registered</div>
+                    </div>
+                    <div class="statistic">
+                        <div class="value">{{ total_episodes|default:"0" }}</div>
+                        <div class="label">Total Episodes</div>
+                    </div>
+                </div>
+
                 <!-- Filter Summary -->
                 {% if request.GET %}
                 <div class="ui rcpch_info message">
@@ -222,23 +164,93 @@
                 {% for name, value in hidden_field_params %} <!-- this adds the facets to the form as hidden fields so that their filters are not ignored when the form is submitted-->
                     <input type="hidden" name="{{ name }}" value="{{ value }}">
                 {% endfor %}
+
+                <div class="ui rcpch_grey segment">
+                    <h5 class="header">
+                        <span class="data-tooltip" data-tooltip="Apply filters by selecting the dropdowns and click `Apply Filters`" data-position="right center">Demographics <i class="rcpch question circle icon"></i></span>
+                    </h5>
+                    <div class="fields">
+                        <div class="four wide field">
+                            <label>Search</label>
+                            <div class="ui icon input">
+                                <input type="text" name="search" placeholder="Search by name, NHS number..." value="{{ request.GET.search }}">
+                                <i class="search icon"></i>
+                            </div>
+                        </div>
+                        
+                        <!-- Sex Filter -->
+                        <div class="four wide field">
+                            <label>{{ filterset.form.sex.label }}</label>
+                            <div class="ui fluid search selection rcpch dropdown">
+                                <input type="hidden" name="sex" value="{{ request.GET.sex|default:'' }}">
+                                <i class="dropdown icon"></i>
+                                <div class="default text">Select Sex</div>
+                                <div class="menu">
+                                    <div class="item" data-value="">All</div>
+                                    {% if sexes %}
+                                        {% for sex in sexes %}
+                                            <div class="item" data-value="{{ sex.0 }}">
+                                                {{ sex.1 }}
+                                            </div>
+                                        {% endfor %}
+                                    {% endif %}
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <!-- Ethnicity Filter -->
+                        <div class="four wide field">
+                            <label>{{ filterset.form.ethnicity.label }}</label>
+                            <div class="ui fluid search selection rcpch dropdown">
+                                <input type="hidden" name="ethnicity" value="{{ request.GET.ethnicity|default:'' }}">
+                                <i class="dropdown icon"></i>
+                                <div class="default text">Select Ethnicity</div>
+                                <div class="menu">
+                                    <div class="item" data-value="">All</div>
+                                    {% if ethnicities %}
+                                        {% for ethnicity in ethnicities %}
+                                            <div class="item" data-value="{{ ethnicity.0 }}">
+                                                {{ ethnicity.1 }}
+                                            </div>
+                                        {% endfor %}
+                                    {% endif %}
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <!-- index of multiple deprivation quintile filter -->
+                        <div class="four wide field">
+                            <label>{{ filterset.form.index_of_multiple_deprivation_quintile.label }}</label>
+                            <div class="ui fluid search selection rcpch dropdown">
+                                <input type="hidden" name="index_of_multiple_deprivation_quintile" value="{{ request.GET.index_of_multiple_deprivation_quintile|default:'' }}">
+                                <i class="dropdown icon"></i>
+                                <div class="default text">Select Index of Multiple Deprivation Quintile</div>
+                                <div class="menu">
+                                    <div class="item" data-value="">All</div>
+                                    {% if imd_choices %}
+                                        {% for index_of_multiple_deprivation_quintile in imd_choices %}
+                                            <div class="item" data-value="{{ index_of_multiple_deprivation_quintile.0 }}">
+                                                {{ index_of_multiple_deprivation_quintile.1 }}
+                                            </div>
+                                        {% endfor %}
+                                    {% endif %}
+                                </div>
+                            </div>
+                        </div>
+                    </div><!--fields-->
+
+                    <div class="fields">
+                        <button type="submit" class="ui rcpch_light_blue button">
+                            <i class="filter icon"></i> Apply Filters
+                        </button>
+                        <a href="{% url 'case_filter_list' organisation_id %}" class="ui rcpch_light_blue button">
+                            <i class="undo icon"></i> Reset
+                        </a>
+                    </div><!--fields-->
+                </div><!--segment-->
+                
             </form>
             
-            <!-- Results Stats -->
-            <div class="ui statistics">
-                <div class="statistic">
-                    <div class="value">{{ total_cases }}</div>
-                    <div class="label">Total Cases</div>
-                </div>
-                <div class="statistic">
-                    <div class="value">{{ registered_cases }}</div>
-                    <div class="label">Registered</div>
-                </div>
-                <div class="statistic">
-                    <div class="value">{{ total_episodes|default:"0" }}</div>
-                    <div class="label">Total Episodes</div>
-                </div>
-            </div>
         </div>
 
         <!-- Three columns for filter categories -->
