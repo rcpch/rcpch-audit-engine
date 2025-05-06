@@ -5,13 +5,19 @@
 {% block content %}
 <div class="ui fluid container" style="padding: 50px;">
     
-    <h1 class="ui header">
-        <i class="users icon"></i>
-        <div class="content">
-            Report Builder for {{ organisation.name }}
-            <div class="sub header">Apply the filters to explore your clinic data</div>
+    <div class="ui grid">
+        <div class="row" style="display: flex; justify-content: space-between; align-items: center;">
+            <h1 class="ui header">
+                <div class="content">
+                    Report Builder for {{ organisation.name }}
+                    <div class="sub header">Apply the filters to explore your clinic data</div>
+                </div>
+            </h1>
+            <a href="javascript:history.back()" class="ui rcpch_light_blue button">
+                <i class="arrow left icon"></i> Back
+            </a>
         </div>
-    </h1>
+    </div>
 
     <div class="ui stackable grid">
         <!-- Main Content - Now at the top -->
@@ -505,17 +511,23 @@
                             </td>
                             <td class="center aligned">
                                 <div class="ui icon buttons">
-                                    <a href="{% url 'update_case' organisation_id=organisation_id case_id=case.id %}" class="ui rcpch_primary button">
-                                        <i class="edit icon"></i>
-                                    </a>
-                                    {% if case.registration %}
+                                    <span class="data-tooltip" data-tooltip="Edit Child Details" data-position="top center">
+                                        <a href="{% url 'update_case' organisation_id=organisation_id case_id=case.id %}" class="ui rcpch_primary button">
+                                            <i class="edit icon"></i>
+                                        </a>
+                                    </span>
+                                    {% if case.registration.cohort %}
+                                    <span class="data-tooltip" data-tooltip="View Audit" data-position="top center">
                                         <a href="{% url 'case_performance_summary' case_id=case.id %}" class="ui rcpch_purple button">
                                             <i class="chart bar icon"></i>
                                         </a>
+                                    </span>
                                     {% else %}
-                                        <a href="{% url 'register' case_id=case.id %}" class="ui rcpch_pink button">
-                                            <i class="plus icon"></i>FLIP
+                                    <span class="data-tooltip" data-tooltip="Register Child" data-position="top center">
+                                        <a href="{% url 'register' case_id=case.id %}" class="ui rcpch_purple button">
+                                            <i class="plus icon"></i>
                                         </a>
+                                    </span>
                                     {% endif %}
                                 </div>
                             </td>
