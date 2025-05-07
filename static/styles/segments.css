@@ -88,6 +88,14 @@ justify-content: flex-end;
     color: var(--rcpch_dark_blue);
 }
 
+.ui.rcpch_grey.segment {
+    border-radius: 0%;
+    border-width: medium;
+    border-color: var(--rcpch_grey);
+    background-color: var(--rcpch_white);
+    color: var(--rcpch_dark_blue);
+}
+
 .ui.rcpch.facets.vertical.fluid.menu {
     border-radius: 0%;
     border-width: medium;

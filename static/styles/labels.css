@@ -176,5 +176,13 @@ a label {
 /* multiaxial diagnosis form */
 .ui.rcpch.header {
   margin-top: 10px;
-}  
+} 
+
+.ui.rcpch_grey.label {
+  color: white;
+  background-color: var(--rcpch_charcoal);
+  border-radius: 0%;
+  border: transparent;
+  margin: 5px;
+}
   
