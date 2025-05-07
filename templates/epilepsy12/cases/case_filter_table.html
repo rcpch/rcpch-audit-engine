@@ -13,7 +13,7 @@
                     <div class="sub header">Apply the filters to explore your clinic data</div>
                 </div>
             </h1>
-            <a href="javascript:history.back()" class="ui rcpch_light_blue button">
+            <a href="{% url 'selected_organisation_summary' organisation.pk %}" class="ui rcpch_light_blue button">
                 <i class="arrow left icon"></i> Back
             </a>
         </div>
@@ -23,7 +23,7 @@
         <!-- Main Content - Now at the top -->
         <div class="sixteen wide column">
             <!-- Filter Form -->
-            <form method="get" class="ui rcpch form">
+            <form method="get" class="ui rcpch form" action="{% url 'case_filter_list' organisation_id %}">
                 
                 <div class="ui rcpch segment">
                     
@@ -149,7 +149,7 @@
 
                                                 {# Use build_url_parameters to generate the removal link #}
                                                 {# Pass the key and the specific value to remove/toggle #}
-                                                <a href="{% build_url_parameters request key value %}">
+                                                <a href="{% build_url_parameters request key None %}">
                                                     <i class="delete icon"></i>
                                                 </a>
                                             </div>
@@ -596,241 +596,32 @@
         </div>
     
 </div>
-{% endblock %}
-
-{% block extra_js %}
 <script>
-    $(document).ready(function() {
-    
-        // --- Call your other initialization functions here ---
-        // These likely already use jQuery based on your previous code
-        initializeDropdowns();
-        setupFilterRemoval();
-        handleResponsiveBehavior();
-        setupSearchInput();
-        // ---
-    });
-    
-    /**
-     * Initialize all Semantic UI dropdowns with proper configuration
-     */
-    function initializeDropdowns() {
-        $('.ui.dropdown').dropdown({
-            fullTextSearch: true,
-            match: 'text',
-            selectOnKeydown: false,
-            forceSelection: false,
-            hideDividers: 'empty',
-            clearable: true,
-            onChange: function(value, text, $choice) {
-                console.log('Dropdown changed:', $(this).find('input').attr('name'), value);
-                
-                // Submit the form when dropdown value changes
-                $(this).closest('form').submit();
-                
-                // Optional: Add analytics tracking for filter changes
-                if (typeof gtag !== 'undefined') {
-                    gtag('event', 'filter_changed', {
-                        'filter_name': $(this).find('input').attr('name'),
-                        'filter_value': value,
-                        'filter_text': text
-                    });
-                }
-            }
-        });
-        
-        // Set dropdown values based on URL parameters
-        const urlParams = new URLSearchParams(window.location.search);
-        
-        // Create a list of all dropdown inputs to set from URL params
-        const dropdownInputs = [
-            'sex', 'ethnicity', 'trust_or_health_board', 'nhs_england_region',
-            'integrated_care_board', 'country', 'cohort'
-        ];
-        
-        // Set each dropdown value if it exists in URL params
-        dropdownInputs.forEach(function(inputName) {
-            if (urlParams.has(inputName)) {
-                const value = urlParams.get(inputName);
-                if (value) {
-                    $(`input[name="${inputName}"]`).parent().dropdown('set selected', value);
-                }
-            }
-        });
-        
-        // Special handling for search dropdowns
-        $('.ui.search.dropdown').dropdown({
-            fullTextSearch: true,
-            match: 'both',
-            showOnFocus: false,
-            allowAdditions: false,
-            onChange: function(value, text, $choice) {
-                console.log('Search dropdown changed:', $(this).find('input').attr('name'), value);
-                // Submit the form when dropdown value changes
-                $(this).closest('form').submit();
-            }
-        });
-    }
-    
-    /**
-     * Set up filter removal functionality from the active filters section
-     */
-    function setupFilterRemoval() {
-        // When a filter deletion icon is clicked
-        $('.ui.label .delete.icon').on('click', function(e) {
-            e.preventDefault();
-            const href = $(this).parent('a').attr('href');
-            if (href) {
-                window.location.href = href;
-            }
-        });
-        
-        // Clear all filters button
-        $('.reset-filters-button').on('click', function(e) {
-            e.preventDefault();
-            const baseUrl = window.location.pathname;
-            window.location.href = baseUrl;
-        });
-    }
-    
-    /**
-     * Handle responsive behavior for mobile vs desktop
-     */
-    function handleResponsiveBehavior() {
-        // For small screens, make facet menu toggleable
-        if ($(window).width() < 768) {
-            // Create toggle button for facet menu
-            const $facetMenu = $('.four.wide.column .ui.vertical.menu');
-            const $toggleButton = $('<button class="ui fluid rcpch_light_blue button"><i class="filter icon"></i> Show/Hide Filters</button>');
-            
-            $facetMenu.before($toggleButton);
-            $facetMenu.hide();
-            
-            $toggleButton.on('click', function() {
-                $facetMenu.slideToggle(200);
-            });
-            
-            // Show facet menu if any filters are active
-            if (window.location.search && window.location.search !== '?page=1') {
-                $facetMenu.show();
-            }
-        }
-        
-        // Add sticky behavior to the filter form on desktop
-        if ($(window).width() >= 992) {
-            $('.ui.form').sticky({
-                context: '.twelve.wide.column',
-                offset: 20
-            });
-        }
-    }
-    
-    /**
-     * Helper function to update URL parameters without page refresh
-     * @param {string} key - The parameter name
-     * @param {string} value - The parameter value
-     */
-    function updateUrlParam(key, value) {
-        const urlParams = new URLSearchParams(window.location.search);
-        
-        // Remove page parameter to reset to first page when filtering
-        if (urlParams.has('page')) {
-            urlParams.delete('page');
-        }
-        
-        if (value) {
-            urlParams.set(key, value);
-        } else {
-            urlParams.delete(key);
-        }
-        
-        // Update URL without reloading page
-        const newUrl = window.location.pathname + (urlParams.toString() ? '?' + urlParams.toString() : '');
-        window.history.pushState({ path: newUrl }, '', newUrl);
-    }
-    
-    /**
-     * Set up real-time filtering for the search field
-     */
-    function setupSearchInput() {
-        const $searchInput = $('input[name="search"]');
-        let searchTimer;
-        
-        $searchInput.on('input', function() {
-            const searchValue = $(this).val().trim();
-            
-            // Clear previous timer
-            clearTimeout(searchTimer);
-            
-            // Set a timer to prevent too many requests while typing
-            searchTimer = setTimeout(function() {
-                if (searchValue.length >= 3 || searchValue.length === 0) {
-                    // Update URL and trigger form submission
-                    updateUrlParam('search', searchValue);
-                    
-                    // Submit the form after updating URL
-                    $searchInput.closest('form').submit();
-                }
-            }, 500);
-        });
-    }
-    
-    /**
-     * Implement AJAX search to avoid full page reload (optional)
-     */
-    function sendSearchRequest(searchValue) {
-        $.ajax({
-            url: window.location.pathname,
-            method: 'GET',
-            data: $('.ui.rcpch.form').serialize(),
-            success: function(response) {
-                // Update just the table body with new results
-                const $newResults = $(response).find('table tbody');
-                $('table tbody').html($newResults.html());
-                
-                // Update statistics
-                const $newStats = $(response).find('.ui.statistics');
-                $('.ui.statistics').html($newStats.html());
-                
-                // Update facet counts
-                $(response).find('.ui.vertical.menu .item .menu a').each(function() {
-                    const href = $(this).attr('href');
-                    const $facetItem = $('.ui.vertical.menu .item .menu a[href="' + href + '"]');
-                    const $label = $(this).find('.ui.label');
-                    
-                    if ($facetItem.length && $label.length) {
-                        $facetItem.find('.ui.label').text($label.text());
-                    }
-                });
-            }
-        });
-    }
-    
-    // Add keyboard navigation for accessibility
-    $(document).keydown(function(e) {
-        // Enable keyboard navigation for facet filters with Alt+Number keys
-        if (e.altKey && e.keyCode >= 49 && e.keyCode <= 57) { // Alt + 1-9
-            const index = e.keyCode - 49; // 0-based index
-            const $facetLinks = $('.four.wide.column .ui.vertical.menu .item .menu a');
-            
-            if ($facetLinks.length > index) {
-                window.location.href = $facetLinks.eq(index).attr('href');
-            }
-        }
-    });
+    document.addEventListener("DOMContentLoaded", function () {
+        /*
+        This javascript block is necessary to strip the empty parameters from the URL
+        when the form is submitted. It prevents empty values from being sent in the query string.
+        */
+        const form = document.querySelector(".ui.rcpch.form");
+        form.addEventListener("submit", function (event) {
+            event.preventDefault(); // Prevent the default form submission
 
-    $('.ui.dropdown').each(function() {
-        const $dropdown = $(this);
-        const $input = $dropdown.find('input[type="hidden"]');
-        const name = $input.attr('name');
-        
-        console.log('Setting up dropdown for:', name);
-        
-        $dropdown.find('.menu .item').on('click', function() {
-            console.log('Item clicked in dropdown:', name);
-            const value = $(this).data('value');
-            $input.val(value);
-            $dropdown.closest('form').submit();
+            const formData = new FormData(form);
+            const queryParams = new URLSearchParams();
+
+            // Iterate over form fields and add non-empty values to queryParams
+            for (const [key, value] of formData.entries()) {
+                if (value.trim() !== "") {
+                    queryParams.append(key, value);
+                }
+            }
+
+            // Redirect to the constructed URL
+            const baseUrl = form.getAttribute("action") || window.location.pathname;
+            const queryString = queryParams.toString();
+            const finalUrl = queryString ? `${baseUrl}?${queryString}` : baseUrl;
+
+            window.location.href = finalUrl;
         });
     });
 </script>

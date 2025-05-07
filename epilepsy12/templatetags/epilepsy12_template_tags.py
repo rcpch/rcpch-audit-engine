@@ -628,10 +628,6 @@ def strip(value):
     return value
 
 
-# ... existing code ...
-from django.http import QueryDict
-
-
 @register.simple_tag
 def build_url_parameters(request, field, selected_field_value=None):
     """
@@ -685,7 +681,7 @@ def build_url_parameters(request, field, selected_field_value=None):
 
     else:
         # Handle single-value fields
-        if selected_field_value is not None:
+        if selected_field_value:
             # Add or update the field with the new value
             # Check if the value is already set to avoid redundant changes (optional)
             # if query_params.get(field) != str(selected_field_value):
@@ -695,7 +691,16 @@ def build_url_parameters(request, field, selected_field_value=None):
             if field in query_params:
                 del query_params[field]
 
-    # 3. Encode the final query string
+    # 3. Remove empty fields from the query string
+    for key in list(query_params.keys()):
+        if (
+            not query_params.getlist(key)
+            or query_params.getlist(key) == [""]
+            or query_params.getlist(key) == ""
+        ):
+            del query_params[key]
+
+    # 4. Encode the final query string
     final_query_string = query_params.urlencode()
 
     # Return the URL starting with '?'
@@ -757,6 +762,68 @@ def field_value_to_readable_name(field_value, field_key):
         ][0]
     elif field_value == "true":
         return ""
+    elif field_key == "sex":
+        return dict(SEX_TYPE)[int(field_value)]
+    elif field_key == "ethnicity":
+        return dict(ETHNICITIES)[field_value]
+    elif field_key == "index_of_multiple_deprivation_quintile":
+        if field_value == "1":
+            return "1 - Most deprived"
+        elif field_value == "5":
+            return "5 - Least deprived"
+        else:
+            return f"{field_value}"
+    elif field_key == "trust_or_health_board":
+        # Extract the ID from the field_value
+        key = field_value.split("_")[0]
+        match = re.search(r"_(\d+)$", field_value)
+        if match:
+            id = match.group(1)
+            # Get the corresponding object from the database
+            if key == "h":
+                try:
+                    return LocalHealthBoard.objects.get(id=id).name
+                except LocalHealthBoard.DoesNotExist:
+                    return field_value
+            elif key == "t":
+                # Get the corresponding object from the database
+                try:
+                    return Trust.objects.get(id=id).name
+                except Trust.DoesNotExist:
+                    return field_value
+            else:
+                # Handle other cases or return the field_value as is
+                return field_value
+    elif field_key == "integrated_care_board":
+        # Extract the ID from the field_value
+        match = re.search(r"_(\d+)$", field_value)
+        if match:
+            id = match.group(1)
+            # Get the corresponding object from the database
+            try:
+                return IntegratedCareBoard.objects.get(id=id).name
+            except IntegratedCareBoard.DoesNotExist:
+                return field_value
+    elif field_key == "nhs_england_region":
+        # Extract the ID from the field_value
+        match = re.search(r"_(\d+)$", field_value)
+        if match:
+            id = match.group(1)
+            # Get the corresponding object from the database
+            try:
+                return NHSEnglandRegion.objects.get(id=id).name
+            except NHSEnglandRegion.DoesNotExist:
+                return field_value
+    elif field_key == "country":
+        # Extract the ID from the field_value
+        match = re.search(r"_(\d+)$", field_value)
+        if match:
+            id = match.group(1)
+            # Get the corresponding object from the database
+            try:
+                return Country.objects.get(id=id).name
+            except Country.DoesNotExist:
+                return field_value
     else:
         # For other field keys, return the value as is
         return field_value
