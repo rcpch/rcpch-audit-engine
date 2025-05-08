@@ -4,31 +4,31 @@ requests==2.32.3
 
 # third party imports
 ## django and misc
-dj_database_url==2.2.0
-django==5.1.5
+dj_database_url==2.3.0
+django==5.2.1
 django-auto-logout==0.5.1
-django-filter==24.3
-django-htmx==1.19.0
-django-semantic-admin==0.6.0
-django-simple-captcha==0.6.0
-django-simple-history==3.7.0
+django-filter==25.1
+django-htmx==1.23.0
+django-semantic-admin==0.6.6
+django-simple-captcha==0.6.2
+django-simple-history==3.8.0
 django-two-factor-auth==1.17.0
 django-widget-tweaks==1.5.0
 django-multiselectfield==0.1.13
-djangorestframework==3.15.2
+djangorestframework==3.16.0
 docutils==0.21.2
-pandas==2.2.2
+pandas==2.2.3
 # We don't use this but django-two-factor-auth requires it
 # They are working to make it optional https://github.com/jazzband/django-two-factor-auth/issues/469
-phonenumbers==8.13.43
-psycopg2-binary==2.9.9
-whitenoise==6.7.0
+phonenumbers==9.0.4
+psycopg2-binary==2.9.10
+whitenoise==6.9.0
 openpyxl==3.1.5
-python-dotenv==1.0.1
-azure-identity==1.17.1
+python-dotenv==1.1.0
+azure-identity==1.22.0
 
 ## graphing
-plotly==5.23.0
+plotly==6.0.1
 
 # NHS number
 nhs-number==1.3.4
@@ -37,20 +37,20 @@ nhs-number==1.3.4
 gunicorn==23.0.0
 
 # code linting and formatting
-autopep8==2.3.1
-black==24.8.0
+autopep8==2.3.2
+black==25.1.0
 
 # testing and code analysis
-coverage==7.6.1
-pytest-django==4.8.0
+coverage==7.8.0
+pytest-django==4.11.1
 pytest-factoryboy==2.7.0
-rapidfuzz==3.9.6
+rapidfuzz==3.13.0
 
-mkdocs-material==9.5.32
-mkdocs-git-committers-plugin-2==2.3.0 # displays authors at the bottom of the page
-mkdocs-git-revision-date-localized-plugin==1.2.7 # displays last edit date at the bottom of the page
-mkdocs-macros-plugin==1.0.5 # enables 'foldable' admonition text (used for large code blocks)
+mkdocs-material==9.6.12
+mkdocs-git-committers-plugin-2==2.5.0 # displays authors at the bottom of the page
+mkdocs-git-revision-date-localized-plugin==1.4.5 # displays last edit date at the bottom of the page
+mkdocs-macros-plugin==1.3.7 # enables 'foldable' admonition text (used for large code blocks)
 mkdocs-with-pdf==0.9.3 # PDF export feature
 
 # for colored logs
-colorlog==6.8.2
+colorlog==6.9.0
