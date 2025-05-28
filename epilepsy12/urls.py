@@ -322,6 +322,11 @@ organisation_patterns = [
         name="selected_organisation_summary",
     ),
     path(
+        "organisation/<int:organisation_id>/summary/individual_metrics",
+        view=individual_metrics,
+        name="individual_metrics",
+    ),
+    path(
         "organisation/<int:organisation_id>/publish",
         view=publish_kpis,
         name="publish_kpis",
