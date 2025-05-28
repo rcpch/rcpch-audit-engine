@@ -295,8 +295,6 @@ def individual_metrics(request, organisation_id):
     HTMX get request returning individual_metrics.html  real-time Key Performance Indicator (KPI) Metrics table.
     """
 
-    print(cohorts_and_dates(first_paediatric_assessment_date=date.today()))
-
     context = {
         "selected_organisation": Organisation.objects.get(pk=organisation_id),
         "cohort_number": request.GET.get("cohort"),
