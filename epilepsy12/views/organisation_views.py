@@ -290,6 +290,21 @@ def selected_organisation_summary(request, organisation_id):
     )
 
 
+def individual_metrics(request, organisation_id):
+    """
+    HTMX get request returning individual_metrics.html  real-time Key Performance Indicator (KPI) Metrics table.
+    """
+
+    context = {
+        "selected_organisation": Organisation.objects.get(pk=organisation_id),
+        "cohort_number": request.GET.get("cohort"),
+        "cohort_data": cohorts_and_dates(first_paediatric_assessment_date=date.today()),
+        "individual_kpi_choices": INDIVIDUAL_KPI_MEASURES,
+    }
+    template = "epilepsy12/partials/organisation/individual_metrics.html"
+    return render(request=request, template_name=template, context=context)
+
+
 @login_and_otp_required()
 @user_may_view_this_organisation()
 @permission_required("epilepsy12.can_publish_epilepsy12_data", raise_exception=True)
@@ -627,6 +642,8 @@ def kpi_download_file(request, cohort):
         excel_data,
         content_type="application/vnd.openxmlformats-officedocument.spreadsheetml.sheet",
     )
-    # cohort should be validated by Django as an integer 
-    response["Content-Disposition"] = f"attachment; filename=kpi_export_cohort_{cohort}.xlsx"
+    # cohort should be validated by Django as an integer
+    response["Content-Disposition"] = (
+        f"attachment; filename=kpi_export_cohort_{cohort}.xlsx"
+    )
     return response

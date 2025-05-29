@@ -11,13 +11,38 @@
         {% endif %}
       </div>
       
-      <div class="all-kpis-header">
-        <button class="ui right floated rcpch_primary button" _="on click go to top of #kpis">Jump to All KPI Metrics</button>
-      </div>
-    
-    </div>
+<div class="all-kpis-header">
+  <button class="ui right floated rcpch_primary button" _="on click go to top of #kpis">Jump to All KPI Metrics</button>
+
+  <div class="ui floating rcpch_primary dropdown button"
+      id="cohortDropdown"
+     _="on change 
+         set #cohortValueHolder.value to event.target.dataset.value 
+         then set #cohortValueHolder @hx-vals to JSON.stringify({cohort: event.target.dataset.value})
+         then trigger htmx:trigger from #cohortValueHolder">
   
+    <input 
+      type="hidden"
+      id="cohortValueHolder"
+      name="cohort"
+      value="{{ cohort_number }}"
+      hx-get="{% url 'individual_metrics' organisation_id=selected_organisation.pk %}"
+      hx-target="#individual_metrics"
+      hx-swap="innerHTML"
+      hx-trigger="change"
+      hx-include='#cohortValueHolder'
+    >
+
+    <i class="dropdown icon"></i>
+    <span class="text" id="cohortDropdownText">Cohort {{ cohort_number }}</span>
+    <div class="menu">
+      <div class="item" data-value="{{ cohort_data.currently_recruiting_cohort }}">Cohort {{ cohort_data.currently_recruiting_cohort }}</div>
+      <div class="item" data-value="{{ cohort_data.submitting_cohort }}">Cohort {{ cohort_data.submitting_cohort }}</div>
+      <div class="item" data-value="{{ cohort_data.submitting_cohort|add:"-1" }}">Cohort {{ cohort_data.submitting_cohort|add:"-1" }}</div>
+    </div>
   </div>
+
+</div>
 
 
       <div class="ui raised attached rcpch_dark_blue segment" id="selected_trust_select_kpi_marker">
@@ -29,7 +54,7 @@
           </p>
         </div>
           {% url "selected_trust_select_kpi" organisation_id=selected_organisation.pk as hx_post%}
-          {% include 'epilepsy12/partials/page_elements/kpi_select.html' with hx_post=hx_post hx_target='#selected_trust_select_kpi' hx_trigger='change' hx_swap='innerHTML' label='Select a measure and then click on a region' reference="Select one of the 12 measures and then click on a region to view how it compares." choices=individual_kpi_choices test_positive=individual_kpi_choices.0.0 hx_name='kpi_name' %}
+          {% include 'epilepsy12/partials/page_elements/kpi_select.html' with hx_post=hx_post hx_target='#selected_trust_select_kpi' hx_trigger='change, load' hx_swap='innerHTML' label='Select a measure and then click on a region' reference="Select one of the 12 measures and then click on a region to view how it compares." choices=individual_kpi_choices test_positive=individual_kpi_choices.0.0 hx_name='kpi_name' %}
           <div
             hx-headers='{"X-CSRFToken": "{{ csrf_token }}"}'
             hx-post="{% url 'selected_trust_select_kpi' organisation_id=selected_organisation.pk %}"
@@ -54,3 +79,8 @@
       </div>
 
 </div>
+<script>
+  $('.ui.dropdown')
+  .dropdown()
+;
+</script>

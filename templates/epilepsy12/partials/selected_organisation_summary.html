@@ -501,7 +501,9 @@
                 </div>
             </div>
 
-            {% include 'epilepsy12/partials/organisation/individual_metrics.html' with organisation_id=selected_organisation.pk cohort_number=cohort_number %}
+            <div id="individual_metrics">
+                {% include 'epilepsy12/partials/organisation/individual_metrics.html' with organisation_id=selected_organisation.pk cohort_number=cohort_number cohort_data=cohort_data %}
+            </div>
 
         {% else %}
         
