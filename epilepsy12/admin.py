@@ -455,7 +455,7 @@ class Epilepsy12UserAdmin(UserAdmin, SimpleHistoryAdmin):
             form.base_fields["is_staff"].disabled = True
             form.base_fields["is_rcpch_staff"].disabled = True
             form.base_fields["is_rcpch_audit_team_member"].disabled = True
-            return form
+        return form
 
 
 class CaseAdmin(SimpleHistoryAdmin):
