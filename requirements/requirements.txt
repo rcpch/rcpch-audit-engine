@@ -42,6 +42,7 @@ black==25.1.0
 
 # testing and code analysis
 coverage==7.8.0
+pytest==8.3.5 # Unpin once https://github.com/pytest-dev/pytest-factoryboy/issues/232 is resolved
 pytest-django==4.11.1
 pytest-factoryboy==2.7.0
 rapidfuzz==3.13.0
