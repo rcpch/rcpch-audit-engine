@@ -68,7 +68,7 @@
           
           </div>
           
-          {% if form.organisation_employer.value %}
+          {% comment %} {% if form.organisation_employer.value %} {% endcomment %}
             <div class='field' id="organisation_employer">
               <label for="{{form.organisation_employer.id_for_label}}">Employer</label>
               {{ form.organisation_employer }}
@@ -76,7 +76,7 @@
                 <div class="ui pointing red basic label">{{form.organisation_employer.errors}}</div>
               {% endif %}
             </div>
-          {% endif %}
+          {% comment %} {% endif %} {% endcomment %}
           
 
           <div class='two fields'>
