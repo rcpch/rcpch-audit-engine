@@ -90,7 +90,7 @@ def selected_organisation_summary(request, organisation_id):
             else cohort_data["submitting_cohort"]
         )
 
-    # thes are all registered cases for the current cohort at the selected organisation to be plotted in the map
+    # these are all registered cases for the current cohort at the selected organisation to be plotted in the map
     cases_to_plot = filter_all_registered_cases_by_active_lead_site_and_cohort_and_level_of_abstraction(
         organisation=selected_organisation, cohort=cohort_number
     )

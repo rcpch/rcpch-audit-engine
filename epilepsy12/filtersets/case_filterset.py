@@ -1264,8 +1264,19 @@ class CaseFilterMethods:
         Apply all filters from request - both standard and special filters if needed
         """
         # Initialize empty lists if None
-        exclude_params = exclude_params or []
-        special_filter_params = special_filter_params or []
+        if type(exclude_params) is not list:
+            exclude_params = [exclude_params] if exclude_params else []
+        else:
+            exclude_params = exclude_params if exclude_params else []
+
+        if type(special_filter_params) is not list:
+            special_filter_params = (
+                [special_filter_params] if special_filter_params else []
+            )
+        else:
+            special_filter_params = (
+                special_filter_params if special_filter_params else []
+            )
 
         # Always exclude pagination parameter - handle both 'p' and 'page'
         if "p" not in exclude_params:
