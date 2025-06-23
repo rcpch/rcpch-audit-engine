@@ -561,12 +561,26 @@ def edit_epilepsy12_user(request, organisation_id, epilepsy12_user_id):
         else:
             if form.is_valid():
                 # this will not include the password which will be empty
+                # primary employer is now M2M field so can be set directly
+                print(form.cleaned_data["organisation_employer"])
+                primary_employer = Organisation.objects.filter(
+                    pk=form.cleaned_data["organisation_employer"].pk
+                )
+                if primary_employer.exists():
+                    primary_employer = primary_employer.first()
                 new_user = form.save()
-
                 # update group
                 new_group = group_for_role(new_user.role)
                 new_user.groups.clear()
                 new_user.groups.add(new_group)
+                OrganisationEmployer.objects.update_or_create(
+                    epilepsy12_user=new_user,
+                    is_primary=True,
+                    defaults={
+                        "employer_organisation": primary_employer,
+                        "created_by": request.user,
+                    },
+                )
 
                 # adds success message
                 messages.success(

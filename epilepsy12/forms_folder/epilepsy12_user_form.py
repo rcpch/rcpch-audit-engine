@@ -21,7 +21,7 @@ from epilepsy12.constants.user_types import (
     AUDIT_CENTRE_ROLES,
     TITLES,
 )
-from ..models import Epilepsy12User, Organisation, VisitActivity
+from ..models import Epilepsy12User, Organisation, VisitActivity, OrganisationEmployer
 
 # Logging setup
 logger = logging.getLogger(__name__)
@@ -71,6 +71,19 @@ class Epilepsy12UserUpdatePasswordForm(SetPasswordForm):
 class Epilepsy12UserAdminCreationForm(forms.ModelForm):
     """
     This is a standard Django form to be used by admin to create a user without a password
+
+    Just a word about readonly vs disabled fields. Standard django behaviour is to exclude
+    disabled fields from the cleaned data. This means that if a field is disabled, it will not
+    be included in the cleaned data and therefore not saved to the database. This is not
+    desirable in this case, so we use readonly fields instead. Readonly fields are still included
+    in the cleaned data, but they are not editable in the form. This means that the
+    user cannot change the value of the field, but it will still be saved to the database
+    when the form is submitted. However, because we are using semantic ui, readonly does not
+    stop the field from being editable in the UI, so we also set the disabled attribute on the class
+    to prevent the user from editing the field in the UI, but reenable it for RCPCH staff.
+
+    This gives us the desired behaviour of allowing RCPCH staff to create users, edit their email addresses
+    and change their organisation, but preventing other users from doing so.
     """
 
     rcpch_organisation = ""
@@ -94,11 +107,83 @@ class Epilepsy12UserAdminCreationForm(forms.ModelForm):
         if getattr(self, "initial", None):
             initial = getattr(self, "initial")
             if initial.get("email"):
-                self.fields["email"].widget.attrs["disabled"] = True
+                if (
+                    requesting_user.is_superuser
+                    or requesting_user.is_rcpch_staff
+                    or requesting_user.is_rcpch_audit_team_member
+                ):
+                    self.fields["email"].widget.attrs["readonly"] = False
+                    self.fields["email"].widget.attrs["disabled"] = False
+                    self.fields["organisation_employer"].widget.attrs[
+                        "readonly"
+                    ] = False
+                    self.fields["organisation_employer"].widget.attrs[
+                        "disabled"
+                    ] = False
+                else:
+                    # if the user is not RCPCH staff, then the email field should be disabled
+                    self.fields["email"].widget.attrs["readonly"] = True
+                    self.fields["organisation_employer"].widget.attrs["readonly"] = True
+                user_to_edit = Epilepsy12User.objects.filter(
+                    email=initial["email"].lower()
+                )
+                if user_to_edit.exists():
+                    # bound form. get all employers for this user
+                    # to populate the organisation_employer field
+                    user_to_edit = user_to_edit.first()
+                    employers = (
+                        OrganisationEmployer.objects.filter(
+                            epilepsy12_user=user_to_edit,
+                            is_active=True,
+                        )
+                        .all()
+                        .order_by("is_primary")
+                    )
+                    self.fields["organisation_employer"].queryset = (
+                        Organisation.objects.filter(
+                            id__in=employers.values_list(
+                                "employer_organisation__id", flat=True
+                            )
+                        )
+                    )
+                    # set the initial value for organisation_employer to the primary employer
+                    self.fields["organisation_employer"].initial = (
+                        user_to_edit.organisation_employer
+                    )
+                else:
+                    # no user for this email address. should not really be possible
+                    raise ValueError(
+                        "No user found for the email address provided. Please check the email address."
+                    )
+            else:
+                # unbound form. set the email field to enabled
+                self.fields["email"].widget.attrs["readonly"] = False
+                self.fields["email"].widget.attrs["disabled"] = False
+                # set the queryset for organisation_employer to all organisations if RCPCH staff
+                if (
+                    requesting_user.is_superuser
+                    or requesting_user.is_rcpch_staff
+                    or requesting_user.is_rcpch_audit_team_member
+                ):
+                    self.fields["organisation_employer"].widget.attrs[
+                        "readonly"
+                    ] = False
+                    self.fields["organisation_employer"].queryset = (
+                        Organisation.objects.all()
+                    )
+                else:
+                    # if the user is not RCPCH staff, then the organisation_employer field should be disabled (note readonly is used as disabled does not appear in cleaned data)
+                    self.fields["organisation_employer"].widget.attrs["readonly"] = True
+                    # set the queryset for organisation_employer to the requesting user's organisation
+                    self.fields["organisation_employer"].queryset = (
+                        Organisation.objects.filter(
+                            pk=requesting_user.organisation_employer.id
+                        )
+                    )
 
     email = forms.EmailField(
         widget=forms.TextInput(
-            attrs={"class": "ui rcpch form input"},
+            attrs={"class": "ui rcpch form disabled input"},
         ),
         max_length=255,
         help_text="Required. Please enter a valid NHS email address.",
@@ -113,7 +198,7 @@ class Epilepsy12UserAdminCreationForm(forms.ModelForm):
 
     organisation_employer = forms.ModelChoiceField(
         queryset=Organisation.objects.all(),
-        widget=forms.Select(attrs={"class": "ui fluid search rcpch disabled dropdown"}),
+        widget=forms.Select(attrs={"class": "ui fluid search disabled rcpch dropdown"}),
         required=False,
     )
 
@@ -168,7 +253,6 @@ class Epilepsy12UserAdminCreationForm(forms.ModelForm):
         fields = (
             "email",
             "role",
-            "organisation_employer",
             "title",
             "first_name",
             "surname",
@@ -224,12 +308,9 @@ class Epilepsy12UserAdminCreationForm(forms.ModelForm):
             self.cleaned_data["view_preference"] = 0
         return data
 
-    # def clean_organisation_employer(self):
-    #     data = self.cleaned_data["organisation_employer"]
-    #     return data
-
     def clean(self):
         cleaned_data = super().clean()
+        # new user being created is rcpch staff
         if self.rcpch_organisation == "rcpch-staff":
             # RCPCH staff are not affiliated with any organisation
             if (
@@ -247,7 +328,7 @@ class Epilepsy12UserAdminCreationForm(forms.ModelForm):
                     "You do not have permission to create RCPCH staff."
                 )
         else:
-            # this new user is not RCPCH staff
+            # this new user being created  is not RCPCH staff
             if (
                 self.requesting_user.is_rcpch_audit_team_member
                 or self.requesting_user.is_superuser
@@ -255,6 +336,7 @@ class Epilepsy12UserAdminCreationForm(forms.ModelForm):
                 # anything goes
                 return cleaned_data
             else:
+                print(cleaned_data)
                 if (
                     self.requesting_user.organisation_employer
                     != cleaned_data["organisation_employer"]

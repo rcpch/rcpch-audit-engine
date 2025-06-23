@@ -583,7 +583,7 @@ def test_users_update_users_success(
     )
 
     USER_FROM_DIFFERENT_ORG = E12UserFactory(
-        email=f"{DIFF_TRUST_DIFF_ORGANISATION}_ADMINISTRATOR@email.com",
+        email=f"{DIFF_TRUST_DIFF_ORGANISATION}_ADMINISTRATOR@email.com".lower(),
         first_name=f"{DIFF_TRUST_DIFF_ORGANISATION}_ADMINISTRATOR",
         role=test_user_audit_centre_administrator_data.role,
         # Assign flags based on user role
@@ -598,7 +598,7 @@ def test_users_update_users_success(
     )
 
     ANOTHER_USER_FROM_SAME_ORG = E12UserFactory(
-        email=f"{TEST_USER_ORGANISATION}_ADMINISTRATOR@email.com",
+        email=f"{TEST_USER_ORGANISATION}_ADMINISTRATOR@email.com".lower(),
         first_name=f"{TEST_USER_ORGANISATION}_ADMINISTRATOR",
         role=test_user_audit_centre_administrator_data.role,
         # Assign flags based on user role
