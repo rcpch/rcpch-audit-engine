@@ -16,11 +16,11 @@
 
   <div class="ui floating rcpch_primary dropdown button"
       id="cohortDropdown"
+      _="init js $('.ui.dropdown').dropdown();"
      _="on change 
          set #cohortValueHolder.value to event.target.dataset.value 
-         then set #cohortValueHolder @hx-vals to JSON.stringify({cohort: event.target.dataset.value})
-         then trigger htmx:trigger from #cohortValueHolder">
-  
+         then set #cohortValueHolder @hx-vals to JSON.stringify({cohort: event.target.dataset.value})"
+    >
     <input 
       type="hidden"
       id="cohortValueHolder"
@@ -80,7 +80,10 @@
 
 </div>
 <script>
-  $('.ui.dropdown')
-  .dropdown()
-;
+  // Ensure the dropdown text reflects the current cohort
+  document.addEventListener('DOMContentLoaded', function() {
+    const cohortDropdownText = document.getElementById('cohortDropdownText');
+    const cohortValueHolder = document.getElementById('cohortValueHolder');
+    cohortDropdownText.textContent = `Cohort ${cohortValueHolder.value}`;
+  });
 </script>
