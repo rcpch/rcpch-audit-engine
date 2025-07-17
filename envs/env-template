@@ -75,3 +75,7 @@ POSTGRES_USER=epilepsy12user
 
 # TIMEZONE
 TZ="Europe/London"
+
+# FOR LOCAL DEVELOPMENT
+LOCAL_DEV_ADMIN_EMAIL="incubator@rcpch.ac.uk"
+LOCAL_DEV_ADMIN_PASSWORD="devp@ssword12345"
