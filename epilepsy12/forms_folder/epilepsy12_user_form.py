@@ -406,6 +406,20 @@ class CaptchaAuthenticationForm(AuthenticationForm):
     def __init__(self, request, *args, **kwargs) -> None:
         super().__init__(request, *args, **kwargs)
 
+        # If in DEBUG -> don't require captch, pre fill fields
+        if settings.DEBUG:
+            logger.warning(
+                f"IN LOCAL DEVELOPMENT, BYPASSING LOGIN BY PREFILLING FIELDS"
+            )
+            self.fields["username"].widget.attrs["value"] = (
+                settings.LOCAL_DEV_ADMIN_EMAIL
+                or "SET LOCAL_DEV_ADMIN_EMAIL IN ENVIRONMENT VARIABLES"
+            )
+            self.fields["password"].widget.attrs["value"] = (
+                settings.LOCAL_DEV_ADMIN_PASSWORD
+                or "SET LOCAL_DEV_ADMIN_PASSWORD IN ENVIRONMENT VARIABLES"
+            )
+
     def clean_username(self) -> dict[str, Any]:
         email = super().clean()["username"]
         if email:
