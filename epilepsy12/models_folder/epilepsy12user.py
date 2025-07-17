@@ -21,6 +21,7 @@ from epilepsy12.constants.user_types import (
     TITLES,
     # preferences in the view
     VIEW_PREFERENCES,
+    RCPCH_AUDIT_TEAM
 )
 
 logger = logging.getLogger(__name__)
@@ -121,19 +122,12 @@ class Epilepsy12UserManager(BaseUserManager):
             raise ValueError(_("Superuser must have is_staff=True."))
         if extra_fields.get("is_superuser") is not True:
             raise ValueError(_("Superuser must have is_superuser=True."))
+        if not extra_fields.get("role") == RCPCH_AUDIT_TEAM:
+            raise ValueError(_("Superuser must have role=RCPCH_AUDIT_TEAM."))
 
-        if extra_fields.get("role") not in [1, 2, 3, 4]:
-            raise ValueError("--role must be an integer between 1 and 4")
-        else:
-            if extra_fields.get("role") == 4:
-                extra_fields.setdefault("is_rcpch_staff", True)
-                extra_fields.setdefault("view_preference", 2)  # national scope
-                extra_fields.setdefault("organisation_employer", None)
-            else:
-                organisation_employer = Organisation.objects.get(
-                    ods_code="RJZ01"
-                )  # clinicians added to KCH by default
-                extra_fields.setdefault("organisation_employer", organisation_employer)
+        extra_fields.setdefault("is_rcpch_staff", True)
+        extra_fields.setdefault("view_preference", 2)  # national scope
+        extra_fields.setdefault("organisation_employer", None)
 
         logged_in_user = self.create_user(email.lower(), password, **extra_fields)
 
