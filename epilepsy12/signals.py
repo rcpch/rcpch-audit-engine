@@ -118,6 +118,7 @@ EMAIL_TRIGGER_FIELDS = [
     "is_superuser",
     "is_staff",
     "email",
+    "is_active",
 ]
 
 # Fields that should be logged when changed
