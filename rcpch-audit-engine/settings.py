@@ -123,6 +123,8 @@ MIDDLEWARE = [
     "django.middleware.clickjacking.XFrameOptionsMiddleware",
     "whitenoise.middleware.WhiteNoiseMiddleware",
     "django.contrib.sessions.middleware.SessionMiddleware",
+    # Has to come before CommonMiddleware to access Content-Length
+    "epilepsy12.middleware.Epilepsy12RequestLoggingMiddleware",
     "django.middleware.common.CommonMiddleware",
     "django.middleware.csrf.CsrfViewMiddleware",
     "django.contrib.auth.middleware.AuthenticationMiddleware",
@@ -130,7 +132,6 @@ MIDDLEWARE = [
     "django_htmx.middleware.HtmxMiddleware",
     "simple_history.middleware.HistoryRequestMiddleware",
     "django_auto_logout.middleware.auto_logout",
-    "epilepsy12.middleware.CurrentUserMiddleware",
     # 2fa
     "django_otp.middleware.OTPMiddleware",
 ]
@@ -272,6 +273,7 @@ SITE_CONTACT_EMAIL = os.environ.get("SITE_CONTACT_EMAIL")
 ADMINS = os.environ.get("ADMINS", "")
 if ADMINS:
     ADMINS = [e.split(":") for e in ADMINS.split(",")]
+
 
 # Internationalization
 # https://docs.djangoproject.com/en/3.2/topics/i18n/
