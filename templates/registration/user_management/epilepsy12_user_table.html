@@ -244,8 +244,8 @@
                     </button>
                     
                     <button 
-                        data-tooltip='Deactivate {{epilepsy12_user}}.' 
-                        {% if perms.epilepsy12.delete_epilepsy12user and epilepsy12_user.email != user.email  and epilepsy12_user.is_active %}
+                        data-tooltip={% if epilepsy12_user.is_active %}'Deactivate {{epilepsy12_user}}.' {% else %}'Reactivate {{epilepsy12_user}}.' {% endif %}
+                        {% if perms.epilepsy12.delete_epilepsy12user and epilepsy12_user.email != user.email %}
                             class="ui rcpch_danger icon button" 
                         {% else %}
                             class="ui rcpch_danger icon disabled button" 
@@ -258,21 +258,25 @@
                             halt the event
                             call Swal.fire({
                                 title: 'Confirmation Required',
-                                text: 'Are you sure you want to deactivate {{epilepsy12_user}}?',
+                                text: 'Are you sure you want to {% if epilepsy12_user.is_active %}deactivate{% else %}reactivate{% endif %} {{epilepsy12_user}}?',
                                 icon: 'warning',
                                 iconColor: '#e00087',
                                 showCancelButton: true,
                                 confirmButtonColor: '#11a7f2',
                                 cancelButtonColor: '#e60700',
-                                confirmButtonText: 'Deactivate {{epilepsy12_user}}'
+                                confirmButtonText: '{% if epilepsy12_user.is_active %}Deactivate{% else %}Reactivate{% endif %} {{epilepsy12_user}}'
                             })
                             if result.isConfirmed issueRequest()"
                     >
-                        <i class="trash alternate outline icon"></i>
+                        {% if epilepsy12_user.is_active %}
+                            <i class="ban icon"></i>
+                        {% else %}
+                            <i class="undo alternate icon"></i>
+                        {% endif %}
                     </button>
                     
                     <button
-                        {% if perms.epilepsy12.view_logs and epilepsy12_user.is_active %}
+                        {% if perms.epilepsy12.view_logs %}
                             class='ui rcpch_light_blue icon right floated button'
                         {% else %}
                             class='ui rcpch_light_blue icon right floated disabled button'
