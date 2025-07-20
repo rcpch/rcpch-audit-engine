@@ -130,7 +130,8 @@ MIDDLEWARE = [
     "django_htmx.middleware.HtmxMiddleware",
     "simple_history.middleware.HistoryRequestMiddleware",
     "django_auto_logout.middleware.auto_logout",
-    "epilepsy12.middleware.CurrentUserMiddleware",
+    # Custom middleware for request logging
+    "epilepsy12.middleware.Epilepsy12RequestLoggingMiddleware",
     # 2fa
     "django_otp.middleware.OTPMiddleware",
 ]
@@ -272,6 +273,9 @@ SITE_CONTACT_EMAIL = os.environ.get("SITE_CONTACT_EMAIL")
 ADMINS = os.environ.get("ADMINS", "")
 if ADMINS:
     ADMINS = [e.split(":") for e in ADMINS.split(",")]
+else:
+    ADMINS = [("Epilepsy12 Audit Team", DEFAULT_FROM_EMAIL)]
+
 
 # Internationalization
 # https://docs.djangoproject.com/en/3.2/topics/i18n/

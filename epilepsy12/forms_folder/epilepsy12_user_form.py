@@ -124,6 +124,9 @@ class Epilepsy12UserAdminCreationForm(forms.ModelForm):
                     # if the user is not RCPCH staff, then the email field should be disabled
                     self.fields["email"].widget.attrs["readonly"] = True
                     self.fields["organisation_employer"].widget.attrs["readonly"] = True
+                    self.fields["organisation_employer"].widget.attrs[
+                        "disabled"
+                    ] = False
                 user_to_edit = Epilepsy12User.objects.filter(
                     email=initial["email"].lower()
                 )
@@ -159,6 +162,10 @@ class Epilepsy12UserAdminCreationForm(forms.ModelForm):
                 # unbound form. set the email field to enabled
                 self.fields["email"].widget.attrs["readonly"] = False
                 self.fields["email"].widget.attrs["disabled"] = False
+                self.fields["email"].widget.attrs["placeholder"] = "Enter email address"
+                self.fields["email"].widget.attrs.update(
+                    {"class": "ui rcpch form input"}
+                )
                 # set the queryset for organisation_employer to all organisations if RCPCH staff
                 if (
                     requesting_user.is_superuser
@@ -261,6 +268,7 @@ class Epilepsy12UserAdminCreationForm(forms.ModelForm):
             "is_rcpch_audit_team_member",
             "is_superuser",
             "email_confirmed",
+            "organisation_employer",
         )
 
     def clean_email(self):
@@ -336,14 +344,12 @@ class Epilepsy12UserAdminCreationForm(forms.ModelForm):
                 # anything goes
                 return cleaned_data
             else:
-                print(cleaned_data)
-                if (
-                    self.requesting_user.organisation_employer
-                    != cleaned_data["organisation_employer"]
+                if self.requesting_user.organisation_employer != cleaned_data.get(
+                    "organisation_employer"
                 ):
                     # nonmatching organisations might still be in the same health board or trust
                     requested_organisation = Organisation.objects.get(
-                        name=cleaned_data["organisation_employer"]
+                        name=cleaned_data.get("organisation_employer")
                     )
                     if (
                         requested_organisation.country.boundary_identifier

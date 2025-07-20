@@ -876,3 +876,13 @@ def kpi_has_category_title(kpi_key):
         return True
     else:
         return False
+
+
+@register.filter
+def none_to_dash(value):
+    """
+    Convert None to a dash for display purposes.
+    """
+    if value is None:
+        return "-"
+    return value

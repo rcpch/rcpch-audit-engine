@@ -19,16 +19,20 @@
             <thead>
                 <tr>
                     <th>User</th>
+                    <th>Administrator</th>
                     <th>Activity</th>
+                    <th>Details</th>
                     <th>Timestamp</th>
-                    <th>IP Adress</th>
+                    <th>IP Address</th>
                 </tr>
             </thead>
             <tbody>
                 {% for activity in activities %}
                     <tr>
                         <td>{{activity.epilepsy12user}}</td>
+                        <td>{{activity.epilepsy12user_admin|none_to_dash}}</td>
                         <td>{{activity.get_activity_display}}</td>
+                        <td>{{activity.details}}</td>
                         <td>{{activity.activity_datetime}}</td>
                         <td>{{activity.ip_address}}</td>
                     </tr>
