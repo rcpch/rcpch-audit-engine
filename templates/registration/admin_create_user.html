@@ -92,18 +92,6 @@
                 {% endif %}
               </div>
             {% endif %}
-            
-            {% if user.is_superuser %}
-              <div class='eight wide field'>
-                <label for="{{form.is_superuser.id_for_label}}">Superuser</label>
-                <div class='ui toggle checkbox' id='is_staff' _="js $('.ui.toggle.checkbox').checkbox(); end">
-                  {{ form.is_superuser }}
-                </div>
-                {% if form.is_superuser.errors %}
-                  <div class="ui pointing red basic label">{{form.is_superuser.errors}}</div>
-                {% endif %}
-              </div>
-            {% endif %}
 
           </div>
 
@@ -140,7 +128,7 @@
                 {% endif %}
                 name="delete"
                 id="delete"
-                value="Deactivate"
+                value="{% if user.is_active %}Deactivate{% else %}Activate{% endif %} Epilepsy12 user account"
                 hx-post="{% url 'delete_epilepsy12_user' organisation_id=organisation_id epilepsy12_user_id=form.instance.pk %}"
                 hx-trigger='click'
                 hx-headers='{"X-CSRFToken": "{{ csrf_token }}"}'

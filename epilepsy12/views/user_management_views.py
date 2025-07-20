@@ -564,7 +564,6 @@ def edit_epilepsy12_user(request, organisation_id, epilepsy12_user_id):
             if form.is_valid():
                 # this will not include the password which will be empty
                 # primary employer is now M2M field so can be set directly
-                print(form.cleaned_data["organisation_employer"])
                 primary_employer = Organisation.objects.filter(
                     pk=form.cleaned_data["organisation_employer"].pk
                 )
