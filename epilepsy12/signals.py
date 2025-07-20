@@ -549,15 +549,18 @@ def _send_employer_assignment_notification(
             f"Epilepsy12 User employer Assignment Updated - {user.get_full_name()}"
         )
 
+    # Get the display value for role
+    role_display = user.get_role_display() if user.role else "Not specified"
+
     message = f"""
     A user's Organisation employer has been modified:
 
     User: {user.get_full_name()} ({user.email})
     Organisation: {organisation_employer_instance.employer_organisation.name} ({organisation_employer_instance.employer_organisation.trust})
     Action: User {action} Employer
-    Modified by: {current_user.email if current_user else 'System'}
+    Modified by: {current_user.email if current_user else "System"}
 
-    Role in Employer: {getattr(user, 'role', 'Not specified')}
+    Role in Employer: {role_display}
     """
     # Send to audit team members
     try:
