@@ -13,6 +13,7 @@
 import logging
 
 # django imports
+from django.apps import apps
 from django.contrib.auth.signals import (
     user_logged_in,
     user_logged_out,
@@ -228,7 +229,7 @@ def log_user_organisation_assignment(sender, instance, created, **kwargs):
 
     if created:
         # Log new OrganisationEmployer creation
-        details = f"User {instance.epilepsy12_user.email} assigned to Organisation {instance.organisation_employer}  by {current_user.email if current_user else 'system'}"
+        details = f"User {instance.epilepsy12_user.email} assigned to Organisation {instance.employer_organisation}  by {current_user.email if current_user else 'system'}"
 
         _log_user_activity(
             user=instance.epilepsy12_user,
@@ -240,63 +241,70 @@ def log_user_organisation_assignment(sender, instance, created, **kwargs):
         #         # Send notification to admins about new Employer assignment
         _send_employer_assignment_notification(instance, current_user, is_new=True)
 
+        logger.info(
+            f"User {instance.epilepsy12_user.email} assigned to employer {instance.employer_organisation} ({instance.employer_organisation.trust}) by {current_user.email if current_user else 'system'}"
+        )
+    else:
+        # Employer assignment updated (is_primary change, etc.)
+        details = f"Employer assignment updated for user {instance.epilepsy12_user.email} at employer {instance.employer_organisation} by {current_user.email if current_user else 'system'}"
 
-#         logger.info(f"User {instance.npda_user.email} assigned to PDU {instance.paediatric_diabetes_unit.pz_code}")
-#     else:
-#         # PDU assignment updated (is_primary change, etc.)
-#         details = f"PDU assignment updated for user {instance.npda_user.email} at PDU {instance.paediatric_diabetes_unit.pz_code} by {current_user.email if current_user else 'system'}"
+        _log_user_activity(
+            user=instance.epilepsy12_user,
+            activity_type=17,  # EMPLOYER_ROLE_CHANGED
+            details=details,
+            current_user=current_user,
+        )
 
-#         _log_user_activity(
-#             user=instance.npda_user,
-#             activity_type=17,  # PDU_ROLE_CHANGED
-#             details=details,
-#             current_user=current_user
-#         )
-
-#         logger.info(f"PDU assignment updated for user {instance.npda_user.email} at PDU {instance.paediatric_diabetes_unit.pz_code}")
+        logger.info(
+            f"Employer assignment updated for user {instance.epilepsy12_user.email} at employer {instance.employer_organisation} ({instance.employer_organisation.trust})"
+        )
 
 
-# @receiver(pre_delete, sender=OrganisationEmployer)
-# def log_user_pdu_removal(sender, instance, **kwargs):
-#     """
-#     Log when a user is removed from a PDU.
-#     """
-#     from .logging import get_current_user
-#     current_user = get_current_user()
+@receiver(pre_delete, sender=OrganisationEmployer)
+def log_user_employer_removal(sender, instance, **kwargs):
+    """
+    Log when a user is removed from an employer.
+    """
+    from .middleware import get_current_user
 
-#     details = f"User {instance.npda_user.email} removed from PDU {instance.paediatric_diabetes_unit.pz_code} ({instance.paediatric_diabetes_unit.lead_organisation_name}) by {current_user.email if current_user else 'system'}"
+    current_user = get_current_user()
 
-#     # _log_user_activity(
-#     #     user=instance.npda_user,
-#     #     activity_type=16,  # REMOVED_USER_FROM_PDU
-#     #     details=details,
-#     #     current_user=current_user
-#     # )
+    details = f"User {instance.epilepsy12_user.email} removed from employer {instance.employer_organisation} by {current_user.email if current_user else 'system'}"
 
-#     # Send notification to admins about PDU removal
-#     _send_pdu_assignment_notification(instance, current_user, is_new=False, is_removal=True)
+    _log_user_activity(
+        user=instance.epilepsy12_user,
+        activity_type=16,  # REMOVED_USER_FROM_EMPLOYER
+        details=details,
+        current_user=current_user,
+    )
 
-#     logger.info(details)
+    # Send notification to admins about employer removal
+    _send_employer_assignment_notification(
+        instance, current_user, is_new=False, is_removal=True
+    )
 
-# @receiver(pre_save, sender=OrganisationEmployer)
-# def capture_pdu_assignment_changes(sender, instance, **kwargs):
-#     """
-#     Capture the original state before save to compare changes.
-#     """
-#     OrganisationEmployer = apps.get_model('npda', 'OrganisationEmployer')
-#     if instance.pk:  # Only for existing assignments (updates)
-#         try:
-#             original = OrganisationEmployer.objects.get(pk=instance.pk)
-#             instance._original_values = {
-#                 'paediatric_diabetes_unit': original.paediatric_diabetes_unit,
-#                 'npda_user': original.npda_user,
-#                 'is_primary_employer': getattr(original, 'is_primary_employer', None),
-#                 # Add other fields you want to track
-#             }
-#         except OrganisationEmployer.DoesNotExist:
-#             instance._original_values = {}
-#     else:
-#         instance._original_values = {}
+    logger.info(details)
+
+
+@receiver(pre_save, sender=OrganisationEmployer)
+def capture_employer_assignment_changes(sender, instance, **kwargs):
+    """
+    Capture the original state before save to compare changes.
+    """
+    OrganisationEmployer = apps.get_model("epilepsy12", "OrganisationEmployer")
+    if instance.pk:  # Only for existing assignments (updates)
+        try:
+            original = OrganisationEmployer.objects.get(pk=instance.pk)
+            instance._original_values = {
+                "employer_organisation": original.employer_organisation,
+                "epilepsy12_user": original.epilepsy12_user,
+                "is_primary": getattr(original, "is_primary", None),
+            }
+        except OrganisationEmployer.DoesNotExist:
+            instance._original_values = {}
+    else:
+        instance._original_values = {}
+
 
 """
 Helper functions
@@ -527,8 +535,7 @@ def _send_employer_assignment_notification(
     """
     Send notification when user employer assignments change.
     """
-    user = organisation_employer_instance.npda_user
-    # pdu = organisation_employer_instance.paediatric_diabetes_unit
+    user = organisation_employer_instance.epilepsy12_user
 
     if is_removal:
         action = "removed from"
@@ -561,46 +568,3 @@ def _send_employer_assignment_notification(
         logger.error(
             f"Failed to send Employer assignment notification for user {user.email}: {e}"
         )
-
-
-# def _send_user_deletion_notification(user_instance, current_user):
-#     """
-#     Send notification when a user is deleted.
-#     """
-#     # Get the deletion data we captured in pre_delete
-#     deletion_data = getattr(user_instance, "_deletion_data", {})
-
-#     subject = (
-#         f"Epilepsy12 User Deleted - {deletion_data.get('full_name', 'Unknown User')}"
-#     )
-
-#     pdu_info = ""
-#     if deletion_data.get("pdu_names"):
-#         pdu_info = f"\nPDU Memberships: {', '.join(deletion_data['pdu_names'])}"
-
-#     message = f"""
-#     An NPDA user has been DELETED:
-
-#     User: {deletion_data.get('full_name', 'Unknown')} ({deletion_data.get('email', 'Unknown')})
-#     Role: {deletion_data.get('role', 'Unknown')}
-#     Active: {deletion_data.get('is_active', 'Unknown')}
-#     Audit Team Member: {deletion_data.get('is_rcpch_audit_team_member', 'Unknown')}
-#     RCPCH Staff: {deletion_data.get('is_rcpch_staff', 'Unknown')}
-#     Date Joined: {deletion_data.get('date_joined', 'Unknown')}
-#     Last Login: {deletion_data.get('last_login', 'Never') if deletion_data.get('last_login') else 'Never'}{pdu_info}
-
-#     Deleted by: {current_user.email if current_user else 'System'}
-
-#     ⚠️ This action cannot be undone. All user data has been permanently removed.
-#     """
-
-#     # Send to audit team members
-#     try:
-#         send_email_to_recipients(
-#             recipients=settings.ADMINS, subject=subject, message=message
-#         )
-#         logger.info(
-#             f"User deletion notification sent for: {deletion_data.get('email', 'Unknown')}"
-#         )
-#     except Exception as e:
-#         logger.error(f"Failed to send user deletion notification: {e}")
