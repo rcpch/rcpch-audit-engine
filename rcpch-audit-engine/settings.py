@@ -274,7 +274,7 @@ ADMINS = os.environ.get("ADMINS", "")
 if ADMINS:
     ADMINS = [e.split(":") for e in ADMINS.split(",")]
 else:
-    ADMINS = [("RCPCH Epilepsy12 Admin", "admin_email@example.com")]
+    ADMINS = [("Epilepsy12 Audit Team", DEFAULT_FROM_EMAIL)]
 
 
 # Internationalization

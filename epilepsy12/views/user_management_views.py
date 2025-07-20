@@ -516,7 +516,6 @@ def edit_epilepsy12_user(request, organisation_id, epilepsy12_user_id):
 
     if request.method == "POST":
         if "delete" in request.POST:
-            print("User is_active set to", epilepsy12_user_to_edit.is_active)
             # This call back from the user form, not the table.
             # Rather than delete user, instead set is_active to False as prevents cascade delete error for any cases/registrations
             # updated by this user (see issue #813)
