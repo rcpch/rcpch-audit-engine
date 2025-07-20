@@ -27,7 +27,7 @@ from two_factor.signals import user_verified
 # RCPCH
 from .general_functions.email import send_email_to_recipients
 from .general_functions.client_ip import get_client_ip
-from .models import VisitActivity, Epilepsy12User
+from .models import VisitActivity, Epilepsy12User, OrganisationEmployer
 from django.conf import settings
 
 # Logging setup
@@ -82,15 +82,21 @@ def log_user_logout(sender, request, user, **kwargs):
 # Epilepsy12User Signal handlers
 @receiver(pre_save, sender=Epilepsy12User)
 def set_updated_by(sender, instance, **kwargs):
+    from epilepsy12.middleware import get_current_user
+
+    current_user = get_current_user()
     if instance.pk:
-        logger.info(f"{instance} ({instance.email}) updated by {instance.updated_by}.")
-        instance.updated_by = instance.updated_by
+        logger.info(f"{instance} ({instance.email}) updated by {current_user}.")
+        instance.updated_by = current_user
 
 
 @receiver(post_save, sender=Epilepsy12User)
 def set_created_by(sender, instance, created, **kwargs):
+    from epilepsy12.middleware import get_current_user
+
+    current_user = get_current_user()
     if created:
-        instance.created_by = instance.created_by
+        instance.created_by = current_user
         instance.save()
         logger.info(f"{instance} ({instance.email}) created by {instance.updated_by}.")
 
@@ -151,9 +157,9 @@ ACTIVITY = (
     (12, "User role changed"),  # CHANGED_USER_ROLE
     (13, "Superuser or admin status changed"),  # CHANGED_ADMIN_FLAG
     (14, "User record deleted"),  # DELETED_USER_RECORD
-    (15, "User assigned to PDU"),  # ASSIGNED_USER_TO_PDU
-    (16, "User removed from PDU"),  # REMOVED_USER_FROM_PDU
-    (17, "User PDU role changed"),  # USER_PDU_ROLE_CHANGED
+    (15, "User assigned to Employer"),  # ASSIGNED_USER_TO_EMPLOYER
+    (16, "User removed from Employer"),  # REMOVED_USER_FROM_EMPLOYER
+    (17, "User Employer role changed"),  # USER_EMPLOYER_ROLE_CHANGED
 )
 
 
@@ -211,27 +217,29 @@ def log_and_notify_user_changes(sender, instance, created, **kwargs):
                 _send_change_notifications(instance, changes, current_user)
 
 
-# @receiver(post_save, sender=OrganisationEmployer)
-# def log_user_pdu_assignment(sender, instance, created, **kwargs):
-#     """
-#     Log when a user is assigned to or updated in a PDU.
-#     """
-#     from .logging import get_current_user
-#     current_user = get_current_user()
+@receiver(post_save, sender=OrganisationEmployer)
+def log_user_organisation_assignment(sender, instance, created, **kwargs):
+    """
+    Log when a user is assigned to or updated an employer.
+    """
+    from .middleware import get_current_user
 
-#     if created:
-#         # New PDU assignment
-#         details = f"User {instance.epilepsy12_user.email} assigned to Organisation {instance.organisation_employer}  by {current_user.email if current_user else 'system'}"
+    current_user = get_current_user()
 
-#         _log_user_activity(
-#             user=instance.npda_user,
-#             activity_type=15,  # USER_ASSIGNED_TO_PDU
-#             details=details,
-#             current_user=current_user
-#         )
+    if created:
+        # Log new OrganisationEmployer creation
+        details = f"User {instance.epilepsy12_user.email} assigned to Organisation {instance.organisation_employer}  by {current_user.email if current_user else 'system'}"
 
-#         # Send notification to admins about new PDU assignment
-#         _send_pdu_assignment_notification(instance, current_user, is_new=True)
+        _log_user_activity(
+            user=instance.epilepsy12_user,
+            activity_type=15,  # USER_ASSIGNED_TO_ORGANISATION
+            details=details,
+            current_user=current_user,
+        )
+
+        #         # Send notification to admins about new Employer assignment
+        _send_employer_assignment_notification(instance, current_user, is_new=True)
+
 
 #         logger.info(f"User {instance.npda_user.email} assigned to PDU {instance.paediatric_diabetes_unit.pz_code}")
 #     else:
@@ -493,9 +501,9 @@ def _map_changes_to_visit_activity(changes):
         (CHANGED_USER_ROLE, "User role changed"),
         (CHANGED_ADMIN_FLAG, "Superuser or admin status changed"),
         (DELETED_USER_RECORD, "User record deleted"), # 14
-        (ASSIGNED_USER_TO_PDU, "User assigned to PDU"),      # 15
-        (REMOVED_USER_FROM_PDU, "User removed from PDU"),     # 16
-        (USER_PDU_ROLE_CHANGED, "User PDU role changed"),     # 17
+        (ASSIGNED_USER_TO_EMPLOYER, "User assigned to employer"),      # 15
+        (REMOVED_USER_FROM_EMPLOYER, "User removed from employer"),     # 16
+        (USER_EMPLOYER_ROLE_CHANGED, "User employer role changed"),     # 17
     )
     """
 
@@ -513,34 +521,36 @@ def _map_changes_to_visit_activity(changes):
         return 11
 
 
-def _send_pdu_assignment_notification(
+def _send_employer_assignment_notification(
     organisation_employer_instance, current_user, is_new=False, is_removal=False
 ):
     """
-    Send notification when user PDU assignments change.
+    Send notification when user employer assignments change.
     """
     user = organisation_employer_instance.npda_user
     # pdu = organisation_employer_instance.paediatric_diabetes_unit
 
     if is_removal:
         action = "removed from"
-        subject = f"NPDA User Removed from PDU - {user.get_full_name()}"
+        subject = f"Epilepsy12 User Removed from employer - {user.get_full_name()}"
     elif is_new:
         action = "assigned to"
-        subject = f"NPDA User Assigned to PDU - {user.get_full_name()}"
+        subject = f"Epilepsy12 User Assigned to employer - {user.get_full_name()}"
     else:
         action = "updated in"
-        subject = f"NPDA User PDU Assignment Updated - {user.get_full_name()}"
+        subject = (
+            f"Epilepsy12 User employer Assignment Updated - {user.get_full_name()}"
+        )
 
     message = f"""
     A user's Organisation employer has been modified:
 
     User: {user.get_full_name()} ({user.email})
-    Organisation: {pdu.lead_organisation_name} ({pdu.pz_code})
-    Action: User {action} PDU
+    Organisation: {organisation_employer_instance.employer_organisation.name} ({organisation_employer_instance.employer_organisation.trust})
+    Action: User {action} Employer
     Modified by: {current_user.email if current_user else 'System'}
 
-    Role in PDU: {getattr(user, 'role', 'Not specified')}
+    Role in Employer: {getattr(user, 'role', 'Not specified')}
     """
     # Send to audit team members
     try:
@@ -549,48 +559,48 @@ def _send_pdu_assignment_notification(
         )
     except Exception as e:
         logger.error(
-            f"Failed to send OrganiationEmployer assignment notification for user {user.email}: {e}"
+            f"Failed to send Employer assignment notification for user {user.email}: {e}"
         )
 
 
-def _send_user_deletion_notification(user_instance, current_user):
-    """
-    Send notification when a user is deleted.
-    """
-    # Get the deletion data we captured in pre_delete
-    deletion_data = getattr(user_instance, "_deletion_data", {})
+# def _send_user_deletion_notification(user_instance, current_user):
+#     """
+#     Send notification when a user is deleted.
+#     """
+#     # Get the deletion data we captured in pre_delete
+#     deletion_data = getattr(user_instance, "_deletion_data", {})
 
-    subject = (
-        f"Epilepsy12 User Deleted - {deletion_data.get('full_name', 'Unknown User')}"
-    )
+#     subject = (
+#         f"Epilepsy12 User Deleted - {deletion_data.get('full_name', 'Unknown User')}"
+#     )
 
-    pdu_info = ""
-    if deletion_data.get("pdu_names"):
-        pdu_info = f"\nPDU Memberships: {', '.join(deletion_data['pdu_names'])}"
+#     pdu_info = ""
+#     if deletion_data.get("pdu_names"):
+#         pdu_info = f"\nPDU Memberships: {', '.join(deletion_data['pdu_names'])}"
 
-    message = f"""
-    An NPDA user has been DELETED:
+#     message = f"""
+#     An NPDA user has been DELETED:
 
-    User: {deletion_data.get('full_name', 'Unknown')} ({deletion_data.get('email', 'Unknown')})
-    Role: {deletion_data.get('role', 'Unknown')}
-    Active: {deletion_data.get('is_active', 'Unknown')}
-    Audit Team Member: {deletion_data.get('is_rcpch_audit_team_member', 'Unknown')}
-    RCPCH Staff: {deletion_data.get('is_rcpch_staff', 'Unknown')}
-    Date Joined: {deletion_data.get('date_joined', 'Unknown')}
-    Last Login: {deletion_data.get('last_login', 'Never') if deletion_data.get('last_login') else 'Never'}{pdu_info}
+#     User: {deletion_data.get('full_name', 'Unknown')} ({deletion_data.get('email', 'Unknown')})
+#     Role: {deletion_data.get('role', 'Unknown')}
+#     Active: {deletion_data.get('is_active', 'Unknown')}
+#     Audit Team Member: {deletion_data.get('is_rcpch_audit_team_member', 'Unknown')}
+#     RCPCH Staff: {deletion_data.get('is_rcpch_staff', 'Unknown')}
+#     Date Joined: {deletion_data.get('date_joined', 'Unknown')}
+#     Last Login: {deletion_data.get('last_login', 'Never') if deletion_data.get('last_login') else 'Never'}{pdu_info}
 
-    Deleted by: {current_user.email if current_user else 'System'}
+#     Deleted by: {current_user.email if current_user else 'System'}
 
-    ⚠️ This action cannot be undone. All user data has been permanently removed.
-    """
+#     ⚠️ This action cannot be undone. All user data has been permanently removed.
+#     """
 
-    # Send to audit team members
-    try:
-        send_email_to_recipients(
-            recipients=settings.ADMINS, subject=subject, message=message
-        )
-        logger.info(
-            f"User deletion notification sent for: {deletion_data.get('email', 'Unknown')}"
-        )
-    except Exception as e:
-        logger.error(f"Failed to send user deletion notification: {e}")
+#     # Send to audit team members
+#     try:
+#         send_email_to_recipients(
+#             recipients=settings.ADMINS, subject=subject, message=message
+#         )
+#         logger.info(
+#             f"User deletion notification sent for: {deletion_data.get('email', 'Unknown')}"
+#         )
+#     except Exception as e:
+#         logger.error(f"Failed to send user deletion notification: {e}")

@@ -18,9 +18,9 @@ class VisitActivity(models.Model):
     CHANGED_USER_ROLE = 12
     CHANGED_ADMIN_FLAG = 13
     DELETED_USER_RECORD = 14
-    ASSIGNED_USER_TO_PDU = 15
-    REMOVED_USER_FROM_PDU = 16
-    USER_PDU_ROLE_CHANGED = 17
+    ASSIGNED_USER_TO_EMPLOYER = 15
+    REMOVED_USER_FROM_EMPLOYER = 16
+    USER_EMPLOYER_ROLE_CHANGED = 17
 
     ACTIVITY = (
         (SUCCESSFUL_LOGIN, "Successful login"),
@@ -40,9 +40,9 @@ class VisitActivity(models.Model):
         (CHANGED_USER_ROLE, "User role changed"),
         (CHANGED_ADMIN_FLAG, "Superuser or admin status changed"),
         (DELETED_USER_RECORD, "User record deleted"),
-        (ASSIGNED_USER_TO_PDU, "User assigned to PDU"),
-        (REMOVED_USER_FROM_PDU, "User removed from PDU"),
-        (USER_PDU_ROLE_CHANGED, "User PDU role changed"),
+        (ASSIGNED_USER_TO_EMPLOYER, "User assigned to employer"),
+        (REMOVED_USER_FROM_EMPLOYER, "User removed from employer"),
+        (USER_EMPLOYER_ROLE_CHANGED, "User employer role changed"),
     )
 
     activity_datetime = models.DateTimeField(auto_created=True, default=timezone.now)

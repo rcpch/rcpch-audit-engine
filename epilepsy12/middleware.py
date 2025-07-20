@@ -40,44 +40,51 @@ class Epilepsy12RequestLoggingMiddleware:
         self.get_response = get_response
 
     def __call__(self, request):
-        set_current_user(getattr(request, "user", None))
-        set_current_request(request)
-        response = self.get_response(request)
+        try:
+            user = getattr(request, "user", None)
+            if user and user.is_authenticated:
+                set_current_user(user)
+            else:
+                set_current_user(None)
+            set_current_request(request)
 
-        # The dev server already does request logging
-        # if settings.ENABLE_REQUEST_LOGGING:
-        # This replaces the old gunicorn request logging which used this format string
-        # %({x-forwarded-for}i)s %(l)s %(u)s %(t)s "%(r)s" %(s)s %(b)s "%(f)s" "%(a)s"
-        gunicorn_formatted_datetime = (
-            datetime.now().astimezone().strftime("%d/%m/%y:%H:%M:%S %z")
-        )
+            response = self.get_response(request)
 
-        user = get_current_user()
+            # The dev server already does request logging
+            # if settings.ENABLE_REQUEST_LOGGING:
+            # This replaces the old gunicorn request logging which used this format string
+            # %({x-forwarded-for}i)s %(l)s %(u)s %(t)s "%(r)s" %(s)s %(b)s "%(f)s" "%(a)s"
+            gunicorn_formatted_datetime = (
+                datetime.now().astimezone().strftime("%d/%m/%y:%H:%M:%S %z")
+            )
 
-        username_to_log = user if user else "-"
-        if user and hasattr(user, "email"):
-            username_to_log = user.email
+            user = get_current_user()
 
-        x_forwarded_for = request.META.get("HTTP_X_FORWARDED_FOR", "")
-        method_path = f"{request.method} {request.get_full_path()}"
-        content_length = response.get("Content-Length", "-")
-        referer = request.META.get("HTTP_REFERER", "-")
-        user_agent = request.META.get("HTTP_USER_AGENT", "-")
-        audit_year = request.session.get("selected_audit_year", "-")
-        pz_code = request.session.get("pz_code", "-")
+            username_to_log = user if user else "-"
+            if user and hasattr(user, "email"):
+                username_to_log = user.email
 
-        log_message = (
-            f"{x_forwarded_for} - {username_to_log} [{gunicorn_formatted_datetime}] "
-            f'"{method_path}" {response.status_code} {content_length} '
-            f'"{referer}" "{user_agent}" '
-            f'audit_year="{audit_year}" pz_code="{pz_code}"'
-        )
-        request_logger.info(log_message)
+            x_forwarded_for = request.META.get("HTTP_X_FORWARDED_FOR", "")
+            method_path = f"{request.method} {request.get_full_path()}"
+            content_length = response.get("Content-Length", "-")
+            referer = request.META.get("HTTP_REFERER", "-")
+            user_agent = request.META.get("HTTP_USER_AGENT", "-")
+            audit_year = request.session.get("selected_audit_year", "-")
+            pz_code = request.session.get("pz_code", "-")
 
-        # Clean up thread-local storage after request
-        if hasattr(_user, "value"):
-            delattr(_user, "value")
-        if hasattr(_user, "request"):
-            delattr(_user, "request")
+            log_message = (
+                f"{x_forwarded_for} - {username_to_log} [{gunicorn_formatted_datetime}] "
+                f'"{method_path}" {response.status_code} {content_length} '
+                f'"{referer}" "{user_agent}" '
+                f'audit_year="{audit_year}" pz_code="{pz_code}"'
+            )
+            request_logger.info(log_message)
 
-        return response
+            return response
+
+        finally:
+            # Clean up thread-local storage after request
+            if hasattr(_user, "value"):
+                delattr(_user, "value")
+            if hasattr(_user, "request"):
+                delattr(_user, "request")
