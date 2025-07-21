@@ -1,0 +1,9 @@
+#!/bin/bash -e
+
+cat /proc/meminfo
+
+while :
+do
+    docker stats --no-stream
+    sleep 10
+done
