@@ -519,10 +519,11 @@ def edit_epilepsy12_user(request, organisation_id, epilepsy12_user_id):
             # This call back from the user form, not the table.
             # Rather than delete user, instead set is_active to False as prevents cascade delete error for any cases/registrations
             # updated by this user (see issue #813)
-            epilepsy12_user_to_edit.is_active = False
+            epilepsy12_user_to_edit.is_active = not epilepsy12_user_to_edit.is_active
             epilepsy12_user_to_edit.save(update_fields=["is_active"])
             messages.success(
-                request, f"{epilepsy12_user_to_edit.email} Deleted successfully."
+                request,
+                f"{epilepsy12_user_to_edit.email} successfully {'deactivated' if not epilepsy12_user_to_edit.is_active else 'reactivated'}.",
             )
             redirect_url = reverse(
                 "epilepsy12_user_list", kwargs={"organisation_id": organisation_id}
@@ -562,7 +563,6 @@ def edit_epilepsy12_user(request, organisation_id, epilepsy12_user_id):
             if form.is_valid():
                 # this will not include the password which will be empty
                 # primary employer is now M2M field so can be set directly
-                print(form.cleaned_data["organisation_employer"])
                 primary_employer = Organisation.objects.filter(
                     pk=form.cleaned_data["organisation_employer"].pk
                 )
@@ -631,7 +631,22 @@ def delete_epilepsy12_user(request, organisation_id, epilepsy12_user_id):
         # This call back from the table, not the form
         # rather than delete user, instead set is_active to False as prevents cascade delete error for any cases/registrations
         # updated by this user (see issue #813)
-        Epilepsy12User.objects.filter(pk=epilepsy12_user_id).update(is_active=False)
+        epilepsy12_user_to_edit = Epilepsy12User.objects.get(pk=epilepsy12_user_id)
+        if epilepsy12_user_to_edit:
+            epilepsy12_user_to_edit.is_active = not epilepsy12_user_to_edit.is_active
+            epilepsy12_user_to_edit.save(update_fields=["is_active"])
+            messages.success(
+                request,
+                f"{epilepsy12_user_to_edit.email} successfully {'deactivated' if not epilepsy12_user_to_edit.is_active else 'reactivated'}.",
+            )
+        else:
+            raise ValueError("User not found. Please refresh the page and try again.")
+    except Epilepsy12User.DoesNotExist:
+        messages.error(
+            request,
+            "Delete User Unsuccessful: User does not exist. Please refresh the page and try again.",
+        )
+
     except ValueError as error:
         messages.error(request, f"Delete User Unsuccessful: {error}")
 

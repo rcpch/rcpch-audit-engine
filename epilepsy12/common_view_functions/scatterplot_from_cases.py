@@ -20,8 +20,6 @@ def generate_distance_from_organisation_scatterplot_figure(
     Returns a plottable map with Cases overlayed as dots with tooltips on hover
     """
 
-    print(geo_df["pk"])
-
     fig = go.Figure(
         go.Scattermapbox(
             lat=geo_df["latitude"] if not geo_df.empty else [],
