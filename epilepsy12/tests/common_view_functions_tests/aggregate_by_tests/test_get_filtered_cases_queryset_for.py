@@ -33,6 +33,8 @@ from epilepsy12.constants import (
 from .helpers import _clean_cases_from_test_db, _register_cases_in_organisation
 
 
+# Run last in CI to try and speed up runs (https://github.com/rcpch/rcpch-audit-engine/issues/1119)
+@pytest.mark.slow
 @pytest.mark.parametrize(
     "abstraction_level, ODSCodes, expected_count",
     [
