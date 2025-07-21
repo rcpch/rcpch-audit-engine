@@ -31,7 +31,7 @@ services:
     image: e12-django:built # build image and save for use by other containers
     depends_on:
       - postgis
-    command: s/start-dev
+    command: ${DJANGO_START_COMMAND:-s/start-dev}
     restart: always
 
   # PostgreSQL with PostGIS extension
