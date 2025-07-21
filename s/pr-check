@@ -1,5 +1,8 @@
 #!/bin/bash -e
 
+# TEMP DEBUGGING - show docker stats periodically
+s/stats &
+
 docker compose up -d --wait
 s/test -m 'not slow'
 s/test -m 'slow'

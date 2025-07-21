@@ -28,9 +28,6 @@ azure_tag="${AZURE_REGISTRY_NAME}.azurecr.io/e12-django:${GITHUB_SHA}"
 docker tag e12-django:built ${azure_tag}
 docker push ${azure_tag}
 
-# TEMP DEBUGGING - show docker stats periodically
-s/stats &
-
 # Tests (against local Postgres)
 docker compose up -d --wait
 s/test -m 'not slow'
