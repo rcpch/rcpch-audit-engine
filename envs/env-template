@@ -75,3 +75,5 @@ POSTGRES_USER=epilepsy12user
 
 # TIMEZONE
 TZ="Europe/London"
+
+ENABLE_REQUEST_LOGGING="False"
