@@ -75,28 +75,28 @@ class Command(BaseCommand):
         else:
             self.stdout.write(self.style.WARNING(f"{local_dev_admin_email} already exists."))
 
-        self.create_user_if_not_exists(
-            email=lead_clinician_dev_email,
-            first_name="LeadClinician",
-            surname="DevUser",
-            password=password,
-            role=AUDIT_CENTRE_LEAD_CLINICIAN,
-        )
+        # self.create_user_if_not_exists(
+        #     email=lead_clinician_dev_email,
+        #     first_name="LeadClinician",
+        #     surname="DevUser",
+        #     password=password,
+        #     role=AUDIT_CENTRE_LEAD_CLINICIAN,
+        # )
 
-        self.create_user_if_not_exists(
-            email=clinician_dev_email,
-            first_name="Clinician",
-            surname="DevUser",
-            password=password,
-            role=AUDIT_CENTRE_CLINICIAN,
-        )
+        # self.create_user_if_not_exists(
+        #     email=clinician_dev_email,
+        #     first_name="Clinician",
+        #     surname="DevUser",
+        #     password=password,
+        #     role=AUDIT_CENTRE_CLINICIAN,
+        # )
 
-        self.create_user_if_not_exists(
-            email=administrator_dev_email,
-            first_name="Administrator",
-            surname="DevUser",
-            password=password,
-            role=AUDIT_CENTRE_ADMINISTRATOR,
-        )
+        # self.create_user_if_not_exists(
+        #     email=administrator_dev_email,
+        #     first_name="Administrator",
+        #     surname="DevUser",
+        #     password=password,
+        #     role=AUDIT_CENTRE_ADMINISTRATOR,
+        # )
         
 
