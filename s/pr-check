@@ -2,7 +2,7 @@
 
 # Avoid the start-dev script seeding and pytest seeding fighting
 # each other and causing OOM errors
-DJANGO_START_COMMAND='sleep 100000' docker compose up -d --wait
+DJANGO_START_COMMAND='s/start-test' docker compose up -d --wait
 s/test -m 'not slow'
 s/test -m 'slow'
 docker compose down
