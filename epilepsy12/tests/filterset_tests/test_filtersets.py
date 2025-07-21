@@ -523,6 +523,8 @@ def test_filter_by_has_support_for_mental_health_support(e12_case_factory):
     assert case_false not in filtered
 
 
+# Run last in CI to try and speed up runs
+@pytest.mark.slow
 @pytest.mark.django_db
 def test_filter_by_kpi_failed(e12_case_factory):
     _clean_cases_from_test_db()
