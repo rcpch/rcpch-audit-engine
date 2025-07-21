@@ -29,6 +29,16 @@ django_loggers = {
     )
 }
 
+request_loggers = {}
+
+if os.getenv("ENABLE_REQUEST_LOGGING", "False") == "True":
+    request_loggers = {
+        "epilepsy12_request_log": {
+            "handlers": ["epilepsy12_console_request_log"],
+            "level": CONSOLE_LOG_LEVEL,
+        }
+    }
+
 LOGGING = {
     "version": 1,
     "disable_existing_loggers": False,
@@ -81,6 +91,9 @@ LOGGING = {
                 "CRITICAL": "bold_red",
             },
         },
+        "epilepsy12_request_log": {
+            "format": "%(message)s",
+        }
     },
     "handlers": {
         "epilepsy12_console": {
@@ -109,6 +122,12 @@ LOGGING = {
             "filters": ["require_debug_false"],
             "class": "django.utils.log.AdminEmailHandler",
         },
+        "epilepsy12_console_request_log": {
+            "level": CONSOLE_LOG_LEVEL,
+            "class": "logging.StreamHandler",
+            "formatter": "epilepsy12_request_log",
+            "filters": [],
+        },
     },
     "loggers": {
         "django": {
@@ -123,5 +142,6 @@ LOGGING = {
         "two_factor": {
             "handlers": ["epilepsy12_console", "epilepsy12_logfile", "mail_admins"],
         },
+        **request_loggers
     },
 }
