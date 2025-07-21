@@ -5,5 +5,6 @@ cat /proc/meminfo
 while :
 do
     docker stats --no-stream
+    ps -v
     sleep 10
 done
