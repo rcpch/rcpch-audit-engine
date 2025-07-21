@@ -20,6 +20,8 @@ from epilepsy12.tests.UserDataClasses import (
 )
 
 
+# Run last in CI to try and avoid error 137 OOM
+@pytest.mark.slow
 @pytest.mark.django_db
 def test_transfer_centre(
     client,
