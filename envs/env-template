@@ -77,3 +77,7 @@ POSTGRES_USER=epilepsy12user
 TZ="Europe/London"
 
 ENABLE_REQUEST_LOGGING="False"
+
+# FOR LOCAL DEVELOPMENT
+LOCAL_DEV_ADMIN_EMAIL="incubator@rcpch.ac.uk"
+LOCAL_DEV_ADMIN_PASSWORD="devp@ssword12345")

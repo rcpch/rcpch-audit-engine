@@ -1,0 +1,6 @@
+#!/bin/bash -e
+
+python manage.py collectstatic --noinput
+
+# Keep the container alive to run the tests
+sleep 100000

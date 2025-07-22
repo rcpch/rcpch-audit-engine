@@ -396,9 +396,9 @@ def login_and_otp_required():
             user = request.user
 
             # Bypass 2fa if local dev, with warning message
-            if settings.DEBUG and user.is_superuser:
+            if settings.DEBUG and user.is_authenticated:
                 logger.warning(
-                    "User %s has bypassed 2FA for %s as settings.DEBUG is %s and user is superuser",
+                    "User %s has bypassed 2FA for %s as settings.DEBUG is %s",
                     user,
                     view,
                     settings.DEBUG,
