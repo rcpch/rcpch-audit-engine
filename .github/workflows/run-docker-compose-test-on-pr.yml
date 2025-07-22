@@ -22,10 +22,6 @@ jobs:
           echo -e "${{ secrets.ENVIRONMENT }}" | base64 -d > envs/.env
           cat envs/.env
 
-      - name: Show Docker environment info
-        run: |
-          docker compose config
-
       - name: Run PR check script
         run: |
           s/pr-check
