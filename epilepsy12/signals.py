@@ -460,10 +460,11 @@ def _send_admin_notification(user, changes, current_user):
     """
     # send to admins
     try:
-        send_email_to_recipients(
-            recipients=settings.ADMINS, subject=subject, message=message
-        )
-        logger.info(f"Admin notification sent for user changes: {user.email}")
+        if settings.USER_CHANGE_NOTIFICATION_EMAILS:
+            send_email_to_recipients(
+                recipients=settings.USER_CHANGE_NOTIFICATION_EMAILS, subject=subject, message=message
+            )
+            logger.info(f"Admin notification sent for user changes: {user.email}")
     except Exception as e:
         logger.error(f"Failed to send admin notification for user {user.email}: {e}")
 
@@ -483,10 +484,11 @@ def _send_user_creation_notification(user, current_user):
 
     # Send to audit team members
     try:
-        send_email_to_recipients(
-            recipients=settings.ADMINS, subject=subject, message=message
-        )
-        logger.info(f"User creation notification sent for: {user.email}")
+        if settings.CHANGE_NOTIFICATION_EMAILS:
+            send_email_to_recipients(
+                recipients=settings.CHANGE_NOTIFICATION_EMAILS, subject=subject, message=message
+            )
+            logger.info(f"User creation notification sent for: {user.email}")
     except Exception as e:
         logger.error(f"Failed to send user creation notification for {user.email}: {e}")
 
@@ -564,9 +566,11 @@ def _send_employer_assignment_notification(
     """
     # Send to audit team members
     try:
-        send_email_to_recipients(
-            recipients=settings.ADMINS, subject=subject, message=message
-        )
+        if settings.CHANGE_NOTIFICATION_EMAILS:
+            send_email_to_recipients(
+                recipients=settings.CHANGE_NOTIFICATION_EMAILS, subject=subject, message=message
+            )
+            logger.info(f"Employer assignment notification sent for: {user.email}")
     except Exception as e:
         logger.error(
             f"Failed to send Employer assignment notification for user {user.email}: {e}"
