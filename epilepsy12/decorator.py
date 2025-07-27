@@ -147,7 +147,6 @@ def user_may_view_this_organisation():
     def decorator(view):
         def wrapper(request, *args, **kwargs):
             user = request.user
-
             if kwargs.get("organisation_id") is not None:
                 organisation_requested = Organisation.objects.get(
                     pk=kwargs.get("organisation_id")
@@ -186,6 +185,7 @@ def user_may_view_this_organisation():
                                 if kwargs.get("user_type") == "rcpch-staff":
                                     # this route is for rcpch staff to create new rcpch staff members only
                                     raise PermissionDenied()
+                            # user is allowed
                             return view(request, *args, **kwargs)
                         else:
                             raise PermissionDenied()
