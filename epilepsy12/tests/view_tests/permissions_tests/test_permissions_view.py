@@ -305,6 +305,87 @@ def test_users_and_case_list_views_permissions_success(
     ],
 )
 @pytest.mark.django_db
+def test_users_and_case_list_multiple_organisations_views_permissions_success(
+    client,
+    seed_groups_fixture,
+    seed_users_fixture,
+    seed_cases_fixture,
+    URL,
+):
+    """
+    Simulating different E12Users with different roles attempting to access the Users / Cases list in an organisation within their employer list.
+
+
+    NOTE: the `seed_groups_fixture, `seed_users_fixture`, `seed_cases_fixture` fixtures are scoped to the session, they just need to be used once to seed the db across further tests.
+    """
+
+    # set up constants
+
+    # GOSH
+    TEST_USER_ORGANISATION = Organisation.objects.get(
+        ods_code="RP401",
+        trust__ods_code="RP4",
+    )
+
+    # ADDENBROOKE'S
+    DIFF_TRUST_DIFF_ORGANISATION = Organisation.objects.get(
+        ods_code="RGT01",
+        trust__ods_code="RGT",
+    )
+
+    # Welsh Organisation
+    CHEPSTOW_ORGANISATION = Organisation.objects.get(
+        ods_code="7A6BJ",
+    )
+
+    users = Epilepsy12User.objects.filter(
+        employer_organisations__employer_organisation__ods_code="RP401",
+        is_active=True,
+        employer_organisations__is_primary=True,
+    )
+    # Update users to have 2 different organisations in their employer list (including welsh org)
+    for user in users:
+        user.set_organisation_employer(
+            organisation_employer=DIFF_TRUST_DIFF_ORGANISATION, is_primary=False
+        )
+        user.set_organisation_employer(
+            organisation_employer=CHEPSTOW_ORGANISATION, is_primary=False
+        )
+
+    for test_user in users:
+        # Log in Test User
+        client.force_login(test_user)
+
+        # 2fa enable
+        twofactor_signin(client, test_user)
+
+        kwargs = {"organisation_id": TEST_USER_ORGANISATION.id}
+
+        # Request e12 User/Case list endpoint url of same Trust
+        e12_user_list_response = client.get(
+            reverse(
+                URL,
+                kwargs=kwargs,
+            )
+        )
+
+        assert (
+            e12_user_list_response.status_code == HTTPStatus.OK
+        ), f"{test_user.first_name} (from {test_user.organisation_employer}) requested {URL} list of {TEST_USER_ORGANISATION}. Has groups: {test_user.groups.all()} Expected 200 response status code, received {e12_user_list_response.status_code}"
+
+        assert (
+            e12_user_list_response.status_code == HTTPStatus.OK
+        ), f"{test_user.first_name} (from {test_user.organisation_employer}) requested {URL} list of {DIFF_TRUST_DIFF_ORGANISATION}. Has groups: {test_user.groups.all()} Expected 200 response status code, received {e12_user_list_response.status_code}"
+
+
+@pytest.mark.parametrize(
+    "URL",
+    [
+        ("epilepsy12_user_list"),
+        ("cases"),
+    ],
+)
+@pytest.mark.django_db
 def test_users_and_cases_list_view_permissions_forbidden(
     client,
     URL,
@@ -334,6 +415,73 @@ def test_users_and_cases_list_view_permissions_forbidden(
     for test_user in users:
 
         test_user.set_organisation_employer(organisation_employer=GOSH, is_primary=True)
+
+        client.force_login(test_user)
+
+        # 2fa enable
+        twofactor_signin(client, test_user)
+
+        kwargs = {"organisation_id": DIFF_TRUST_DIFF_ORGANISATION.id}
+
+        # Request e12 user list endpoint url diff org
+        e12_user_list_response_different_organisation = client.get(
+            reverse(
+                URL,
+                kwargs=kwargs,
+            )
+        )
+
+        assert (
+            e12_user_list_response_different_organisation.status_code
+            == HTTPStatus.FORBIDDEN
+        ), f"{test_user.first_name} (from {test_user.organisation_employer}) requested {URL} list of {DIFF_TRUST_DIFF_ORGANISATION}. Has groups: {test_user.groups.all()} Expected 403 response status code, received {e12_user_list_response_different_organisation.status_code}"
+
+
+@pytest.mark.parametrize(
+    "URL",
+    [
+        ("epilepsy12_user_list"),
+        ("cases"),
+    ],
+)
+@pytest.mark.django_db
+def test_users_and_cases_list_multiple_organisations_view_permissions_forbidden(
+    client,
+    URL,
+):
+    """
+    Simulating different E12Users with different roles attempting to access the Users / Cases list of different Trust even if they have multiple organisations in their employer list.
+
+    Assert these users CAN'T view the List of a different Trust.
+    """
+    # GOS
+    GOSH = Organisation.objects.get(ods_code="RP401")
+    # Welsh Organisation
+    CHEPSTOW_ORGANISATION = Organisation.objects.get(
+        ods_code="7A6BJ",
+    )
+    # ADDENBROOKE'S - DIFFERENT TRUST
+    DIFF_TRUST_DIFF_ORGANISATION = Organisation.objects.get(
+        ods_code="RGT01",
+        trust__ods_code="RGT",
+    )
+
+    # RCPCH/CLINICAL AUDIT TEAM HAVE FULL ACCESS SO EXCLUDE
+    users = Epilepsy12User.objects.filter(
+        first_name__in=[
+            test_user_audit_centre_administrator_data.role_str,
+            test_user_audit_centre_clinician_data.role_str,
+            test_user_audit_centre_lead_clinician_data.role_str,
+        ]
+    )
+
+    for test_user in users:
+
+        test_user.set_organisation_employer(organisation_employer=GOSH, is_primary=True)
+        # Add 2 different organisations in their employer list (including welsh org)
+        test_user.set_organisation_employer(
+            organisation_employer=CHEPSTOW_ORGANISATION, is_primary=False
+        )
 
         client.force_login(test_user)
 
