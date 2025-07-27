@@ -17,15 +17,22 @@
           </div>
         </div>
         <div id="employer-list">
-          {% include 'registration/user_management/employers.html' with epilepsy12_user=epilepsy12_user employer_organisations=employer_organisations current_employer_organisations=current_employer_organisations error=error %}
+          {% include 'registration/user_management/employers.html' with epilepsy12_user=epilepsy12_user employer_organisations=employer_organisations current_employer_organisations=current_employer_organisations error=error editable=True %}
         </div>
          <!-- Cancel button -->
-        <div class="ui basic segment">
-          <a href="{% url 'edit_epilepsy12_user' organisation_id=organisation_id epilepsy12_user_id=epilepsy12_user.pk %}" 
-             class="ui button">
-            Cancel
-          </a>
+          <div style="display: flex; justify-content: flex-end; margin-top: 1rem;">
+            <div class="ui buttons">
+            <a href="{% url 'edit_epilepsy12_user' organisation_id=organisation_id epilepsy12_user_id=epilepsy12_user.pk %}" 
+                class="ui rcpch_light_blue button">
+                Return to {{epilepsy12_user}}
+            </a>
+            <a href="{% url 'epilepsy12_user_list' organisation_id=organisation_id %}" 
+                class="ui rcpch_light_blue button">
+                Return to Epilepsy12 User List
+            </a>
+            </div>
         </div>
+        
 
     </div>
 
