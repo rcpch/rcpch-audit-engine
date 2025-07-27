@@ -673,8 +673,6 @@ def add_employer_organisation(request, organisation_id, epilepsy12_user_id):
     else:
         template_name = "registration/user_management/add_employer.html"
 
-    print(request.POST)
-
     epilepsy12_user = get_object_or_404(Epilepsy12User, pk=epilepsy12_user_id)
     error = None
     if "action" in request.POST:
@@ -729,12 +727,6 @@ def add_employer_organisation(request, organisation_id, epilepsy12_user_id):
                 is_primary=True,
                 created_by=request.user,
             )
-        # log the activity
-        VisitActivity.objects.create(
-            epilepsy12user=epilepsy12_user,
-            activity=3,  # add employer organisation
-            ip_address=request.META.get("REMOTE_ADDR"),
-        )
 
         messages.success(
             request, f"{organisation_employer} added to {epilepsy12_user.email}."
