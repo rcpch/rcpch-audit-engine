@@ -30,6 +30,103 @@
     </div>
 
   </div>
+  {# Custom Semantic UI Confirmation Modal - OUTSIDE the #employer-list div #}
+        <div class="ui basic modal" id="confirmation-modal">
+            <div class="ui icon header">
+                <i class="exclamation triangle icon"></i>
+                Are you sure you want to change {{epilepsy12_user}}'s' employer?
+            </div>
+            <div class="content">
+                <p id="confirmation-message"></p>
+            </div>
+            <div class="actions">
+                <div class="ui rcpch_light_blue cancel button">
+                    <i class="remove icon"></i>
+                    No
+                </div>
+                <div class="ui rcpch_danger ok button">
+                    <i class="checkmark icon"></i>
+                    Yes
+                </div>
+            </div>
+        </div>
+
+        <script>
+            document.addEventListener('DOMContentLoaded', function() {
+                document.body.addEventListener('htmx:confirm', function(event) {
+                    event.preventDefault();
+                    const confirmMessage = event.detail.elt.dataset.confirmMessage;
+                    const confirmationModal = document.getElementById('confirmation-modal');
+                    const confirmationMessageParagraph = document.getElementById('confirmation-message');
+
+                    if (!confirmationModal || !confirmationMessageParagraph) {
+                        console.error("Confirmation modal or message element not found.");
+                        if (window.confirm(confirmMessage)) {
+                            event.detail.issueRequest(true);
+                        } else {
+                            event.detail.issueRequest(false);
+                        }
+                        return;
+                    }
+
+                    confirmationMessageParagraph.textContent = confirmMessage;
+
+                    $(confirmationModal)
+                        .modal({
+                            closable: false,
+                            onApprove: function() {
+                                event.detail.issueRequest(true);
+                                return true;
+                            },
+                            onDeny: function() {
+                                event.detail.issueRequest(false);
+                                return true;
+                            }
+                        })
+                        .modal('show');
+                });
+            });
+
+            // Function to initialize/re-initialize the dropdown and button state
+            function initializeEmployerForm() {
+                const dropdown = $('.ui.rcpch.search.selection.dropdown');
+                const hiddenInput = $('#employer_organisation');
+                const submitButton = $('#submit_button');
+
+                dropdown.dropdown({
+                    fullTextSearch: true,
+                    onChange: function(value, text, $choice) {
+                        hiddenInput.val(value).trigger('change');
+                        // Ensure button state is updated immediately on change
+                        if (value && value !== '') {
+                            submitButton.removeAttr('disabled').removeClass('disabled');
+                        } else {
+                            submitButton.attr('disabled', 'disabled').addClass('disabled');
+                        }
+                    }
+                });
+
+                // Immediately check the state of the dropdown after initialization
+                // and update the submit button's state accordingly.
+                // This handles the initial state right after HTMX swap.
+                if (hiddenInput.val() && hiddenInput.val() !== '') {
+                    submitButton.removeAttr('disabled').removeClass('disabled');
+                } else {
+                    submitButton.attr('disabled', 'disabled').addClass('disabled');
+                }
+            }
+
+
+            // Run initialization on DOMContentLoaded for the initial page load
+            document.addEventListener('DOMContentLoaded', initializeEmployerForm);
+
+            // Run initialization after HTMX swaps content into #employer-list
+            document.body.addEventListener('htmx:afterSwap', function(event) {
+                if (event.detail.target.id === 'employer-list') {
+                    initializeEmployerForm(); // Re-initialize dropdown and button state
+                }
+            });
+        </script>
 </div>
 
 {% endblock %}

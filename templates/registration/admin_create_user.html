@@ -72,9 +72,9 @@
           <label for="{{form.organisation_employer.id_for_label}}">Employer</label>
             <div class='two fields data-tooltip' id="organisation_employer" >
               {{ form.organisation_employer }}
-              <button class="ui rcpch_primary button" data-tooltip="Add a new employer">
-                <a href="{% url 'add_employer_organisation' epilepsy12_user_id=user.id  organisation_id=organisation_id %}"><i class="plus icon"></i></a>
-              </button>
+              <span class="tooltip tooltip-left" data-tooltip="Add a new employer">
+                <a class="ui rcpch_primary button" href="{% url 'add_employer_organisation' epilepsy12_user_id=user.id  organisation_id=organisation_id %}"><i class="plus icon"></i></a>
+              </span>
               {% if form.organisation_employer.errors %}
                 <div class="ui pointing red basic label">{{form.organisation_employer.errors}}</div>
               {% endif %}

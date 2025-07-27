@@ -660,18 +660,24 @@ def delete_epilepsy12_user(request, organisation_id, epilepsy12_user_id):
     )
 
 
-# @login_and_otp_required()
-# @user_may_view_this_organisation()
-# @user_can_access_user()1
+@login_and_otp_required()
+@user_may_view_this_organisation()
+@user_can_access_user()
 def add_employer_organisation(request, organisation_id, epilepsy12_user_id):
     """
     Callback to add an employer organisation to a user
     """
-    template_name = "registration/user_management/add_employer.html"
+
+    if request.htmx:
+        template_name = "registration/user_management/employers.html"
+    else:
+        template_name = "registration/user_management/add_employer.html"
+
+    print(request.POST)
+
     epilepsy12_user = get_object_or_404(Epilepsy12User, pk=epilepsy12_user_id)
     error = None
     if "action" in request.POST:
-        template_name = "registration/user_management/employers.html"
         if request.POST["action"] == "set_primary":
             employer_id = request.POST.get("employer_id")
             if employer_id:
@@ -704,9 +710,8 @@ def add_employer_organisation(request, organisation_id, epilepsy12_user_id):
 
     # Check if this is an "add employer" action
     elif "add_employer" in request.POST:
-        template_name = "registration/user_management/employers.html"
         organisation_employer = Organisation.objects.get(
-            pk=request.POST.get("employer_organisation")
+            pk=request.POST.get("add_employer")
         )
         # create the OrganisationEmployer object
         current_primary_organisation_employer = OrganisationEmployer.objects.filter(
