@@ -660,8 +660,10 @@ def add_employer_organisation(request, organisation_id, epilepsy12_user_id):
     """
 
     if request.htmx:
+        editable = True
         template_name = "registration/user_management/employers.html"
     else:
+        editable = False
         template_name = "registration/user_management/add_employer.html"
 
     epilepsy12_user = get_object_or_404(Epilepsy12User, pk=epilepsy12_user_id)
@@ -724,6 +726,7 @@ def add_employer_organisation(request, organisation_id, epilepsy12_user_id):
         )
 
     context = {
+        "editable": editable,
         "error": error,
         "organisation_id": organisation_id,
         "epilepsy12_user": epilepsy12_user,
