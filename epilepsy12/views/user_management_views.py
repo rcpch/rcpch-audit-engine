@@ -384,13 +384,9 @@ def create_epilepsy12_user(request, organisation_id, user_type, epilepsy12_user_
     organisation = Organisation.objects.get(pk=organisation_id)
     if user_type == "organisation-staff":
         admin_title = "Add Epilepsy12 User"
-        prepopulated_data = {
-            "organisation_employer": organisation,
-        }
         form = Epilepsy12UserAdminCreationForm(
             rcpch_organisation=user_type,
             requesting_user=request.user,
-            initial=prepopulated_data,
         )
     elif user_type == "rcpch-staff":
         admin_title = "Add RCPCH Epilepsy12 staff member"
@@ -416,7 +412,7 @@ def create_epilepsy12_user(request, organisation_id, user_type, epilepsy12_user_
             new_user.view_preference = 0
             try:
                 new_user.save()
-                # add the organisation to the user as a primary organisation
+                # add the organisation in the URL as the new  user's primary organisation
                 new_user.set_organisation_employer(
                     organisation_employer=organisation,
                     created_by=request.user,
@@ -465,7 +461,7 @@ def create_epilepsy12_user(request, organisation_id, user_type, epilepsy12_user_
 
     context = {
         "form": form,
-        "organisation_id": organisation_id,
+        "organisation": organisation,
         "admin_title": admin_title,
         "user_type": user_type,
     }
@@ -494,6 +490,7 @@ def edit_epilepsy12_user(request, organisation_id, epilepsy12_user_id):
         or request.user.organisation_employer == organisation
         or request.user.is_rcpch_audit_team_member
     ):
+        # user is RCPCH staff or has the same organisation as the user being edited
         can_edit = True
     if match_in_choice_key(AUDIT_CENTRE_ROLES, epilepsy12_user_to_edit.role):
         user_type = "organisation-staff"
@@ -563,24 +560,13 @@ def edit_epilepsy12_user(request, organisation_id, epilepsy12_user_id):
             if form.is_valid():
                 # this will not include the password which will be empty
                 # primary employer is now M2M field so can be set directly
-                primary_employer = Organisation.objects.filter(
-                    pk=form.cleaned_data["organisation_employer"].pk
-                )
-                if primary_employer.exists():
-                    primary_employer = primary_employer.first()
+                # Simplified logic #1261 - organisation employer is now handled
+                # by a separate router.
                 new_user = form.save()
                 # update group
                 new_group = group_for_role(new_user.role)
                 new_user.groups.clear()
                 new_user.groups.add(new_group)
-                OrganisationEmployer.objects.update_or_create(
-                    epilepsy12_user=new_user,
-                    is_primary=True,
-                    defaults={
-                        "employer_organisation": primary_employer,
-                        "created_by": request.user,
-                    },
-                )
 
                 # adds success message
                 messages.success(
@@ -592,7 +578,7 @@ def edit_epilepsy12_user(request, organisation_id, epilepsy12_user_id):
                 redirect_url = reverse(
                     "epilepsy12_user_list",
                     kwargs={
-                        "organisation_id": organisation_id,
+                        "organisation_id": organisation.id,
                     },
                 )
                 return redirect(redirect_url)
@@ -610,10 +596,15 @@ def edit_epilepsy12_user(request, organisation_id, epilepsy12_user_id):
         request,
         template_name,
         {
-            "organisation_id": organisation_id,
+            "organisation": organisation,
             "form": form,
             "admin_title": admin_title,
             "user_type": user_type,
+            "current_employer_organisations": epilepsy12_user_to_edit.employer_organisations.filter(
+                is_active=True
+            ).order_by(
+                "-is_primary", "employer_organisation__name"
+            ),
         },
     )
 

@@ -61,6 +61,7 @@
     {% endif %}
 {% endfor %}
 
+{% if editable%}
 <form
     class="ui form"
     id="add_employer_form"
@@ -92,4 +93,12 @@
         </button>
     </div>
 </form>
+
+    <div class="ui buttons">
+        <a href="{% url 'edit_epilepsy12_user' organisation_id=organisation_id epilepsy12_user_id=epilepsy12_user.pk %}" 
+           class="ui rcpch_light_blue button">
+           Return to Epilepsy12 User
+        </a>
+    </div>
+{% endif %}
 
