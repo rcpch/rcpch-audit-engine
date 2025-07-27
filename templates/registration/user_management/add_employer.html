@@ -1,0 +1,35 @@
+{% extends "base.html" %}
+{% load static %}
+{% load epilepsy12_template_tags %}
+{% block content %}
+{% csrf_token %}
+<div class='ui rcpch container'>
+  <div class="rcpch_padding">
+
+    <div class="ui column centered padded grid">
+      
+      <div class="column">
+        
+        <div class="ui header">
+          <img src='{% static "images/epilepsy12-logo-1.png" %}'>
+          <div class="content">
+            <h2>Add Employer</h2>
+          </div>
+        </div>
+        <div id="employer-list">
+          {% include 'registration/user_management/employers.html' with epilepsy12_user=epilepsy12_user employer_organisations=employer_organisations current_employer_organisations=current_employer_organisations error=error %}
+        </div>
+         <!-- Cancel button -->
+        <div class="ui basic segment">
+          <a href="{% url 'edit_epilepsy12_user' organisation_id=organisation_id epilepsy12_user_id=epilepsy12_user.pk %}" 
+             class="ui button">
+            Cancel
+          </a>
+        </div>
+
+    </div>
+
+  </div>
+</div>
+
+{% endblock %}

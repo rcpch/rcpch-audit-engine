@@ -111,6 +111,12 @@ user_patterns = [
         name="create_epilepsy12_user",
     ),
     path(
+        "organisation/<int:organisation_id>/epilepsy12_users/<int:epilepsy12_user_id>/add_employer",
+        # accepts params organisation-staff or rcpch-staff
+        view=add_employer_organisation,
+        name="add_employer_organisation",
+    ),
+    path(
         "organisation/<int:organisation_id>/epilepsy12_users/<int:epilepsy12_user_id>/delete",
         view=delete_epilepsy12_user,
         name="delete_epilepsy12_user",

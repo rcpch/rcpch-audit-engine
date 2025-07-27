@@ -660,6 +660,99 @@ def delete_epilepsy12_user(request, organisation_id, epilepsy12_user_id):
     )
 
 
+# @login_and_otp_required()
+# @user_may_view_this_organisation()
+# @user_can_access_user()1
+def add_employer_organisation(request, organisation_id, epilepsy12_user_id):
+    """
+    Callback to add an employer organisation to a user
+    """
+    template_name = "registration/user_management/add_employer.html"
+    epilepsy12_user = get_object_or_404(Epilepsy12User, pk=epilepsy12_user_id)
+    error = None
+    if "action" in request.POST:
+        template_name = "registration/user_management/employers.html"
+        if request.POST["action"] == "set_primary":
+            employer_id = request.POST.get("employer_id")
+            if employer_id:
+                # Handle setting primary employer
+                # First, unset current primary
+                OrganisationEmployer.objects.filter(
+                    epilepsy12_user=epilepsy12_user, is_primary=True
+                ).update(is_primary=False)
+
+                # Set new primary
+                OrganisationEmployer.objects.filter(
+                    id=employer_id, epilepsy12_user=epilepsy12_user
+                ).update(is_primary=True)
+
+                messages.success(request, "Primary employer updated successfully.")
+        elif request.POST["action"] == "remove":
+            employer_id = request.POST.get("employer_id")
+            if employer_id:
+                # Handle setting primary employer
+                organisation_employer_to_remove = OrganisationEmployer.objects.filter(
+                    id=employer_id, epilepsy12_user=epilepsy12_user
+                ).first()
+                if organisation_employer_to_remove:
+                    if organisation_employer_to_remove.is_primary:
+                        # If the employer being removed is primary, raise an error - should not be possible to remove primary employer
+                        error = "Cannot remove primary employer. Please set another employer as primary first."
+                    else:
+                        # Remove the employer organisation
+                        organisation_employer_to_remove.delete()
+
+    # Check if this is an "add employer" action
+    elif "add_employer" in request.POST:
+        template_name = "registration/user_management/employers.html"
+        organisation_employer = Organisation.objects.get(
+            pk=request.POST.get("employer_organisation")
+        )
+        # create the OrganisationEmployer object
+        current_primary_organisation_employer = OrganisationEmployer.objects.filter(
+            epilepsy12_user=epilepsy12_user,
+            is_primary=True,
+            is_active=True,
+        ).first()
+        if current_primary_organisation_employer:
+            # if the user already has a primary organisation, set it to not primary
+            current_primary_organisation_employer.is_primary = False
+            current_primary_organisation_employer.save(update_fields=["is_primary"])
+            OrganisationEmployer.objects.create(
+                epilepsy12_user=epilepsy12_user,
+                employer_organisation=organisation_employer,
+                is_primary=True,
+                created_by=request.user,
+            )
+        # log the activity
+        VisitActivity.objects.create(
+            epilepsy12user=epilepsy12_user,
+            activity=3,  # add employer organisation
+            ip_address=request.META.get("REMOTE_ADDR"),
+        )
+
+        messages.success(
+            request, f"{organisation_employer} added to {epilepsy12_user.email}."
+        )
+
+    context = {
+        "error": error,
+        "organisation_id": organisation_id,
+        "epilepsy12_user": epilepsy12_user,
+        "employer_organisations": Organisation.objects.filter(active=True)
+        .exclude(
+            pk__in=epilepsy12_user.employer_organisations.values_list(
+                "employer_organisation__pk", flat=True
+            )
+        )
+        .order_by("name"),
+        "current_employer_organisations": OrganisationEmployer.objects.filter(
+            epilepsy12_user=epilepsy12_user, is_active=True
+        ).order_by("-is_primary", "employer_organisation__name"),
+    }
+    return render(request=request, context=context, template_name=template_name)
+
+
 class ResetPasswordView(SuccessMessageMixin, PasswordResetView):
     template_name = "registration/password_reset.html"
     html_email_template_name = "registration/password_reset_email.html"
