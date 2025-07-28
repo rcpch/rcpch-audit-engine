@@ -460,9 +460,9 @@ def _send_admin_notification(user, changes, current_user):
     """
     # send to admins
     try:
-        if settings.USER_CHANGE_NOTIFICATION_EMAILS:
+        if settings.CHANGE_NOTIFICATION_EMAILS:
             send_email_to_recipients(
-                recipients=settings.USER_CHANGE_NOTIFICATION_EMAILS, subject=subject, message=message
+                recipients=settings.CHANGE_NOTIFICATION_EMAILS, subject=subject, message=message
             )
             logger.info(f"Admin notification sent for user changes: {user.email}")
     except Exception as e:
