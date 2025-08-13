@@ -23,6 +23,7 @@ for item in tf_urls:
 urlpatterns = [
     path("admin/doc/", include(urls)),
     path("admin/", admin.site.urls),
+    path('silk/', include('silk.urls', namespace='silk')),
     path('', include(tf_urls)),
     path("", include("epilepsy12.urls")),
 ]

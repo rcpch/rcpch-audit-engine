@@ -33,6 +33,9 @@ plotly==6.0.1
 # NHS number
 nhs-number==1.3.4
 
+# profiling
+django-silk==5.4.1
+
 # live application server
 gunicorn==23.0.0
 

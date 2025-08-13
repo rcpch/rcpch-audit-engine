@@ -117,6 +117,7 @@ INSTALLED_APPS = [
     "two_factor.plugins.phonenumber",  # we don't use phones currently but required for app to work
     # captcha
     "captcha",
+    "silk",
     # application
     "epilepsy12",
 ]
@@ -131,6 +132,7 @@ MIDDLEWARE = [
     "django.middleware.common.CommonMiddleware",
     "django.middleware.csrf.CsrfViewMiddleware",
     "django.contrib.auth.middleware.AuthenticationMiddleware",
+    "silk.middleware.SilkyMiddleware",
     "django.contrib.messages.middleware.MessageMiddleware",
     "django_htmx.middleware.HtmxMiddleware",
     "simple_history.middleware.HistoryRequestMiddleware",
