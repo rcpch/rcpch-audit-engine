@@ -215,7 +215,7 @@ def selected_organisation_summary(request, organisation_id):
         or request.user.is_rcpch_staff
     ):
         # select any organisations except currently selected organisation
-        organisation_list = Organisation.objects.filter(active=True).order_by("name")
+        organisation_list = Organisation.objects.get_organisation_list()
     else:
         if selected_organisation.country.boundary_identifier == "W92000004":  # Wales
             organisation_list = Organisation.objects.filter(
