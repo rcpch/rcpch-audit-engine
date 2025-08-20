@@ -212,10 +212,7 @@ def consultant_paediatrician_referral_made(request, assessment_id):
             else:
                 site.delete()
 
-    # filter list to include only NHS organisations
-    organisation_list = Organisation.objects.filter(active=True).order_by("name")
-
-    context = {"assessment": assessment, "organisation_list": organisation_list}
+    context = {"assessment": assessment, "organisation_list": Organisation.objects.get_organisation_list() }
 
     # add previous and current sites to context
     sites_context = add_sites_and_site_history_to_context(assessment.registration.case)
@@ -264,13 +261,10 @@ def consultant_paediatrician_referral_date(request, assessment_id):
     # refresh all objects and return
     assessment = Assessment.objects.get(pk=assessment_id)
 
-    # filter list to include only NHS organisations
-    organisation_list = Organisation.objects.filter(active=True).order_by("name")
-
     context = {
         "assessment": assessment,
         "general_paediatric_edit_active": False,
-        "organisation_list": organisation_list,
+        "organisation_list": Organisation.objects.get_organisation_list(),
     }
 
     # add previous and current sites to context
@@ -314,7 +308,7 @@ def consultant_paediatrician_input_achieved(request, assessment_id):
         error_message = error
 
     # filter list to include only NHS organisations
-    organisation_list = Organisation.objects.filter(active=True).order_by("name")
+    organisation_list = Organisation.objects.get_organisation_list()
 
     assessment = Assessment.objects.get(pk=assessment_id)
 
@@ -382,7 +376,7 @@ def consultant_paediatrician_input_date(request, assessment_id):
     assessment = Assessment.objects.get(pk=assessment_id)
 
     # filter list to include only NHS organisations
-    organisation_list = Organisation.objects.filter(active=True).order_by("name")
+    organisation_list = Organisation.objects.get_organisation_list()
 
     context = {
         "assessment": Assessment.objects.get(pk=assessment_id),
@@ -435,10 +429,8 @@ def general_paediatric_centre(request, assessment_id):
     )
 
     # filter list to include only NHS organisations
-    organisation_list = (
-        Organisation.objects.filter(active=True)
-        .order_by("name")
-        .exclude(pk=general_paediatric_centre.pk)
+    organisation_list = Organisation.objects.get_organisation_list(
+        exclude_pk=general_paediatric_centre.pk
     )
 
     context = {
@@ -488,10 +480,8 @@ def edit_general_paediatric_centre(request, assessment_id, site_id):
     )
 
     # filter list to include only NHS organisations
-    organisation_list = (
-        Organisation.objects.filter(active=True)
-        .order_by("name")
-        .exclude(pk=general_paediatric_centre.pk)
+    organisation_list = Organisation.objects.get_organisation_list(
+        exclude_pk=general_paediatric_centre.pk
     )
 
     context = {
@@ -538,10 +528,8 @@ def update_general_paediatric_centre_pressed(request, assessment_id, site_id, ac
     selected_site = Site.objects.get(pk=site_id)
 
     # filter list to include only NHS organisations
-    organisation_list = (
-        Organisation.objects.filter(active=True)
-        .order_by("name")
-        .exclude(pk=selected_site.organisation.pk)
+    organisation_list = Organisation.objects.get_organisation_list(
+        exclude_pk=selected_site.organisation.pk
     )
 
     context = {
@@ -604,7 +592,7 @@ def delete_general_paediatric_centre(request, assessment_id, site_id):
     assessment = Assessment.objects.get(pk=assessment_id)
 
     # filter list to include only NHS organisations
-    organisation_list = Organisation.objects.filter(active=True).order_by("name")
+    organisation_list = Organisation.objects.get_organisation_list()
 
     context = {
         "assessment": assessment,
@@ -696,7 +684,7 @@ def paediatric_neurologist_referral_made(request, assessment_id):
                     site.delete()
 
     # filter list to include only NHS organisations
-    organisation_list = Organisation.objects.filter(active=True).order_by("name")
+    organisation_list = Organisation.objects.get_organisation_list()
 
     context = {"assessment": assessment, "organisation_list": organisation_list}
 
@@ -751,7 +739,7 @@ def paediatric_neurologist_referral_date(request, assessment_id):
     assessment = Assessment.objects.get(pk=assessment_id)
 
     # filter list to include only NHS organisations
-    organisation_list = Organisation.objects.filter(active=True).order_by("name")
+    organisation_list = Organisation.objects.get_organisation_list()
 
     context = {
         "assessment": assessment,
@@ -814,7 +802,7 @@ def paediatric_neurologist_input_date(request, assessment_id):
     assessment.save(update_fields=["paediatric_neurologist_input_achieved"])
 
     # filter list to include only NHS organisations
-    organisation_list = Organisation.objects.filter(active=True).order_by("name")
+    organisation_list = Organisation.objects.get_organisation_list()
 
     context = {
         "assessment": assessment,
@@ -864,7 +852,7 @@ def paediatric_neurologist_input_achieved(request, assessment_id):
         error_message = error
 
     # filter list to include only NHS organisations
-    organisation_list = Organisation.objects.filter(active=True).order_by("name")
+    organisation_list = Organisation.objects.get_organisation_list()
 
     assessment = Assessment.objects.get(pk=assessment_id)
 
@@ -928,7 +916,7 @@ def paediatric_neurology_centre(request, assessment_id):
     )
 
     # filter list to include only NHS organisations
-    organisation_list = Organisation.objects.filter(active=True).order_by("name")
+    organisation_list = Organisation.objects.get_organisation_list()
 
     context = {
         "assessment": assessment,
@@ -976,7 +964,7 @@ def edit_paediatric_neurology_centre(request, assessment_id, site_id):
     )
 
     # filter list to include only NHS organisations
-    organisation_list = Organisation.objects.filter(active=True).order_by("name")
+    organisation_list = Organisation.objects.get_organisation_list()
 
     context = {
         "assessment": assessment,
@@ -1019,7 +1007,7 @@ def update_paediatric_neurology_centre_pressed(request, assessment_id, site_id, 
         neurology_edit_active = False
 
     # filter list to include only NHS organisations
-    organisation_list = Organisation.objects.filter(active=True).order_by("name")
+    organisation_list = Organisation.objects.get_organisation_list()
 
     context = {
         "assessment": assessment,
@@ -1081,7 +1069,7 @@ def delete_paediatric_neurology_centre(request, assessment_id, site_id):
     assessment = Assessment.objects.get(pk=assessment_id)
 
     # filter list to include only NHS organisations
-    organisation_list = Organisation.objects.filter(active=True).order_by("name")
+    organisation_list = Organisation.objects.get_organisation_list()
 
     context = {
         "assessment": assessment,
@@ -1136,7 +1124,7 @@ def childrens_epilepsy_surgical_service_referral_criteria_met(request, assessmen
 
     assessment = Assessment.objects.get(pk=assessment_id)
     # filter list to include only NHS organisations
-    organisation_list = Organisation.objects.filter(active=True).order_by("name")
+    organisation_list = Organisation.objects.get_organisation_list()
 
     context = {
         "assessment": assessment,
@@ -1224,7 +1212,7 @@ def childrens_epilepsy_surgical_service_referral_made(request, assessment_id):
                     site.delete()
 
     # filter list to include only NHS organisations
-    organisation_list = Organisation.objects.filter(active=True).order_by("name")
+    organisation_list = Organisation.objects.get_organisation_list()
 
     context = {
         "assessment": assessment,
@@ -1282,7 +1270,7 @@ def childrens_epilepsy_surgical_service_referral_date(request, assessment_id):
     assessment = Assessment.objects.get(pk=assessment_id)
 
     # filter list to include only NHS organisations
-    organisation_list = Organisation.objects.filter(active=True).order_by("name")
+    organisation_list = Organisation.objects.get_organisation_list()
 
     context = {
         "assessment": assessment,
@@ -1331,7 +1319,7 @@ def childrens_epilepsy_surgical_service_review_date_status(
         error_message = e
 
     # filter list to include only NHS organisations
-    organisation_list = Organisation.objects.filter(active=True).order_by("name")
+    organisation_list = Organisation.objects.get_organisation_list()
 
     if status == "unknown":
         # remove any previously stored surgical review date
@@ -1393,7 +1381,7 @@ def childrens_epilepsy_surgical_service_input_date(request, assessment_id):
     assessment = Assessment.objects.get(pk=assessment_id)
 
     # filter list to include only NHS organisations
-    organisation_list = Organisation.objects.filter(active=True).order_by("name")
+    organisation_list = Organisation.objects.get_organisation_list()
 
     context = {
         "assessment": assessment,
@@ -1445,7 +1433,7 @@ def epilepsy_surgery_centre(request, assessment_id):
     )
 
     # filter list to include only NHS organisations
-    organisation_list = Organisation.objects.filter(active=True).order_by("name")
+    organisation_list = Organisation.objects.get_organisation_list()
 
     context = {
         "assessment": assessment,
@@ -1498,7 +1486,7 @@ def edit_epilepsy_surgery_centre(request, assessment_id, site_id):
     )
 
     # filter list to include only NHS organisations
-    organisation_list = Organisation.objects.filter(active=True).order_by("name")
+    organisation_list = Organisation.objects.get_organisation_list()
 
     context = {
         "assessment": assessment,
@@ -1542,7 +1530,7 @@ def update_epilepsy_surgery_centre_pressed(request, assessment_id, site_id, acti
         surgery_edit_active = False
 
     # filter list to include only NHS organisations
-    organisation_list = Organisation.objects.filter(active=True).order_by("name")
+    organisation_list = Organisation.objects.get_organisation_list()
 
     context = {
         "assessment": Assessment.objects.get(pk=assessment_id),
@@ -1607,7 +1595,7 @@ def delete_epilepsy_surgery_centre(request, assessment_id, site_id):
     assessment = Assessment.objects.get(pk=assessment_id)
 
     # filter list to include only NHS organisations
-    organisation_list = Organisation.objects.filter(active=True).order_by("name")
+    organisation_list = Organisation.objects.get_organisation_list()
 
     context = {
         "assessment": Assessment.objects.get(pk=assessment_id),
@@ -1844,8 +1832,8 @@ def assessment(request, case_id):
     assessment = Assessment.objects.filter(registration=registration).get()
 
     # filter list to include only NHS organisations
-    organisation_list = Organisation.objects.filter(active=True).order_by("name")
-
+    organisation_list = Organisation.objects.get_organisation_list()
+    
     site = Site.objects.filter(
         site_is_actively_involved_in_epilepsy_care=True,
         site_is_primary_centre_of_epilepsy_care=True,
