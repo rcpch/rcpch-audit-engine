@@ -362,3 +362,11 @@ SILKY_MAX_RESPONSE_BODY_SIZE = 1024  # If response body>1024 bytes, ignore
 
 SILKY_MAX_RECORDED_REQUESTS = 10**4
 SILKY_MAX_RECORDED_REQUESTS_CHECK_PERCENT = 1
+
+def my_custom_logic(request):
+    if request.path.endswith("/summary"):
+        return False
+
+    return True
+
+SILKY_INTERCEPT_FUNC = my_custom_logic
