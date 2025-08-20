@@ -1,5 +1,6 @@
 from datetime import datetime
 import logging
+from timeit import default_timer as timer
 from threading import local
 from django.conf import settings
 
@@ -63,13 +64,18 @@ class Epilepsy12RequestLoggingMiddleware:
         self.get_response = get_response
 
     def __call__(self, request):
+        start = timer()
+
         response = self.get_response(request)
 
+        end = timer()
+
+        duration = end - start
+        duration_ms = round(duration * 1000)
+
+        # The dev server already does request logging
         if settings.ENABLE_REQUEST_LOGGING:
-            # The dev server already does request logging
-            # if settings.ENABLE_REQUEST_LOGGING:
-            # This replaces the old gunicorn request logging which used this format string
-            # %({x-forwarded-for}i)s %(l)s %(u)s %(t)s "%(r)s" %(s)s %(b)s "%(f)s" "%(a)s"
+            # This replaces the old gunicorn request logging which used this date format string
             gunicorn_formatted_datetime = (
                 datetime.now().astimezone().strftime("%d/%m/%y:%H:%M:%S %z")
             )
@@ -85,7 +91,7 @@ class Epilepsy12RequestLoggingMiddleware:
             log_message = (
                 f"{x_forwarded_for} - {username_to_log} [{gunicorn_formatted_datetime}] "
                 f'"{method_path}" {response.status_code} {content_length} '
-                f'"{referer}" "{user_agent}"'
+                f'"{referer}" "{user_agent}" {duration_ms}'
             )
 
             request_logger.info(log_message)
