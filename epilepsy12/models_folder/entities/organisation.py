@@ -15,11 +15,24 @@ from simple_history.models import HistoricalRecords
 from ..time_and_user_abstract_base_classes import TimeStampAbstractBaseClass
 
 
+class OrganisationManager(models.Manager):
+    def get_organisation_list(self, exclude_pk=None):
+        queryset = self.filter(active=True)
+
+        if exclude_pk is not None:
+            queryset = queryset.exclude(pk=exclude_pk)
+
+        # Avoid N+1 query problem when the template renders the list
+        return queryset.select_related("trust", "local_health_board").order_by("name")
+
+
 class Organisation(TimeStampAbstractBaseClass):
     """
     This class details information about organisations.
     It represents a list of organisations that can be looked up
     """
+
+    objects = OrganisationManager()
 
     ods_code = CharField(
         max_length=100, null=True, blank=True, default=None, unique=True
