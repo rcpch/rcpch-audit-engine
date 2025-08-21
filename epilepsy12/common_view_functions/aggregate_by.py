@@ -248,33 +248,15 @@ Filter cases, run aggregations and store results in KPIAggregation models - ther
 
 def update_all_kpi_agg_models(
     cohort: int,
-    abstractions: Union[Literal["all"], list[EnumAbstractionLevel]] = "all",
     open_access=False,
 ) -> None:
     """
     Using all cases in a given cohort,
         for all abstraction levels | specified `abstractions`,
             aggregate kpi scores and update that abstraction's KPIAggregation model
-
-    Args:
-        `cohort` - cohort filter for Cases
-        `abstraction` (optional, default='all') - specify abstraction level(s) to update. Provide list of EnumAbstractionLevel values if required.
     """
 
-    if (abstractions != "all") and not isinstance(abstractions, list):
-        raise ValueError(
-            'Can only be string literal "all" or list of EnumAbstraction values'
-        )
-
-    if isinstance(abstractions, list):
-        if not all(isinstance(item, EnumAbstractionLevel) for item in abstractions):
-            raise ValueError(
-                "If providing list, all items must be EnumAbstraction values"
-            )
-
-    abstraction_levels = EnumAbstractionLevel if abstractions == "all" else abstractions
-
-    for ABSTRACTION_LEVEL in abstraction_levels:
+    for ABSTRACTION_LEVEL in EnumAbstractionLevel:
         """
         Loop through each level of abstraction
 
