@@ -454,9 +454,6 @@ def groups_seeder(
                     )
                     add_permissions_to_group(EDITOR_PERMISSIONS, newGroup)
                     add_permissions_to_group(FULL_ACCESS_PERMISSIONS, newGroup)
-                    add_permissions_to_group(
-                        E12_AUDIT_TEAM_CUSTOM_PERMISSIONS, newGroup
-                    )
 
                 elif group == TRUST_AUDIT_TEAM_VIEW_ONLY:
                     # custom permissions
