@@ -21,7 +21,8 @@ from epilepsy12.constants.user_types import (
     TITLES,
     # preferences in the view
     VIEW_PREFERENCES,
-    RCPCH_AUDIT_TEAM
+    RCPCH_AUDIT_TEAM,
+    CAN_ALLOCATE_USER_TO_ORGANISATION,
 )
 
 logger = logging.getLogger(__name__)
@@ -263,6 +264,7 @@ class Epilepsy12User(AbstractUser, PermissionsMixin):
                 name="user_email_ci_uniqueness",
             ),
         ]
+        permissions = [CAN_ALLOCATE_USER_TO_ORGANISATION]
 
     def __str__(self) -> str:
         return self.get_full_name()

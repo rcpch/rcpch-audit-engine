@@ -5,7 +5,6 @@ from django.conf import settings
 from django.core.exceptions import PermissionDenied
 from django.http import Http404
 from django.contrib.auth.decorators import login_required
-from django.db.models import Q
 from .models import (
     FirstPaediatricAssessment,
     MultiaxialDiagnosis,
@@ -340,16 +339,8 @@ def user_can_access_user():
                 request.user.is_rcpch_audit_team_member
                 or request.user.is_rcpch_staff
                 or request.user.is_superuser
-                or (
-                    user_to_edit.organisation_employer.trust is not None
-                    and user_to_edit.organisation_employer.trust
-                    == request.user.organisation_employer.trust
-                )
-                or (
-                    user_to_edit.organisation_employer.local_health_board is not None
-                    and user_to_edit.organisation_employer.local_health_board
-                    == request.user.organisation_employer.local_health_board
-                )
+                or request.user.organisation_employer
+                in organisation_white_list_for_user(user_to_edit)
             ):
                 # allow access if user requesting acess is:
                 # 1. a superuser

@@ -22,7 +22,8 @@ from epilepsy12.constants.user_types import (
     CAN_LOCK_CHILD_CASE_DATA_FROM_EDITING,
     CAN_UNLOCK_CHILD_CASE_DATA_FROM_EDITING,
     CAN_OPT_OUT_CHILD_FROM_INCLUSION_IN_AUDIT,
-    CAN_PUBLISH_EPILEPSY12_DATA
+    CAN_PUBLISH_EPILEPSY12_DATA,
+    CAN_ALLOCATE_USER_TO_ORGANISATION,
 )
 from epilepsy12.models import (
     AntiEpilepsyMedicine,
@@ -42,7 +43,7 @@ from epilepsy12.models import (
     Keyword,
     Site,
     Epilepsy12User,
-    OrganisationKPIAggregation
+    OrganisationKPIAggregation,
 )
 
 
@@ -72,7 +73,9 @@ def groups_seeder(
     keywordContentType = ContentType.objects.get_for_model(Keyword)
     auditprogressContentType = ContentType.objects.get_for_model(AuditProgress)
     epilepsy12userContentType = ContentType.objects.get_for_model(Epilepsy12User)
-    organisationKPIAggregationContentType = ContentType.objects.get_for_model(OrganisationKPIAggregation)
+    organisationKPIAggregationContentType = ContentType.objects.get_for_model(
+        OrganisationKPIAggregation
+    )
 
     """
     Note view permissions include viewing users, but not creating, updating or deleting them
@@ -306,6 +309,10 @@ def groups_seeder(
             "codename": CAN_UNREGISTER_CHILD_IN_EPILEPSY12[0],
             "content_type": registrationContentType,
         },
+        {
+            "codename": CAN_ALLOCATE_USER_TO_ORGANISATION[0],
+            "content_type": epilepsy12userContentType,
+        },
     ]
 
     """
@@ -447,6 +454,9 @@ def groups_seeder(
                     )
                     add_permissions_to_group(EDITOR_PERMISSIONS, newGroup)
                     add_permissions_to_group(FULL_ACCESS_PERMISSIONS, newGroup)
+                    add_permissions_to_group(
+                        E12_AUDIT_TEAM_CUSTOM_PERMISSIONS, newGroup
+                    )
 
                 elif group == TRUST_AUDIT_TEAM_VIEW_ONLY:
                     # custom permissions

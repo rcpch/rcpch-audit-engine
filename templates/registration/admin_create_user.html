@@ -67,27 +67,8 @@
             </div>
           
           </div>
-          
-          {% if form.instance.pk %}
-          <label for="{{form.organisation_employer.id_for_label}}">Employer(s)</label>
-            {% include 'registration/user_management/employers.html' with epilepsy12_user=form.instance.pk  current_employer_organisations=current_employer_organisations error=error editable=False %}
-              <span class="tooltip tooltip-left" data-tooltip="Add a new employer" style="display: flex; justify-content: flex-end; margin-top: 1rem;">
-                <a class="ui rcpch_primary button" href="{% url 'add_employer_organisation' epilepsy12_user_id=form.instance.pk organisation_id=organisation.pk %}">
-                  <i class="plus icon"></i>
-                </a>
-              </span>
-              {% else %}
-              <div class="ui icon message">
-            <i class="rcpch_pink building outline icon"></i>
-                <div class="content">
-                    <div class="header">Primary Employer</div>
-                    <p>{{ organisation }}</p>
-                </div>
-            </div>
-            {% endif %}
-          
 
-          <div class='two fields'>
+           <div class='two fields'>
 
             {% if user.is_rcpch_audit_team_member %}
               <div class='eight wide field'>
@@ -102,6 +83,19 @@
             {% endif %}
 
           </div>
+          <hr>
+          
+          {% if form.instance.pk and perms.epilepsy12.can_allocate_user_to_organisation %}
+          <label for="{{form.organisation_employer.id_for_label}}">Employer(s)</label>
+            {% include 'registration/user_management/employers.html' with epilepsy12_user=form.instance  current_employer_organisations=current_employer_organisations error=error editable=False organisation_id=organisation.pk %}
+              <span style="display: flex; justify-content: flex-end; margin-top: 1rem;" class="hover:text-white">
+                <a class="ui rcpch_primary button" href="{% url 'add_employer_organisation' epilepsy12_user_id=form.instance.pk organisation_id=organisation.pk %}">
+                  <i class="plus icon"></i>Add Employer
+                </a>
+              </span>
+          {% else %}
+            {% include 'registration/user_management/employers.html' with epilepsy12_user=form.instance.pk  current_employer_organisations=current_employer_organisations error=error editable=False %}
+          {% endif %}
 
          <div class="ui basic segment" style="padding: 1rem 0; border: none; box-shadow: none;">
             <div style="display: flex; justify-content: space-between; flex-wrap: wrap; gap: 0.5rem;">

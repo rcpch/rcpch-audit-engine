@@ -26,33 +26,33 @@
                     </div>
                     <div class="four wide column right aligned">
                         {% if editable %}
-                        <div class="ui buttons">
-                            <button class="ui compact rcpch_pink button"
-                                    title="Set as Primary Employer"
-                                    hx-headers='{"X-CSRFToken": "{{ csrf_token }}"}'
-                                    hx-vals='{"action": "set_primary", "employer_id": "{{ employer.id }}"}'
-                                    hx-post="{% url 'add_employer_organisation' organisation_id=organisation_id epilepsy12_user_id=epilepsy12_user.id %}"
-                                    hx-target="#employer-list"
-                                    hx-swap="innerHTML"
-                                    hx-confirm=""
-                                    data-confirm-message="Are you sure you want to set {{ employer.employer_organisation.name }} as your primary employer?"
-                                    >
-                                <i class="rcpch_pink building outline icon"></i>
-                                Set Primary
-                            </button>
-                            <button class="ui compact red basic button"
-                                    title="Remove Employer"
-                                    hx-headers='{"X-CSRFToken": "{{ csrf_token }}"}'
-                                    hx-vals='{"action": "remove", "employer_id": "{{ employer.id }}"}'
-                                    hx-post="{% url 'add_employer_organisation' organisation_id=organisation_id epilepsy12_user_id=epilepsy12_user.id %}"
-                                    hx-target="#employer-list"
-                                    hx-swap="innerHTML"
-                                    hx-confirm=""
-                                    data-confirm-message="Are you sure you want to remove {{ employer.employer_organisation.name }} from your employers?"
-                                    >
-                                <i class="trash alternate outline rcpch_red  icon"></i>
-                            </button>
-                        </div>
+                            <div class="ui buttons">
+                                <button class="ui compact rcpch_pink button"
+                                        title="Set as Primary Employer"
+                                        hx-headers='{"X-CSRFToken": "{{ csrf_token }}"}'
+                                        hx-vals='{"action": "set_primary", "employer_id": "{{ employer.id }}"}'
+                                        hx-post="{% url 'add_employer_organisation' organisation_id=employer.employer_organisation.id epilepsy12_user_id=epilepsy12_user.id %}"
+                                        hx-target="#employer-list"
+                                        hx-swap="innerHTML"
+                                        hx-confirm=""
+                                        data-confirm-message="Are you sure you want to set {{ employer.employer_organisation.name }} as your primary employer?"
+                                        >
+                                    <i class="rcpch_pink building outline icon"></i>
+                                    Set Primary
+                                </button>
+                                <button class="ui compact red basic button"
+                                        title="Remove Employer"
+                                        hx-headers='{"X-CSRFToken": "{{ csrf_token }}"}'
+                                        hx-vals='{"action": "remove", "employer_id": "{{ employer.id }}"}'
+                                        hx-post="{% url 'add_employer_organisation' organisation_id=organisation_id epilepsy12_user_id=epilepsy12_user.id %}"
+                                        hx-target="#employer-list"
+                                        hx-swap="innerHTML"
+                                        hx-confirm=""
+                                        data-confirm-message="Are you sure you want to remove {{ employer.employer_organisation.name }} from your employers?"
+                                        >
+                                    <i class="trash alternate outline rcpch_red  icon"></i>
+                                </button>
+                            </div>
                         {% endif%}
                     </div>
                 </div>
@@ -61,38 +61,38 @@
     {% endif %}
 {% endfor %}
 
-{% if editable%}
-<form
-    class="ui form"
-    id="add_employer_form"
-    hx-post="{% url 'add_employer_organisation' organisation_id=organisation_id epilepsy12_user_id=epilepsy12_user.id %}"
-    hx-target="#employer-list" {# Make sure this target actually exists and wraps the content to be replaced #}
-    hx-swap="innerHTML">
-    {% csrf_token %}
-    <div class='two fields'>
-        <div class="ui rcpch fluid search selection dropdown">
-            <i class="dropdown icon"></i>
-            <input type="hidden"
-                   name="add_employer"
-                   id="add_employer"
-            >
-            <div class="default text">Add a new Employer</div>
-            <div class="menu">
-                {% for item in employer_organisations %}
-                    {% if item.trust %}
-                        <div class="item" data-value="{{item.pk}}">{{item.name}} - {{item.city}} ({{item.trust.name}})</div>
-                    {% else %}
-                        <div class="item" data-value="{{item.pk}}">{{item.name}} - {{item.city}} ({{item.local_health_board.name}})</div>
-                    {% endif %}
-                {% endfor %}
+{% if editable %}
+    <form
+        class="ui form"
+        id="add_employer_form"
+        hx-post="{% url 'add_employer_organisation' organisation_id=organisation_id epilepsy12_user_id=epilepsy12_user.id %}"
+        hx-target="#employer-list" 
+        hx-swap="innerHTML">
+        {% csrf_token %}
+        <div class='two fields'>
+            <div class="ui rcpch fluid search selection dropdown">
+                <i class="dropdown icon"></i>
+                <input type="hidden"
+                    name="add_employer"
+                    id="add_employer"
+                >
+                <div class="default text">Add a new Employer</div>
+                <div class="menu">
+                    {% for item in employer_organisations %}
+                        {% if item.trust %}
+                            <div class="item" data-value="{{item.pk}}">{{item.name}} - {{item.city}} ({{item.trust.name}})</div>
+                        {% else %}
+                            <div class="item" data-value="{{item.pk}}">{{item.name}} - {{item.city}} ({{item.local_health_board.name}})</div>
+                        {% endif %}
+                    {% endfor %}
+                </div>
             </div>
+            <button class="ui disabled rcpch_primary button" type="submit" id="submit_button"
+                    name="add_employer" value="add_employer">
+                <i class="plus icon"></i>
+            </button>
         </div>
-        <button class="ui disabled rcpch_primary button" type="submit" id="submit_button"
-                name="add_employer" value="add_employer">
-            <i class="plus icon"></i>
-        </button>
-    </div>
-</form>
+    </form>
 
     <div class="ui buttons">
         <a href="{% url 'edit_epilepsy12_user' organisation_id=organisation_id epilepsy12_user_id=epilepsy12_user.pk %}" 

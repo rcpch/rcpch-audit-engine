@@ -598,6 +598,7 @@ def edit_epilepsy12_user(request, organisation_id, epilepsy12_user_id):
         {
             "organisation": organisation,
             "form": form,
+            "epilepsy12_user": epilepsy12_user_to_edit,
             "admin_title": admin_title,
             "user_type": user_type,
             "current_employer_organisations": epilepsy12_user_to_edit.employer_organisations.filter(
@@ -654,17 +655,20 @@ def delete_epilepsy12_user(request, organisation_id, epilepsy12_user_id):
 @login_and_otp_required()
 @user_may_view_this_organisation()
 @user_can_access_user()
+@permission_required(
+    "epilepsy12.can_allocate_user_to_organisation", raise_exception=True
+)
 def add_employer_organisation(request, organisation_id, epilepsy12_user_id):
     """
     Callback to add an employer organisation to a user
     """
-
+    editable = False
+    template_name = "registration/user_management/add_employer.html"
     if request.htmx:
-        editable = True
-        template_name = "registration/user_management/employers.html"
-    else:
-        editable = False
-        template_name = "registration/user_management/add_employer.html"
+        if request.user.permissions.filter(
+            codename="can_allocate_user_to_organisation"
+        ).exists():
+            editable = True
 
     epilepsy12_user = get_object_or_404(Epilepsy12User, pk=epilepsy12_user_id)
     error = None

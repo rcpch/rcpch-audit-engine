@@ -8,8 +8,9 @@ from ...constants.user_types import (
     AUDIT_CENTRE_LEAD_CLINICIAN,
     AUDIT_CENTRE_CLINICIAN,
     AUDIT_CENTRE_ADMINISTRATOR,
-    RCPCH_AUDIT_TEAM
+    RCPCH_AUDIT_TEAM,
 )
+
 
 class Command(BaseCommand):
     help = "Create test users using the base set in environment variables: LOCAL_DEV_ADMIN_EMAIL and LOCAL_DEV_ADMIN_PASSWORD."
@@ -24,6 +25,13 @@ class Command(BaseCommand):
                 ods_code="RJZ01"  # Kings College Hospital
             )
 
+            if role == RCPCH_AUDIT_TEAM:
+                is_rcpch_audit_team_member = True
+                is_rcpch_staff = True
+            else:
+                is_rcpch_audit_team_member = False
+                is_rcpch_staff = False
+
             user_model.objects.create_user(
                 first_name=first_name,
                 surname=surname,
@@ -32,9 +40,11 @@ class Command(BaseCommand):
                 role=role,
                 is_active=True,
                 organisation_employer=dev_organisation_employer,
-                email_confirmed=True
+                email_confirmed=True,
+                is_rcpch_audit_team_member=is_rcpch_audit_team_member,
+                is_rcpch_staff=is_rcpch_staff,
             )
-            
+
             self.stdout.write(self.style.SUCCESS(f"Successfully created {email}."))
         else:
             self.stdout.write(self.style.WARNING(f"{email} already exists."))
@@ -47,13 +57,18 @@ class Command(BaseCommand):
         password = os.environ.get("LOCAL_DEV_ADMIN_PASSWORD", None)
 
         if not local_dev_admin_email or not password:
-            self.stdout.write(self.style.WARNING("LOCAL_DEV_ADMIN_EMAIL or LOCAL_DEV_ADMIN_PASSWORD not set. Not creating any test users."))
+            self.stdout.write(
+                self.style.WARNING(
+                    "LOCAL_DEV_ADMIN_EMAIL or LOCAL_DEV_ADMIN_PASSWORD not set. Not creating any test users."
+                )
+            )
 
         (local_part, domain) = local_dev_admin_email.split("@")
 
         lead_clinician_dev_email = f"{local_part}+lead_clinician@{domain}"
         clinician_dev_email = f"{local_part}+clinician@{domain}"
         administrator_dev_email = f"{local_part}+administrator@{domain}"
+        e12_audit_team_dev_email = f"{local_part}+e12_audit_team@{domain}"
 
         if not user_model.objects.filter(email=local_dev_admin_email).exists():
             Organisation = apps.get_model("epilepsy12", "Organisation")
@@ -68,12 +83,16 @@ class Command(BaseCommand):
                 email=local_dev_admin_email,
                 password=password,
                 role=RCPCH_AUDIT_TEAM,
-                organisation_employer=dev_organisation_employer
+                organisation_employer=dev_organisation_employer,
             )
-            
-            self.stdout.write(self.style.SUCCESS(f"Successfully created {local_dev_admin_email}."))
+
+            self.stdout.write(
+                self.style.SUCCESS(f"Successfully created {local_dev_admin_email}.")
+            )
         else:
-            self.stdout.write(self.style.WARNING(f"{local_dev_admin_email} already exists."))
+            self.stdout.write(
+                self.style.WARNING(f"{local_dev_admin_email} already exists.")
+            )
 
         self.create_user_if_not_exists(
             email=lead_clinician_dev_email,
@@ -98,5 +117,11 @@ class Command(BaseCommand):
             password=password,
             role=AUDIT_CENTRE_ADMINISTRATOR,
         )
-        
 
+        self.create_user_if_not_exists(
+            email=e12_audit_team_dev_email,
+            first_name="E12AuditTeam",
+            surname="DevUser",
+            password=password,
+            role=RCPCH_AUDIT_TEAM,
+        )
