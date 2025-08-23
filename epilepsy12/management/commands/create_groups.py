@@ -309,10 +309,6 @@ def groups_seeder(
             "codename": CAN_UNREGISTER_CHILD_IN_EPILEPSY12[0],
             "content_type": registrationContentType,
         },
-        {
-            "codename": CAN_ALLOCATE_USER_TO_ORGANISATION[0],
-            "content_type": epilepsy12userContentType,
-        },
     ]
 
     """
@@ -336,6 +332,10 @@ def groups_seeder(
         {"codename": "change_keyword", "content_type": keywordContentType},
         {"codename": "add_keyword", "content_type": keywordContentType},
         {"codename": "delete_keyword", "content_type": keywordContentType},
+        {
+            "codename": CAN_ALLOCATE_USER_TO_ORGANISATION[0],
+            "content_type": epilepsy12userContentType,
+        },
     ]
 
     PATIENT_ACCESS_PERMISSIONS = [

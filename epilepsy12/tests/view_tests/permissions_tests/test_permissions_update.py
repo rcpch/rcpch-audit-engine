@@ -2935,3 +2935,119 @@ def test_users_update_antiepilepsymedicine_success(client):
             assert (
                 response.status_code == HTTPStatus.OK
             ), f"{test_user.first_name} (from {test_user.organisation_employer}) requested to update AntiepilepsyMedicine {URL} for {CASE_FROM_SAME_ORG} in {TEST_USER_ORGANISATION}. Has groups: {test_user.groups.all()} Expected {HTTPStatus.OK} response status code, received {response.status_code}"
+
+
+"""
+Tests to ensure only E12 Audit Team users can change employers
+"""
+
+
+@pytest.mark.django_db
+def test_e12_audit_team_can_change_employer(client):
+    # Arrange
+    # GOSH
+    TEST_USER_ORGANISATION = Organisation.objects.get(
+        ods_code="RP401",
+        trust__ods_code="RP4",
+    )
+
+    # ADDENBROOKE'S
+    DIFF_TRUST_DIFF_ORGANISATION = Organisation.objects.get(
+        ods_code="RGT01",
+        trust__ods_code="RGT",
+    )
+
+    user_first_names_for_test = [
+        test_user_audit_centre_clinician_data.role_str,
+        test_user_audit_centre_lead_clinician_data.role_str,
+        test_user_clinicial_audit_team_data.role_str,
+    ]
+    users = Epilepsy12User.objects.filter(first_name__in=user_first_names_for_test)
+
+    e12_audit_team_user = Epilepsy12User.objects.get(
+        first_name=test_user_rcpch_audit_team_data.role_str
+    )
+
+    # create a user
+    e12_audit_team_user.set_organisation_employer(
+        organisation_employer=TEST_USER_ORGANISATION,
+        is_primary=True,
+    )
+    assert e12_audit_team_user.has_perm(
+        "epilepsy12.can_allocate_user_to_organisation"
+    ), "E12 Audit Team user does not have permission to allocate user to organisation but should"
+    client.force_login(e12_audit_team_user)
+    twofactor_signin(client, e12_audit_team_user)
+
+    # Act
+    for test_user in users:
+        response = client.post(
+            reverse(
+                "add_employer_organisation",
+                kwargs={
+                    "epilepsy12_user_id": test_user.id,
+                    "organisation_id": DIFF_TRUST_DIFF_ORGANISATION.id,
+                },
+            ),
+            data={"add_employer": DIFF_TRUST_DIFF_ORGANISATION.id},
+        )
+        assert test_user.organisation_employer == DIFF_TRUST_DIFF_ORGANISATION
+
+
+@pytest.mark.django_db
+def test_audit_centre_lead_clinician_cannot_change_employer(client):
+    # Arrange
+    # GOSH
+    TEST_USER_ORGANISATION = Organisation.objects.get(
+        ods_code="RP401",
+        trust__ods_code="RP4",
+    )
+
+    # ADDENBROOKE'S
+    DIFF_TRUST_DIFF_ORGANISATION = Organisation.objects.get(
+        ods_code="RGT01",
+        trust__ods_code="RGT",
+    )
+
+    user_first_names_for_test = [
+        test_user_audit_centre_clinician_data.role_str,
+        test_user_clinicial_audit_team_data.role_str,
+        test_user_rcpch_audit_team_data.role_str,
+    ]
+
+    users = Epilepsy12User.objects.filter(first_name__in=user_first_names_for_test)
+
+    audit_centre_lead_clinician = Epilepsy12User.objects.get(
+        first_name=test_user_audit_centre_lead_clinician_data.role_str
+    )
+
+    # create a user
+    audit_centre_lead_clinician.set_organisation_employer(
+        organisation_employer=TEST_USER_ORGANISATION,
+        is_primary=True,
+    )
+    assert (
+        audit_centre_lead_clinician.has_perm(
+            "epilepsy12.can_allocate_user_to_organisation"
+        )
+        == False
+    ), "Audit Centre Lead Clinician has permission to allocate user to organisation but should not"
+    client.force_login(audit_centre_lead_clinician)
+    twofactor_signin(client, audit_centre_lead_clinician)
+
+    # Act
+    for test_user in users:
+        response = client.post(
+            reverse(
+                "add_employer_organisation",
+                kwargs={
+                    "epilepsy12_user_id": test_user.id,
+                    "organisation_id": DIFF_TRUST_DIFF_ORGANISATION.id,
+                },
+            ),
+            data={"add_employer": DIFF_TRUST_DIFF_ORGANISATION.id},
+        )
+        assert (
+            test_user.organisation_employer != DIFF_TRUST_DIFF_ORGANISATION
+        ), "Audit Centre Lead Clinician was able to change user's employer but should not have been able to"
+        assert response.status_code == 403, "Expected 403 Forbidden response"
