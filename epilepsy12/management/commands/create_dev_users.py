@@ -21,7 +21,7 @@ class Command(BaseCommand):
             Organisation = apps.get_model("epilepsy12", "Organisation")
 
             dev_organisation_employer = Organisation.objects.get(
-                ods_code="RJZ01"  # Kings College Hospital
+                ods_code="8HV48"  # RCPCH
             )
 
             user_model.objects.create_user(
