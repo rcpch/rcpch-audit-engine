@@ -8,7 +8,10 @@ from django.contrib.gis.geos import Point
 
 def seed_rcpch_organisation(apps, schema_editor):
     Organisation = apps.get_model("epilepsy12", "Organisation")
-    
+    Country = apps.get_model("epilepsy12", "Country")
+
+    england = Country.objects.get(boundary_identifier="E92000001")
+
     # Create the RCPCH as an organisation for testing
     Organisation.objects.update_or_create(
         ods_code="8HV48",
@@ -21,6 +24,7 @@ def seed_rcpch_organisation(apps, schema_editor):
             "city": "LONDON",
             "county": "GREATER LONDON",
             "postcode": "WC1X 8SH",
+            "country": england,
             "latitude": 51.52077435089506,
             "longitude": -0.11583854557536251,
             "geocode_coordinates": Point(
