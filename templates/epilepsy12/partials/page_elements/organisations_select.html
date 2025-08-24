@@ -43,8 +43,10 @@ hx_confirm: if present, the text to confirm continue
                 {% for item in organisation_list %}
                     {% if item.trust %}
                         <div class="item" data-value="{{item.pk}}" >{{item.name}} ({{item.trust.name}})</div>
-                    {% else %}
+                    {% elif item.local_health_board %}
                         <div class="item" data-value="{{item.pk}}" >{{item.name}} ({{item.local_health_board.name}})</div>
+                    {% else %}
+                        <div class="item" data-value="{{item.pk}}" >{{item.name}}</div>
                     {% endif %}
                 {% endfor %}
             </div>

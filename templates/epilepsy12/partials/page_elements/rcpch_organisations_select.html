@@ -31,8 +31,10 @@ test_positive: currently selected organisation id
                     {% for item in organisation_list %}
                         {% if item.trust %}
                             <div class="item" data-value="{{item.pk}}">{{item.name}} - {{item.city}} ({{item.trust.name}})</div>
-                        {% else %}
+                        {% elif item.local_health_board %}
                             <div class="item" data-value="{{item.pk}}">{{item.name}} - {{item.city}} ({{item.local_health_board.name}})</div>
+                        {% else %}
+                            <div class="item" data-value="{{item.pk}}">{{item.name}} - {{item.city}}</div>
                         {% endif %}
                     {% endfor %}
                 </div>
