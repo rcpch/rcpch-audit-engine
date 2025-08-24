@@ -26,6 +26,7 @@ from epilepsy12.constants import (
 )
 from epilepsy12.general_functions import cohorts_and_dates
 from epilepsy12.common_view_functions import calculate_kpis
+from epilepsy12.models_folder.entities.organisation import Organisation
 
 # Logging setup
 logger = logging.getLogger(__name__)
@@ -247,6 +248,7 @@ Filter cases, run aggregations and store results in KPIAggregation models - ther
 
 
 def update_all_kpi_agg_models(
+    organisation: Organisation,
     cohort: int,
     open_access=False,
 ) -> None:
@@ -255,7 +257,6 @@ def update_all_kpi_agg_models(
         for all abstraction levels | specified `abstractions`,
             aggregate kpi scores and update that abstraction's KPIAggregation model
     """
-
     for ABSTRACTION_LEVEL in EnumAbstractionLevel:
         """
         Loop through each level of abstraction
@@ -269,8 +270,12 @@ def update_all_kpi_agg_models(
         # have completed a full year of epilepsy care
         """
 
+        abstraction_filter = get_abstraction_filter_for_organisation_and_level(
+            organisation, ABSTRACTION_LEVEL 
+        )
+
         all_cases = filter_completed_cases_at_one_year_by_abstraction_level(
-            abstraction_level=ABSTRACTION_LEVEL, cohort=cohort
+            abstraction_filter=abstraction_filter, cohort=cohort
         )
 
         """
@@ -516,7 +521,7 @@ def update_kpi_aggregation_model(
 
 
 def filter_completed_cases_at_one_year_by_abstraction_level(
-    abstraction_level: EnumAbstractionLevel, cohort: int
+    abstraction_filter, cohort: int
 ):
     """
     Filters all cases for a given abstraction level and cohort
@@ -525,13 +530,6 @@ def filter_completed_cases_at_one_year_by_abstraction_level(
     NOTE: this step is used as a filter query prior to performing aggregations and persisting results in the KPIAggregations tables
     """
     Case = apps.get_model("epilepsy12", "Case")
-    if abstraction_level == EnumAbstractionLevel.NATIONAL:
-        # no filters required for National level data
-        abstraction_filter = None
-    else:
-        abstraction_filter = {
-            f"epilepsy12_sites__organisation__{abstraction_level.value}__isnull": False
-        }
 
     all_cases = Case.objects.filter(
         epilepsy12_sites__site_is_actively_involved_in_epilepsy_care=True,
@@ -769,6 +767,43 @@ def get_abstraction_model_from_level(
         },
     }
     return abstraction_model_map[enum_abstraction_level]
+
+def get_abstraction_filter_for_organisation_and_level(
+    organisation: Organisation,
+    abstraction_level: EnumAbstractionLevel
+):
+    match abstraction_level:
+        case EnumAbstractionLevel.ORGANISATION:
+            return {
+                f"epilepsy12_sites__organisation": organisation
+            }
+        case EnumAbstractionLevel.TRUST if organisation.trust:
+            return {
+                f"epilepsy12_sites__organisation__trust": organisation.trust
+            }
+        case EnumAbstractionLevel.LOCAL_HEALTH_BOARD if organisation.local_health_board:
+            return {
+                f"epilepsy12_sites__organisation__local_health_board": organisation.local_health_board
+            }
+        case EnumAbstractionLevel.ICB if organisation.integrated_care_board:
+            return {
+                f"epilepsy12_sites__organisation__integrated_care_board": organisation.integrated_care_board
+            }
+        case EnumAbstractionLevel.NHS_ENGLAND_REGION if organisation.nhs_england_region:
+            return {
+                f"epilepsy12_sites__organisation__nhs_england_region": organisation.nhs_england_region
+            }
+        case EnumAbstractionLevel.OPEN_UK if organisation.openuk_network:
+            return {
+                f"epilepsy12_sites__organisation__openuk_network": organisation.openuk_network
+            }
+        case EnumAbstractionLevel.COUNTRY:
+            return {
+                f"epilepsy12_sites__organisation__country": organisation.country
+            }
+        # national
+        case _:
+            return None
 
 
 def _calculate_all_kpis():

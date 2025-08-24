@@ -324,8 +324,10 @@ def publish_kpis(request, organisation_id):
         else cohort_data["submitting_cohort"]
     )
 
+    organisation = Organisation.objects.get(pk=organisation_id)
+
     # perform aggregations and update all the KPIAggregation models only for clinicians
-    update_all_kpi_agg_models(cohort=cohort_number, open_access=True)
+    update_all_kpi_agg_models(organisation=organisation, cohort=cohort_number, open_access=True)
 
     return render(
         request=request,
@@ -379,7 +381,7 @@ def selected_trust_kpis(request, organisation_id, access):
 
         if access == "private":
             # perform aggregations and update all the KPIAggregation models only for clinicians
-            update_all_kpi_agg_models(cohort=cohort_number, open_access=False)
+            update_all_kpi_agg_models(organisation=organisation, cohort=cohort_number, open_access=False)
 
         # Gather relevant data specific for this view - still show only published data if this is public view
         all_data = get_all_kpi_aggregation_data_for_view(
