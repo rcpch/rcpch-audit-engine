@@ -220,7 +220,10 @@ def selected_organisation_summary(request, organisation_id):
         # select any organisations except currently selected organisation
         organisation_list = Organisation.objects.get_organisation_list()
     else:
-        if selected_organisation.country.boundary_identifier == "W92000004":  # Wales
+        # Jersey and RCPCH test org
+        if selected_organisation.trust is None and selected_organisation.local_health_board is None:
+            organisation_list = [selected_organisation]
+        elif selected_organisation.country.boundary_identifier == "W92000004":  # Wales
             organisation_list = Organisation.objects.filter(
                 local_health_board=selected_organisation.local_health_board,
                 active=True,
