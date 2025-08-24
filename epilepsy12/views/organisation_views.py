@@ -122,9 +122,12 @@ def selected_organisation_summary(request, organisation_id):
         )
     else:
         # generate choropleth map of case counts for each level of abstraction
-        if selected_organisation.ods_code == "RGT1W":
+        if selected_organisation.ods_code in ["RGT1W", "8HV48"]:
             # Jersey is a special case and although is mapped to England, is in the Channel Islands and has no ICB, NHS Region or LHB
+            # RCPCH is an organisation just for testing
             abstraction_level = "trust"
+            icb_heatmap = None
+            nhsregion_heatmap = None
         else:
             abstraction_level = "trust"
             icb_heatmap = generate_case_count_choropleth_map(
