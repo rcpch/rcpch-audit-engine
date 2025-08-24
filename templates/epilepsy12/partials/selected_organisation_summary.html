@@ -43,6 +43,10 @@
                                 {% with organisation_name=selected_organisation.local_health_board.name|title %}
                                 {{ organisation_name|capitalise_org_names }} 
                                 {% endwith %}
+                            {% else %}
+                                {% with organisation_name=selected_organisation.name|title %}
+                                {{ organisation_name|capitalise_org_names }} 
+                                {% endwith %}
                             {% endif %}
                         </a>
                     </div>
@@ -79,6 +83,10 @@
                                 {% with organisation_name=selected_organisation.local_health_board.name|title %}
                                 {{ organisation_name|capitalise_org_names }} 
                                 {% endwith %}
+                            {% else %}
+                                {% with organisation_name=selected_organisation.name|title %}
+                                {{ organisation_name|capitalise_org_names }} 
+                                {% endwith %}
                             {% endif %}
                         </a>
                     </div>
@@ -92,6 +100,10 @@
                                     {% endwith %}
                                 {% elif selected_organisation.local_health_board %}
                                     {% with organisation_name=selected_organisation.local_health_board.name|title %}
+                                    {{ organisation_name|capitalise_org_names }} 
+                                    {% endwith %}
+                                {% else %}
+                                    {% with organisation_name=selected_organisation.name|title %}
                                     {{ organisation_name|capitalise_org_names }} 
                                     {% endwith %}
                                 {% endif %}
