@@ -257,16 +257,17 @@ import factory
 
 # E12 imports
 from epilepsy12.models import (
-    Epilepsy12User,
-    Organisation,
     Case,
-    Episode,
-    Keyword,
     Comorbidity,
-    MultiaxialDiagnosis,
     ComorbidityList,
     EpilepsyCause,
+    Epilepsy12User,
+    Episode,
+    Keyword,
     Medicine,
+    MultiaxialDiagnosis,
+    Organisation,
+    OrganisationEmployer,
 )
 from epilepsy12.tests.UserDataClasses import (
     test_user_audit_centre_administrator_data,
@@ -3047,8 +3048,331 @@ def test_audit_centre_lead_clinician_cannot_change_employer(client):
                 },
             ),
             data={"add_employer": DIFF_TRUST_DIFF_ORGANISATION.id},
+            headers={"Hx-Request": "true"},
         )
         assert (
             test_user.organisation_employer != DIFF_TRUST_DIFF_ORGANISATION
         ), "Audit Centre Lead Clinician was able to change user's employer but should not have been able to"
         assert response.status_code == 403, "Expected 403 Forbidden response"
+
+
+@pytest.mark.django_db
+def test_e12_audit_team_can_remove_employer(client):
+    # Arrange
+    # GOSH
+    TEST_USER_ORGANISATION = Organisation.objects.get(
+        ods_code="RP401",
+        trust__ods_code="RP4",
+    )
+
+    # ADDENBROOKE'S
+    DIFF_TRUST_DIFF_ORGANISATION = Organisation.objects.get(
+        ods_code="RGT01",
+        trust__ods_code="RGT",
+    )
+
+    user_first_names_for_test = [
+        test_user_audit_centre_clinician_data.role_str,
+        test_user_audit_centre_lead_clinician_data.role_str,
+        test_user_clinicial_audit_team_data.role_str,
+    ]
+    users = Epilepsy12User.objects.filter(first_name__in=user_first_names_for_test)
+
+    e12_audit_team_user = Epilepsy12User.objects.get(
+        first_name=test_user_rcpch_audit_team_data.role_str
+    )
+
+    # create a user
+    e12_audit_team_user.set_organisation_employer(
+        organisation_employer=TEST_USER_ORGANISATION,
+        is_primary=True,
+    )
+    assert e12_audit_team_user.has_perm(
+        "epilepsy12.can_allocate_user_to_organisation"
+    ), "E12 Audit Team user does not have permission to allocate user to organisation but should"
+
+    client.force_login(e12_audit_team_user)
+    twofactor_signin(client, e12_audit_team_user)
+
+    # Act
+    for test_user in users:
+        # add another employer that is not primary
+        test_user.set_organisation_employer(
+            organisation_employer=DIFF_TRUST_DIFF_ORGANISATION,
+            is_primary=False,
+        )
+        assert (
+            test_user.employer_organisations.count() == 2
+        ), "Test user should have 2 employers"
+
+        assert OrganisationEmployer.objects.filter(
+            employer_organisation=TEST_USER_ORGANISATION,
+            epilepsy12_user=test_user,
+            is_primary=True,
+        ).exists(), (
+            "Test user should have TEST_USER_ORGANISATION as the primary employer"
+        )
+
+        employer_id = OrganisationEmployer.objects.get(
+            employer_organisation=DIFF_TRUST_DIFF_ORGANISATION,
+            epilepsy12_user=test_user,
+        ).id
+
+        response = client.post(
+            reverse(
+                "add_employer_organisation",
+                kwargs={
+                    "epilepsy12_user_id": test_user.id,
+                    "organisation_id": DIFF_TRUST_DIFF_ORGANISATION.id,
+                },
+            ),
+            headers={"Hx-Request": "true"},
+            data={
+                "action": "remove",
+                "employer_id": employer_id,
+            },
+        )
+        assert response.status_code == 200, "Expected 200 OK response"
+        assert (
+            OrganisationEmployer.objects.filter(
+                pk=employer_id,
+            ).exists()
+            == False
+        ), "E12 Audit Team member was not able to remove user's employer but should have been able to"
+
+
+@pytest.mark.django_db
+def test_audit_centre_lead_clinician_cannot_remove_employer(client):
+    # Arrange
+    # GOSH
+    TEST_USER_ORGANISATION = Organisation.objects.get(
+        ods_code="RP401",
+        trust__ods_code="RP4",
+    )
+
+    # ADDENBROOKE'S
+    DIFF_TRUST_DIFF_ORGANISATION = Organisation.objects.get(
+        ods_code="RGT01",
+        trust__ods_code="RGT",
+    )
+
+    user_first_names_for_test = [
+        test_user_audit_centre_clinician_data.role_str,
+        test_user_clinicial_audit_team_data.role_str,
+        test_user_rcpch_audit_team_data.role_str,
+    ]
+
+    users = Epilepsy12User.objects.filter(first_name__in=user_first_names_for_test)
+
+    audit_centre_lead_clinician = Epilepsy12User.objects.get(
+        first_name=test_user_audit_centre_lead_clinician_data.role_str
+    )
+
+    # create a user
+    audit_centre_lead_clinician.set_organisation_employer(
+        organisation_employer=TEST_USER_ORGANISATION,
+        is_primary=True,
+    )
+    assert (
+        audit_centre_lead_clinician.has_perm(
+            "epilepsy12.can_allocate_user_to_organisation"
+        )
+        == False
+    ), "Audit Centre Lead Clinician has permission to allocate user to organisation but should not"
+    client.force_login(audit_centre_lead_clinician)
+    twofactor_signin(client, audit_centre_lead_clinician)
+
+    # Act
+    for test_user in users:
+        # add another employer that is not primary
+        test_user.set_organisation_employer(
+            organisation_employer=DIFF_TRUST_DIFF_ORGANISATION,
+            is_primary=False,
+        )
+        employer_id = OrganisationEmployer.objects.get(
+            employer_organisation=DIFF_TRUST_DIFF_ORGANISATION,
+            epilepsy12_user=test_user,
+        ).id
+        # try and remove it
+        response = client.post(
+            reverse(
+                "add_employer_organisation",
+                kwargs={
+                    "epilepsy12_user_id": test_user.id,
+                    "organisation_id": DIFF_TRUST_DIFF_ORGANISATION.id,
+                },
+            ),
+            data={
+                "action": "remove",
+                "employer_id": employer_id,
+            },
+            headers={"Hx-Request": "true"},
+        )
+        assert (
+            OrganisationEmployer.objects.filter(
+                epilepsy12_user=test_user,
+                employer_organisation=DIFF_TRUST_DIFF_ORGANISATION,
+                is_primary=False,
+            ).pk
+            == employer_id
+        ), "Audit Centre Lead Clinician was able to remove user's employer but should not have been able to"
+        assert response.status_code == 403, "Expected 403 Forbidden response"
+
+
+@pytest.mark.django_db
+def test_audit_centre_lead_clinician_cannot_set_primary_employer(client):
+    # Arrange
+    # GOSH
+    TEST_USER_ORGANISATION = Organisation.objects.get(
+        ods_code="RP401",
+        trust__ods_code="RP4",
+    )
+
+    # ADDENBROOKE'S
+    DIFF_TRUST_DIFF_ORGANISATION = Organisation.objects.get(
+        ods_code="RGT01",
+        trust__ods_code="RGT",
+    )
+
+    user_first_names_for_test = [
+        test_user_audit_centre_clinician_data.role_str,
+        test_user_clinicial_audit_team_data.role_str,
+        test_user_rcpch_audit_team_data.role_str,
+    ]
+
+    users = Epilepsy12User.objects.filter(first_name__in=user_first_names_for_test)
+
+    audit_centre_lead_clinician = Epilepsy12User.objects.get(
+        first_name=test_user_audit_centre_lead_clinician_data.role_str
+    )
+
+    # create a user
+    audit_centre_lead_clinician.set_organisation_employer(
+        organisation_employer=TEST_USER_ORGANISATION,
+        is_primary=True,
+    )
+    assert (
+        audit_centre_lead_clinician.has_perm(
+            "epilepsy12.can_allocate_user_to_organisation"
+        )
+        == False
+    ), "Audit Centre Lead Clinician has permission to allocate user to organisation but should not"
+    client.force_login(audit_centre_lead_clinician)
+    twofactor_signin(client, audit_centre_lead_clinician)
+
+    # Act
+    for test_user in users:
+        # add another employer that is not primary
+        test_user.set_organisation_employer(
+            organisation_employer=DIFF_TRUST_DIFF_ORGANISATION,
+            is_primary=False,
+        )
+        # try and set it as primary
+        response = client.post(
+            reverse(
+                "add_employer_organisation",
+                kwargs={
+                    "epilepsy12_user_id": test_user.id,
+                    "organisation_id": DIFF_TRUST_DIFF_ORGANISATION.id,
+                },
+            ),
+            data={
+                "action": "set_primary",
+                "organisation_id": DIFF_TRUST_DIFF_ORGANISATION.id,
+            },
+            headers={"Hx-Request": "true"},
+        )
+        assert OrganisationEmployer.objects.filter(
+            employer_organisation=DIFF_TRUST_DIFF_ORGANISATION,
+            epilepsy12_user=test_user,
+        ).exists(), "Audit Centre Lead Clinician was able to set user's employer as primary but should not have been able to"
+        assert response.status_code == 403, "Expected 403 Forbidden response"
+
+
+@pytest.mark.django_db
+def test_e12_audit_team_can_set_primary_employer(client):
+    # Arrange
+    # GOSH
+    TEST_USER_ORGANISATION = Organisation.objects.get(
+        ods_code="RP401",
+        trust__ods_code="RP4",
+    )
+
+    # ADDENBROOKE'S
+    DIFF_TRUST_DIFF_ORGANISATION = Organisation.objects.get(
+        ods_code="RGT01",
+        trust__ods_code="RGT",
+    )
+
+    user_first_names_for_test = [
+        test_user_audit_centre_clinician_data.role_str,
+        test_user_audit_centre_lead_clinician_data.role_str,
+        test_user_clinicial_audit_team_data.role_str,
+    ]
+    users = Epilepsy12User.objects.filter(first_name__in=user_first_names_for_test)
+
+    e12_audit_team_user = Epilepsy12User.objects.get(
+        first_name=test_user_rcpch_audit_team_data.role_str
+    )
+
+    # create a user
+    e12_audit_team_user.set_organisation_employer(
+        organisation_employer=TEST_USER_ORGANISATION,
+        is_primary=True,
+    )
+
+    assert e12_audit_team_user.has_perm(
+        "epilepsy12.can_allocate_user_to_organisation"
+    ), "E12 Audit Team user does not have permission to allocate user to organisation but should"
+
+    client.force_login(e12_audit_team_user)
+    twofactor_signin(client, e12_audit_team_user)
+
+    # Act
+    for test_user in users:
+        # add another employer that is not primary
+        test_user.set_organisation_employer(
+            organisation_employer=DIFF_TRUST_DIFF_ORGANISATION,
+            is_primary=False,
+        )
+        assert (
+            test_user.employer_organisations.count() == 2
+        ), "Test user should have 2 employers"
+
+        assert OrganisationEmployer.objects.filter(
+            employer_organisation=TEST_USER_ORGANISATION,
+            epilepsy12_user=test_user,
+            is_primary=True,
+        ).exists(), (
+            f"Test user should have {TEST_USER_ORGANISATION} as the primary employer"
+        )
+
+        employer_id = test_user.employer_organisations.get(
+            employer_organisation=DIFF_TRUST_DIFF_ORGANISATION
+        ).id
+
+        response = client.post(
+            reverse(
+                "add_employer_organisation",
+                kwargs={
+                    "epilepsy12_user_id": test_user.id,
+                    "organisation_id": DIFF_TRUST_DIFF_ORGANISATION.id,
+                },
+            ),
+            headers={"Hx-Request": "true"},
+            data={
+                "action": "set_primary",
+                "employer_id": employer_id,
+            },
+        )
+        assert response.status_code == 200, "Expected 200 OK response"
+        assert OrganisationEmployer.objects.filter(
+            employer_organisation=DIFF_TRUST_DIFF_ORGANISATION,
+            epilepsy12_user=test_user,
+            is_primary=True,
+        ).exists(), "E12 Audit Team member was not able to set user's employer as primary but should have been able to"
+        assert OrganisationEmployer.objects.filter(
+            employer_organisation=TEST_USER_ORGANISATION,
+            epilepsy12_user=test_user,
+            is_primary=False,
+        ).exists(), f"E12 Audit Team member should have set {DIFF_TRUST_DIFF_ORGANISATION} as primary and {TEST_USER_ORGANISATION} as secondary employer but did not."
