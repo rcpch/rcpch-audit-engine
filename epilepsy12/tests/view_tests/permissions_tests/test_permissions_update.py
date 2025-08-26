@@ -2989,6 +2989,7 @@ def test_e12_audit_team_can_change_employer(client):
                     "organisation_id": DIFF_TRUST_DIFF_ORGANISATION.id,
                 },
             ),
+            headers={"Hx-Request": "true"},
             data={"add_employer": DIFF_TRUST_DIFF_ORGANISATION.id},
         )
         assert test_user.organisation_employer == DIFF_TRUST_DIFF_ORGANISATION

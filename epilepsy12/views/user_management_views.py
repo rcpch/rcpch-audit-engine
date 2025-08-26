@@ -665,9 +665,8 @@ def add_employer_organisation(request, organisation_id, epilepsy12_user_id):
     editable = False
     template_name = "registration/user_management/add_employer.html"
     if request.htmx:
-        if request.user.permissions.filter(
-            codename="can_allocate_user_to_organisation"
-        ).exists():
+        template_name = "registration/user_management/add_employer_partial.html"
+        if request.user.has_perm("can_allocate_user_to_organisation"):
             editable = True
 
     epilepsy12_user = get_object_or_404(Epilepsy12User, pk=epilepsy12_user_id)
