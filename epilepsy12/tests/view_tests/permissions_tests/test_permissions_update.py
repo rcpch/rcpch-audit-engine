@@ -3213,7 +3213,9 @@ def test_audit_centre_lead_clinician_cannot_remove_employer(client):
                 epilepsy12_user=test_user,
                 employer_organisation=DIFF_TRUST_DIFF_ORGANISATION,
                 is_primary=False,
-            ).pk
+            )
+            .get()
+            .pk
             == employer_id
         ), "Audit Centre Lead Clinician was able to remove user's employer but should not have been able to"
         assert response.status_code == 403, "Expected 403 Forbidden response"
