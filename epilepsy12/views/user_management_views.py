@@ -680,7 +680,7 @@ class ResetPasswordView(SuccessMessageMixin, PasswordResetView):
 
     # extend form_valid to set user.password_last_set
     def form_valid(self, form):
-        email = form.cleaned_data["email"]
+        email = form.cleaned_data["email"].lower()
         if Epilepsy12User.objects.filter(email=email, is_active=True).exists():
             e12user = Epilepsy12User.objects.filter(email=email, is_active=True).get()
             # password reset link sent
@@ -717,10 +717,10 @@ class ResetPasswordComplete(PasswordResetCompleteView):
         user_email = request.session.get("user_email")
         if (
             user_email
-            and Epilepsy12User.objects.filter(email=user_email, is_active=True).exists()
+            and Epilepsy12User.objects.filter(email=user_email.lower(), is_active=True).exists()
         ):
             updated_user = Epilepsy12User.objects.filter(
-                email=user_email, is_active=True
+                email=user_email.lower(), is_active=True
             ).get()
             try:
                 # log that User has successfully reset password
