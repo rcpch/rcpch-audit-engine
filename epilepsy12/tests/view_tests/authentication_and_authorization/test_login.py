@@ -9,6 +9,7 @@
 """
 
 # python imports
+from http import HTTPStatus
 import pytest
 import logging
 
@@ -129,4 +130,26 @@ def test_unsuccessful_login_lockout(client):
     # this is the item including errors
     assert form.errors['username'][0] == "You have failed to login 5 or more consecutive times. You have been locked out for 10 minutes"
 
-    
+
+@pytest.mark.django_db
+def test_login_from_direct_link_to_class_based_view(client):
+    url = reverse("case_filter_list", kwargs={
+        "organisation_id": 1
+    })
+
+    response = client.get(url)
+
+    assert response.status_code == HTTPStatus.FOUND
+    assert response.url == reverse("login") + "?next=" + url
+
+
+@pytest.mark.django_db
+def test_login_from_direct_link_to_function_based_view(client):
+    url = reverse("selected_organisation_summary", kwargs={
+        "organisation_id": 1
+    })
+
+    response = client.get(url)
+
+    assert response.status_code == HTTPStatus.FOUND
+    assert response.url == reverse("login") + "?next=" + url
