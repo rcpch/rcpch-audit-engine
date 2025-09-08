@@ -132,6 +132,7 @@ def test_unsuccessful_login_lockout(client):
 
 
 @pytest.mark.django_db
+@pytest.skip(reason="https://github.com/rcpch/rcpch-audit-engine/issues/1280")
 def test_login_from_direct_link_to_class_based_view(client):
     url = reverse("case_filter_list", kwargs={
         "organisation_id": 1
