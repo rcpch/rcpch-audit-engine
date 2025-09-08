@@ -388,9 +388,6 @@ def login_and_otp_required():
     """
 
     def decorator(view):
-        # First use login_required on decorator
-        login_required(view)
-
         def wrapper(request, *args, **kwargs):
             # Then, ensure 2fa verified
             user = request.user
@@ -418,6 +415,6 @@ def login_and_otp_required():
 
             return view(request, *args, **kwargs)
 
-        return wrapper
+        return login_required(wrapper)
 
     return decorator
