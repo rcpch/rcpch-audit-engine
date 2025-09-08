@@ -164,7 +164,7 @@ AUTO_LOGOUT = {
 
 # LOGIN_URL = "/registration/login/"
 LOGIN_URL = "two_factor:login"  # change LOGIN_URL to the 2fa one
-LOGIN_REDIRECT_URL = "index"
+LOGIN_REDIRECT_URL = "index" # not actually used, see RCPCHLoginView.get_success_url
 LOGOUT_REDIRECT_URL = "two_factor:login"
 
 TEMPLATES = [

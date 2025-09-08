@@ -749,8 +749,23 @@ class RCPCHLoginView(TwoFactorLoginView):
         self.form_list["auth"] = CaptchaAuthenticationForm
 
     # Override successful login redirect to org summary page
+    def get_success_url(self):
+        url = self.get_redirect_url()
+        
+        if url:
+            return url
+        
+        org_employer = self.request.user.organisation_employer 
+        org_id = org_employer.id if org_employer else None
+
+        if org_id:
+            return reverse("selected_organisation_summary", kwargs={"organisation_id": org_id})
+        
+        return reverse(settings.LOGIN_REDIRECT_URL)
+
     def done(self, form_list, **kwargs):
         response = super().done(form_list)
+
         user = self.get_user()
 
         # check for outstanding transfers in to this organisation
@@ -781,7 +796,7 @@ class RCPCHLoginView(TwoFactorLoginView):
             # log user out
             logout(self.request)
             return redirect(reverse("password_reset"))
-        
+
         last_logged_in = VisitActivity.objects.filter(
             activity=1, epilepsy12user=user
         ).order_by("-activity_datetime")[:2]
