@@ -124,7 +124,7 @@ extra:
       link: https://twitter.com/rcpchtweets
     - icon: fontawesome/brands/github
       link: https://github.com/rcpch
-  site_contact_email: !ENV SITE_CONTACT_EMAIL
+  site_contact_email: epilepsy12@rcpch.ac.uk
 
 nav:
   - Home:
