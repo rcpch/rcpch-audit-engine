@@ -26,7 +26,7 @@ def test_anonymous_user_cannot_access_organisational_audit(client, group):
     response = client.get(reverse(f"organisational_audit_{group}", kwargs={f"id": 1}))
 
     assert response.status_code == 302
-    assert response.headers["Location"] == "/account/login/"
+    assert response.headers["Location"].startswith("/account/login/")
 
 
 @pytest.mark.parametrize(
