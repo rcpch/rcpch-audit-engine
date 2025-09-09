@@ -140,7 +140,7 @@ class Case(TimeStampAbstractBaseClass, UserStampAbstractBaseClass, HelpTextMixin
         null=True,
     )
 
-    history = HistoricalRecords()
+    history = HistoricalRecords(cascade_delete_history=True)
 
     # relationships
     organisations = models.ManyToManyField(

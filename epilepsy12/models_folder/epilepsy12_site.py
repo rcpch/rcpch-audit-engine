@@ -51,7 +51,7 @@ class Site(TimeStampAbstractBaseClass, UserStampAbstractBaseClass):
     )
     transfer_request_date = models.DateField(blank=True, null=True, default=None)
 
-    history = HistoricalRecords()
+    history = HistoricalRecords(cascade_delete_history=True)
 
     # relationships
     # Site is a link table between Case and Organisation in a many to many relationship

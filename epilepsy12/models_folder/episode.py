@@ -277,7 +277,7 @@ class Episode(TimeStampAbstractBaseClass, UserStampAbstractBaseClass, HelpTextMi
         max_length=250, default=None, null=True, blank=True
     )
 
-    history = HistoricalRecords()
+    history = HistoricalRecords(cascade_delete_history=True)
 
     @property
     def _history_user(self):

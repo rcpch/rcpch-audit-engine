@@ -17,7 +17,7 @@ class Keyword(models.Model):
         max_length=100
     )
 
-    history = HistoricalRecords()
+    history = HistoricalRecords(cascade_delete_history=True)
 
     @property
     def _history_user(self):

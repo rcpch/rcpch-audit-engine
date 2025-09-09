@@ -28,7 +28,7 @@ class Medicine(TimeStampAbstractBaseClass, UserStampAbstractBaseClass, HelpTextM
     preferredTerm = models.CharField(default=None, null=True, blank=True)
     is_rescue = models.BooleanField(default=None, null=True, blank=True)
 
-    history = HistoricalRecords()
+    history = HistoricalRecords(cascade_delete_history=True)
 
     @property
     def _history_user(self):

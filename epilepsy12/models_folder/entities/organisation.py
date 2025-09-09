@@ -105,7 +105,7 @@ class Organisation(TimeStampAbstractBaseClass):
         to="epilepsy12.Country", on_delete=models.PROTECT, null=True, blank=True
     )
 
-    history = HistoricalRecords()
+    history = HistoricalRecords(cascade_delete_history=True)
 
     @property
     def _history_user(self):

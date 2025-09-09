@@ -61,7 +61,7 @@ class OrganisationalAuditSubmission(TimeStampAbstractBaseClass, UserStampAbstrac
     # or
     local_health_board = models.ForeignKey(LocalHealthBoard, null=True, on_delete=models.SET_NULL)
 
-    history = HistoricalRecords()
+    history = HistoricalRecords(cascade_delete_history=True)
 
     submitted = models.BooleanField(default=False)
 
