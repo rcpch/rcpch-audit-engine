@@ -375,7 +375,7 @@ def epilepsy12_user_list(request, organisation_id):
 @login_and_otp_required()
 @user_may_view_this_organisation()
 @permission_required("epilepsy12.add_epilepsy12user", raise_exception=True)
-def create_epilepsy12_user(request, organisation_id, user_type, epilepsy12_user_id):
+def create_epilepsy12_user(request, organisation_id, user_type):
     """
     Creates an epilepsy12 user. It is called from epilepsy12 list of users
     If from the create epilepsy12 user button, the originating organisation is added to
@@ -384,13 +384,9 @@ def create_epilepsy12_user(request, organisation_id, user_type, epilepsy12_user_
     organisation = Organisation.objects.get(pk=organisation_id)
     if user_type == "organisation-staff":
         admin_title = "Add Epilepsy12 User"
-        prepopulated_data = {
-            "organisation_employer": organisation,
-        }
         form = Epilepsy12UserAdminCreationForm(
             rcpch_organisation=user_type,
             requesting_user=request.user,
-            initial=prepopulated_data,
         )
     elif user_type == "rcpch-staff":
         admin_title = "Add RCPCH Epilepsy12 staff member"
@@ -416,7 +412,7 @@ def create_epilepsy12_user(request, organisation_id, user_type, epilepsy12_user_
             new_user.view_preference = 0
             try:
                 new_user.save()
-                # add the organisation to the user as a primary organisation
+                # add the organisation in the URL as the new  user's primary organisation
                 new_user.set_organisation_employer(
                     organisation_employer=organisation,
                     created_by=request.user,
@@ -465,7 +461,7 @@ def create_epilepsy12_user(request, organisation_id, user_type, epilepsy12_user_
 
     context = {
         "form": form,
-        "organisation_id": organisation_id,
+        "organisation": organisation,
         "admin_title": admin_title,
         "user_type": user_type,
     }
@@ -494,6 +490,7 @@ def edit_epilepsy12_user(request, organisation_id, epilepsy12_user_id):
         or request.user.organisation_employer == organisation
         or request.user.is_rcpch_audit_team_member
     ):
+        # user is RCPCH staff or has the same organisation as the user being edited
         can_edit = True
     if match_in_choice_key(AUDIT_CENTRE_ROLES, epilepsy12_user_to_edit.role):
         user_type = "organisation-staff"
@@ -563,24 +560,13 @@ def edit_epilepsy12_user(request, organisation_id, epilepsy12_user_id):
             if form.is_valid():
                 # this will not include the password which will be empty
                 # primary employer is now M2M field so can be set directly
-                primary_employer = Organisation.objects.filter(
-                    pk=form.cleaned_data["organisation_employer"].pk
-                )
-                if primary_employer.exists():
-                    primary_employer = primary_employer.first()
+                # Simplified logic #1261 - organisation employer is now handled
+                # by a separate router.
                 new_user = form.save()
                 # update group
                 new_group = group_for_role(new_user.role)
                 new_user.groups.clear()
                 new_user.groups.add(new_group)
-                OrganisationEmployer.objects.update_or_create(
-                    epilepsy12_user=new_user,
-                    is_primary=True,
-                    defaults={
-                        "employer_organisation": primary_employer,
-                        "created_by": request.user,
-                    },
-                )
 
                 # adds success message
                 messages.success(
@@ -592,7 +578,7 @@ def edit_epilepsy12_user(request, organisation_id, epilepsy12_user_id):
                 redirect_url = reverse(
                     "epilepsy12_user_list",
                     kwargs={
-                        "organisation_id": organisation_id,
+                        "organisation_id": organisation.id,
                     },
                 )
                 return redirect(redirect_url)
@@ -610,10 +596,16 @@ def edit_epilepsy12_user(request, organisation_id, epilepsy12_user_id):
         request,
         template_name,
         {
-            "organisation_id": organisation_id,
+            "organisation": organisation,
             "form": form,
+            "epilepsy12_user": epilepsy12_user_to_edit,
             "admin_title": admin_title,
             "user_type": user_type,
+            "current_employer_organisations": epilepsy12_user_to_edit.employer_organisations.filter(
+                is_active=True
+            ).order_by(
+                "-is_primary", "employer_organisation__name"
+            ),
         },
     )
 
@@ -658,6 +650,101 @@ def delete_epilepsy12_user(request, organisation_id, epilepsy12_user_id):
             },
         )
     )
+
+
+@login_and_otp_required()
+@user_may_view_this_organisation()
+@user_can_access_user()
+@permission_required(
+    "epilepsy12.can_allocate_user_to_organisation", raise_exception=True
+)
+def add_employer_organisation(request, organisation_id, epilepsy12_user_id):
+    """
+    Callback to add an employer organisation to a user
+    """
+    editable = False
+    template_name = "registration/user_management/add_employer.html"
+    if request.htmx:
+        template_name = "registration/user_management/add_employer_partial.html"
+        if request.user.has_perm("can_allocate_user_to_organisation"):
+            editable = True
+
+    epilepsy12_user = get_object_or_404(Epilepsy12User, pk=epilepsy12_user_id)
+    error = None
+    if "action" in request.POST:
+        if request.POST["action"] == "set_primary":
+            employer_id = request.POST.get("employer_id")
+            if employer_id:
+                # Handle setting primary employer
+                # First, unset current primary
+                OrganisationEmployer.objects.filter(
+                    epilepsy12_user=epilepsy12_user, is_primary=True
+                ).update(is_primary=False)
+
+                # Set new primary
+                OrganisationEmployer.objects.filter(
+                    id=employer_id, epilepsy12_user=epilepsy12_user
+                ).update(is_primary=True)
+
+                messages.success(request, "Primary employer updated successfully.")
+        elif request.POST["action"] == "remove":
+            employer_id = request.POST.get("employer_id")
+            if employer_id:
+                # Handle setting primary employer
+                organisation_employer_to_remove = OrganisationEmployer.objects.filter(
+                    id=employer_id, epilepsy12_user=epilepsy12_user
+                ).first()
+                if organisation_employer_to_remove:
+                    if organisation_employer_to_remove.is_primary:
+                        # If the employer being removed is primary, raise an error - should not be possible to remove primary employer
+                        error = "Cannot remove primary employer. Please set another employer as primary first."
+                    else:
+                        # Remove the employer organisation
+                        organisation_employer_to_remove.delete()
+
+    # Check if this is an "add employer" action
+    elif "add_employer" in request.POST:
+        organisation_employer = Organisation.objects.get(
+            pk=request.POST.get("add_employer")
+        )
+        # create the OrganisationEmployer object
+        current_primary_organisation_employer = OrganisationEmployer.objects.filter(
+            epilepsy12_user=epilepsy12_user,
+            is_primary=True,
+            is_active=True,
+        ).first()
+        if current_primary_organisation_employer:
+            # if the user already has a primary organisation, set it to not primary
+            current_primary_organisation_employer.is_primary = False
+            current_primary_organisation_employer.save(update_fields=["is_primary"])
+            OrganisationEmployer.objects.create(
+                epilepsy12_user=epilepsy12_user,
+                employer_organisation=organisation_employer,
+                is_primary=True,
+                created_by=request.user,
+            )
+
+        messages.success(
+            request, f"{organisation_employer} added to {epilepsy12_user.email}."
+        )
+
+    context = {
+        "editable": editable,
+        "error": error,
+        "organisation_id": organisation_id,
+        "epilepsy12_user": epilepsy12_user,
+        "employer_organisations": Organisation.objects.filter(active=True)
+        .exclude(
+            pk__in=epilepsy12_user.employer_organisations.values_list(
+                "employer_organisation__pk", flat=True
+            )
+        )
+        .order_by("name"),
+        "current_employer_organisations": OrganisationEmployer.objects.filter(
+            epilepsy12_user=epilepsy12_user, is_active=True
+        ).order_by("-is_primary", "employer_organisation__name"),
+    }
+    return render(request=request, context=context, template_name=template_name)
 
 
 class ResetPasswordView(SuccessMessageMixin, PasswordResetView):

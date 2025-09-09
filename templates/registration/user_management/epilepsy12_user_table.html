@@ -102,7 +102,17 @@
                 </div>
                 </th>
                 <th><div class="rcpch_td_data_indicator_wrapper">
-                    <p>Primary Employer</p>
+                    <p>
+                        Primary Employer
+                        <i
+                            class="info circle icon"
+                            id='primary-employer-info'
+                            data-title='Employer Information'
+                            data-content="Note that a user's primary employer may differ from the organisation selected. This is particularly relevant for users who work across multiple organisations."
+                            data-position='top right'
+                            _="init js $('#primary-employer-info').popup(); end"
+                        ></i>
+                    </p>
                         {% if sort_flag and sort_flag == "sort_epilepsy12_users_by_organisation_employer_up" %}
                             <i
                                 class="sort icon"
@@ -145,7 +155,21 @@
             <td>{{ epilepsy12_user.get_full_name }}</td>
             <td>{{ epilepsy12_user.email }}</td>
             <td>{{ epilepsy12_user.get_role_display }}</td>
-            <td>{{ epilepsy12_user.organisation_employer  }}</td>
+            <td>
+                <span>
+                    {% if epilepsy12_user.organisation_employer != organisation %}
+                    <i
+                        class="rcpch question circle icon"
+                        id='user-employer-primary-differs-{{epilepsy12_user.id}}'
+                        data-title='Employer Information'
+                        data-content="Note that {{epilepsy12_user.get_full_name}}'s primary employer is {{epilepsy12_user.organisation_employer}} though they are also employed by {{organisation}}."
+                        data-position='top right'
+                        _="init js $('#user-employer-primary-differs-{{epilepsy12_user.id}}').popup(); end"
+                    ></i>
+                    {% endif %}
+                    {{ epilepsy12_user.organisation_employer  }}
+                </span>
+            </td>
             <td>
                 {% if not epilepsy12_user.email_confirmed and epilepsy12_user.is_active %}
                     <i 

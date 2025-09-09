@@ -6,6 +6,7 @@ from django.shortcuts import render
 from django.urls import reverse
 from django.contrib.auth.decorators import permission_required
 from django.http import HttpResponse
+from django.db.models import Q
 
 from django_htmx.http import HttpResponseClientRedirect
 import pandas as pd
@@ -32,6 +33,9 @@ from ..common_view_functions import (
     piechart_plot_cases_by_age_range,
 )
 from epilepsy12.common_view_functions.render_charts import update_all_data_with_charts
+from epilepsy12.common_view_functions.sanction_user_access import (
+    organisation_white_list_for_user,
+)
 from ..general_functions import (
     value_from_key,
     cohorts_and_dates,
@@ -217,16 +221,10 @@ def selected_organisation_summary(request, organisation_id):
         # select any organisations except currently selected organisation
         organisation_list = Organisation.objects.get_organisation_list()
     else:
-        if selected_organisation.country.boundary_identifier == "W92000004":  # Wales
-            organisation_list = Organisation.objects.filter(
-                local_health_board=selected_organisation.local_health_board,
-                active=True,
-            )
-        else:
-            organisation_list = Organisation.objects.filter(
-                trust=selected_organisation.trust,
-                active=True,
-            )
+        # organisation list is scoped to the all organisations in the users organisation_employer list and their siblings
+        organisation_list = organisation_white_list_for_user(
+            epilepsy12_user=request.user
+        )
 
     context = {
         "user": request.user,

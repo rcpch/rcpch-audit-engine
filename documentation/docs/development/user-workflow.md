@@ -25,3 +25,11 @@ This workflow is available from the login page and is the standard Django workfl
 ### Resend password
 
 If the user has not clicked on the link within 72 hours, or the email has been lost in junk, the administrator can send a further email from the newly created user form. The workflow is identical to user creation.
+
+### Organisation Employers
+
+Users can be affiliated with more than one organisation. They can only have one primary organisation. The create user route will only create new users against the organisation in the URL. Users with appropriate permissions can add additional organisations to a user account, as well as move the `is_primary` flag between them.
+
+### Logging
+
+Changes to the `Epilepsy12User` and `OrganisationEmployer` models are important so activity is logged to the console and for some changes, emailed to admin. All activity is tracked to the `VisitActivity` model also.

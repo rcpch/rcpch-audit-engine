@@ -1,0 +1,7 @@
+{% extends "base.html" %}
+{% load static %}
+{% load epilepsy12_template_tags %}
+{% block content %}
+{% csrf_token %}
+    {% include 'registration/user_management/add_employer_partial.html' with epilepsy12_user=epilepsy12_user employer_organisations=employer_organisations current_employer_organisations=current_employer_organisations error=error editable=True organisation_id=organisation_id %}
+{% endblock %}

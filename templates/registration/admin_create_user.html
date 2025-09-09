@@ -6,7 +6,7 @@
 <div class='ui rcpch container'>
   <div class="rcpch_padding">
 
-    <div class="ui two column centered grid">
+    <div class="ui column centered grid">
       
       <div class="column">
         
@@ -67,19 +67,8 @@
             </div>
           
           </div>
-          
-          {% comment %} {% if form.organisation_employer.value %} {% endcomment %}
-            <div class='field' id="organisation_employer">
-              <label for="{{form.organisation_employer.id_for_label}}">Employer</label>
-              {{ form.organisation_employer }}
-              {% if form.organisation_employer.errors %}
-                <div class="ui pointing red basic label">{{form.organisation_employer.errors}}</div>
-              {% endif %}
-            </div>
-          {% comment %} {% endif %} {% endcomment %}
-          
 
-          <div class='two fields'>
+           <div class='two fields'>
 
             {% if user.is_rcpch_audit_team_member %}
               <div class='eight wide field'>
@@ -94,67 +83,87 @@
             {% endif %}
 
           </div>
+          <hr>
+          
+          {% if form.instance.pk and perms.epilepsy12.can_allocate_user_to_organisation %}
+          <label for="{{form.organisation_employer.id_for_label}}">Employer(s)</label>
+            {% include 'registration/user_management/employers.html' with epilepsy12_user=form.instance  current_employer_organisations=current_employer_organisations error=error editable=False organisation_id=organisation.pk %}
+              <span style="display: flex; justify-content: flex-end; margin-top: 1rem;" class="hover:text-white">
+                <a class="ui rcpch_primary button" href="{% url 'add_employer_organisation' epilepsy12_user_id=form.instance.pk organisation_id=organisation.pk %}">
+                  <i class="plus icon"></i>Add Employer
+                </a>
+              </span>
+          {% else %}
+            {% include 'registration/user_management/employers.html' with epilepsy12_user=form.instance.pk  current_employer_organisations=current_employer_organisations error=error editable=False %}
+          {% endif %}
 
-          <div class="eight wide field case_create_buttons_wrapper">
-            <input
-              class="ui rcpch_primary button"
-              type="submit"
-              value="{{admin_title}}"
-              name='edit'/>
-            {% if not form.email_confirmed.value and admin_title != 'Add Epilepsy12 User' %}
-              <button
-                type="submit"
-                {% if perms.epilepsy12.change_epilepsy12user %}
-                  class="ui rcpch_primary icon button"
-                  {% else %}
-                  class="ui rcpch_primary disabled icon button"
+         <div class="ui basic segment" style="padding: 1rem 0; border: none; box-shadow: none;">
+            <div style="display: flex; justify-content: space-between; flex-wrap: wrap; gap: 0.5rem;">
+              <!-- Left button group -->
+              <div class="ui buttons">
+                <input
+                  class="ui rcpch_primary button"
+                  type="submit"
+                  value="{{admin_title}}"
+                  name='edit'/>
+                {% if not form.email_confirmed.value and admin_title != 'Add Epilepsy12 User' %}
+                  <button
+                    type="submit"
+                    {% if perms.epilepsy12.change_epilepsy12user %}
+                      class="ui rcpch_primary icon button"
+                      {% else %}
+                      class="ui rcpch_primary disabled icon button"
+                    {% endif %}
+                    name="resend"
+                    value="resend"
+                  >
+                    Resend Account Confirmation Email
+                  </button>
                 {% endif %}
-                name="resend"
-                value="resend"
-              >
-                Resend Account Confirmation Email
-              </button>
-            {% endif %}
+                
+                <a
+                  class="ui rcpch_negative button"
+                  name="cancel"
+                  href="{% url 'epilepsy12_user_list' organisation_id=organisation.pk %}"
+                >Cancel</a>
+              </div>
+
+              <!-- Right button group -->
+              {% if admin_title != 'Add Epilepsy12 User' and admin_title != "Add RCPCH Epilepsy12 staff member" %}
+                <div class="ui buttons">
+                  <input
+                    type="submit"
+                    {% if perms.epilepsy12.delete_epilepsy12user and user.email != form.email.value %}
+                      class="ui rcpch_danger button"
+                    {% else %}
+                      class="ui rcpch_danger disabled button"
+                    {% endif %}
+                    name="delete"
+                    id="delete"
+                    value="{% if user.is_active %}Deactivate{% else %}Activate{% endif %} Epilepsy12 user account"
+                    hx-post="{% url 'delete_epilepsy12_user' organisation_id=organisation.pk epilepsy12_user_id=form.instance.pk %}"
+                    hx-trigger='click'
+                    hx-headers='{"X-CSRFToken": "{{ csrf_token }}"}'
+                    _= "on htmx:confirm(issueRequest)
+                      halt the event
+                      call Swal.fire({
+                        title: 'Confirmation Required',
+                        text: 'This will deactivate the account for {{form.first_name.value}} {{form.surname.value}}.',
+                        icon: 'warning',
+                        iconColor: '#e00087',
+                        showCancelButton: true,
+                        confirmButtonColor: '#11a7f2',
+                        cancelButtonColor: '#e60700',
+                        confirmButtonText: 'Deactivate Epilepsy12 user account.'
+                      })
+                      if result.isConfirmed issueRequest()"
+                  />
+                </div>
+              {% endif %}
+            </div>
             
             {{form.email_confirmed.as_hidden}}
-
-            {% if admin_title != 'Add Epilepsy12 User' and admin_title != "Add RCPCH Epilepsy12 staff member" %}
-              <input
-                type="submit"
-                {% if perms.epilepsy12.delete_epilepsy12user and user.email != form.email.value %}
-                  class="ui rcpch_danger button"
-                {% else %}
-                  class="ui rcpch_danger disabled button"
-                {% endif %}
-                name="delete"
-                id="delete"
-                value="{% if user.is_active %}Deactivate{% else %}Activate{% endif %} Epilepsy12 user account"
-                hx-post="{% url 'delete_epilepsy12_user' organisation_id=organisation_id epilepsy12_user_id=form.instance.pk %}"
-                hx-trigger='click'
-                hx-headers='{"X-CSRFToken": "{{ csrf_token }}"}'
-                _= "on htmx:confirm(issueRequest)
-                  halt the event
-                  call Swal.fire({
-                    title: 'Confirmation Required',
-                    text: 'This will deactivate the account for {{form.first_name.value}} {{form.surname.value}}.',
-                    icon: 'warning',
-                    iconColor: '#e00087',
-                    showCancelButton: true,
-                    confirmButtonColor: '#11a7f2',
-                    cancelButtonColor: '#e60700',
-                    confirmButtonText: 'Deactivate Epilepsy12 user account.'
-                  })
-                  if result.isConfirmed issueRequest()"
-              />
-            
-            {% endif %}
-            
-            <a
-              class="ui rcpch_negative button"
-              name="cancel"
-              href="{% url 'epilepsy12_user_list' organisation_id=organisation_id %}"
-            >Cancel</a>
-          </div>
+        </div>
 
         </form>
         {% if form.errors %}

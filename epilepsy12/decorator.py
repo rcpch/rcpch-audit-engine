@@ -14,7 +14,6 @@ from .models import (
     Management,
     Registration,
     Case,
-    Site,
     Episode,
     Syndrome,
     AntiEpilepsyMedicine,
@@ -24,6 +23,9 @@ from .models import (
 )
 
 from .constants import AUDIT_CENTRE_LEAD_CLINICIAN
+from epilepsy12.common_view_functions.sanction_user_access import (
+    organisation_white_list_for_user,
+)
 
 # Logging setup
 logger = logging.getLogger(__name__)
@@ -143,57 +145,37 @@ def user_may_view_this_organisation():
     # access is granted only to users who are either:
     # 1. superusers
     # 2. Active RCPCH audit members
-    # 3. Active trust level users where their trust matches the id of the organisation requested
+    # 3. Active trust/LHB level users where any trust/LHB they have access to includes the id of the organisation requested
     def decorator(view):
         def wrapper(request, *args, **kwargs):
             user = request.user
-
             if kwargs.get("organisation_id") is not None:
                 organisation_requested = Organisation.objects.get(
                     pk=kwargs.get("organisation_id")
                 )
-                if (user.is_active and user.email_confirmed) or user.is_superuser:
-                    if (
-                        user.is_rcpch_audit_team_member
-                        or user.is_rcpch_staff
-                        or user.is_superuser
-                    ):
-                        # RCPCH staff or E12 RCPCH staff can see all children across the UK
-                        return view(request, *args, **kwargs)
-                    else:
-                        # regular user - not a member of RCPCH
-                        if (
-                            user.organisation_employer.country.boundary_identifier
-                            == "W92000004"
-                        ):
-                            user_parent = user.organisation_employer.local_health_board
-                        else:
-                            user_parent = user.organisation_employer.trust
-
-                        if (
-                            organisation_requested.country.boundary_identifier
-                            == "W92000004"
-                        ):
-                            organisation_requested_parent = (
-                                organisation_requested.local_health_board
-                            )
-                        else:
-                            organisation_requested_parent = organisation_requested.trust
-
-                        if user_parent == organisation_requested_parent:
-                            # user's employing trust is the same as the trust of the organisation requested
-                            if kwargs.get("user_type") is not None:
-                                if kwargs.get("user_type") == "rcpch-staff":
-                                    # this route is for rcpch staff to create new rcpch staff members only
-                                    raise PermissionDenied()
-                            return view(request, *args, **kwargs)
-                        else:
+                organisation_list = organisation_white_list_for_user(
+                    epilepsy12_user=user
+                )
+                if (
+                    (
+                        organisation_requested in organisation_list
+                        and user.is_active
+                        and user.email_confirmed
+                    )
+                    or user.is_superuser
+                    or user.is_rcpch_audit_team_member
+                ):
+                    # user's has an organisation employer in the same trust or LHB as the organisation requested
+                    if kwargs.get("user_type") is not None:
+                        if kwargs.get("user_type") == "rcpch-staff":
+                            # this route is for rcpch staff to create new rcpch staff members only
                             raise PermissionDenied()
-
+                    # user is allowed
+                    return view(request, *args, **kwargs)
                 else:
-                    # user is not active or email confirmed
                     raise PermissionDenied()
             else:
+                # organisation requested does not exist
                 raise ValueError("Organisation requested does not exist!")
 
         return wrapper
@@ -357,16 +339,8 @@ def user_can_access_user():
                 request.user.is_rcpch_audit_team_member
                 or request.user.is_rcpch_staff
                 or request.user.is_superuser
-                or (
-                    user_to_edit.organisation_employer.trust is not None
-                    and user_to_edit.organisation_employer.trust
-                    == request.user.organisation_employer.trust
-                )
-                or (
-                    user_to_edit.organisation_employer.local_health_board is not None
-                    and user_to_edit.organisation_employer.local_health_board
-                    == request.user.organisation_employer.local_health_board
-                )
+                or request.user.organisation_employer
+                in organisation_white_list_for_user(user_to_edit)
             ):
                 # allow access if user requesting acess is:
                 # 1. a superuser

@@ -165,7 +165,6 @@ def test_user_create_same_org_success(
             kwargs={
                 "organisation_id": TEST_USER_ORGANISATION.id,
                 "user_type": "organisation-staff",
-                "epilepsy12_user_id": test_user.id,
             },
         )
 
@@ -179,7 +178,6 @@ def test_user_create_same_org_success(
             "title": 1,
             "email": f"{test_user.first_name}@test.com",
             "role": 1,
-            "organisation_employer": TEST_USER_ORGANISATION.id,
             "first_name": TEMP_CREATED_USER_FIRST_NAME,
             "surname": "User",
             "is_rcpch_audit_team_member": False,
@@ -247,7 +245,6 @@ def test_user_create_diff_org_success(
             kwargs={
                 "organisation_id": DIFF_TRUST_DIFF_ORGANISATION.id,
                 "user_type": "organisation-staff",
-                "epilepsy12_user_id": test_user.id,
             },
         )
 
@@ -255,7 +252,6 @@ def test_user_create_diff_org_success(
             "title": 1,
             "email": f"{test_user.first_name}@test.com",
             "role": 1,
-            "organisation_employer": DIFF_TRUST_DIFF_ORGANISATION.id,
             "first_name": TEMP_CREATED_USER_FIRST_NAME,
             "surname": "User",
             "is_rcpch_audit_team_member": True,
@@ -325,7 +321,6 @@ def test_user_creation_forbidden(
             kwargs={
                 "organisation_id": DIFF_TRUST_DIFF_ORGANISATION.id,
                 "user_type": "organisation-staff",
-                "epilepsy12_user_id": test_user.id,
             },
         )
 
@@ -339,7 +334,6 @@ def test_user_creation_forbidden(
             "title": 1,
             "email": f"{test_user.first_name}@test.com",
             "role": 1,
-            "organisation_employer": DIFF_TRUST_DIFF_ORGANISATION.id,
             "first_name": TEMP_CREATED_USER_FIRST_NAME,
             "surname": "User",
             "is_rcpch_audit_team_member": False,

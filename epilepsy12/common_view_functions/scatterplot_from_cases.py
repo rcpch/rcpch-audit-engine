@@ -20,53 +20,88 @@ def generate_distance_from_organisation_scatterplot_figure(
     Returns a plottable map with Cases overlayed as dots with tooltips on hover
     """
 
+    # Ensure numeric and drop rows without coordinates
+    geo_df = geo_df.copy()
+    geo_df["latitude"] = pd.to_numeric(geo_df["latitude"], errors="coerce")
+    geo_df["longitude"] = pd.to_numeric(geo_df["longitude"], errors="coerce")
+    geo_df = geo_df.dropna(subset=["latitude", "longitude"])
+
+    # Use plain lists/ndarrays for safety
+    lats = geo_df["latitude"].astype(float).tolist()
+    lons = geo_df["longitude"].astype(float).tolist()
+    has_custom = {"pk", "distance_mi", "distance_km"}.issubset(geo_df.columns)
+    custom = (
+        list(
+            zip(
+                geo_df["pk"].astype(str).tolist(),
+                geo_df["distance_mi"].astype(float).tolist(),
+                geo_df["distance_km"].astype(float).tolist(),
+            )
+        )
+        if has_custom
+        else None
+    )
+    hovertext = (
+        geo_df["epilepsy12_sites__organisation__name"].astype(str).tolist()
+        if "epilepsy12_sites__organisation__name" in geo_df.columns
+        else None
+    )
+
+    # Compute a sensible center (fall back to organisation if available)
+    center_lat = (
+        float(geo_df["latitude"].mean())
+        if not geo_df.empty
+        else getattr(organisation, "latitude", None)
+    )
+    center_lon = (
+        float(geo_df["longitude"].mean())
+        if not geo_df.empty
+        else getattr(organisation, "longitude", None)
+    )
+
+    # plot the cases
     fig = go.Figure(
         go.Scattermapbox(
-            lat=geo_df["latitude"] if not geo_df.empty else [],
-            lon=geo_df["longitude"] if not geo_df.empty else [],
-            hovertext=(
-                geo_df["epilepsy12_sites__organisation__name"]
-                if not geo_df.empty
-                else None
-            ),
+            lat=lats,
+            lon=lons,
+            hovertext=hovertext,
             mode="markers",
-            marker=go.scattermapbox.Marker(
-                size=9,
-                color=RCPCH_PINK,
-            ),
-            customdata=geo_df[["pk", "distance_mi", "distance_km"]],
+            marker=go.scattermapbox.Marker(size=12, color=RCPCH_PINK, opacity=0.95),
+            customdata=custom,
         )
     )
 
     fig.update_layout(
         mapbox_style="carto-positron",
-        mapbox_zoom=10,
-        mapbox_center=dict(lat=organisation.latitude, lon=organisation.longitude),
+        mapbox_zoom=8,
+        mapbox_center=dict(lat=center_lat, lon=center_lon),
         height=590,
         mapbox_accesstoken=settings.MAPBOX_API_KEY,
         showlegend=False,
     )
 
-    # Update the hover template
-    fig.update_traces(
-        hovertemplate="<b>%{hovertext}</b><br>Epilepsy12 ID: %{customdata[0]}<br>Distance to Lead Centre: %{customdata[1]:.2f} mi (%{customdata[2]:.2f} km)<extra></extra>"
-    )
-
-    # Add a scatterplot point for the organization
-    fig.add_trace(
-        go.Scattermapbox(
-            lat=[organisation.latitude],
-            lon=[organisation.longitude],
-            mode="markers",
-            marker=go.scattermapbox.Marker(
-                size=12,
-                color=RCPCH_DARK_BLUE,  # Set the color of the point
-            ),
-            text=[organisation.name],  # Set the hover text for the point
-            hovertemplate="%{text}<extra></extra>",  # Custom hovertemplate just for the lead organisation
-            showlegend=False,
+    # Update the hover template (only if customdata present)
+    if set(["pk", "distance_mi", "distance_km"]).issubset(geo_df.columns):
+        fig.update_traces(
+            hovertemplate="<b>%{hovertext}</b><br>Epilepsy12 ID: %{customdata[0]}<br>Distance to Lead Centre: %{customdata[1]:.2f} mi (%{customdata[2]:.2f} km)<extra></extra>"
         )
-    )
+
+    # Add a scatterplot point for the organization if it has valid coords
+    if (
+        getattr(organisation, "latitude", None) is not None
+        and getattr(organisation, "longitude", None) is not None
+    ):
+        fig.add_trace(
+            go.Scattermapbox(
+                lat=[organisation.latitude],
+                lon=[organisation.longitude],
+                mode="markers",
+                marker=go.scattermapbox.Marker(size=12, color=RCPCH_DARK_BLUE),
+                text=[organisation.name],
+                hovertemplate="%{text}<extra></extra>",
+                showlegend=False,
+            )
+        )
 
     fig.update_layout(
         margin={"r": 0, "t": 0, "l": 0, "b": 0},
@@ -79,7 +114,6 @@ def generate_distance_from_organisation_scatterplot_figure(
         ),
     )
 
-    # Convert the Plotly figure to JSON
     return pio.to_json(fig)
 
 

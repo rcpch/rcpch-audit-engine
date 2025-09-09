@@ -18,6 +18,7 @@ These tests test the validations in the clean function in the epilepsy_12_user_f
 import pytest
 
 # django imports
+from django.urls import reverse
 
 # E12 Imports
 from epilepsy12.tests.UserDataClasses import (
@@ -30,6 +31,7 @@ from epilepsy12.tests.UserDataClasses import (
 from epilepsy12.models import (
     Epilepsy12User,
     Organisation,
+    OrganisationEmployer,
 )
 from epilepsy12.tests.view_tests.permissions_tests.perm_tests_utils import (
     twofactor_signin,
@@ -59,7 +61,6 @@ def test_lead_clinician_cannot_create_a_user_in_another_trust(client):
         "title": 1,
         "email": f"{test_user.first_name}@test.com",
         "role": 1,
-        "organisation_employer": OTHER_ORGANISATION_OTHER_TRUST,
         "first_name": TEMP_CREATED_USER_FIRST_NAME,
         "surname": "User",
         "is_rcpch_audit_team_member": False,
@@ -80,12 +81,20 @@ def test_lead_clinician_cannot_create_a_user_in_another_trust(client):
         data=data,
     )
 
-    assert form.is_valid() == False, "Invalid form"
+    assert form.is_valid() == True, "The form should be valid"
+
+    url = reverse(
+        "create_epilepsy12_user",
+        kwargs={
+            "organisation_id": OTHER_ORGANISATION_OTHER_TRUST.pk,
+            "user_type": "organisation-staff",
+        },
+    )
+    response = client.post(path=url, data=data)
 
     assert (
-        form.errors["organisation_employer"][0]
-        == f"You do not have permission to create users in different trusts or local health boards."
-    ), f"Expected {test_user} from {test_user.organisation_employer} NOT to be able to create user in {OTHER_ORGANISATION_OTHER_TRUST} in different Trust"
+        response.status_code == 403
+    ), "Lead clinician cannot create user in another trust"
 
 
 @pytest.mark.django_db
@@ -112,7 +121,6 @@ def test_lead_clinician_can_create_a_user_in_the_same_trust(client):
         "title": 1,
         "email": f"{test_user.first_name}@test.com",
         "role": 1,
-        "organisation_employer": OTHER_ORGANISATION_SAME_TRUST,
         "first_name": TEMP_CREATED_USER_FIRST_NAME,
         "surname": "User",
         "is_rcpch_audit_team_member": False,
@@ -135,9 +143,31 @@ def test_lead_clinician_can_create_a_user_in_the_same_trust(client):
 
     assert form.is_valid() == True, "Valid form"
 
+    # be sure this user does not already exist is this trust
     assert (
-        form.errors == {}
-    ), f"Expected {test_user} from {test_user.organisation_employer} CAN create user in {OTHER_ORGANISATION_SAME_TRUST} in same Trust"
+        OrganisationEmployer.objects.filter(
+            employer_organisation=OTHER_ORGANISATION_SAME_TRUST,
+            epilepsy12_user__first_name=TEMP_CREATED_USER_FIRST_NAME,
+        ).exists()
+        == False
+    ), "User should not yet exist in the same trust"
+
+    url = reverse(
+        "create_epilepsy12_user",
+        kwargs={
+            "organisation_id": OTHER_ORGANISATION_SAME_TRUST.pk,
+            "user_type": "organisation-staff",
+        },
+    )
+    response = client.post(path=url, data=data, follow=True)
+
+    assert Epilepsy12User.objects.filter(
+        first_name=TEMP_CREATED_USER_FIRST_NAME,
+    ).exists(), "User should be created in the same trust"
+    assert OrganisationEmployer.objects.filter(
+        employer_organisation=OTHER_ORGANISATION_SAME_TRUST,
+        epilepsy12_user__first_name=TEMP_CREATED_USER_FIRST_NAME,
+    ).exists(), "User should be created in the same trust"
 
 
 @pytest.mark.django_db
@@ -151,7 +181,9 @@ def test_lead_clinician_cannot_create_a_user_in_another_local_health_board(clien
 
     TEMP_CREATED_USER_FIRST_NAME = "TEMP_CREATED_USER_FIRST_NAME"
 
-    OTHER_ORGANISATION_OTHER_LOCAL_HEALTH_BOARD = Organisation.objects.get(pk=334)
+    OTHER_ORGANISATION_OTHER_LOCAL_HEALTH_BOARD = Organisation.objects.get(
+        ods_code="7A3LW"
+    )  # Organisation in Swansea Bay University Health Board
 
     test_user = Epilepsy12User.objects.create(
         surname="leadclinician",
@@ -165,16 +197,17 @@ def test_lead_clinician_cannot_create_a_user_in_another_local_health_board(clien
         email_confirmed=False,
         is_staff=False,
         is_patient_or_carer=False,
+        is_active=True,
     )
     test_user.set_organisation_employer(
-        Organisation.objects.get(pk=333), is_primary=True
+        Organisation.objects.get(ods_code="7A3LW"),
+        is_primary=True,  # Organisation in Powys Teaching Health Board
     )
 
     data = {
         "title": 1,
         "email": f"{test_user.first_name}@test.com",
         "role": 1,
-        "organisation_employer": OTHER_ORGANISATION_OTHER_LOCAL_HEALTH_BOARD,
         "first_name": TEMP_CREATED_USER_FIRST_NAME,
         "surname": "User",
         "is_rcpch_audit_team_member": False,
@@ -195,12 +228,20 @@ def test_lead_clinician_cannot_create_a_user_in_another_local_health_board(clien
         data=data,
     )
 
-    assert form.is_valid() == False, "Invalid form"
+    assert form.is_valid(), "Form should be valid"
+
+    url = reverse(
+        "create_epilepsy12_user",
+        kwargs={
+            "organisation_id": OTHER_ORGANISATION_OTHER_LOCAL_HEALTH_BOARD.pk,
+            "user_type": "organisation-staff",
+        },
+    )
+    response = client.post(path=url, data=data)
 
     assert (
-        form.errors["organisation_employer"][0]
-        == f"You do not have permission to create users in different trusts or local health boards."
-    ), f"Expected {test_user} from {test_user.organisation_employer} NOT to be able to create user in {OTHER_ORGANISATION_OTHER_LOCAL_HEALTH_BOARD}"
+        response.status_code == 403
+    ), "User should not be able to create user in different health board"
 
 
 @pytest.mark.django_db
@@ -216,26 +257,16 @@ def test_lead_clinician_can_create_a_user_in_the_same_local_health_board(client)
 
     OTHER_ORGANISATION_SAME_LOCAL_HEALTH_BOARD = Organisation.objects.get(
         ods_code="7A6BJ",  # Chepstow Community Hospital
-    )  # Chepstow Community Hospital - same Local Health Board as Ysbyty Ystrad Fawr
+    )  # Chepstow Community Hospital - same Local Health Board as Ysbyty Ystrad Fawr (Aneurin Bevan Health Board)
 
-    test_user = Epilepsy12User.objects.create(
-        surname="leadclinician",
-        title=1,
-        email=f"welsh.leadclinician@test.com",
-        role=1,
-        first_name="welsh",
-        is_rcpch_audit_team_member=False,
-        is_rcpch_staff=False,
-        is_superuser=False,
-        email_confirmed=False,
-        is_staff=False,
-        is_patient_or_carer=False,
-    )
+    test_user = Epilepsy12User.objects.filter(
+        first_name=test_user_audit_centre_lead_clinician_data.role_str
+    ).first()
 
     test_user.set_organisation_employer(
         organisation_employer=Organisation.objects.get(
             ods_code="7A6AV"
-        ),  # Ysbyty Ystrad Fawr
+        ),  # Ysbyty Ystrad Fawr - In Aneurin Bevan Health Board
         is_primary=True,
     )
 
@@ -266,9 +297,22 @@ def test_lead_clinician_can_create_a_user_in_the_same_local_health_board(client)
 
     assert form.is_valid() == True, "Valid form"
 
-    assert (
-        form.errors == {}
-    ), f"Expected {test_user} from {test_user.organisation_employer} CAN create user in {OTHER_ORGANISATION_SAME_LOCAL_HEALTH_BOARD} (same LHB)"
+    url = reverse(
+        "create_epilepsy12_user",
+        kwargs={
+            "organisation_id": OTHER_ORGANISATION_SAME_LOCAL_HEALTH_BOARD.pk,
+            "user_type": "organisation-staff",
+        },
+    )
+    response = client.post(path=url, data=data, follow=True)
+
+    assert Epilepsy12User.objects.filter(
+        first_name=TEMP_CREATED_USER_FIRST_NAME,
+    ).exists(), "User should be created in the same local health board"
+    assert OrganisationEmployer.objects.filter(
+        employer_organisation=OTHER_ORGANISATION_SAME_LOCAL_HEALTH_BOARD,
+        epilepsy12_user__first_name=TEMP_CREATED_USER_FIRST_NAME,
+    ).exists(), "User should be created in the same local health board"
 
 
 @pytest.mark.django_db
@@ -304,7 +348,6 @@ def test_lead_clinician_cannot_create_an_RCPCH_audit_team_member(client):
         "email_confirmed": False,
         "is_staff": False,
         "is_child_or_carer": False,
-        "organisation_employer": TEST_USER_ORGANISATION,
     }
 
     form = Epilepsy12UserAdminCreationForm(
@@ -347,7 +390,6 @@ def test_lead_clinician_cannot_create_an_RCPCH_staff_member(client):
         "title": 1,
         "email": f"{test_user.first_name}@test.com",
         "role": 1,
-        "organisation_employer": TEST_USER_ORGANISATION,
         "first_name": TEMP_CREATED_USER_FIRST_NAME,
         "surname": "User",
         "is_rcpch_audit_team_member": False,
@@ -398,7 +440,6 @@ def test_lead_clinician_cannot_create_a_superuser(client):
         "title": 1,
         "email": f"{test_user.first_name}@test.com",
         "role": 1,
-        "organisation_employer": TEST_USER_ORGANISATION,
         "first_name": TEMP_CREATED_USER_FIRST_NAME,
         "surname": "User",
         "is_rcpch_audit_team_member": False,
