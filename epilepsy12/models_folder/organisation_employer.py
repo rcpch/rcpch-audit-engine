@@ -44,7 +44,7 @@ class OrganisationEmployer(models.Model):
         related_name="updated_organisation_employers",
     )
 
-    history = HistoricalRecords()
+    history = HistoricalRecords(cascade_delete_history=True)
 
     class Meta:
         constraints = [

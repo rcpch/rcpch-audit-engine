@@ -19,7 +19,7 @@ class EpilepsyCause(TimeStampAbstractBaseClass, UserStampAbstractBaseClass):
     term = models.CharField(default=None, null=True, blank=True)
     preferredTerm = models.CharField(default=None, null=True, blank=True)
 
-    history = HistoricalRecords()
+    history = HistoricalRecords(cascade_delete_history=True)
 
     @property
     def _history_user(self):

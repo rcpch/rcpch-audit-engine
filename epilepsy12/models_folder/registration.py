@@ -65,7 +65,7 @@ class Registration(
 
     cohort = models.PositiveSmallIntegerField(default=None, null=True)
 
-    history = HistoricalRecords()
+    history = HistoricalRecords(cascade_delete_history=True)
 
     @property
     def _history_user(self):

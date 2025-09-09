@@ -214,7 +214,7 @@ class Epilepsy12User(AbstractUser, PermissionsMixin):
         related_name="updated_users",
     )
 
-    history = HistoricalRecords()
+    history = HistoricalRecords(cascade_delete_history=True)
 
     REQUIRED_FIELDS = ["role", "first_name", "surname", "is_rcpch_audit_team_member"]
     USERNAME_FIELD = "email"
