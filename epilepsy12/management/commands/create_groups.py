@@ -344,7 +344,7 @@ def groups_seeder(
             "content_type": epilepsy12userContentType,
         },
         {
-            "codename": CAN_RESET_TWO_FACTOR_AUTHENTICATION,
+            "codename": CAN_RESET_TWO_FACTOR_AUTHENTICATION[0],
             "content_type": epilepsy12userContentType,
         }
     ]
