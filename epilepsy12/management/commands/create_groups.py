@@ -24,6 +24,7 @@ from epilepsy12.constants.user_types import (
     CAN_OPT_OUT_CHILD_FROM_INCLUSION_IN_AUDIT,
     CAN_PUBLISH_EPILEPSY12_DATA,
     CAN_ALLOCATE_USER_TO_ORGANISATION,
+    CAN_RESET_TWO_FACTOR_AUTHENTICATION
 )
 from epilepsy12.models import (
     AntiEpilepsyMedicine,
@@ -342,6 +343,10 @@ def groups_seeder(
             "codename": CAN_ALLOCATE_USER_TO_ORGANISATION[0],
             "content_type": epilepsy12userContentType,
         },
+        {
+            "codename": CAN_RESET_TWO_FACTOR_AUTHENTICATION,
+            "content_type": epilepsy12userContentType,
+        }
     ]
 
     PATIENT_ACCESS_PERMISSIONS = [

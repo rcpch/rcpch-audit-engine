@@ -920,9 +920,13 @@ def logs(request, organisation_id, epilepsy12_user_id):
     has_device = user_has_device(user=epilepsy12_user)
 
     if request.htmx:
+        if not request.user.has_perm("epilepsy12.can_reset_two_factor_authentication"):
+            raise PermissionDenied()
+
         for device in devices:
             if device.name == request.htmx.trigger_name:
                 device.delete()
+        
         devices = devices_for_user(user=epilepsy12_user, confirmed=True)
         template_name = "epilepsy12/logs_user_summary.html"
     else:
