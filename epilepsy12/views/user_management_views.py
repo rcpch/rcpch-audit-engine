@@ -903,6 +903,7 @@ class RCPCHLoginView(TwoFactorLoginView):
 
 @login_and_otp_required()
 @user_can_access_user()
+@permission_required("epilepsy12.view_visitactivity", raise_exception=True)
 def logs(request, organisation_id, epilepsy12_user_id):
     """
     returns logs for given organisation and user

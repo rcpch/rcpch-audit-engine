@@ -44,6 +44,7 @@ from epilepsy12.models import (
     Site,
     Epilepsy12User,
     OrganisationKPIAggregation,
+    VisitActivity
 )
 
 
@@ -76,6 +77,7 @@ def groups_seeder(
     organisationKPIAggregationContentType = ContentType.objects.get_for_model(
         OrganisationKPIAggregation
     )
+    visitactivityContentType = ContentType.objects.get_for_model(VisitActivity)
 
     """
     Note view permissions include viewing users, but not creating, updating or deleting them
@@ -309,6 +311,10 @@ def groups_seeder(
             "codename": CAN_UNREGISTER_CHILD_IN_EPILEPSY12[0],
             "content_type": registrationContentType,
         },
+        {
+            "codename": "view_visitactivity",
+            "content_type": visitactivityContentType
+        }
     ]
 
     """
