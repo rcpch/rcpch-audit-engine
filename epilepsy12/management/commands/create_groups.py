@@ -24,6 +24,7 @@ from epilepsy12.constants.user_types import (
     CAN_OPT_OUT_CHILD_FROM_INCLUSION_IN_AUDIT,
     CAN_PUBLISH_EPILEPSY12_DATA,
     CAN_ALLOCATE_USER_TO_ORGANISATION,
+    CAN_RESET_TWO_FACTOR_AUTHENTICATION
 )
 from epilepsy12.models import (
     AntiEpilepsyMedicine,
@@ -44,6 +45,7 @@ from epilepsy12.models import (
     Site,
     Epilepsy12User,
     OrganisationKPIAggregation,
+    VisitActivity
 )
 
 
@@ -76,6 +78,7 @@ def groups_seeder(
     organisationKPIAggregationContentType = ContentType.objects.get_for_model(
         OrganisationKPIAggregation
     )
+    visitactivityContentType = ContentType.objects.get_for_model(VisitActivity)
 
     """
     Note view permissions include viewing users, but not creating, updating or deleting them
@@ -309,6 +312,10 @@ def groups_seeder(
             "codename": CAN_UNREGISTER_CHILD_IN_EPILEPSY12[0],
             "content_type": registrationContentType,
         },
+        {
+            "codename": "view_visitactivity",
+            "content_type": visitactivityContentType
+        }
     ]
 
     """
@@ -336,6 +343,10 @@ def groups_seeder(
             "codename": CAN_ALLOCATE_USER_TO_ORGANISATION[0],
             "content_type": epilepsy12userContentType,
         },
+        {
+            "codename": CAN_RESET_TWO_FACTOR_AUTHENTICATION[0],
+            "content_type": epilepsy12userContentType,
+        }
     ]
 
     PATIENT_ACCESS_PERMISSIONS = [

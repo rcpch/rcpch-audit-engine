@@ -903,6 +903,7 @@ class RCPCHLoginView(TwoFactorLoginView):
 
 @login_and_otp_required()
 @user_can_access_user()
+@permission_required("epilepsy12.view_visitactivity", raise_exception=True)
 def logs(request, organisation_id, epilepsy12_user_id):
     """
     returns logs for given organisation and user
@@ -919,19 +920,32 @@ def logs(request, organisation_id, epilepsy12_user_id):
     has_device = user_has_device(user=epilepsy12_user)
 
     if request.htmx:
+        if not request.user.has_perm("epilepsy12.can_reset_two_factor_authentication"):
+            raise PermissionDenied()
+
         for device in devices:
             if device.name == request.htmx.trigger_name:
                 device.delete()
+        
         devices = devices_for_user(user=epilepsy12_user, confirmed=True)
         template_name = "epilepsy12/logs_user_summary.html"
     else:
         template_name = "epilepsy12/logs.html"
+    
+    device_data = [
+        {
+            "name": device.name,
+            # The name doesn't describe the method used
+            "display_name": f"{device.name} ({str(type(device).__name__)})",
+            "last_used_at": device.last_used_at
+        } for device in devices
+    ]
 
     context = {
         "epilepsy12_user": epilepsy12_user,
         "organisation": organisation,
         "activities": activities,
-        "devices": devices,
+        "devices": device_data,
         "has_device": has_device,
     }
 
