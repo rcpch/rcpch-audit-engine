@@ -931,12 +931,21 @@ def logs(request, organisation_id, epilepsy12_user_id):
         template_name = "epilepsy12/logs_user_summary.html"
     else:
         template_name = "epilepsy12/logs.html"
+    
+    device_data = [
+        {
+            "name": device.name,
+            # The name doesn't describe the method used
+            "display_name": f"{device.name} ({str(type(device).__name__)})",
+            "last_used_at": device.last_used_at
+        } for device in devices
+    ]
 
     context = {
         "epilepsy12_user": epilepsy12_user,
         "organisation": organisation,
         "activities": activities,
-        "devices": devices,
+        "devices": device_data,
         "has_device": has_device,
     }
 

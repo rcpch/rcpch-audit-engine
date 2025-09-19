@@ -34,13 +34,14 @@
                                 cancelButtonColor: '#e60700',
                                 confirmButtonText: 'Remove device'
                             })
-                            if result.isConfirmed issueRequest()">Remove Device: <i><b>{{device.name}}</b></i></button>
+                            if result.isConfirmed issueRequest()">Remove Device: <i><b>{{device.display_name}}</b></i></button>
+                        last used at {{device.last_used_at}}
                 </span>
             {% endfor %}
         {% else %}
             <ul>
                 {% for device in devices %}
-                    <li>Device: <b>{{device.name}}</b> last used at {{device.last_used}}</li>
+                    <li>Device: <b>{{device.display_name}}</b> last used at {{device.last_used_at}}</li>
                 {% endfor %}
             </ul>
         {% endif %}
