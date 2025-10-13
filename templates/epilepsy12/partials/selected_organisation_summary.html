@@ -40,7 +40,7 @@
 
 
             <div class="fluid row stackable org_view_all_buttons_wrapper three column grid">
-                <div class="column">
+                <div class="{% if not organisational_audit_submission_period.is_open %}eight wide{% endif %} column">
                     <a class="ui rcpch_grey button bold fluid" href="{% url 'epilepsy12_user_list' organisation_id=selected_organisation.pk %}">
                         View users of
                         {% if selected_organisation.trust %}
@@ -54,7 +54,7 @@
                         {% endif %}
                     </a>
                 </div>
-                <div class="column">
+                <div class="{% if not organisational_audit_submission_period.is_open %}eight wide{% endif %} column">
                     <a class="ui rcpch_primary button bold fluid" href="{% url 'cases' organisation_id=selected_organisation.pk %}">
                         View Clinical Audit entries for
                         {% if selected_organisation.trust %}
@@ -68,6 +68,7 @@
                         {% endif %}
                     </a>
                 </div>
+                {% if organisational_audit_submission_period.is_open %}
                 <div class="column">
                     <a class="ui rcpch_primary button bold fluid" href="{% url 'organisational_audit' %}">
                         View Organisational Audit for
@@ -82,6 +83,7 @@
                         {% endif %}
                     </a>
                 </div>
+                {% endif %}
         </div>
 
         <div class="fluid centered row">
