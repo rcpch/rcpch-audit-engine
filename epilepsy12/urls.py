@@ -1100,7 +1100,11 @@ organisational_audit_patterns = [
         view=organisational_audit_local_health_board,
         name="organisational_audit_local_health_board",
     ),
-    path("organisational_audit", view=organisational_audit),
+    path(
+        "organisational_audit",
+        view=organisational_audit,
+        name="organisational_audit",
+    ),
 ]
 
 urlpatterns = []

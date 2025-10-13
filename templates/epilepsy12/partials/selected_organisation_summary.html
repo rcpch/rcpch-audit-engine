@@ -3,20 +3,30 @@
 {% csrf_token %}
 
 <div class="ui grid container selected_organisation_container">
-        <div class="view_label_container tables">
-            <div class='back link'>
-                <button class="ui rcpch_positive button jump" _="on click go to top of #kpis">Jump to All KPI Metrics</button>
-                {% if perms.epilepsy12.can_publish_epilepsy12_data %}
-                <a class="ui rcpch_positive button" href="{% url 'case_filter_list' organisation_id=selected_organisation.pk %}">
-                    <i class="yellow wrench icon"></i>
-                    Report Builder
-                    <div class="ui yellow left pointing label" style="margin-left: 8px; padding: 4px 8px; font-size: 0.7em;">
-                        NEW <i class="red star icon" style="margin: 0 0 0 4px;"></i>
-                    </div>
-                </a>
+        <div class="fluid row stackable three column grid">
+            <div class='column'>
+                <div class="back link">
+                    <button class="ui rcpch_positive button jump" _="on click go to top of #kpis">Jump to All KPI Metrics</button>
+                    {% if perms.epilepsy12.can_publish_epilepsy12_data %}
+                    <a class="ui rcpch_positive button" href="{% url 'case_filter_list' organisation_id=selected_organisation.pk %}">
+                        <i class="yellow wrench icon"></i>
+                        Report Builder
+                        <div class="ui yellow left pointing label" style="margin-left: 8px; padding: 4px 8px; font-size: 0.7em;">
+                            NEW <i class="red star icon" style="margin: 0 0 0 4px;"></i>
+                        </div>
+                    </a>
+                    {% endif %}
+                </div>
+            </div>
+            <div class="ui rcpch_view label column" style="display: flex; align-items: center; justify-content: center; margin: 0; font-size: 25px;">
+                Organisation Dashboard
+            </div>
+            <div id="publish_button" class="column" style="display: flex; justify-content: flex-end;">
+                {% if user.is_rcpch_audit_team_member or user.is_superuser %}
+                    <!-- Only RCPCH Audit team members and superusers can publish aggregations to the open access page -->
+                    {% include './organisation/publish_button.html' with selected_organisation=selected_organisation publish_success=publish_success %}
                 {% endif %}
             </div>
-            <div class="ui rcpch_view label view_title">Organisation Dashboard</div>
         </div>
 
         
@@ -30,76 +40,48 @@
 
 
             <div class="fluid row stackable org_view_all_buttons_wrapper three column grid">
-                {% if user.is_rcpch_audit_team_member or user.is_superuser %}
-                        <!-- Only RCPCH Audit team members and superusers can publish aggregations to the open access page -->
-                    <div class="column">
-                        <a class="ui rcpch_grey button bold fluid" href="{% url 'epilepsy12_user_list' organisation_id=selected_organisation.pk %}">
-                            View users of 
-                            {% if selected_organisation.trust %}
-                                {% with organisation_name=selected_organisation.trust.name|title %}
-                                {{ organisation_name|capitalise_org_names }} 
-                                {% endwith %}
-                            {% elif selected_organisation.local_health_board %}
-                                {% with organisation_name=selected_organisation.local_health_board.name|title %}
-                                {{ organisation_name|capitalise_org_names }} 
-                                {% endwith %}
-                            {% endif %}
-                        </a>
-                    </div>
-                    <div class="column">
-                        <div class="ui buttons">
-                            <a class="ui rcpch_primary button bold fluid" href="{% url 'cases' organisation_id=selected_organisation.pk %}">
-                                View Clinical Audit entries for
-                                {% if selected_organisation.trust %}
-                                    {% with organisation_name=selected_organisation.trust.name|title %}
-                                    {{ organisation_name|capitalise_org_names }} 
-                                    {% endwith %}
-                                {% elif selected_organisation.local_health_board %}
-                                    {% with organisation_name=selected_organisation.local_health_board.name|title %}
-                                    {{ organisation_name|capitalise_org_names }} 
-                                    {% endwith %}
-                                {% endif %}
-                            </a>
-                        </div>
-                    </div>
-                    <div class="column" id="publish_button">
-                        {% include './organisation/publish_button.html' with selected_organisation=selected_organisation publish_success=publish_success %}
-                    </div>
-
-                {% else %}
-
-                    <div class="eight wide column">
-                        <a class="ui rcpch_grey button bold fluid" href="{% url 'epilepsy12_user_list' organisation_id=selected_organisation.pk %}">
-                            View users of
-                            {% if selected_organisation.trust %}
-                                {% with organisation_name=selected_organisation.trust.name|title %}
-                                {{ organisation_name|capitalise_org_names }} 
-                                {% endwith %}
-                            {% elif selected_organisation.local_health_board %}
-                                {% with organisation_name=selected_organisation.local_health_board.name|title %}
-                                {{ organisation_name|capitalise_org_names }} 
-                                {% endwith %}
-                            {% endif %}
-                        </a>
-                    </div>
-                    <div class="eight wide  column">
-                        <div class="eight wide column">
-                            <a class="ui rcpch_primary button bold fluid" href="{% url 'cases' organisation_id=selected_organisation.pk %}">
-                                View Clinical Audit entries for
-                                {% if selected_organisation.trust %}
-                                    {% with organisation_name=selected_organisation.trust.name|title %}
-                                    {{ organisation_name|capitalise_org_names }} 
-                                    {% endwith %}
-                                {% elif selected_organisation.local_health_board %}
-                                    {% with organisation_name=selected_organisation.local_health_board.name|title %}
-                                    {{ organisation_name|capitalise_org_names }} 
-                                    {% endwith %}
-                                {% endif %}
-                            </a>
-                        </div>
-                    </div>
-
-                {% endif %}
+                <div class="column">
+                    <a class="ui rcpch_grey button bold fluid" href="{% url 'epilepsy12_user_list' organisation_id=selected_organisation.pk %}">
+                        View users of
+                        {% if selected_organisation.trust %}
+                            {% with organisation_name=selected_organisation.trust.name|title %}
+                            {{ organisation_name|capitalise_org_names }} 
+                            {% endwith %}
+                        {% elif selected_organisation.local_health_board %}
+                            {% with organisation_name=selected_organisation.local_health_board.name|title %}
+                            {{ organisation_name|capitalise_org_names }} 
+                            {% endwith %}
+                        {% endif %}
+                    </a>
+                </div>
+                <div class="column">
+                    <a class="ui rcpch_primary button bold fluid" href="{% url 'cases' organisation_id=selected_organisation.pk %}">
+                        View Clinical Audit entries for
+                        {% if selected_organisation.trust %}
+                            {% with organisation_name=selected_organisation.trust.name|title %}
+                            {{ organisation_name|capitalise_org_names }} 
+                            {% endwith %}
+                        {% elif selected_organisation.local_health_board %}
+                            {% with organisation_name=selected_organisation.local_health_board.name|title %}
+                            {{ organisation_name|capitalise_org_names }} 
+                            {% endwith %}
+                        {% endif %}
+                    </a>
+                </div>
+                <div class="column">
+                    <a class="ui rcpch_primary button bold fluid" href="{% url 'organisational_audit' %}">
+                        View Organisational Audit for
+                        {% if selected_organisation.trust %}
+                            {% with organisation_name=selected_organisation.trust.name|title %}
+                            {{ organisation_name|capitalise_org_names }} 
+                            {% endwith %}
+                        {% elif selected_organisation.local_health_board %}
+                            {% with organisation_name=selected_organisation.local_health_board.name|title %}
+                            {{ organisation_name|capitalise_org_names }} 
+                            {% endwith %}
+                        {% endif %}
+                    </a>
+                </div>
         </div>
 
         <div class="fluid centered row">
