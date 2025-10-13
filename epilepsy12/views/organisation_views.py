@@ -14,7 +14,7 @@ import pandas as pd
 # E12 imports
 from ..decorator import user_may_view_this_organisation, login_and_otp_required
 from epilepsy12.constants import INDIVIDUAL_KPI_MEASURES, EnumAbstractionLevel
-from epilepsy12.models import Organisation, KPI, OrganisationKPIAggregation
+from epilepsy12.models import Organisation, KPI, OrganisationKPIAggregation, OrganisationalAuditSubmissionPeriod
 from ..common_view_functions import (
     cases_aggregated_by_sex,
     cases_aggregated_by_ethnicity,
@@ -225,6 +225,12 @@ def selected_organisation_summary(request, organisation_id):
         organisation_list = organisation_white_list_for_user(
             epilepsy12_user=request.user
         )
+    
+    organisational_audit_submission_period = (
+        OrganisationalAuditSubmissionPeriod.objects
+        .order_by("-year")
+        .first()
+    )
 
     context = {
         "user": request.user,
@@ -264,6 +270,7 @@ def selected_organisation_summary(request, organisation_id):
         "organisation_cases_map": scatterplot_of_cases_for_selected_organisation,
         "aggregated_distances": aggregated_distances,
         "country_heatmap": country_heatmap,
+        "organisational_audit_submission_period": organisational_audit_submission_period,
     }
     if selected_organisation.country.boundary_identifier == "W92000004":
         context["lhb_heatmap"] = lhb_heatmap
