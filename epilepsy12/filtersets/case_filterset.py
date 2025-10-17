@@ -12,11 +12,6 @@ from ..constants import KPI_MAP, ETHNICITIES, SEX_TYPE
 from epilepsy12.models import (
     Organisation,
     Case,
-    Country,
-    IntegratedCareBoard,
-    LocalHealthBoard,
-    NHSEnglandRegion,
-    Trust,
 )
 
 
