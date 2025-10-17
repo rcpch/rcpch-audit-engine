@@ -10,6 +10,7 @@ django-auto-logout==0.5.1
 django-filter==25.1
 django-htmx==1.23.0
 django-semantic-admin==0.6.6
+django-silk==5.4.3
 django-simple-captcha==0.6.2
 django-simple-history==3.8.0
 django-two-factor-auth==1.17.0

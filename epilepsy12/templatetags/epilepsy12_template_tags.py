@@ -657,7 +657,10 @@ def build_url_parameters(request, field, selected_field_value=None):
     if field == "kpi_failed":
         # Handle multi-value KPI toggling
         # Assumes selected_field_value is the specific KPI ID to add or remove
-        if selected_field_value is not None:
+        if selected_field_value is None:
+            if "kpi_failed" in query_params:
+                del query_params["kpi_failed"]
+        else:
             kpi_to_toggle = str(selected_field_value)  # Ensure string comparison
             current_kpis = query_params.getlist("kpi_failed")
 
@@ -744,6 +747,8 @@ def field_key_to_readable_name(field_key):
         "global_developmental_delay_or_learning_difficulties": "Global developmental delay or learning difficulties",
         "autistic_spectrum_disorder": "Autistic spectrum disorder",
         "mental_health_issue_identified": "Mental health issue identified",
+        "age_range": "Age range",
+        "registration_status": "Registration Status",
     }
 
     return field_keys.get(field_key, field_key)
@@ -824,6 +829,18 @@ def field_value_to_readable_name(field_value, field_key):
                 return Country.objects.get(id=id).name
             except Country.DoesNotExist:
                 return field_value
+    elif field_key == "age_range":
+        if field_value == "under_12":
+            return "Under 12s"
+        elif field_value == "over_12":
+            return "12 and Over"
+        else:
+            return field_value
+    elif field_key == "registration_status":
+        if field_value == "registered":
+            return "Registered"
+        elif field_value == "unregistered":
+            return "Unregistered"
     else:
         # For other field keys, return the value as is
         return field_value

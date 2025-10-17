@@ -16,13 +16,15 @@ router = routers.DefaultRouter()
 for item in tf_urls:
     if type(item) == list:
         for url_pattern in item:
-            if vars(url_pattern).get('name') == 'login':
+            if vars(url_pattern).get("name") == "login":
                 url_pattern.callback = RCPCHLoginView.as_view()
         break
 
 urlpatterns = [
     path("admin/doc/", include(urls)),
     path("admin/", admin.site.urls),
-    path('', include(tf_urls)),
+    path("", include(tf_urls)),
     path("", include("epilepsy12.urls")),
 ]
+
+urlpatterns += [path("silk/", include("silk.urls", namespace="silk"))]

@@ -6,6 +6,7 @@ from django import forms
 
 # Third-party imports
 import django_filters
+from silk.profiling.profiler import silk_profile
 
 from ..constants import KPI_MAP, ETHNICITIES, SEX_TYPE
 from epilepsy12.models import (
@@ -310,26 +311,541 @@ class CaseFilterMethods:
     # Simple facet counts for fields on the Case model
 
     """
-    Fields on the Case model
+    Counts for fields on the Case model or related models
+    """
+
+    # @staticmethod
+    # @silk_profile(name="Get Audit Progress Complete Count")
+    # def get_audit_progress_complete_count(queryset, value):
+    #     """
+    #     Returns counts of case by complete audit progress status - includes cases with no registration
+    #     Accepts a value in the format of "audit_<audit_id>"
+    #     """
+    #     if value:
+    #         # Filter by complete audit progress status
+    #         return (
+    #             queryset.filter(
+    #                 epilepsy12_sites__site_is_primary_centre_of_epilepsy_care=True,
+    #                 epilepsy12_sites__site_is_actively_involved_in_epilepsy_care=True,
+    #                 epilepsy12_sites__case__isnull=False,
+    #                 epilepsy12_sites__case__registration__isnull=False,
+    #                 registration__audit_progress__registration_complete=True,
+    #                 registration__audit_progress__first_paediatric_assessment_complete=True,
+    #                 registration__audit_progress__epilepsy_context_complete=True,
+    #                 registration__audit_progress__assessment_complete=True,
+    #                 registration__audit_progress__multiaxial_diagnosis_complete=True,
+    #                 registration__audit_progress__investigations_complete=True,
+    #                 registration__audit_progress__management_complete=True,
+    #             )
+    #             .distinct()
+    #             .count()
+    #         )
+    #     else:
+    #         return queryset.count()
+
+    # @staticmethod
+    # @silk_profile(name="Get Registration Cohort Counts")
+    # def get_registration_cohort_counts(queryset, value):
+    #     """
+    #     Returns counts of case by registration cohort - includes cases with no registration
+    #     Accepts a value in the format of "cohort_<cohort_id>"
+    #     """
+    #     if not value:
+    #         return 0
+    #     # Filter by registration cohort
+    #     return (
+    #         queryset.filter(
+    #             epilepsy12_sites__site_is_primary_centre_of_epilepsy_care=True,
+    #             epilepsy12_sites__site_is_actively_involved_in_epilepsy_care=True,
+    #             epilepsy12_sites__case__isnull=False,
+    #             epilepsy12_sites__case__registration__isnull=False,
+    #             registration__cohort=value,
+    #         )
+    #         .distinct()
+    #         .count()
+    #     )
+
+    # @staticmethod
+    # @silk_profile(name="Get Audit Progress Incomplete Count")
+    # def get_audit_progress_incomplete_count(queryset, value):
+    #     """
+    #     Returns counts of case by incomplete audit progress status - includes cases with no registration
+    #     Accepts boolean value
+    #     """
+
+    #     if value:
+    #         # Filter by incomplete audit progress status
+    #         return (
+    #             queryset.filter(
+    #                 Q(
+    #                     Q(registration__audit_progress__registration_complete=False)
+    #                     | Q(
+    #                         registration__audit_progress__first_paediatric_assessment_complete=False
+    #                     )
+    #                     | Q(
+    #                         registration__audit_progress__epilepsy_context_complete=False
+    #                     )
+    #                     | Q(registration__audit_progress__assessment_complete=False)
+    #                     | Q(
+    #                         registration__audit_progress__multiaxial_diagnosis_complete=False
+    #                     )
+    #                     | Q(registration__audit_progress__investigations_complete=False)
+    #                     | Q(registration__audit_progress__management_complete=False)
+    #                 ),
+    #                 epilepsy12_sites__site_is_primary_centre_of_epilepsy_care=True,
+    #                 epilepsy12_sites__site_is_actively_involved_in_epilepsy_care=True,
+    #                 epilepsy12_sites__case__isnull=False,
+    #                 epilepsy12_sites__case__registration__isnull=False,
+    #             )
+    #             .distinct()
+    #             .count()
+    #         )
+    #     return queryset.count()
+
+    @staticmethod
+    @silk_profile(name="Get Total Episodes Count")
+    def get_total_episodes_count(queryset, value):
+        """
+        Returns the total count of episodes in the queryset.
+        """
+        if not value:
+            return 0
+        try:
+            value_type, value_id = value.split("_", 1)
+        except ValueError:
+            # Handle the case where value is not in the expected format
+            return 0
+
+        if value_type == "episodes":
+            # Filter by total episodes count
+            return queryset.filter(
+                epilepsy12_sites__site_is_primary_centre_of_epilepsy_care=True,
+                epilepsy12_sites__site_is_actively_involved_in_epilepsy_care=True,
+            ).annotate(
+                episode_count=Count(
+                    "registration__multiaxialdiagnosis__episodes", distinct=True
+                ).aggregate(total_episodes=Sum("episode_count"))["total_episodes"]
+            )
+        return 0
+
+    @staticmethod
+    @silk_profile(name="Get KPI Failed Counts")
+    def get_kpi_failed_counts(queryset):
+        """
+        Returns a dictionary of KPI fields and counts of cases failing each KPI.
+
+        Returns:
+            dict: Keys are KPI numbers (1-10), values are the count of cases failing that KPI
+        """
+
+        aggregations = {}
+        for key, field in KPI_MAP.items():
+            if field:
+                aggregations[key] = Count(
+                    "id",
+                    filter=Q(
+                        **{f"registration__kpi__{field}": 0},
+                        epilepsy12_sites__site_is_primary_centre_of_epilepsy_care=True,
+                        epilepsy12_sites__site_is_actively_involved_in_epilepsy_care=True,
+                        epilepsy12_sites__case__isnull=False,
+                        epilepsy12_sites__case__registration__isnull=False,
+                    ),
+                )
+        counts = queryset.aggregate(**aggregations)
+        return {(key.strip(), KPI_MAP[key]): count for key, count in counts.items()}
+
+    # @staticmethod
+    # @silk_profile(name="Get Ethnicity Counts")
+    # def get_ethnicity_counts(queryset):
+    #     """Return counts of each ethnicity in ONE queryset"""
+    #     # ethnicity_counts = {}
+    #     # for code, label in ETHNICITIES:
+    #     #     ethnicity_counts[code] = queryset.filter(ethnicity=code).count()
+    #     # return ethnicity_counts
+    #     counts = queryset.aggregate(
+    #         **{
+    #             code: Count("id", filter=Q(ethnicity=code))
+    #             for code, label in ETHNICITIES
+    #         }
+    #     )
+    #     return counts
+
+    # @staticmethod
+    # @silk_profile(name="Filter Sex Counts")
+    # def get_sex_counts(queryset):
+    #     """Return counts by sex in ONE queryset"""
+    #     # sex_counts = {}
+    #     # for code, label in SEX_TYPE:
+    #     #     sex_counts[code] = queryset.filter(sex=code).count()
+    #     # return sex_counts
+    #     aggregations = {
+    #         f"sex_{code}": Count("id", filter=Q(sex=code)) for code, label in SEX_TYPE
+    #     }
+    #     counts = queryset.aggregate(**aggregations)
+    #     return {code: counts[f"sex_{code}"] for code, label in SEX_TYPE}
+
+    # @staticmethod
+    # @silk_profile(name="Get Age Counts")
+    # def get_age_counts(queryset):
+    #     """
+    #     Returns counts of cases under/over 12 years old
+    #     """
+    #     twelve_years_ago = timezone.now().date() - relativedelta(years=12)
+
+    #     under_12_count = queryset.filter(date_of_birth__gt=twelve_years_ago).count()
+    #     over_12_count = queryset.filter(date_of_birth__lte=twelve_years_ago).count()
+
+    #     return {"under_12": under_12_count, "12_and_over": over_12_count}
+
+    # @staticmethod
+    # @silk_profile(name="Get Index of Multiple Deprivation Quintile Counts")
+    # def get_index_of_multiple_deprivation_quintile_counts(queryset):
+    #     """
+    #     Returns counts of cases by index of multiple deprivation quintile
+    #     """
+    #     aggregations = {
+    #         f"imd_{i}": Count("id", filter=Q(index_of_multiple_deprivation_quintile=i))
+    #         for i in range(1, 6)
+    #     }
+    #     counts = queryset.aggregate(**aggregations)
+    #     return {i: counts[f"imd_{i}"] for i in range(1, 6)}
+
+    # @staticmethod
+    # @silk_profile(name="All Ethnicities with Counts")
+    # def all_ethnicities(queryset):
+
+    #     ethnicity_counts = CaseFilterMethods.get_ethnicity_counts(queryset=queryset)
+    #     return [
+    #         (
+    #             f"ethnicity_{ethnicity[0]}",
+    #             f"{ethnicity[1]} ({ethnicity_counts})",
+    #         )
+    #         for ethnicity in ETHNICITIES
+    #     ]
+
+    # @staticmethod
+    # @silk_profile(name="Get Registration Status Counts")
+    # def get_registration_status_counts(queryset, value):
+    #     """
+    #     Returns counts of cases by registration status
+    #     """
+    #     if value == "registered":
+    #         return queryset.filter(
+    #             epilepsy12_sites__site_is_primary_centre_of_epilepsy_care=True,
+    #             epilepsy12_sites__site_is_actively_involved_in_epilepsy_care=True,
+    #             registration__isnull=False,
+    #         ).count()
+    #     elif value == "unregistered":
+    #         return queryset.filter(
+    #             epilepsy12_sites__site_is_primary_centre_of_epilepsy_care=True,
+    #             epilepsy12_sites__site_is_actively_involved_in_epilepsy_care=True,
+    #             registration__isnull=True,
+    #         ).count()
+    #     return 0
+
+    # @staticmethod
+    # @silk_profile(name="Get Developmental Learning or Schooling Problems Counts")
+    # def get_developmental_learning_or_schooling_problems_counts(queryset):
+    #     """
+    #     Returns counts of cases by developmental learning or schooling problems
+    #     """
+    #     return queryset.filter(
+    #         registration__firstpaediatricassessment__developmental_learning_or_schooling_problems=True
+    #     ).count()
+
+    # @staticmethod
+    # @silk_profile(name="Get Behavioural or Emotional Problems Counts")
+    # def get_behavioural_or_emotional_problems_counts(queryset):
+    #     """
+    #     Returns counts of cases by behavioural or emotional problems
+    #     """
+    #     return queryset.filter(
+    #         registration__firstpaediatricassessment__behavioural_or_emotional_problems=True
+    #     ).count()
+
+    # @staticmethod
+    # @silk_profile(name="Get Syndrome Present Counts")
+    # def get_syndrome_present_counts(queryset):
+    #     """
+    #     Returns counts of cases with syndrome present
+    #     """
+    #     return queryset.filter(
+    #         registration__multiaxialdiagnosis__syndrome_present=True
+    #     ).count()
+
+    # @staticmethod
+    # @silk_profile(name="Get Epilepsy Cause Known Counts")
+    # def get_epilepsy_cause_known_counts(queryset):
+    #     """
+    #     Returns counts of cases where epilepsy cause is known
+    #     """
+    #     return queryset.filter(
+    #         registration__multiaxialdiagnosis__epilepsy_cause_known=True
+    #     ).count()
+
+    # @staticmethod
+    # @silk_profile(name="Get Global Developmental Delay or Learning Difficulties Counts")
+    # def get_global_developmental_delay_or_learning_difficulties_counts(queryset):
+    #     """
+    #     Returns counts of cases with global developmental delay or learning difficulties
+    #     """
+    #     return queryset.filter(
+    #         registration__multiaxialdiagnosis__global_developmental_delay_or_learning_difficulties=True
+    #     ).count()
+
+    # @staticmethod
+    # @silk_profile(name="Get Autistic Spectrum Disorder Counts")
+    # def get_autistic_spectrum_disorder_counts(queryset):
+    #     """
+    #     Returns counts of cases with autistic spectrum disorder
+    #     """
+    #     return queryset.filter(
+    #         registration__multiaxialdiagnosis__autistic_spectrum_disorder=True
+    #     ).count()
+
+    # @staticmethod
+    # @silk_profile(name="Get Mental Health Issue Identified Counts")
+    # def get_mental_health_issue_identified_counts(queryset):
+    #     """
+    #     Returns counts of cases with identified mental health issues
+    #     """
+    #     return queryset.filter(
+    #         registration__multiaxialdiagnosis__mental_health_issue_identified=True
+    #     ).count()
+
+    # @staticmethod
+    # @silk_profile(name="Get Has Been Referred For Mental Health Support Counts")
+    # def get_has_been_referred_for_mental_health_support_counts(queryset, value=None):
+    #     """
+    #     Returns counts of cases where patient has been referred for mental health support
+    #     """
+    #     return queryset.filter(
+    #         registration__management__has_been_referred_for_mental_health_support=True
+    #     ).count()
+
+    # @staticmethod
+    # @silk_profile(name="Get Has Support For Mental Health Support Counts")
+    # def get_has_support_for_mental_health_support_counts(queryset):
+    #     """
+    #     Returns counts of cases where patient has mental health support in place
+    #     """
+    #     return queryset.filter(
+    #         registration__management__has_support_for_mental_health_support=True
+    #     ).count()
+
+    # @staticmethod
+    # @silk_profile(name="Get Organisation Counts")
+    # def get_organisation_counts(queryset, organisation_id):
+    #     """
+    #     Returns counts of cases by organisation (registered and unregistered)
+    #     """
+    #     if not organisation_id:
+    #         return queryset.count()
+    #     return queryset.filter(
+    #         epilepsy12_sites__organisation_id=organisation_id,
+    #         epilepsy12_sites__site_is_primary_centre_of_epilepsy_care=True,
+    #         epilepsy12_sites__site_is_actively_involved_in_epilepsy_care=True,
+    #     ).count()
+
+    @staticmethod
+    def get_all_simple_case_field_counts(queryset):
+        """
+        Returns a dictionary of all simple case field counts
+        """
+        twelve_years_ago = timezone.now().date() - relativedelta(years=12)
+
+        aggregations = {
+            # under or over 12 years
+            "under_12_count": Count("id", filter=Q(date_of_birth__gt=twelve_years_ago)),
+            "over_12_count": Count("id", filter=Q(date_of_birth__lte=twelve_years_ago)),
+            # sex, ethnicity, index of multiple deprivation quintile
+            **{f"sex_{code}": Count("id", filter=Q(sex=code)) for code, _ in SEX_TYPE},
+            **{
+                f"ethnicity_{code}": Count("id", filter=Q(ethnicity=code))
+                for code, _ in ETHNICITIES
+            },
+            **{
+                f"imd_{code}": Count(
+                    "id", filter=Q(index_of_multiple_deprivation_quintile=code)
+                )
+                for code in range(1, 6)
+            },
+        }
+
+        raw_counts = queryset.aggregate(**aggregations)
+
+        # Format counts into a more usable structure
+        return {
+            "ethnicity_counts": {
+                code: raw_counts.get(f"ethnicity_{code}", 0) for code, _ in ETHNICITIES
+            },
+            "sex_counts": {
+                code: raw_counts.get(f"sex_{code}", 0) for code, _ in SEX_TYPE
+            },
+            "imd_counts": {
+                code: raw_counts.get(f"imd_{code}", 0) for code in range(1, 6)
+            },
+            "under_12_count": raw_counts.get("under_12_count", 0),
+            "over_12_count": raw_counts.get("over_12_count", 0),
+        }
+
+    @staticmethod
+    def get_all_registration_related_counts(queryset):
+        """
+        Returns a dictionary of all registration-related counts
+        Includes counts for: registration, audit progress, cohort
+        """
+        base_filter = Q(
+            epilepsy12_sites__site_is_primary_centre_of_epilepsy_care=True,
+            epilepsy12_sites__site_is_actively_involved_in_epilepsy_care=True,
+            epilepsy12_sites__case__isnull=False,
+        )
+
+        aggregations = {
+            # registration status
+            "registered_cases": Count(
+                "id", filter=base_filter & Q(registration__isnull=False), distinct=True
+            ),
+            "unregistered_cases": Count(
+                "id", filter=base_filter & Q(registration__isnull=True), distinct=True
+            ),
+            # audit progress
+            "audit_progress_complete": Count(
+                "id",
+                filter=base_filter
+                & Q(registration__isnull=False)
+                & Q(
+                    registration__audit_progress__registration_complete=True,
+                    registration__audit_progress__first_paediatric_assessment_complete=True,
+                    registration__audit_progress__epilepsy_context_complete=True,
+                    registration__audit_progress__assessment_complete=True,
+                    registration__audit_progress__multiaxial_diagnosis_complete=True,
+                    registration__audit_progress__investigations_complete=True,
+                    registration__audit_progress__management_complete=True,
+                ),
+                distinct=True,
+            ),
+            "audit_progress_incomplete": Count(
+                "id",
+                filter=base_filter
+                & Q(registration__isnull=False)
+                & Q(
+                    Q(registration__audit_progress__registration_complete=False)
+                    | Q(
+                        registration__audit_progress__first_paediatric_assessment_complete=False
+                    )
+                    | Q(registration__audit_progress__epilepsy_context_complete=False)
+                    | Q(registration__audit_progress__assessment_complete=False)
+                    | Q(
+                        registration__audit_progress__multiaxial_diagnosis_complete=False
+                    )
+                    | Q(registration__audit_progress__investigations_complete=False)
+                    | Q(registration__audit_progress__management_complete=False)
+                ),
+                distinct=True,
+            ),
+            **{
+                f"cohort_{i}": Count(
+                    "id",
+                    filter=base_filter
+                    & Q(registration__isnull=False)
+                    & Q(registration__cohort=i),
+                    distinct=True,
+                )
+                for i in range(5, 8)
+            },
+        }
+
+        raw_counts = queryset.aggregate(**aggregations)
+
+        # Format counts into a more usable structure
+        return {
+            "registered": raw_counts.get("registered_cases", 0),
+            "unregistered": raw_counts.get("unregistered_cases", 0),
+            "cases_complete": raw_counts.get("audit_progress_complete", 0),
+            "cases_incomplete": raw_counts.get("audit_progress_incomplete", 0),
+            "cohort_counts": {i: raw_counts.get(f"cohort_{i}", 0) for i in range(5, 8)},
+        }
+
+    @staticmethod
+    def get_all_comorbidity_counts(queryset):
+        """
+        Returns a dictionary of all comorbidity-related counts
+        Includes counts for: developmental learning or schooling problems, behavioural or emotional problems,
+        syndrome present, epilepsy cause known, global developmental delay or learning difficulties,
+        autistic spectrum disorder, mental health issue identified, has been referred for mental health support,
+        has support for mental health support
+        """
+
+        aggregations = {
+            "developmental_learning_or_schooling_problems": Count(
+                "id",
+                filter=Q(
+                    registration__firstpaediatricassessment__developmental_learning_or_schooling_problems=True
+                ),
+                distinct=True,
+            ),
+            "behavioural_or_emotional_problems": Count(
+                "id",
+                filter=Q(
+                    registration__firstpaediatricassessment__behavioural_or_emotional_problems=True
+                ),
+                distinct=True,
+            ),
+            "syndrome_present": Count(
+                "id",
+                filter=Q(registration__multiaxialdiagnosis__syndrome_present=True),
+                distinct=True,
+            ),
+            "epilepsy_cause_known": Count(
+                "id",
+                filter=Q(registration__multiaxialdiagnosis__epilepsy_cause_known=True),
+                distinct=True,
+            ),
+            "global_developmental_delay_or_learning_difficulties": Count(
+                "id",
+                filter=Q(
+                    registration__multiaxialdiagnosis__global_developmental_delay_or_learning_difficulties=True
+                ),
+                distinct=True,
+            ),
+            "autistic_spectrum_disorder": Count(
+                "id",
+                filter=Q(
+                    registration__multiaxialdiagnosis__autistic_spectrum_disorder=True
+                ),
+                distinct=True,
+            ),
+            "mental_health_issue_identified": Count(
+                "id",
+                filter=Q(
+                    registration__multiaxialdiagnosis__mental_health_issue_identified=True
+                ),
+                distinct=True,
+            ),
+            "has_been_referred_for_mental_health_support": Count(
+                "id",
+                filter=Q(
+                    registration__management__has_been_referred_for_mental_health_support=True
+                ),
+                distinct=True,
+            ),
+            "has_support_for_mental_health_support": Count(
+                "id",
+                filter=Q(
+                    registration__management__has_support_for_mental_health_support=True
+                ),
+                distinct=True,
+            ),
+        }
+        return queryset.aggregate(**aggregations)
+
+    """
+    These are methods to filter cases or related fields by various criteria
     """
 
     @staticmethod
-    def get_ethnicity_counts(queryset):
-        """Return counts of each ethnicity in the queryset"""
-        ethnicity_counts = {}
-        for code, label in ETHNICITIES:
-            ethnicity_counts[code] = queryset.filter(ethnicity=code).count()
-        return ethnicity_counts
-
-    @staticmethod
-    def get_sex_counts(queryset):
-        """Return counts by sex"""
-        sex_counts = {}
-        for code, label in SEX_TYPE:
-            sex_counts[code] = queryset.filter(sex=code).count()
-        return sex_counts
-
-    @staticmethod
+    @silk_profile(name="Filter By Sex")
     def filter_by_sex(queryset, value):
         """
         Filter cases by sex
@@ -337,6 +853,7 @@ class CaseFilterMethods:
         return queryset.filter(sex=value)
 
     @staticmethod
+    @silk_profile(name="Filter By Ethnicity")
     def filter_by_ethnicity(queryset, value):
         """
         Filter by ethnicity
@@ -345,6 +862,7 @@ class CaseFilterMethods:
 
     # Custom filter methods for filtering cases based on various criteria
     @staticmethod
+    @silk_profile(name="Filter By Age Range")
     def filter_by_age_range(queryset, age_range):
         twelve_years_ago = timezone.now().date() - relativedelta(years=12)
 
@@ -355,17 +873,6 @@ class CaseFilterMethods:
         return queryset
 
     @staticmethod
-    def get_age_counts(queryset):
-        """
-        Returns counts of cases under/over 12 years old
-        """
-        twelve_years_ago = timezone.now().date() - relativedelta(years=12)
-
-        under_12_count = queryset.filter(date_of_birth__gt=twelve_years_ago).count()
-        over_12_count = queryset.filter(date_of_birth__lte=twelve_years_ago).count()
-
-        return {"under_12": under_12_count, "12_and_over": over_12_count}
-
     def filter_by_index_of_multiple_deprivation_quintile(queryset, value):
         """
         Filter cases by index of multiple deprivation quintile
@@ -373,38 +880,7 @@ class CaseFilterMethods:
         return queryset.filter(index_of_multiple_deprivation_quintile=value)
 
     @staticmethod
-    def get_index_of_multiple_deprivation_quintile_counts(queryset):
-        """
-        Returns counts of cases by index of multiple deprivation quintile
-        """
-        index_counts = {}
-        for i in range(1, 6):
-            index_counts[i] = queryset.filter(
-                index_of_multiple_deprivation_quintile=i
-            ).count()
-        return index_counts
-
-    """
-    Total ethnicities and indices of multiple deprivation quintile with counts for dropdowns
-    """
-
-    @staticmethod
-    def all_ethnicities(queryset):
-
-        ethnicity_counts = CaseFilterMethods.get_ethnicity_counts(queryset=queryset)
-        return [
-            (
-                f"ethnicity_{ethnicity[0]}",
-                f"{ethnicity[1]} ({ethnicity_counts})",
-            )
-            for ethnicity in ETHNICITIES
-        ]
-
-    """
-    Related fields - these are not on the Case model, but are related to it
-    """
-
-    @staticmethod
+    @silk_profile(name="Filter By Registration Status")
     def filter_by_registration_status(queryset, value):
         """
         Filter cases by registration status
@@ -424,25 +900,7 @@ class CaseFilterMethods:
         return queryset
 
     @staticmethod
-    def get_registration_status_counts(queryset, value):
-        """
-        Returns counts of cases by registration status
-        """
-        if value == "registered":
-            return queryset.filter(
-                epilepsy12_sites__site_is_primary_centre_of_epilepsy_care=True,
-                epilepsy12_sites__site_is_actively_involved_in_epilepsy_care=True,
-                registration__isnull=False,
-            ).count()
-        elif value == "unregistered":
-            return queryset.filter(
-                epilepsy12_sites__site_is_primary_centre_of_epilepsy_care=True,
-                epilepsy12_sites__site_is_actively_involved_in_epilepsy_care=True,
-                registration__isnull=True,
-            ).count()
-        return 0
-
-    @staticmethod
+    @silk_profile(name="Filter By Organisation")
     def filter_by_developmental_learning_or_schooling_problems(queryset, value=None):
         """
         Filter cases by developmental learning or schooling problems
@@ -452,15 +910,7 @@ class CaseFilterMethods:
         )
 
     @staticmethod
-    def get_developmental_learning_or_schooling_problems_counts(queryset):
-        """
-        Returns counts of cases by developmental learning or schooling problems
-        """
-        return queryset.filter(
-            registration__firstpaediatricassessment__developmental_learning_or_schooling_problems=True
-        ).count()
-
-    @staticmethod
+    @silk_profile(name="Filter By Behavioural or Emotional Problems")
     def filter_by_behavioural_or_emotional_problems(queryset, value=None):
         """
         Filter cases by behavioural or emotional problems
@@ -470,15 +920,7 @@ class CaseFilterMethods:
         )
 
     @staticmethod
-    def get_behavioural_or_emotional_problems_counts(queryset):
-        """
-        Returns counts of cases by behavioural or emotional problems
-        """
-        return queryset.filter(
-            registration__firstpaediatricassessment__behavioural_or_emotional_problems=True
-        ).count()
-
-    @staticmethod
+    @silk_profile(name="Filter By Syndrome Present")
     def filter_by_syndrome_present(queryset, value=None):
         """
         Filter cases by syndrome presence
@@ -486,15 +928,7 @@ class CaseFilterMethods:
         return queryset.filter(registration__multiaxialdiagnosis__syndrome_present=True)
 
     @staticmethod
-    def get_syndrome_present_counts(queryset):
-        """
-        Returns counts of cases with syndrome present
-        """
-        return queryset.filter(
-            registration__multiaxialdiagnosis__syndrome_present=True
-        ).count()
-
-    @staticmethod
+    @silk_profile(name="Filter By Epilepsy Cause Known")
     def filter_by_epilepsy_cause_known(queryset, value=None):
         """
         Filter cases where epilepsy cause is known
@@ -504,15 +938,7 @@ class CaseFilterMethods:
         )
 
     @staticmethod
-    def get_epilepsy_cause_known_counts(queryset):
-        """
-        Returns counts of cases where epilepsy cause is known
-        """
-        return queryset.filter(
-            registration__multiaxialdiagnosis__epilepsy_cause_known=True
-        ).count()
-
-    @staticmethod
+    @silk_profile(name="Filter By Global Developmental Delay or Learning Difficulties")
     def filter_by_global_developmental_delay_or_learning_difficulties(
         queryset, value=None
     ):
@@ -524,15 +950,7 @@ class CaseFilterMethods:
         )
 
     @staticmethod
-    def get_global_developmental_delay_or_learning_difficulties_counts(queryset):
-        """
-        Returns counts of cases with global developmental delay or learning difficulties
-        """
-        return queryset.filter(
-            registration__multiaxialdiagnosis__global_developmental_delay_or_learning_difficulties=True
-        ).count()
-
-    @staticmethod
+    @silk_profile(name="Filter By Autistic Spectrum Disorder")
     def filter_by_autistic_spectrum_disorder(queryset, value=None):
         """
         Filter cases with autistic spectrum disorder
@@ -542,15 +960,7 @@ class CaseFilterMethods:
         )
 
     @staticmethod
-    def get_autistic_spectrum_disorder_counts(queryset):
-        """
-        Returns counts of cases with autistic spectrum disorder
-        """
-        return queryset.filter(
-            registration__multiaxialdiagnosis__autistic_spectrum_disorder=True
-        ).count()
-
-    @staticmethod
+    @silk_profile(name="Filter By Mental Health Issue Identified")
     def filter_by_mental_health_issue_identified(queryset, value=None):
         """
         Filter cases with identified mental health issues
@@ -560,15 +970,7 @@ class CaseFilterMethods:
         )
 
     @staticmethod
-    def get_mental_health_issue_identified_counts(queryset):
-        """
-        Returns counts of cases with identified mental health issues
-        """
-        return queryset.filter(
-            registration__multiaxialdiagnosis__mental_health_issue_identified=True
-        ).count()
-
-    @staticmethod
+    @silk_profile(name="Filter By Has Been Referred For Mental Health Support")
     def filter_by_has_been_referred_for_mental_health_support(queryset, value=None):
         """
         Filter cases where patient has been referred for mental health support
@@ -578,15 +980,7 @@ class CaseFilterMethods:
         )
 
     @staticmethod
-    def get_has_been_referred_for_mental_health_support_counts(queryset, value=None):
-        """
-        Returns counts of cases where patient has been referred for mental health support
-        """
-        return queryset.filter(
-            registration__management__has_been_referred_for_mental_health_support=True
-        ).count()
-
-    @staticmethod
+    @silk_profile(name="Filter By Has Support For Mental Health Support")
     def filter_by_has_support_for_mental_health_support(queryset, value=None):
         """
         Filter cases where patient has mental health support in place
@@ -598,20 +992,12 @@ class CaseFilterMethods:
             registration__management__has_support_for_mental_health_support=True
         )
 
-    @staticmethod
-    def get_has_support_for_mental_health_support_counts(queryset):
-        """
-        Returns counts of cases where patient has mental health support in place
-        """
-        return queryset.filter(
-            registration__management__has_support_for_mental_health_support=True
-        ).count()
-
     """
     Methods to filter cases by organisation, trust, health board, integrated care board,
     """
 
     @staticmethod
+    @silk_profile(name="Filter By Organisation")
     def filter_by_organisation(queryset, organisation_id):
         if not organisation_id:
             return queryset
@@ -622,19 +1008,7 @@ class CaseFilterMethods:
         )
 
     @staticmethod
-    def get_organisation_counts(queryset, organisation_id):
-        """
-        Returns counts of cases by organisation (registered and unregistered)
-        """
-        if not organisation_id:
-            return queryset.count()
-        return queryset.filter(
-            epilepsy12_sites__organisation_id=organisation_id,
-            epilepsy12_sites__site_is_primary_centre_of_epilepsy_care=True,
-            epilepsy12_sites__site_is_actively_involved_in_epilepsy_care=True,
-        ).count()
-
-    @staticmethod
+    @silk_profile(name="Filter By Trust or Local Health Board")
     def filter_by_trust_or_health_board(queryset, value):
         """
         Filter cases by the trust or health board their site is part of.
@@ -650,7 +1024,6 @@ class CaseFilterMethods:
         epilepsy care.
         The queryset is also filtered to include only cases that have a registration.
         """
-
         value_type, value_id = value.split("_", 1)
 
         if value_type == "t":
@@ -674,61 +1047,16 @@ class CaseFilterMethods:
         return queryset
 
     @staticmethod
-    def get_trust_or_local_health_board_counts(queryset, value):
-        """
-        Returns counts of case by trust of local health board - includes cases with no registration
-        Accepts a value in the format of "type_id" where type can be "t" for Trust or "h" for Health Board.
-        The id is the ID of the trust or health board.
-        There queryset is all cases to be filtered to include only cases that are associated with
-        the specified trust or health board, and that are part of a site that is a primary centre of
-        epilepsy care and is actively involved in epilepsy care.1
-        The queryset includes cases that have no registration.
-        Acceptable values are:
-        - t_<trust_id> for Trust
-        - h_<health_board_id> for Health Board
-        """
-        if not value:
-            return 0
-        try:
-            value_type, value_id = value.split("_", 1)
-        except ValueError:
-            # Handle the case where value is not in the expected format
-            return 0
-
-        if value_type == "t":
-            # Filter by Trust
-            return (
-                queryset.filter(
-                    epilepsy12_sites__site_is_primary_centre_of_epilepsy_care=True,
-                    epilepsy12_sites__site_is_actively_involved_in_epilepsy_care=True,
-                    epilepsy12_sites__organisation__trust__id=value_id,
-                )
-                .distinct()
-                .count()
-            )
-        elif value_type == "h":
-            # Filter by Local Health Board
-            return (
-                queryset.filter(
-                    epilepsy12_sites__site_is_primary_centre_of_epilepsy_care=True,
-                    epilepsy12_sites__site_is_actively_involved_in_epilepsy_care=True,
-                    epilepsy12_sites__organisation__local_health_board__id=value_id,
-                )
-                .distinct()
-                .count()
-            )
-        return 0
-
-    @staticmethod
+    @silk_profile(name="Filter By Integrated Care Board")
     def filter_by_integrated_care_board(queryset, value):
         """
         Filter cases by the integrated care board their site is part of.
         """
-        # value_type and value_id would come from parsing the value parameter
+        print("Filtering by ICB with value:", value)
         value_type, value_id = value.split("_", 1)
 
-        if value_type == "i":
-            # Filter by Integrate Care Board
+        if value_type == "icb":
+            # Filter by Integrated Care Board
             return queryset.filter(
                 epilepsy12_sites__site_is_primary_centre_of_epilepsy_care=True,
                 epilepsy12_sites__site_is_actively_involved_in_epilepsy_care=True,
@@ -739,41 +1067,14 @@ class CaseFilterMethods:
         return queryset
 
     @staticmethod
-    def get_integrated_care_board_counts(queryset, value):
-        """
-        Returns counts of case by integrated care board - includes cases with no registration
-        Accepts a value in the format of "icb_<integrated_care_board_id>"
-        """
-        if not value:
-            return 0
-        try:
-            value_type, value_id = value.split("_", 1)
-        except ValueError:
-            # Handle the case where value is not in the expected format
-            return 0
-
-        if value_type == "icb":
-            # Filter by Integrated Care Board
-            return (
-                queryset.filter(
-                    epilepsy12_sites__site_is_primary_centre_of_epilepsy_care=True,
-                    epilepsy12_sites__site_is_actively_involved_in_epilepsy_care=True,
-                    epilepsy12_sites__organisation__integrated_care_board__id=value_id,
-                )
-                .distinct()
-                .count()
-            )
-        return 0
-
-    @staticmethod
+    @silk_profile(name="Filter By NHS England Region")
     def filter_by_nhs_england_region(queryset, value):
         """
         Filter cases by the NHS England region their site is part of.
         """
-        # value_type and value_id would come from parsing the value parameter
         value_type, value_id = value.split("_", 1)
 
-        if value_type == "n":
+        if value_type == "nhsenglandregion":
             # Filter by NHS England Region
             return queryset.filter(
                 epilepsy12_sites__site_is_primary_centre_of_epilepsy_care=True,
@@ -784,33 +1085,8 @@ class CaseFilterMethods:
             )
         return queryset
 
-    def get_nhs_england_region_counts(queryset, value):
-        """
-        Returns counts of case by NHS England region - includes cases with no registration
-        Accepts a value in the format of "nhsenglandregion_<nhs_england_region_id>"
-        """
-        if not value:
-            return 0
-        try:
-            value_type, value_id = value.split("_", 1)
-        except ValueError:
-            # Handle the case where value is not in the expected format
-            return 0
-
-        if value_type == "nhsenglandregion":
-            # Filter by NHS England Region
-            return (
-                queryset.filter(
-                    epilepsy12_sites__site_is_primary_centre_of_epilepsy_care=True,
-                    epilepsy12_sites__site_is_actively_involved_in_epilepsy_care=True,
-                    epilepsy12_sites__organisation__nhs_england_region__id=value_id,
-                )
-                .distinct()
-                .count()
-            )
-        return 0
-
     @staticmethod
+    @silk_profile(name="Filter By Country")
     def filter_by_country(queryset, value):
         """
         Filter cases by the country their site is part of.
@@ -818,7 +1094,7 @@ class CaseFilterMethods:
         # value_type and value_id would come from parsing the value parameter
         value_type, value_id = value.split("_", 1)
 
-        if value_type == "c":
+        if value_type == "country":
             # Filter by Country
             return queryset.filter(
                 epilepsy12_sites__site_is_primary_centre_of_epilepsy_care=True,
@@ -829,91 +1105,74 @@ class CaseFilterMethods:
             )
         return queryset
 
-    @staticmethod
-    def get_country_counts(queryset, value):
-        """
-        Returns counts of case by country - includes cases with no registration
-        Accepts a value in the format of "country_<country_id>"
-        """
-        if not value:
-            return 0
-        try:
-            value_type, value_id = value.split("_", 1)
-        except ValueError:
-            # Handle the case where value is not in the expected format
-            return 0
-
-        if value_type == "country":
-            # Filter by Country
-            return (
-                queryset.filter(
-                    epilepsy12_sites__site_is_primary_centre_of_epilepsy_care=True,
-                    epilepsy12_sites__site_is_actively_involved_in_epilepsy_care=True,
-                    epilepsy12_sites__organisation__country__id=value_id,
-                )
-                .distinct()
-                .count()
-            )
-        return 0
-
     """
     Methods to get all trusts, local health boards, integrated care boards, NHS England regions, and countries for the dropdowns
     The lists filter out any trusts or health boards that are not part of a site that is a primary centre of epilepsy care or there are no patients
     """
 
     @staticmethod
+    @silk_profile(name="Get All Trusts and Local Health Boards")
     def all_trusts_and_local_health_boards(queryset):
         """
-        Returns all trusts and local health boards in the queryset.
+        Returns all trusts and local health boards in One queryset.
         This method assumes that the queryset is already filtered to include only cases
         that are part of a site that is a primary centre of epilepsy care and is actively involved in epilepsy care.
+        Acceptable values are:
+        - t_<trust_id> for Trust
+        - h_<health_board_id> for Health Board
         """
         trusts = (
-            Trust.objects.filter(
-                organisation__patient_sites__site_is_primary_centre_of_epilepsy_care=True,
-                organisation__patient_sites__site_is_actively_involved_in_epilepsy_care=True,
-                organisation__patient_sites__case__isnull=False,
+            queryset.filter(
+                epilepsy12_sites__site_is_primary_centre_of_epilepsy_care=True,
+                epilepsy12_sites__site_is_actively_involved_in_epilepsy_care=True,
+                epilepsy12_sites__case__isnull=False,
             )
-            .distinct()
-            .order_by("name")
+            .values(
+                "epilepsy12_sites__organisation__trust__id",
+                "epilepsy12_sites__organisation__trust__name",
+            )
+            .annotate(count=Count("id", distinct=True))
+            .order_by("epilepsy12_sites__organisation__trust__name")
         )
 
         # Get health boards with active registered cases
         local_health_boards = (
-            LocalHealthBoard.objects.filter(
-                organisation__patient_sites__site_is_primary_centre_of_epilepsy_care=True,
-                organisation__patient_sites__site_is_actively_involved_in_epilepsy_care=True,
-                organisation__patient_sites__case__isnull=False,
-                organisation__patient_sites__case__registration__isnull=False,
+            queryset.filter(
+                epilepsy12_sites__site_is_primary_centre_of_epilepsy_care=True,
+                epilepsy12_sites__site_is_actively_involved_in_epilepsy_care=True,
+                epilepsy12_sites__case__isnull=False,
+                epilepsy12_sites__case__registration__isnull=False,
             )
-            .distinct()
-            .order_by("name")
+            .values(
+                "epilepsy12_sites__organisation__local_health_board__id",
+                "epilepsy12_sites__organisation__local_health_board__name",
+            )
+            .annotate(count=Count("id", distinct=True))
+            .order_by("epilepsy12_sites__organisation__local_health_board__name")
         )
 
         result = []
         # Get counts for trusts
         for trust in trusts:
-            trust_counts = CaseFilterMethods.get_trust_or_local_health_board_counts(
-                queryset=queryset, value=f"t_{trust.id}"
-            )
-            result.append((f"t_{trust.id}", f"Trust: {trust.name} ({trust_counts})"))
-        # Get counts for health boards
-        for hb in local_health_boards:
-            local_health_board_counts = (
-                CaseFilterMethods.get_trust_or_local_health_board_counts(
-                    queryset=queryset, value=f"h_{hb.id}"
-                )
-            )
             result.append(
                 (
-                    f"h_{hb.id}",
-                    f"Local Health Board: {hb.name} ({local_health_board_counts})",
+                    f"t_{trust['epilepsy12_sites__organisation__trust__id']}",
+                    f"Trust: {trust['epilepsy12_sites__organisation__trust__name']} ({trust['count']})",
+                )
+            )
+        # Get counts for health boards
+        for hb in local_health_boards:
+            result.append(
+                (
+                    f"h_{hb['epilepsy12_sites__organisation__local_health_board__id']}",
+                    f"Local Health Board: {hb['epilepsy12_sites__organisation__local_health_board__name']} ({hb['count']})",
                 )
             )
 
         return result
 
     @staticmethod
+    @silk_profile(name="Get All Integrated Care Boards")
     def all_integrated_care_boards(queryset):
         """
         Returns all integrated care boards in the queryset.
@@ -921,63 +1180,77 @@ class CaseFilterMethods:
         that are part of a site that is a primary centre of epilepsy care and is actively involved in epilepsy care.
         """
         integrated_care_boards = (
-            IntegratedCareBoard.objects.filter(
-                organisation__patient_sites__site_is_primary_centre_of_epilepsy_care=True,
-                organisation__patient_sites__site_is_actively_involved_in_epilepsy_care=True,
-                organisation__patient_sites__case__isnull=False,
+            queryset.filter(
+                epilepsy12_sites__site_is_primary_centre_of_epilepsy_care=True,
+                epilepsy12_sites__site_is_actively_involved_in_epilepsy_care=True,
+                epilepsy12_sites__case__isnull=False,
             )
-            .distinct()
-            .order_by("name")
+            .values(
+                "epilepsy12_sites__organisation__integrated_care_board__id",
+                "epilepsy12_sites__organisation__integrated_care_board__name",
+            )
+            .annotate(count=Count("id", distinct=True))
+            .order_by("epilepsy12_sites__organisation__integrated_care_board__name")
         )
 
         return [
             (
-                f"icb_{icb.id}",
-                f"{icb.name} ({CaseFilterMethods.get_integrated_care_board_counts(queryset=queryset, value=f'icb_{icb.id}')})",
+                f"icb_{icb['epilepsy12_sites__organisation__integrated_care_board__id']}",
+                f"{icb['epilepsy12_sites__organisation__integrated_care_board__name']} ({icb['count']})",
             )
             for icb in integrated_care_boards
         ]
 
     @staticmethod
+    @silk_profile(name="Get All NHS England Regions")
     def all_nhs_england_regions(queryset):
         """
         Returns all NHS England regions in the queryset.
         """
         regions = (
-            NHSEnglandRegion.objects.filter(
-                organisation__patient_sites__site_is_primary_centre_of_epilepsy_care=True,
-                organisation__patient_sites__site_is_actively_involved_in_epilepsy_care=True,
-                organisation__patient_sites__case__isnull=False,
+            queryset.filter(
+                epilepsy12_sites__site_is_primary_centre_of_epilepsy_care=True,
+                epilepsy12_sites__site_is_actively_involved_in_epilepsy_care=True,
+                epilepsy12_sites__case__isnull=False,
             )
-            .distinct()
-            .order_by("name")
+            .values(
+                "epilepsy12_sites__organisation__nhs_england_region__id",
+                "epilepsy12_sites__organisation__nhs_england_region__name",
+            )
+            .annotate(count=Count("id", distinct=True))
+            .order_by("epilepsy12_sites__organisation__nhs_england_region__name")
         )
 
         return [
             (
-                f"nhsenglandregion_{region.id}",
-                f"{region.name} ({CaseFilterMethods.get_nhs_england_region_counts(queryset=queryset, value=f'nhsenglandregion_{region.id}')})",
+                f"nhsenglandregion_{region['epilepsy12_sites__organisation__nhs_england_region__id']}",
+                f"{region['epilepsy12_sites__organisation__nhs_england_region__name']} ({region['count']})",
             )
             for region in regions
         ]
 
     @staticmethod
+    @silk_profile(name="Get All Countries")
     def all_countries(queryset):
         countries = (
-            Country.objects.filter(
-                organisation__patient_sites__site_is_primary_centre_of_epilepsy_care=True,
-                organisation__patient_sites__site_is_actively_involved_in_epilepsy_care=True,
-                organisation__patient_sites__case__isnull=False,
+            queryset.filter(
+                epilepsy12_sites__site_is_primary_centre_of_epilepsy_care=True,
+                epilepsy12_sites__site_is_actively_involved_in_epilepsy_care=True,
+                epilepsy12_sites__case__isnull=False,
             )
-            .distinct()
-            .order_by("name")
+            .values(
+                "epilepsy12_sites__organisation__country__id",
+                "epilepsy12_sites__organisation__country__name",
+            )
+            .annotate(count=Count("id", distinct=True))
+            .order_by("epilepsy12_sites__organisation__country__name")
         )
         # Get counts for countries
 
         return [
             (
-                f"country_{country.id}",
-                f"{country.name} ({CaseFilterMethods.get_country_counts(queryset=queryset, value=f'country_{country.id}')})",
+                f"country_{country['epilepsy12_sites__organisation__country__id']}",
+                f"{country['epilepsy12_sites__organisation__country__name']} ({country['count']})",
             )
             for country in countries
         ]
@@ -987,6 +1260,7 @@ class CaseFilterMethods:
     """
 
     @staticmethod
+    @silk_profile(name="Filter By KPI Failed")
     def filter_by_kpi_failed(queryset, value_list):
         """
         Filter cases by the KPI failed status. Differs from other filters as accepts a list of kpis
@@ -1014,39 +1288,6 @@ class CaseFilterMethods:
         )
 
     @staticmethod
-    def get_kpi_failed_counts(queryset):
-        """
-        Returns a dictionary of KPI fields and counts of cases failing each KPI.
-
-        Returns:
-            dict: Keys are KPI numbers (1-10), values are the count of cases failing that KPI
-        """
-
-        kpi_counts = {}
-
-        kpi_items = [(key.strip(), value) for key, value in KPI_MAP.items()]
-        for i in kpi_items:
-            kpi_field = i[1]
-            if kpi_field:
-                # Count cases failing this KPI (value=0 means failed)
-                filter_kwargs = {f"registration__kpi__{kpi_field}": 0}
-                count = (
-                    queryset.filter(
-                        Q(**filter_kwargs),
-                        epilepsy12_sites__site_is_primary_centre_of_epilepsy_care=True,
-                        epilepsy12_sites__site_is_actively_involved_in_epilepsy_care=True,
-                        epilepsy12_sites__case__isnull=False,
-                        epilepsy12_sites__case__registration__isnull=False,
-                    )
-                    .distinct()
-                    .count()
-                )
-
-                # Store the count for this KPI
-                kpi_counts[i] = count
-        return kpi_counts
-
-    @staticmethod
     def filter_by_audit_progress_complete(queryset, value):
         """
         Filter cases by the complete audit progress status.
@@ -1072,34 +1313,7 @@ class CaseFilterMethods:
             return queryset
 
     @staticmethod
-    def get_audit_progress_complete_count(queryset, value):
-        """
-        Returns counts of case by complete audit progress status - includes cases with no registration
-        Accepts a value in the format of "audit_<audit_id>"
-        """
-        if value:
-            # Filter by complete audit progress status
-            return (
-                queryset.filter(
-                    epilepsy12_sites__site_is_primary_centre_of_epilepsy_care=True,
-                    epilepsy12_sites__site_is_actively_involved_in_epilepsy_care=True,
-                    epilepsy12_sites__case__isnull=False,
-                    epilepsy12_sites__case__registration__isnull=False,
-                    registration__audit_progress__registration_complete=True,
-                    registration__audit_progress__first_paediatric_assessment_complete=True,
-                    registration__audit_progress__epilepsy_context_complete=True,
-                    registration__audit_progress__assessment_complete=True,
-                    registration__audit_progress__multiaxial_diagnosis_complete=True,
-                    registration__audit_progress__investigations_complete=True,
-                    registration__audit_progress__management_complete=True,
-                )
-                .distinct()
-                .count()
-            )
-        else:
-            return queryset.count()
-
-    @staticmethod
+    @silk_profile(name="Filter By Registration Cohort")
     def filter_by_registration_cohort(queryset, cohort):
         """
         Filter cases by the registration cohort.
@@ -1115,27 +1329,7 @@ class CaseFilterMethods:
         )
 
     @staticmethod
-    def get_registration_cohort_counts(queryset, value):
-        """
-        Returns counts of case by registration cohort - includes cases with no registration
-        Accepts a value in the format of "cohort_<cohort_id>"
-        """
-        if not value:
-            return 0
-        # Filter by registration cohort
-        return (
-            queryset.filter(
-                epilepsy12_sites__site_is_primary_centre_of_epilepsy_care=True,
-                epilepsy12_sites__site_is_actively_involved_in_epilepsy_care=True,
-                epilepsy12_sites__case__isnull=False,
-                epilepsy12_sites__case__registration__isnull=False,
-                registration__cohort=value,
-            )
-            .distinct()
-            .count()
-        )
-
-    @staticmethod
+    @silk_profile(name="Filter By Audit Progress Incomplete")
     def filter_by_audit_progress_incomplete(queryset, value):
         """
         Filter cases by the incomplete audit progress status.
@@ -1167,67 +1361,7 @@ class CaseFilterMethods:
         return queryset
 
     @staticmethod
-    def get_audit_progress_incomplete_count(queryset, value):
-        """
-        Returns counts of case by incomplete audit progress status - includes cases with no registration
-        Accepts boolean value
-        """
-
-        if value:
-            # Filter by incomplete audit progress status
-            return (
-                queryset.filter(
-                    Q(
-                        Q(registration__audit_progress__registration_complete=False)
-                        | Q(
-                            registration__audit_progress__first_paediatric_assessment_complete=False
-                        )
-                        | Q(
-                            registration__audit_progress__epilepsy_context_complete=False
-                        )
-                        | Q(registration__audit_progress__assessment_complete=False)
-                        | Q(
-                            registration__audit_progress__multiaxial_diagnosis_complete=False
-                        )
-                        | Q(registration__audit_progress__investigations_complete=False)
-                        | Q(registration__audit_progress__management_complete=False)
-                    ),
-                    epilepsy12_sites__site_is_primary_centre_of_epilepsy_care=True,
-                    epilepsy12_sites__site_is_actively_involved_in_epilepsy_care=True,
-                    epilepsy12_sites__case__isnull=False,
-                    epilepsy12_sites__case__registration__isnull=False,
-                )
-                .distinct()
-                .count()
-            )
-        return queryset.count()
-
-    @staticmethod
-    def get_total_episodes_count(queryset, value):
-        """
-        Returns the total count of episodes in the queryset.
-        """
-        if not value:
-            return 0
-        try:
-            value_type, value_id = value.split("_", 1)
-        except ValueError:
-            # Handle the case where value is not in the expected format
-            return 0
-
-        if value_type == "episodes":
-            # Filter by total episodes count
-            return queryset.filter(
-                epilepsy12_sites__site_is_primary_centre_of_epilepsy_care=True,
-                epilepsy12_sites__site_is_actively_involved_in_epilepsy_care=True,
-            ).annotate(
-                episode_count=Count(
-                    "registration__multiaxialdiagnosis__episodes", distinct=True
-                ).aggregate(total_episodes=Sum("episode_count"))["total_episodes"]
-            )
-        return 0
-
-    @staticmethod
+    @silk_profile(name="Filter Episodes")
     def filter_episodes(queryset, value):
         """
         Filter cases by the total episodes count.
@@ -1253,6 +1387,7 @@ class CaseFilterMethods:
     """
 
     @staticmethod
+    @silk_profile(name="Apply All Active Case Filters")
     def apply_all_active_filters(
         queryset,
         request,

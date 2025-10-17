@@ -89,6 +89,7 @@ MAPBOX_API_KEY = os.getenv("MAPBOX_API_KEY")
 # Application definition
 
 INSTALLED_APPS = [
+    "silk",
     "semantic_admin",
     "django.contrib.gis",
     "django.contrib.admin",
@@ -122,11 +123,12 @@ INSTALLED_APPS = [
 ]
 
 MIDDLEWARE = [
+    "silk.middleware.SilkyMiddleware",
     "django.middleware.security.SecurityMiddleware",
     "django.middleware.clickjacking.XFrameOptionsMiddleware",
     "whitenoise.middleware.WhiteNoiseMiddleware",
     "django.contrib.sessions.middleware.SessionMiddleware",
-    # Has to come before CommonMiddleware to access Content-Length  
+    # Has to come before CommonMiddleware to access Content-Length
     "epilepsy12.middleware.Epilepsy12RequestLoggingMiddleware",
     "django.middleware.common.CommonMiddleware",
     "django.middleware.csrf.CsrfViewMiddleware",
@@ -164,7 +166,7 @@ AUTO_LOGOUT = {
 
 # LOGIN_URL = "/registration/login/"
 LOGIN_URL = "two_factor:login"  # change LOGIN_URL to the 2fa one
-LOGIN_REDIRECT_URL = "index" # not actually used, see RCPCHLoginView.get_success_url
+LOGIN_REDIRECT_URL = "index"  # not actually used, see RCPCHLoginView.get_success_url
 LOGOUT_REDIRECT_URL = "two_factor:login"
 
 TEMPLATES = [
@@ -174,9 +176,11 @@ TEMPLATES = [
         "APP_DIRS": True,
         "OPTIONS": {
             "context_processors": [
+                "django.template.context_processors.request",
                 "django.template.context_processors.debug",
                 "django.template.context_processors.request",
                 "django.contrib.auth.context_processors.auth",
+                "django.template.context_processors.request",
                 "django.contrib.messages.context_processors.messages",
                 "django_auto_logout.context_processors.auto_logout_client",  # auto logout
                 "rcpch-audit-engine.build_info.get_build_info",
@@ -338,3 +342,6 @@ REST_FRAMEWORK = {
 ENABLE_REQUEST_LOGGING = os.getenv("ENABLE_REQUEST_LOGGING", "False") == "True"
 
 CHANGE_NOTIFICATION_EMAILS = os.getenv("CHANGE_NOTIFICATION_EMAILS", "").split(",")
+SILKY_PYTHON_PROFILER = True
+SILKY_AUTHENTICATION = True  # User must be logged in
+SILKY_META = True  # Record meta data about requests (e.g. user)

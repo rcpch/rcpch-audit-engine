@@ -1,6 +1,7 @@
 # python imports
 from datetime import datetime
 import logging
+from silk.profiling.profiler import silk_profile
 
 # django imports
 from django.apps import apps
@@ -64,314 +65,325 @@ def case_list(request, organisation_id):
     If the user is a superuser, they can view and edit all cases in the audit (but with great power comes great responsibility)
 
     """
+    with silk_profile(name="case_list_full_execution"):
+        sort_flag = None
 
-    sort_flag = None
+        filter_term = request.GET.get("filtered_case_list")
 
-    filter_term = request.GET.get("filtered_case_list")
+        # get currently selected organisation
+        organisation = Organisation.objects.get(pk=organisation_id)
 
-    # get currently selected organisation
-    organisation = Organisation.objects.get(pk=organisation_id)
+        # get trust or health board
+        if organisation.country.boundary_identifier == "W92000004":
+            parent_trust = organisation.local_health_board
+            organisation_children = Organisation.objects.filter(
+                local_health_board=parent_trust, active=True
+            ).all()
+        else:
+            parent_trust = organisation.trust
+            # get all organisations which are in the same parent trust
+            organisation_children = Organisation.objects.filter(
+                trust=parent_trust, active=True
+            ).all()
 
-    # get trust or health board
-    if organisation.country.boundary_identifier == "W92000004":
-        parent_trust = organisation.local_health_board
-        organisation_children = Organisation.objects.filter(
-            local_health_board=parent_trust, active=True
-        ).all()
-    else:
-        parent_trust = organisation.trust
-        # get all organisations which are in the same parent trust
-        organisation_children = Organisation.objects.filter(
-            trust=parent_trust, active=True
-        ).all()
-
-    if filter_term:
-        # filter_term is called if filtering by search box
-        if request.user.view_preference == 0:
-            # user has requested organisation level view
-            all_cases = (
-                Case.objects.filter(
-                    Q(epilepsy12_sites__organisation=organisation)
-                    & Q(epilepsy12_sites__site_is_primary_centre_of_epilepsy_care=True)
-                    & Q(
-                        epilepsy12_sites__site_is_actively_involved_in_epilepsy_care=True
+        if filter_term:
+            # filter_term is called if filtering by search box
+            if request.user.view_preference == 0:
+                # user has requested organisation level view
+                all_cases = (
+                    Case.objects.filter(
+                        Q(epilepsy12_sites__organisation=organisation)
+                        & Q(
+                            epilepsy12_sites__site_is_primary_centre_of_epilepsy_care=True
+                        )
+                        & Q(
+                            epilepsy12_sites__site_is_actively_involved_in_epilepsy_care=True
+                        )
+                        & (
+                            Q(first_name__icontains=filter_term)
+                            | Q(surname__icontains=filter_term)
+                            | Q(nhs_number__icontains=filter_term)
+                            | Q(unique_reference_number__icontains=filter_term)
+                            | Q(id__icontains=filter_term)
+                        )
                     )
-                    & (
-                        Q(first_name__icontains=filter_term)
-                        | Q(surname__icontains=filter_term)
-                        | Q(nhs_number__icontains=filter_term)
-                        | Q(unique_reference_number__icontains=filter_term)
-                        | Q(id__icontains=filter_term)
+                    .order_by("surname")
+                    .all()
+                )
+            elif request.user.view_preference == 1:
+                # user has requested trust level view
+                if organisation.country.boundary_identifier == "W92000004":
+                    # in Wales filter by health board
+                    trust_filter = Q(
+                        epilepsy12_sites__organisation__local_health_board=organisation.local_health_board
                     )
+                else:
+                    # England filter by Trust
+                    trust_filter = Q(
+                        epilepsy12_sites__organisation__trust=organisation.trust
+                    )
+
+                all_cases = (
+                    Case.objects.filter(
+                        trust_filter
+                        & Q(
+                            epilepsy12_sites__site_is_primary_centre_of_epilepsy_care=True
+                        )
+                        & Q(
+                            epilepsy12_sites__site_is_actively_involved_in_epilepsy_care=True
+                        )
+                        & (
+                            Q(first_name__icontains=filter_term)
+                            | Q(surname__icontains=filter_term)
+                            | Q(nhs_number__icontains=filter_term)
+                            | Q(unique_reference_number__icontains=filter_term)
+                            | Q(id__icontains=filter_term)
+                        )
+                    )
+                    .order_by("surname")
+                    .all()
                 )
-                .order_by("surname")
-                .all()
-            )
-        elif request.user.view_preference == 1:
-            # user has requested trust level view
-            if organisation.country.boundary_identifier == "W92000004":
-                # in Wales filter by health board
-                trust_filter = Q(
-                    epilepsy12_sites__organisation__local_health_board=organisation.local_health_board
+            elif request.user.view_preference == 2:
+                # user has requested national level view
+                all_cases = (
+                    Case.objects.filter(
+                        Q(
+                            epilepsy12_sites__site_is_primary_centre_of_epilepsy_care=True
+                        )
+                        & Q(
+                            epilepsy12_sites__site_is_actively_involved_in_epilepsy_care=True
+                        )
+                        & (
+                            Q(first_name__icontains=filter_term)
+                            | Q(surname__icontains=filter_term)
+                            | Q(nhs_number__icontains=filter_term)
+                            | Q(unique_reference_number__icontains=filter_term)
+                            | Q(id__icontains=filter_term)
+                        )
+                    )
+                    .order_by("surname")
+                    .all()
                 )
+
+        else:
+            """
+            Cases are filtered based on user preference (request.user.view_preference), where 0 is organisation level,
+            1 is trust level and 2 is national level
+            Only RCPCH audit staff have this final option.
+            """
+
+            jersey_flag = organisation.country.boundary_identifier == "JEY"
+
+            if request.user.view_preference == 2:
+                # this is an RCPCH audit team member requesting National level
+                filtered_cases = Case.objects.all()
+            elif request.user.view_preference == 1:
+                # filters all primary Trust level centres, irrespective of if active or inactive
+                if organisation.country.boundary_identifier == "W92000004":
+                    # welsh - select health boards
+                    filtered_cases = Case.objects.filter(
+                        organisations__local_health_board=parent_trust,
+                        epilepsy12_sites__site_is_primary_centre_of_epilepsy_care=True,
+                        epilepsy12_sites__site_is_actively_involved_in_epilepsy_care=True,
+                    )
+                else:
+                    # England - select trusts
+                    filtered_cases = Case.objects.filter(
+                        organisations__trust=parent_trust,
+                        epilepsy12_sites__site_is_primary_centre_of_epilepsy_care=True,
+                        epilepsy12_sites__site_is_actively_involved_in_epilepsy_care=True,
+                    )
+
             else:
-                # England filter by Trust
-                trust_filter = Q(
-                    epilepsy12_sites__organisation__trust=organisation.trust
-                )
-
-            all_cases = (
-                Case.objects.filter(
-                    trust_filter
-                    & Q(epilepsy12_sites__site_is_primary_centre_of_epilepsy_care=True)
-                    & Q(
-                        epilepsy12_sites__site_is_actively_involved_in_epilepsy_care=True
-                    )
-                    & (
-                        Q(first_name__icontains=filter_term)
-                        | Q(surname__icontains=filter_term)
-                        | Q(nhs_number__icontains=filter_term)
-                        | Q(unique_reference_number__icontains=filter_term)
-                        | Q(id__icontains=filter_term)
-                    )
-                )
-                .order_by("surname")
-                .all()
-            )
-        elif request.user.view_preference == 2:
-            # user has requested national level view
-            all_cases = (
-                Case.objects.filter(
-                    Q(epilepsy12_sites__site_is_primary_centre_of_epilepsy_care=True)
-                    & Q(
-                        epilepsy12_sites__site_is_actively_involved_in_epilepsy_care=True
-                    )
-                    & (
-                        Q(first_name__icontains=filter_term)
-                        | Q(surname__icontains=filter_term)
-                        | Q(nhs_number__icontains=filter_term)
-                        | Q(unique_reference_number__icontains=filter_term)
-                        | Q(id__icontains=filter_term)
-                    )
-                )
-                .order_by("surname")
-                .all()
-            )
-
-    else:
-        """
-        Cases are filtered based on user preference (request.user.view_preference), where 0 is organisation level,
-        1 is trust level and 2 is national level
-        Only RCPCH audit staff have this final option.
-        """
-
-        jersey_flag = organisation.country.boundary_identifier == "JEY"
-
-        if request.user.view_preference == 2:
-            # this is an RCPCH audit team member requesting National level
-            filtered_cases = Case.objects.all()
-        elif request.user.view_preference == 1:
-            # filters all primary Trust level centres, irrespective of if active or inactive
-            if organisation.country.boundary_identifier == "W92000004":
-                # welsh - select health boards
+                # filters all primary centres at organisation level, irrespective of if active or inactive
                 filtered_cases = Case.objects.filter(
-                    organisations__local_health_board=parent_trust,
+                    organisations__name=organisation,
                     epilepsy12_sites__site_is_primary_centre_of_epilepsy_care=True,
                     epilepsy12_sites__site_is_actively_involved_in_epilepsy_care=True,
                 )
+
+            if (
+                request.htmx.trigger_name == "sort_by_nhs_number_up"
+                or request.GET.get("sort_flag") == "sort_by_nhs_number_up"
+            ):
+                all_cases = filtered_cases.order_by("nhs_number").all()
+                if jersey_flag:
+                    all_cases = filtered_cases.order_by("unique_reference_number").all()
+                sort_flag = "sort_by_nhs_number_up"
+            elif (
+                request.htmx.trigger_name == "sort_by_nhs_number_down"
+                or request.GET.get("sort_flag") == "sort_by_nhs_number_down"
+            ):
+                all_cases = filtered_cases.order_by("-nhs_number").all()
+                if jersey_flag:
+                    all_cases = filtered_cases.order_by(
+                        "-unique_reference_number"
+                    ).all()
+                sort_flag = "sort_by_nhs_number_down"
+            elif (
+                request.htmx.trigger_name == "sort_by_ethnicity_up"
+                or request.GET.get("sort_flag") == "sort_by_ethnicity_up"
+            ):
+                all_cases = filtered_cases.order_by("ethnicity").all()
+                sort_flag = "sort_by_ethnicity_up"
+            elif (
+                request.htmx.trigger_name == "sort_by_ethnicity_down"
+                or request.GET.get("sort_flag") == "sort_by_ethnicity_down"
+            ):
+                all_cases = filtered_cases.order_by("-ethnicity").all()
+                sort_flag = "sort_by_ethnicity_down"
+            elif (
+                request.htmx.trigger_name == "sort_by_sex_up"
+                or request.GET.get("sort_flag") == "sort_by_sex_up"
+            ):
+                all_cases = filtered_cases.order_by("sex").all()
+                sort_flag = "sort_by_sex_up"
+            elif (
+                request.htmx.trigger_name == "sort_by_sex_down"
+                or request.GET.get("sort_flag") == "sort_by_sex_down"
+            ):
+                all_cases = filtered_cases.order_by("-sex").all()
+                sort_flag = "sort_by_sex_down"
+            elif (
+                request.htmx.trigger_name == "sort_by_name_up"
+                or request.GET.get("sort_flag") == "sort_by_name_up"
+            ):
+                all_cases = filtered_cases.order_by("surname").all()
+                sort_flag = "sort_by_name_up"
+            elif (
+                request.htmx.trigger_name == "sort_by_name_down"
+                or request.GET.get("sort_flag") == "sort_by_name_down"
+            ):
+                all_cases = filtered_cases.order_by("-surname").all()
+                sort_flag = "sort_by_name_down"
+            elif (
+                request.htmx.trigger_name == "sort_by_id_up"
+                or request.GET.get("sort_flag") == "sort_by_id_up"
+            ):
+                all_cases = filtered_cases.order_by("id").all()
+                sort_flag = "sort_by_id_up"
+            elif (
+                request.htmx.trigger_name == "sort_by_id_down"
+                or request.GET.get("sort_flag") == "sort_by_id_down"
+            ):
+                all_cases = filtered_cases.order_by("-id").all()
+                sort_flag = "sort_by_id_down"
+            elif (
+                request.htmx.trigger_name == "sort_by_deadline_up"
+                or request.GET.get("sort_flag") == "sort_by_deadline_up"
+            ):
+                all_cases = filtered_cases.order_by(
+                    "registration__audit_submission_date"
+                ).all()
+                sort_flag = "sort_by_deadline_up"
+            elif (
+                request.htmx.trigger_name == "sort_by_deadline_down"
+                or request.GET.get("sort_flag") == "sort_by_deadline_down"
+            ):
+                all_cases = filtered_cases.order_by(
+                    "-registration__audit_submission_date"
+                ).all()
+                sort_flag = "sort_by_deadline_down"
+            elif (
+                request.htmx.trigger_name == "sort_by_cohort_up"
+                or request.GET.get("sort_flag") == "sort_by_cohort_up"
+            ):
+                all_cases = filtered_cases.order_by("registration__cohort").all()
+                sort_flag = "sort_by_cohort_up"
+            elif (
+                request.htmx.trigger_name == "sort_by_cohort_down"
+                or request.GET.get("sort_flag") == "sort_by_cohort_down"
+            ):
+                all_cases = filtered_cases.order_by("-registration__cohort").all()
+                sort_flag = "sort_by_cohort_down"
+            elif (
+                request.htmx.trigger_name == "sort_by_days_remaining_up"
+                or request.GET.get("sort_flag") == "sort_by_days_remaining_up"
+            ):
+                all_cases = filtered_cases.order_by(
+                    "registration__days_remaining_before_submission"
+                ).all()
+                sort_flag = "sort_by_days_remaining_before_submission_up"
+            elif (
+                request.htmx.trigger_name
+                == "sort_by_days_remaining_before_submission_down"
+                or request.GET.get("sort_flag")
+                == "sort_by_days_remaining_before_submission_down"
+            ):
+                all_cases = filtered_cases.order_by(
+                    "-registration__days_remaining_before_submission"
+                ).all()
+                sort_flag = "sort_by_days_remaining_before_submission_down"
             else:
-                # England - select trusts
-                filtered_cases = Case.objects.filter(
-                    organisations__trust=parent_trust,
-                    epilepsy12_sites__site_is_primary_centre_of_epilepsy_care=True,
-                    epilepsy12_sites__site_is_actively_involved_in_epilepsy_care=True,
-                )
+                all_cases = filtered_cases.order_by("surname").all()
 
-        else:
-            # filters all primary centres at organisation level, irrespective of if active or inactive
-            filtered_cases = Case.objects.filter(
-                organisations__name=organisation,
-                epilepsy12_sites__site_is_primary_centre_of_epilepsy_care=True,
-                epilepsy12_sites__site_is_actively_involved_in_epilepsy_care=True,
-            )
+        registered_cases = all_cases.filter(
+            ~Q(registration__isnull=True)
+            & Q(epilepsy12_sites__site_is_primary_centre_of_epilepsy_care=True)
+            & Q(epilepsy12_sites__site_is_actively_involved_in_epilepsy_care=True)
+        ).all()
 
-        if (
-            request.htmx.trigger_name == "sort_by_nhs_number_up"
-            or request.GET.get("sort_flag") == "sort_by_nhs_number_up"
-        ):
-            all_cases = filtered_cases.order_by("nhs_number").all()
-            if jersey_flag:
-                all_cases = filtered_cases.order_by("unique_reference_number").all()
-            sort_flag = "sort_by_nhs_number_up"
-        elif (
-            request.htmx.trigger_name == "sort_by_nhs_number_down"
-            or request.GET.get("sort_flag") == "sort_by_nhs_number_down"
-        ):
-            all_cases = filtered_cases.order_by("-nhs_number").all()
-            if jersey_flag:
-                all_cases = filtered_cases.order_by("-unique_reference_number").all()
-            sort_flag = "sort_by_nhs_number_down"
-        elif (
-            request.htmx.trigger_name == "sort_by_ethnicity_up"
-            or request.GET.get("sort_flag") == "sort_by_ethnicity_up"
-        ):
-            all_cases = filtered_cases.order_by("ethnicity").all()
-            sort_flag = "sort_by_ethnicity_up"
-        elif (
-            request.htmx.trigger_name == "sort_by_ethnicity_down"
-            or request.GET.get("sort_flag") == "sort_by_ethnicity_down"
-        ):
-            all_cases = filtered_cases.order_by("-ethnicity").all()
-            sort_flag = "sort_by_ethnicity_down"
-        elif (
-            request.htmx.trigger_name == "sort_by_sex_up"
-            or request.GET.get("sort_flag") == "sort_by_sex_up"
-        ):
-            all_cases = filtered_cases.order_by("sex").all()
-            sort_flag = "sort_by_sex_up"
-        elif (
-            request.htmx.trigger_name == "sort_by_sex_down"
-            or request.GET.get("sort_flag") == "sort_by_sex_down"
-        ):
-            all_cases = filtered_cases.order_by("-sex").all()
-            sort_flag = "sort_by_sex_down"
-        elif (
-            request.htmx.trigger_name == "sort_by_name_up"
-            or request.GET.get("sort_flag") == "sort_by_name_up"
-        ):
-            all_cases = filtered_cases.order_by("surname").all()
-            sort_flag = "sort_by_name_up"
-        elif (
-            request.htmx.trigger_name == "sort_by_name_down"
-            or request.GET.get("sort_flag") == "sort_by_name_down"
-        ):
-            all_cases = filtered_cases.order_by("-surname").all()
-            sort_flag = "sort_by_name_down"
-        elif (
-            request.htmx.trigger_name == "sort_by_id_up"
-            or request.GET.get("sort_flag") == "sort_by_id_up"
-        ):
-            all_cases = filtered_cases.order_by("id").all()
-            sort_flag = "sort_by_id_up"
-        elif (
-            request.htmx.trigger_name == "sort_by_id_down"
-            or request.GET.get("sort_flag") == "sort_by_id_down"
-        ):
-            all_cases = filtered_cases.order_by("-id").all()
-            sort_flag = "sort_by_id_down"
-        elif (
-            request.htmx.trigger_name == "sort_by_deadline_up"
-            or request.GET.get("sort_flag") == "sort_by_deadline_up"
-        ):
-            all_cases = filtered_cases.order_by(
-                "registration__audit_submission_date"
-            ).all()
-            sort_flag = "sort_by_deadline_up"
-        elif (
-            request.htmx.trigger_name == "sort_by_deadline_down"
-            or request.GET.get("sort_flag") == "sort_by_deadline_down"
-        ):
-            all_cases = filtered_cases.order_by(
-                "-registration__audit_submission_date"
-            ).all()
-            sort_flag = "sort_by_deadline_down"
-        elif (
-            request.htmx.trigger_name == "sort_by_cohort_up"
-            or request.GET.get("sort_flag") == "sort_by_cohort_up"
-        ):
-            all_cases = filtered_cases.order_by("registration__cohort").all()
-            sort_flag = "sort_by_cohort_up"
-        elif (
-            request.htmx.trigger_name == "sort_by_cohort_down"
-            or request.GET.get("sort_flag") == "sort_by_cohort_down"
-        ):
-            all_cases = filtered_cases.order_by("-registration__cohort").all()
-            sort_flag = "sort_by_cohort_down"
-        elif (
-            request.htmx.trigger_name == "sort_by_days_remaining_up"
-            or request.GET.get("sort_flag") == "sort_by_days_remaining_up"
-        ):
-            all_cases = filtered_cases.order_by(
-                "registration__days_remaining_before_submission"
-            ).all()
-            sort_flag = "sort_by_days_remaining_before_submission_up"
-        elif (
-            request.htmx.trigger_name == "sort_by_days_remaining_before_submission_down"
-            or request.GET.get("sort_flag")
-            == "sort_by_days_remaining_before_submission_down"
-        ):
-            all_cases = filtered_cases.order_by(
-                "-registration__days_remaining_before_submission"
-            ).all()
-            sort_flag = "sort_by_days_remaining_before_submission_down"
-        else:
-            all_cases = filtered_cases.order_by("surname").all()
-
-    registered_cases = all_cases.filter(
-        ~Q(registration__isnull=True)
-        & Q(epilepsy12_sites__site_is_primary_centre_of_epilepsy_care=True)
-        & Q(epilepsy12_sites__site_is_actively_involved_in_epilepsy_care=True)
-    ).all()
-
-    cases_in_transfer = registered_cases.filter(epilepsy12_sites__active_transfer=True)
-
-    paginator = Paginator(all_cases, 50)
-    page_number = request.GET.get("page", 1)
-    case_list = paginator.page(page_number)
-
-    case_count = all_cases.count()
-    registered_count = registered_cases.count()
-
-    if (
-        request.user.is_rcpch_audit_team_member
-        or request.user.is_rcpch_staff
-        or request.user.is_superuser
-    ):
-        if organisation.country.boundary_identifier == "W92000004":
-            rcpch_choices = (
-                (0, "Organisation level"),
-                (1, "Local Health Board level"),
-                (2, "National level"),
-            )
-        else:
-            rcpch_choices = (
-                (0, "Organisation level"),
-                (1, "Trust level"),
-                (2, "National level"),
-            )
-    else:
-        if organisation.country.boundary_identifier == "W92000004":
-            rcpch_choices = (
-                (0, "Organisation level"),
-                (1, "Local Health Board level"),
-            )
-        else:
-            rcpch_choices = (
-                (0, "Organisation level"),
-                (1, "Trust level"),
-            )
-
-    context = {
-        "case_list": case_list,
-        "total_cases": case_count,
-        "total_registrations": registered_count,
-        "sort_flag": sort_flag,
-        "organisation": organisation,
-        "organisation_children": organisation_children,
-        "rcpch_choices": rcpch_choices,
-        "organisation_id": organisation_id,
-        "cases_in_transfer": cases_in_transfer,
-        "filtered_case_list": filter_term,
-    }
-    if request.htmx:
-        return render(
-            request=request,
-            template_name="epilepsy12/partials/case_table.html",
-            context=context,
+        cases_in_transfer = registered_cases.filter(
+            epilepsy12_sites__active_transfer=True
         )
 
-    template_name = "epilepsy12/cases/cases.html"
-    return render(request, template_name, context)
+        paginator = Paginator(all_cases, 50)
+        page_number = request.GET.get("page", 1)
+        case_list = paginator.page(page_number)
+
+        case_count = all_cases.count()
+        registered_count = registered_cases.count()
+
+        if (
+            request.user.is_rcpch_audit_team_member
+            or request.user.is_rcpch_staff
+            or request.user.is_superuser
+        ):
+            if organisation.country.boundary_identifier == "W92000004":
+                rcpch_choices = (
+                    (0, "Organisation level"),
+                    (1, "Local Health Board level"),
+                    (2, "National level"),
+                )
+            else:
+                rcpch_choices = (
+                    (0, "Organisation level"),
+                    (1, "Trust level"),
+                    (2, "National level"),
+                )
+        else:
+            if organisation.country.boundary_identifier == "W92000004":
+                rcpch_choices = (
+                    (0, "Organisation level"),
+                    (1, "Local Health Board level"),
+                )
+            else:
+                rcpch_choices = (
+                    (0, "Organisation level"),
+                    (1, "Trust level"),
+                )
+
+        context = {
+            "case_list": case_list,
+            "total_cases": case_count,
+            "total_registrations": registered_count,
+            "sort_flag": sort_flag,
+            "organisation": organisation,
+            "organisation_children": organisation_children,
+            "rcpch_choices": rcpch_choices,
+            "organisation_id": organisation_id,
+            "cases_in_transfer": cases_in_transfer,
+            "filtered_case_list": filter_term,
+        }
+        if request.htmx:
+            return render(
+                request=request,
+                template_name="epilepsy12/partials/case_table.html",
+                context=context,
+            )
+
+        template_name = "epilepsy12/cases/cases.html"
+        return render(request, template_name, context)
 
 
 @login_and_otp_required()
@@ -1040,46 +1052,65 @@ class CaseListView(LoginRequiredMixin, PermissionRequiredMixin, ListView):
         # Get the filtered queryset (after all filters have been applied)
         filtered_queryset = self.get_queryset()
 
-        # Add age distribution facets
-        context.update(CaseFilterMethods.get_age_counts(filtered_queryset))
+        simple_counts = CaseFilterMethods.get_all_simple_case_field_counts(
+            queryset=filtered_queryset
+        )
 
-        # Total counts for the filtered results
         context["total_cases"] = filtered_queryset.count()
-        context["registered_cases"] = CaseFilterMethods.get_registration_status_counts(
-            filtered_queryset, "registered"
-        )
-        context["unregistered_cases"] = (
-            CaseFilterMethods.get_registration_status_counts(
-                filtered_queryset, "unregistered"
-            )
+        context["under_12_count"] = simple_counts.get("under_12_count", 0)
+        context["over_12_count"] = simple_counts.get("over_12_count", 0)
+
+        registration_counts = CaseFilterMethods.get_all_registration_related_counts(
+            queryset=filtered_queryset
         )
 
-        age_counts = CaseFilterMethods.get_age_counts(filtered_queryset)
-
-        context["under_12_count"] = age_counts["under_12"]
-        context["over_12_count"] = age_counts["12_and_over"]
-
-        # Add complete and incomplete audit progress counts
-        context["complete_cases"] = CaseFilterMethods.get_audit_progress_complete_count(
-            filtered_queryset, True
+        context["registered_cases_count"] = registration_counts.get("registered", 0)
+        context["unregistered_cases_count"] = registration_counts.get("unregistered", 0)
+        context["complete_cases_count"] = registration_counts.get("cases_complete", 0)
+        context["incomplete_cases_count"] = registration_counts.get(
+            "cases_incomplete", 0
         )
 
-        context["incomplete_cases"] = (
-            CaseFilterMethods.get_audit_progress_incomplete_count(
-                filtered_queryset, True
-            )
-        )
+        # # Add age distribution facets
+        # context.update(CaseFilterMethods.get_age_counts(filtered_queryset))
+
+        # # Total counts for the filtered results
+        # context["total_cases"] = filtered_queryset.count()
+        # context["registered_cases"] = CaseFilterMethods.get_registration_status_counts(
+        #     filtered_queryset, "registered"
+        # )
+        # context["unregistered_cases"] = (
+        #     CaseFilterMethods.get_registration_status_counts(
+        #         filtered_queryset, "unregistered"
+        #     )
+        # )
+
+        # age_counts = CaseFilterMethods.get_age_counts(filtered_queryset)
+
+        # context["under_12_count"] = age_counts["under_12"]
+        # context["over_12_count"] = age_counts["12_and_over"]
+
+        # # Add complete and incomplete audit progress counts
+        # context["complete_cases"] = CaseFilterMethods.get_audit_progress_complete_count(
+        #     filtered_queryset, True
+        # )
+
+        # context["incomplete_cases"] = (
+        #     CaseFilterMethods.get_audit_progress_incomplete_count(
+        #         filtered_queryset, True
+        #     )
+        # )
 
         # Add ethnicity facets to dropdowns
-        ethnicity_counts = CaseFilterMethods.get_ethnicity_counts(filtered_queryset)
+        ethnicity_counts = simple_counts.get("ethnicity_counts", {})
         ethnicity_choices = [("", "All")]
         for ethnicity_code, label in ETHNICITIES:
             count = ethnicity_counts.get(ethnicity_code, 0)
             ethnicity_choices.append((f"{ethnicity_code}", f"{label} ({count})"))
         context["ethnicities"] = ethnicity_choices
 
-        # Add sex facets to dropdowns
-        sex_counts = CaseFilterMethods.get_sex_counts(filtered_queryset)
+        # # Add sex facets to dropdowns
+        sex_counts = simple_counts.get("sex_counts", {})
         sex_choices = [("", "All")]
         for sex_code, label in SEX_TYPE:
             count = sex_counts.get(sex_code, 0)
@@ -1089,9 +1120,7 @@ class CaseListView(LoginRequiredMixin, PermissionRequiredMixin, ListView):
         # Add cohort distribution - assuming cohorts 5-7
         cohort_counts = {}
         for cohort in range(5, 8):
-            count = CaseFilterMethods.get_registration_cohort_counts(
-                filtered_queryset, value=cohort
-            )
+            count = registration_counts.get("cohort_counts", {}).get(cohort, 0)
             cohort_counts[cohort] = count
         context["cohort_counts"] = cohort_counts
 
@@ -1101,11 +1130,8 @@ class CaseListView(LoginRequiredMixin, PermissionRequiredMixin, ListView):
         )
 
         # Add fact counts to index of multiple deprivation quintile dropdown
-        imd_counts = (
-            CaseFilterMethods.get_index_of_multiple_deprivation_quintile_counts(
-                filtered_queryset
-            )
-        )
+        imd_counts = simple_counts.get("imd_counts", {})
+
         imd_choices = [("", "All")]
         for imd in range(1, 6):
             count = imd_counts.get(imd, 0)
@@ -1115,8 +1141,8 @@ class CaseListView(LoginRequiredMixin, PermissionRequiredMixin, ListView):
                 additional_label = " (least deprived)"
             else:
                 additional_label = ""
-
-            imd_choices.append((imd, f"{imd} {additional_label} ({count})"))
+            appendage = f"{imd} {additional_label} ({count})"
+            imd_choices.append((f"{imd}", appendage))
         context["imd_choices"] = imd_choices
 
         context["total_episodes"] = CaseFilterMethods.get_total_episodes_count(
@@ -1152,55 +1178,38 @@ class CaseListView(LoginRequiredMixin, PermissionRequiredMixin, ListView):
         )
 
         # related fields
+        comorbidity_counts = CaseFilterMethods.get_all_comorbidity_counts(
+            queryset=filtered_queryset
+        )
         context["developmental_learning_or_schooling_problems_count"] = (
-            CaseFilterMethods.get_developmental_learning_or_schooling_problems_counts(
-                queryset=filtered_queryset
-            )
+            comorbidity_counts.get("developmental_learning_or_schooling_problems", 0)
         )
-        context["behavioural_or_emotional_problems_count"] = (
-            CaseFilterMethods.get_behavioural_or_emotional_problems_counts(
-                queryset=filtered_queryset
-            )
+        context["behavioural_or_emotional_problems_count"] = comorbidity_counts.get(
+            "behavioural_or_emotional_problems", 0
         )
-
-        context["syndrome_present_count"] = (
-            CaseFilterMethods.get_syndrome_present_counts(queryset=filtered_queryset)
+        context["syndrome_present_count"] = comorbidity_counts.get(
+            "syndrome_present", 0
         )
 
-        context["epilepsy_cause_known_count"] = (
-            CaseFilterMethods.get_epilepsy_cause_known_counts(
-                queryset=filtered_queryset
-            )
+        context["epilepsy_cause_known_count"] = comorbidity_counts.get(
+            "epilepsy_cause_known", 0
         )
-
         context["global_developmental_delay_or_learning_difficulties_count"] = (
-            CaseFilterMethods.get_global_developmental_delay_or_learning_difficulties_counts(
-                queryset=filtered_queryset
+            comorbidity_counts.get(
+                "global_developmental_delay_or_learning_difficulties", 0
             )
         )
-
-        context["autistic_spectrum_disorder_count"] = (
-            CaseFilterMethods.get_autistic_spectrum_disorder_counts(
-                queryset=filtered_queryset
-            )
+        context["autistic_spectrum_disorder_count"] = comorbidity_counts.get(
+            "autistic_spectrum_disorder", 0
         )
-
-        context["mental_health_issue_identified_count"] = (
-            CaseFilterMethods.get_mental_health_issue_identified_counts(
-                queryset=filtered_queryset
-            )
+        context["mental_health_issue_identified_count"] = comorbidity_counts.get(
+            "mental_health_issue_identified_count", 0
         )
-
         context["has_been_referred_for_mental_health_support_count"] = (
-            CaseFilterMethods.get_has_been_referred_for_mental_health_support_counts(
-                queryset=filtered_queryset
-            )
+            comorbidity_counts.get("has_been_referred_for_mental_health_support", 0)
         )
-
-        context["has_support_for_mental_health_support_count"] = (
-            CaseFilterMethods.get_has_support_for_mental_health_support_counts(
-                queryset=filtered_queryset
-            )
+        context["has_support_for_mental_health_support_count"] = comorbidity_counts.get(
+            "has_support_for_mental_health_support", 0
         )
 
         # deal with the KPIs - this is a list of all the KPIs that have failed stored in kpi_failed
