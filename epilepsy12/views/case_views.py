@@ -4,7 +4,6 @@ import logging
 from silk.profiling.profiler import silk_profile
 
 # django imports
-from django.apps import apps
 from django.core.exceptions import PermissionDenied
 from django.utils import timezone
 from django.shortcuts import get_object_or_404, redirect, render
@@ -25,9 +24,7 @@ from epilepsy12.forms import CaseForm
 from epilepsy12.models import (
     AuditProgress,
     Case,
-    Country,
     Epilepsy12User,
-    NHSEnglandRegion,
     Organisation,
     Site,
 )
@@ -1070,36 +1067,6 @@ class CaseListView(LoginRequiredMixin, PermissionRequiredMixin, ListView):
         context["incomplete_cases_count"] = registration_counts.get(
             "cases_incomplete", 0
         )
-
-        # # Add age distribution facets
-        # context.update(CaseFilterMethods.get_age_counts(filtered_queryset))
-
-        # # Total counts for the filtered results
-        # context["total_cases"] = filtered_queryset.count()
-        # context["registered_cases"] = CaseFilterMethods.get_registration_status_counts(
-        #     filtered_queryset, "registered"
-        # )
-        # context["unregistered_cases"] = (
-        #     CaseFilterMethods.get_registration_status_counts(
-        #         filtered_queryset, "unregistered"
-        #     )
-        # )
-
-        # age_counts = CaseFilterMethods.get_age_counts(filtered_queryset)
-
-        # context["under_12_count"] = age_counts["under_12"]
-        # context["over_12_count"] = age_counts["12_and_over"]
-
-        # # Add complete and incomplete audit progress counts
-        # context["complete_cases"] = CaseFilterMethods.get_audit_progress_complete_count(
-        #     filtered_queryset, True
-        # )
-
-        # context["incomplete_cases"] = (
-        #     CaseFilterMethods.get_audit_progress_incomplete_count(
-        #         filtered_queryset, True
-        #     )
-        # )
 
         # Add ethnicity facets to dropdowns
         ethnicity_counts = simple_counts.get("ethnicity_counts", {})
