@@ -356,6 +356,7 @@ class CaseFilterMethods:
         return {(key.strip(), KPI_MAP[key]): count for key, count in counts.items()}
 
     @staticmethod
+    @silk_profile(name="Get All Simple Case Field Counts")
     def get_all_simple_case_field_counts(queryset):
         """
         Returns a dictionary of all simple case field counts
@@ -398,6 +399,7 @@ class CaseFilterMethods:
         }
 
     @staticmethod
+    @silk_profile(name="Get All Registration Related Counts")
     def get_all_registration_related_counts(queryset):
         """
         Returns a dictionary of all registration-related counts
@@ -476,6 +478,7 @@ class CaseFilterMethods:
         }
 
     @staticmethod
+    @silk_profile(name="Get All Comorbidity Counts")
     def get_all_comorbidity_counts(queryset):
         """
         Returns a dictionary of all comorbidity-related counts
