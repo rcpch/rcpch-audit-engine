@@ -21,13 +21,11 @@
           </div>
         </div>
           
-        <div class="twelve wide notupperpadded column">
-              
+        <div class="eight wide notupperpadded column">
               <a href="{% url 'create_case' organisation_id %}"><button class="ui rcpch_purple button">Add a new Child/Young Person</button></a>
-              
         </div>
             
-        <div class="four wide notupperpadded column" id='case_statistics'>
+        <div class="eight wide notupperpadded column" id='case_statistics'>
             {% include 'epilepsy12/partials/cases/case_statistics.html' with organisation=organisation total_cases=total_cases total_registrations=total_registrations %}
         </div>
 

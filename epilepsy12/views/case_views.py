@@ -1,9 +1,9 @@
 # python imports
-from datetime import datetime
+from datetime import datetime, date
 import logging
+from silk.profiling.profiler import silk_profile
 
 # django imports
-from django.apps import apps
 from django.core.exceptions import PermissionDenied
 from django.utils import timezone
 from django.shortcuts import get_object_or_404, redirect, render
@@ -21,12 +21,11 @@ from django_htmx.http import trigger_client_event, HttpResponseClientRedirect
 
 # RCPCH imports
 from epilepsy12.forms import CaseForm
+from epilepsy12.general_functions.cohort_number import cohorts_and_dates
 from epilepsy12.models import (
     AuditProgress,
     Case,
-    Country,
     Epilepsy12User,
-    NHSEnglandRegion,
     Organisation,
     Site,
 )
@@ -52,6 +51,7 @@ logger = logging.getLogger(__name__)
 
 @login_and_otp_required()
 @user_may_view_this_organisation()
+@silk_profile(name="case_list_full_execution")
 def case_list(request, organisation_id):
     """
     Returns a list of all children registered under the user's service.
@@ -351,9 +351,16 @@ def case_list(request, organisation_id):
                 (1, "Trust level"),
             )
 
+    current_submitting_cohort = cohorts_and_dates(date.today()).get("submitting_cohort")
+    current_cohort_total = CaseFilterMethods.get_all_registration_related_counts(
+        queryset=registered_cases
+    )["cohort_counts"].get(current_submitting_cohort)
+
     context = {
         "case_list": case_list,
         "total_cases": case_count,
+        "total_cases_in_current_submitting_cohort": current_cohort_total,
+        "submitting_cohort": current_submitting_cohort,
         "total_registrations": registered_count,
         "sort_flag": sort_flag,
         "organisation": organisation,
@@ -1040,46 +1047,35 @@ class CaseListView(LoginRequiredMixin, PermissionRequiredMixin, ListView):
         # Get the filtered queryset (after all filters have been applied)
         filtered_queryset = self.get_queryset()
 
-        # Add age distribution facets
-        context.update(CaseFilterMethods.get_age_counts(filtered_queryset))
+        simple_counts = CaseFilterMethods.get_all_simple_case_field_counts(
+            queryset=filtered_queryset
+        )
 
-        # Total counts for the filtered results
         context["total_cases"] = filtered_queryset.count()
-        context["registered_cases"] = CaseFilterMethods.get_registration_status_counts(
-            filtered_queryset, "registered"
-        )
-        context["unregistered_cases"] = (
-            CaseFilterMethods.get_registration_status_counts(
-                filtered_queryset, "unregistered"
-            )
+        context["under_12_count"] = simple_counts.get("under_12_count", 0)
+        context["over_12_count"] = simple_counts.get("over_12_count", 0)
+
+        registration_counts = CaseFilterMethods.get_all_registration_related_counts(
+            queryset=filtered_queryset
         )
 
-        age_counts = CaseFilterMethods.get_age_counts(filtered_queryset)
-
-        context["under_12_count"] = age_counts["under_12"]
-        context["over_12_count"] = age_counts["12_and_over"]
-
-        # Add complete and incomplete audit progress counts
-        context["complete_cases"] = CaseFilterMethods.get_audit_progress_complete_count(
-            filtered_queryset, True
-        )
-
-        context["incomplete_cases"] = (
-            CaseFilterMethods.get_audit_progress_incomplete_count(
-                filtered_queryset, True
-            )
+        context["registered_cases_count"] = registration_counts.get("registered", 0)
+        context["unregistered_cases_count"] = registration_counts.get("unregistered", 0)
+        context["complete_cases_count"] = registration_counts.get("cases_complete", 0)
+        context["incomplete_cases_count"] = registration_counts.get(
+            "cases_incomplete", 0
         )
 
         # Add ethnicity facets to dropdowns
-        ethnicity_counts = CaseFilterMethods.get_ethnicity_counts(filtered_queryset)
+        ethnicity_counts = simple_counts.get("ethnicity_counts", {})
         ethnicity_choices = [("", "All")]
         for ethnicity_code, label in ETHNICITIES:
             count = ethnicity_counts.get(ethnicity_code, 0)
             ethnicity_choices.append((f"{ethnicity_code}", f"{label} ({count})"))
         context["ethnicities"] = ethnicity_choices
 
-        # Add sex facets to dropdowns
-        sex_counts = CaseFilterMethods.get_sex_counts(filtered_queryset)
+        # # Add sex facets to dropdowns
+        sex_counts = simple_counts.get("sex_counts", {})
         sex_choices = [("", "All")]
         for sex_code, label in SEX_TYPE:
             count = sex_counts.get(sex_code, 0)
@@ -1089,9 +1085,7 @@ class CaseListView(LoginRequiredMixin, PermissionRequiredMixin, ListView):
         # Add cohort distribution - assuming cohorts 5-7
         cohort_counts = {}
         for cohort in range(5, 8):
-            count = CaseFilterMethods.get_registration_cohort_counts(
-                filtered_queryset, value=cohort
-            )
+            count = registration_counts.get("cohort_counts", {}).get(cohort, 0)
             cohort_counts[cohort] = count
         context["cohort_counts"] = cohort_counts
 
@@ -1101,11 +1095,8 @@ class CaseListView(LoginRequiredMixin, PermissionRequiredMixin, ListView):
         )
 
         # Add fact counts to index of multiple deprivation quintile dropdown
-        imd_counts = (
-            CaseFilterMethods.get_index_of_multiple_deprivation_quintile_counts(
-                filtered_queryset
-            )
-        )
+        imd_counts = simple_counts.get("imd_counts", {})
+
         imd_choices = [("", "All")]
         for imd in range(1, 6):
             count = imd_counts.get(imd, 0)
@@ -1115,8 +1106,8 @@ class CaseListView(LoginRequiredMixin, PermissionRequiredMixin, ListView):
                 additional_label = " (least deprived)"
             else:
                 additional_label = ""
-
-            imd_choices.append((imd, f"{imd} {additional_label} ({count})"))
+            appendage = f"{imd} {additional_label} ({count})"
+            imd_choices.append((f"{imd}", appendage))
         context["imd_choices"] = imd_choices
 
         context["total_episodes"] = CaseFilterMethods.get_total_episodes_count(
@@ -1152,55 +1143,38 @@ class CaseListView(LoginRequiredMixin, PermissionRequiredMixin, ListView):
         )
 
         # related fields
+        comorbidity_counts = CaseFilterMethods.get_all_comorbidity_counts(
+            queryset=filtered_queryset
+        )
         context["developmental_learning_or_schooling_problems_count"] = (
-            CaseFilterMethods.get_developmental_learning_or_schooling_problems_counts(
-                queryset=filtered_queryset
-            )
+            comorbidity_counts.get("developmental_learning_or_schooling_problems", 0)
         )
-        context["behavioural_or_emotional_problems_count"] = (
-            CaseFilterMethods.get_behavioural_or_emotional_problems_counts(
-                queryset=filtered_queryset
-            )
+        context["behavioural_or_emotional_problems_count"] = comorbidity_counts.get(
+            "behavioural_or_emotional_problems", 0
         )
-
-        context["syndrome_present_count"] = (
-            CaseFilterMethods.get_syndrome_present_counts(queryset=filtered_queryset)
+        context["syndrome_present_count"] = comorbidity_counts.get(
+            "syndrome_present", 0
         )
 
-        context["epilepsy_cause_known_count"] = (
-            CaseFilterMethods.get_epilepsy_cause_known_counts(
-                queryset=filtered_queryset
-            )
+        context["epilepsy_cause_known_count"] = comorbidity_counts.get(
+            "epilepsy_cause_known", 0
         )
-
         context["global_developmental_delay_or_learning_difficulties_count"] = (
-            CaseFilterMethods.get_global_developmental_delay_or_learning_difficulties_counts(
-                queryset=filtered_queryset
+            comorbidity_counts.get(
+                "global_developmental_delay_or_learning_difficulties", 0
             )
         )
-
-        context["autistic_spectrum_disorder_count"] = (
-            CaseFilterMethods.get_autistic_spectrum_disorder_counts(
-                queryset=filtered_queryset
-            )
+        context["autistic_spectrum_disorder_count"] = comorbidity_counts.get(
+            "autistic_spectrum_disorder", 0
         )
-
-        context["mental_health_issue_identified_count"] = (
-            CaseFilterMethods.get_mental_health_issue_identified_counts(
-                queryset=filtered_queryset
-            )
+        context["mental_health_issue_identified_count"] = comorbidity_counts.get(
+            "mental_health_issue_identified_count", 0
         )
-
         context["has_been_referred_for_mental_health_support_count"] = (
-            CaseFilterMethods.get_has_been_referred_for_mental_health_support_counts(
-                queryset=filtered_queryset
-            )
+            comorbidity_counts.get("has_been_referred_for_mental_health_support", 0)
         )
-
-        context["has_support_for_mental_health_support_count"] = (
-            CaseFilterMethods.get_has_support_for_mental_health_support_counts(
-                queryset=filtered_queryset
-            )
+        context["has_support_for_mental_health_support_count"] = comorbidity_counts.get(
+            "has_support_for_mental_health_support", 0
         )
 
         # deal with the KPIs - this is a list of all the KPIs that have failed stored in kpi_failed

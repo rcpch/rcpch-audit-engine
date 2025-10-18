@@ -14,11 +14,6 @@ from ..common_view_functions_tests.aggregate_by_tests.helpers import (
 from epilepsy12.models import (
     Case,
     KPI,
-    FirstPaediatricAssessment,
-    MultiaxialDiagnosis,
-    Management,
-    AuditProgress,
-    Site,
 )
 
 
@@ -51,17 +46,18 @@ def test_get_ethnicity_counts(e12_case_factory):
         epilepsy12_sites__organisation__ods_code="7A6AV"
     ).count()
 
-    ethnicity_counts = CaseFilterMethods.get_ethnicity_counts(
+    simple_counts = CaseFilterMethods.get_all_simple_case_field_counts(
         queryset=Case.objects.all()
     )
+
     assert (
-        ethnicity_counts["A"] == org1_cases_count
+        simple_counts["ethnicity_counts"].get("A") == org1_cases_count
     ), f"Expected {org1_cases_count} for Ethnicity A"
     assert (
-        ethnicity_counts["B"] == org2_cases_count
+        simple_counts["ethnicity_counts"].get("B") == org2_cases_count
     ), f"Expected {org2_cases_count} for Ethnicity B"
     assert (
-        ethnicity_counts["C"] == org3_cases_count
+        simple_counts["ethnicity_counts"].get("C") == org3_cases_count
     ), f"Expected {org3_cases_count} for Ethnicity C"
 
 
@@ -84,10 +80,12 @@ def test_get_sex_counts(e12_case_factory):
         epilepsy12_sites__organisation__ods_code="RGN90"
     ).count()
 
-    sex_counts = CaseFilterMethods.get_sex_counts(Case.objects.all())
+    simple_counts = CaseFilterMethods.get_all_simple_case_field_counts(
+        queryset=Case.objects.all()
+    )
 
-    assert sex_counts[1] == org1_count
-    assert sex_counts[2] == org2_count
+    assert simple_counts["sex_counts"].get(1) == org1_count
+    assert simple_counts["sex_counts"].get(2) == org2_count
 
 
 @pytest.mark.django_db
@@ -100,8 +98,10 @@ def test_get_age_counts(e12_case_factory):
         year=cases[0].date_of_birth.year + 13
     )
     cases[0].save()
-    age_counts = CaseFilterMethods.get_age_counts(Case.objects.all())
-    assert age_counts["under_12"] + age_counts["12_and_over"] == 2
+    simple_counts = CaseFilterMethods.get_all_simple_case_field_counts(
+        queryset=Case.objects.all()
+    )
+    assert simple_counts["under_12_count"] + simple_counts["over_12_count"] == 2
 
 
 @pytest.mark.django_db
@@ -109,10 +109,10 @@ def test_get_index_of_multiple_deprivation_quintile_counts(e12_case_factory):
     _clean_cases_from_test_db()
     _register_cases_in_organisation(["RGT01"], e12_case_factory, n_cases=3)
     Case.objects.all().update(index_of_multiple_deprivation_quintile=2)
-    counts = CaseFilterMethods.get_index_of_multiple_deprivation_quintile_counts(
-        Case.objects.all()
+    counts = CaseFilterMethods.get_all_simple_case_field_counts(
+        queryset=Case.objects.all()
     )
-    assert counts[2] == 3
+    assert counts["imd_counts"].get(2) == 3
 
 
 @pytest.mark.django_db
@@ -120,12 +120,11 @@ def test_get_registration_status_counts(e12_case_factory):
     _clean_cases_from_test_db()
     _register_cases_in_organisation(["RGT01"], e12_case_factory, n_cases=2)
     # Assume all are registered by default
-    registered = CaseFilterMethods.get_registration_status_counts(
-        Case.objects.all(), "registered"
+    registered_counts = CaseFilterMethods.get_all_registration_related_counts(
+        queryset=Case.objects.all()
     )
-    unregistered = CaseFilterMethods.get_registration_status_counts(
-        Case.objects.all(), "unregistered"
-    )
+    registered = registered_counts.get("registered", 0)
+    unregistered = registered_counts.get("unregistered", 0)
     assert registered + unregistered == 2
 
 
@@ -139,10 +138,10 @@ def test_get_developmental_learning_or_schooling_problems_counts(e12_case_factor
         registration__first_paediatric_assessment__developmental_learning_or_schooling_problems=False
     )
 
-    count = CaseFilterMethods.get_developmental_learning_or_schooling_problems_counts(
-        Case.objects.all()
+    comorbidity_count = CaseFilterMethods.get_all_comorbidity_counts(
+        queryset=Case.objects.all()
     )
-    assert count == 1
+    assert comorbidity_count.get("developmental_learning_or_schooling_problems", 0) == 1
 
 
 @pytest.mark.django_db
@@ -155,10 +154,10 @@ def test_get_behavioural_or_emotional_problems_counts(e12_case_factory):
         registration__first_paediatric_assessment__behavioural_or_emotional_problems=False
     )
 
-    count = CaseFilterMethods.get_behavioural_or_emotional_problems_counts(
-        Case.objects.all()
+    comorbidity_count = CaseFilterMethods.get_all_comorbidity_counts(
+        queryset=Case.objects.all()
     )
-    assert count == 1
+    assert comorbidity_count.get("behavioural_or_emotional_problems", 0) == 1
 
 
 @pytest.mark.django_db
@@ -169,8 +168,10 @@ def test_get_syndrome_present_counts(e12_case_factory):
         registration__multiaxial_diagnosis__syndrome_present=False
     )
 
-    count = CaseFilterMethods.get_syndrome_present_counts(Case.objects.all())
-    assert count == 1
+    comorbidity_count = CaseFilterMethods.get_all_comorbidity_counts(
+        queryset=Case.objects.all()
+    )
+    assert comorbidity_count.get("syndrome_present", 0) == 1
 
 
 @pytest.mark.django_db
@@ -183,8 +184,10 @@ def test_get_epilepsy_cause_known_counts(e12_case_factory):
         registration__multiaxial_diagnosis__epilepsy_cause_known=False
     )
 
-    count = CaseFilterMethods.get_epilepsy_cause_known_counts(Case.objects.all())
-    assert count == 1
+    comorbidity_count = CaseFilterMethods.get_all_comorbidity_counts(
+        queryset=Case.objects.all()
+    )
+    assert comorbidity_count.get("epilepsy_cause_known", 0) == 1
 
 
 @pytest.mark.django_db
@@ -199,10 +202,13 @@ def test_get_global_developmental_delay_or_learning_difficulties_counts(
         registration__multiaxial_diagnosis__global_developmental_delay_or_learning_difficulties=False
     )
 
-    count = CaseFilterMethods.get_global_developmental_delay_or_learning_difficulties_counts(
-        Case.objects.all()
+    comorbidity_count = CaseFilterMethods.get_all_comorbidity_counts(
+        queryset=Case.objects.all()
     )
-    assert count == 1
+    assert (
+        comorbidity_count.get("global_developmental_delay_or_learning_difficulties", 0)
+        == 1
+    )
 
 
 @pytest.mark.django_db
@@ -215,8 +221,10 @@ def test_get_autistic_spectrum_disorder_counts(e12_case_factory):
         registration__multiaxial_diagnosis__autistic_spectrum_disorder=False
     )
 
-    count = CaseFilterMethods.get_autistic_spectrum_disorder_counts(Case.objects.all())
-    assert count == 1
+    comorbidity_count = CaseFilterMethods.get_all_comorbidity_counts(
+        queryset=Case.objects.all()
+    )
+    assert comorbidity_count.get("autistic_spectrum_disorder", 0) == 1
 
 
 @pytest.mark.django_db
@@ -229,10 +237,10 @@ def test_get_mental_health_issue_identified_counts(e12_case_factory):
         registration__multiaxial_diagnosis__mental_health_issue_identified=False
     )
 
-    count = CaseFilterMethods.get_mental_health_issue_identified_counts(
-        Case.objects.all()
+    comorbidity_count = CaseFilterMethods.get_all_comorbidity_counts(
+        queryset=Case.objects.all()
     )
-    assert count == 1
+    assert comorbidity_count.get("mental_health_issue_identified", 0) == 1
 
 
 @pytest.mark.django_db
@@ -245,10 +253,10 @@ def test_get_has_been_referred_for_mental_health_support_counts(e12_case_factory
         registration__management__has_been_referred_for_mental_health_support=False
     )
 
-    count = CaseFilterMethods.get_has_been_referred_for_mental_health_support_counts(
-        Case.objects.all()
+    comorbidity_count = CaseFilterMethods.get_all_comorbidity_counts(
+        queryset=Case.objects.all()
     )
-    assert count == 1
+    assert comorbidity_count.get("has_been_referred_for_mental_health_support", 0) == 1
 
 
 @pytest.mark.django_db
@@ -261,10 +269,10 @@ def test_get_has_support_for_mental_health_support_counts(e12_case_factory):
         registration__management__has_support_for_mental_health_support=False
     )
 
-    count = CaseFilterMethods.get_has_support_for_mental_health_support_counts(
-        Case.objects.all()
+    comorbidity_count = CaseFilterMethods.get_all_comorbidity_counts(
+        queryset=Case.objects.all()
     )
-    assert count == 1
+    assert comorbidity_count.get("has_support_for_mental_health_support", 0) == 1
 
 
 @pytest.mark.django_db

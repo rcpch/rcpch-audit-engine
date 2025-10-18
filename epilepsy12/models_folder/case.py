@@ -134,7 +134,7 @@ class Case(TimeStampAbstractBaseClass, UserStampAbstractBaseClass, HelpTextMixin
     index_of_multiple_deprivation_quintile = models.PositiveSmallIntegerField(
         # this is a calculated field - it relies on the availability of the Deprivare server running
         # A quintile is calculated on save and persisted in the database
-        "index of multiple deprivation calculated from MySociety data.",
+        "index of multiple deprivation quintile",
         blank=True,
         editable=False,
         null=True,
@@ -176,14 +176,14 @@ class Case(TimeStampAbstractBaseClass, UserStampAbstractBaseClass, HelpTextMixin
         Today's date is optional and defaults to date.today()
         """
         return stringify_time_elapsed(self.date_of_birth, today_date)
-    
+
     def editable(self):
         if self.locked:
             return False
-        
+
         if not hasattr(self, "registration"):
             return True
-        
+
         return self.registration.days_remaining_before_submission > 0
 
     def save(self, *args, **kwargs) -> None:

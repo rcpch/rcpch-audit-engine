@@ -148,10 +148,16 @@
                                                 {{ key|field_key_to_readable_name }}: {{ value|field_value_to_readable_name:key }}
 
                                                 {# Use build_url_parameters to generate the removal link #}
-                                                {# Pass the key and the specific value to remove/toggle #}
+                                                {# Pass the key and the specific value to remove/toggle - if kpi_failed then pass the kpi value, if not then pass None as a flag that this should be deleted #}
+                                                {% if key == 'kpi_failed' %}
+                                                <a href="{% build_url_parameters request key value %}">
+                                                    <i class="delete icon"></i>
+                                                </a>
+                                                {% else %}
                                                 <a href="{% build_url_parameters request key None %}">
                                                     <i class="delete icon"></i>
                                                 </a>
+                                                {% endif %}
                                             </div>
                                         </div>
                                     {% endif %}
@@ -287,12 +293,12 @@
                                 
                                 <a class="item {% if request.GET.registration_status == 'registered' %}active{% endif %}" 
                                 href="{% build_url_parameters request 'registration_status' "registered" %}">
-                                    Registered <div class="ui {% if request.GET.registration_status == 'registered' %}left pointing{% endif %} rcpch facets label">{{ registered_cases }}</div>
+                                    Registered <div class="ui {% if request.GET.registration_status == 'registered' %}left pointing{% endif %} rcpch facets label">{{ registered_cases_count }}</div>
                                 </a>
                                 
                                 <a class="item {% if request.GET.registration_status == 'unregistered' %}active{% endif %}" 
                                 href="{% build_url_parameters request 'registration_status' "unregistered" %}">
-                                    Unregistered <div class="ui {% if request.GET.registration_status == 'unregistered' %}left pointing{% endif %} rcpch facets label">{{ unregistered_cases }}</div>
+                                    Unregistered <div class="ui {% if request.GET.registration_status == 'unregistered' %}left pointing{% endif %} rcpch facets label">{{ unregistered_cases_count }}</div>
                                 </a>
                             </div>
                         </div>
@@ -332,12 +338,12 @@
                                 
                                 <a class="item {% if request.GET.audit_progress_complete %}active{% endif %}" 
                                 href="{% if request.GET.audit_progress_complete == 'true' %}{% build_url_parameters request 'audit_progress_complete' None %}{% else %}{% build_url_parameters request 'audit_progress_complete' 'true' %}{% endif %}">
-                                    Complete <div class="ui {% if request.GET.audit_progress_complete %}left pointing{% endif %} rcpch facets label">{{ complete_cases }}</div>
+                                    Complete <div class="ui {% if request.GET.audit_progress_complete %}left pointing{% endif %} rcpch facets label">{{ complete_cases_count }}</div>
                                 </a>
                                 
                                 <a class="item {% if request.GET.audit_progress_incomplete %}active{% endif %}" 
                                 href="{% if request.GET.audit_progress_incomplete == 'true' %}{% build_url_parameters request 'audit_progress_incomplete' None %}{% else %}{% build_url_parameters request 'audit_progress_incomplete' 'true' %}{% endif %}">
-                                    Incomplete <div class="ui {% if request.GET.audit_progress_incomplete %}left pointing{% endif %} rcpch facets label">{{ incomplete_cases }}</div>
+                                    Incomplete <div class="ui {% if request.GET.audit_progress_incomplete %}left pointing{% endif %} rcpch facets label">{{ incomplete_cases_count }}</div>
                                 </a>
                             </div>
                         </div>
