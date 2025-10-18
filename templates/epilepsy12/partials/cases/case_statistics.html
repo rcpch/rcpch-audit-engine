@@ -1,4 +1,4 @@
-<div class="ui two mini statistics"
+<div class="ui three mini statistics"
     hx-get="{% url 'case_statistics' organisation_id=organisation.pk %}"
     hx-swap='innerHTML'
     name='case_statistics'
@@ -7,10 +7,18 @@
 >
     <div class="rcpch_light_blue statistic">
         <div class="value">
+        {{total_cases_in_current_submitting_cohort}}
+        </div>
+        <div class="label">
+        Total (Cohort {{submitting_cohort}})
+        </div>
+    </div>
+    <div class="rcpch_light_blue statistic">
+        <div class="value">
         {{total_cases}}
         </div>
         <div class="label">
-        Total
+        Total (All Cohorts)
         </div>
     </div>
     <div class="rcpch_light_blue statistic">
@@ -18,7 +26,7 @@
         {{total_registrations}}
         </div>
         <div class="label">
-        Registered
+        Registered (All Cohorts)
         </div>
     </div>
 </div>

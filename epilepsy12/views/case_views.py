@@ -1,5 +1,5 @@
 # python imports
-from datetime import datetime
+from datetime import datetime, date
 import logging
 from silk.profiling.profiler import silk_profile
 
@@ -21,6 +21,7 @@ from django_htmx.http import trigger_client_event, HttpResponseClientRedirect
 
 # RCPCH imports
 from epilepsy12.forms import CaseForm
+from epilepsy12.general_functions.cohort_number import cohorts_and_dates
 from epilepsy12.models import (
     AuditProgress,
     Case,
@@ -50,6 +51,7 @@ logger = logging.getLogger(__name__)
 
 @login_and_otp_required()
 @user_may_view_this_organisation()
+@silk_profile(name="case_list_full_execution")
 def case_list(request, organisation_id):
     """
     Returns a list of all children registered under the user's service.
@@ -62,325 +64,321 @@ def case_list(request, organisation_id):
     If the user is a superuser, they can view and edit all cases in the audit (but with great power comes great responsibility)
 
     """
-    with silk_profile(name="case_list_full_execution"):
-        sort_flag = None
 
-        filter_term = request.GET.get("filtered_case_list")
+    sort_flag = None
 
-        # get currently selected organisation
-        organisation = Organisation.objects.get(pk=organisation_id)
+    filter_term = request.GET.get("filtered_case_list")
 
-        # get trust or health board
-        if organisation.country.boundary_identifier == "W92000004":
-            parent_trust = organisation.local_health_board
-            organisation_children = Organisation.objects.filter(
-                local_health_board=parent_trust, active=True
-            ).all()
-        else:
-            parent_trust = organisation.trust
-            # get all organisations which are in the same parent trust
-            organisation_children = Organisation.objects.filter(
-                trust=parent_trust, active=True
-            ).all()
+    # get currently selected organisation
+    organisation = Organisation.objects.get(pk=organisation_id)
 
-        if filter_term:
-            # filter_term is called if filtering by search box
-            if request.user.view_preference == 0:
-                # user has requested organisation level view
-                all_cases = (
-                    Case.objects.filter(
-                        Q(epilepsy12_sites__organisation=organisation)
-                        & Q(
-                            epilepsy12_sites__site_is_primary_centre_of_epilepsy_care=True
-                        )
-                        & Q(
-                            epilepsy12_sites__site_is_actively_involved_in_epilepsy_care=True
-                        )
-                        & (
-                            Q(first_name__icontains=filter_term)
-                            | Q(surname__icontains=filter_term)
-                            | Q(nhs_number__icontains=filter_term)
-                            | Q(unique_reference_number__icontains=filter_term)
-                            | Q(id__icontains=filter_term)
-                        )
+    # get trust or health board
+    if organisation.country.boundary_identifier == "W92000004":
+        parent_trust = organisation.local_health_board
+        organisation_children = Organisation.objects.filter(
+            local_health_board=parent_trust, active=True
+        ).all()
+    else:
+        parent_trust = organisation.trust
+        # get all organisations which are in the same parent trust
+        organisation_children = Organisation.objects.filter(
+            trust=parent_trust, active=True
+        ).all()
+
+    if filter_term:
+        # filter_term is called if filtering by search box
+        if request.user.view_preference == 0:
+            # user has requested organisation level view
+            all_cases = (
+                Case.objects.filter(
+                    Q(epilepsy12_sites__organisation=organisation)
+                    & Q(epilepsy12_sites__site_is_primary_centre_of_epilepsy_care=True)
+                    & Q(
+                        epilepsy12_sites__site_is_actively_involved_in_epilepsy_care=True
                     )
-                    .order_by("surname")
-                    .all()
+                    & (
+                        Q(first_name__icontains=filter_term)
+                        | Q(surname__icontains=filter_term)
+                        | Q(nhs_number__icontains=filter_term)
+                        | Q(unique_reference_number__icontains=filter_term)
+                        | Q(id__icontains=filter_term)
+                    )
                 )
-            elif request.user.view_preference == 1:
-                # user has requested trust level view
-                if organisation.country.boundary_identifier == "W92000004":
-                    # in Wales filter by health board
-                    trust_filter = Q(
-                        epilepsy12_sites__organisation__local_health_board=organisation.local_health_board
-                    )
-                else:
-                    # England filter by Trust
-                    trust_filter = Q(
-                        epilepsy12_sites__organisation__trust=organisation.trust
-                    )
-
-                all_cases = (
-                    Case.objects.filter(
-                        trust_filter
-                        & Q(
-                            epilepsy12_sites__site_is_primary_centre_of_epilepsy_care=True
-                        )
-                        & Q(
-                            epilepsy12_sites__site_is_actively_involved_in_epilepsy_care=True
-                        )
-                        & (
-                            Q(first_name__icontains=filter_term)
-                            | Q(surname__icontains=filter_term)
-                            | Q(nhs_number__icontains=filter_term)
-                            | Q(unique_reference_number__icontains=filter_term)
-                            | Q(id__icontains=filter_term)
-                        )
-                    )
-                    .order_by("surname")
-                    .all()
+                .order_by("surname")
+                .all()
+            )
+        elif request.user.view_preference == 1:
+            # user has requested trust level view
+            if organisation.country.boundary_identifier == "W92000004":
+                # in Wales filter by health board
+                trust_filter = Q(
+                    epilepsy12_sites__organisation__local_health_board=organisation.local_health_board
                 )
-            elif request.user.view_preference == 2:
-                # user has requested national level view
-                all_cases = (
-                    Case.objects.filter(
-                        Q(
-                            epilepsy12_sites__site_is_primary_centre_of_epilepsy_care=True
-                        )
-                        & Q(
-                            epilepsy12_sites__site_is_actively_involved_in_epilepsy_care=True
-                        )
-                        & (
-                            Q(first_name__icontains=filter_term)
-                            | Q(surname__icontains=filter_term)
-                            | Q(nhs_number__icontains=filter_term)
-                            | Q(unique_reference_number__icontains=filter_term)
-                            | Q(id__icontains=filter_term)
-                        )
-                    )
-                    .order_by("surname")
-                    .all()
-                )
-
-        else:
-            """
-            Cases are filtered based on user preference (request.user.view_preference), where 0 is organisation level,
-            1 is trust level and 2 is national level
-            Only RCPCH audit staff have this final option.
-            """
-
-            jersey_flag = organisation.country.boundary_identifier == "JEY"
-
-            if request.user.view_preference == 2:
-                # this is an RCPCH audit team member requesting National level
-                filtered_cases = Case.objects.all()
-            elif request.user.view_preference == 1:
-                # filters all primary Trust level centres, irrespective of if active or inactive
-                if organisation.country.boundary_identifier == "W92000004":
-                    # welsh - select health boards
-                    filtered_cases = Case.objects.filter(
-                        organisations__local_health_board=parent_trust,
-                        epilepsy12_sites__site_is_primary_centre_of_epilepsy_care=True,
-                        epilepsy12_sites__site_is_actively_involved_in_epilepsy_care=True,
-                    )
-                else:
-                    # England - select trusts
-                    filtered_cases = Case.objects.filter(
-                        organisations__trust=parent_trust,
-                        epilepsy12_sites__site_is_primary_centre_of_epilepsy_care=True,
-                        epilepsy12_sites__site_is_actively_involved_in_epilepsy_care=True,
-                    )
-
             else:
-                # filters all primary centres at organisation level, irrespective of if active or inactive
+                # England filter by Trust
+                trust_filter = Q(
+                    epilepsy12_sites__organisation__trust=organisation.trust
+                )
+
+            all_cases = (
+                Case.objects.filter(
+                    trust_filter
+                    & Q(epilepsy12_sites__site_is_primary_centre_of_epilepsy_care=True)
+                    & Q(
+                        epilepsy12_sites__site_is_actively_involved_in_epilepsy_care=True
+                    )
+                    & (
+                        Q(first_name__icontains=filter_term)
+                        | Q(surname__icontains=filter_term)
+                        | Q(nhs_number__icontains=filter_term)
+                        | Q(unique_reference_number__icontains=filter_term)
+                        | Q(id__icontains=filter_term)
+                    )
+                )
+                .order_by("surname")
+                .all()
+            )
+        elif request.user.view_preference == 2:
+            # user has requested national level view
+            all_cases = (
+                Case.objects.filter(
+                    Q(epilepsy12_sites__site_is_primary_centre_of_epilepsy_care=True)
+                    & Q(
+                        epilepsy12_sites__site_is_actively_involved_in_epilepsy_care=True
+                    )
+                    & (
+                        Q(first_name__icontains=filter_term)
+                        | Q(surname__icontains=filter_term)
+                        | Q(nhs_number__icontains=filter_term)
+                        | Q(unique_reference_number__icontains=filter_term)
+                        | Q(id__icontains=filter_term)
+                    )
+                )
+                .order_by("surname")
+                .all()
+            )
+
+    else:
+        """
+        Cases are filtered based on user preference (request.user.view_preference), where 0 is organisation level,
+        1 is trust level and 2 is national level
+        Only RCPCH audit staff have this final option.
+        """
+
+        jersey_flag = organisation.country.boundary_identifier == "JEY"
+
+        if request.user.view_preference == 2:
+            # this is an RCPCH audit team member requesting National level
+            filtered_cases = Case.objects.all()
+        elif request.user.view_preference == 1:
+            # filters all primary Trust level centres, irrespective of if active or inactive
+            if organisation.country.boundary_identifier == "W92000004":
+                # welsh - select health boards
                 filtered_cases = Case.objects.filter(
-                    organisations__name=organisation,
+                    organisations__local_health_board=parent_trust,
+                    epilepsy12_sites__site_is_primary_centre_of_epilepsy_care=True,
+                    epilepsy12_sites__site_is_actively_involved_in_epilepsy_care=True,
+                )
+            else:
+                # England - select trusts
+                filtered_cases = Case.objects.filter(
+                    organisations__trust=parent_trust,
                     epilepsy12_sites__site_is_primary_centre_of_epilepsy_care=True,
                     epilepsy12_sites__site_is_actively_involved_in_epilepsy_care=True,
                 )
 
-            if (
-                request.htmx.trigger_name == "sort_by_nhs_number_up"
-                or request.GET.get("sort_flag") == "sort_by_nhs_number_up"
-            ):
-                all_cases = filtered_cases.order_by("nhs_number").all()
-                if jersey_flag:
-                    all_cases = filtered_cases.order_by("unique_reference_number").all()
-                sort_flag = "sort_by_nhs_number_up"
-            elif (
-                request.htmx.trigger_name == "sort_by_nhs_number_down"
-                or request.GET.get("sort_flag") == "sort_by_nhs_number_down"
-            ):
-                all_cases = filtered_cases.order_by("-nhs_number").all()
-                if jersey_flag:
-                    all_cases = filtered_cases.order_by(
-                        "-unique_reference_number"
-                    ).all()
-                sort_flag = "sort_by_nhs_number_down"
-            elif (
-                request.htmx.trigger_name == "sort_by_ethnicity_up"
-                or request.GET.get("sort_flag") == "sort_by_ethnicity_up"
-            ):
-                all_cases = filtered_cases.order_by("ethnicity").all()
-                sort_flag = "sort_by_ethnicity_up"
-            elif (
-                request.htmx.trigger_name == "sort_by_ethnicity_down"
-                or request.GET.get("sort_flag") == "sort_by_ethnicity_down"
-            ):
-                all_cases = filtered_cases.order_by("-ethnicity").all()
-                sort_flag = "sort_by_ethnicity_down"
-            elif (
-                request.htmx.trigger_name == "sort_by_sex_up"
-                or request.GET.get("sort_flag") == "sort_by_sex_up"
-            ):
-                all_cases = filtered_cases.order_by("sex").all()
-                sort_flag = "sort_by_sex_up"
-            elif (
-                request.htmx.trigger_name == "sort_by_sex_down"
-                or request.GET.get("sort_flag") == "sort_by_sex_down"
-            ):
-                all_cases = filtered_cases.order_by("-sex").all()
-                sort_flag = "sort_by_sex_down"
-            elif (
-                request.htmx.trigger_name == "sort_by_name_up"
-                or request.GET.get("sort_flag") == "sort_by_name_up"
-            ):
-                all_cases = filtered_cases.order_by("surname").all()
-                sort_flag = "sort_by_name_up"
-            elif (
-                request.htmx.trigger_name == "sort_by_name_down"
-                or request.GET.get("sort_flag") == "sort_by_name_down"
-            ):
-                all_cases = filtered_cases.order_by("-surname").all()
-                sort_flag = "sort_by_name_down"
-            elif (
-                request.htmx.trigger_name == "sort_by_id_up"
-                or request.GET.get("sort_flag") == "sort_by_id_up"
-            ):
-                all_cases = filtered_cases.order_by("id").all()
-                sort_flag = "sort_by_id_up"
-            elif (
-                request.htmx.trigger_name == "sort_by_id_down"
-                or request.GET.get("sort_flag") == "sort_by_id_down"
-            ):
-                all_cases = filtered_cases.order_by("-id").all()
-                sort_flag = "sort_by_id_down"
-            elif (
-                request.htmx.trigger_name == "sort_by_deadline_up"
-                or request.GET.get("sort_flag") == "sort_by_deadline_up"
-            ):
-                all_cases = filtered_cases.order_by(
-                    "registration__audit_submission_date"
-                ).all()
-                sort_flag = "sort_by_deadline_up"
-            elif (
-                request.htmx.trigger_name == "sort_by_deadline_down"
-                or request.GET.get("sort_flag") == "sort_by_deadline_down"
-            ):
-                all_cases = filtered_cases.order_by(
-                    "-registration__audit_submission_date"
-                ).all()
-                sort_flag = "sort_by_deadline_down"
-            elif (
-                request.htmx.trigger_name == "sort_by_cohort_up"
-                or request.GET.get("sort_flag") == "sort_by_cohort_up"
-            ):
-                all_cases = filtered_cases.order_by("registration__cohort").all()
-                sort_flag = "sort_by_cohort_up"
-            elif (
-                request.htmx.trigger_name == "sort_by_cohort_down"
-                or request.GET.get("sort_flag") == "sort_by_cohort_down"
-            ):
-                all_cases = filtered_cases.order_by("-registration__cohort").all()
-                sort_flag = "sort_by_cohort_down"
-            elif (
-                request.htmx.trigger_name == "sort_by_days_remaining_up"
-                or request.GET.get("sort_flag") == "sort_by_days_remaining_up"
-            ):
-                all_cases = filtered_cases.order_by(
-                    "registration__days_remaining_before_submission"
-                ).all()
-                sort_flag = "sort_by_days_remaining_before_submission_up"
-            elif (
-                request.htmx.trigger_name
-                == "sort_by_days_remaining_before_submission_down"
-                or request.GET.get("sort_flag")
-                == "sort_by_days_remaining_before_submission_down"
-            ):
-                all_cases = filtered_cases.order_by(
-                    "-registration__days_remaining_before_submission"
-                ).all()
-                sort_flag = "sort_by_days_remaining_before_submission_down"
-            else:
-                all_cases = filtered_cases.order_by("surname").all()
-
-        registered_cases = all_cases.filter(
-            ~Q(registration__isnull=True)
-            & Q(epilepsy12_sites__site_is_primary_centre_of_epilepsy_care=True)
-            & Q(epilepsy12_sites__site_is_actively_involved_in_epilepsy_care=True)
-        ).all()
-
-        cases_in_transfer = registered_cases.filter(
-            epilepsy12_sites__active_transfer=True
-        )
-
-        paginator = Paginator(all_cases, 50)
-        page_number = request.GET.get("page", 1)
-        case_list = paginator.page(page_number)
-
-        case_count = all_cases.count()
-        registered_count = registered_cases.count()
-
-        if (
-            request.user.is_rcpch_audit_team_member
-            or request.user.is_rcpch_staff
-            or request.user.is_superuser
-        ):
-            if organisation.country.boundary_identifier == "W92000004":
-                rcpch_choices = (
-                    (0, "Organisation level"),
-                    (1, "Local Health Board level"),
-                    (2, "National level"),
-                )
-            else:
-                rcpch_choices = (
-                    (0, "Organisation level"),
-                    (1, "Trust level"),
-                    (2, "National level"),
-                )
         else:
-            if organisation.country.boundary_identifier == "W92000004":
-                rcpch_choices = (
-                    (0, "Organisation level"),
-                    (1, "Local Health Board level"),
-                )
-            else:
-                rcpch_choices = (
-                    (0, "Organisation level"),
-                    (1, "Trust level"),
-                )
-
-        context = {
-            "case_list": case_list,
-            "total_cases": case_count,
-            "total_registrations": registered_count,
-            "sort_flag": sort_flag,
-            "organisation": organisation,
-            "organisation_children": organisation_children,
-            "rcpch_choices": rcpch_choices,
-            "organisation_id": organisation_id,
-            "cases_in_transfer": cases_in_transfer,
-            "filtered_case_list": filter_term,
-        }
-        if request.htmx:
-            return render(
-                request=request,
-                template_name="epilepsy12/partials/case_table.html",
-                context=context,
+            # filters all primary centres at organisation level, irrespective of if active or inactive
+            filtered_cases = Case.objects.filter(
+                organisations__name=organisation,
+                epilepsy12_sites__site_is_primary_centre_of_epilepsy_care=True,
+                epilepsy12_sites__site_is_actively_involved_in_epilepsy_care=True,
             )
 
-        template_name = "epilepsy12/cases/cases.html"
-        return render(request, template_name, context)
+        if (
+            request.htmx.trigger_name == "sort_by_nhs_number_up"
+            or request.GET.get("sort_flag") == "sort_by_nhs_number_up"
+        ):
+            all_cases = filtered_cases.order_by("nhs_number").all()
+            if jersey_flag:
+                all_cases = filtered_cases.order_by("unique_reference_number").all()
+            sort_flag = "sort_by_nhs_number_up"
+        elif (
+            request.htmx.trigger_name == "sort_by_nhs_number_down"
+            or request.GET.get("sort_flag") == "sort_by_nhs_number_down"
+        ):
+            all_cases = filtered_cases.order_by("-nhs_number").all()
+            if jersey_flag:
+                all_cases = filtered_cases.order_by("-unique_reference_number").all()
+            sort_flag = "sort_by_nhs_number_down"
+        elif (
+            request.htmx.trigger_name == "sort_by_ethnicity_up"
+            or request.GET.get("sort_flag") == "sort_by_ethnicity_up"
+        ):
+            all_cases = filtered_cases.order_by("ethnicity").all()
+            sort_flag = "sort_by_ethnicity_up"
+        elif (
+            request.htmx.trigger_name == "sort_by_ethnicity_down"
+            or request.GET.get("sort_flag") == "sort_by_ethnicity_down"
+        ):
+            all_cases = filtered_cases.order_by("-ethnicity").all()
+            sort_flag = "sort_by_ethnicity_down"
+        elif (
+            request.htmx.trigger_name == "sort_by_sex_up"
+            or request.GET.get("sort_flag") == "sort_by_sex_up"
+        ):
+            all_cases = filtered_cases.order_by("sex").all()
+            sort_flag = "sort_by_sex_up"
+        elif (
+            request.htmx.trigger_name == "sort_by_sex_down"
+            or request.GET.get("sort_flag") == "sort_by_sex_down"
+        ):
+            all_cases = filtered_cases.order_by("-sex").all()
+            sort_flag = "sort_by_sex_down"
+        elif (
+            request.htmx.trigger_name == "sort_by_name_up"
+            or request.GET.get("sort_flag") == "sort_by_name_up"
+        ):
+            all_cases = filtered_cases.order_by("surname").all()
+            sort_flag = "sort_by_name_up"
+        elif (
+            request.htmx.trigger_name == "sort_by_name_down"
+            or request.GET.get("sort_flag") == "sort_by_name_down"
+        ):
+            all_cases = filtered_cases.order_by("-surname").all()
+            sort_flag = "sort_by_name_down"
+        elif (
+            request.htmx.trigger_name == "sort_by_id_up"
+            or request.GET.get("sort_flag") == "sort_by_id_up"
+        ):
+            all_cases = filtered_cases.order_by("id").all()
+            sort_flag = "sort_by_id_up"
+        elif (
+            request.htmx.trigger_name == "sort_by_id_down"
+            or request.GET.get("sort_flag") == "sort_by_id_down"
+        ):
+            all_cases = filtered_cases.order_by("-id").all()
+            sort_flag = "sort_by_id_down"
+        elif (
+            request.htmx.trigger_name == "sort_by_deadline_up"
+            or request.GET.get("sort_flag") == "sort_by_deadline_up"
+        ):
+            all_cases = filtered_cases.order_by(
+                "registration__audit_submission_date"
+            ).all()
+            sort_flag = "sort_by_deadline_up"
+        elif (
+            request.htmx.trigger_name == "sort_by_deadline_down"
+            or request.GET.get("sort_flag") == "sort_by_deadline_down"
+        ):
+            all_cases = filtered_cases.order_by(
+                "-registration__audit_submission_date"
+            ).all()
+            sort_flag = "sort_by_deadline_down"
+        elif (
+            request.htmx.trigger_name == "sort_by_cohort_up"
+            or request.GET.get("sort_flag") == "sort_by_cohort_up"
+        ):
+            all_cases = filtered_cases.order_by("registration__cohort").all()
+            sort_flag = "sort_by_cohort_up"
+        elif (
+            request.htmx.trigger_name == "sort_by_cohort_down"
+            or request.GET.get("sort_flag") == "sort_by_cohort_down"
+        ):
+            all_cases = filtered_cases.order_by("-registration__cohort").all()
+            sort_flag = "sort_by_cohort_down"
+        elif (
+            request.htmx.trigger_name == "sort_by_days_remaining_up"
+            or request.GET.get("sort_flag") == "sort_by_days_remaining_up"
+        ):
+            all_cases = filtered_cases.order_by(
+                "registration__days_remaining_before_submission"
+            ).all()
+            sort_flag = "sort_by_days_remaining_before_submission_up"
+        elif (
+            request.htmx.trigger_name == "sort_by_days_remaining_before_submission_down"
+            or request.GET.get("sort_flag")
+            == "sort_by_days_remaining_before_submission_down"
+        ):
+            all_cases = filtered_cases.order_by(
+                "-registration__days_remaining_before_submission"
+            ).all()
+            sort_flag = "sort_by_days_remaining_before_submission_down"
+        else:
+            all_cases = filtered_cases.order_by("surname").all()
+
+    registered_cases = all_cases.filter(
+        ~Q(registration__isnull=True)
+        & Q(epilepsy12_sites__site_is_primary_centre_of_epilepsy_care=True)
+        & Q(epilepsy12_sites__site_is_actively_involved_in_epilepsy_care=True)
+    ).all()
+
+    cases_in_transfer = registered_cases.filter(epilepsy12_sites__active_transfer=True)
+
+    paginator = Paginator(all_cases, 50)
+    page_number = request.GET.get("page", 1)
+    case_list = paginator.page(page_number)
+
+    case_count = all_cases.count()
+    registered_count = registered_cases.count()
+
+    if (
+        request.user.is_rcpch_audit_team_member
+        or request.user.is_rcpch_staff
+        or request.user.is_superuser
+    ):
+        if organisation.country.boundary_identifier == "W92000004":
+            rcpch_choices = (
+                (0, "Organisation level"),
+                (1, "Local Health Board level"),
+                (2, "National level"),
+            )
+        else:
+            rcpch_choices = (
+                (0, "Organisation level"),
+                (1, "Trust level"),
+                (2, "National level"),
+            )
+    else:
+        if organisation.country.boundary_identifier == "W92000004":
+            rcpch_choices = (
+                (0, "Organisation level"),
+                (1, "Local Health Board level"),
+            )
+        else:
+            rcpch_choices = (
+                (0, "Organisation level"),
+                (1, "Trust level"),
+            )
+
+    current_submitting_cohort = cohorts_and_dates(date.today()).get("submitting_cohort")
+    current_cohort_total = CaseFilterMethods.get_all_registration_related_counts(
+        queryset=registered_cases
+    )["cohort_counts"].get(current_submitting_cohort)
+
+    context = {
+        "case_list": case_list,
+        "total_cases": case_count,
+        "total_cases_in_current_submitting_cohort": current_cohort_total,
+        "submitting_cohort": current_submitting_cohort,
+        "total_registrations": registered_count,
+        "sort_flag": sort_flag,
+        "organisation": organisation,
+        "organisation_children": organisation_children,
+        "rcpch_choices": rcpch_choices,
+        "organisation_id": organisation_id,
+        "cases_in_transfer": cases_in_transfer,
+        "filtered_case_list": filter_term,
+    }
+    if request.htmx:
+        return render(
+            request=request,
+            template_name="epilepsy12/partials/case_table.html",
+            context=context,
+        )
+
+    template_name = "epilepsy12/cases/cases.html"
+    return render(request, template_name, context)
 
 
 @login_and_otp_required()

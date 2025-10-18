@@ -94,13 +94,13 @@ a label {
   }
 
   /* statistics in cohort view */
-  .ui.two.mini.statistics .rcpch_light_blue.statistic div.value {
+  .ui.three.mini.statistics .rcpch_light_blue.statistic div.value {
     color: var(--rcpch_light_blue) !important;
     font-family: var(--rcpch_standard_font);
     font-weight: 400;
   }
   
-  .ui.two.mini.statistics .rcpch_light_blue.statistic div.label {
+  .ui.three.mini.statistics .rcpch_light_blue.statistic div.label {
     font-family: var(--rcpch_standard_font);
     /* color: var(--rcpch_charcoal); */
     color: var(--rcpch_light_blue);
