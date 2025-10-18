@@ -766,7 +766,6 @@ class CaseFilterMethods:
         """
         Filter cases by the integrated care board their site is part of.
         """
-        print("Filtering by ICB with value:", value)
         value_type, value_id = value.split("_", 1)
 
         if value_type == "icb":

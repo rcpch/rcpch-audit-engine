@@ -39,6 +39,7 @@ class OrganisationCaseFilter(admin.SimpleListFilter):
                 patient_sites__case__isnull=False,
                 patient_sites__case__registration__isnull=False,
             )
+            .annotate(case_count=Count("patient_sites__case", distinct=True))
             .distinct()
             .order_by("name")
         )  # populates the dropdown with organisations
@@ -54,7 +55,7 @@ class OrganisationCaseFilter(admin.SimpleListFilter):
         return [
             (
                 org.pk,
-                f"{org.name} ({CaseFilterMethods.get_organisation_counts(queryset=filtered_queryset, organisation_id=org.id)})",
+                f"{org.name} ({org.case_count})",
             )
             for org in organisations
         ]
@@ -136,16 +137,26 @@ class TrustOrLocalHealthBoardFilter(admin.SimpleListFilter):
         result = []
         # Get counts for trusts
         for trust in trusts:
-            trust_counts = CaseFilterMethods.get_trust_or_local_health_board_counts(
+            trust_filtered = CaseFilterMethods.filter_by_trust_or_health_board(
                 queryset=filtered_queryset, value=f"t_{trust.id}"
+            )
+            trust_counts = (
+                trust_filtered.count()
+                if hasattr(trust_filtered, "count")
+                else trust_filtered
             )
             result.append((f"t_{trust.id}", f"Trust: {trust.name} ({trust_counts})"))
         # Get counts for health boards
         for hb in local_health_boards:
-            local_health_board_counts = (
-                CaseFilterMethods.get_trust_or_local_health_board_counts(
+            local_health_board_filtered = (
+                CaseFilterMethods.filter_by_trust_or_health_board(
                     queryset=filtered_queryset, value=f"h_{hb.id}"
                 )
+            )
+            local_health_board_counts = (
+                local_health_board_filtered.count()
+                if hasattr(local_health_board_filtered, "count")
+                else local_health_board_filtered
             )
             result.append(
                 (f"h_{hb.id}", f"Health Board: {hb.name} ({local_health_board_counts})")
@@ -192,7 +203,7 @@ class IntegratedCareBoardFilter(admin.SimpleListFilter):
         return [
             (
                 f"i_{icb.id}",
-                f"{icb.name} ({CaseFilterMethods.get_integrated_care_board_counts(queryset=filtered_queryset, value=f'i_{icb.id}')})",
+                f"{icb.name} ({CaseFilterMethods.filter_by_integrated_care_board(queryset=filtered_queryset, value=f'i_{icb.id}').count()})",
             )
             for icb in icbs
         ]
@@ -236,7 +247,7 @@ class NHSEnglandRegionFilter(admin.SimpleListFilter):
         return [
             (
                 f"nhs_{region.id}",
-                f"{region.name} ({CaseFilterMethods.get_nhs_england_region_counts(queryset=filtered_queryset, value=f'nhs_{region.id}')})",
+                f"{region.name} ({CaseFilterMethods.filter_by_nhs_england_region(queryset=filtered_queryset, value=f'nhs_{region.id}').count()})",
             )
             for region in regions
         ]
@@ -280,7 +291,7 @@ class CountryFilter(admin.SimpleListFilter):
         return [
             (
                 f"c_{country.id}",
-                f"{country.name} ({CaseFilterMethods.get_country_counts(queryset=filtered_queryset, value=f'c_{country.id}')})",
+                f"{country.name} ({CaseFilterMethods.filter_by_country(queryset=filtered_queryset, value=f'c_{country.id}').count()})",
             )
             for country in countries
         ]
@@ -309,11 +320,13 @@ class AgeRangeFilter(admin.SimpleListFilter):
             base_queryset, request, exclude_params=self.parameter_name
         )
         # Get counts for age ranges
-        counts = CaseFilterMethods.get_age_counts(filtered_queryset)
+        counts = CaseFilterMethods.get_all_simple_case_field_counts(
+            queryset=filtered_queryset
+        )
 
         return [
-            ("under_12", f"Under 12 years ({counts['under_12']})"),
-            ("12_and_over", f"12 years and over ({counts['12_and_over']})"),
+            ("under_12", f"Under 12 years ({counts['under_12_count']})"),
+            ("12_and_over", f"12 years and over ({counts['over_12_count']})"),
         ]
 
     def queryset(self, request, queryset):
