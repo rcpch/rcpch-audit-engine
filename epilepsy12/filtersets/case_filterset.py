@@ -1,8 +1,6 @@
 from dateutil.relativedelta import relativedelta
-from django.http import QueryDict
 from django.utils import timezone
 from django.db.models import Q, Count, Sum
-from django import forms
 
 # Third-party imports
 import django_filters
@@ -303,11 +301,7 @@ class CaseFilterMethods:
     to be used in the CaseFilter class and in the admin.
     """
 
-    # Simple facet counts for fields on the Case model
-
-    """
-    Counts for fields on the Case model or related models
-    """
+    # Counts for fields on the Case model or related models
 
     @staticmethod
     @silk_profile(name="Get Total Episodes Count")
@@ -574,7 +568,6 @@ class CaseFilterMethods:
         """
         return queryset.filter(ethnicity=value)
 
-    # Custom filter methods for filtering cases based on various criteria
     @staticmethod
     @silk_profile(name="Filter By Age Range")
     def filter_by_age_range(queryset, age_range):
