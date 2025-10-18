@@ -5,6 +5,7 @@ Tests the Case model
 # Standard imports
 import pytest
 from datetime import date
+from unittest.mock import patch
 
 # Third party imports
 
@@ -65,11 +66,30 @@ def test_case_save_unknown_postcode_when_imd_not_none(e12_case_factory):
 
 
 @pytest.mark.django_db
-def test_case_save_postcode_obtain_imdq(e12_case_factory):
-    # Tests that the save method works as expected using a known postcode IMD
+@patch("epilepsy12.models_folder.case.coordinates_for_postcode")
+@patch("epilepsy12.models_folder.case.imd_for_postcode")
+def test_case_save_postcode_obtain_imdq(
+    mock_imd_for_postcode, mock_coordinates_for_postcode, e12_case_factory
+):
+    """
+    Tests that the save method works as expected using a known postcode IMD.
+    Mocks both the coordinates API and the IMD calculation API.
+    """
+    # Mock the coordinates API response
+    mock_coordinates_for_postcode.return_value = (-0.1234, 51.5678)
+
+    # Mock the IMD calculation API response to return quintile 4
+    mock_imd_for_postcode.return_value = 4
+
     e12Case = e12_case_factory(index_of_multiple_deprivation_quintile=None)
     e12Case.postcode = "WC1X8SH"  # RCPCH address
     e12Case.save()
+
+    # Verify both mocks were called
+    mock_coordinates_for_postcode.assert_called_once_with(postcode="WC1X8SH")
+    mock_imd_for_postcode.assert_called_once_with("WC1X8SH")
+
+    # Verify the IMD was set correctly
     assert e12Case.index_of_multiple_deprivation_quintile == 4
 
 
@@ -84,10 +104,23 @@ def test_case_save_invalid_postcode(e12_case_factory):
 
 
 @pytest.mark.django_db
-def test_case_overwrite_index_of_multiple_deprivation_quintile(e12_case_factory):
+@patch("epilepsy12.models_folder.case.coordinates_for_postcode")
+@patch("epilepsy12.models_folder.case.imd_for_postcode")
+def test_case_overwrite_index_of_multiple_deprivation_quintile(
+    mock_imd_for_postcode, mock_coordinates_for_postcode, e12_case_factory
+):
     e12Case = e12_case_factory(index_of_multiple_deprivation_quintile=5)
+
+    # Mock the coordinates API response
+    mock_coordinates_for_postcode.return_value = (-0.1234, 51.5678)
+
+    # Mock the IMD calculation API response to return quintile 4
+    mock_imd_for_postcode.return_value = 4
 
     e12Case.postcode = "WC1X 8SH"
     e12Case.save()
+    # Verify both mocks were called
+    mock_coordinates_for_postcode.assert_called_once_with(postcode="WC1X8SH")
+    mock_imd_for_postcode.assert_called_once_with("WC1X8SH")
     assert e12Case.postcode == "WC1X8SH"
-    assert e12Case.index_of_multiple_deprivation_quintile is 4
+    assert e12Case.index_of_multiple_deprivation_quintile == 4
