@@ -1,6 +1,6 @@
-""" Tests for `total_fields_expected` fn and `scoreable_fields_for_model_class_name` helper fn.
+"""Tests for `total_fields_expected` fn and `scoreable_fields_for_model_class_name` helper fn.
 
-All models EXCEPT the following 5 simply return the output of `scoreable_fields_for_model_class_name`. 
+All models EXCEPT the following 5 simply return the output of `scoreable_fields_for_model_class_name`.
 
 Additionally, these 5 use `scoreable_fields_for_model_class_name` += some extra fields in related models.
 
@@ -26,6 +26,7 @@ from epilepsy12.models import (
     Medicine,
 )
 from epilepsy12.common_view_functions.recalculate_form_generate_response import (
+    completed_fields,
     scoreable_fields_for_model_class_name,
     total_fields_expected,
     count_episode_fields,
@@ -47,6 +48,7 @@ from epilepsy12.constants import (
     NON_EPILEPSY_SEIZURE_ONSET,
     NON_EPILEPSY_SEIZURE_TYPE,
 )
+from epilepsy12.models_folder.management import Management
 from epilepsy12.tests.view_tests.form_calculations.test_number_of_completed_fields_in_related_models import (
     get_random_answers_update_counter,
 )
@@ -513,3 +515,102 @@ def test_total_fields_expected_management(
     assert (
         return_value == expected_value
     ), f"total_fields_expected(management) expected {expected_value} but got {return_value}. 13yo girl registered with Valproate AED and Keppra as rescue"
+
+
+# Test the form total_fields_expected for topiramate or valproate based on the sex and age of the case
+# After cohort 6, both topiramate and valproate require pregnancy prevention programme fields to be filled in girls though in the case of topiramate only if she is over 12y.
+# For boys no pregnancy prevention programme fields are required for either medicine but valproate still requires the annual risk acknowledgement form to be completed.
+# In cohort 6 and below neither medicine requires pregnancy prevention programme fields to be filled only for girls over 12y on valproate. For cohort 6 and below
+# the annual risk acknowledgement is not required
+
+
+# Note the baseline minimum expected fields for management is 5 when an AED has been given.
+@pytest.mark.parametrize(
+    "age_over_12, medicine, sex, expected_value",
+    [
+        (True, "777808008", 2, 5 + 5),  # over 12, female, topiramate
+        (True, "387481005", 2, 5 + 5),  # over 12, female, valproate
+        (False, "777808008", 2, 5 + 4),  # under 12, female, topiramate
+        (False, "387481005", 2, 5 + 5),  # under 12, female, valproate
+        (True, "777808008", 1, 5 + 4),  # over 12, male, topiramate
+        (True, "387481005", 1, 5 + 4),  # over 12, male, valproate
+    ],
+)
+@pytest.mark.django_db
+def test_total_fields_expected_topiramate_or_valproate_for_sex_and_age(
+    e12_case_factory,
+    e12_anti_epilepsy_medicine_factory,
+    GOSH,
+    age_over_12,
+    medicine,
+    sex,
+    expected_value,
+):
+    """
+    Tests total_fields_expected(management) returns correct expected output, with all fields all True.
+    """
+    if age_over_12:
+        dob = date(2024, 5, 1) - relativedelta(years=13)
+    else:
+        dob = date(2024, 5, 1) - relativedelta(years=10)
+
+    CASE = e12_case_factory(
+        first_name=f"temp_child_{GOSH.name}",
+        date_of_birth=dob,
+        organisations__organisation=GOSH,
+        sex=SEX_TYPE[sex][0],
+    )
+
+    CASE.registration.first_paediatric_assessment_date = date(2024, 5, 1)
+    CASE.registration.cohort = 7
+    CASE.registration.management.has_an_aed_been_given = True
+    CASE.registration.save()
+
+    # score +3 for medicine present, +2 as topiramate in childbearing female
+    if (
+        (age_over_12 and medicine == "777808008") or (medicine == "387481005")
+    ) and sex == 2:
+        aed_answers = {
+            "medicine_entity": Medicine.objects.get(conceptId=medicine),
+            "antiepilepsy_medicine_start_date": date(2024, 6, 1),
+            "antiepilepsy_medicine_risk_discussed": True,
+            "is_a_pregnancy_prevention_programme_needed": True,
+            "is_a_pregnancy_prevention_programme_in_place": True,
+            "has_a_valproate_annual_risk_acknowledgement_form_been_completed": True,
+        }
+    else:
+        aed_answers = {
+            "medicine_entity": Medicine.objects.get(conceptId=medicine),
+            "antiepilepsy_medicine_start_date": date(2024, 6, 1),
+            "antiepilepsy_medicine_risk_discussed": True,
+            "is_a_pregnancy_prevention_programme_needed": None,
+            "is_a_pregnancy_prevention_programme_in_place": None,
+            "has_a_valproate_annual_risk_acknowledgement_form_been_completed": True,
+        }
+
+    e12_anti_epilepsy_medicine_factory(
+        management=CASE.registration.management,
+        is_rescue_medicine=False,
+        **aed_answers,
+    )
+
+    return_value = total_fields_expected(CASE.registration.management)
+
+    assert (
+        CASE.registration.cohort == 7
+    ), "Cohort should be 7 for first paediatric assessment date of 2024-05-01"
+    if age_over_12:
+        assert CASE.age_days() > (
+            12 * 365.25
+        ), f"Case should be over 12 years old, but is {CASE.age_days()/365.25} years old"
+    else:
+        assert CASE.age_days() < (
+            12 * 365.25
+        ), f"Case should be under 12 years old, but is {CASE.age_days()/365.25} years old"
+    assert (
+        CASE.sex == sex
+    ), f"Case should be {SEX_TYPE[sex][1]}, but is {SEX_TYPE[CASE.sex][1]}"
+
+    assert (
+        return_value == expected_value
+    ), f"total_fields_expected(management) expected {expected_value} but got {return_value}. >12yo girl registered with Topiramate AED"

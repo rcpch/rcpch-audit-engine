@@ -360,39 +360,56 @@ def medicine_id(request, antiepilepsy_medicine_id, medicine_status):
 
     antiepilepsy_medicine.medicine_entity = medicine_entity
 
+    # determine if pregnancy prevention programme questions are needed
+    # Note that as of issue #1215, topiramate is only included for cohorts >6 as requiring pregnancy prevention programme
+    # in girls over 12 years of age. Girls on sodium valproate should have a pregnancy prevention programme in place when they are
+    # over 12 years in cohort 6, and any age in later cohorts.
+
+    def requires_pregnancy_prevention_programme(cohort, medicine_concept_id, age, sex):
+        """
+        Determine if a pregnancy prevention programme is required based on cohort, medicine, age, and sex
+        As of issue #1215, topiramate is only included for cohorts >6 as requiring pregnancy prevention programme from 12y and up
+        as well as all girls on sodium valproate in cohorts >6 irrespective of age
+        387481005 = sodium valproate
+        777808008 = topiramate
+
+        """
+        if cohort > 6:
+            if medicine_concept_id == "387481005" and sex == 2:  # sodium valproate
+                return True  # all girls on valproate irrespective of age need a pregnancy prevention programme
+            elif (
+                medicine_concept_id == "777808008" and sex == 2 and age >= 12
+            ):  # topiramate
+                return True  # girls over 12 on topiramate need a pregnancy prevention programme
+            return False
+        else:
+            if (
+                medicine_concept_id == "387481005" and sex == 2 and age >= 12
+            ):  # sodium valproate
+                return True  # girls on valproate over 12 need a pregnancy prevention programme
+            return False  # other medicines/cohorts do not require pregnancy prevention programme (including topiramate in cohort 6 and below)
+
     if hasattr(antiepilepsy_medicine, "medicine_entity"):
         if antiepilepsy_medicine.medicine_entity is not None:
-            if (
-                antiepilepsy_medicine.medicine_entity.medicine_name
-                == "Sodium valproate"
-                and int(antiepilepsy_medicine.management.registration.case.sex) == 2
+            today = date.today()
+            calculated_age = relativedelta.relativedelta(
+                today,
+                antiepilepsy_medicine.management.registration.case.date_of_birth,
+            )
+            sex = int(antiepilepsy_medicine.management.registration.case.sex)
+            if requires_pregnancy_prevention_programme(
+                cohort=antiepilepsy_medicine.management.registration.cohort,
+                medicine_concept_id=antiepilepsy_medicine.medicine_entity.conceptId,
+                age=calculated_age.years,
+                sex=sex,
             ):
-                today = date.today()
-                calculated_age = relativedelta.relativedelta(
-                    today,
-                    antiepilepsy_medicine.management.registration.case.date_of_birth,
+                antiepilepsy_medicine.is_a_pregnancy_prevention_programme_needed = True
+                antiepilepsy_medicine.is_a_pregnancy_prevention_programme_in_place = (
+                    None
                 )
-                if calculated_age.years >= 12:
-                    # sodium valproate selected and patient is female
-                    antiepilepsy_medicine.is_a_pregnancy_prevention_programme_needed = (
-                        True
-                    )
-                    antiepilepsy_medicine.is_a_pregnancy_prevention_programme_in_place = (
-                        None
-                    )
-                    antiepilepsy_medicine.has_a_valproate_annual_risk_acknowledgement_form_been_completed = (
-                        None
-                    )
-                else:
-                    antiepilepsy_medicine.is_a_pregnancy_prevention_programme_needed = (
-                        False
-                    )
-                    antiepilepsy_medicine.is_a_pregnancy_prevention_programme_in_place = (
-                        None
-                    )
-                    antiepilepsy_medicine.has_a_valproate_annual_risk_acknowledgement_form_been_completed = (
-                        None
-                    )
+                antiepilepsy_medicine.has_a_valproate_annual_risk_acknowledgement_form_been_completed = (
+                    None
+                )
             else:
                 antiepilepsy_medicine.is_a_pregnancy_prevention_programme_needed = False
                 antiepilepsy_medicine.is_a_pregnancy_prevention_programme_in_place = (
