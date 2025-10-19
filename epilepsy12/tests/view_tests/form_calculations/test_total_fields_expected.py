@@ -537,7 +537,7 @@ def test_total_fields_expected_management(
     ],
 )
 @pytest.mark.django_db
-def test_total_fields_expected_topiramate_or_valproate_for_sex_and_age(
+def test_total_fields_expected_topiramate_or_valproate_for_sex_and_age_cohort_7(
     e12_case_factory,
     e12_anti_epilepsy_medicine_factory,
     GOSH,
@@ -599,6 +599,100 @@ def test_total_fields_expected_topiramate_or_valproate_for_sex_and_age(
     assert (
         CASE.registration.cohort == 7
     ), "Cohort should be 7 for first paediatric assessment date of 2024-05-01"
+    if age_over_12:
+        assert CASE.age_days() > (
+            12 * 365.25
+        ), f"Case should be over 12 years old, but is {CASE.age_days()/365.25} years old"
+    else:
+        assert CASE.age_days() < (
+            12 * 365.25
+        ), f"Case should be under 12 years old, but is {CASE.age_days()/365.25} years old"
+    assert (
+        CASE.sex == sex
+    ), f"Case should be {SEX_TYPE[sex][1]}, but is {SEX_TYPE[CASE.sex][1]}"
+
+    assert (
+        return_value == expected_value
+    ), f"total_fields_expected(management) expected {expected_value} but got {return_value}. >12yo girl registered with Topiramate AED"
+
+
+@pytest.mark.parametrize(
+    "age_over_12, medicine, sex, expected_value",
+    [
+        (True, "777808008", 2, 5 + 3),  # over 12, female, topiramate
+        (
+            True,
+            "387481005",
+            2,
+            5 + 5,
+        ),  # over 12, female, valproate (needs annual risk acknowledgement and pregnancy prevention programme)
+        (False, "777808008", 2, 5 + 3),  # under 12, female, topiramate
+        (False, "387481005", 2, 5 + 3),  # under 12, female, valproate
+        (True, "777808008", 1, 5 + 3),  # over 12, male, topiramate
+        (True, "387481005", 1, 5 + 3),  # over 12, male, valproate
+    ],
+)
+@pytest.mark.django_db
+def test_total_fields_expected_topiramate_or_valproate_for_sex_and_age_cohort_6(
+    e12_case_factory,
+    e12_anti_epilepsy_medicine_factory,
+    GOSH,
+    age_over_12,
+    medicine,
+    sex,
+    expected_value,
+):
+    """
+    Tests total_fields_expected(management) returns correct expected output, with all fields all True.
+    """
+    if age_over_12:
+        dob = date(2023, 2, 1) - relativedelta(years=13)
+    else:
+        dob = date(2023, 2, 1) - relativedelta(years=9)
+
+    CASE = e12_case_factory(
+        first_name=f"temp_child_{GOSH.name}",
+        date_of_birth=dob,
+        organisations__organisation=GOSH,
+        sex=SEX_TYPE[sex][0],
+    )
+
+    CASE.registration.first_paediatric_assessment_date = date(2023, 5, 1)
+    CASE.registration.cohort = 6
+    CASE.registration.management.has_an_aed_been_given = True
+    CASE.registration.save()
+
+    # score +3 for medicine present, +2 as topiramate in childbearing female
+    if age_over_12 and medicine == "387481005" and sex == 2:
+        aed_answers = {
+            "medicine_entity": Medicine.objects.get(conceptId=medicine),
+            "antiepilepsy_medicine_start_date": date(2023, 6, 1),
+            "antiepilepsy_medicine_risk_discussed": True,
+            "is_a_pregnancy_prevention_programme_needed": True,
+            "is_a_pregnancy_prevention_programme_in_place": True,
+            "has_a_valproate_annual_risk_acknowledgement_form_been_completed": None,
+        }
+    else:
+        aed_answers = {
+            "medicine_entity": Medicine.objects.get(conceptId=medicine),
+            "antiepilepsy_medicine_start_date": date(2023, 6, 1),
+            "antiepilepsy_medicine_risk_discussed": True,
+            "is_a_pregnancy_prevention_programme_needed": None,
+            "is_a_pregnancy_prevention_programme_in_place": None,
+            "has_a_valproate_annual_risk_acknowledgement_form_been_completed": None,
+        }
+
+    e12_anti_epilepsy_medicine_factory(
+        management=CASE.registration.management,
+        is_rescue_medicine=False,
+        **aed_answers,
+    )
+
+    return_value = total_fields_expected(CASE.registration.management)
+
+    assert (
+        CASE.registration.cohort == 6
+    ), f"Cohort should be 6 for first paediatric assessment date of 2023-05-01, but got {CASE.registration.cohort}"
     if age_over_12:
         assert CASE.age_days() > (
             12 * 365.25
