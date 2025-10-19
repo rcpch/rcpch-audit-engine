@@ -80,7 +80,6 @@ def update_audit_progress(model_instance):
         f"{verbose_name_underscored}_complete": all_completed_fields
         == all_expected_fields,
     }
-
     # all models are related to registration, except registration itself
     if verbose_name_underscored == "registration":
         registration = model_instance
@@ -162,7 +161,6 @@ def total_fields_expected(model_instance):
     """
     Returns as expected fields for a given model instance, based on user selections.
     """
-
     model_class_name = model_instance.__class__.__name__
     # get the minimum number of fields for this model
     cumulative_score = scoreable_fields_for_model_class_name(
@@ -287,6 +285,7 @@ def total_fields_expected(model_instance):
                     - Both questions appear for females aged 12 year and over and on topiramate
                     - the Annual Risk Acknowledgment Form question appear for males on topiramate (the pregnancy prevention programme doesn't apply to males)
                     """
+                    # by this stage cumulative score must already be +3 for medicine name, start date,  risk discussed
                     if model_instance.registration.cohort > 6:
                         if medicine.medicine_entity is not None:
                             if (
@@ -298,16 +297,23 @@ def total_fields_expected(model_instance):
                                 cumulative_score += 1
 
                                 if model_instance.registration.case.sex == 2:
-                                    # if patient is a girl and either she is on valproate or she is 12 years or older and on topiramate
-                                    # essential fields are:
-                                    # 'is_a_pregnancy_prevention_programme_in_place
-                                    cumulative_score += 1
                                     if (
-                                        medicine.is_a_pregnancy_prevention_programme_needed
-                                    ):
-                                        # essential fields are:
-                                        # 'is_a_pregnancy_prevention_programme_in_place
-                                        cumulative_score += 1
+                                        medicine.medicine_entity.conceptId
+                                        == "387481005"
+                                        or (
+                                            medicine.medicine_entity.conceptId
+                                            == "777808008"  # topiramate
+                                            and calculated_age.years >= 12
+                                        )
+                                    ):  # valproate or topiramate
+                                        # if patient is a girl and either she is on valproate or she is 12 years or older and on topiramate
+                                        if (
+                                            medicine.is_a_pregnancy_prevention_programme_needed
+                                        ):
+                                            # essential fields are:
+                                            # 'is_a_pregnancy_prevention_programme_in_place
+                                            cumulative_score += 1
+
                     else:
                         # cohort is 6 or below
                         # essential fields are:
@@ -318,10 +324,7 @@ def total_fields_expected(model_instance):
                             and calculated_age.years >= 12
                         ):
                             if medicine.medicine_entity is not None:
-                                if (
-                                    medicine.medicine_entity.medicine_name
-                                    == "Sodium valproate"
-                                ):
+                                if medicine.medicine_entity.conceptId == "387481005":
                                     # essential fields are:
                                     # 'is_a_pregnancy_prevention_programme_needed' - this is not scored
                                     if (
@@ -428,6 +431,7 @@ def avoid_fields(model_instance):
         ]
 
     elif model_class_name == "AntiEpilepsyMedicine":
+        print("Avoiding fields for AntiEpilepsyMedicine")
         return META_VARIABLES + [
             "management",
             "is_rescue_medicine",
@@ -687,8 +691,8 @@ def number_of_completed_fields_in_related_models(model_instance):
                 for medicine in medicines:
                     # essential fields are:
                     # medicineentity_medicine_name', 'antiepilepsy_medicine_start_date',
-                    # 'antiepilepsy_medicine_risk_discussed', and if valproate prescribed
-                    # in a girl > 12y, 'is_a_pregnancy_prevention_programme_in_place'
+                    # 'antiepilepsy_medicine_risk_discussed', and if valproate/topiramate depending on cohort prescribed
+                    # 'is_a_pregnancy_prevention_programme_in_place'
                     # 'has_a_valproate_annual_risk_acknowledgement_form_been_completed'
                     cumulative_score += completed_fields(medicine)
 

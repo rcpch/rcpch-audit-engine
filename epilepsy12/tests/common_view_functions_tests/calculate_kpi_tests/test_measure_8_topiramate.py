@@ -7,6 +7,9 @@ import pytest
 
 # RCPCH imports
 from epilepsy12.common_view_functions import calculate_kpis
+from epilepsy12.common_view_functions.recalculate_form_generate_response import (
+    total_fields_expected,
+)
 from epilepsy12.constants import SEX_TYPE, KPI_SCORE
 from epilepsy12.models import (
     AntiEpilepsyMedicine,
