@@ -84,16 +84,17 @@ def merged_parent_list_for_user(epilepsy12_user, organisation_list=None):
     
     # Get all trusts and LHBs that have organisations in the whitelist
     # Using values_list to avoid loading full objects we don't need
+    # organisation_list is already filtered by active=True organisations
     trust_ids = organisation_list.filter(
-        trust__isnull=False, 
-        active=True
+        trust__isnull=False
     ).values_list('trust', flat=True).distinct()
     
     lhb_ids = organisation_list.filter(
-        local_health_board__isnull=False, 
+        local_health_board__isnull=False
     ).values_list('local_health_board', flat=True).distinct()
     
     # Fetch all trusts and LHBs in two queries (not N+1)
+    # Only trusts have an active field - LHBs don't
     trusts = Trust.objects.filter(
         id__in=trust_ids,
         active=True
