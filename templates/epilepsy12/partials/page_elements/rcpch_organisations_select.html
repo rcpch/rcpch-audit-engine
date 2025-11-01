@@ -4,7 +4,7 @@ It relies on a little bit of jquery unfortunately because that is semantic-ui
 Parameters:
 hx_name: [paediatric_neurology_centre, epilepsy_surgery_centre]
 hx_url: the url complete with parameters to POST
-label: received from the parent - text for the button
+label: text label to display above the dropdown (e.g., "Select Organisation")
 hx_target: the id of the html element to be replaced 
 hx_default_text: placeholder text for the search select dropdown
 hx_post: url to post to
@@ -13,6 +13,9 @@ test_positive: currently selected organisation id
 {% endcomment %}
 {% csrf_token %}
 <div class="field" hx-headers='{"X-CSRFToken": "{{ csrf_token }}"}'>
+        {% if label %}
+            <label>{{ label }}</label>
+        {% endif %}
         <div 
             class="ui rcpch fluid search selection dropdown"
         >
@@ -37,6 +40,4 @@ test_positive: currently selected organisation id
                     {% endfor %}
                 </div>
         </div>
-    
-
 </div>

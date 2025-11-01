@@ -37,6 +37,7 @@ from ..common_view_functions import (
 from epilepsy12.common_view_functions.render_charts import update_all_data_with_charts
 from epilepsy12.common_view_functions.sanction_user_access import (
     organisation_white_list_for_user,
+    merged_parent_list_for_user,
 )
 from ..general_functions import (
     value_from_key,
@@ -63,6 +64,60 @@ def selected_organisation_summary_select(request):
         kwargs={"organisation_id": selected_organisation.pk},
     )
     return HttpResponseClientRedirect(response)
+
+@login_and_otp_required()
+def filter_organisations_by_parent(request, parent_id, parent_type):
+    """
+    HTMX callback when parent dropdown changes.
+    Since the entire dashboard is tied to the selected organisation,
+    we redirect to the first organisation in the selected parent.
+    
+    Params:
+    parent_id: primary key of selected parent trust or local health board
+    parent_type: string, one of ['trust', 'local_health_board']
+    """
+    
+    # If HTMX posts the selected parent in the body, extract both id and type
+    # Format: "parent_id:parent_type" (e.g., "5:trust" or "12:local_health_board")
+    posted_parent = request.POST.get("selected_parent_summary_select")
+    if posted_parent and ':' in posted_parent:
+        try:
+            parent_id_str, parent_type = posted_parent.split(':', 1)
+            parent_id = int(parent_id_str)
+        except (ValueError, TypeError):
+            # Ignore and use URL parameters
+            pass
+
+    # Filter organisations by parent type
+    if parent_type == 'trust':
+        organisations = Organisation.objects.filter(trust__id=parent_id, active=True)
+    else:  # local_health_board
+        organisations = Organisation.objects.filter(local_health_board__id=parent_id, active=True)
+
+    # Apply user access restrictions if not admin
+    if not (request.user.is_rcpch_staff or request.user.is_superuser):
+        allowed_orgs = organisation_white_list_for_user(request.user)
+        organisations = organisations.filter(id__in=allowed_orgs.values_list('id', flat=True))
+    
+    # Get the first organisation in the filtered list and redirect to it
+    # This triggers a full page reload with all the organisation-specific data
+    selected_organisation = organisations.order_by('name').first()
+    
+    if selected_organisation:
+        response = reverse(
+            "selected_organisation_summary",
+            kwargs={"organisation_id": selected_organisation.pk},
+        )
+        return HttpResponseClientRedirect(response)
+    else:
+        # No organisations found for this parent
+        # This should not happen if parent_list is properly filtered
+        from django.http import HttpResponse
+        return HttpResponse(
+            f"No organisations found for the selected {'trust' if parent_type == 'trust' else 'local health board'}. "
+            "Please contact support if this issue persists.", 
+            status=404
+        )
 
 
 @login_and_otp_required()
@@ -224,25 +279,35 @@ def selected_organisation_summary(request, organisation_id):
         or request.user.is_superuser
         or request.user.is_rcpch_staff
     ):
-        # select any organisations except currently selected organisation
+        # Admin users: select any organisations except currently selected organisation
         organisation_list = Organisation.objects.get_organisation_list()
-        if selected_organisation.country.boundary_identifier == "W92000004":  # Wales
-            parent_list = LocalHealthBoard.objects.get_local_health_board_list()
-        else:
-            parent_list = Trust.objects.get_trust_list()
+        # Get merged parent list for all active organisations
+        parent_list = merged_parent_list_for_user(
+            epilepsy12_user=request.user,
+            organisation_list=organisation_list
+        )
     else:
-        # organisation list is scoped to the all organisations in the users organisation_employer list and their siblings
+        # Regular users: organisation list is scoped to the organisations in the user's organisation_employer list and their siblings
         organisation_list = organisation_white_list_for_user(
             epilepsy12_user=request.user
         )
-        if selected_organisation.country.boundary_identifier == "W92000004":  # Wales
-            parent_list = LocalHealthBoard.objects.filter(
-                Q(organisation__in=organisation_list)
-            ).distinct()
-        else:
-            parent_list = Trust.objects.filter(
-                Q(organisation__in=organisation_list)
-            ).distinct()
+        # Get merged parent list only for organisations the user has access to
+        parent_list = merged_parent_list_for_user(
+            epilepsy12_user=request.user,
+            organisation_list=organisation_list
+        )
+
+    # Filter organisation_list to only show organisations within the selected parent
+    # This makes the organisation dropdown dependent on the parent dropdown
+    if selected_organisation.trust:
+        organisation_list = organisation_list.filter(trust=selected_parent)
+        parent_type = 'trust'
+    elif selected_organisation.local_health_board:
+        organisation_list = organisation_list.filter(local_health_board=selected_parent)
+        parent_type = 'local_health_board'
+    else:
+        # Organisation has no parent (shouldn't happen in practice)
+        parent_type = None
 
     organisational_audit_submission_period = (
         OrganisationalAuditSubmissionPeriod.objects
@@ -258,6 +323,7 @@ def selected_organisation_summary(request, organisation_id):
         "organisation_list": organisation_list,
         "selected_parent": selected_parent,
         "parent_list": parent_list,
+        "parent_type": parent_type,  # Set above based on selected_organisation's parent
         "cases_aggregated_by_ethnicity": cases_aggregated_by_ethnicity(
             selected_organisation=selected_organisation
         ),

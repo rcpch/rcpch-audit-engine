@@ -29,23 +29,9 @@
             </div>
         </div>
 
-        
-            <div class='sixteen wide column'>
-
-                <div class="field" hx-headers='{"X-CSRFToken": "{{ csrf_token }}"}'>
-                    <h3 class="ui dividing header">
-                        Select Trust to View Summary
-                    </h3>
-                    {% url 'selected_trust_summary_select' as hx_post %}
-                    {% include 'epilepsy12/partials/page_elements/trust_or_health_board_select.html' with parent_list=parent_list hx_post=hx_post hx_target="#rcpch_trust_select" hx_trigger="change" hx_swap="innerHTML" hx_name="selected_trust_summary_select" test_positive=selected_trust.pk label="Select a trust to view" hx_default_text="Search trusts..." data_position="top left" %}
-                </div>
-
-                <div class="field" hx-headers='{"X-CSRFToken": "{{ csrf_token }}"}'>
-                    {% url 'selected_organisation_summary_select' as hx_post %}
-                    {% include 'epilepsy12/partials/page_elements/rcpch_organisations_select.html' with organisation_list=organisation_list hx_post=hx_post hx_target="#rcpch_organisation_select" hx_trigger="change" hx_swap="innerHTML" hx_name="selected_organisation_summary_select" test_positive=selected_organisation.pk label="Select an organisation to view" hx_default_text="Search general paediatric organisations..." data_position="top left" %}
-                </div>
-
-            </div>
+        <div class='sixteen wide column' id="rcpch_selection_fields">
+            {% include 'epilepsy12/partials/organisation/rcpch_organisation_selections.html' with selected_organisation=selected_organisation selected_parent=selected_parent organisation_list=organisation_list parent_list=parent_list parent_type=parent_type %}
+        </div>
 
         <div class="fluid row stackable org_view_all_buttons_wrapper three column grid">
             <div class="{% if not organisational_audit_submission_period.is_open %}eight wide{% endif %} column">

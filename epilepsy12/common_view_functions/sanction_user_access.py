@@ -54,3 +54,75 @@ def organisation_white_list_for_user(epilepsy12_user):
         .distinct()
         .order_by("name")
     )
+
+
+def merged_parent_list_for_user(epilepsy12_user, organisation_list=None):
+    """
+    Returns a merged list of Trusts and Local Health Boards that the user can access.
+    Each item in the list is a dict with:
+    - pk: primary key
+    - name: parent name  
+    - parent_type: 'trust' or 'local_health_board'
+    - ods_code: ODS code
+    
+    Avoids N+1 queries by fetching all parents in two queries, then merging in Python.
+    
+    Args:
+        epilepsy12_user: The user to get parents for
+        organisation_list: Optional pre-filtered organisation queryset. If None, 
+                          will call organisation_white_list_for_user()
+    
+    Returns:
+        List of dicts sorted by name
+    """
+    Trust = apps.get_model("epilepsy12", "Trust")
+    LocalHealthBoard = apps.get_model("epilepsy12", "LocalHealthBoard")
+    
+    # Get organisation list if not provided
+    if organisation_list is None:
+        organisation_list = organisation_white_list_for_user(epilepsy12_user)
+    
+    # Get all trusts and LHBs that have organisations in the whitelist
+    # Using values_list to avoid loading full objects we don't need
+    trust_ids = organisation_list.filter(
+        trust__isnull=False, 
+        active=True
+    ).values_list('trust', flat=True).distinct()
+    
+    lhb_ids = organisation_list.filter(
+        local_health_board__isnull=False, 
+    ).values_list('local_health_board', flat=True).distinct()
+    
+    # Fetch all trusts and LHBs in two queries (not N+1)
+    trusts = Trust.objects.filter(
+        id__in=trust_ids,
+        active=True
+    ).values('pk', 'name', 'ods_code').order_by('name')
+    
+    lhbs = LocalHealthBoard.objects.filter(
+        id__in=lhb_ids
+    ).values('pk', 'name', 'ods_code').order_by('name')
+    
+    # Merge and annotate with parent_type
+    merged_list = []
+    
+    for trust in trusts:
+        merged_list.append({
+            'pk': trust['pk'],
+            'name': trust['name'],
+            'parent_type': 'trust',
+            'ods_code': trust['ods_code'],
+        })
+    
+    for lhb in lhbs:
+        merged_list.append({
+            'pk': lhb['pk'],
+            'name': lhb['name'],
+            'parent_type': 'local_health_board',
+            'ods_code': lhb['ods_code'],
+        })
+    
+    # Sort by name
+    merged_list.sort(key=lambda x: x['name'])
+    
+    return merged_list
