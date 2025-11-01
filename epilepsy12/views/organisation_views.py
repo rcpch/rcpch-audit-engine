@@ -11,10 +11,12 @@ from django.db.models import Q
 from django_htmx.http import HttpResponseClientRedirect
 import pandas as pd
 
+from epilepsy12.models_folder.entities.local_health_board import LocalHealthBoard
+
 # E12 imports
 from ..decorator import user_may_view_this_organisation, login_and_otp_required
 from epilepsy12.constants import INDIVIDUAL_KPI_MEASURES, EnumAbstractionLevel
-from epilepsy12.models import Organisation, KPI, OrganisationKPIAggregation, OrganisationalAuditSubmissionPeriod
+from epilepsy12.models import Organisation, KPI, OrganisationKPIAggregation, OrganisationalAuditSubmissionPeriod, Trust
 from ..common_view_functions import (
     cases_aggregated_by_sex,
     cases_aggregated_by_ethnicity,
@@ -75,6 +77,10 @@ def selected_organisation_summary(request, organisation_id):
     Otherwise it returns the organisation.html template
     """
     selected_organisation = Organisation.objects.get(pk=organisation_id)
+    if selected_organisation.trust:
+        selected_parent = selected_organisation.trust
+    else:
+        selected_parent = selected_organisation.local_health_board
 
     template_name = "epilepsy12/organisation.html"
 
@@ -220,12 +226,24 @@ def selected_organisation_summary(request, organisation_id):
     ):
         # select any organisations except currently selected organisation
         organisation_list = Organisation.objects.get_organisation_list()
+        if selected_organisation.country.boundary_identifier == "W92000004":  # Wales
+            parent_list = LocalHealthBoard.objects.get_local_health_board_list()
+        else:
+            parent_list = Trust.objects.get_trust_list()
     else:
         # organisation list is scoped to the all organisations in the users organisation_employer list and their siblings
         organisation_list = organisation_white_list_for_user(
             epilepsy12_user=request.user
         )
-    
+        if selected_organisation.country.boundary_identifier == "W92000004":  # Wales
+            parent_list = LocalHealthBoard.objects.filter(
+                Q(organisation__in=organisation_list)
+            ).distinct()
+        else:
+            parent_list = Trust.objects.filter(
+                Q(organisation__in=organisation_list)
+            ).distinct()
+
     organisational_audit_submission_period = (
         OrganisationalAuditSubmissionPeriod.objects
         .order_by("-year")
@@ -238,6 +256,8 @@ def selected_organisation_summary(request, organisation_id):
         "cohort_data": cohort_data,  # the cohort data object for the cohort_card
         "selected_organisation": selected_organisation,
         "organisation_list": organisation_list,
+        "selected_parent": selected_parent,
+        "parent_list": parent_list,
         "cases_aggregated_by_ethnicity": cases_aggregated_by_ethnicity(
             selected_organisation=selected_organisation
         ),
