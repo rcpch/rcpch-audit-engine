@@ -195,9 +195,14 @@ def test_merged_parent_list_no_n_plus_one_queries(
     Test that merged_parent_list_for_user does not create N+1 query problems.
     It should execute a fixed number of queries regardless of the number of parents.
     
-    The function is highly optimized and uses only 2 queries total:
+    For admin users, the function uses 2 queries total:
     1. Trust.objects.filter(id__in=subquery).values() - gets all trusts with subquery for IDs
     2. LocalHealthBoard.objects.filter(id__in=subquery).values() - gets all LHBs with subquery for IDs
+    
+    For regular users, it uses 3 queries (adds Jersey check):
+    1. Check if user is employed at Jersey (for Jersey filtering logic)
+    2. Trust.objects.filter(id__in=subquery).values() - gets all trusts with subquery for IDs
+    3. LocalHealthBoard.objects.filter(id__in=subquery).values() - gets all LHBs with subquery for IDs
     
     Django optimizes the .values_list() calls into subqueries within the main query,
     so we don't see separate queries for getting the IDs.
@@ -205,12 +210,26 @@ def test_merged_parent_list_no_n_plus_one_queries(
     The key is that it doesn't scale with the number of parents (no N+1).
     """
     
-    # Get an admin user who will see all parents
+    # Get an admin user who will see all parents (no Jersey check)
     admin_user = Epilepsy12User.objects.get(first_name="RCPCH_AUDIT_TEAM")
     
-    # Should use only 2 queries regardless of number of parents
-    with django_assert_num_queries(2, info="Should use only 2 queries (1 for trusts, 1 for LHBs), not N+1"):
+    # Should use only 2 queries for admin users (trusts, LHBs), not N+1
+    with django_assert_num_queries(2, info="Should use only 2 queries (trusts, LHBs) for admin users, not N+1"):
         parent_list = merged_parent_list_for_user(admin_user)
+        
+        # Access all fields to ensure no lazy loading
+        for parent in parent_list:
+            _ = parent['pk']
+            _ = parent['name']
+            _ = parent['parent_type']
+            _ = parent['ods_code']
+    
+    # Test with a regular user (should use 3 queries with Jersey check)
+    regular_user = Epilepsy12User.objects.get(first_name="AUDIT_CENTRE_CLINICIAN")
+    
+    # Should use 3 queries for regular user (Jersey check + trusts + LHBs)
+    with django_assert_num_queries(3, info="Should use 3 queries (Jersey check, trusts, LHBs) for regular users, not N+1"):
+        parent_list = merged_parent_list_for_user(regular_user)
         
         # Access all fields to ensure no lazy loading
         for parent in parent_list:
@@ -365,3 +384,193 @@ def test_merged_parent_list_multiple_orgs_same_trust(
                 f"Trust {first_org.trust.name} should appear only once, "
                 f"not {trust_count} times"
             )
+
+
+@pytest.mark.django_db
+def test_merged_parent_list_jersey_user_cannot_see_uk_trusts(
+    seed_groups_fixture,
+    seed_users_fixture,
+):
+    """
+    Test that Jersey users can only see Jersey trust, not UK trusts or LHBs.
+    
+    Jersey is a special case with country="JERSEY". Users employed at Jersey
+    should not see UK trusts or Welsh LHBs unless they are also employed there.
+    """
+    
+    # Get Jersey organisation
+    JERSEY = Organisation.objects.get(ods_code="RGT1W", trust__ods_code="RGT1W")
+    jersey_trust = JERSEY.trust
+    
+    # Create a Jersey-only user
+    jersey_user = Epilepsy12User.objects.create(
+        first_name="Jersey",
+        surname="User",
+        email="jersey.user@test.com",
+        is_active=True,
+        is_staff=False,
+        is_rcpch_audit_team_member=False,
+        is_rcpch_staff=False,
+    )
+    
+    OrganisationEmployer.objects.create(
+        epilepsy12_user=jersey_user,
+        employer_organisation=JERSEY,
+        is_active=True,
+    )
+    
+    # Get merged parent list
+    parent_list = merged_parent_list_for_user(jersey_user)
+    
+    # User should only see Jersey trust
+    assert len(parent_list) == 1, (
+        f"Jersey user should see only 1 parent (Jersey), but sees {len(parent_list)}"
+    )
+    
+    assert parent_list[0]['name'] == jersey_trust.name
+    assert parent_list[0]['country'] and parent_list[0]['country'].upper() == 'JERSEY'
+    assert parent_list[0]['parent_type'] == 'trust'
+    
+    # Verify no UK trusts or LHBs are in the list
+    parent_names = [p['name'] for p in parent_list]
+    
+    # Check some UK organisations are NOT in the list
+    GOSH = Organisation.objects.get(ods_code="RP401", trust__ods_code="RP4")
+    assert GOSH.trust.name not in parent_names, "Jersey user should not see UK trusts"
+
+
+@pytest.mark.django_db
+def test_merged_parent_list_uk_user_cannot_see_jersey(
+    seed_groups_fixture,
+    seed_users_fixture,
+):
+    """
+    Test that UK users cannot see Jersey trust unless employed there.
+    
+    Users employed at UK trusts should not see Jersey in their parent list
+    unless they are also employed at Jersey.
+    """
+    
+    # Get a UK organisation
+    GOSH = Organisation.objects.get(ods_code="RP401", trust__ods_code="RP4")
+    
+    # Create a UK-only user
+    uk_user = Epilepsy12User.objects.create(
+        first_name="UK",
+        surname="User",
+        email="uk.user@test.com",
+        is_active=True,
+        is_staff=False,
+        is_rcpch_audit_team_member=False,
+        is_rcpch_staff=False,
+    )
+    
+    OrganisationEmployer.objects.create(
+        epilepsy12_user=uk_user,
+        employer_organisation=GOSH,
+        is_active=True,
+    )
+    
+    # Get merged parent list
+    parent_list = merged_parent_list_for_user(uk_user)
+    
+    # Verify Jersey is NOT in the list
+    parent_names = [p['name'] for p in parent_list]
+    parent_countries = [p.get('country') for p in parent_list if p.get('country')]
+    
+    # Check that Jersey is not in countries (case-insensitive)
+    jersey_found = any(c and c.upper() == 'JERSEY' for c in parent_countries)
+    assert not jersey_found, "UK user should not see Jersey trust"
+    
+    # Get Jersey trust name
+    JERSEY = Organisation.objects.get(ods_code="RGT1W", trust__ods_code="RGT1W")
+    assert JERSEY.trust.name not in parent_names, (
+        "UK user should not see Jersey trust in parent list"
+    )
+
+
+@pytest.mark.django_db
+def test_merged_parent_list_admin_sees_jersey_and_uk(
+    seed_groups_fixture,
+    seed_users_fixture,
+):
+    """
+    Test that admin users can see both Jersey and UK trusts/LHBs.
+    
+    Admin users should have access to all parents regardless of country.
+    """
+    
+    # Get an admin user
+    admin_user = Epilepsy12User.objects.get(first_name="RCPCH_AUDIT_TEAM")
+    
+    # Get all active organisations (as admin would)
+    all_organisations = Organisation.objects.get_organisation_list()
+    
+    # Get merged parent list
+    parent_list = merged_parent_list_for_user(admin_user, organisation_list=all_organisations)
+    
+    # Check that both Jersey and UK trusts are present
+    parent_countries = [p.get('country') for p in parent_list if p.get('country')]
+    
+    # Should have Jersey (case-insensitive check)
+    jersey_found = any(c and c.upper() == 'JERSEY' for c in parent_countries)
+    assert jersey_found, f"Admin should see Jersey trust. Countries found: {parent_countries}"
+    
+    # Should also have UK trusts
+    uk_found = any(c and c.upper() in ['ENGLAND', 'WALES'] for c in parent_countries)
+    assert uk_found or any(c is None for c in [p.get('country') for p in parent_list]), (
+        "Admin should see UK trusts as well as Jersey"
+    )
+
+
+@pytest.mark.django_db
+def test_merged_parent_list_user_employed_both_jersey_and_uk(
+    seed_groups_fixture,
+    seed_users_fixture,
+):
+    """
+    Test that a user employed at both Jersey and UK organisations
+    can see both sets of parents.
+    
+    This is a rare edge case but should be supported.
+    """
+    
+    # Get Jersey and UK organisations
+    JERSEY = Organisation.objects.get(ods_code="RGT1W", trust__ods_code="RGT1W")
+    GOSH = Organisation.objects.get(ods_code="RP401", trust__ods_code="RP4")
+    
+    # Create a user employed at both
+    dual_user = Epilepsy12User.objects.create(
+        first_name="Dual",
+        surname="User",
+        email="dual.user@test.com",
+        is_active=True,
+        is_staff=False,
+        is_rcpch_audit_team_member=False,
+        is_rcpch_staff=False,
+    )
+    
+    OrganisationEmployer.objects.create(
+        epilepsy12_user=dual_user,
+        employer_organisation=JERSEY,
+        is_active=True,
+    )
+    OrganisationEmployer.objects.create(
+        epilepsy12_user=dual_user,
+        employer_organisation=GOSH,
+        is_active=True,
+    )
+    
+    # Get merged parent list
+    parent_list = merged_parent_list_for_user(dual_user)
+    
+    # User should see both Jersey and UK parent(s)
+    parent_names = [p['name'] for p in parent_list]
+    parent_countries = [p.get('country') for p in parent_list if p.get('country')]
+    
+    assert JERSEY.trust.name in parent_names, "Dual-employed user should see Jersey"
+    assert GOSH.trust.name in parent_names, "Dual-employed user should see UK trust"
+    
+    # Check Jersey is in countries (case-insensitive)
+    jersey_found = any(c and c.upper() == 'JERSEY' for c in parent_countries)
+    assert jersey_found, f"Should have Jersey country in list. Found: {parent_countries}"
