@@ -1,0 +1,29 @@
+
+                {% load epilepsy12_template_tags %}
+
+                {# Only show parent dropdown if user has more than one parent option #}
+                {% if parent_list|length > 1 %}
+                <div class="field" hx-headers='{"X-CSRFToken": "{{ csrf_token }}"}' id="rcpch_parent_select" style="margin-bottom: 1.5em;">
+                    {% if selected_parent %}
+                        {% url 'filter_organisations_by_parent' parent_id=selected_parent.pk parent_type=parent_type as hx_post %}
+                        {# Format test_positive as "pk:parent_type" for merged dropdown #}
+                        {% with test_positive_value=selected_parent.pk|stringformat:"s"|add:":"|add:parent_type %}
+                            {% include 'epilepsy12/partials/page_elements/parent_organisation_select.html' with parent_list=parent_list hx_post=hx_post hx_target="#rcpch_selection_fields" hx_trigger="change" hx_swap="innerHTML" hx_name="selected_parent_summary_select" test_positive=test_positive_value label="Select Trust or Local Health Board" hx_default_text="Search trusts and health boards..." data_position="top left" %}
+                        {% endwith %}
+                    {% else %}
+                        {% url 'filter_organisations_by_parent' parent_id=0 parent_type='trust' as hx_post %}
+                        {% include 'epilepsy12/partials/page_elements/parent_organisation_select.html' with parent_list=parent_list hx_post=hx_post hx_target="#rcpch_selection_fields" hx_trigger="change" hx_swap="innerHTML" hx_name="selected_parent_summary_select" test_positive="" label="Select Trust or Local Health Board" hx_default_text="Search trusts and health boards..." data_position="top left" %}
+                    {% endif %}
+                </div>
+                {% endif %}
+
+                <div class="field" hx-headers='{"X-CSRFToken": "{{ csrf_token }}"}'>
+                    {% url 'selected_organisation_summary_select' as hx_post %}
+                    {# Show parent name in label if only one parent option #}
+                    {% if parent_list|length == 1 %}
+                        {% organisation_label parent_list.0.name organisation_list|length as label_text %}
+                        {% include 'epilepsy12/partials/page_elements/rcpch_organisations_select.html' with organisation_list=organisation_list hx_post=hx_post hx_target="#rcpch_organisation_select" hx_trigger="change" hx_swap="innerHTML" hx_name="selected_organisation_summary_select" test_positive=selected_organisation.pk label=label_text hx_default_text="Search organisations..." data_position="top left" %}
+                    {% else %}
+                        {% include 'epilepsy12/partials/page_elements/rcpch_organisations_select.html' with organisation_list=organisation_list hx_post=hx_post hx_target="#rcpch_organisation_select" hx_trigger="change" hx_swap="innerHTML" hx_name="selected_organisation_summary_select" test_positive=selected_organisation.pk label="Select Organisation" hx_default_text="Search organisations..." data_position="top left" %}
+                    {% endif %}
+                </div>

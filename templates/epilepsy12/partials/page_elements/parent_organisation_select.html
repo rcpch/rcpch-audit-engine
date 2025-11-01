@@ -1,15 +1,15 @@
 {% comment %}
-This partial template is a dropdown of all the organisation trusts
+This partial template is a dropdown of all parent organisations (Trusts and Local Health Boards merged)
 It relies on a little bit of jquery unfortunately because that is semantic-ui
 Parameters:
-hx_name: [paediatric_neurology_centre, epilepsy_surgery_centre]
+hx_name: 'selected_parent_summary_select'
 hx_url: the url complete with parameters to POST
-label: text label to display above the dropdown (e.g., "Select Organisation")
+label: text label to display above the dropdown (e.g., "Select Trust or Local Health Board")
 hx_target: the id of the html element to be replaced 
 hx_default_text: placeholder text for the search select dropdown
 hx_post: url to post to
-organisation_list: a filtered list of organisations
-test_positive: currently selected organisation id
+parent_list: a list of dicts with keys: pk, name, parent_type, ods_code
+test_positive: currently selected parent in format "pk:parent_type" (e.g., "5:trust")
 {% endcomment %}
 {% csrf_token %}
 <div class="field" hx-headers='{"X-CSRFToken": "{{ csrf_token }}"}'>
@@ -31,13 +31,15 @@ test_positive: currently selected organisation id
                 >
                 <div class="default text">{{hx_default_text}}</div>
                 <div class="menu" >
-                    {% for item in organisation_list %}
-                        {% if item.trust %}
-                            <div class="item" data-value="{{item.pk}}">{{item.name}} - {{item.city}} ({{item.trust.name}})</div>
-                        {% else %}
-                            <div class="item" data-value="{{item.pk}}">{{item.name}} - {{item.city}} ({{item.local_health_board.name}})</div>
-                        {% endif %}
+                    {% for parent in parent_list %}
+                            <div class="item" data-value="{{parent.pk}}:{{parent.parent_type}}">
+                                {{parent.name}}
+                                {% if parent.parent_type == 'local_health_board' %}
+                                    <span style="color: #999; font-size: 0.9em;"> (LHB)</span>
+                                {% endif %}
+                            </div>
                     {% endfor %}
                 </div>
         </div>
+
 </div>

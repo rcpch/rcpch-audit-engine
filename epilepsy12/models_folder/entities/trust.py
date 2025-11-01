@@ -1,8 +1,18 @@
 from django.contrib.gis.db import models
 from ..time_and_user_abstract_base_classes import TimeStampAbstractBaseClass
 
+class TrustManager(models.Manager):
+    def get_trust_list(self, exclude_pk=None):
+        queryset = self.filter(active=True)
+
+        if exclude_pk is not None:
+            queryset = queryset.exclude(pk=exclude_pk)
+
+        return queryset.order_by("name")
 
 class Trust(TimeStampAbstractBaseClass):
+    objects = TrustManager()
+    
     ods_code = models.CharField(max_length=10, unique=True)
     name = models.CharField(max_length=100)
     address_line_1 = models.CharField(

@@ -323,6 +323,16 @@ organisation_patterns = [
         name="child_organisation_select",
     ),
     path(
+    "organisations/filter_by_parent/<int:parent_id>/<str:parent_type>",
+        view=filter_organisations_by_parent,
+        name="filter_organisations_by_parent",
+    ),
+    path(
+        "organisation/<int:organisation_id>/summary",
+        view=selected_organisation_summary,
+        name="selected_organisation_summary",
+    ),
+    path(
         "organisation/<int:organisation_id>/summary",
         view=selected_organisation_summary,
         name="selected_organisation_summary",

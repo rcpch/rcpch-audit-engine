@@ -903,3 +903,23 @@ def none_to_dash(value):
     if value is None:
         return "-"
     return value
+
+
+@register.simple_tag
+def organisation_label(parent_name, organisation_count):
+    """
+    Generate a label for the organisation dropdown based on the parent name
+    and number of organisations.
+    
+    Args:
+        parent_name: Name of the parent (Trust or Local Health Board)
+        organisation_count: Number of organisations in the parent
+    
+    Returns:
+        HTML-formatted label with proper singular/plural form
+    """
+    if organisation_count == 1:
+        label = f"<strong>Organisation in {parent_name}</strong>"
+    else:
+        label = f"<strong>Organisations in {parent_name}</strong>"
+    return mark_safe(label)

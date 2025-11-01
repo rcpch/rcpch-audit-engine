@@ -32,7 +32,17 @@ class LocalHealthBoardBoundaries(TimeStampAbstractBaseClass):
         abstract = True
 
 
+class LocalHealthBoardManager(models.Manager):
+    def get_local_health_board_list(self, exclude_pk=None):
+        queryset = self.filter(active=True)
+
+        if exclude_pk is not None:
+            queryset = queryset.exclude(pk=exclude_pk)
+
+        return queryset.order_by("name")
+
 class LocalHealthBoard(LocalHealthBoardBoundaries):
+    objects = LocalHealthBoardManager()
     ods_code = models.CharField(max_length=3)
     publication_date = models.DateField(blank=True, null=True)
 
