@@ -137,6 +137,10 @@
   font-weight: 400;
 }
 
+.ui.rcpch_purple.button.bold {
+  font-family: "Montserrat-Bold" !important;
+}
+
 .ui.rcpch_dark_purple.button {
   border-radius: 0% !important;
   color: white;
