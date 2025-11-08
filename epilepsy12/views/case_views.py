@@ -1106,10 +1106,11 @@ class CaseListView(LoginRequiredMixin, PermissionRequiredMixin, ListView):
         context["sexes"] = sex_choices
 
         # Add cohort distribution - assuming cohorts 5-7
-        cohort_counts = {}
-        for cohort in range(5, 8):
-            count = registration_counts.get("cohort_counts", {}).get(cohort, 0)
-            cohort_counts[cohort] = count
+        cohort_counts = []
+        cohort_list = get_all_cohort_list()
+        for cohort in cohort_list:
+            count = registration_counts.get("cohort_counts", {}).get(cohort["cohort"], 0)
+            cohort_counts.append({'cohort':cohort["cohort"], 'count': count, 'has_data': cohort['has_data']})
         context["cohort_counts"] = cohort_counts
 
         # Gets all the KPI failed counts in one object to iterate over to produce labels in the template
