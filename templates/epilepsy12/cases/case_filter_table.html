@@ -274,11 +274,11 @@
                             <div class="header">Cohort</div>
                             <div class="menu">
                                 <!-- All Cohorts option -->
-                                
-                                {% for cohort, count in cohort_counts.items %}
-                                    <a class="item {% if request.GET.registration_cohort == cohort|stringformat:'i' %}active{% endif %}" 
-                                        href="{% build_url_parameters request 'registration_cohort' cohort %}">
-                                        Cohort {{ cohort }} <div class="ui {% if request.GET.registration_cohort == cohort|stringformat:'i' %}left pointing{% endif %} rcpch facets label">{{ count }}</div>
+
+                                {% for cohort in cohort_counts %}
+                                    <a class="item {% if request.GET.registration_cohort == cohort.cohort|stringformat:'i' %}active{% endif %}"
+                                        href="{% build_url_parameters request 'registration_cohort' cohort.cohort %}">
+                                        Cohort {{ cohort.cohort }} <div class="ui {% if request.GET.registration_cohort == cohort.cohort|stringformat:'i' %}left pointing{% endif %} rcpch facets label">{{ cohort.count }}</div>
                                     </a>
                                 {% endfor %}
 
