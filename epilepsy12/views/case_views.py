@@ -69,6 +69,19 @@ def case_list(request, organisation_id):
 
     filter_term = request.GET.get("filtered_case_list")
 
+    cohort_filter_term = request.GET.get("cohort")
+    cohort_filter = Q()
+    if cohort_filter_term is None:
+        selected_cohort = 'all_children'
+    elif cohort_filter_term == 'all_children':
+        selected_cohort = 'all_children'
+    elif cohort_filter_term == 'all_cohorts':
+        cohort_filter = Q(registration__cohort__isnull=False)
+        selected_cohort = 'all_cohorts'
+    else:
+        cohort_filter = Q(registration__cohort=cohort_filter_term)
+        selected_cohort = cohort_filter_term
+
     # get currently selected organisation
     organisation = Organisation.objects.get(pk=organisation_id)
 
@@ -96,6 +109,7 @@ def case_list(request, organisation_id):
                     & Q(
                         epilepsy12_sites__site_is_actively_involved_in_epilepsy_care=True
                     )
+                    & cohort_filter # filter by cohort if selected
                     & (
                         Q(first_name__icontains=filter_term)
                         | Q(surname__icontains=filter_term)
@@ -127,6 +141,7 @@ def case_list(request, organisation_id):
                     & Q(
                         epilepsy12_sites__site_is_actively_involved_in_epilepsy_care=True
                     )
+                    & cohort_filter # filter by cohort if selected
                     & (
                         Q(first_name__icontains=filter_term)
                         | Q(surname__icontains=filter_term)
@@ -146,6 +161,7 @@ def case_list(request, organisation_id):
                     & Q(
                         epilepsy12_sites__site_is_actively_involved_in_epilepsy_care=True
                     )
+                    & cohort_filter # filter by cohort if selected
                     & (
                         Q(first_name__icontains=filter_term)
                         | Q(surname__icontains=filter_term)
@@ -169,30 +185,35 @@ def case_list(request, organisation_id):
 
         if request.user.view_preference == 2:
             # this is an RCPCH audit team member requesting National level
-            filtered_cases = Case.objects.all()
+            filtered_cases = Case.objects.filter(
+                cohort_filter
+            )
         elif request.user.view_preference == 1:
             # filters all primary Trust level centres, irrespective of if active or inactive
             if organisation.country.boundary_identifier == "W92000004":
                 # welsh - select health boards
                 filtered_cases = Case.objects.filter(
-                    organisations__local_health_board=parent_trust,
+                    Q(organisations__local_health_board=parent_trust,
                     epilepsy12_sites__site_is_primary_centre_of_epilepsy_care=True,
-                    epilepsy12_sites__site_is_actively_involved_in_epilepsy_care=True,
+                    epilepsy12_sites__site_is_actively_involved_in_epilepsy_care=True)
+                    & cohort_filter # filter by cohort if selected
                 )
             else:
                 # England - select trusts
                 filtered_cases = Case.objects.filter(
-                    organisations__trust=parent_trust,
+                    Q(organisations__trust=parent_trust,
                     epilepsy12_sites__site_is_primary_centre_of_epilepsy_care=True,
-                    epilepsy12_sites__site_is_actively_involved_in_epilepsy_care=True,
+                    epilepsy12_sites__site_is_actively_involved_in_epilepsy_care=True)
+                    & cohort_filter # filter by cohort if selected
                 )
 
         else:
             # filters all primary centres at organisation level, irrespective of if active or inactive
             filtered_cases = Case.objects.filter(
-                organisations__name=organisation,
+                Q(organisations__name=organisation,
                 epilepsy12_sites__site_is_primary_centre_of_epilepsy_care=True,
-                epilepsy12_sites__site_is_actively_involved_in_epilepsy_care=True,
+                epilepsy12_sites__site_is_actively_involved_in_epilepsy_care=True)
+                & cohort_filter # filter by cohort if selected
             )
 
         if (
@@ -369,6 +390,8 @@ def case_list(request, organisation_id):
         "organisation_id": organisation_id,
         "cases_in_transfer": cases_in_transfer,
         "filtered_case_list": filter_term,
+        "cohort_choices": get_all_cohort_list(),
+        "selected_cohort": selected_cohort
     }
     if request.htmx:
         return render(

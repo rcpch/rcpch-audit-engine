@@ -11,6 +11,7 @@ from epilepsy12.models import (
     Organisation,
     Case,
 )
+from ..general_functions.cohort_number import get_all_cohort_list
 
 
 class CaseFilter(django_filters.FilterSet):
@@ -405,6 +406,8 @@ class CaseFilterMethods:
         Returns a dictionary of all registration-related counts
         Includes counts for: registration, audit progress, cohort
         """
+
+        cohort_list  = get_all_cohort_list()
         base_filter = Q(
             epilepsy12_sites__site_is_primary_centre_of_epilepsy_care=True,
             epilepsy12_sites__site_is_actively_involved_in_epilepsy_care=True,
@@ -455,14 +458,14 @@ class CaseFilterMethods:
                 distinct=True,
             ),
             **{
-                f"cohort_{i}": Count(
+                f"cohort_{i['cohort']}": Count(
                     "id",
                     filter=base_filter
                     & Q(registration__isnull=False)
-                    & Q(registration__cohort=i),
+                    & Q(registration__cohort=i["cohort"]),
                     distinct=True,
                 )
-                for i in range(5, 8)
+                for i in cohort_list
             },
         }
 
@@ -474,7 +477,7 @@ class CaseFilterMethods:
             "unregistered": raw_counts.get("unregistered_cases", 0),
             "cases_complete": raw_counts.get("audit_progress_complete", 0),
             "cases_incomplete": raw_counts.get("audit_progress_incomplete", 0),
-            "cohort_counts": {i: raw_counts.get(f"cohort_{i}", 0) for i in range(5, 8)},
+            "cohort_counts": {i['cohort']: raw_counts.get(f"cohort_{i['cohort']}", 0) for i in cohort_list},
         }
 
     @staticmethod

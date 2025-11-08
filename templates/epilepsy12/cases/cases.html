@@ -29,6 +29,20 @@
             {% include 'epilepsy12/partials/cases/case_statistics.html' with organisation=organisation total_cases=total_cases total_registrations=total_registrations %}
         </div>
 
+        <div class="sixteen wide notupperpadded column" id='cohort_buttons'>
+            <div class="ui rcpch_dark_blue buttons">
+              <a href="{% url 'cases' organisation_id=organisation.pk %}?cohort=all_children"><button class="ui mini compact {% if selected_cohort|default:''|stringformat:'s' == 'all_children' %}positive{% endif %} rcpch_dark_blue button">All Children</button></a>
+              <a href="{% url 'cases' organisation_id=organisation.pk %}?cohort=all_cohorts"><button class="ui mini compact {% if selected_cohort|default:''|stringformat:'s' == 'all_cohorts' %}positive{% endif %} rcpch_dark_blue button">All Cohorts</button></a>
+              {% for cohort in cohort_choices %}
+                {% if cohort.has_data %}
+                  <a href="{% url 'cases' organisation_id=organisation.pk %}?cohort={{cohort.cohort}}"><button class="ui mini compact {% if selected_cohort|default:''|stringformat:'s' == cohort.cohort|stringformat:'s' %}positive{% endif %} rcpch_dark_blue button">Cohort {{cohort.cohort}}</button></a>
+                {% else %}
+                  <button class="ui mini compact disabled rcpch_dark_blue button" disabled>Cohort {{cohort.cohort}}</button>
+                {% endif %}
+              {% endfor %}
+            </div>
+        </div>
+
         <div class="sixteen wide notupperpadded column">
 
           <div class="ui rcpch icon fluid input" data-tooltip="Start typing to Filter by name, NHS Number or case ID.">

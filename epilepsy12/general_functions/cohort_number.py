@@ -5,6 +5,9 @@ Cohort numbers functions
 # python imports
 from datetime import date
 
+# django imports
+from django.apps import apps
+
 # e12 imports
 from .date_functions import nth_tuesday_of_year
 
@@ -159,3 +162,14 @@ def cohorts_and_dates(first_paediatric_assessment_date: date):
         "within_grace_period": within_grace_period,
         "today": date.today(),
     }
+
+def get_all_cohort_list():
+    """
+    Return a list of all cohort numbers starting at 5 (earliest) up to latest cohort in Registration model
+    """
+    Registration = apps.get_model("epilepsy12", "Registration")
+    earliest_cohort = 5
+    latest_cohort = Registration.objects.filter().values("cohort").order_by("cohort").last()["cohort"]
+
+    cohort_list = [{'cohort': cohort, 'has_data': Registration.objects.filter(cohort=cohort).exists()} for cohort in range(earliest_cohort, latest_cohort + 1)]
+    return cohort_list
