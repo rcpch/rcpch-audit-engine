@@ -169,7 +169,9 @@ def get_all_cohort_list():
     """
     Registration = apps.get_model("epilepsy12", "Registration")
     earliest_cohort = 5
-    latest_cohort = Registration.objects.filter().values("cohort").order_by("cohort").last()["cohort"]
+    
+    latest_registration = Registration.objects.filter().values("cohort").order_by("cohort").last()
+    latest_cohort = latest_registration['cohort'] if latest_registration else earliest_cohort
 
     cohort_list = [{'cohort': cohort, 'has_data': Registration.objects.filter(cohort=cohort).exists()} for cohort in range(earliest_cohort, latest_cohort + 1)]
     return cohort_list
