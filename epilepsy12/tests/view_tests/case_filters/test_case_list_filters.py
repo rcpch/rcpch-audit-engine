@@ -36,19 +36,12 @@ from epilepsy12.tests.view_tests.permissions_tests.perm_tests_utils import (
 from epilepsy12.constants import GROUPS
 
 
-def _clean_cases_from_test_db():
-    """Clean up all cases and registrations from test database"""
-    Registration.objects.all().delete()
-    Case.objects.all().delete()
-
-
 # ===== COHORT FILTERING TESTS =====
 
 
 @pytest.mark.django_db
 def test_filter_by_all_children(client, seed_groups_fixture, seed_users_fixture):
     """Test filtering by 'all_children' shows all cases"""
-    _clean_cases_from_test_db()
 
     gosh = Organisation.objects.get(ods_code="RP401", trust__ods_code="RP4")
     group = Group.objects.get(name="trust_audit_team_edit_access")
@@ -121,7 +114,6 @@ def test_filter_by_all_children(client, seed_groups_fixture, seed_users_fixture)
 @pytest.mark.django_db
 def test_filter_by_all_cohorts(client, seed_groups_fixture, seed_users_fixture):
     """Test filtering by 'all_cohorts' shows only registered cases"""
-    _clean_cases_from_test_db()
 
     gosh = Organisation.objects.get(ods_code="RP401", trust__ods_code="RP4")
     group = Group.objects.get(name="trust_audit_team_edit_access")
