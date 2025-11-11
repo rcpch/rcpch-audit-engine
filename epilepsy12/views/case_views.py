@@ -72,12 +72,12 @@ def case_list(request, organisation_id):
     cohort_filter_term = request.GET.get("cohort")
     cohort_filter = Q()
     if cohort_filter_term is None:
-        selected_cohort = 'all_children'
-    elif cohort_filter_term == 'all_children':
-        selected_cohort = 'all_children'
-    elif cohort_filter_term == 'all_cohorts':
+        selected_cohort = "all_children"
+    elif cohort_filter_term == "all_children":
+        selected_cohort = "all_children"
+    elif cohort_filter_term == "all_cohorts":
         cohort_filter = Q(registration__cohort__isnull=False)
-        selected_cohort = 'all_cohorts'
+        selected_cohort = "all_cohorts"
     else:
         cohort_filter = Q(registration__cohort=cohort_filter_term)
         selected_cohort = cohort_filter_term
@@ -98,18 +98,23 @@ def case_list(request, organisation_id):
             trust=parent_trust, active=True
         ).all()
 
+    #  Get all counts prior to filtering for display
+    base_cases = Case.objects.filter(
+        Q(epilepsy12_sites__site_is_primary_centre_of_epilepsy_care=True)
+        & Q(epilepsy12_sites__site_is_actively_involved_in_epilepsy_care=True)
+    ).all()
+    registration_related_counts = CaseFilterMethods.get_all_registration_related_counts(
+        queryset=base_cases
+    )
+
     if filter_term:
         # filter_term is called if filtering by search box
         if request.user.view_preference == 0:
             # user has requested organisation level view
             all_cases = (
-                Case.objects.filter(
-                    Q(epilepsy12_sites__organisation=organisation)
-                    & Q(epilepsy12_sites__site_is_primary_centre_of_epilepsy_care=True)
-                    & Q(
-                        epilepsy12_sites__site_is_actively_involved_in_epilepsy_care=True
-                    )
-                    & cohort_filter # filter by cohort if selected
+                base_cases.filter(
+                    cohort_filter  # filter by cohort if selected
+                    & Q(epilepsy12_sites__organisation=organisation)
                     & (
                         Q(first_name__icontains=filter_term)
                         | Q(surname__icontains=filter_term)
@@ -135,13 +140,9 @@ def case_list(request, organisation_id):
                 )
 
             all_cases = (
-                Case.objects.filter(
+                base_cases.filter(
                     trust_filter
-                    & Q(epilepsy12_sites__site_is_primary_centre_of_epilepsy_care=True)
-                    & Q(
-                        epilepsy12_sites__site_is_actively_involved_in_epilepsy_care=True
-                    )
-                    & cohort_filter # filter by cohort if selected
+                    & cohort_filter  # filter by cohort if selected
                     & (
                         Q(first_name__icontains=filter_term)
                         | Q(surname__icontains=filter_term)
@@ -156,12 +157,8 @@ def case_list(request, organisation_id):
         elif request.user.view_preference == 2:
             # user has requested national level view
             all_cases = (
-                Case.objects.filter(
-                    Q(epilepsy12_sites__site_is_primary_centre_of_epilepsy_care=True)
-                    & Q(
-                        epilepsy12_sites__site_is_actively_involved_in_epilepsy_care=True
-                    )
-                    & cohort_filter # filter by cohort if selected
+                base_cases.filter(
+                    cohort_filter  # filter by cohort if selected
                     & (
                         Q(first_name__icontains=filter_term)
                         | Q(surname__icontains=filter_term)
@@ -185,35 +182,27 @@ def case_list(request, organisation_id):
 
         if request.user.view_preference == 2:
             # this is an RCPCH audit team member requesting National level
-            filtered_cases = Case.objects.filter(
-                cohort_filter
-            )
+            filtered_cases = base_cases.filter(cohort_filter)
         elif request.user.view_preference == 1:
             # filters all primary Trust level centres, irrespective of if active or inactive
             if organisation.country.boundary_identifier == "W92000004":
                 # welsh - select health boards
-                filtered_cases = Case.objects.filter(
-                    Q(organisations__local_health_board=parent_trust,
-                    epilepsy12_sites__site_is_primary_centre_of_epilepsy_care=True,
-                    epilepsy12_sites__site_is_actively_involved_in_epilepsy_care=True)
-                    & cohort_filter # filter by cohort if selected
+                filtered_cases = base_cases.filter(
+                    Q(organisations__local_health_board=parent_trust)
+                    & cohort_filter  # filter by cohort if selected
                 )
             else:
                 # England - select trusts
-                filtered_cases = Case.objects.filter(
-                    Q(organisations__trust=parent_trust,
-                    epilepsy12_sites__site_is_primary_centre_of_epilepsy_care=True,
-                    epilepsy12_sites__site_is_actively_involved_in_epilepsy_care=True)
-                    & cohort_filter # filter by cohort if selected
+                filtered_cases = base_cases.filter(
+                    Q(organisations__trust=parent_trust)
+                    & cohort_filter  # filter by cohort if selected
                 )
 
         else:
             # filters all primary centres at organisation level, irrespective of if active or inactive
-            filtered_cases = Case.objects.filter(
-                Q(organisations__name=organisation,
-                epilepsy12_sites__site_is_primary_centre_of_epilepsy_care=True,
-                epilepsy12_sites__site_is_actively_involved_in_epilepsy_care=True)
-                & cohort_filter # filter by cohort if selected
+            filtered_cases = base_cases.filter(
+                Q(organisations__name=organisation)
+                & cohort_filter  # filter by cohort if selected
             )
 
         if (
@@ -340,8 +329,8 @@ def case_list(request, organisation_id):
     page_number = request.GET.get("page", 1)
     case_list = paginator.page(page_number)
 
-    case_count = all_cases.count()
-    registered_count = registered_cases.count()
+    # case_count = all_cases.count()
+    # registered_count = registered_cases.count()
 
     if (
         request.user.is_rcpch_audit_team_member
@@ -373,16 +362,28 @@ def case_list(request, organisation_id):
             )
 
     current_submitting_cohort = cohorts_and_dates(date.today()).get("submitting_cohort")
-    current_cohort_total = CaseFilterMethods.get_all_registration_related_counts(
-        queryset=registered_cases
-    )["cohort_counts"].get(current_submitting_cohort)
+
+    merged_cohort_counts = [
+        {
+            "cohort": cohort["cohort"],
+            "has_data": cohort["has_data"],
+            "count": registration_related_counts["cohort_counts"].get(
+                cohort["cohort"], 0
+            ),
+        }
+        for cohort in get_all_cohort_list()
+    ]
+
+    filtered_totals = CaseFilterMethods.get_all_registration_related_counts(
+        queryset=all_cases
+    )
 
     context = {
         "case_list": case_list,
-        "total_cases": case_count,
-        "total_cases_in_current_submitting_cohort": current_cohort_total,
+        # "total_cases": case_count,
+        # "total_cases_in_current_submitting_cohort": current_cohort_total,
         "submitting_cohort": current_submitting_cohort,
-        "total_registrations": registered_count,
+        # "total_registrations": registered_count,
         "sort_flag": sort_flag,
         "organisation": organisation,
         "organisation_children": organisation_children,
@@ -390,9 +391,23 @@ def case_list(request, organisation_id):
         "organisation_id": organisation_id,
         "cases_in_transfer": cases_in_transfer,
         "filtered_case_list": filter_term,
-        "cohort_choices": get_all_cohort_list(),
-        "selected_cohort": selected_cohort
+        "cohort_choices": merged_cohort_counts,
+        "selected_cohort": selected_cohort,
+        "total_registered": registration_related_counts[
+            "registered"
+        ],  # all those registered in a cohort
+        "total_unregistered": registration_related_counts[
+            "unregistered"
+        ],  # all those not registered in a cohort
+        "all_unfiltered_counts": registration_related_counts["unregistered"]
+        + registration_related_counts[
+            "registered"
+        ],  # all children who may not be yet be registered in a cohort as well as those who are
+        "total_filtered_complete": filtered_totals["cases_complete"],
+        "total_filtered_incomplete": filtered_totals["cases_incomplete"],
+        "total_filtered_registered": filtered_totals["registered"],
     }
+
     if request.htmx:
         return render(
             request=request,
@@ -1109,8 +1124,16 @@ class CaseListView(LoginRequiredMixin, PermissionRequiredMixin, ListView):
         cohort_counts = []
         cohort_list = get_all_cohort_list()
         for cohort in cohort_list:
-            count = registration_counts.get("cohort_counts", {}).get(cohort["cohort"], 0)
-            cohort_counts.append({'cohort':cohort["cohort"], 'count': count, 'has_data': cohort['has_data']})
+            count = registration_counts.get("cohort_counts", {}).get(
+                cohort["cohort"], 0
+            )
+            cohort_counts.append(
+                {
+                    "cohort": cohort["cohort"],
+                    "count": count,
+                    "has_data": cohort["has_data"],
+                }
+            )
         context["cohort_counts"] = cohort_counts
 
         # Gets all the KPI failed counts in one object to iterate over to produce labels in the template
