@@ -182,7 +182,7 @@ def case_list(request, organisation_id):
 
         if request.user.view_preference == 2:
             # this is an RCPCH audit team member requesting National level
-            filtered_cases = Case.objects.filter(cohort_filter)
+            filtered_cases = base_cases.filter(cohort_filter)
         elif request.user.view_preference == 1:
             # filters all primary Trust level centres, irrespective of if active or inactive
             if organisation.country.boundary_identifier == "W92000004":
