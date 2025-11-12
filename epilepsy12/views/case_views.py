@@ -103,9 +103,6 @@ def case_list(request, organisation_id):
         Q(epilepsy12_sites__site_is_primary_centre_of_epilepsy_care=True)
         & Q(epilepsy12_sites__site_is_actively_involved_in_epilepsy_care=True)
     ).all()
-    registration_related_counts = CaseFilterMethods.get_all_registration_related_counts(
-        queryset=base_cases
-    )
 
     if filter_term:
         # filter_term is called if filtering by search box
@@ -363,27 +360,22 @@ def case_list(request, organisation_id):
 
     current_submitting_cohort = cohorts_and_dates(date.today()).get("submitting_cohort")
 
-    merged_cohort_counts = [
-        {
-            "cohort": cohort["cohort"],
-            "has_data": cohort["has_data"],
-            "count": registration_related_counts["cohort_counts"].get(
-                cohort["cohort"], 0
-            ),
-        }
-        for cohort in get_all_cohort_list()
-    ]
-
     filtered_totals = CaseFilterMethods.get_all_registration_related_counts(
         queryset=all_cases
     )
 
+    merged_cohort_counts = [
+        {
+            "cohort": cohort["cohort"],
+            "has_data": cohort["has_data"],
+            "count": filtered_totals["cohort_counts"].get(cohort["cohort"], 0),
+        }
+        for cohort in get_all_cohort_list()
+    ]
+
     context = {
         "case_list": case_list,
-        # "total_cases": case_count,
-        # "total_cases_in_current_submitting_cohort": current_cohort_total,
         "submitting_cohort": current_submitting_cohort,
-        # "total_registrations": registered_count,
         "sort_flag": sort_flag,
         "organisation": organisation,
         "organisation_children": organisation_children,
@@ -393,14 +385,8 @@ def case_list(request, organisation_id):
         "filtered_case_list": filter_term,
         "cohort_choices": merged_cohort_counts,
         "selected_cohort": selected_cohort,
-        "total_registered": registration_related_counts[
-            "registered"
-        ],  # all those registered in a cohort
-        "total_unregistered": registration_related_counts[
-            "unregistered"
-        ],  # all those not registered in a cohort
-        "all_unfiltered_counts": registration_related_counts["unregistered"]
-        + registration_related_counts[
+        "all_filtered_counts": filtered_totals["unregistered"]
+        + filtered_totals[
             "registered"
         ],  # all children who may not be yet be registered in a cohort as well as those who are
         "total_filtered_complete": filtered_totals["cases_complete"],

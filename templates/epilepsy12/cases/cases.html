@@ -31,8 +31,8 @@
 
         <div class="sixteen wide notupperpadded column" id='cohort_buttons'>
             <div class="ui rcpch_dark_blue buttons">
-              <a href="{% url 'cases' organisation_id=organisation.pk %}?cohort=all_children"><button class="ui mini compact {% if selected_cohort|default:''|stringformat:'s' == 'all_children' %}positive{% endif %} rcpch_dark_blue button">All Children ({{ all_unfiltered_counts }})</button></a>
-              <a href="{% url 'cases' organisation_id=organisation.pk %}?cohort=all_cohorts"><button class="ui mini compact {% if selected_cohort|default:''|stringformat:'s' == 'all_cohorts' %}positive{% endif %} rcpch_dark_blue button">All Cohorts ({{ total_registered }})</button></a>
+              <a href="{% url 'cases' organisation_id=organisation.pk %}?cohort=all_children"><button class="ui mini compact {% if selected_cohort|default:''|stringformat:'s' == 'all_children' %}positive{% endif %} rcpch_dark_blue button">All Children ({{ all_filtered_counts }})</button></a>
+              <a href="{% url 'cases' organisation_id=organisation.pk %}?cohort=all_cohorts"><button class="ui mini compact {% if selected_cohort|default:''|stringformat:'s' == 'all_cohorts' %}positive{% endif %} rcpch_dark_blue button">All Cohorts ({{ total_filtered_registered }})</button></a>
               {% for cohort in cohort_choices %}
                 {% if cohort.has_data %} 
                   <a href="{% url 'cases' organisation_id=organisation.pk %}?cohort={{cohort.cohort}}"><button class="ui mini compact {% if selected_cohort|default:''|stringformat:'s' == cohort.cohort|stringformat:'s' %}positive{% endif %} rcpch_dark_blue button">Cohort {{cohort.cohort}} ({{cohort.count}})</button></a>
