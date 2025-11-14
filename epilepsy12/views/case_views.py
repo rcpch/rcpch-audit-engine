@@ -995,7 +995,7 @@ class CaseListView(LoginRequiredMixin, PermissionRequiredMixin, ListView):
     paginate_by = 50
     filterset_class = CaseFilter
     ordering = "surname"
-    permission_required = "epilepsy12.can_publish_epilepsy12_data"
+    permission_required = "epilepsy12.view_case"
     raise_exception = True
 
     def get_queryset(self):
