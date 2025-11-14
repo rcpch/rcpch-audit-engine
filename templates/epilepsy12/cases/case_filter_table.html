@@ -192,9 +192,7 @@
                         <button type="submit" class="ui rcpch_light_blue button">
                             <i class="filter icon"></i> Apply Filters
                         </button>
-                        <a href="{% url 'case_filter_list' organisation_id %}" class="ui rcpch_light_blue button">
-                            <i class="undo icon"></i> Reset
-                        </a>
+                        
                     </div><!--fields-->
 
                 </div><!--segment-->
@@ -206,7 +204,7 @@
                         <div class="label">Total Cases</div>
                     </div>
                     <div class="statistic">
-                        <div class="value">{{ registered_cases }}</div>
+                        <div class="value">{{ registered_cases_count }}</div>
                         <div class="label">Registered</div>
                     </div>
                     <div class="statistic">
@@ -246,8 +244,10 @@
                                 {% endfor %}
                             {% endif %}
                         {% endfor %}
+                        
                     </div>
                 </div>
+                
                 {% endif %}
                 {% for name, value in hidden_field_params %} <!-- this adds the facets to the form as hidden fields so that their filters are not ignored when the form is submitted-->
                     <input type="hidden" name="{{ name }}" value="{{ value }}">
