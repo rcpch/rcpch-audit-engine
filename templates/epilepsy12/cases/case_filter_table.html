@@ -244,7 +244,11 @@
                                 {% endfor %}
                             {% endif %}
                         {% endfor %}
-                        
+                        <div class="field">
+                            <a href="{% url 'case_filter_list' organisation_id %}" class="ui left floated tiny rcpch_light_blue button">
+                                <i class="undo icon"></i> Reset
+                            </a>
+                        </div>
                     </div>
                 </div>
                 
