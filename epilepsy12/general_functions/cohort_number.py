@@ -12,7 +12,9 @@ from django.apps import apps
 from .date_functions import nth_tuesday_of_year
 
 
-def days_remaining_before_submission(audit_submission_date: date, current_date: date) -> int:
+def days_remaining_before_submission(
+    audit_submission_date: date, current_date: date
+) -> int:
     if audit_submission_date:
         remaining = audit_submission_date - current_date
         # submission is possible on the last day
@@ -145,7 +147,9 @@ def cohorts_and_dates(first_paediatric_assessment_date: date):
         "currently_recruiting_cohort_days_remaining": currently_recruiting_cohort.get(
             "days_remaining", None
         ),
-        "currently_recruiting_cohort_dates": dates_for_cohort(currently_recruiting_cohort_number),
+        "currently_recruiting_cohort_dates": dates_for_cohort(
+            currently_recruiting_cohort_number
+        ),
         "submitting_cohort": submitting_cohort_number,
         "submitting_cohort_start_date": submitting_cohort.get(
             "cohort_start_date", None
@@ -163,15 +167,29 @@ def cohorts_and_dates(first_paediatric_assessment_date: date):
         "today": date.today(),
     }
 
+
 def get_all_cohort_list():
     """
     Return a list of all cohort numbers starting at 5 (earliest) up to latest cohort in Registration model
     """
     Registration = apps.get_model("epilepsy12", "Registration")
-    earliest_cohort = 5
-    
-    latest_registration = Registration.objects.filter(cohort__isnull=False).values("cohort").order_by("cohort").last()
-    latest_cohort = latest_registration['cohort'] if latest_registration else earliest_cohort
+    earliest_cohort = 6
 
-    cohort_list = [{'cohort': cohort, 'has_data': Registration.objects.filter(cohort=cohort).exists()} for cohort in range(earliest_cohort, latest_cohort + 1)]
+    latest_registration = (
+        Registration.objects.filter(cohort__isnull=False)
+        .values("cohort")
+        .order_by("cohort")
+        .last()
+    )
+    latest_cohort = (
+        latest_registration["cohort"] if latest_registration else earliest_cohort
+    )
+
+    cohort_list = [
+        {
+            "cohort": cohort,
+            "has_data": Registration.objects.filter(cohort=cohort).exists(),
+        }
+        for cohort in range(earliest_cohort, latest_cohort + 1)
+    ]
     return cohort_list
