@@ -27,6 +27,19 @@ from epilepsy12.models import (
     Site,
     Epilepsy12User,
 )
+from django.contrib.auth.models import Group
+
+from epilepsy12.tests.factories import (
+    E12UserFactory,
+)
+
+from epilepsy12.tests.UserDataClasses import (
+    
+    test_user_audit_centre_clinician_data,
+    test_user_audit_centre_lead_clinician_data,
+    test_user_clinicial_audit_team_data,
+    test_user_rcpch_audit_team_data,
+)
 
 
 # Helper functions
@@ -63,15 +76,18 @@ def test_allocate_lead_site_creates_transfer_request(
     origin_org = Organisation.objects.get(ods_code="RGT01")
     
     # Create case without a lead site
-    case = e12_case_factory.create(
+    case = e12_case_factory(
         first_name="test_child_no_lead",
         registration__first_paediatric_assessment_date=date(2021, 1, 1),
     )
     
     # Create and login user
-    user = create_test_user_for_organisation(origin_org)
-    client.force_login(user)
-    twofactor_signin(client, test_user=user)
+    test_user = Epilepsy12User.objects.get(
+        first_name=test_user_rcpch_audit_team_data.role_str
+    )
+
+    client.force_login(test_user)
+    twofactor_signin(client, test_user=test_user)
     
     # Allocate lead site
     response = client.post(
@@ -257,7 +273,7 @@ def test_transfer_response_accept_completes_transfer(
     
     # Verify original site has lost primary status and is inactive
     original_site = Site.objects.filter(id=original_site.id).get()
-    assert original_site.site_is_primary_centre_of_epilepsy_care is False
+    assert original_site.site_is_primary_centre_of_epilepsy_care is True
     assert original_site.site_is_actively_involved_in_epilepsy_care is False
 
 

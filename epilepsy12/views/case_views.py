@@ -572,6 +572,7 @@ def transfer_response(request, organisation_id, case_id, organisation_response):
             case=case,
             organisation=origin_organisation,
             site_is_primary_centre_of_epilepsy_care=True,
+            site_is_actively_involved_in_epilepsy_care=True,
         ).update(
             site_is_primary_centre_of_epilepsy_care=False,
             site_is_actively_involved_in_epilepsy_care=False,
