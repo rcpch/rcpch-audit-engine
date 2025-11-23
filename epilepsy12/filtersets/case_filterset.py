@@ -407,7 +407,7 @@ class CaseFilterMethods:
         Includes counts for: registration, audit progress, cohort
         """
 
-        cohort_list  = get_all_cohort_list()
+        cohort_list = get_all_cohort_list()
         base_filter = Q(
             epilepsy12_sites__site_is_primary_centre_of_epilepsy_care=True,
             epilepsy12_sites__site_is_actively_involved_in_epilepsy_care=True,
@@ -477,7 +477,10 @@ class CaseFilterMethods:
             "unregistered": raw_counts.get("unregistered_cases", 0),
             "cases_complete": raw_counts.get("audit_progress_complete", 0),
             "cases_incomplete": raw_counts.get("audit_progress_incomplete", 0),
-            "cohort_counts": {i['cohort']: raw_counts.get(f"cohort_{i['cohort']}", 0) for i in cohort_list},
+            "cohort_counts": {
+                i["cohort"]: raw_counts.get(f"cohort_{i['cohort']}", 0)
+                for i in cohort_list
+            },
         }
 
     @staticmethod
@@ -838,6 +841,7 @@ class CaseFilterMethods:
                 epilepsy12_sites__site_is_primary_centre_of_epilepsy_care=True,
                 epilepsy12_sites__site_is_actively_involved_in_epilepsy_care=True,
                 epilepsy12_sites__case__isnull=False,
+                epilepsy12_sites__organisation__trust__isnull=False,
             )
             .values(
                 "epilepsy12_sites__organisation__trust__id",
@@ -853,7 +857,7 @@ class CaseFilterMethods:
                 epilepsy12_sites__site_is_primary_centre_of_epilepsy_care=True,
                 epilepsy12_sites__site_is_actively_involved_in_epilepsy_care=True,
                 epilepsy12_sites__case__isnull=False,
-                epilepsy12_sites__case__registration__isnull=False,
+                epilepsy12_sites__organisation__local_health_board__isnull=False,
             )
             .values(
                 "epilepsy12_sites__organisation__local_health_board__id",
@@ -869,7 +873,7 @@ class CaseFilterMethods:
             result.append(
                 (
                     f"t_{trust['epilepsy12_sites__organisation__trust__id']}",
-                    f"Trust: {trust['epilepsy12_sites__organisation__trust__name']} ({trust['count']})",
+                    f"{trust['epilepsy12_sites__organisation__trust__name']} ({trust['count']})",
                 )
             )
         # Get counts for health boards
@@ -877,7 +881,7 @@ class CaseFilterMethods:
             result.append(
                 (
                     f"h_{hb['epilepsy12_sites__organisation__local_health_board__id']}",
-                    f"Local Health Board: {hb['epilepsy12_sites__organisation__local_health_board__name']} ({hb['count']})",
+                    f"{hb['epilepsy12_sites__organisation__local_health_board__name']} ({hb['count']})",
                 )
             )
 

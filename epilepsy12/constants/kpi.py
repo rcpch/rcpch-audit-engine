@@ -64,12 +64,12 @@ KPI_MAP = {
     "10": "school_individual_healthcare_plan",
 }
 KPI_LABEL_MAP = {
-    "1": "Paediatrician with expertise in epilepsies",
-    "2": "Epilepsy specialist nurse",
+    "1": "Paediatrician with expertise in epilepsies within 2 weeks",
+    "2": "Access to Epilepsy specialist nurse",
     "3": "Tertiary input",
     "3b": "Epilepsy surgery referral",
     "4": "ECG",
-    "5": "MRI",
+    "5": "MRI within 6 weeks",
     "6": "Assessment of mental health issues",
     "7": "Mental health support",
     "8": "Sodium valproate and topiramate",

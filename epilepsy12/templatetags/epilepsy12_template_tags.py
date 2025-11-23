@@ -1,10 +1,12 @@
 import re
 import math
-import json
 
+from django.apps import apps
 from django import template
 from django.utils.safestring import mark_safe
 from django.conf import settings
+
+from epilepsy12.constants.kpi import KPI_MAP
 from ..models import (
     Country,
     IntegratedCareBoard,
@@ -721,6 +723,17 @@ def kpi_key_to_readable_name(kpi_key):
 
 
 @register.filter
+def kpi_key_to_help_text(kpi_key):
+    """
+    Convert a KPI key to a KPI helptext.
+    """
+    field = KPI_MAP.get(kpi_key)
+    KPI = apps.get_model("epilepsy12", "KPI")
+    help_text = KPI._meta.get_field(field).help_text["reference"]
+    return help_text if help_text else kpi_key
+
+
+@register.filter
 def field_key_to_readable_name(field_key):
     """
     Convert a field key to a human-readable name.
@@ -910,11 +923,11 @@ def organisation_label(parent_name, organisation_count):
     """
     Generate a label for the organisation dropdown based on the parent name
     and number of organisations.
-    
+
     Args:
         parent_name: Name of the parent (Trust or Local Health Board)
         organisation_count: Number of organisations in the parent
-    
+
     Returns:
         HTML-formatted label with proper singular/plural form
     """

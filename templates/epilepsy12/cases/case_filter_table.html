@@ -115,63 +115,6 @@
                     </div>
                     {% endif %}
 
-                </div><!--segment-->
-
-                <!-- Results Stats -->
-                <div class="ui statistics">
-                    <div class="statistic">
-                        <div class="value">{{ total_cases }}</div>
-                        <div class="label">Total Cases</div>
-                    </div>
-                    <div class="statistic">
-                        <div class="value">{{ registered_cases }}</div>
-                        <div class="label">Registered</div>
-                    </div>
-                    <div class="statistic">
-                        <div class="value">{{ total_episodes|default:"0" }}</div>
-                        <div class="label">Total Episodes</div>
-                    </div>
-                </div>
-
-                <!-- Filter Summary -->
-                {% if request.GET %}
-                <div class="ui rcpch_info message">
-                    <div class="header">Active Filters</div>
-                    <div class="ui horizontal list">
-                        {% for key, value_list in request.GET.lists %} {# Iterate through .lists() to get all values #}
-                            {% if key != 'page' %}
-                                {% for value in value_list %} {# Loop through potentially multiple values for the key #}
-                                    {% if value %} {# Ensure value is not empty #}
-                                        <div class="item">
-                                            <div class="ui rcpch_light_blue label">
-                                                {# Display the key and the specific value #}
-                                                {{ key|field_key_to_readable_name }}: {{ value|field_value_to_readable_name:key }}
-
-                                                {# Use build_url_parameters to generate the removal link #}
-                                                {# Pass the key and the specific value to remove/toggle - if kpi_failed then pass the kpi value, if not then pass None as a flag that this should be deleted #}
-                                                {% if key == 'kpi_failed' %}
-                                                <a href="{% build_url_parameters request key value %}">
-                                                    <i class="delete icon"></i>
-                                                </a>
-                                                {% else %}
-                                                <a href="{% build_url_parameters request key None %}">
-                                                    <i class="delete icon"></i>
-                                                </a>
-                                                {% endif %}
-                                            </div>
-                                        </div>
-                                    {% endif %}
-                                {% endfor %}
-                            {% endif %}
-                        {% endfor %}
-                    </div>
-                </div>
-                {% endif %}
-                {% for name, value in hidden_field_params %} <!-- this adds the facets to the form as hidden fields so that their filters are not ignored when the form is submitted-->
-                    <input type="hidden" name="{{ name }}" value="{{ value }}">
-                {% endfor %}
-
-                <div class="ui rcpch_grey segment">
                     <h5 class="header">
                         <span class="data-tooltip" data-tooltip="Apply filters by selecting the dropdowns and click `Apply Filters`" data-position="right center">Demographics <i class="rcpch question circle icon"></i></span>
                     </h5>
@@ -249,11 +192,70 @@
                         <button type="submit" class="ui rcpch_light_blue button">
                             <i class="filter icon"></i> Apply Filters
                         </button>
-                        <a href="{% url 'case_filter_list' organisation_id %}" class="ui rcpch_light_blue button">
-                            <i class="undo icon"></i> Reset
-                        </a>
+                        
                     </div><!--fields-->
+
                 </div><!--segment-->
+
+                <!-- Results Stats -->
+                <div class="ui statistics">
+                    <div class="statistic">
+                        <div class="value">{{ total_cases }}</div>
+                        <div class="label">Total Cases</div>
+                    </div>
+                    <div class="statistic">
+                        <div class="value">{{ registered_cases_count }}</div>
+                        <div class="label">Registered</div>
+                    </div>
+                    <div class="statistic">
+                        <div class="value">{{ total_episodes|default:"0" }}</div>
+                        <div class="label">Total Episodes</div>
+                    </div>
+                </div>
+
+                <!-- Filter Summary -->
+                {% if request.GET %}
+                <div class="ui rcpch_info message">
+                    <div class="header">Active Filters</div>
+                    <div class="ui horizontal list">
+                        {% for key, value_list in request.GET.lists %} {# Iterate through .lists() to get all values #}
+                            {% if key != 'page' %}
+                                {% for value in value_list %} {# Loop through potentially multiple values for the key #}
+                                    {% if value %} {# Ensure value is not empty #}
+                                        <div class="item">
+                                            <div class="ui rcpch_light_blue label">
+                                                {# Display the key and the specific value #}
+                                                {{ key|field_key_to_readable_name }}: {{ value|field_value_to_readable_name:key }}
+
+                                                {# Use build_url_parameters to generate the removal link #}
+                                                {# Pass the key and the specific value to remove/toggle - if kpi_failed then pass the kpi value, if not then pass None as a flag that this should be deleted #}
+                                                {% if key == 'kpi_failed' %}
+                                                <a href="{% build_url_parameters request key value %}">
+                                                    <i class="delete icon"></i>
+                                                </a>
+                                                {% else %}
+                                                <a href="{% build_url_parameters request key None %}">
+                                                    <i class="delete icon"></i>
+                                                </a>
+                                                {% endif %}
+                                            </div>
+                                        </div>
+                                    {% endif %}
+                                {% endfor %}
+                            {% endif %}
+                        {% endfor %}
+                        <div class="field">
+                            <a href="{% url 'case_filter_list' organisation_id %}" class="ui left floated tiny rcpch_light_blue button">
+                                <i class="undo icon"></i> Reset
+                            </a>
+                        </div>
+                    </div>
+                </div>
+                
+                {% endif %}
+                {% for name, value in hidden_field_params %} <!-- this adds the facets to the form as hidden fields so that their filters are not ignored when the form is submitted-->
+                    <input type="hidden" name="{{ name }}" value="{{ value }}">
+                {% endfor %}
                 
             </form>
             
@@ -365,14 +367,22 @@
                                             <a class="item active"
                                             href="{% build_url_parameters request 'kpi_failed' kpi_id %}">
                                             
-                                            <span data-tooltip="{{ kpi_id|kpi_key_to_readable_name }}" data-position="right center">KPI {{ kpi_id|kpi_key_formatted }} <i class="rcpch question circle icon"></i></span>
+                                            <span 
+                                            class="kpi-popup"
+                                            data-content="{{ kpi_id|kpi_key_to_help_text }}" data-position="top center" data-variation="wide"><b>{{ kpi_id|kpi_key_formatted }}</b> - {{kpi_id|kpi_key_to_readable_name}} <i class="rcpch question circle icon"></i></span>
                                                 <div class="ui left pointing rcpch facets label">{{ count }}</div>
                                             </a>
                                         {% else %}
                                             {# Add this KPI to the selection #}
                                             <a class="item"
-                                            href="{% build_url_parameters request 'kpi_failed' kpi_id %}">
-                                                <span data-tooltip="{{ kpi_id|kpi_key_to_readable_name }}" data-position="right center">KPI {{ kpi_id|kpi_key_formatted }} <i class="rcpch question circle icon"></i></span>
+                                                href="{% build_url_parameters request 'kpi_failed' kpi_id %}"
+                                            >
+                                                <span 
+                                                    class="kpi-popup"
+                                                    data-content="{{ kpi_id|kpi_key_to_help_text }}" 
+                                                    data-position="top center" data-variation="wide"
+                                                    _="init js $('.kpi-popup').popup(); end"
+                                                ><b>{{ kpi_id|kpi_key_formatted }}</b> - {{kpi_id|kpi_key_to_readable_name}} <i class="rcpch question circle icon"></i></span>
                                                 <div class="ui rcpch facets label">{{ count }}</div>
                                             </a>
                                         {% endif %}
@@ -629,6 +639,8 @@
 
             window.location.href = finalUrl;
         });
+        
     });
+    
 </script>
 {% endblock %}
