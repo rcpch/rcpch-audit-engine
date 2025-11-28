@@ -404,3 +404,35 @@ def login_and_otp_required():
         return login_required(wrapper)
 
     return decorator
+
+
+class LoginAndOTPRequiredMixin(AccessMixin):
+    def dispatch(self, request, *args, **kwargs):
+        user = request.user
+
+        # Check if the user is authenticated
+        if not user.is_authenticated:
+            return self.handle_no_permission()
+
+        # Bypass 2fa if local dev, with warning message
+        if settings.DEBUG and user.is_authenticated:
+            logger.warning(
+                "User %s has bypassed 2FA for %s as settings.DEBUG is %s",
+                user,
+                self.__class__.__name__,
+                settings.DEBUG,
+            )
+            return super().dispatch(request, *args, **kwargs)
+
+        # Prevent unverified users
+        if not user.is_verified():
+            user_list = user.__dict__
+            epilepsy12_user = user_list["_wrapped"]
+            logger.info(
+                "User %s is unverified. Tried accessing %s",
+                epilepsy12_user,
+                self.__class__.__name__,
+            )
+            raise PermissionDenied()
+
+        return super().dispatch(request, *args, **kwargs)

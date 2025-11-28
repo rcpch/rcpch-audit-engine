@@ -36,6 +36,7 @@ from ..decorator import (
     user_may_view_this_organisation,
     user_may_view_this_child,
     login_and_otp_required,
+    LoginAndOTPRequiredMixin,
     OrganisationAccessMixin
 )
 
@@ -1013,7 +1014,7 @@ def consent_confirmation(request, case_id, consent_type):
     return response
 
 
-class CaseListView(LoginRequiredMixin, PermissionRequiredMixin, OrganisationAccessMixin, ListView):
+class CaseListView(LoginAndOTPRequiredMixin, PermissionRequiredMixin, OrganisationAccessMixin, ListView):
     """
     View to display a list of cases for a given organisation.
     This view uses a faceted search for certain key metrics such as KPI
