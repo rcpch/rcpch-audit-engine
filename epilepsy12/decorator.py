@@ -141,6 +141,44 @@ def group_required(*group_names):
     return decorator
 
 
+def _user_may_view_this_organisation(request, kwargs):
+    user = request.user
+    if kwargs.get("organisation_id") is not None:
+        organisation_requested = Organisation.objects.get(
+            pk=kwargs.get("organisation_id")
+        )
+        organisation_list = organisation_white_list_for_user(
+            epilepsy12_user=user
+        )
+        if (
+            (
+                organisation_requested in organisation_list
+                and user.is_active
+                and user.email_confirmed
+            )
+            or user.is_superuser
+            or user.is_rcpch_audit_team_member
+        ):
+            # user's has an organisation employer in the same trust or LHB as the organisation requested
+            if kwargs.get("user_type") is not None:
+                if kwargs.get("user_type") == "rcpch-staff":
+                    # this route is for rcpch staff to create new rcpch staff members only
+                    raise PermissionDenied()
+            # user is allowed
+        else:
+            raise PermissionDenied()
+    else:
+        # organisation requested does not exist
+        raise ValueError("Organisation requested does not exist!")
+
+
+class OrganisationAccessMixin(AccessMixin):
+    def dispatch(self, request, *args, **kwargs):
+        # Raises PermissionDenied
+        _user_may_view_this_organisation(request, kwargs)
+        return super().dispatch(request, *args, **kwargs)
+
+
 def user_may_view_this_organisation():
     # decorator receives organisation_id.
     # access is granted only to users who are either:
@@ -149,35 +187,8 @@ def user_may_view_this_organisation():
     # 3. Active trust/LHB level users where any trust/LHB they have access to includes the id of the organisation requested
     def decorator(view):
         def wrapper(request, *args, **kwargs):
-            user = request.user
-            if kwargs.get("organisation_id") is not None:
-                organisation_requested = Organisation.objects.get(
-                    pk=kwargs.get("organisation_id")
-                )
-                organisation_list = organisation_white_list_for_user(
-                    epilepsy12_user=user
-                )
-                if (
-                    (
-                        organisation_requested in organisation_list
-                        and user.is_active
-                        and user.email_confirmed
-                    )
-                    or user.is_superuser
-                    or user.is_rcpch_audit_team_member
-                ):
-                    # user's has an organisation employer in the same trust or LHB as the organisation requested
-                    if kwargs.get("user_type") is not None:
-                        if kwargs.get("user_type") == "rcpch-staff":
-                            # this route is for rcpch staff to create new rcpch staff members only
-                            raise PermissionDenied()
-                    # user is allowed
-                    return view(request, *args, **kwargs)
-                else:
-                    raise PermissionDenied()
-            else:
-                # organisation requested does not exist
-                raise ValueError("Organisation requested does not exist!")
+            _user_may_view_this_organisation(request, kwargs)
+            return view(request, *args, **kwargs)
 
         return wrapper
 
