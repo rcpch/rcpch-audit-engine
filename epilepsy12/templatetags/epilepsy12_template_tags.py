@@ -209,7 +209,7 @@ def record_complete(model):
             )
             if (
                 model.management.registration.case.sex == 2
-                and model.medicine_entity.medicine_name == "Sodium valproate"
+                and model.medicine_entity.conceptId == "387481005"  # Sodium valproate
                 and model.management.registration.case.age_days() >= 365 * 12
             ):
                 return minimum_requirement_met and (

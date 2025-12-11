@@ -1,5 +1,6 @@
 from dateutil import relativedelta
 from datetime import date
+import logging
 
 # 3rd Party Imports
 from django_htmx.http import trigger_client_event
@@ -27,6 +28,8 @@ from epilepsy12.constants import (
     Management_minimum_scorable_fields,
     AntiEpilepsyMedicine_minimum_scorable_fields,
 )
+
+logger = logging.getLogger(__name__)
 
 
 def recalculate_form_generate_response(
@@ -85,6 +88,12 @@ def update_audit_progress(model_instance):
         registration = model_instance
     else:
         registration = model_instance.registration
+
+    # Logging step
+    if all_completed_fields > all_expected_fields:
+        logger.error(
+            f"Completed fields {all_completed_fields} exceed expected fields {all_expected_fields} for {verbose_name_underscored} for {registration.case} (e12id: {registration.case.pk}, registration ID {registration.id})"
+        )
 
     # update KPIs
     calculate_kpis(registration_instance=registration)
