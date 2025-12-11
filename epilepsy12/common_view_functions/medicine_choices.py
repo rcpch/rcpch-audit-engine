@@ -14,6 +14,9 @@ def get_medicine_choices(management, antiepilepsy_medicine_id=None, is_rescue=Fa
     # Get all comorbidity entities that have been selected for this multiaxial diagnosis except the current one
     all_selected_medicines = (
         AntiEpilepsyMedicine.objects.filter(management=management)
+        .filter(
+            antiepilepsy_medicine_stop_date__isnull=True
+        )  # only exclude active medicines
         .exclude(pk=antiepilepsy_medicine_id)
         .values_list("medicine_entity", flat=True)
     )
@@ -23,10 +26,10 @@ def get_medicine_choices(management, antiepilepsy_medicine_id=None, is_rescue=Fa
         entity for entity in all_selected_medicines if entity is not None
     ]
 
-    comorbidity_choices = (
+    medicine_choices = (
         Medicine.objects.filter(is_rescue=is_rescue)
         .exclude(pk__in=all_selected_medicineentities)
         .order_by("preferredTerm")
     )
 
-    return comorbidity_choices
+    return medicine_choices
