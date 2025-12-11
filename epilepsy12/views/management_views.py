@@ -397,27 +397,20 @@ def medicine_id(request, antiepilepsy_medicine_id, medicine_status):
             antiepilepsy_medicine.has_a_valproate_annual_risk_acknowledgement_form_been_completed = (
                 None
             )
-            if requires_pregnancy_prevention_programme(
-                cohort=antiepilepsy_medicine.management.registration.cohort,
-                medicine_concept_id=antiepilepsy_medicine.medicine_entity.conceptId,
-                age=calculated_age.years,
-                sex=sex,
-            ):
-                antiepilepsy_medicine.is_a_pregnancy_prevention_programme_needed = True
-                antiepilepsy_medicine.is_a_pregnancy_prevention_programme_in_place = (
-                    None
+            antiepilepsy_medicine.is_a_pregnancy_prevention_programme_needed = (
+                requires_pregnancy_prevention_programme(
+                    cohort=antiepilepsy_medicine.management.registration.cohort,
+                    medicine_concept_id=antiepilepsy_medicine.medicine_entity.conceptId,
+                    age=calculated_age.years,
+                    sex=sex,
                 )
-                antiepilepsy_medicine.has_a_valproate_annual_risk_acknowledgement_form_been_completed = (
-                    None
-                )
-            else:
-                antiepilepsy_medicine.is_a_pregnancy_prevention_programme_needed = False
-                antiepilepsy_medicine.is_a_pregnancy_prevention_programme_in_place = (
-                    None
-                )
-                antiepilepsy_medicine.has_a_valproate_annual_risk_acknowledgement_form_been_completed = (
-                    None
-                )
+            )
+
+            antiepilepsy_medicine.is_a_pregnancy_prevention_programme_in_place = None
+            antiepilepsy_medicine.has_a_valproate_annual_risk_acknowledgement_form_been_completed = (
+                None
+            )
+
     else:
         antiepilepsy_medicine.is_a_pregnancy_prevention_programme_needed = False
         antiepilepsy_medicine.is_a_pregnancy_prevention_programme_in_place = None
