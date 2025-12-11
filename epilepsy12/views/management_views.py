@@ -397,6 +397,11 @@ def medicine_id(request, antiepilepsy_medicine_id, medicine_status):
                 antiepilepsy_medicine.management.registration.case.date_of_birth,
             )
             sex = int(antiepilepsy_medicine.management.registration.case.sex)
+            # reset pregnancy prevention programme fields based on new medicine selection
+            antiepilepsy_medicine.is_a_pregnancy_prevention_programme_needed = None
+            antiepilepsy_medicine.has_a_valproate_annual_risk_acknowledgement_form_been_completed = (
+                None
+            )
             if requires_pregnancy_prevention_programme(
                 cohort=antiepilepsy_medicine.management.registration.cohort,
                 medicine_concept_id=antiepilepsy_medicine.medicine_entity.conceptId,
