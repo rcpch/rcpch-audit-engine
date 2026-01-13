@@ -16,7 +16,7 @@
 
   <div class="rcpch_summary_stats_row">
     <div class="rcpch_summary_stats_dates" {% if cohort_data.within_grace_period %} style="color: var(--rcpch_pink)"{% endif %}>
-      {% if cohort.submission_date > cohort_data.today %}
+      {% if cohort.submission_date >= cohort_data.today %}
         <div class="rcpch_summary_stats_description">
           {{cohort.days_remaining}} days until data submission deadline
         </div>
