@@ -14,7 +14,7 @@
             </thead>
             <tbody>
                 {% for unit, status in units.items %}
-                    <tr>
+                    <tr class="{% if status == 'No data' %}report-missing{% endif %}{% if status == 'In progress' %}report-in-progress{% endif %}{% if status == 'Submitted' %}report-submitted{% endif %}">
                         <td>{{ period.year }}</td>
                         <td>{{ unit }}</td>
                         <td>{{ status }}</td>
