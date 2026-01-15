@@ -14,3 +14,4 @@ from .registration_views import *
 from .route_views import *
 from .syndrome_views import *
 from .user_management_views import *
+from .report_views import *

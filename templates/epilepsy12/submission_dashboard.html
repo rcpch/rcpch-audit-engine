@@ -1,0 +1,34 @@
+{% extends "base.html" %}  
+{% block content %}
+<div class="ui rcpch container main_content">
+    <h1>Submission Dashboard</h1>
+    <div class="report-section">
+        <h2 class="report-section-title">Organisational Audit</h2>
+        <a class="ui rcpch_positive button" href="{% url 'submission_dashboard' %}?download=org-audit-csv">
+            Download CSV
+        </a>
+    </div>
+    {% for period, units in org_audit_by_period_and_trust_lhb.items %}
+        <table class="ui celled table">
+            <thead>
+                <tr>
+                    <th>Period</th>
+                    <th>Organisation</th>
+                    <th>Status</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for unit, status in units.items %}
+                    <tr class="{% if status == 'No data' %}report-missing{% endif %}{% if status == 'In progress' %}report-in-progress{% endif %}{% if status == 'Submitted' %}report-submitted{% endif %}">
+                        <td>{{ period.year }}</td>
+                        <td>{{ unit }}</td>
+                        <td>{{ status }}</td>
+                    </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    {% empty %}
+        <p>No submissions found.</p>
+    {% endfor %}
+</div>
+{% endblock %}

@@ -1,0 +1,19 @@
+.report-missing {
+    background-color: var(--rcpch_red_light_tint3);
+}
+
+.report-in-progress {
+    background-color: var(--rcpch_yellow_light_tint3);
+}
+
+.report-submitted {
+    background-color: var(--rcpch_strong_green_light_tint2);
+}
+
+.report-section {
+    display: flex;
+}
+
+.report-section-title {
+    flex: 1;
+}
