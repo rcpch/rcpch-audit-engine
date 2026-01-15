@@ -2,5 +2,28 @@
 {% block content %}
 <div class="ui rcpch container main_content">
     <h1>Submission Dashboard</h1>
+    <h2>Organisational Audit</h2>
+    {% for period, units in org_audit_by_period_and_trust_lhb.items %}
+        <table class="ui celled table">
+            <thead>
+                <tr>
+                    <th>Period</th>
+                    <th>Organisation</th>
+                    <th>Status</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for unit, status in units.items %}
+                    <tr>
+                        <td>{{ period.year }}</td>
+                        <td>{{ unit }}</td>
+                        <td>{{ status }}</td>
+                    </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    {% empty %}
+        <p>No submissions found.</p>
+    {% endfor %}
 </div>
 {% endblock %}
