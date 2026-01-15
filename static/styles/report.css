@@ -9,3 +9,11 @@
 .report-submitted {
     background-color: var(--rcpch_strong_green_light_tint2);
 }
+
+.report-section {
+    display: flex;
+}
+
+.report-section-title {
+    flex: 1;
+}

@@ -53,6 +53,24 @@ def submission_dashboard(request):
                 else:
                     status = "In progress"
             org_audit_by_period_and_trust_lhb[period][unit] = status
+    
+    if request.GET.get("download") == "org-audit-csv":
+        import csv
+        from django.http import HttpResponse
+
+        response = HttpResponse(content_type='text/csv')
+        response['Content-Disposition'] = 'attachment; filename="e12_org_audit_submissions.csv"'
+
+        writer = csv.writer(response)
+        header = ["Period", "Unit", "Status"]
+        writer.writerow(header)
+
+        for period in org_audit_by_period_and_trust_lhb:
+            for unit, status in org_audit_by_period_and_trust_lhb[period].items():
+                row = [period.year, unit, status]
+                writer.writerow(row)
+        
+        return response
 
     context = {"org_audit_by_period_and_trust_lhb": org_audit_by_period_and_trust_lhb}
     return render(request, "epilepsy12/submission_dashboard.html", context)

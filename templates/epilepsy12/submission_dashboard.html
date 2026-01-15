@@ -2,7 +2,12 @@
 {% block content %}
 <div class="ui rcpch container main_content">
     <h1>Submission Dashboard</h1>
-    <h2>Organisational Audit</h2>
+    <div class="report-section">
+        <h2 class="report-section-title">Organisational Audit</h2>
+        <a class="ui rcpch_positive button" href="{% url 'submission_dashboard' %}?download=org-audit-csv">
+            Download CSV
+        </a>
+    </div>
     {% for period, units in org_audit_by_period_and_trust_lhb.items %}
         <table class="ui celled table">
             <thead>
