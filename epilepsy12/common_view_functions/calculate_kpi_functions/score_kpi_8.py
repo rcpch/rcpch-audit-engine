@@ -1,6 +1,8 @@
 # python imports
+from datetime import datetime, timezone
 
 # django imports
+from dateutil.relativedelta import relativedelta
 from django.apps import apps
 from django.db.models import Q
 
@@ -17,7 +19,7 @@ def score_kpi_8(registration_instance, age_at_first_paediatric_assessment) -> in
     
     Title: Medication and Reproductive Risks
 
-    Percentage of all females 12 years and above currently on valproate treatment with annual risk acknowledgement form completed
+    Percentage of all females 12 years and above currently on valproate treatment with annual risk acknowledgement form completed in the first year of care.
 
     Calculation Method
     
@@ -30,8 +32,13 @@ def score_kpi_8(registration_instance, age_at_first_paediatric_assessment) -> in
     
     Denominator = Number of females aged 12 and above diagnosed with epilepsy at first year AND on valproate
     """
-    # ineligible - < 12yo or male
-    if age_at_first_paediatric_assessment < 12 or registration_instance.case.sex != 2:
+
+    # ineligible - < 12yo or male/unknown
+    if (
+        age_at_first_paediatric_assessment < 12
+        or registration_instance.case.sex != 2
+        or not is_first_year_of_care
+    ):
         return KPI_SCORE["INELIGIBLE"]
 
     # not scored
@@ -41,17 +48,29 @@ def score_kpi_8(registration_instance, age_at_first_paediatric_assessment) -> in
     # ineligible
     if not AntiEpilepsyMedicine.objects.filter(
         management=registration_instance.management,
-        medicine_entity=Medicine.objects.get(medicine_name="Sodium valproate"),
+        medicine_entity=Medicine.objects.get(conceptId="387481005"),  # valproate
     ).exists():
         return KPI_SCORE["INELIGIBLE"]
 
     # get valproate assigned
     valproate = AntiEpilepsyMedicine.objects.filter(
         management=registration_instance.management,
-        medicine_entity=Medicine.objects.filter(
-            medicine_name="Sodium valproate"
-        ).first(),
+        medicine_entity=Medicine.objects.get(conceptId="387481005"),  # valproate
     ).first()
+
+    medication_started_in_first_year_of_care = (
+        (
+            registration_instance.completed_first_year_of_care_date is not None
+            and registration_instance.completed_first_year_of_care_date
+            <= datetime.now().date()
+        )
+        and valproate.antiepilepsy_medicine_start_date is not None
+        and valproate.antiepilepsy_medicine_start_date
+        <= registration_instance.completed_first_year_of_care_date
+    )
+
+    if not medication_started_in_first_year_of_care:
+        return KPI_SCORE["INELIGIBLE"]
 
     # not scored
     if (
@@ -79,7 +98,7 @@ def score_kpi_8_topiramate(
     """
     Title: KPI 8: Medication and Reproduction Risks - Topiramate: Note this only applies to cohort 7
 
-    Description: Percentage of females on valproate treatment and females aged 12 years and above on topiramate with a risk acknowledgement form completed or Pregnancy Prevention Programme in place
+    Description: Percentage of females on valproate treatment and females aged 12 years and above on topiramate with a risk acknowledgement form completed or Pregnancy Prevention Programme in place during the first year of care.
 
     Numerator:
     (Number of all females on valproate OR females aged 12 years and above on topiramate)
@@ -90,7 +109,6 @@ def score_kpi_8_topiramate(
     Number of all females on valproate OR females aged 12 years and above on topiramate
     """
     # set up parameters
-    male = registration_instance.case.sex == 1
     female = registration_instance.case.sex == 2
     age_12_or_above = age_at_first_paediatric_assessment >= 12
 
@@ -105,6 +123,9 @@ def score_kpi_8_topiramate(
     a_pregnancy_prevention_programme_is_in_place = False
     a_valproate_annual_risk_acknowledgement_form_been_completed = False
 
+    valproate_started_in_first_year_of_care = None
+    topiramate_started_in_first_year_of_care = None
+
     if valproate_prescribed:
         valproate = AntiEpilepsyMedicine.objects.filter(
             management=registration_instance.management,
@@ -116,6 +137,14 @@ def score_kpi_8_topiramate(
         a_valproate_annual_risk_acknowledgement_form_been_completed = (
             valproate.has_a_valproate_annual_risk_acknowledgement_form_been_completed
         )
+        valproate_started_in_first_year_of_care = (
+            registration_instance.completed_first_year_of_care_date is not None
+            and registration_instance.completed_first_year_of_care_date
+            <= datetime.now().date()
+            and valproate.antiepilepsy_medicine_start_date is not None
+            and valproate.antiepilepsy_medicine_start_date
+            <= registration_instance.completed_first_year_of_care_date
+        )
     if topiramate_prescribed:
         topiramate = AntiEpilepsyMedicine.objects.filter(
             management=registration_instance.management,
@@ -124,13 +153,30 @@ def score_kpi_8_topiramate(
         a_pregnancy_prevention_programme_is_in_place = (
             topiramate.is_a_pregnancy_prevention_programme_in_place
         )
+        topiramate_started_in_first_year_of_care = (
+            registration_instance.completed_first_year_of_care_date is not None
+            and registration_instance.completed_first_year_of_care_date
+            <= datetime.now().date()
+            and topiramate.antiepilepsy_medicine_start_date is not None
+            and topiramate.antiepilepsy_medicine_start_date
+            <= registration_instance.completed_first_year_of_care_date
+        )
         if female:
             a_valproate_annual_risk_acknowledgement_form_been_completed = (
                 topiramate.has_a_valproate_annual_risk_acknowledgement_form_been_completed
             )
 
-    # ineligible - exclude boys
-    if male:
+    # ineligible - exclude those who did not start either medication in first year of care
+    if not any(
+        [
+            valproate_started_in_first_year_of_care,
+            topiramate_started_in_first_year_of_care,
+        ]
+    ):
+        return KPI_SCORE["INELIGIBLE"]
+
+    # ineligible - exclude boys or unknown sex
+    if not female:
         return KPI_SCORE["INELIGIBLE"]
 
     #  ineligible - exclude those  not on valproate and not ( >12 and on topiramate)
