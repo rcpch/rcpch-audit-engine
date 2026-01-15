@@ -1117,6 +1117,14 @@ organisational_audit_patterns = [
     ),
 ]
 
+report_patterns = [
+    path(
+        "submission_dashboard",
+        view=submission_dashboard,
+        name="submission_dashboard",
+    )
+]
+
 urlpatterns = []
 
 # This is related to the DRF
@@ -1149,6 +1157,7 @@ urlpatterns += comorbidities_patterns
 urlpatterns += registration_patterns
 urlpatterns += antiepilepsy_medicine_patterns
 urlpatterns += organisational_audit_patterns
+urlpatterns += report_patterns
 
 # This is related to the DRF
 # urlpatterns += drf_routes

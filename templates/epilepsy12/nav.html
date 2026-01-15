@@ -24,6 +24,9 @@
           <div class="menu">
             <div class="item" onclick="location.href='{% url 'two_factor:profile' %}'"><i class="id badge outline icon"></i> Account settings</div>
             <div class="item" onclick="location.href='{% url 'password_reset' %}'"><i class="key icon"></i> Reset password</div>
+            {% if user.is_rcpch_audit_team_member or user.is_rcpch_staff or user.is_superuser %}
+            <div class="item" onclick="location.href='{% url 'submission_dashboard' %}'"><i class="cogs icon"></i> Submission dashboard</div>
+            {% endif %}
           </div>
         </div>
       </div>
