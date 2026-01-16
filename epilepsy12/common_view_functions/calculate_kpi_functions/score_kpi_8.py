@@ -34,11 +34,7 @@ def score_kpi_8(registration_instance, age_at_first_paediatric_assessment) -> in
     """
 
     # ineligible - < 12yo or male/unknown
-    if (
-        age_at_first_paediatric_assessment < 12
-        or registration_instance.case.sex != 2
-        or not is_first_year_of_care
-    ):
+    if age_at_first_paediatric_assessment < 12 or registration_instance.case.sex != 2:
         return KPI_SCORE["INELIGIBLE"]
 
     # not scored
