@@ -56,7 +56,7 @@ def test_measure_8_sodium_valproate_risk_eligible(
     1) (age_at_first_paediatric_assessment >= 12 && sex == 2 && medicine is valproate) AND BOTH
             - is_a_pregnancy_prevention_programme_in_place==False
             - has_a_valproate_annual_risk_acknowledgement_form_been_completed==False
-
+    Note valproate must be started in first year of care to be eligible for scoring
     """
 
     # Explicitly set age to exactly 12yo and sex female (=2)
@@ -84,6 +84,8 @@ def test_measure_8_sodium_valproate_risk_eligible(
         is_rescue_medicine=False,
         medicine_entity=Medicine.objects.get(medicine_name="Sodium valproate"),
         antiepilepsy_medicine_risk_discussed=True,
+        antiepilepsy_medicine_start_date=case.registration.first_paediatric_assessment_date
+        + relativedelta(months=6),
         is_a_pregnancy_prevention_programme_in_place=is_a_pregnancy_prevention_programme_in_place,
         has_a_valproate_annual_risk_acknowledgement_form_been_completed=has_a_valproate_annual_risk_acknowledgement_form_been_completed,
     )

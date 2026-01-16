@@ -20,12 +20,14 @@ from epilepsy12.models import (
 
 
 @pytest.mark.parametrize(
-    "over_12, valproate, topiramate, is_a_pregnancy_prevention_programme_in_place, has_a_valproate_annual_risk_acknowledgement_form_been_completed,expected_score",
+    "is_female,over_12, valproate, topiramate, is_a_pregnancy_prevention_programme_in_place, has_a_valproate_annual_risk_acknowledgement_form_been_completed, within_one_year_of_care,expected_score",
     [
         # PASS scenarios
         (
             True,
+            True,
             False,
+            True,
             True,
             True,
             True,
@@ -33,40 +35,50 @@ from epilepsy12.models import (
         ),  # >=12yo female on topiramate with both prevention measures
         (
             True,
+            True,
             False,
             True,
             True,
             False,
+            True,
             KPI_SCORE["PASS"],
         ),  # >=12yo female on topiramate with prevention programme
         (
             True,
+            True,
             False,
             True,
             False,
+            True,
             True,
             KPI_SCORE["PASS"],
         ),  # >=12yo female on topiramate with risk form
         (
-            False,
             True,
             False,
             True,
             False,
+            True,
+            False,
+            True,
             KPI_SCORE["PASS"],
         ),  # <12yo female on valproate with prevention programme
         (
+            True,
             False,
             True,
             False,
             False,
+            True,
             True,
             KPI_SCORE["PASS"],
         ),  # <12yo female on valproate with risk form
         (
+            True,
             False,
             True,
             False,
+            True,
             True,
             True,
             KPI_SCORE["PASS"],
@@ -74,53 +86,67 @@ from epilepsy12.models import (
         (
             True,
             True,
+            True,
             False,
             True,
             False,
+            True,
             KPI_SCORE["PASS"],
         ),  # >=12yo female on valproate with prevention programme
         (
             True,
             True,
+            True,
             False,
             False,
+            True,
             True,
             KPI_SCORE["PASS"],
         ),  # >=12yo female on valproate with risk form
         (
             True,
             True,
+            True,
             False,
+            True,
             True,
             True,
             KPI_SCORE["PASS"],
         ),  # >=12yo female on valproate with both prevention measures
         (
+            True,
             False,
             True,
             False,
             None,
+            True,
             True,
             KPI_SCORE["PASS"],
         ),  # <12yo female on valproate with unknown prevention programme
         (
+            True,
             False,
             True,
             False,
             True,
             None,
+            True,
             KPI_SCORE["PASS"],
         ),  # <12yo female on valproate with unknown risk form
         (
+            True,
             False,
             True,
             True,
             True,
             None,
+            True,
             KPI_SCORE["PASS"],
         ),  # <12yo female on valproate and topiramate with unknown risk form
         (
+            True,
             False,
+            True,
             True,
             True,
             True,
@@ -132,117 +158,166 @@ from epilepsy12.models import (
             True,
             True,
             True,
+            True,
             None,
+            True,
             KPI_SCORE["PASS"],
         ),  # >12yo female on valproate and topiramate with unknown risk form
         # FAIL scenarios
         (
             True,
+            True,
             False,
             True,
             False,
             False,
+            True,
             KPI_SCORE["FAIL"],
         ),  # >=12yo female on topiramate with no prevention measures or risk form
         (
+            True,
             False,
             True,
             False,
             False,
             False,
+            True,
             KPI_SCORE["FAIL"],
         ),  # <12yo female on valproate with no prevention measures or risk form
         (
             True,
             True,
+            True,
             False,
             False,
             False,
+            True,
             KPI_SCORE["FAIL"],
         ),  # >=12yo female on valproate with no prevention measures or risk form
         (
             True,
             True,
             True,
+            True,
             False,
             False,
+            True,
             KPI_SCORE["FAIL"],
         ),  # >=12yo female on valproate and topiramate with no prevention measures and no risk form
         (
             True,
+            True,
             False,
             True,
             None,
             None,
+            True,
             KPI_SCORE["NOT_SCORED"],
         ),  # >=12yo female on topiramate with both unknown
         (
+            True,
             False,
             True,
             False,
             None,
             None,
+            True,
             KPI_SCORE["NOT_SCORED"],
         ),  # <12yo female on valproate with both unknown
         (
             True,
             True,
+            True,
             False,
             None,
             None,
+            True,
             KPI_SCORE["NOT_SCORED"],
         ),  # >=12yo female on valproate with both unknown
         # INELIGIBLE scenarios
         (
+            True,
             False,
             False,
             False,
             True,
             True,
-            KPI_SCORE["INELIGIBLE"],
-        ),  # <12yo female not on valproate or topiramate
-        (
-            False,
-            False,
-            False,
-            False,
-            False,
+            True,
             KPI_SCORE["INELIGIBLE"],
         ),  # <12yo female not on valproate or topiramate
         (
             True,
             False,
             False,
+            False,
+            False,
+            False,
+            True,
+            KPI_SCORE["INELIGIBLE"],
+        ),  # <12yo female not on valproate or topiramate
+        (
+            True,
+            True,
+            False,
+            False,
+            True,
             True,
             True,
             KPI_SCORE["INELIGIBLE"],
         ),  # >=12yo female not on valproate or topiramate
         (
             True,
+            True,
             False,
             False,
             False,
             False,
+            True,
             KPI_SCORE["INELIGIBLE"],
         ),  # >=12yo female not on valproate or topiramate
         (
+            True,
             True,
             False,
             False,
             None,
             None,
+            True,
             KPI_SCORE["INELIGIBLE"],
         ),  # >=12yo female not on valproate or topiramate
+        # "over_12, valproate, topiramate, is_a_pregnancy_prevention_programme_in_place, has_a_valproate_annual_risk_acknowledgement_form_been_completed,expected_score",
+        (
+            True,
+            True,
+            False,
+            True,
+            None,
+            True,
+            False,
+            KPI_SCORE["INELIGIBLE"],
+        ),  # beyond first year of care
+        (
+            False,
+            True,
+            False,
+            True,
+            None,
+            True,
+            True,
+            KPI_SCORE["INELIGIBLE"],
+        ),  # Sex is None
     ],
 )
 @pytest.mark.django_db
 def test_measure_8_sodium_valproate_risk_eligible_cohort_7_and_above(
     e12_case_factory,
+    is_female,
     over_12,
     valproate,
     topiramate,
     is_a_pregnancy_prevention_programme_in_place,
     has_a_valproate_annual_risk_acknowledgement_form_been_completed,
+    within_one_year_of_care,
     expected_score,
 ):
     """
@@ -273,7 +348,11 @@ def test_measure_8_sodium_valproate_risk_eligible_cohort_7_and_above(
         DATE_OF_BIRTH = FIRST_PAEDIATRIC_ASSESSMENT_DATE - relativedelta(years=13)
     else:
         DATE_OF_BIRTH = FIRST_PAEDIATRIC_ASSESSMENT_DATE - relativedelta(years=11)
-    SEX = SEX_TYPE[2][0]
+
+    if is_female:
+        SEX = SEX_TYPE[2][0]
+    else:
+        SEX = None
 
     # create case
     case = e12_case_factory(
@@ -304,6 +383,12 @@ def test_measure_8_sodium_valproate_risk_eligible_cohort_7_and_above(
         antiepilepsy_medicine_risk_discussed=True,
         is_a_pregnancy_prevention_programme_in_place=is_a_pregnancy_prevention_programme_in_place,
         has_a_valproate_annual_risk_acknowledgement_form_been_completed=has_a_valproate_annual_risk_acknowledgement_form_been_completed,
+        antiepilepsy_medicine_start_date=(
+            case.registration.first_paediatric_assessment_date + relativedelta(months=1)
+            if within_one_year_of_care
+            else case.registration.first_paediatric_assessment_date
+            + relativedelta(years=1, days=1)
+        ),
     )
 
     if valproate and topiramate:
@@ -315,6 +400,13 @@ def test_measure_8_sodium_valproate_risk_eligible_cohort_7_and_above(
             antiepilepsy_medicine_risk_discussed=True,
             is_a_pregnancy_prevention_programme_in_place=is_a_pregnancy_prevention_programme_in_place,
             has_a_valproate_annual_risk_acknowledgement_form_been_completed=has_a_valproate_annual_risk_acknowledgement_form_been_completed,
+            antiepilepsy_medicine_start_date=(
+                case.registration.first_paediatric_assessment_date
+                + relativedelta(months=1)
+                if within_one_year_of_care
+                else case.registration.first_paediatric_assessment_date
+                + relativedelta(years=1, days=1)
+            ),
         )
 
     # get registration for the saved case model
@@ -331,12 +423,14 @@ def test_measure_8_sodium_valproate_risk_eligible_cohort_7_and_above(
         assertion_message = f"{'>=12yo' if over_12 else '<12yo'} on {'valproate' if valproate else ''}{'topiramate' if topiramate else ''} with valproate pregnancy prevention in place & has: {'annual risk acknowledgement=True' if has_a_valproate_annual_risk_acknowledgement_form_been_completed else ''} {'is_a_pregnancy_prevention_programme_in_place=True' if is_a_pregnancy_prevention_programme_in_place else ''}, but not failing measure"
     elif expected_score == KPI_SCORE["NOT_SCORED"]:
         assertion_message = f"{'>=12yo' if over_12 else '<12yo'} on {'valproate' if valproate else ''}{'topiramate' if topiramate else ''} with valproate pregnancy prevention in place & has: {'annual risk acknowledgement=True' if has_a_valproate_annual_risk_acknowledgement_form_been_completed else ''} {'is_a_pregnancy_prevention_programme_in_place=True' if is_a_pregnancy_prevention_programme_in_place else ''}, but not returning NOT SCORED measure"
+    elif expected_score == KPI_SCORE["INELIGIBLE"]:
+        assertion_message = f"{'>=12yo' if over_12 else '<12yo'} on {'valproate' if valproate else ''}{'topiramate' if topiramate else ''} with valproate pregnancy prevention in place & has: {'annual risk acknowledgement=True' if has_a_valproate_annual_risk_acknowledgement_form_been_completed else ''} {'is_a_pregnancy_prevention_programme_in_place=True' if is_a_pregnancy_prevention_programme_in_place else ''}, but not returning INELIGIBLE measure"
 
     assert kpi_score == expected_score, assertion_message
 
 
 @pytest.mark.parametrize(
-    "age, sex, aed_given, not_valproate, topiramate, expected_score",
+    "age, sex, aed_given, not_valproate, topiramate, within_one_year_of_care, expected_score",
     [
         (
             relativedelta(years=11, months=11),
@@ -344,6 +438,7 @@ def test_measure_8_sodium_valproate_risk_eligible_cohort_7_and_above(
             True,
             True,
             False,
+            True,
             KPI_SCORE["INELIGIBLE"],
         ),  # 11y11mo, F, aed given, topiramate
         (
@@ -352,6 +447,7 @@ def test_measure_8_sodium_valproate_risk_eligible_cohort_7_and_above(
             True,
             True,
             False,
+            True,
             KPI_SCORE["INELIGIBLE"],
         ),  # 12yo, M, aed given, topiramate, not valproate
         (
@@ -360,13 +456,39 @@ def test_measure_8_sodium_valproate_risk_eligible_cohort_7_and_above(
             False,
             True,
             False,
+            True,
             KPI_SCORE["INELIGIBLE"],
         ),  # 12yo, F, aed NOT given, NO valproate
+        (
+            relativedelta(years=12),
+            SEX_TYPE[0][0],  # Not Known
+            True,
+            False,
+            True,
+            True,
+            KPI_SCORE["INELIGIBLE"],
+        ),  # 12yo, F, aed NOT given, NO valproate: SEX not known
+        (
+            relativedelta(years=12),
+            SEX_TYPE[2][0],  # Not Known
+            True,
+            False,
+            True,
+            False,  # beyond first year of care
+            KPI_SCORE["INELIGIBLE"],
+        ),  # 12yo, F, aed NOT given, NO valproate: SEX not known
     ],
 )
 @pytest.mark.django_db
 def test_measure_8_cohort_7_and_above_ineligible(
-    e12_case_factory, age, sex, aed_given, not_valproate, topiramate, expected_score
+    e12_case_factory,
+    age,
+    sex,
+    aed_given,
+    not_valproate,
+    topiramate,
+    within_one_year_of_care,
+    expected_score,
 ):
     """
     *INELIGIBLE*
@@ -374,6 +496,8 @@ def test_measure_8_cohort_7_and_above_ineligible(
     2) registration_instance.case.sex == 1
     3) registration_instance.management.has_an_aed_been_given == False
     4) AEM is not valproate and not topiramate or AEM is None
+    5) Beyond first year of care
+    6) Sex is 0 (Not Known) or 9 (Not Specified)
 
     Note this test is only for cohort 7 and above
     """
@@ -417,6 +541,13 @@ def test_measure_8_cohort_7_and_above_ineligible(
                 is_rescue_medicine=False,
                 medicine_entity=Medicine.objects.get(medicine_name="Sodium valproate"),
                 antiepilepsy_medicine_risk_discussed=True,
+                antiepilepsy_medicine_start_date=(
+                    case.registration.first_paediatric_assessment_date
+                    + relativedelta(months=1)
+                    if within_one_year_of_care
+                    else case.registration.first_paediatric_assessment_date
+                    + relativedelta(years=1, days=1)
+                ),
             )
 
         if topiramate:
@@ -424,6 +555,13 @@ def test_measure_8_cohort_7_and_above_ineligible(
                 management=management,
                 is_rescue_medicine=False,
                 medicine_entity=Medicine.objects.get(medicine_name="Topiramate"),
+                antiepilepsy_medicine_start_date=(
+                    case.registration.first_paediatric_assessment_date
+                    + relativedelta(months=1)
+                    if within_one_year_of_care
+                    else case.registration.first_paediatric_assessment_date
+                    + relativedelta(years=1, days=1)
+                ),
             )
 
     else:
@@ -442,11 +580,17 @@ def test_measure_8_cohort_7_and_above_ineligible(
     # set assertion error reason
     if aed_given and not_valproate:
         assertion_message = f"Not on valproate yet not being scored as ineligible"
+    elif aed_given and not within_one_year_of_care:
+        assertion_message = (
+            f"Beyond first year of care yet not being scored as ineligible"
+        )
     else:
         if age == relativedelta(years=11, months=11):
             reason = "age is 11y11m (<12y)"
         elif sex == SEX_TYPE[1][0]:
             reason = "male"
+        elif sex == SEX_TYPE[0][0]:
+            reason = "sex not known"
         elif not aed_given:
             reason = "no AED given"
         assertion_message = (
