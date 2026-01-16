@@ -73,7 +73,7 @@ def group_questions(fields_by_question_number):
 
 
 def group_form_fields(form):
-    # Loops trough the form fields and groups them by section and question number
+    # Loops through the form fields and groups them by section and question number
     # The question number is taken from the help text of the field
     # This function is called with every field updated in the form and rerenders the form partial
 
@@ -182,8 +182,11 @@ def get_submission(submission_period, group, group_field):
 def get_submission_form(submission, last_submission):
     data = {}
     
+    fields_not_to_copy_from_last_year = OrganisationalAuditSubmissionForm.Meta.exclude
+    fields_not_to_copy_from_last_year += ["id", "submitted"]
+
     for field in OrganisationalAuditSubmission._meta.fields:
-        if field.name != "id" and not field.name in OrganisationalAuditSubmissionForm.Meta.exclude:
+        if not field.name in fields_not_to_copy_from_last_year:
             field_value = getattr(submission, field.name) if submission else None
             
             if not field_value and last_submission:
@@ -237,6 +240,8 @@ def _organisational_audit(request, group_id, group_model, group_field):
 
         if number_completed != total_questions:
             form.instance.submitted = False
+        else:
+            form.instance.submitted = True
 
         context["questions_by_section"] = questions_by_section
         context["number_completed"] = number_completed
