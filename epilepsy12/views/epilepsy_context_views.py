@@ -27,7 +27,7 @@ def epilepsy_context(request, case_id):
 
     context = {
         "case_id": case_id,
-        "enabled": request.user.is_rcpch_audit_team_member or (not registration.case.locked and request.user.has_perm("change_epilepsycontext")),
+        "enabled": request.user.is_rcpch_audit_team_member or (not registration.case.editable and request.user.has_perm("change_epilepsycontext")),
         "registration": registration,
         "epilepsy_context": epilepsy_context,
         "uncertain_choices": OPT_OUT_UNCERTAIN,

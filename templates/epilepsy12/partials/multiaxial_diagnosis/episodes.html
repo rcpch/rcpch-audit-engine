@@ -72,7 +72,7 @@
         <td>
           <div class="ui rcpch_light_blue buttons">
             <button
-              {% if perms.epilepsy12.view_episode %}
+              {% if perms.epilepsy12.view_episode and editable %}
               class="ui rcpch_primary button"
               {% else %}
               class="ui rcpch_primary disabled button"
@@ -85,7 +85,7 @@
               Edit
             </button>
             <button
-              {% if perms.epilepsy12.delete_episode %}
+              {% if perms.epilepsy12.delete_episode and editable %}
               class="ui rcpch_red icon button"
               {% else %}
               class="ui rcpch_red icon disabled button"
@@ -144,7 +144,7 @@
       </div>
   {% endif %}
   <button
-    {% if perms.epilepsy12.add_episode %}
+    {% if perms.epilepsy12.add_episode and editable %}
     class="ui rcpch_primary button"
     {% else %}
     class="ui rcpch_primary disabled button"

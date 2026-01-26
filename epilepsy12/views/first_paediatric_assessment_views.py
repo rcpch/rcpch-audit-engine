@@ -1,6 +1,7 @@
 from django.contrib.auth.decorators import permission_required
 from django.http import HttpResponse
 from epilepsy12.constants import *
+from epilepsy12.models_folder import registration
 from ..common_view_functions import (
     validate_and_update_model,
     recalculate_form_generate_response,
@@ -37,7 +38,7 @@ def first_paediatric_assessment(request, case_id) -> HttpResponse:
 
     context = {
         "case_id": case_id,
-        "enabled": request.user.is_rcpch_audit_team_member or (not registration.case.locked and request.user.has_perm("change_firstpaediatricassessment")),
+        "enabled": request.user.is_rcpch_audit_team_member or (not registration.case.editable and request.user.has_perm("change_firstpaediatricassessment")),
         "registration": registration,
         "first_paediatric_assessment": first_paediatric_assessment,
         "chronicity_selection": CHRONICITY,

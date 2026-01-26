@@ -140,6 +140,7 @@ def multiaxial_diagnosis(request, case_id):
         "mental_health_issues_choices": NEUROPSYCHIATRIC,
         "global_developmental_delay_or_learning_difficulties_severity_choices": SEVERITY,
         "organisation_id": organisation_id,
+        "editable": request.user.is_rcpch_audit_team_member or registration.case.editable
     }
 
     response = recalculate_form_generate_response(
