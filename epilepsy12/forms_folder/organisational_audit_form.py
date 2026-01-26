@@ -12,7 +12,8 @@ class OrganisationalAuditSubmissionForm(forms.ModelForm):
             "created_by",
             "updated_by",
             "created_at",
-            "updated_at"
+            "updated_at",
+            "submitted"
         ]
 
         help_texts = {
