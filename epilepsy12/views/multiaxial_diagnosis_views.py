@@ -123,6 +123,8 @@ def multiaxial_diagnosis(request, case_id):
     ).get()
     organisation_id = site.organisation.pk
 
+    editable = request.user.is_rcpch_audit_team_member or registration.case.editable()
+
     context = {
         "case_id": registration.case_id,
         "registration": registration,
@@ -140,7 +142,8 @@ def multiaxial_diagnosis(request, case_id):
         "mental_health_issues_choices": NEUROPSYCHIATRIC,
         "global_developmental_delay_or_learning_difficulties_severity_choices": SEVERITY,
         "organisation_id": organisation_id,
-        "editable": request.user.is_rcpch_audit_team_member or registration.case.editable
+        "editable": editable,
+        "can_change_syndrome": editable and request.user.has_perm("epilepsy12.change_syndrome"),
     }
 
     response = recalculate_form_generate_response(
