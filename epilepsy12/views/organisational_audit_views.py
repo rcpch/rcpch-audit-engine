@@ -34,7 +34,7 @@ def show_child_field(parent, child):
     else:
         # Special case to hide 1.4i S01ESNFunctions if 1.4 S01WTEEpilepsySpecialistNurses is zero
         # On page load it's a decimal, on form submit it's a string. Quack quack quack 🦆!
-        if Decimal(parent_value) == 0:
+        if parent_value is not None and Decimal(parent_value) == 0:
             return False
         
         return bool(parent_value)
