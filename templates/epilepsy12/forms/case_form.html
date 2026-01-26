@@ -8,213 +8,230 @@
   action="">
   {% csrf_token %}
   
-  <div class="two fields">
-    <div class="field">
-      <label for="{{form.first_name_for_label}}">First Name</label>
-      <div class="field">{{form.first_name}}</div>
-      {% if form.first_name.errors %}
-      <div class="ui pointing rcpch_light_blue label">
-          {% for error in form.first_name.errors %}
-            {{ error }}
-          {% endfor %}
+  <fieldset
+    {% if not case.editable and not user.is_rcpch_audit_team_member %}disabled{% endif %}
+  >
+
+    {% if not case.editable %}
+      <div class="ui rcpch_warning icon message">
+          <i class="ui exclamation circle icon"></i>
+          <div class="content">
+            <div class="header">Submission closed</div>
+            <p>
+              This child is part of cohort {{ case.registration.cohort }} which has now closed.
+            </p>
+          </div>
       </div>
-      {% endif %}
-    </div>
-    <div class="field">
-      <label>Surname</label>
-      <div class="field">{{form.surname}}</div>
-      {% if form.surname.errors %}
-      <div class="ui pointing rcpch_light_blue label">
-          {% for error in form.surname.errors %}
-            {{ error }}
-          {% endfor %}
-      </div>
-      {% endif %}
-    </div>
-  </div>
-  <div class="two fields">
-    
-    <div class="field">
-      <label>Date of Birth</label>
-      {{form.date_of_birth}} 
-      {% if form.date_of_birth.errors %}
+    {% endif %}
+
+    <div class="two fields">
+      <div class="field">
+        <label for="{{form.first_name_for_label}}">First Name</label>
+        <div class="field">{{form.first_name}}</div>
+        {% if form.first_name.errors %}
         <div class="ui pointing rcpch_light_blue label">
-            {% for error in form.date_of_birth.errors %}
+            {% for error in form.first_name.errors %}
               {{ error }}
             {% endfor %}
         </div>
-      {% endif %}
+        {% endif %}
+      </div>
+      <div class="field">
+        <label>Surname</label>
+        <div class="field">{{form.surname}}</div>
+        {% if form.surname.errors %}
+        <div class="ui pointing rcpch_light_blue label">
+            {% for error in form.surname.errors %}
+              {{ error }}
+            {% endfor %}
+        </div>
+        {% endif %}
+      </div>
     </div>
-
-    <div class="field">
-      <label>Sex</label>
-      {{form.sex}} 
-      {% if form.sex.errors %}
-    <div class="ui pointing rcpch_light_blue label">
-        {% for error in form.sex.errors %}
-          {{ error }}
-        {% endfor %}
-    </div>
-    {% endif %}
-    </div>
-  </div>
-
-  <div class="two fields">
-
-      <div class="four wide field" id="postcode_field">
-        <label
-          >Postcode
-          <i class="rcpch question circle icon link" id="postcodeIdPopup"></i>
-          <div class="ui flowing popup top left transition hidden">
-            <p>Post code at the time of registration in Epilepsy12</p>
-          </div>
-        </label>
-        {{form.postcode}} 
-        {% if form.postcode.errors %}
+    <div class="two fields">
+      
+      <div class="field">
+        <label>Date of Birth</label>
+        {{form.date_of_birth}} 
+        {% if form.date_of_birth.errors %}
           <div class="ui pointing rcpch_light_blue label">
-              {% for error in form.postcode.errors %}
+              {% for error in form.date_of_birth.errors %}
                 {{ error }}
               {% endfor %}
           </div>
         {% endif %}
       </div>
 
-    <div id="postcode_options">
-      {% include 'epilepsy12/cases/postcode_options.html' with choices=choices test_positive=test_positive child_has_unknown_postcode=child_has_unknown_postcode %}
-    </div>
-
-  </div>
-
-  {% if organisation.country.boundary_identifier == "JEY" %}
-    <div class="field">
-      <label>Unique Reference Number</label>
-      {{form.unique_reference_number}} 
+      <div class="field">
+        <label>Sex</label>
+        {{form.sex}} 
+        {% if form.sex.errors %}
       <div class="ui pointing rcpch_light_blue label">
-        {% for error in form.unique_reference_number.errors %}
-          {{ error }}
-        {% endfor %}
-    </div>
-    </div>
-  {% else %}
-    <div class="field">
-      <label>NHS Number</label>
-      {{form.nhs_number}}
-      {% if form.nhs_number.errors %}
-      <div class="ui pointing rcpch_light_blue label">
-        {% for error in form.nhs_number.errors %}
-          {{ error }}
-        {% endfor %}
-      </div>
-      {% endif %}
-    </div>
-  {% endif %}
-
-  <div class="field">
-    <label>Ethnicity</label>
-    {{form.ethnicity}} 
-    {% if form.ethnicity.errors %}
-      <div class="ui pointing rcpch_light_blue label">
-          {% for error in form.ethnicity.errors %}
+          {% for error in form.sex.errors %}
             {{ error }}
           {% endfor %}
       </div>
-    {% endif %}
-  </div>
+      {% endif %}
+      </div>
+    </div>
 
-  {% if case and perms.epilepsy.can_opt_out_child_from_inclusion_in_audit %}
+    <div class="two fields">
+
+        <div class="four wide field" id="postcode_field">
+          <label
+            >Postcode
+            <i class="rcpch question circle icon link" id="postcodeIdPopup"></i>
+            <div class="ui flowing popup top left transition hidden">
+              <p>Post code at the time of registration in Epilepsy12</p>
+            </div>
+          </label>
+          {{form.postcode}} 
+          {% if form.postcode.errors %}
+            <div class="ui pointing rcpch_light_blue label">
+                {% for error in form.postcode.errors %}
+                  {{ error }}
+                {% endfor %}
+            </div>
+          {% endif %}
+        </div>
+
+      <div id="postcode_options">
+        {% include 'epilepsy12/cases/postcode_options.html' with choices=choices test_positive=test_positive child_has_unknown_postcode=child_has_unknown_postcode %}
+      </div>
+
+    </div>
+
+    {% if organisation.country.boundary_identifier == "JEY" %}
+      <div class="field">
+        <label>Unique Reference Number</label>
+        {{form.unique_reference_number}} 
+        <div class="ui pointing rcpch_light_blue label">
+          {% for error in form.unique_reference_number.errors %}
+            {{ error }}
+          {% endfor %}
+      </div>
+      </div>
+    {% else %}
+      <div class="field">
+        <label>NHS Number</label>
+        {{form.nhs_number}}
+        {% if form.nhs_number.errors %}
+        <div class="ui pointing rcpch_light_blue label">
+          {% for error in form.nhs_number.errors %}
+            {{ error }}
+          {% endfor %}
+        </div>
+        {% endif %}
+      </div>
+    {% endif %}
 
     <div class="field">
-      <div class="ui icon rcpch_info message">
-        <i class="ui exclamation circle icon"></i>
-        <p>
-          Children, young people and their families can opt out of Epilepsy12 at any
-          time. Should {{case}} or their family choose to do so, all records
-          relating to {{case}}'s epilepsy care will be removed from RCPCH servers.
-        </p>
-        <button
-          hx-post="{% url 'opt_out' organisation_id case.pk %}"
-          hx-trigger="click"
-          class="ui rcpch_danger button"
-          _="on htmx:confirm(issueRequest)
-                  halt the event
-                  call Swal.fire({ title: 'Confirmation Required', text: 'This will irreversibly remove {{case}} and related data from Epilepsy12.', icon: 'warning', iconColor: '#e00087', showCancelButton: true, confirmButtonColor: '#11a7f2', cancelButtonColor: '#e60700', confirmButtonText: 'Remove {{case}} from Epilepsy12' })
-                  if result.isConfirmed issueRequest()"
-        >
-          Opt out of Epilepsy12
-        </button>
-      </div>
-    </div>
-
-  {% else %}
-
-  <div class="field">
-    <div class="ui rcpch_info icon message">
-      <i class="ui exclamation circle icon"></i>
-      <div class="content">
-        <div class="header">Organisation</div>
-        <p>
-          <b>{% if organisation.trust %}
-              {{organisation.name}}({{organisation.trust.name}})
-              {% else %}
-              {{organisation.name}}({{organisation.local_health_board.name}})
-              {% endif %}
-          </b>
-          will be allocated automatically as the lead Epilepsy12 centre on saving
-          this child's information.
-        </p>
-      </div>
-    </div>
-  </div>
-
-  {% endif %} 
-  
-  <div class="three fields">
-    <div class="eight wide field case_create_buttons_wrapper">
-      <a 
-        href="{% url 'cases' organisation_id %}" class="ui rcpch_negative button">
-        Cancel
-      </a>
-      {% if perms.epilepsy12.change_case or perms.epilepsy12.add_case %}
-        <button 
-        id="create_update_case_button"
-        type="submit" 
-        class="ui rcpch_primary button" 
-        name="update" 
-        _="on click toggle .disabled on me">
-          Save
-        </button>
-    
+      <label>Ethnicity</label>
+      {{form.ethnicity}} 
+      {% if form.ethnicity.errors %}
+        <div class="ui pointing rcpch_light_blue label">
+            {% for error in form.ethnicity.errors %}
+              {{ error }}
+            {% endfor %}
+        </div>
       {% endif %}
-      
-      {% if case %}
-        {% if perms.epilepsy12.delete_case %}
+    </div>
+
+    {% if case and perms.epilepsy.can_opt_out_child_from_inclusion_in_audit %}
+
+      <div class="field">
+        <div class="ui icon rcpch_info message">
+          <i class="ui exclamation circle icon"></i>
+          <p>
+            Children, young people and their families can opt out of Epilepsy12 at any
+            time. Should {{case}} or their family choose to do so, all records
+            relating to {{case}}'s epilepsy care will be removed from RCPCH servers.
+          </p>
           <button
-            hx-post="{% url 'update_case' organisation_id case.pk %}"
+            hx-post="{% url 'opt_out' organisation_id case.pk %}"
             hx-trigger="click"
             class="ui rcpch_danger button"
-            name="delete"
-            id="delete"
-            value="Delete"
-            _= "on htmx:confirm(issueRequest)
-                halt the event
-                call Swal.fire({
-                  title: 'Confirmation Required',
-                  text: 'This will irreversibly remove {{case}} and related data from Epilepsy12.',
-                  icon: 'warning',
-                  iconColor: '#e00087',
-                  showCancelButton: true,
-                  confirmButtonColor: '#11a7f2',
-                  cancelButtonColor: '#e60700',
-                  confirmButtonText: 'Remove {{case}} from Epilepsy12'
-                })
-                if result.isConfirmed issueRequest()
-                end
-                      "
-          >Delete Child</button>
-        {% endif %}
-      {% endif %}
-    </div>
-  </div>
+            _="on htmx:confirm(issueRequest)
+                    halt the event
+                    call Swal.fire({ title: 'Confirmation Required', text: 'This will irreversibly remove {{case}} and related data from Epilepsy12.', icon: 'warning', iconColor: '#e00087', showCancelButton: true, confirmButtonColor: '#11a7f2', cancelButtonColor: '#e60700', confirmButtonText: 'Remove {{case}} from Epilepsy12' })
+                    if result.isConfirmed issueRequest()"
+          >
+            Opt out of Epilepsy12
+          </button>
+        </div>
+      </div>
 
+    {% else %}
+
+    <div class="field">
+      <div class="ui rcpch_info icon message">
+        <i class="ui exclamation circle icon"></i>
+        <div class="content">
+          <div class="header">Organisation</div>
+          <p>
+            <b>{% if organisation.trust %}
+                {{organisation.name}}({{organisation.trust.name}})
+                {% else %}
+                {{organisation.name}}({{organisation.local_health_board.name}})
+                {% endif %}
+            </b>
+            will be allocated automatically as the lead Epilepsy12 centre on saving
+            this child's information.
+          </p>
+        </div>
+      </div>
+    </div>
+
+    {% endif %} 
+    
+    <div class="three fields">
+      <div class="eight wide field case_create_buttons_wrapper">
+        <a 
+          href="{% url 'cases' organisation_id %}" class="ui rcpch_negative button">
+          Cancel
+        </a>
+        {% if perms.epilepsy12.change_case or perms.epilepsy12.add_case %}
+          <button 
+          id="create_update_case_button"
+          type="submit" 
+          class="ui rcpch_primary button" 
+          name="update" 
+          _="on click toggle .disabled on me">
+            Save
+          </button>
+      
+        {% endif %}
+        
+        {% if case %}
+          {% if perms.epilepsy12.delete_case %}
+            <button
+              hx-post="{% url 'update_case' organisation_id case.pk %}"
+              hx-trigger="click"
+              class="ui rcpch_danger button"
+              name="delete"
+              id="delete"
+              value="Delete"
+              _= "on htmx:confirm(issueRequest)
+                  halt the event
+                  call Swal.fire({
+                    title: 'Confirmation Required',
+                    text: 'This will irreversibly remove {{case}} and related data from Epilepsy12.',
+                    icon: 'warning',
+                    iconColor: '#e00087',
+                    showCancelButton: true,
+                    confirmButtonColor: '#11a7f2',
+                    cancelButtonColor: '#e60700',
+                    confirmButtonText: 'Remove {{case}} from Epilepsy12'
+                  })
+                  if result.isConfirmed issueRequest()
+                  end
+                        "
+            >Delete Child</button>
+          {% endif %}
+        {% endif %}
+      </div>
+    </div>
+
+  </fieldset>
 </form>
 
