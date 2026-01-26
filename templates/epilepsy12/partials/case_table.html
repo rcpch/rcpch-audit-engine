@@ -133,13 +133,16 @@
           <td class='two wide'>
             <div class='ui buttons'>
               <button 
-                data-tooltip='Edit or delete child.'
+                data-tooltip='{% if perms.epilepsy12.change_case and case.editable or request.user.is_rcpch_audit_team_member %}Edit or delete child.{% else %}View child details.{% endif %}'
                 class="ui rcpch_purple icon button"
-                tabindexed="0"
-                {% if not perms.epilepsy12.change_case or not case.editable and not request.user.is_rcpch_audit_team_member %}disabled{% endif %}>
+                tabindexed="0">
                 <a href="{% url 'update_case' organisation_id=organisation_id case_id=case.id%}" class="rcpch_purple half_button">
-                  <i class="edit outline icon icon_white"></i>
-                  Edit
+                  {% if perms.epilepsy12.change_case and case.editable or request.user.is_rcpch_audit_team_member %}
+                    <i class="edit outline icon icon_white"></i>
+                  {% else %}
+                    <i class="child icon icon_white"></i>
+                  {% endif %}
+                  Child
                 </a>
               </button>
               <button 
@@ -147,7 +150,6 @@
                   class="ui rcpch_dark_purple button" 
                   tabindexed="2" 
                   onclick="location.href='{% url 'register'  case.id %}'"
-                  {% if not case.editable and not request.user.is_rcpch_audit_team_member %} disabled {% endif %}
                 >Audit</button>
             </div>
 
