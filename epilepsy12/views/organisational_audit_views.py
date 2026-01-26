@@ -182,8 +182,7 @@ def get_submission(submission_period, group, group_field):
 def get_submission_form(submission, last_submission):
     data = {}
     
-    fields_not_to_copy_from_last_year = OrganisationalAuditSubmissionForm.Meta.exclude
-    fields_not_to_copy_from_last_year += ["id", "submitted"]
+    fields_not_to_copy_from_last_year = OrganisationalAuditSubmissionForm.Meta.exclude + ["id"]
 
     for field in OrganisationalAuditSubmission._meta.fields:
         if not field.name in fields_not_to_copy_from_last_year:
@@ -238,10 +237,10 @@ def _organisational_audit(request, group_id, group_model, group_field):
             form
         )
 
-        if number_completed != total_questions:
-            form.instance.submitted = False
-        else:
+        if number_completed == total_questions and request.POST.get("action") == "submit":
             form.instance.submitted = True
+        else:
+            form.instance.submitted = False
 
         context["questions_by_section"] = questions_by_section
         context["number_completed"] = number_completed

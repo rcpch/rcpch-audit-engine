@@ -81,7 +81,7 @@
     font-family: var(--rcpch_standard_font) !important;
 }
 
-.org-audit-progress input[type="submit"] {
+.org-audit-progress--submit {
     font-family: var(--rcpch_standard_font) !important;
     color: white !important;
     font-size: 1.2em;
