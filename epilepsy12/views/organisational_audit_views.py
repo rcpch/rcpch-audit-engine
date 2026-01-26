@@ -1,4 +1,5 @@
 from collections.abc import Iterable
+import decimal
 
 from django.shortcuts import render, redirect
 from django.forms import model_to_dict
@@ -31,10 +32,15 @@ def show_child_field(parent, child):
             # Single value choice
             return str(parent_value) == required_parent_value
     else:
-        # Special case for 1.4 S01WTEEpilepsySpecialistNurses
-        if parent_value == "0":
-            return False
-        
+        # Special case to hide 1.4i S01ESNFunctions if 1.4 S01WTEEpilepsySpecialistNurses is zero
+        # On page load it's a decimal, on form submit it's a string. Quack quack quack 🦆!
+        try:
+            parent_value = decimal.Decimal(parent_value)
+            if parent_value == 0:
+                return False
+        except (decimal.InvalidOperation, TypeError):
+            pass
+
         return bool(parent_value)
 
 
