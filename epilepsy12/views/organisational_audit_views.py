@@ -36,7 +36,7 @@ def show_child_field(parent, child):
         # On page load it's a decimal, on form submit it's a string. Quack quack quack 🦆!
         if Decimal(parent_value) == 0:
             return False
-
+        
         return bool(parent_value)
 
 
