@@ -37,6 +37,7 @@ def first_paediatric_assessment(request, case_id) -> HttpResponse:
 
     context = {
         "case_id": case_id,
+        "enabled": request.user.is_rcpch_audit_team_member or (not registration.case.locked and request.user.has_perm("change_firstpaediatricassessment")),
         "registration": registration,
         "first_paediatric_assessment": first_paediatric_assessment,
         "chronicity_selection": CHRONICITY,
