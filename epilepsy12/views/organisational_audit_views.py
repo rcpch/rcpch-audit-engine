@@ -36,9 +36,6 @@ def show_child_field(parent, child):
         # On page load it's a decimal, on form submit it's a string. Quack quack quack 🦆!
         if Decimal(parent_value) == 0:
             return False
-        
-        if child.name == "S01ESNFunctions":
-            print(f"!! {child.name} parent_value={parent_value}:{type(parent_value)} ret={bool(parent_value)}")
 
         return bool(parent_value)
 
@@ -124,13 +121,9 @@ def group_form_fields(form):
         if parent:
             # Synthesised parent question (Eg 3.5)
             if not "field" in parent:
-                if field.name == "S01ESNFunctions":
-                    print(f"!! {field.name} hidden=False. not field in parent")
                 hidden = False
             else:
                 hidden = not show_child_field(parent["field"], field)
-                if field.name == "S01ESNFunctions":
-                    print(f"!! {field.name} hidden={hidden}. not show_child_field")
 
             if not hidden:
                 total_questions += 1
@@ -153,9 +146,6 @@ def group_form_fields(form):
             fields_by_question_number[question_number] = child
             parent["children"].append(child)
 
-            if field.name == "S01ESNFunctions":
-                print(f"!! {field.name} completed={completed} hidden={hidden}")
-
         else:
             total_questions += 1
 
@@ -172,9 +162,6 @@ def group_form_fields(form):
                 "children": [],
                 "completed": completed,
             }
-
-            if not completed:
-                print(F"!! {field.name} completed={completed}")
 
         ix += 1
 
