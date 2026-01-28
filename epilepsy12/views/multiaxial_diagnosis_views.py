@@ -145,6 +145,7 @@ def multiaxial_diagnosis(request, case_id):
         "editable": editable,
         "can_change_syndrome": editable and request.user.has_perm("epilepsy12.change_syndrome"),
         "can_change_multiaxialdiagnosis": editable and request.user.has_perm("epilepsy12.change_multiaxialdiagnosis"),
+        "can_change_comorbidity": editable and request.user.has_perm("epilepsy12.change_comorbidity"),
     }
 
     response = recalculate_form_generate_response(
