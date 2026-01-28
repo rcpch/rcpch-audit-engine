@@ -6,7 +6,7 @@ from ..common_view_functions import (
     validate_and_update_model,
     recalculate_form_generate_response,
 )
-from ..decorator import user_may_view_this_child, login_and_otp_required
+from ..decorator import user_may_view_this_child, user_may_view_this_child_2, login_and_otp_required
 
 
 def update_site_model(
@@ -1102,8 +1102,8 @@ def delete_paediatric_neurology_centre(request, assessment_id, site_id):
 
 @login_and_otp_required()
 @permission_required("epilepsy12.change_assessment", raise_exception=True)
-@user_may_view_this_child()
-def childrens_epilepsy_surgical_service_referral_criteria_met(request, assessment_id):
+@user_may_view_this_child_2()
+def childrens_epilepsy_surgical_service_referral_criteria_met(request, editable, assessment_id):
     """
     This is an HTMX callback from the epilepsy_surgery partial template
     It is triggered by a toggle in the partial generating a post request
@@ -1129,8 +1129,8 @@ def childrens_epilepsy_surgical_service_referral_criteria_met(request, assessmen
     context = {
         "assessment": assessment,
         "organisation_list": organisation_list,
-        "show_input_date": assessment.childrens_epilepsy_surgical_service_input_date
-        is not None,
+        "show_input_date": assessment.childrens_epilepsy_surgical_service_input_date is not None,
+        "enabled": editable,
     }
 
     template_name = "epilepsy12/partials/assessment/epilepsy_surgery.html"
@@ -1819,8 +1819,8 @@ def epilepsy_specialist_nurse_input_date(request, assessment_id):
 
 @login_and_otp_required()
 @permission_required("epilepsy12.view_assessment", raise_exception=True)
-@user_may_view_this_child()
-def assessment(request, case_id):
+@user_may_view_this_child_2()
+def assessment(request, editable, case_id):
     case = Case.objects.get(pk=case_id)
     registration = Registration.objects.filter(case=case).get()
 
@@ -1850,7 +1850,7 @@ def assessment(request, case_id):
         "organisation_list": organisation_list,
         "organisation_id": organisation_id,
         "show_input_date": assessment.childrens_epilepsy_surgical_service_input_date is not None,
-        "enabled": request.user.is_rcpch_audit_team_member or (registration.case.editable() and request.user.has_perm("epilepsy12.change_assessment")),
+        "enabled": editable and request.user.has_perm("epilepsy12.change_assessment"),
     }
 
     # add previous and current sites to context
