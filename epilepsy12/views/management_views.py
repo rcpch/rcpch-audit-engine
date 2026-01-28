@@ -50,6 +50,8 @@ def management(request, case_id):
     ).get()
     organisation_id = site.organisation.pk
 
+    editable = request.user.is_rcpch_audit_team_member or registration.case.editable()
+
     context = {
         "case_id": case_id,
         "registration": registration,
@@ -59,6 +61,11 @@ def management(request, case_id):
         "audit_progress": registration.audit_progress,
         "active_template": "management",
         "organisation_id": organisation_id,
+        "editable": editable,
+        "can_change_management": editable and request.user.has_perm("epilepsy12.change_management"),
+        "can_change_antiepilepsymedicine": editable and request.user.has_perm("epilepsy12.change_antiepilepsymedicine"),
+        "can_add_antiepilepsymedicine": editable and request.user.has_perm("epilepsy12.add_antiepilepsymedicine"),
+        "can_delete_antiepilepsymedicine": editable and request.user.has_perm("epilepsy12.delete_antiepilepsymedicine"),
     }
 
     template_name = "epilepsy12/management.html"
@@ -114,9 +121,12 @@ def has_an_aed_been_given(request, management_id):
         management=management, is_rescue_medicine=False
     ).order_by("-antiepilepsy_medicine_start_date")
 
+    editable = request.user.is_rcpch_audit_team_member or management.registration.case.editable()
+
     context = {
         "management": management,
         "antiepilepsy_medicines": antiepilepsy_medicines,
+        "can_change_management": editable and request.user.has_perm("epilepsy12.change_management"),
     }
 
     template_name = "epilepsy12/partials/management/antiepilepsy_medicines/antiepilepsy_medicines.html"
@@ -166,11 +176,14 @@ def add_antiepilepsy_medicine(request, management_id, is_rescue_medicine):
         management=management,
     )
 
+    editable = request.user.is_rcpch_audit_team_member or management.registration.case.editable()
+
     context = {
         "choices": choices,
         "antiepilepsy_medicine": antiepilepsy_medicine,
         "management_id": management_id,
         "is_rescue_medicine": is_rescue,
+        "can_change_antiepilepsymedicine": editable and request.user.has_perm("epilepsy12.change_antiepilepsymedicine"),
     }
 
     template_name = "epilepsy12/partials/management/antiepilepsy_medicines/antiepilepsy_medicine.html"
@@ -208,10 +221,15 @@ def remove_antiepilepsy_medicine(request, antiepilepsy_medicine_id):
         management=management, is_rescue_medicine=is_rescue_medicine
     ).order_by("-antiepilepsy_medicine_start_date")
 
+    editable = request.user.is_rcpch_audit_team_member or management.registration.case.editable()
+
     context = {
         "medicines": antiepilepsy_medicines,
         "management_id": management.pk,
         "is_rescue_medicine": is_rescue_medicine,
+        "can_add_antiepilepsymedicine": editable and request.user.has_perm("epilepsy12.add_antiepilepsymedicine"),
+        "can_change_antiepilepsymedicine": editable and request.user.has_perm("epilepsy12.change_antiepilepsymedicine"),
+        "can_delete_antiepilepsymedicine": editable and request.user.has_perm("epilepsy12.delete_antiepilepsymedicine"),
     }
 
     template_name = "epilepsy12/partials/management/antiepilepsy_medicines/antiepilepsy_medicine_list.html"
@@ -300,10 +318,15 @@ def close_antiepilepsy_medicine(request, antiepilepsy_medicine_id):
         is_rescue_medicine=is_rescue_medicine,
     ).order_by("-antiepilepsy_medicine_start_date")
 
+    editable = request.user.is_rcpch_audit_team_member or antiepilepsy_medicine.management.registration.case.editable()
+
     context = {
         "medicines": antiepilepsy_medicines,
         "management_id": antiepilepsy_medicine.management.pk,
         "is_rescue_medicine": is_rescue_medicine,
+        "can_add_antiepilepsymedicine": editable and request.user.has_perm("epilepsy12.add_antiepilepsymedicine"),
+        "can_change_antiepilepsymedicine": editable and request.user.has_perm("epilepsy12.change_antiepilepsymedicine"),
+        "can_delete_antiepilepsymedicine": editable and request.user.has_perm("epilepsy12.delete_antiepilepsymedicine"),
     }
 
     template_name = "epilepsy12/partials/management/antiepilepsy_medicines/antiepilepsy_medicine_list.html"
@@ -425,11 +448,14 @@ def medicine_id(request, antiepilepsy_medicine_id, medicine_status):
     else:
         show_end_date = False
 
+    editable = request.user.is_rcpch_audit_team_member or antiepilepsy_medicine.management.registration.case.editable()
+
     context = {
         "choices": choices,
         "antiepilepsy_medicine": antiepilepsy_medicine,
         "is_rescue_medicine": is_rescue,
         "show_end_date": show_end_date,
+        "can_change_antiepilepsymedicine": editable and request.user.has_perm("epilepsy12.change_antiepilepsymedicine"),
     }
 
     template_name = "epilepsy12/partials/management/antiepilepsy_medicines/antiepilepsy_medicine.html"
@@ -488,11 +514,14 @@ def antiepilepsy_medicine_start_date(request, antiepilepsy_medicine_id):
     else:
         show_end_date = False
 
+    editable = request.user.is_rcpch_audit_team_member or antiepilepsy_medicine.management.registration.case.editable()
+
     context = {
         "choices": choices,
         "antiepilepsy_medicine": antiepilepsy_medicine,
         "is_rescue_medicine": antiepilepsy_medicine.is_rescue_medicine,
         "show_end_date": show_end_date,
+        "can_change_antiepilepsymedicine": editable and request.user.has_perm("epilepsy12.change_antiepilepsymedicine"),
     }
 
     template_name = "epilepsy12/partials/management/antiepilepsy_medicines/antiepilepsy_medicine.html"
@@ -576,11 +605,14 @@ def antiepilepsy_medicine_remove_stop_date(request, antiepilepsy_medicine_id):
         management=management,
     )
 
+    editable = request.user.is_rcpch_audit_team_member or antiepilepsy_medicine.management.registration.case.editable()
+
     context = {
         "choices": choices,
         "antiepilepsy_medicine": antiepilepsy_medicine,
         "is_rescue_medicine": antiepilepsy_medicine.is_rescue_medicine,
         "show_end_date": False,
+        "can_change_antiepilepsymedicine": editable and request.user.has_perm("epilepsy12.change_antiepilepsymedicine"),
     }
 
     template_name = "epilepsy12/partials/management/antiepilepsy_medicines/antiepilepsy_medicine.html"
@@ -634,11 +666,14 @@ def antiepilepsy_medicine_stop_date(request, antiepilepsy_medicine_id):
         management=management,
     )
 
+    editable = request.user.is_rcpch_audit_team_member or antiepilepsy_medicine.management.registration.case.editable()
+
     context = {
         "choices": choices,
         "antiepilepsy_medicine": antiepilepsy_medicine,
         "is_rescue_medicine": antiepilepsy_medicine.is_rescue_medicine,
         "show_end_date": True,
+        "can_change_antiepilepsymedicine": editable and request.user.has_perm("epilepsy12.change_antiepilepsymedicine"),
     }
 
     template_name = "epilepsy12/partials/management/antiepilepsy_medicines/antiepilepsy_medicine.html"
@@ -691,11 +726,14 @@ def antiepilepsy_medicine_risk_discussed(request, antiepilepsy_medicine_id):
     else:
         show_end_date = False
 
+    editable = request.user.is_rcpch_audit_team_member or antiepilepsy_medicine.management.registration.case.editable()
+
     context = {
         "choices": choices,
         "antiepilepsy_medicine": antiepilepsy_medicine,
         "is_rescue_medicine": antiepilepsy_medicine.is_rescue_medicine,
         "show_end_date": show_end_date,
+        "can_change_antiepilepsymedicine": editable and request.user.has_perm("epilepsy12.change_antiepilepsymedicine"),
     }
 
     template_name = "epilepsy12/partials/management/antiepilepsy_medicines/antiepilepsy_medicine.html"
@@ -748,11 +786,14 @@ def is_a_pregnancy_prevention_programme_in_place(request, antiepilepsy_medicine_
     else:
         show_end_date = False
 
+    editable = request.user.is_rcpch_audit_team_member or antiepilepsy_medicine.management.registration.case.editable()
+
     context = {
         "choices": choices,
         "antiepilepsy_medicine": antiepilepsy_medicine,
         "is_rescue_medicine": antiepilepsy_medicine.is_rescue_medicine,
         "show_end_date": show_end_date,
+        "can_change_antiepilepsymedicine": editable and request.user.has_perm("epilepsy12.change_antiepilepsymedicine"),
     }
 
     template_name = "epilepsy12/partials/management/antiepilepsy_medicines/antiepilepsy_medicine.html"
@@ -807,11 +848,14 @@ def has_a_valproate_annual_risk_acknowledgement_form_been_completed(
     else:
         show_end_date = False
 
+    editable = request.user.is_rcpch_audit_team_member or antiepilepsy_medicine.management.registration.case.editable()
+
     context = {
         "choices": choices,
         "antiepilepsy_medicine": antiepilepsy_medicine,
         "is_rescue_medicine": antiepilepsy_medicine.is_rescue_medicine,
         "show_end_date": show_end_date,
+        "can_change_antiepilepsymedicine": editable and request.user.has_perm("epilepsy12.change_antiepilepsymedicine"),
     }
 
     template_name = "epilepsy12/partials/management/antiepilepsy_medicines/antiepilepsy_medicine.html"
@@ -869,9 +913,12 @@ def has_rescue_medication_been_prescribed(request, management_id):
         management=management, is_rescue_medicine=True
     ).all()
 
+    editable = request.user.is_rcpch_audit_team_member or management.registration.case.editable()
+
     context = {
         "management": management,
         "rescue_medicines": rescue_medicines,
+        "can_change_management": editable and request.user.has_perm("epilepsy12.change_management"),
     }
 
     template_name = (
@@ -938,7 +985,12 @@ def individualised_care_plan_in_place(request, management_id):
 
     management = Management.objects.get(pk=management_id)
 
-    context = {"management": management}
+    editable = request.user.is_rcpch_audit_team_member or management.registration.case.editable()
+
+    context = {
+        "management": management,
+        "can_change_management": editable and request.user.has_perm("epilepsy12.change_management"),
+    }
 
     template_name = "epilepsy12/partials/management/individualised_care_plan.html"
 
@@ -981,7 +1033,12 @@ def individualised_care_plan_date(request, management_id):
 
     management = Management.objects.get(pk=management_id)
 
-    context = {"management": management}
+    editable = request.user.is_rcpch_audit_team_member or management.registration.case.editable()
+
+    context = {
+        "management": management,
+        "can_change_management": editable and request.user.has_perm("epilepsy12.change_management"),
+    }
 
     template_name = "epilepsy12/partials/management/individualised_care_plan.html"
 
@@ -1020,7 +1077,12 @@ def individualised_care_plan_has_parent_carer_child_agreement(request, managemen
 
     management = Management.objects.get(pk=management_id)
 
-    context = {"management": management}
+    editable = request.user.is_rcpch_audit_team_member or management.registration.case.editable()
+
+    context = {
+        "management": management,
+        "can_change_management": editable and request.user.has_perm("epilepsy12.change_management"),
+    }
 
     template_name = "epilepsy12/partials/management/individualised_care_plan.html"
 
@@ -1058,7 +1120,12 @@ def individualised_care_plan_includes_service_contact_details(request, managemen
         error_message = error
 
     management = Management.objects.get(pk=management_id)
-    context = {"management": management}
+    editable = request.user.is_rcpch_audit_team_member or management.registration.case.editable()
+
+    context = {
+        "management": management,
+        "can_change_management": editable and request.user.has_perm("epilepsy12.change_management"),
+    }
 
     template_name = "epilepsy12/partials/management/individualised_care_plan.html"
 
@@ -1095,7 +1162,12 @@ def individualised_care_plan_include_first_aid(request, management_id):
         error_message = error
 
     management = Management.objects.get(pk=management_id)
-    context = {"management": management}
+    editable = request.user.is_rcpch_audit_team_member or management.registration.case.editable()
+
+    context = {
+        "management": management,
+        "can_change_management": editable and request.user.has_perm("epilepsy12.change_management"),
+    }
 
     template_name = "epilepsy12/partials/management/individualised_care_plan.html"
 
@@ -1133,7 +1205,12 @@ def individualised_care_plan_parental_prolonged_seizure_care(request, management
         error_message = error
 
     management = Management.objects.get(pk=management_id)
-    context = {"management": management}
+    editable = request.user.is_rcpch_audit_team_member or management.registration.case.editable()
+
+    context = {
+        "management": management,
+        "can_change_management": editable and request.user.has_perm("epilepsy12.change_management"),
+    }
 
     template_name = "epilepsy12/partials/management/individualised_care_plan.html"
 
@@ -1172,7 +1249,12 @@ def individualised_care_plan_includes_general_participation_risk(
         error_message = error
 
     management = Management.objects.get(pk=management_id)
-    context = {"management": management}
+    editable = request.user.is_rcpch_audit_team_member or management.registration.case.editable()
+
+    context = {
+        "management": management,
+        "can_change_management": editable and request.user.has_perm("epilepsy12.change_management"),
+    }
 
     template_name = "epilepsy12/partials/management/individualised_care_plan.html"
 
@@ -1209,7 +1291,12 @@ def individualised_care_plan_addresses_water_safety(request, management_id):
         error_message = error
 
     management = Management.objects.get(pk=management_id)
-    context = {"management": management}
+    editable = request.user.is_rcpch_audit_team_member or management.registration.case.editable()
+
+    context = {
+        "management": management,
+        "can_change_management": editable and request.user.has_perm("epilepsy12.change_management"),
+    }
 
     template_name = "epilepsy12/partials/management/individualised_care_plan.html"
 
@@ -1246,7 +1333,12 @@ def individualised_care_plan_addresses_sudep(request, management_id):
         error_message = error
 
     management = Management.objects.get(pk=management_id)
-    context = {"management": management}
+    editable = request.user.is_rcpch_audit_team_member or management.registration.case.editable()
+
+    context = {
+        "management": management,
+        "can_change_management": editable and request.user.has_perm("epilepsy12.change_management"),
+    }
 
     template_name = "epilepsy12/partials/management/individualised_care_plan.html"
 
@@ -1283,7 +1375,12 @@ def individualised_care_plan_includes_ehcp(request, management_id):
         error_message = error
 
     management = Management.objects.get(pk=management_id)
-    context = {"management": management}
+    editable = request.user.is_rcpch_audit_team_member or management.registration.case.editable()
+
+    context = {
+        "management": management,
+        "can_change_management": editable and request.user.has_perm("epilepsy12.change_management"),
+    }
 
     template_name = "epilepsy12/partials/management/individualised_care_plan.html"
 
@@ -1321,7 +1418,12 @@ def has_individualised_care_plan_been_updated_in_the_last_year(request, manageme
 
     management = Management.objects.get(pk=management_id)
 
-    context = {"management": management}
+    editable = request.user.is_rcpch_audit_team_member or management.registration.case.editable()
+
+    context = {
+        "management": management,
+        "can_change_management": editable and request.user.has_perm("epilepsy12.change_management"),
+    }
 
     template_name = "epilepsy12/partials/management/individualised_care_plan.html"
 
@@ -1359,7 +1461,12 @@ def has_been_referred_for_mental_health_support(request, management_id):
 
     management = Management.objects.get(pk=management_id)
 
-    context = {"management": management}
+    editable = request.user.is_rcpch_audit_team_member or management.registration.case.editable()
+
+    context = {
+        "management": management,
+        "can_change_management": editable and request.user.has_perm("epilepsy12.change_management"),
+    }
 
     template_name = "epilepsy12/partials/management/mental_health_support.html"
 
@@ -1397,7 +1504,12 @@ def has_support_for_mental_health_support(request, management_id):
 
     management = Management.objects.get(pk=management_id)
 
-    context = {"management": management}
+    editable = request.user.is_rcpch_audit_team_member or management.registration.case.editable()
+
+    context = {
+        "management": management,
+        "can_change_management": editable and request.user.has_perm("epilepsy12.change_management"),
+    }
 
     template_name = "epilepsy12/partials/management/mental_health_support.html"
 

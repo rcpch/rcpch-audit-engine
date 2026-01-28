@@ -45,6 +45,7 @@ def investigations(request, case_id):
         "organisation_id": organisation_id,
         "eeg_declined": eeg_declined,
         "mri_brain_declined": mri_brain_declined,
+        "enabled": request.user.is_rcpch_audit_team_member or (registration.case.editable() and request.user.has_perm("epilepsy12.change_investigations")),
     }
 
     template_name = "epilepsy12/investigations.html"
