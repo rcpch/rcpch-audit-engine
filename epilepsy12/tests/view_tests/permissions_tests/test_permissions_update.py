@@ -879,6 +879,11 @@ def test_users_update_first_paediatric_assessment_success(client):
         first_name=f"child_{TEST_USER_ORGANISATION.name}"
     )
 
+    # https://github.com/rcpch/rcpch-audit-engine/pull/1346
+    # Case must be registered to an open cohort
+    CASE_FROM_SAME_ORG.registration.first_paediatric_assessment_date = date.today()
+    CASE_FROM_SAME_ORG.registration.save()
+
     user_first_names_for_test = [
         test_user_audit_centre_clinician_data.role_str,
         test_user_audit_centre_lead_clinician_data.role_str,
@@ -1029,6 +1034,11 @@ def test_users_update_epilepsy_context_success(client):
     CASE_FROM_SAME_ORG = Case.objects.get(
         first_name=f"child_{TEST_USER_ORGANISATION.name}"
     )
+
+    # https://github.com/rcpch/rcpch-audit-engine/pull/1346
+    # Case must be registered to an open cohort
+    CASE_FROM_SAME_ORG.registration.first_paediatric_assessment_date = date.today()
+    CASE_FROM_SAME_ORG.registration.save()
 
     user_first_names_for_test = [
         test_user_audit_centre_clinician_data.role_str,
