@@ -1849,8 +1849,8 @@ def assessment(request, case_id):
         "active_template": "assessment",
         "organisation_list": organisation_list,
         "organisation_id": organisation_id,
-        "show_input_date": assessment.childrens_epilepsy_surgical_service_input_date
-        is not None,
+        "show_input_date": assessment.childrens_epilepsy_surgical_service_input_date is not None,
+        "enabled": request.user.is_rcpch_audit_team_member or (registration.case.editable() and request.user.has_perm("epilepsy12.change_assessment")),
     }
 
     # add previous and current sites to context
