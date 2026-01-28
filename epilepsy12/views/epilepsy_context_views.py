@@ -1,5 +1,5 @@
 from django.contrib.auth.decorators import permission_required
-from ..decorator import user_may_view_this_child, login_and_otp_required
+from ..decorator import user_may_view_this_child_2, user_may_edit_this_child, login_and_otp_required
 from epilepsy12.constants.common import OPT_OUT_UNCERTAIN
 from ..models import EpilepsyContext, Registration, Site
 from ..common_view_functions import (
@@ -9,9 +9,9 @@ from ..common_view_functions import (
 
 
 @login_and_otp_required()
-@user_may_view_this_child()
+@user_may_view_this_child_2()
 @permission_required("epilepsy12.view_epilepsycontext", raise_exception=True)
-def epilepsy_context(request, case_id):
+def epilepsy_context(request, editable, case_id):
     registration = Registration.objects.filter(case=case_id).first()
 
     epilepsy_context, created = EpilepsyContext.objects.get_or_create(
@@ -27,7 +27,7 @@ def epilepsy_context(request, case_id):
 
     context = {
         "case_id": case_id,
-        "enabled": request.user.is_rcpch_audit_team_member or (not registration.case.editable() and request.user.has_perm("change_epilepsycontext")),
+        "enabled": editable and request.user.has_perm("change_epilepsycontext"),
         "registration": registration,
         "epilepsy_context": epilepsy_context,
         "uncertain_choices": OPT_OUT_UNCERTAIN,
@@ -47,7 +47,7 @@ def epilepsy_context(request, case_id):
 
 
 @login_and_otp_required()
-@user_may_view_this_child()
+@user_may_edit_this_child()
 @permission_required("epilepsy12.change_epilepsycontext", raise_exception=True)
 def previous_febrile_seizure(request, epilepsy_context_id):
     """
@@ -74,6 +74,7 @@ def previous_febrile_seizure(request, epilepsy_context_id):
     context = {
         "epilepsy_context": epilepsy_context,
         "uncertain_choices": OPT_OUT_UNCERTAIN,
+        "enabled": True,
     }
 
     response = recalculate_form_generate_response(
@@ -88,7 +89,7 @@ def previous_febrile_seizure(request, epilepsy_context_id):
 
 
 @login_and_otp_required()
-@user_may_view_this_child()
+@user_may_edit_this_child()
 @permission_required("epilepsy12.change_epilepsycontext", raise_exception=True)
 def previous_acute_symptomatic_seizure(request, epilepsy_context_id):
     """
@@ -115,6 +116,7 @@ def previous_acute_symptomatic_seizure(request, epilepsy_context_id):
     context = {
         "epilepsy_context": epilepsy_context,
         "uncertain_choices": OPT_OUT_UNCERTAIN,
+        "enabled": True,
     }
 
     response = recalculate_form_generate_response(
@@ -129,7 +131,7 @@ def previous_acute_symptomatic_seizure(request, epilepsy_context_id):
 
 
 @login_and_otp_required()
-@user_may_view_this_child()
+@user_may_edit_this_child()
 @permission_required("epilepsy12.change_epilepsycontext", raise_exception=True)
 def is_there_a_family_history_of_epilepsy(request, epilepsy_context_id):
     """
@@ -156,6 +158,7 @@ def is_there_a_family_history_of_epilepsy(request, epilepsy_context_id):
     context = {
         "epilepsy_context": epilepsy_context,
         "uncertain_choices": OPT_OUT_UNCERTAIN,
+        "enabled": True,
     }
 
     response = recalculate_form_generate_response(
@@ -170,7 +173,7 @@ def is_there_a_family_history_of_epilepsy(request, epilepsy_context_id):
 
 
 @login_and_otp_required()
-@user_may_view_this_child()
+@user_may_edit_this_child()
 @permission_required("epilepsy12.change_epilepsycontext", raise_exception=True)
 def previous_neonatal_seizures(request, epilepsy_context_id):
     """
@@ -197,6 +200,7 @@ def previous_neonatal_seizures(request, epilepsy_context_id):
     context = {
         "epilepsy_context": epilepsy_context,
         "uncertain_choices": OPT_OUT_UNCERTAIN,
+        "enabled": True,
     }
 
     response = recalculate_form_generate_response(
@@ -211,7 +215,7 @@ def previous_neonatal_seizures(request, epilepsy_context_id):
 
 
 @login_and_otp_required()
-@user_may_view_this_child()
+@user_may_edit_this_child()
 @permission_required("epilepsy12.change_epilepsycontext", raise_exception=True)
 def were_any_of_the_epileptic_seizures_convulsive(request, epilepsy_context_id):
     """
@@ -237,6 +241,7 @@ def were_any_of_the_epileptic_seizures_convulsive(request, epilepsy_context_id):
     context = {
         "epilepsy_context": epilepsy_context,
         "uncertain_choices": OPT_OUT_UNCERTAIN,
+        "enabled": True,
     }
 
     response = recalculate_form_generate_response(
@@ -251,7 +256,7 @@ def were_any_of_the_epileptic_seizures_convulsive(request, epilepsy_context_id):
 
 
 @login_and_otp_required()
-@user_may_view_this_child()
+@user_may_edit_this_child()
 @permission_required("epilepsy12.change_epilepsycontext", raise_exception=True)
 def experienced_prolonged_generalized_convulsive_seizures(request, epilepsy_context_id):
     """
@@ -278,6 +283,7 @@ def experienced_prolonged_generalized_convulsive_seizures(request, epilepsy_cont
     context = {
         "epilepsy_context": epilepsy_context,
         "uncertain_choices": OPT_OUT_UNCERTAIN,
+        "enabled": True,
     }
 
     response = recalculate_form_generate_response(
@@ -292,7 +298,7 @@ def experienced_prolonged_generalized_convulsive_seizures(request, epilepsy_cont
 
 
 @login_and_otp_required()
-@user_may_view_this_child()
+@user_may_edit_this_child()
 @permission_required("epilepsy12.change_epilepsycontext", raise_exception=True)
 def experienced_prolonged_focal_seizures(request, epilepsy_context_id):
     """
@@ -319,6 +325,7 @@ def experienced_prolonged_focal_seizures(request, epilepsy_context_id):
     context = {
         "epilepsy_context": epilepsy_context,
         "uncertain_choices": OPT_OUT_UNCERTAIN,
+        "enabled": True,
     }
 
     response = recalculate_form_generate_response(
@@ -333,7 +340,7 @@ def experienced_prolonged_focal_seizures(request, epilepsy_context_id):
 
 
 @login_and_otp_required()
-@user_may_view_this_child()
+@user_may_edit_this_child()
 @permission_required("epilepsy12.change_epilepsycontext", raise_exception=True)
 def diagnosis_of_epilepsy_withdrawn(request, epilepsy_context_id):
     """
@@ -357,7 +364,10 @@ def diagnosis_of_epilepsy_withdrawn(request, epilepsy_context_id):
 
     epilepsy_context = EpilepsyContext.objects.get(pk=epilepsy_context_id)
 
-    context = {"epilepsy_context": epilepsy_context}
+    context = {
+        "epilepsy_context": epilepsy_context,
+        "enabled": True,
+    }
 
     response = recalculate_form_generate_response(
         model_instance=epilepsy_context,

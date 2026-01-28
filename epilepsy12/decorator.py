@@ -409,7 +409,7 @@ def user_may_view_this_child_2():
 def user_may_edit_this_child():
     def decorator(view):
         def wrapper(request, *args, **kwargs):
-            permissions = lookup_user_permissions_on_child(request)
+            permissions = lookup_user_permissions_on_child(request, kwargs)
 
             if permissions["can_edit"]:
                 return view(request, *args, **kwargs)
