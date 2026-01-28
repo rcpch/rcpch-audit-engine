@@ -402,6 +402,10 @@ def user_may_view_this_child_2():
 
                 if is_admin or organisation.exists():
                     editable = is_admin or child.editable()
+
+                    if not editable and request.method != "GET":
+                        raise PermissionDenied()
+
                     return view(request, editable, *args, **kwargs)
                 else:
                     raise PermissionDenied()
