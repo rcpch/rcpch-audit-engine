@@ -17,7 +17,7 @@
             label: this is the label text pulled in from the the model help text
             reference: this is the reference text pulled in from the the model help text
             data_position: this is the position of the popup label (js independent) ['top left', 'top center', 'top right', 'bottom left', 'bottom center', 'bottom right', 'right center', 'left center']
-            enabled: buttons are disabled if users have view-only access
+            disabled: buttons are disabled if the cohort is closed orusers have view-only access
     {% endcomment %}
     
     <h5 class="toggle_button_label">
@@ -43,7 +43,7 @@
                 </span>
                 <div class="ui rcpch_dark_blue buttons">
                         <div
-                            {% if enabled %} 
+                            {% if not disabled %} 
                                 class="ui mini compact rcpch_dark_blue button"
                             {% else %}
                                 class="ui mini compact rcpch_dark_blue disabled button"
@@ -57,7 +57,7 @@
                         Yes
                         </div>
                         <div 
-                            {% if enabled %} 
+                            {% if not disabled %} 
                                 class="ui mini compact rcpch_dark_blue button"
                             {% else %}
                                 class="ui mini compact rcpch_dark_blue disabled button"
@@ -82,7 +82,7 @@
                     </div>
                     <div class="ui rcpch_dark_blue buttons">
                         <div
-                            {% if enabled %}
+                            {% if not disabled %}
                                 class="ui mini compact positive rcpch_dark_blue button"
                             {% else %}
                                 class="ui mini compact positive rcpch_dark_blue disabled button"
@@ -91,7 +91,7 @@
                         Yes
                         </div>
                         <div 
-                            {% if enabled %} 
+                            {% if not disabled %} 
                                 class="ui mini compact rcpch_dark_blue button"
                             {% else %}
                                 class="ui mini compact rcpch_dark_blue disabled button"
@@ -114,7 +114,7 @@
                 </div>
                 <div class="ui buttons">
                     <div 
-                        {% if enabled %} 
+                        {% if not disabled %} 
                             class="ui mini compact rcpch_dark_blue button"
                         {% else %}
                             class="ui mini compact rcpch_dark_blue disabled button"
@@ -129,7 +129,7 @@
                     <i class="htmx-indicator spinner loading icon" id="spinner"></i>
                     </div>
                     <div 
-                        {% if enabled %} 
+                        {% if not disabled %} 
                             class="ui mini compact rcpch_dark_blue positive button"
                         {% else %}
                             class="ui mini compact rcpch_dark_blue positive disabled button"
@@ -145,7 +145,7 @@
             </div>
         {% endif %} -->
     </div>
-    {% if not enabled %}
+    {% if disabled %}
         <small class='rcpch_warning_label'>You do not have permission to update this field</small>
     {% endif %}
 

@@ -17,7 +17,7 @@
             label: this is the label text (passed in from the model help label text)
             reference: this is the reference text (passed in from the model help reference text)
             data_position: this is the position of the popup label (js independent) ['top left', 'top center', 'top right', 'bottom left', 'bottom center', 'bottom right', 'right center', 'left center']
-            enabled: this is only true if view_only groups are seeing the form
+            disabled: for closed cohorts or read only views
             hide_completion_fields: hides the tick and target if true
         The chosen value is stored as the name of the button and accessed in the view as request.htmx.trigger_name
         Which choices are selected from is obvious because the endpoint posted to is specific to the choices.
@@ -55,7 +55,7 @@
                     <div class="ui rcpch_dark_blue buttons">
                         {% for choice in choices %}
                             <div 
-                                {% if enabled %}
+                                {% if not disabled %}
                                     class="ui mini compact rcpch_dark_blue button"
                                 {% else %}
                                     class="ui mini compact rcpch_dark_blue disabled button"
@@ -82,7 +82,7 @@
                             {% for choice in choices %}
                                 {% if test_positive == choice.0 %}
                                     <div 
-                                        {% if enabled %}
+                                        {% if not disabled %}
                                             class="ui mini compact positive rcpch_dark_blue button"
                                         {% else %}
                                             class="ui mini compact positive rcpch_dark_blue disabled button"
@@ -90,7 +90,7 @@
                                     >{{choice.1}}</div>
                                 {% else %}
                                     <div 
-                                        {% if enabled %}
+                                        {% if not disabled %}
                                             class="ui mini compact rcpch_dark_blue button"
                                         {% else %}
                                             class="ui mini compact rcpch_dark_blue disabled button"
@@ -124,7 +124,7 @@
                                 >{{choice}}</div>
                             {% else %}
                                 <div 
-                                    {% if enabled %}
+                                    {% if not disabled %}
                                         class="ui mini compact rcpch_dark_blue button"
                                     {% else %}
                                         disabled
@@ -151,7 +151,7 @@
             {% endif %}
 
         </div>
-        {% if not enabled %}
+        {% if disabled %}
             <small class='rcpch_warning_label'>You do not have permission to update this field</small>
         {% endif %}
 

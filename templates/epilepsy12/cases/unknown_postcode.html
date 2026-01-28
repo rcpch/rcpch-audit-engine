@@ -1,8 +1,8 @@
 {% url 'unknown_postcode' organisation_id=organisation_id as hx_post %}
 {% if perms.epilepsy12.change_case or perms.epilepsy12.create_case  %}
-    {% include 'epilepsy12/partials/page_elements/single_choice_multiple_toggle_button.html' with choices=choices hx_post=hx_post hx_target='#unknown_postcode' hx_name='unknown_postcode'  hide_completion_fields=True enabled=True test_positive=test_positive hx_swap='innerHTML' %}
+    {% include 'epilepsy12/partials/page_elements/single_choice_multiple_toggle_button.html' with choices=choices hx_post=hx_post hx_target='#unknown_postcode' hx_name='unknown_postcode'  hide_completion_fields=True test_positive=test_positive hx_swap='innerHTML' %}
 {% else %}
-    {% include 'epilepsy12/partials/page_elements/single_choice_multiple_toggle_button.html' with choices=choices hx_post=hx_post hx_target='#unknown_postcode' hx_name='unknown_postcode'  hide_completion_fields=True enabled=False test_positive=test_positive hx_swap='innerHTML' %}
+    {% include 'epilepsy12/partials/page_elements/single_choice_multiple_toggle_button.html' with choices=choices hx_post=hx_post hx_target='#unknown_postcode' hx_name='unknown_postcode'  hide_completion_fields=True disabled=True test_positive=test_positive hx_swap='innerHTML' %}
 {% endif %}
 <input 
     value="{{test_positive}}" 
