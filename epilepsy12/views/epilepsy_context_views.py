@@ -27,7 +27,7 @@ def epilepsy_context(request, editable, case_id):
 
     context = {
         "case_id": case_id,
-        "enabled": editable and request.user.has_perm("change_epilepsycontext"),
+        "disabled": not editable or not request.user.has_perm("change_epilepsycontext"),
         "registration": registration,
         "epilepsy_context": epilepsy_context,
         "uncertain_choices": OPT_OUT_UNCERTAIN,
@@ -74,7 +74,6 @@ def previous_febrile_seizure(request, epilepsy_context_id):
     context = {
         "epilepsy_context": epilepsy_context,
         "uncertain_choices": OPT_OUT_UNCERTAIN,
-        "enabled": True,
     }
 
     response = recalculate_form_generate_response(
@@ -116,7 +115,6 @@ def previous_acute_symptomatic_seizure(request, epilepsy_context_id):
     context = {
         "epilepsy_context": epilepsy_context,
         "uncertain_choices": OPT_OUT_UNCERTAIN,
-        "enabled": True,
     }
 
     response = recalculate_form_generate_response(
@@ -158,7 +156,6 @@ def is_there_a_family_history_of_epilepsy(request, epilepsy_context_id):
     context = {
         "epilepsy_context": epilepsy_context,
         "uncertain_choices": OPT_OUT_UNCERTAIN,
-        "enabled": True,
     }
 
     response = recalculate_form_generate_response(
@@ -200,7 +197,6 @@ def previous_neonatal_seizures(request, epilepsy_context_id):
     context = {
         "epilepsy_context": epilepsy_context,
         "uncertain_choices": OPT_OUT_UNCERTAIN,
-        "enabled": True,
     }
 
     response = recalculate_form_generate_response(
@@ -241,7 +237,6 @@ def were_any_of_the_epileptic_seizures_convulsive(request, epilepsy_context_id):
     context = {
         "epilepsy_context": epilepsy_context,
         "uncertain_choices": OPT_OUT_UNCERTAIN,
-        "enabled": True,
     }
 
     response = recalculate_form_generate_response(
@@ -283,7 +278,6 @@ def experienced_prolonged_generalized_convulsive_seizures(request, epilepsy_cont
     context = {
         "epilepsy_context": epilepsy_context,
         "uncertain_choices": OPT_OUT_UNCERTAIN,
-        "enabled": True,
     }
 
     response = recalculate_form_generate_response(
@@ -325,7 +319,6 @@ def experienced_prolonged_focal_seizures(request, epilepsy_context_id):
     context = {
         "epilepsy_context": epilepsy_context,
         "uncertain_choices": OPT_OUT_UNCERTAIN,
-        "enabled": True,
     }
 
     response = recalculate_form_generate_response(
@@ -366,7 +359,6 @@ def diagnosis_of_epilepsy_withdrawn(request, epilepsy_context_id):
 
     context = {
         "epilepsy_context": epilepsy_context,
-        "enabled": True,
     }
 
     response = recalculate_form_generate_response(
