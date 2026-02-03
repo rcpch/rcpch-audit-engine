@@ -27,7 +27,7 @@ The following JavaScript libraries need to be updated manually due to network re
 - **htmx**: 1.8.4 → **Latest: 2.0.7** (Major version update)
 - **_hyperscript**: 0.9.12 → **Latest: 0.9.12** (Already current)
 - **SweetAlert2**: 11.11.0 → **Latest: 11.26.18** (Minor update)
-- **Plotly.js**: 1.58.5 → **Latest: 2.38.1** (Major version update)
+- **Plotly.js**: 1.58.5 → **Latest: 6.5.2** (Updated - bundled with Python plotly package)
 
 #### CDN References to Replace:
 1. **Popper.js** in `templates/rest_framework/api.html`:
@@ -60,7 +60,7 @@ After running the update script, the following template files need to be modifie
    <!-- Update these lines: -->
    <script src="{% static 'plotly_1.58.5/plotly.min.js' %}"></script>
    <!-- TO: -->
-   <script src="{% static 'plotly_2.38.1/plotly.min.js' %}"></script>
+   <script src="{% static 'plotly_6.5.2/plotly.min.js' %}"></script>
 
    <script src="{% static 'htmx_1.8.4/htmx.min.js' %}"></script>
    <!-- TO: -->

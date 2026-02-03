@@ -9,7 +9,7 @@ echo "Updating JavaScript libraries for Epilepsy12..."
 # Define versions
 HTMX_VERSION="2.0.7"
 SWEETALERT2_VERSION="11.26.18"
-PLOTLY_VERSION="2.38.1"  # Latest v2 (matches Python plotly package structure)
+PLOTLY_VERSION="6.5.2"  # Matches Python plotly package version
 HYPERSCRIPT_VERSION="0.9.12"  # No newer releases found
 POPPER_VERSION="2.11.8"  # Latest v2
 
@@ -29,7 +29,9 @@ wget -q "https://cdn.jsdelivr.net/npm/sweetalert2@${SWEETALERT2_VERSION}/dist/sw
 
 # Download Plotly
 echo "Downloading Plotly ${PLOTLY_VERSION}..."
-wget -q "https://cdn.plot.ly/plotly-${PLOTLY_VERSION}.min.js" -O plotly.min.js
+# Note: Plotly.js bundled with Python plotly package has already been extracted
+# This downloads it directly if needed for other purposes
+wget -q "https://cdn.plot.ly/plotly-${PLOTLY_VERSION}.min.js" -O plotly.min.js || echo "Plotly download skipped - using version from Python package"
 
 # Download _hyperscript (if newer version exists, update version number)
 echo "Downloading _hyperscript ${HYPERSCRIPT_VERSION}..."
@@ -46,15 +48,15 @@ cd -
 echo "Creating new library directories..."
 mkdir -p "static/htmx_${HTMX_VERSION}"
 mkdir -p "static/sweetalert2_${SWEETALERT2_VERSION}"
-mkdir -p "static/plotly_${PLOTLY_VERSION}"
 mkdir -p "static/popper_${POPPER_VERSION}"
+# Note: plotly_${PLOTLY_VERSION} already exists from Python package extraction
 
 # Copy files to static directories
 echo "Copying files to static directories..."
 cp "$TEMP_DIR/htmx.min.js" "static/htmx_${HTMX_VERSION}/"
 cp "$TEMP_DIR/sweetalert2.all.min.js" "static/sweetalert2_${SWEETALERT2_VERSION}/"
-cp "$TEMP_DIR/plotly.min.js" "static/plotly_${PLOTLY_VERSION}/"
 cp "$TEMP_DIR/popper.min.js" "static/popper_${POPPER_VERSION}/"
+# Note: plotly.min.js already copied from Python package
 
 # Clean up
 rm -rf "$TEMP_DIR"
@@ -67,7 +69,7 @@ echo "1. Update templates/base.html to reference new library versions:"
 echo "   - htmx_1.8.4 → htmx_${HTMX_VERSION}"
 echo "   - hyperscript_0.9.12 → hyperscript_${HYPERSCRIPT_VERSION} (no update needed)"
 echo "   - sweetalert2_11.11.0 → sweetalert2_${SWEETALERT2_VERSION}"
-echo "   - plotly_1.58.5 → plotly_${PLOTLY_VERSION}"
+echo "   - plotly_6.5.2 already updated (extracted from Python package)"
 echo ""
 echo "2. Update templates/rest_framework/api.html:"
 echo "   - Replace CDN popper.js reference with: {% static 'popper_${POPPER_VERSION}/popper.min.js' %}"
