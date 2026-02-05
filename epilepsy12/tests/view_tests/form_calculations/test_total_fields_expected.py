@@ -599,14 +599,19 @@ def test_total_fields_expected_topiramate_or_valproate_for_sex_and_age_cohort_7(
     assert (
         CASE.registration.cohort == 7
     ), "Cohort should be 7 for first paediatric assessment date of 2024-05-01"
+    
+    # Calculate age at the assessment date, not at current time
+    assessment_date = CASE.registration.first_paediatric_assessment_date
+    age_at_assessment = CASE.age_days(today_date=assessment_date)
+    
     if age_over_12:
-        assert CASE.age_days() > (
+        assert age_at_assessment > (
             12 * 365.25
-        ), f"Case should be over 12 years old, but is {CASE.age_days()/365.25} years old"
+        ), f"Case should be over 12 years old at assessment date {assessment_date}, but is {age_at_assessment/365.25} years old"
     else:
-        assert CASE.age_days() < (
+        assert age_at_assessment < (
             12 * 365.25
-        ), f"Case should be under 12 years old, but is {CASE.age_days()/365.25} years old"
+        ), f"Case should be under 12 years old at assessment date {assessment_date}, but is {age_at_assessment/365.25} years old"
     assert (
         CASE.sex == sex
     ), f"Case should be {SEX_TYPE[sex][1]}, but is {SEX_TYPE[CASE.sex][1]}"
