@@ -62,14 +62,14 @@ def GOSH():
 
 @pytest.fixture
 @pytest.mark.django_db
-def CASE_GOSH():
+def CASE_GOSH(GOSH):
     return Case.objects.get(first_name=f"child_{GOSH.name}")
 
 
 @pytest.fixture
 @pytest.mark.django_db
 def ADDENBROOKES():
-    Organisation.objects.get(
+    return Organisation.objects.get(
         ods_code="RGT01",
         trust__ods_code="RGT",
     )
@@ -77,5 +77,5 @@ def ADDENBROOKES():
 
 @pytest.fixture
 @pytest.mark.django_db
-def CASE_ADDENBROOKES():
-    Case.objects.get(first_name=f"child_{ADDENBROOKES.name}")
+def CASE_ADDENBROOKES(ADDENBROOKES):
+    return Case.objects.get(first_name=f"child_{ADDENBROOKES.name}")
