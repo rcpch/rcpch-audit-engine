@@ -5,7 +5,7 @@ requests==2.32.4
 # third party imports
 ## django and misc
 dj_database_url==2.3.0
-django==5.2.9
+django==5.2.11
 django-auto-logout==0.5.1
 django-filter==25.1
 django-htmx==1.23.0
