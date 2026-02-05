@@ -28,6 +28,8 @@ The following JavaScript libraries need to be updated manually due to network re
 - **_hyperscript**: 0.9.12 → **Latest: 0.9.12** (Already current)
 - **SweetAlert2**: 11.11.0 → **Latest: 11.26.18** (Minor update)
 - **Plotly.js**: 1.58.5 → **Latest: 6.5.2** (Updated - bundled with Python plotly package)
+- **jQuery**: 3.3.1 → **Latest: 3.7.1** (Security update - addresses CVEs in Issue #1278)
+- **jQuery Mask Plugin**: Current → **Latest: 1.14.16** (Compatibility update)
 
 #### CDN References to Replace:
 1. **Popper.js** in `templates/rest_framework/api.html`:
@@ -107,6 +109,12 @@ After running the update script, the following template files need to be modifie
 - Review release notes for any configuration changes needed
 - **Action**: Test application startup and performance
 
+#### jQuery 3.7.1
+- Addresses multiple CVEs present in 3.3.1 (Issue #1278)
+- Compatible upgrade within jQuery 3.x series
+- No breaking changes expected
+- **Action**: Test jQuery-dependent functionality (forms, animations, AJAX)
+
 ### Testing Checklist
 
 After applying updates, test the following:
@@ -116,6 +124,8 @@ After applying updates, test the following:
 - [ ] All HTMX interactions (form submissions, dynamic loading)
 - [ ] SweetAlert2 popups and confirmations
 - [ ] Plotly charts render correctly
+- [ ] jQuery functionality (DOM manipulation, animations, AJAX calls)
+- [ ] jQuery Mask Plugin (input masking on forms)
 - [ ] Two-factor authentication flow
 - [ ] Date picker functionality (registration dates)
 - [ ] API endpoints (REST framework)

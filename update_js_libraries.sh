@@ -12,6 +12,8 @@ SWEETALERT2_VERSION="11.26.18"
 PLOTLY_VERSION="6.5.2"  # Matches Python plotly package version
 HYPERSCRIPT_VERSION="0.9.12"  # No newer releases found
 POPPER_VERSION="2.11.8"  # Latest v2
+JQUERY_VERSION="3.7.1"  # Latest v3 (addresses CVEs in 3.3.1 - Issue #1278)
+JQUERY_MASK_VERSION="1.14.16"  # Latest version
 
 # Create temporary directory
 TEMP_DIR=$(mktemp -d)
@@ -41,6 +43,14 @@ wget -q "https://unpkg.com/hyperscript.org@${HYPERSCRIPT_VERSION}/dist/_hyperscr
 echo "Downloading Popper.js ${POPPER_VERSION}..."
 wget -q "https://cdn.jsdelivr.net/npm/@popperjs/core@${POPPER_VERSION}/dist/umd/popper.min.js" -O popper.min.js
 
+# Download jQuery (addresses security issue #1278)
+echo "Downloading jQuery ${JQUERY_VERSION}..."
+wget -q "https://code.jquery.com/jquery-${JQUERY_VERSION}.min.js" -O jquery.min.js
+
+# Download jQuery Mask Plugin
+echo "Downloading jQuery Mask Plugin ${JQUERY_MASK_VERSION}..."
+wget -q "https://cdn.jsdelivr.net/npm/jquery-mask-plugin@${JQUERY_MASK_VERSION}/dist/jquery.mask.min.js" -O jquery.mask.min.js
+
 # Get back to project root
 cd -
 
@@ -56,6 +66,8 @@ echo "Copying files to static directories..."
 cp "$TEMP_DIR/htmx.min.js" "static/htmx_${HTMX_VERSION}/"
 cp "$TEMP_DIR/sweetalert2.all.min.js" "static/sweetalert2_${SWEETALERT2_VERSION}/"
 cp "$TEMP_DIR/popper.min.js" "static/popper_${POPPER_VERSION}/"
+cp "$TEMP_DIR/jquery.min.js" "static/js/"
+cp "$TEMP_DIR/jquery.mask.min.js" "static/jquery_mask/"
 # Note: plotly.min.js already copied from Python package
 
 # Clean up
@@ -65,18 +77,23 @@ echo ""
 echo "✓ JavaScript libraries downloaded successfully!"
 echo ""
 echo "Next steps:"
-echo "1. Update templates/base.html to reference new library versions:"
+echo "1. jQuery ${JQUERY_VERSION} and jQuery Mask Plugin ${JQUERY_MASK_VERSION} have been updated in place"
+echo "   - static/js/jquery.min.js (3.3.1 → ${JQUERY_VERSION}) - Addresses Issue #1278"
+echo "   - static/jquery_mask/jquery.mask.min.js (updated to ${JQUERY_MASK_VERSION})"
+echo ""
+echo "2. Update templates/base.html to reference new library versions:"
 echo "   - htmx_1.8.4 → htmx_${HTMX_VERSION}"
 echo "   - hyperscript_0.9.12 → hyperscript_${HYPERSCRIPT_VERSION} (no update needed)"
 echo "   - sweetalert2_11.11.0 → sweetalert2_${SWEETALERT2_VERSION}"
 echo "   - plotly_6.5.2 already updated (extracted from Python package)"
+echo "   - jQuery already uses static/js/jquery.min.js (no template change needed)"
 echo ""
-echo "2. Update templates/rest_framework/api.html:"
+echo "3. Update templates/rest_framework/api.html:"
 echo "   - Replace CDN popper.js reference with: {% static 'popper_${POPPER_VERSION}/popper.min.js' %}"
 echo ""
-echo "3. Update templates/epilepsy12/partials/registration/registration_dates.html:"
+echo "4. Update templates/epilepsy12/partials/registration/registration_dates.html:"
 echo "   - Replace CDN sweetalert2 reference with: {% static 'sweetalert2_${SWEETALERT2_VERSION}/sweetalert2.all.min.js' %}"
 echo ""
-echo "4. Test the application thoroughly"
-echo "5. Remove old library directories after confirming everything works"
+echo "5. Test the application thoroughly"
+echo "6. Remove old library directories after confirming everything works"
 echo ""

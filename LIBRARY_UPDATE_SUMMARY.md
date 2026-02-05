@@ -35,6 +35,8 @@ Due to network restrictions in the build environment, the following updates requ
 1. **htmx**: 1.8.4 → 2.0.7 (Major version - breaking changes)
 2. **SweetAlert2**: 11.11.0 → 11.26.18 (Minor version)
 3. **Popper.js**: CDN reference → 2.11.8 local (Security improvement)
+4. **jQuery**: 3.3.1 → 3.7.1 (Security update - addresses CVEs in Issue #1278)
+5. **jQuery Mask Plugin**: → 1.14.16 (Compatibility update)
 
 **Action Required**: Run `./update_js_libraries.sh` in an environment with internet access to complete these updates.
 
@@ -49,8 +51,8 @@ Due to network restrictions in the build environment, the following updates requ
    - Future maintenance guidelines
 
 2. **`update_js_libraries.sh`**: Automated script to:
-   - Download latest versions of htmx, SweetAlert2, and Popper.js
-   - Place files in versioned static directories
+   - Download latest versions of htmx, SweetAlert2, Popper.js, jQuery, and jQuery Mask Plugin
+   - Place files in versioned static directories (or update in place for jQuery)
    - Provide step-by-step instructions for template updates
 
 ## Security Improvements
@@ -159,6 +161,7 @@ Detailed rollback procedures are documented in `LIBRARY_UPDATES.md`.
 ## Related Issues
 
 - Issue #571: Pentesting items - "All JavaScript libraries and other scripts should be hosted in-house" ✓ In Progress
+- Issue #1278: Upgrade jQuery from 3.3.1 to 3.7.1 (CVE fixes) ✓ Addressed in update script
 - Security audit requirement to eliminate CDN dependencies
 
 ## Recommendations
