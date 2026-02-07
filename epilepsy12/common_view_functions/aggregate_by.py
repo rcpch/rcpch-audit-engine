@@ -532,8 +532,6 @@ def filter_completed_cases_at_one_year_by_abstraction_level(
     Case = apps.get_model("epilepsy12", "Case")
 
     all_cases = Case.objects.filter(
-        epilepsy12_sites__site_is_actively_involved_in_epilepsy_care=True,
-        epilepsy12_sites__site_is_primary_centre_of_epilepsy_care=True,
         registration__id__isnull=False,
         registration__cohort=cohort,
         registration__completed_first_year_of_care_date__lte=date.today(),
