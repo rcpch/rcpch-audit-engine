@@ -772,38 +772,44 @@ def get_abstraction_filter_for_organisation_and_level(
     organisation: Organisation,
     abstraction_level: EnumAbstractionLevel
 ):
+    abstraction_filter = None
+
     match abstraction_level:
         case EnumAbstractionLevel.ORGANISATION:
-            return {
+            abstraction_filter = {
                 f"epilepsy12_sites__organisation": organisation
             }
         case EnumAbstractionLevel.TRUST if organisation.trust:
-            return {
+            abstraction_filter = {
                 f"epilepsy12_sites__organisation__trust": organisation.trust
             }
         case EnumAbstractionLevel.LOCAL_HEALTH_BOARD if organisation.local_health_board:
-            return {
+            abstraction_filter = {
                 f"epilepsy12_sites__organisation__local_health_board": organisation.local_health_board
             }
         case EnumAbstractionLevel.ICB if organisation.integrated_care_board:
-            return {
+            abstraction_filter = {
                 f"epilepsy12_sites__organisation__integrated_care_board": organisation.integrated_care_board
             }
         case EnumAbstractionLevel.NHS_ENGLAND_REGION if organisation.nhs_england_region:
-            return {
+            abstraction_filter = {
                 f"epilepsy12_sites__organisation__nhs_england_region": organisation.nhs_england_region
             }
         case EnumAbstractionLevel.OPEN_UK if organisation.openuk_network:
-            return {
+            abstraction_filter = {
                 f"epilepsy12_sites__organisation__openuk_network": organisation.openuk_network
             }
         case EnumAbstractionLevel.COUNTRY:
-            return {
+            abstraction_filter = {
                 f"epilepsy12_sites__organisation__country": organisation.country
             }
-        # national
-        case _:
-            return None
+        # national, no filter
+    
+    if abstraction_filter:
+        abstraction_filter["epilepsy12_sites__site_is_primary_centre_of_epilepsy_care"] = True
+        abstraction_filter["epilepsy12_sites__site_is_actively_involved_in_epilepsy_care"] = True
+
+    return abstraction_filter
 
 
 def _calculate_all_kpis():
