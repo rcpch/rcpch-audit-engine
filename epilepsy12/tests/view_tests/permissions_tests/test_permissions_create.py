@@ -120,7 +120,6 @@ def test_user_create_same_org_success(
     client,
     seed_groups_fixture,
     seed_users_fixture,
-    seed_cases_fixture,
 ):
     """Integration test checking functionality of view and form.
 
