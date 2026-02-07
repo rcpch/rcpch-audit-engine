@@ -753,7 +753,7 @@ SELECTS = (
 
 @pytest.mark.django_db
 def test_user_updates_single_choice_multiple_toggle_success(
-    client, seed_groups_fixture, seed_users_fixture, seed_cases_fixture
+    client, seed_groups_fixture, seed_users_fixture
 ):
     """
     Assert for each single_choice_multiple_toggle choice selection, value stored in model is correct selection value
@@ -800,7 +800,7 @@ def test_user_updates_single_choice_multiple_toggle_success(
 
 @pytest.mark.django_db
 def test_user_updates_single_choice_multiple_toggle_fail(
-    client, seed_groups_fixture, seed_users_fixture, seed_cases_fixture
+    client, seed_groups_fixture, seed_users_fixture
 ):
     """
     Assert for each single_choice_multiple_toggle choice selection, value stored in model is correct selection value

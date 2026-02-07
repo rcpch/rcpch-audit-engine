@@ -1,5 +1,4 @@
 from .seed_groups_permissions import seed_groups_fixture
-from .seed_cases import seed_cases_fixture
 from .seed_users import seed_users_fixture
 from .E12AntiEpilepsyMedicineFactory import E12AntiEpilepsyMedicineFactory
 from .E12AssessmentFactory import E12AssessmentFactory
