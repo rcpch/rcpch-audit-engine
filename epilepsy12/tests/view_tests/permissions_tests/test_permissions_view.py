@@ -224,7 +224,6 @@ def test_users_and_case_list_views_permissions_success(
     client,
     seed_groups_fixture,
     seed_users_fixture,
-    seed_cases_fixture,
     URL,
 ):
     """
@@ -232,8 +231,7 @@ def test_users_and_case_list_views_permissions_success(
 
     Additionally, tests RCPCH Audit Team can access lists of different Trust.
 
-
-    NOTE: the `seed_groups_fixture, `seed_users_fixture`, `seed_cases_fixture` fixtures are scoped to the session, they just need to be used once to seed the db across further tests.
+    NOTE: the `seed_groups_fixture and `seed_users_fixture` fixtures are scoped to the session, they just need to be used once to seed the db across further tests.
     """
 
     # set up constants
@@ -309,14 +307,13 @@ def test_users_and_case_list_multiple_organisations_views_permissions_success(
     client,
     seed_groups_fixture,
     seed_users_fixture,
-    seed_cases_fixture,
     URL,
 ):
     """
     Simulating different E12Users with different roles attempting to access the Users / Cases list in an organisation within their employer list.
 
 
-    NOTE: the `seed_groups_fixture, `seed_users_fixture`, `seed_cases_fixture` fixtures are scoped to the session, they just need to be used once to seed the db across further tests.
+    NOTE: the `seed_groups_fixture and `seed_users_fixture` fixtures are scoped to the session, they just need to be used once to seed the db across further tests.
     """
 
     # set up constants

@@ -291,7 +291,6 @@ def test_users_update_users_forbidden(
     client,
     seed_groups_fixture,
     seed_users_fixture,
-    seed_cases_fixture,
 ):
     """
     Simulating different E12 Users attempting to update users in Epilepsy12
