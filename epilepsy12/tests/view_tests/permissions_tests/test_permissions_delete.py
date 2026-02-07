@@ -113,8 +113,7 @@ from epilepsy12.tests.view_tests.permissions_tests.perm_tests_utils import (
 def test_user_deactivate_success(
     client,
     seed_groups_fixture,
-    seed_users_fixture,
-    seed_cases_fixture,
+    seed_users_fixture
 ):
     """Simulating different E12 users with different roles attempting to deactivate inside own trust.
 

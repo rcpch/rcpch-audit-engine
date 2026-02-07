@@ -224,7 +224,6 @@ def test_users_and_case_list_views_permissions_success(
     client,
     seed_groups_fixture,
     seed_users_fixture,
-    seed_cases_fixture,
     URL,
 ):
     """
@@ -232,8 +231,7 @@ def test_users_and_case_list_views_permissions_success(
 
     Additionally, tests RCPCH Audit Team can access lists of different Trust.
 
-
-    NOTE: the `seed_groups_fixture, `seed_users_fixture`, `seed_cases_fixture` fixtures are scoped to the session, they just need to be used once to seed the db across further tests.
+    NOTE: the `seed_groups_fixture and `seed_users_fixture` fixtures are scoped to the session, they just need to be used once to seed the db across further tests.
     """
 
     # set up constants
@@ -309,14 +307,13 @@ def test_users_and_case_list_multiple_organisations_views_permissions_success(
     client,
     seed_groups_fixture,
     seed_users_fixture,
-    seed_cases_fixture,
     URL,
 ):
     """
     Simulating different E12Users with different roles attempting to access the Users / Cases list in an organisation within their employer list.
 
 
-    NOTE: the `seed_groups_fixture, `seed_users_fixture`, `seed_cases_fixture` fixtures are scoped to the session, they just need to be used once to seed the db across further tests.
+    NOTE: the `seed_groups_fixture and `seed_users_fixture` fixtures are scoped to the session, they just need to be used once to seed the db across further tests.
     """
 
     # set up constants
@@ -505,7 +502,7 @@ def test_users_and_cases_list_multiple_organisations_view_permissions_forbidden(
 
 
 @pytest.mark.django_db
-def test_registration_view_permissions_success(client):
+def test_registration_view_permissions_success(client, e12_case_factory):
     """
     Assert these users CAN view registration for their own Trust.
 
@@ -517,8 +514,9 @@ def test_registration_view_permissions_success(client):
         ods_code="RP401",
         trust__ods_code="RP4",
     )
-    CASE_FROM_SAME_ORG = Case.objects.get(
-        first_name=f"child_{TEST_USER_ORGANISATION.name}"
+    CASE_FROM_SAME_ORG = e12_case_factory(
+        first_name=f"child_{TEST_USER_ORGANISATION.name}",
+        organisations__organisation=TEST_USER_ORGANISATION,
     )
 
     users = Epilepsy12User.objects.filter(
@@ -572,7 +570,7 @@ def test_registration_view_permissions_success(client):
 
 
 @pytest.mark.django_db
-def test_registration_view_permissions_forbidden(client):
+def test_registration_view_permissions_forbidden(client, e12_case_factory):
     """
     Assert these users CANT view registration for different Trust.
     """
@@ -583,8 +581,9 @@ def test_registration_view_permissions_forbidden(client):
         ods_code="RGT01",
         trust__ods_code="RGT",
     )
-    CASE_FROM_DIFF_ORG = Case.objects.get(
-        first_name=f"child_{DIFF_TRUST_DIFF_ORGANISATION.name}"
+    CASE_FROM_DIFF_ORG = e12_case_factory(
+        first_name=f"child_{DIFF_TRUST_DIFF_ORGANISATION.name}",
+        organisations__organisation=DIFF_TRUST_DIFF_ORGANISATION,
     )
 
     # RCPCH/CLINCAL AUDIT TEAM HAVE FULL ACCESS SO DONT INCLUDE
@@ -620,7 +619,7 @@ def test_registration_view_permissions_forbidden(client):
 
 
 @pytest.mark.django_db
-def test_episode_syndrome_aem_view_permissions_success(client):
+def test_episode_syndrome_aem_view_permissions_success(client, e12_case_factory):
     """
     Assert these users CAN view following for Case from their own Trust:
 
@@ -636,8 +635,9 @@ def test_episode_syndrome_aem_view_permissions_success(client):
         ods_code="RP401",
         trust__ods_code="RP4",
     )
-    CASE_FROM_SAME_ORG = Case.objects.get(
-        first_name=f"child_{TEST_USER_ORGANISATION.name}"
+    CASE_FROM_SAME_ORG = e12_case_factory(
+        first_name=f"child_{TEST_USER_ORGANISATION.name}",
+        organisations__organisation=TEST_USER_ORGANISATION,
     )
 
     users = Epilepsy12User.objects.filter(
@@ -703,8 +703,9 @@ def test_episode_syndrome_aem_view_permissions_success(client):
                         ods_code="RGT01",
                         trust__ods_code="RGT",
                     )
-                    CASE_FROM_DIFF_ORG = Case.objects.get(
-                        first_name=f"child_{DIFF_TRUST_DIFF_ORGANISATION.name}"
+                    CASE_FROM_DIFF_ORG = e12_case_factory(
+                        first_name=f"child_{DIFF_TRUST_DIFF_ORGANISATION.name}",
+                        organisations__organisation=DIFF_TRUST_DIFF_ORGANISATION,
                     )
 
                     # Create objs to search for
@@ -755,7 +756,7 @@ def test_episode_syndrome_aem_view_permissions_success(client):
 
 @pytest.mark.parametrize("URL", [("edit_episode"), ("close_episode")])
 @pytest.mark.django_db
-def test_episode_view_permissions_forbidden(client, URL):
+def test_episode_view_permissions_forbidden(client, URL, e12_case_factory):
     """
     Assert these users CANT view Episode for Case from different Trust.
     """
@@ -764,8 +765,9 @@ def test_episode_view_permissions_forbidden(client, URL):
         ods_code="RGT01",
         trust__ods_code="RGT",
     )
-    CASE_FROM_DIFF_ORG = Case.objects.get(
-        first_name=f"child_{DIFF_TRUST_DIFF_ORGANISATION.name}"
+    CASE_FROM_DIFF_ORG = e12_case_factory(
+        first_name=f"child_{DIFF_TRUST_DIFF_ORGANISATION.name}",
+        organisations__organisation=DIFF_TRUST_DIFF_ORGANISATION,
     )
 
     EPISODE_DIFF_ORG = Episode.objects.get(
@@ -807,7 +809,7 @@ def test_episode_view_permissions_forbidden(client, URL):
 
 @pytest.mark.parametrize("URL", [("edit_syndrome"), ("close_syndrome")])
 @pytest.mark.django_db
-def test_syndrome_view_permissions_forbidden(client, URL):
+def test_syndrome_view_permissions_forbidden(client, URL, e12_case_factory):
     """
     Assert these users CANT view syndrome for Case from different Trust.
     """
@@ -816,8 +818,9 @@ def test_syndrome_view_permissions_forbidden(client, URL):
         ods_code="RGT01",
         trust__ods_code="RGT",
     )
-    CASE_FROM_DIFF_ORG = Case.objects.get(
-        first_name=f"child_{DIFF_TRUST_DIFF_ORGANISATION.name}"
+    CASE_FROM_DIFF_ORG = e12_case_factory(
+        first_name=f"child_{DIFF_TRUST_DIFF_ORGANISATION.name}",
+        organisations__organisation=DIFF_TRUST_DIFF_ORGANISATION,
     )
 
     syndrome_DIFF_ORG = Syndrome.objects.get(
@@ -861,7 +864,7 @@ def test_syndrome_view_permissions_forbidden(client, URL):
     "URL", [("edit_antiepilepsy_medicine"), ("close_antiepilepsy_medicine")]
 )
 @pytest.mark.django_db
-def test_antiepilepsy_medicine_view_permissions_forbidden(client, URL):
+def test_antiepilepsy_medicine_view_permissions_forbidden(client, URL, e12_case_factory):
     """
     Assert these users CANT view antiepilepsy_medicine for Case from different Trust.
     """
@@ -870,8 +873,9 @@ def test_antiepilepsy_medicine_view_permissions_forbidden(client, URL):
         ods_code="RGT01",
         trust__ods_code="RGT",
     )
-    CASE_FROM_DIFF_ORG = Case.objects.get(
-        first_name=f"child_{DIFF_TRUST_DIFF_ORGANISATION.name}"
+    CASE_FROM_DIFF_ORG = e12_case_factory(
+        first_name=f"child_{DIFF_TRUST_DIFF_ORGANISATION.name}",
+        organisations__organisation=DIFF_TRUST_DIFF_ORGANISATION,
     )
 
     antiepilepsy_medicine_DIFF_ORG = AntiEpilepsyMedicine.objects.create(
@@ -921,7 +925,7 @@ def test_antiepilepsy_medicine_view_permissions_forbidden(client, URL):
     ],
 )
 @pytest.mark.django_db
-def test_comborbidity_view_permissions_success(client, URL):
+def test_comborbidity_view_permissions_success(client, URL, e12_case_factory):
     """
     Assert these users CAN view comorbidities for Case from their own Trust.
 
@@ -933,8 +937,9 @@ def test_comborbidity_view_permissions_success(client, URL):
         ods_code="RP401",
         trust__ods_code="RP4",
     )
-    CASE_FROM_SAME_ORG = Case.objects.get(
-        first_name=f"child_{TEST_USER_ORGANISATION.name}"
+    CASE_FROM_SAME_ORG = e12_case_factory(
+        first_name=f"child_{TEST_USER_ORGANISATION.name}",
+        organisations__organisation=TEST_USER_ORGANISATION,
     )
 
     COMORBIDITY_SAME_ORG = Comorbidity.objects.create(
@@ -990,8 +995,9 @@ def test_comborbidity_view_permissions_success(client, URL):
                 ods_code="RGT01",
                 trust__ods_code="RGT",
             )
-            CASE_FROM_DIFF_ORG = Case.objects.get(
-                first_name=f"child_{DIFF_TRUST_DIFF_ORGANISATION.name}"
+            CASE_FROM_DIFF_ORG = e12_case_factory(
+                first_name=f"child_{DIFF_TRUST_DIFF_ORGANISATION.name}",
+                organisations__organisation=DIFF_TRUST_DIFF_ORGANISATION,
             )
 
             comborbidity_DIFF_ORG = Comorbidity.objects.create(
@@ -1028,7 +1034,7 @@ def test_comborbidity_view_permissions_success(client, URL):
     "URL", [("edit_comorbidity"), ("close_comorbidity"), ("comorbidities")]
 )
 @pytest.mark.django_db
-def test_comborbidity_view_permissions_forbidden(client, URL):
+def test_comborbidity_view_permissions_forbidden(client, URL, e12_case_factory):
     """
     Assert these users CANT view comborbidity for Case from different Trust.
     """
@@ -1037,8 +1043,9 @@ def test_comborbidity_view_permissions_forbidden(client, URL):
         ods_code="RGT01",
         trust__ods_code="RGT",
     )
-    CASE_FROM_DIFF_ORG = Case.objects.get(
-        first_name=f"child_{DIFF_TRUST_DIFF_ORGANISATION.name}"
+    CASE_FROM_DIFF_ORG = e12_case_factory(
+        first_name=f"child_{DIFF_TRUST_DIFF_ORGANISATION.name}",
+        organisations__organisation=DIFF_TRUST_DIFF_ORGANISATION,
     )
 
     COMORBIDITY_DIFF_ORG = Comorbidity.objects.create(
@@ -1092,7 +1099,7 @@ def test_comborbidity_view_permissions_forbidden(client, URL):
 
 
 @pytest.mark.django_db
-def test_multiple_views_permissions_success(client):
+def test_multiple_views_permissions_success(client, e12_case_factory):
     """
     Assert these users CAN view the following pages for their own Trust:
 
@@ -1111,8 +1118,9 @@ def test_multiple_views_permissions_success(client):
         ods_code="RP401",
         trust__ods_code="RP4",
     )
-    CASE_FROM_SAME_ORG = Case.objects.get(
-        first_name=f"child_{TEST_USER_ORGANISATION.name}"
+    CASE_FROM_SAME_ORG = e12_case_factory(
+        first_name=f"child_{TEST_USER_ORGANISATION.name}",
+        organisations__organisation=TEST_USER_ORGANISATION,
     )
 
     users = Epilepsy12User.objects.filter(
@@ -1159,8 +1167,9 @@ def test_multiple_views_permissions_success(client):
                     ods_code="RGT01",
                     trust__ods_code="RGT",
                 )
-                CASE_FROM_DIFF_ORG = Case.objects.get(
-                    first_name=f"child_{TEST_USER_ORGANISATION.name}"
+                CASE_FROM_DIFF_ORG = e12_case_factory(
+                    first_name=f"child_{DIFF_TRUST_DIFF_ORGANISATION.name}",
+                    organisations__organisation=DIFF_TRUST_DIFF_ORGANISATION,
                 )
 
                 # Request e12 patients list endpoint url different org
@@ -1177,7 +1186,7 @@ def test_multiple_views_permissions_success(client):
 
 
 @pytest.mark.django_db
-def test_multiple_views_permissions_forbidden(client):
+def test_multiple_views_permissions_forbidden(client, e12_case_factory):
     """
     Assert these users CANT view these pages for different Trust.
 
@@ -1193,8 +1202,9 @@ def test_multiple_views_permissions_forbidden(client):
         ods_code="RGT01",
         trust__ods_code="RGT",
     )
-    CASE_FROM_DIFF_ORG = Case.objects.get(
-        first_name=f"child_{DIFF_TRUST_DIFF_ORGANISATION.name}"
+    CASE_FROM_DIFF_ORG = e12_case_factory(
+        first_name=f"child_{DIFF_TRUST_DIFF_ORGANISATION.name}",
+        organisations__organisation=DIFF_TRUST_DIFF_ORGANISATION,
     )
 
     # RCPCH/CLINCAL AUDIT TEAM HAVE FULL ACCESS SO DONT INCLUDE

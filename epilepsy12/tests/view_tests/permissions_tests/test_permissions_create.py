@@ -120,7 +120,6 @@ def test_user_create_same_org_success(
     client,
     seed_groups_fixture,
     seed_users_fixture,
-    seed_cases_fixture,
 ):
     """Integration test checking functionality of view and form.
 
@@ -565,7 +564,7 @@ def test_patient_creation_forbidden(
 
 
 @pytest.mark.django_db
-def test_add_episode_comorbidity_syndrome_aem_success(client):
+def test_add_episode_comorbidity_syndrome_aem_success(client, e12_case_factory):
     """
     Simulating different permitted E12 Roles request.POSTing to the following htmx urls:
 
@@ -590,8 +589,9 @@ def test_add_episode_comorbidity_syndrome_aem_success(client):
         trust__ods_code="RGT",
     )
 
-    CASE_FROM_SAME_ORG = Case.objects.get(
-        first_name=f"child_{TEST_USER_ORGANISATION.name}"
+    CASE_FROM_SAME_ORG = e12_case_factory(
+        first_name=f"child_{TEST_USER_ORGANISATION.name}",
+        organisations__organisation=TEST_USER_ORGANISATION,
     )
 
     URLS = [
@@ -667,7 +667,7 @@ def test_add_episode_comorbidity_syndrome_aem_success(client):
 
 
 @pytest.mark.django_db
-def test_add_episode_comorbidity_syndrome_aem_forbidden(client):
+def test_add_episode_comorbidity_syndrome_aem_forbidden(client, e12_case_factory):
     """
     Simulating different unauthorized E12 Roles adding Episodes for Case in same / diff Trust.
 
@@ -691,12 +691,14 @@ def test_add_episode_comorbidity_syndrome_aem_forbidden(client):
         trust__ods_code="RGT",
     )
 
-    CASE_FROM_SAME_ORG = Case.objects.get(
-        first_name=f"child_{TEST_USER_ORGANISATION.name}"
+    CASE_FROM_SAME_ORG = e12_case_factory(
+        first_name=f"child_{TEST_USER_ORGANISATION.name}",
+        organisations__organisation=TEST_USER_ORGANISATION,
     )
 
-    CASE_FROM_DIFF_ORG = Case.objects.get(
-        first_name=f"child_{DIFF_TRUST_DIFF_ORGANISATION.name}"
+    CASE_FROM_DIFF_ORG = e12_case_factory(
+        first_name=f"child_{DIFF_TRUST_DIFF_ORGANISATION.name}",
+        organisations__organisation=DIFF_TRUST_DIFF_ORGANISATION,
     )
 
     selected_users = [
