@@ -16,13 +16,22 @@ def test_remove_jersey_patients_from_kpi_export(
     seed_groups_fixture,
     seed_users_fixture,
 ):
-    english_org = Organisation.objects.filter(
-        country__name="England"
-    ).first()
-
     jersey_org = Organisation.objects.filter(
         country__name="Jersey"
     ).first()
+
+    # Jersey is part of SWIPE but we still want to exclude it from the export
+    jersey_openuk_network = jersey_org.openuk_network
+
+    english_org = Organisation.objects.filter(
+        country__name="England"
+    ).exclude(
+        openuk_network=jersey_openuk_network
+    ).first()
+
+    english_openuk_network = english_org.openuk_network
+
+    assert jersey_openuk_network != english_openuk_network
 
     english_case = e12_case_factory(
         date_of_birth=date(2013, 1, 1),
@@ -48,7 +57,7 @@ def test_remove_jersey_patients_from_kpi_export(
     )
 
     calculate_kpis(jersey_case.registration)
-    update_all_kpi_agg_models(organisation=english_org, cohort=english_case.registration.cohort, open_access=False)
+    update_all_kpi_agg_models(organisation=jersey_org, cohort=english_case.registration.cohort, open_access=False)
 
     assert english_case.registration.cohort == jersey_case.registration.cohort
 
@@ -96,6 +105,20 @@ def test_remove_jersey_patients_from_kpi_export(
     # Check "National_level" does not include Jersey
     # The names of the sheet and the NationalKPIAggregation model are confusing because they come from before we added
     # Jersey. They really mean "England and Wales", as per the row name in the sheet.
-    national_df = national_df.loc[national_df["Measure"] == "10. School Individual Health Care Plan"].iloc[0]
+    # national_df = national_df.loc[national_df["Measure"] == "10. School Individual Health Care Plan"].iloc[0]
     assert national_df["Numerator"] == 1
     assert national_df["Denominator"] == 1
+
+    # Jersey is in an Open UK Network (SWIPE) so we need to check it's excluded from that as well
+    network_df = network_df.loc[network_df["Network"] == jersey_openuk_network.boundary_identifier]
+    network_kpi_10_row = network_df.loc[network_df["Measure"] == "10. School Individual Health Care Plan"].iloc[0]
+
+    assert network_kpi_10_row["Numerator"] == 0
+    assert network_kpi_10_row["Denominator"] == 0
+
+    # Triple check the other case is in their (different) Open UK Network
+    network_df = network_df.loc[network_df["Network"] == english_openuk_network.boundary_identifier]
+    network_kpi_10_row = network_df.loc[network_df["Measure"] == "10. School Individual Health Care Plan"].iloc[0]
+
+    assert network_kpi_10_row["Numerator"] == 1
+    assert network_kpi_10_row["Denominator"] == 1
