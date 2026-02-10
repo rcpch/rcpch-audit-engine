@@ -1151,7 +1151,9 @@ def create_totals_dataframe(cohort, abstraction_level):
             organisation_count=Count("organisation")
         ).filter(organisation_count__gt=0)
     elif abstraction_level == "country":
-        query_set = Country.objects.annotate(
+        query_set = Country.objects.exclude(
+            organisation__country__boundary_identifier="JEY"
+        ).annotate(
             organisation_count=Count("organisation")
         ).filter(organisation_count__gt=0)
 
