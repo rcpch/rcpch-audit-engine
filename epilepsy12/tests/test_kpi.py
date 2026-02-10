@@ -110,11 +110,8 @@ def test_remove_jersey_patients_from_kpi_export(
     assert national_df["Denominator"] == 1
 
     # Jersey is in an Open UK Network (SWIPE) so we need to check it's excluded from that as well
-    network_df = network_df.loc[network_df["Network"] == jersey_openuk_network.boundary_identifier]
-    network_kpi_10_row = network_df.loc[network_df["Measure"] == "10. School Individual Health Care Plan"].iloc[0]
-
-    assert network_kpi_10_row["Numerator"] == 0
-    assert network_kpi_10_row["Denominator"] == 0
+    networks = set(network_df["Network"])
+    assert jersey_openuk_network.boundary_identifier not in networks
 
     # Triple check the other case is in their (different) Open UK Network
     network_df = network_df.loc[network_df["Network"] == english_openuk_network.boundary_identifier]
