@@ -92,3 +92,10 @@ def test_remove_jersey_patients_from_kpi_export(
 
     assert welsh_df["All Registered Cases"].iloc[0] == 0
     assert welsh_df["All Cases"].iloc[0] == 0
+
+    # Check "National_level" does not include Jersey
+    # The names of the sheet and the NationalKPIAggregation model are confusing because they come from before we added
+    # Jersey. They really mean "England and Wales", as per the row name in the sheet.
+    national_df = national_df.loc[national_df["Measure"] == "10. School Individual Health Care Plan"].iloc[0]
+    assert national_df["Numerator"] == 1
+    assert national_df["Denominator"] == 1
