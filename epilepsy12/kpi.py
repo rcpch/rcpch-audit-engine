@@ -153,7 +153,8 @@ def download_kpi_summary_as_csv(cohort):
     # create a dataframe with a row for each measure, and column for each of ["Measure", "Percentage", "Numerator", "Denominator"]
     # note rows are named ["1. Paediatrician with expertise","2. Epilepsy specialist nurse","3a. Tertiary involvement","3b. Epilepsy surgery referral","4. ECG","5. MRI","6. Assessment of mental health issues","7. Mental health support","8. Sodium valproate","9a. Comprehensive care planning agreement","9b. Comprehensive care planning content","10. School Individual Health Care Plan"]
 
-    # NationalKPIAggregation has no abstraction relation to walk so add the key field manually
+    # NationalKPIAggregation has no abstraction relation to walk so add the key field manually.
+    # Jersey is excluded from the calculations at write time.
     national_rows = [
         row | {"key_field": "England and Wales"}
         for row in get_kpi_aggregation_rows(NationalKPIAggregation, cohort)

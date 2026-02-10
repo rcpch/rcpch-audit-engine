@@ -802,6 +802,8 @@ class CountryKPIAggregation(BaseKPIAggregation):
         return super().save(*args, **kwargs)
 
 
+# The name of the NationalKPIAggregation model is confusing because it comes from before we added
+# Jersey. It really means "England and Wales", as per the row name in the KPI export spreadsheet.
 class NationalKPIAggregation(BaseKPIAggregation):
     """
     KPI summary statistics for England and Wales.

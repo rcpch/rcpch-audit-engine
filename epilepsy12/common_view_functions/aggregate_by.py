@@ -932,7 +932,9 @@ def _seed_all_aggregation_models(cohort=None) -> None:
 
             logger.info(f"Created {new_agg_model}")
 
-    # National handled separately as it has no abstraction relation field
+    # National handled separately as it has no abstraction relation field.
+    # The name of the NationalKPIAggregation model is confusing because it comes from before we added
+    # Jersey. It really means "England and Wales", as per the row name in the KPI export spreadsheet.
     if NationalKPIAggregation.objects.filter(
         cohort=requested_cohort,
     ).exists():
