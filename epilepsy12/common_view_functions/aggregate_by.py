@@ -801,7 +801,12 @@ def get_abstraction_filter_for_organisation_and_level(
             abstraction_filter = {
                 f"epilepsy12_sites__organisation__country": organisation.country
             }
-        # national, no filter
+        # We exclude Jersey from the "National" KPI agg
+        # (it's really England and Wales, the name is confusing because it predates us adding Jersey to the audit)
+        case EnumAbstractionLevel.NATIONAL:
+            abstraction_filter = {
+                f"epilepsy12_sites__organisation__country__boundary_identifier__in": ["E92000001", "W92000004"]
+            }
     
     if abstraction_filter:
         abstraction_filter["epilepsy12_sites__site_is_primary_centre_of_epilepsy_care"] = True
