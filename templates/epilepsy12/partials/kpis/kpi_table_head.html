@@ -66,6 +66,7 @@
             ></i>({{all_data.LOCAL_HEALTH_BOARD_KPIS.total_cases_registered}})</p>
         </th>
         {% endif %}
+        {% if country.boundary_identifier != 'JEY' %}
         <th class='right aligned'>
             <p>OPEN UK Region</p>
             <p><i 
@@ -77,6 +78,7 @@
                 _="init js $('#totals_open_uk_{{kpi_head_id}}').popup(); end"
             ></i>({{all_data.OPEN_UK_KPIS.total_cases_registered}})</p>
         </th>
+        {% endif %}
         <th class='right aligned'>
             <p>{{all_data.COUNTRY_KPIS.aggregation_model.abstraction_relation.name}}</p>
             <p><i 
@@ -88,6 +90,7 @@
                 _="init js $('#totals_country_{{kpi_head_id}}').popup(); end"
             ></i>({{all_data.COUNTRY_KPIS.total_cases_registered}})</p>
         </th>
+        {% if country.boundary_identifier != 'JEY' %}
         <th class='right aligned'>
             <p>National</p>
             <p><i 
@@ -99,5 +102,6 @@
                 _="init js $('#totals_national_{{kpi_head_id}}').popup(); end"
             ></i>({{all_data.NATIONAL_KPIS.total_cases_registered}})</p>
         </th>
+        {% endif %}
     </tr>
 </thead>
