@@ -797,7 +797,7 @@ def get_abstraction_filter_for_organisation_and_level(
         case EnumAbstractionLevel.OPEN_UK if organisation.openuk_network:
             abstraction_filter = {
                 f"epilepsy12_sites__organisation__openuk_network": organisation.openuk_network,
-                f"epilepsy12_sites__organisation__country__boundary_identifier__in": ["E92000001", "E92000002"]
+                f"epilepsy12_sites__organisation__country__boundary_identifier__in": ["E92000001", "W92000004"]
             }
         case EnumAbstractionLevel.COUNTRY:
             abstraction_filter = {
@@ -807,7 +807,7 @@ def get_abstraction_filter_for_organisation_and_level(
         # (it's really England and Wales, the name is confusing because it predates us adding Jersey to the audit)
         case EnumAbstractionLevel.NATIONAL:
             abstraction_filter = {
-                f"epilepsy12_sites__organisation__country__boundary_identifier__in": ["E92000001", "E92000002"]
+                f"epilepsy12_sites__organisation__country__boundary_identifier__in": ["E92000001", "W92000004"]
             }
     
     if abstraction_filter:
