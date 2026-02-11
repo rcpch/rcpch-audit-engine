@@ -793,15 +793,22 @@ def get_abstraction_filter_for_organisation_and_level(
             abstraction_filter = {
                 f"epilepsy12_sites__organisation__nhs_england_region": organisation.nhs_england_region
             }
+        # Jersey is in the SWIPE Open UK network but we exclude it from the KPI calculations
         case EnumAbstractionLevel.OPEN_UK if organisation.openuk_network:
             abstraction_filter = {
-                f"epilepsy12_sites__organisation__openuk_network": organisation.openuk_network
+                f"epilepsy12_sites__organisation__openuk_network": organisation.openuk_network,
+                f"epilepsy12_sites__organisation__country__boundary_identifier__in": ["E92000001", "W92000004"]
             }
         case EnumAbstractionLevel.COUNTRY:
             abstraction_filter = {
                 f"epilepsy12_sites__organisation__country": organisation.country
             }
-        # national, no filter
+        # We exclude Jersey from the "National" KPI agg
+        # (it's really England and Wales, the name is confusing because it predates us adding Jersey to the audit)
+        case EnumAbstractionLevel.NATIONAL:
+            abstraction_filter = {
+                f"epilepsy12_sites__organisation__country__boundary_identifier__in": ["E92000001", "W92000004"]
+            }
     
     if abstraction_filter:
         abstraction_filter["epilepsy12_sites__site_is_primary_centre_of_epilepsy_care"] = True
@@ -932,7 +939,9 @@ def _seed_all_aggregation_models(cohort=None) -> None:
 
             logger.info(f"Created {new_agg_model}")
 
-    # National handled separately as it has no abstraction relation field
+    # National handled separately as it has no abstraction relation field.
+    # The name of the NationalKPIAggregation model is confusing because it comes from before we added
+    # Jersey. It really means "England and Wales", as per the row name in the KPI export spreadsheet.
     if NationalKPIAggregation.objects.filter(
         cohort=requested_cohort,
     ).exists():
@@ -1151,7 +1160,9 @@ def create_totals_dataframe(cohort, abstraction_level):
             organisation_count=Count("organisation")
         ).filter(organisation_count__gt=0)
     elif abstraction_level == "country":
-        query_set = Country.objects.annotate(
+        query_set = Country.objects.exclude(
+            organisation__country__boundary_identifier="JEY"
+        ).annotate(
             organisation_count=Count("organisation")
         ).filter(organisation_count__gt=0)
 
