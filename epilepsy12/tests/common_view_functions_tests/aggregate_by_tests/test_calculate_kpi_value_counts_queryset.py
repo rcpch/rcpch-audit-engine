@@ -66,6 +66,9 @@ from .helpers import _clean_cases_from_test_db, _register_kpi_scored_cases
     ],
 )
 @pytest.mark.django_db
+# Run last as it can sometimes pick pathological query plans when running fresh before Postgres has properly
+# analysed the tables (https://github.com/rcpch/rcpch-audit-engine/issues/1119)
+@pytest.mark.slow
 def test_calculate_kpi_value_counts_queryset_all_levels(
     abstraction_level, abstraction_codes, ods_codes, e12_case_factory
 ):
