@@ -5,6 +5,7 @@
     [x] Assert an Audit Centre Lead Clinician can create users inside own Trust - response.status_code == HTTPStatus.OK
     [x] Assert RCPCH Audit Team can create users nationally, inside own Trust, and outside  - response.status_code == HTTPStatus.OK
     [x] Assert Clinical Audit Team can create users nationally, inside own Trust, and outside  - response.status_code == HTTPStatus.OK
+    [ ] Assert RCPCH staff can create new RCPCH staff users - response.status_code == HTTPStatus.OK
 
     [x] Assert an Audit Centre Administrator CANNOT create users - response.status_code == HTTPStatus.FORBIDDEN
     [x] Assert an audit centre clinician CANNOT create users - response.status_code == HTTPStatus.FORBIDDEN
@@ -110,6 +111,7 @@ from epilepsy12.models import (
     Organisation,
     Case,
 )
+from epilepsy12.constants.user_types import RCPCH_AUDIT_TEAM
 from epilepsy12.tests.view_tests.permissions_tests.perm_tests_utils import (
     twofactor_signin,
 )
@@ -351,6 +353,77 @@ def test_user_creation_forbidden(
         Epilepsy12User.objects.filter(first_name=TEMP_CREATED_USER_FIRST_NAME).count()
         == 0
     ), f"Logged in as 3 different unpermitted Users and attempted to create an e12 user with first_name = {TEMP_CREATED_USER_FIRST_NAME}. Should be 0 matches in db for this filter."
+
+
+@pytest.mark.django_db
+def test_rcpch_staff_can_create_rcpch_staff_user(
+    client,
+    seed_groups_fixture,
+    seed_users_fixture,
+):
+    """Regression test: RCPCH staff users should be able to create new RCPCH staff users.
+
+    The create_epilepsy12_user view accepts user_type='rcpch-staff' for creating RCPCH staff
+    members. This test asserts that an RCPCH staff user can access this route and successfully
+    create a new RCPCH staff user.
+    """
+
+    # GOSH - used as the organisation_id in the URL (RCPCH staff are not tied to an org)
+    TEST_USER_ORGANISATION = Organisation.objects.get(
+        ods_code="RP401",
+        trust__ods_code="RP4",
+    )
+
+    TEMP_CREATED_USER_FIRST_NAME = "TEMP_RCPCH_STAFF_CREATED"
+
+    test_user = Epilepsy12User.objects.get(
+        first_name=test_user_rcpch_audit_team_data.role_str
+    )
+
+    client.force_login(test_user)
+
+    test_user.set_organisation_employer(
+        organisation_employer=TEST_USER_ORGANISATION, is_primary=True
+    )
+
+    # OTP ENABLE
+    twofactor_signin(client, test_user)
+
+    url = reverse(
+        "create_epilepsy12_user",
+        kwargs={
+            "organisation_id": TEST_USER_ORGANISATION.id,
+            "user_type": "rcpch-staff",
+        },
+    )
+
+    response = client.get(url)
+
+    assert (
+        response.status_code == HTTPStatus.OK
+    ), f"RCPCH staff user requested `{url}`. Expected {HTTPStatus.OK}, received {response.status_code}"
+
+    data = {
+        "title": 1,
+        "email": f"{TEMP_CREATED_USER_FIRST_NAME}@rcpch.ac.uk",
+        "role": RCPCH_AUDIT_TEAM,
+        "first_name": TEMP_CREATED_USER_FIRST_NAME,
+        "surname": "Staff",
+        "is_rcpch_audit_team_member": True,
+        "is_rcpch_staff": True,
+        "email_confirmed": True,
+    }
+
+    response = client.post(url, data=data)
+
+    assert (
+        response.status_code == HTTPStatus.FOUND
+    ), f"RCPCH staff user POSTed valid data to `{url}`. Expected {HTTPStatus.FOUND}, received {response.status_code}"
+
+    assert (
+        Epilepsy12User.objects.filter(first_name=TEMP_CREATED_USER_FIRST_NAME).count()
+        == 1
+    ), f"Expected 1 newly created RCPCH staff user with first_name={TEMP_CREATED_USER_FIRST_NAME}, found 0."
 
 
 @pytest.mark.django_db

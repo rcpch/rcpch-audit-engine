@@ -161,7 +161,7 @@ def _user_may_view_this_organisation(request, kwargs):
         ):
             # user's has an organisation employer in the same trust or LHB as the organisation requested
             if kwargs.get("user_type") is not None:
-                if kwargs.get("user_type") == "rcpch-staff":
+                if kwargs.get("user_type") == "rcpch-staff" and not user.is_rcpch_staff:
                     # this route is for rcpch staff to create new rcpch staff members only
                     raise PermissionDenied()
             # user is allowed
