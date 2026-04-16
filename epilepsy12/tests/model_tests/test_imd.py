@@ -20,7 +20,9 @@ from datetime import date
 from unittest.mock import patch, call
 
 # RCPCH imports
-from epilepsy12.general_functions.index_multiple_deprivation import recalculate_imd_for_case
+from epilepsy12.general_functions.index_multiple_deprivation import (
+    recalculate_imd_for_case,
+)
 
 IMD_PATCH = "epilepsy12.general_functions.index_multiple_deprivation.imd_for_postcode"
 COORDS_PATCH = "epilepsy12.models_folder.case.coordinates_for_postcode"
@@ -32,9 +34,7 @@ COORDS_PATCH = "epilepsy12.models_folder.case.coordinates_for_postcode"
 @pytest.mark.django_db
 @patch(COORDS_PATCH)
 @patch(IMD_PATCH)
-def test_imd_uses_2019_for_cohort_below_8(
-    mock_imd, mock_coords, e12_case_factory
-):
+def test_imd_uses_2019_for_cohort_below_8(mock_imd, mock_coords, e12_case_factory):
     """Cohort 7 (assessment date in 2024) should call the API with year=2019."""
     mock_coords.return_value = (-0.1234, 51.5678)
     mock_imd.return_value = 3
@@ -53,9 +53,7 @@ def test_imd_uses_2019_for_cohort_below_8(
 @pytest.mark.django_db
 @patch(COORDS_PATCH)
 @patch(IMD_PATCH)
-def test_imd_uses_2025_for_cohort_8_and_above(
-    mock_imd, mock_coords, e12_case_factory
-):
+def test_imd_uses_2025_for_cohort_8_and_above(mock_imd, mock_coords, e12_case_factory):
     """Cohort 8 (assessment date in 2025) should call the API with year=2025."""
     mock_coords.return_value = (-0.1234, 51.5678)
     mock_imd.return_value = 2
@@ -185,6 +183,7 @@ def test_imd_not_calculated_when_no_registration(
     # cache is cleared (otherwise case.registration still returns the cached instance).
     case.registration.delete()
     from epilepsy12.models import Case
+
     case = Case.objects.get(pk=case.pk)
     mock_imd.reset_mock()
 
@@ -210,6 +209,7 @@ def test_imd_not_calculated_when_cohort_is_none(
 
     # Force cohort to None without triggering signals
     from epilepsy12.models import Registration
+
     Registration.objects.filter(pk=case.registration.pk).update(cohort=None)
     case.registration.refresh_from_db()
     mock_imd.reset_mock()
@@ -235,6 +235,7 @@ def test_imd_persisted_to_database(mock_imd, mock_coords, e12_case_factory):
     )
 
     from epilepsy12.models import Case
+
     db_value = Case.objects.get(pk=case.pk).index_of_multiple_deprivation_quintile
     assert db_value == 5
 
@@ -242,9 +243,7 @@ def test_imd_persisted_to_database(mock_imd, mock_coords, e12_case_factory):
 @pytest.mark.django_db
 @patch(COORDS_PATCH)
 @patch(IMD_PATCH)
-def test_imd_set_to_none_when_api_returns_none(
-    mock_imd, mock_coords, e12_case_factory
-):
+def test_imd_set_to_none_when_api_returns_none(mock_imd, mock_coords, e12_case_factory):
     """If the API returns None (e.g. postcode not found), IMD should be None."""
     mock_coords.return_value = (-0.1234, 51.5678)
     mock_imd.return_value = None
