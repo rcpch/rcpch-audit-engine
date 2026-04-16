@@ -94,6 +94,7 @@
 import pytest
 from http import HTTPStatus
 from datetime import date
+from unittest.mock import patch
 
 # django imports
 from django.urls import reverse
@@ -427,9 +428,12 @@ def test_rcpch_staff_can_create_rcpch_staff_user(
 
 
 @pytest.mark.django_db
+@patch("epilepsy12.models_folder.case.coordinates_for_postcode")
 def test_patient_create_success(
+    mock_coords,
     client,
 ):
+    mock_coords.return_value = (-0.1234, 51.5678)
     """Integration test checking functionality of view and form.
 
     Simulating different E12 users with different roles attempting to create Patients inside own trust.
