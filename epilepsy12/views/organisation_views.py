@@ -1,7 +1,10 @@
 # Python imports
 from datetime import date
+import json
+import math
 
 # third party libraries
+from django.conf import settings
 from django.shortcuts import render
 from django.urls import reverse
 from django.contrib.auth.decorators import permission_required
@@ -16,7 +19,13 @@ from epilepsy12.models_folder.entities.local_health_board import LocalHealthBoar
 # E12 imports
 from ..decorator import user_may_view_this_organisation, login_and_otp_required
 from epilepsy12.constants import INDIVIDUAL_KPI_MEASURES, EnumAbstractionLevel
-from epilepsy12.models import Organisation, KPI, OrganisationKPIAggregation, OrganisationalAuditSubmissionPeriod, Trust
+from epilepsy12.models import (
+    Organisation,
+    KPI,
+    OrganisationKPIAggregation,
+    OrganisationalAuditSubmissionPeriod,
+    Trust,
+)
 from ..common_view_functions import (
     cases_aggregated_by_sex,
     cases_aggregated_by_ethnicity,
@@ -27,7 +36,6 @@ from ..common_view_functions import (
     logged_in_user_may_access_this_organisation,
     filter_all_registered_cases_by_active_lead_site_and_cohort_and_level_of_abstraction,
     generate_dataframe_and_aggregated_distance_data_from_cases,
-    generate_distance_from_organisation_scatterplot_figure,
     generate_case_count_choropleth_map,
     piechart_plot_cases_by_ethnicity,
     piechart_plot_cases_by_index_of_multiple_deprivation,
@@ -65,44 +73,49 @@ def selected_organisation_summary_select(request):
     )
     return HttpResponseClientRedirect(response)
 
+
 @login_and_otp_required()
 def filter_organisations_by_parent(request, parent_id, parent_type):
     """
     HTMX callback when parent dropdown changes.
     Since the entire dashboard is tied to the selected organisation,
     we redirect to the first organisation in the selected parent.
-    
+
     Params:
     parent_id: primary key of selected parent trust or local health board
     parent_type: string, one of ['trust', 'local_health_board']
     """
-    
+
     # If HTMX posts the selected parent in the body, extract both id and type
     # Format: "parent_id:parent_type" (e.g., "5:trust" or "12:local_health_board")
     posted_parent = request.POST.get("selected_parent_summary_select")
-    if posted_parent and ':' in posted_parent:
+    if posted_parent and ":" in posted_parent:
         try:
-            parent_id_str, parent_type = posted_parent.split(':', 1)
+            parent_id_str, parent_type = posted_parent.split(":", 1)
             parent_id = int(parent_id_str)
         except (ValueError, TypeError):
             # Ignore and use URL parameters
             pass
 
     # Filter organisations by parent type
-    if parent_type == 'trust':
+    if parent_type == "trust":
         organisations = Organisation.objects.filter(trust__id=parent_id, active=True)
     else:  # local_health_board
-        organisations = Organisation.objects.filter(local_health_board__id=parent_id, active=True)
+        organisations = Organisation.objects.filter(
+            local_health_board__id=parent_id, active=True
+        )
 
     # Apply user access restrictions if not admin
     if not (request.user.is_rcpch_staff or request.user.is_superuser):
         allowed_orgs = organisation_white_list_for_user(request.user)
-        organisations = organisations.filter(id__in=allowed_orgs.values_list('id', flat=True))
-    
+        organisations = organisations.filter(
+            id__in=allowed_orgs.values_list("id", flat=True)
+        )
+
     # Get the first organisation in the filtered list and redirect to it
     # This triggers a full page reload with all the organisation-specific data
-    selected_organisation = organisations.order_by('name').first()
-    
+    selected_organisation = organisations.order_by("name").first()
+
     if selected_organisation:
         response = reverse(
             "selected_organisation_summary",
@@ -113,10 +126,11 @@ def filter_organisations_by_parent(request, parent_id, parent_type):
         # No organisations found for this parent
         # This should not happen if parent_list is properly filtered
         from django.http import HttpResponse
+
         return HttpResponse(
             f"No organisations found for the selected {'trust' if parent_type == 'trust' else 'local health board'}. "
-            "Please contact support if this issue persists.", 
-            status=404
+            "Please contact support if this issue persists.",
+            status=404,
         )
 
 
@@ -167,12 +181,47 @@ def selected_organisation_summary(request, organisation_id):
         )
     )
 
-    # generate scatterplot of cases by distance from the selected organisation
+    # IMD tile era: cohorts < 8 use 2011 LSOA boundaries (2019 IMD),
+    # cohorts >= 8 use 2021 LSOA boundaries (2025 IMD)
+    imd_tile_era = "2011" if cohort_number < 8 else "2021"
 
-    scatterplot_of_cases_for_selected_organisation = (
-        generate_distance_from_organisation_scatterplot_figure(
-            geo_df=case_distances_dataframe, organisation=selected_organisation
-        )
+    # Serialise case locations as GeoJSON for the MapLibre deprivation map
+    _case_features = []
+    if not case_distances_dataframe.empty:
+        _required = {"latitude", "longitude"}
+        if _required.issubset(case_distances_dataframe.columns):
+            for _, _row in case_distances_dataframe.dropna(
+                subset=["latitude", "longitude"]
+            ).iterrows():
+                _props = {}
+                for _col in (
+                    "pk",
+                    "distance_mi",
+                    "distance_km",
+                    "epilepsy12_sites__organisation__name",
+                ):
+                    if _col in case_distances_dataframe.columns:
+                        _val = _row[_col]
+                        _props[_col] = (
+                            None
+                            if (isinstance(_val, float) and math.isnan(_val))
+                            else _val
+                        )
+                _case_features.append(
+                    {
+                        "type": "Feature",
+                        "geometry": {
+                            "type": "Point",
+                            "coordinates": [
+                                float(_row["longitude"]),
+                                float(_row["latitude"]),
+                            ],
+                        },
+                        "properties": _props,
+                    }
+                )
+    cases_geojson = json.dumps(
+        {"type": "FeatureCollection", "features": _case_features}
     )
 
     # differentiate between England and Wales
@@ -283,8 +332,7 @@ def selected_organisation_summary(request, organisation_id):
         organisation_list = Organisation.objects.get_organisation_list()
         # Get merged parent list for all active organisations
         parent_list = merged_parent_list_for_user(
-            epilepsy12_user=request.user,
-            organisation_list=organisation_list
+            epilepsy12_user=request.user, organisation_list=organisation_list
         )
     else:
         # Regular users: organisation list is scoped to the organisations in the user's organisation_employer list and their siblings
@@ -293,26 +341,23 @@ def selected_organisation_summary(request, organisation_id):
         )
         # Get merged parent list only for organisations the user has access to
         parent_list = merged_parent_list_for_user(
-            epilepsy12_user=request.user,
-            organisation_list=organisation_list
+            epilepsy12_user=request.user, organisation_list=organisation_list
         )
 
     # Filter organisation_list to only show organisations within the selected parent
     # This makes the organisation dropdown dependent on the parent dropdown
     if selected_organisation.trust:
         organisation_list = organisation_list.filter(trust=selected_parent)
-        parent_type = 'trust'
+        parent_type = "trust"
     elif selected_organisation.local_health_board:
         organisation_list = organisation_list.filter(local_health_board=selected_parent)
-        parent_type = 'local_health_board'
+        parent_type = "local_health_board"
     else:
         # Organisation has no parent (shouldn't happen in practice)
         parent_type = None
 
     organisational_audit_submission_period = (
-        OrganisationalAuditSubmissionPeriod.objects
-        .order_by("-year")
-        .first()
+        OrganisationalAuditSubmissionPeriod.objects.order_by("-year").first()
     )
 
     context = {
@@ -353,7 +398,12 @@ def selected_organisation_summary(request, organisation_id):
         "count_of_all_current_cohort_registered_cases_in_this_trust": count_of_all_current_cohort_registered_cases_in_this_trust,
         "count_of_current_cohort_registered_completed_cases_in_this_trust": count_of_current_cohort_registered_completed_cases_in_this_trust,
         "individual_kpi_choices": INDIVIDUAL_KPI_MEASURES,
-        "organisation_cases_map": scatterplot_of_cases_for_selected_organisation,
+        "cases_geojson": cases_geojson,
+        "imd_tile_era": imd_tile_era,
+        "deprivation_tiles_url": settings.RCPCH_DEPRIVATION_TILES_URL,
+        "org_lat": selected_organisation.latitude,
+        "org_lng": selected_organisation.longitude,
+        "org_name": selected_organisation.name,
         "aggregated_distances": aggregated_distances,
         "country_heatmap": country_heatmap,
         "organisational_audit_submission_period": organisational_audit_submission_period,
@@ -418,7 +468,9 @@ def publish_kpis(request, organisation_id):
     organisation = Organisation.objects.get(pk=organisation_id)
 
     # perform aggregations and update all the KPIAggregation models only for clinicians
-    update_all_kpi_agg_models(organisation=organisation, cohort=cohort_number, open_access=True)
+    update_all_kpi_agg_models(
+        organisation=organisation, cohort=cohort_number, open_access=True
+    )
 
     return render(
         request=request,
@@ -472,7 +524,9 @@ def selected_trust_kpis(request, organisation_id, access):
 
         if access == "private":
             # perform aggregations and update all the KPIAggregation models only for clinicians
-            update_all_kpi_agg_models(organisation=organisation, cohort=cohort_number, open_access=False)
+            update_all_kpi_agg_models(
+                organisation=organisation, cohort=cohort_number, open_access=False
+            )
 
         # Gather relevant data specific for this view - still show only published data if this is public view
         all_data = get_all_kpi_aggregation_data_for_view(

@@ -2,6 +2,10 @@
 {% load epilepsy12_template_tags %}
 {% csrf_token %}
 
+{# MapLibre GL JS — loaded here so it is available for the deprivation map below #}
+<link rel="stylesheet" href="https://unpkg.com/maplibre-gl@4/dist/maplibre-gl.css" />
+<script src="https://unpkg.com/maplibre-gl@4/dist/maplibre-gl.js"></script>
+
 <div class="ui grid container selected_organisation_container">
         <div class="fluid row stackable three column grid">
             <div class='column'>
@@ -506,12 +510,208 @@
 </div>
 
 <script>
-    var organisation_plotly_map = {{ organisation_cases_map|safe }}
-    
-    var country_plotly_map = {{ country_heatmap|safe }}; 
+    // ── Deprivation + Cases map (MapLibre GL JS) ──────────────────────────────
+    (function () {
+        const TILES_BASE_URL = "{{ deprivation_tiles_url }}";
+        const IMD_ERA       = "{{ imd_tile_era }}";   // "2011" or "2021"
+        const ORG_LNG       = {{ org_lng|default:"null" }};
+        const ORG_LAT       = {{ org_lat|default:"null" }};
+        const ORG_NAME      = "{{ org_name|escapejs }}";
+
+        // Bail out gracefully if no organisation coordinates
+        if (ORG_LNG === null || ORG_LAT === null) {
+            document.getElementById("organisation_cases_map").innerHTML =
+                '<p style="padding:1em;color:#666;">Map unavailable: organisation has no coordinates.</p>';
+            return;
+        }
+        const CASES_GEOJSON = {{ cases_geojson|safe }};
+
+        // Layer name follows pg_tileserv view naming: public.uk_master_{era}_{zoomBucket}
+        function getLayerName(era, zoom) {
+            // Keep z8 in the medium bucket to avoid expensive z8_10 fetches at boundary zoom.
+            const bucket = zoom <= 4 ? "z0_4" : zoom <= 8 ? "z5_7" : "z8_10";
+            return `public.uk_master_${era}_${bucket}`;
+        }
+
+        function imdFillColor() {
+            return [
+                "case",
+                ["==", ["get", "imd_decile"], 0], "#cccccc",
+                // England — reds
+                ["==", ["get", "nation"], "england"],
+                ["interpolate", ["linear"], ["get", "imd_decile"],
+                    1, "#67000d", 3, "#a50f15", 5, "#ef3b2c", 7, "#fb6a4a", 10, "#fee5d9"],
+                // Scotland — blues
+                ["==", ["get", "nation"], "scotland"],
+                ["interpolate", ["linear"], ["get", "imd_decile"],
+                    1, "#08306b", 3, "#2171b5", 5, "#6baed6", 7, "#bdd7e7", 10, "#eff3ff"],
+                // Wales — greens
+                ["==", ["get", "nation"], "wales"],
+                ["interpolate", ["linear"], ["get", "imd_decile"],
+                    1, "#00441b", 3, "#238b45", 5, "#74c476", 7, "#bae4b3", 10, "#edf8e9"],
+                // N. Ireland — oranges
+                ["==", ["get", "nation"], "northern_ireland"],
+                ["interpolate", ["linear"], ["get", "imd_decile"],
+                    1, "#7f2704", 3, "#d94801", 5, "#fd8d3c", 7, "#fdbe85", 10, "#feedde"],
+                "#cccccc"
+            ];
+        }
+
+        const map = new maplibregl.Map({
+            container: "organisation_cases_map",
+            // Use an inline style so we don't depend on fetching an external style.json,
+            // which delays / silently blocks map.on("load") if the URL is slow or fails.
+            style: {
+                version: 8,
+                glyphs: "https://fonts.openmaptiles.org/{fontstack}/{range}.pbf",
+                sources: {
+                    "basemap": {
+                        type: "raster",
+                        tiles: [
+                            "https://a.basemaps.cartocdn.com/light_all/{z}/{x}/{y}.png",
+                            "https://b.basemaps.cartocdn.com/light_all/{z}/{x}/{y}.png",
+                        ],
+                        tileSize: 256,
+                        attribution: "© <a href='https://www.openstreetmap.org/copyright'>OpenStreetMap</a> contributors © <a href='https://carto.com/'>CARTO</a>",
+                    },
+                },
+                layers: [{
+                    id: "basemap-layer",
+                    type: "raster",
+                    source: "basemap",
+                    minzoom: 0,
+                    maxzoom: 19,
+                }],
+            },
+            center: [ORG_LNG, ORG_LAT],
+            zoom: 8,
+        });
+
+        let activeLayerName = null;
+
+        function addDeprivationLayer(beforeId, forcedLayerName) {
+            const layerName = forcedLayerName || getLayerName(IMD_ERA, map.getZoom());
+
+            // Avoid rebuilding the same layer/source on every zoomend.
+            if (activeLayerName === layerName && map.getLayer("deprivation-layer")) {
+                return;
+            }
+
+            if (map.getLayer("deprivation-layer")) map.removeLayer("deprivation-layer");
+            if (map.getSource("deprivation-source")) map.removeSource("deprivation-source");
+            map.addSource("deprivation-source", {
+                type: "vector",
+                tiles: [`${TILES_BASE_URL}/${layerName}/{z}/{x}/{y}.pbf`],
+                minzoom: 0,
+                maxzoom: 14,
+            });
+            map.addLayer({
+                id: "deprivation-layer",
+                type: "fill",
+                source: "deprivation-source",
+                "source-layer": layerName,
+                paint: {
+                    "fill-color": imdFillColor(),
+                    "fill-opacity": 0.65,
+                    "fill-outline-color": "rgba(255,255,255,0.15)",
+                },
+            }, beforeId);   // insert below case dots when beforeId is provided
+
+            activeLayerName = layerName;
+        }
+
+        map.on("error", function (e) {
+            const msg = (e && e.error && e.error.message) ? e.error.message : "";
+
+            // If the high-detail layer intermittently 500s, gracefully fall back.
+            if (msg.includes("public.uk_master_") && msg.includes("_z8_10")) {
+                addDeprivationLayer("cases-layer", `public.uk_master_${IMD_ERA}_z5_7`);
+            }
+        });
+
+        map.on("load", function () {
+            // 1. Deprivation tiles (no beforeId yet — cases-layer added next)
+            addDeprivationLayer();
+            map.on("zoomend", function () { addDeprivationLayer("cases-layer"); });
+
+            // 2. Case locations (patients)
+            map.addSource("cases-source", {
+                type: "geojson",
+                data: CASES_GEOJSON,
+            });
+            map.addLayer({
+                id: "cases-layer",
+                type: "circle",
+                source: "cases-source",
+                paint: {
+                    "circle-radius": 7,
+                    "circle-color": "#e91e8c",   // RCPCH pink
+                    "circle-opacity": 0.9,
+                    "circle-stroke-width": 1,
+                    "circle-stroke-color": "#ffffff",
+                },
+            });
+
+            // 3. Selected organisation marker (dark blue)
+            map.addLayer({
+                id: "org-layer",
+                type: "circle",
+                source: {
+                    type: "geojson",
+                    data: {
+                        type: "Feature",
+                        geometry: { type: "Point", coordinates: [ORG_LNG, ORG_LAT] },
+                        properties: { name: ORG_NAME },
+                    },
+                },
+                paint: {
+                    "circle-radius": 10,
+                    "circle-color": "#003087",   // RCPCH dark blue
+                    "circle-opacity": 1,
+                    "circle-stroke-width": 2,
+                    "circle-stroke-color": "#ffffff",
+                },
+            });
+
+            // 4. Popups on hover
+            const popup = new maplibregl.Popup({ closeButton: false, closeOnClick: false });
+
+            map.on("mousemove", "cases-layer", function (e) {
+                map.getCanvas().style.cursor = "pointer";
+                const props = e.features[0].properties;
+                const orgName = props["epilepsy12_sites__organisation__name"] || "";
+                const distMi  = props["distance_mi"] != null ? Number(props["distance_mi"]).toFixed(2) : "—";
+                const distKm  = props["distance_km"] != null ? Number(props["distance_km"]).toFixed(2) : "—";
+                popup.setLngLat(e.lngLat)
+                    .setHTML(`<strong>${orgName}</strong><br>Distance: ${distMi} mi (${distKm} km)`)
+                    .addTo(map);
+            });
+            map.on("mouseleave", "cases-layer", function () {
+                map.getCanvas().style.cursor = "";
+                popup.remove();
+            });
+
+            map.on("mousemove", "deprivation-layer", function (e) {
+                map.getCanvas().style.cursor = "pointer";
+                const props  = e.features[0].properties;
+                const decile = props["imd_decile"] === 0 ? "No data" : props["imd_decile"];
+                popup.setLngLat(e.lngLat)
+                    .setHTML(`<strong>${(props["nation"] || "").toUpperCase()} LSOA</strong><br>IMD decile: ${decile}`)
+                    .addTo(map);
+            });
+            map.on("mouseleave", "deprivation-layer", function () {
+                map.getCanvas().style.cursor = "";
+                popup.remove();
+            });
+        });
+
+        map.addControl(new maplibregl.NavigationControl(), "top-right");
+    })();
+
+    // ── Remaining Plotly charts ───────────────────────────────────────────────
+    var country_plotly_map = {{ country_heatmap|safe }};
     Plotly.newPlot("country_map", country_plotly_map.data, country_plotly_map.layout);
-    Plotly.react('organisation_cases_map', organisation_plotly_map.data, organisation_plotly_map.layout)
-    
+
     var nhs_region_data = {{ nhsregion_heatmap|safe }};
     var icb_data = {{ icb_heatmap|safe }};
     Plotly.react("icb_map", icb_data.data, icb_data.layout);
