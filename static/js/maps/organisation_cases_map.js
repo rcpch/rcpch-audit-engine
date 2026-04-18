@@ -530,6 +530,7 @@
         const laCode = props["la_code"] || "N/A";
         const decile =
           props["imd_decile"] === 0 ? "No data" : props["imd_decile"];
+        const imdYear = props["imd_year"] || props["year"] || "N/A";
 
         const boundaryByType = {};
         if (boundaryContextLayerIds.length > 0) {
@@ -592,7 +593,7 @@
         popup
           .setLngLat(e.lngLat)
           .setHTML(
-            `<strong>${areaName}</strong><br>Code: ${areaCode}<br>LA: ${laName} (${laCode})<br>IMD decile: ${decile}<sup>†</sup>${boundaryContextHtml}`,
+            `<strong>${areaName}</strong><br>Code: ${areaCode}<br>LA: ${laName} (${laCode})<br>IMD year: ${imdYear}<br>IMD decile: ${decile}<sup>†</sup>${boundaryContextHtml}`,
           )
           .addTo(map);
       }
