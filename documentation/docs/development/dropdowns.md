@@ -51,7 +51,10 @@ eg: `extra_causes_without_concept_ids = [...., {"preferredTerm": "Cause name", "
 
 Note that the function expects a list, even if only one item is supplied.
 
-<!-- There will need to be further documentation added here for new organisations and trust, as well as new comorbidities, and possibly medications and so on. For now, this is the workflow for EpilepsyCauses -->
+> [!NOTE]
+> Epilepsy Causes have as of #1224 been deprecated pending a better solution.
+
+
 
 ### Organisations
 

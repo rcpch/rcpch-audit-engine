@@ -114,8 +114,6 @@ def multiaxial_diagnosis(request, case_id):
 
     keyword_choices = Keyword.objects.all()
 
-    # epilepsy_causes = EpilepsyCause.objects.all().order_by("preferredTerm")
-
     site = Site.objects.filter(
         site_is_actively_involved_in_epilepsy_care=True,
         site_is_primary_centre_of_epilepsy_care=True,
@@ -132,7 +130,6 @@ def multiaxial_diagnosis(request, case_id):
         "comorbidities": comorbidities,
         "keyword_choices": keyword_choices,
         "epilepsy_cause_selection": EPILEPSY_CAUSES,
-        # "epilepsy_causes": epilepsy_causes,
         "case_id": case_id,
         "audit_progress": registration.audit_progress,
         "active_template": "multiaxial_diagnosis",
@@ -1362,12 +1359,9 @@ def epilepsy_cause_known(request, multiaxial_diagnosis_id):
 
     multiaxial_diagnosis = MultiaxialDiagnosis.objects.get(pk=multiaxial_diagnosis_id)
 
-    # epilepsy_causes = EpilepsyCause.objects.all().order_by("preferredTerm")
-
     context = {
         "multiaxial_diagnosis": multiaxial_diagnosis,
         "epilepsy_cause_selection": EPILEPSY_CAUSES,
-        # "epilepsy_causes": epilepsy_causes,
     }
 
     response = recalculate_form_generate_response(
@@ -1401,12 +1395,12 @@ def epilepsy_cause_known(request, multiaxial_diagnosis_id):
 #     except ValueError as error:
 #         error_message = error
 
-#     # epilepsy_causes = EpilepsyCause.objects.all().order_by("preferredTerm")
+#
 
 #     multiaxial_diagnosis = MultiaxialDiagnosis.objects.get(pk=multiaxial_diagnosis_id)
 
 #     context = {
-#         # "epilepsy_causes": epilepsy_causes,
+#
 #         "multiaxial_diagnosis": multiaxial_diagnosis,
 #         "epilepsy_cause_selection": EPILEPSY_CAUSES,
 #     }

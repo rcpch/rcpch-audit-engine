@@ -143,7 +143,7 @@ class MultiaxialDiagnosis(
         related_name="multiaxialdiagnosis",
     )
 
-    epilepsy_cause = models.ForeignKey(
+    epilepsy_cause = models.ForeignKey(  # DEPRECATED - as of #1224: to be removed in a future release
         "epilepsy12.EpilepsyCause",
         on_delete=models.PROTECT,
         help_text={
