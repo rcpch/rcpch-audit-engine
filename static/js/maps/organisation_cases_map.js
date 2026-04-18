@@ -145,6 +145,8 @@
     const DEPRIVATION_SECONDARY_LAYER_ID = "deprivation-layer-secondary";
     let activeLayerSignature = null;
     let forcedPrimaryLayerName = null;
+    const boundaryContextLayerIds = [];
+    const boundaryOverlayLayerIdsById = {};
 
     function addBoundaryOverlays(overlays) {
       if (!Array.isArray(overlays) || overlays.length === 0) {
@@ -152,53 +154,142 @@
       }
 
       overlays.forEach(function (overlay) {
-        if (
-          !overlay ||
-          !overlay.id ||
-          !overlay.tilesBaseUrl ||
-          !overlay.sourceLayer
-        ) {
+        if (!overlay || !overlay.id) {
           return;
         }
 
         const sourceId = `${overlay.id}-source`;
-        const layerId = `${overlay.id}-layer`;
-        const layerType = overlay.layerType || "line";
-        const paint = overlay.paint || {
-          "line-color": "#003087",
-          "line-width": 1.5,
-          "line-opacity": 0.8,
+        const lineLayerId = `${overlay.id}-line`;
+        const fillLayerId = `${overlay.id}-fill`;
+        const linePaint = overlay.linePaint ||
+          overlay.paint || {
+            "line-color": "#003087",
+            "line-width": 1.5,
+            "line-opacity": 0.8,
+          };
+        const fillPaint = overlay.fillPaint || {
+          "fill-color": "#000000",
+          "fill-opacity": 0,
         };
 
-        if (map.getLayer(layerId)) {
-          map.removeLayer(layerId);
+        if (map.getLayer(fillLayerId)) {
+          map.removeLayer(fillLayerId);
+        }
+        if (map.getLayer(lineLayerId)) {
+          map.removeLayer(lineLayerId);
         }
         if (map.getSource(sourceId)) {
           map.removeSource(sourceId);
         }
 
-        map.addSource(sourceId, {
-          type: "vector",
-          tiles: [overlay.tilesBaseUrl],
-          minzoom: overlay.minzoom != null ? overlay.minzoom : 0,
-          maxzoom: overlay.maxzoom != null ? overlay.maxzoom : 14,
-        });
+        if (overlay.sourceType === "geojson") {
+          map.addSource(sourceId, {
+            type: "geojson",
+            data: overlay.data || { type: "FeatureCollection", features: [] },
+          });
+        } else {
+          if (!overlay.tilesBaseUrl || !overlay.sourceLayer) {
+            return;
+          }
+          map.addSource(sourceId, {
+            type: "vector",
+            tiles: [overlay.tilesBaseUrl],
+            minzoom: overlay.minzoom != null ? overlay.minzoom : 0,
+            maxzoom: overlay.maxzoom != null ? overlay.maxzoom : 14,
+          });
+        }
 
         const beforeId =
           overlay.beforeLayerId && map.getLayer(overlay.beforeLayerId)
             ? overlay.beforeLayerId
             : undefined;
 
-        map.addLayer(
-          {
-            id: layerId,
-            type: layerType,
-            source: sourceId,
-            "source-layer": overlay.sourceLayer,
-            paint: paint,
-          },
-          beforeId,
+        const fillLayerConfig = {
+          id: fillLayerId,
+          type: "fill",
+          source: sourceId,
+          paint: fillPaint,
+        };
+        const lineLayerConfig = {
+          id: lineLayerId,
+          type: "line",
+          source: sourceId,
+          paint: linePaint,
+        };
+
+        if (overlay.sourceType !== "geojson") {
+          fillLayerConfig["source-layer"] = overlay.sourceLayer;
+          lineLayerConfig["source-layer"] = overlay.sourceLayer;
+        }
+
+        map.addLayer(fillLayerConfig, beforeId);
+        map.addLayer(lineLayerConfig, beforeId);
+        boundaryContextLayerIds.push(fillLayerId);
+        boundaryOverlayLayerIdsById[overlay.id] = {
+          fillLayerId: fillLayerId,
+          lineLayerId: lineLayerId,
+          visible: true,
+        };
+      });
+    }
+
+    function setBoundaryOverlayVisibility(overlayId, isVisible) {
+      const overlayLayers = boundaryOverlayLayerIdsById[overlayId];
+      if (!overlayLayers) {
+        return;
+      }
+
+      const visibility = isVisible ? "visible" : "none";
+
+      if (map.getLayer(overlayLayers.fillLayerId)) {
+        map.setLayoutProperty(
+          overlayLayers.fillLayerId,
+          "visibility",
+          visibility,
         );
+      }
+      if (map.getLayer(overlayLayers.lineLayerId)) {
+        map.setLayoutProperty(
+          overlayLayers.lineLayerId,
+          "visibility",
+          visibility,
+        );
+      }
+
+      overlayLayers.visible = isVisible;
+    }
+
+    function wireBoundaryLegendToggles() {
+      const toggleButtons = document.querySelectorAll("[data-boundary-toggle]");
+      if (!toggleButtons || toggleButtons.length === 0) {
+        return;
+      }
+
+      toggleButtons.forEach(function (button) {
+        const overlayId = button.getAttribute("data-boundary-toggle");
+        if (!overlayId || !boundaryOverlayLayerIdsById[overlayId]) {
+          button.style.opacity = "0.45";
+          button.style.cursor = "not-allowed";
+          return;
+        }
+
+        const setLegendState = function (isVisible) {
+          button.setAttribute("aria-pressed", isVisible ? "true" : "false");
+          button.style.opacity = isVisible ? "1" : "0.5";
+          button.style.filter = isVisible ? "none" : "grayscale(100%)";
+        };
+
+        setLegendState(true);
+
+        button.addEventListener("click", function () {
+          const current = boundaryOverlayLayerIdsById[overlayId];
+          if (!current) {
+            return;
+          }
+          const nextVisibility = !current.visible;
+          setBoundaryOverlayVisibility(overlayId, nextVisibility);
+          setLegendState(nextVisibility);
+        });
       });
     }
 
@@ -358,6 +449,7 @@
 
       // 4. Optional generic boundary overlays for gradual migration from Plotly maps.
       addBoundaryOverlays(boundaryOverlays);
+      wireBoundaryLegendToggles();
 
       // 5. Popups on hover
       const popup = new maplibregl.Popup({
@@ -438,10 +530,69 @@
         const laCode = props["la_code"] || "N/A";
         const decile =
           props["imd_decile"] === 0 ? "No data" : props["imd_decile"];
+
+        const boundaryByType = {};
+        if (boundaryContextLayerIds.length > 0) {
+          const boundaryFeatures = map.queryRenderedFeatures(e.point, {
+            layers: boundaryContextLayerIds,
+          });
+          (boundaryFeatures || []).forEach(function (feature) {
+            const featureProps = feature.properties || {};
+            const boundaryType = featureProps["boundary_type"] || "Boundary";
+            if (!boundaryByType[boundaryType]) {
+              boundaryByType[boundaryType] = featureProps;
+            }
+          });
+        }
+
+        function formatBoundaryLine(label, boundaryProps) {
+          if (!boundaryProps) {
+            return "";
+          }
+          const name =
+            boundaryProps["boundary_name"] ||
+            boundaryProps["name"] ||
+            "Unknown";
+          const code =
+            boundaryProps["boundary_code"] ||
+            boundaryProps["ods_code"] ||
+            boundaryProps["region_code"] ||
+            "N/A";
+          const cases =
+            boundaryProps["case_count"] != null
+              ? boundaryProps["case_count"]
+              : "0";
+          return `${label}: ${name} (${code}) [${cases} cases]`;
+        }
+
+        const nhsRegionLine = formatBoundaryLine(
+          "NHS Region",
+          boundaryByType["NHS England Region"],
+        );
+        const icbLine = formatBoundaryLine(
+          "ICB",
+          boundaryByType["Integrated Care Board"],
+        );
+        const lhbLine = formatBoundaryLine(
+          "LHB",
+          boundaryByType["Local Health Board"],
+        );
+
+        let boundaryContextHtml = "";
+        if (nhsRegionLine) {
+          boundaryContextHtml += `<br>${nhsRegionLine}`;
+        }
+        if (icbLine) {
+          boundaryContextHtml += `<br>${icbLine}`;
+        }
+        if (lhbLine) {
+          boundaryContextHtml += `<br>${lhbLine}`;
+        }
+
         popup
           .setLngLat(e.lngLat)
           .setHTML(
-            `<strong>${areaName}</strong><br>Code: ${areaCode}<br>LA: ${laName} (${laCode})<br>IMD decile: ${decile}`,
+            `<strong>${areaName}</strong><br>Code: ${areaCode}<br>LA: ${laName} (${laCode})<br>IMD decile: ${decile}<sup>†</sup>${boundaryContextHtml}`,
           )
           .addTo(map);
       }

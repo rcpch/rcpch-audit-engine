@@ -36,7 +36,6 @@ from ..common_view_functions import (
     logged_in_user_may_access_this_organisation,
     filter_all_registered_cases_by_active_lead_site_and_cohort_and_level_of_abstraction,
     generate_dataframe_and_aggregated_distance_data_from_cases,
-    generate_case_count_choropleth_map,
     piechart_plot_cases_by_ethnicity,
     piechart_plot_cases_by_index_of_multiple_deprivation,
     piechart_plot_cases_by_sex,
@@ -54,6 +53,10 @@ from ..general_functions import (
 from ..kpi import download_kpi_summary_as_csv
 from epilepsy12.common_view_functions.aggregate_by import (
     update_all_kpi_agg_models,
+)
+from epilepsy12.common_view_functions.tiles_for_region import return_tile_for_region
+from epilepsy12.common_view_functions.map_from_shape_file import (
+    generate_case_counts_for_each_region_in_each_abstraction_level,
 )
 
 
@@ -227,42 +230,98 @@ def selected_organisation_summary(request, organisation_id):
         {"type": "FeatureCollection", "features": _case_features}
     )
 
-    # differentiate between England and Wales
+    def _build_boundary_overlay(
+        *,
+        overlay_id,
+        boundary_type,
+        region_key,
+        abstraction_enum,
+        identifier_property,
+        line_color,
+    ):
+        """Create a boundary overlay payload for the frontend map."""
+        region_geojson = json.loads(return_tile_for_region(region_key))
+        case_counts_df = generate_case_counts_for_each_region_in_each_abstraction_level(
+            abstraction_level=abstraction_enum,
+            cohort=cohort_number,
+            organisation=selected_organisation,
+        )
+
+        case_count_by_identifier = {}
+        if not case_counts_df.empty:
+            for _, count_row in case_counts_df.iterrows():
+                identifier = count_row.get("identifier")
+                if identifier is None:
+                    continue
+                raw_cases = count_row.get("cases", 0)
+                case_count_by_identifier[str(identifier)] = int(raw_cases or 0)
+
+        for feature in region_geojson.get("features", []):
+            props = feature.setdefault("properties", {})
+            identifier = props.get(identifier_property)
+            props["boundary_type"] = boundary_type
+            props["boundary_name"] = props.get("name", "Unknown boundary")
+            props["boundary_code"] = identifier if identifier is not None else "N/A"
+            props["case_count"] = case_count_by_identifier.get(str(identifier), 0)
+
+        return {
+            "id": overlay_id,
+            "sourceType": "geojson",
+            "data": region_geojson,
+            "beforeLayerId": "cases-layer",
+            "linePaint": {
+                "line-color": line_color,
+                "line-width": 2,
+                "line-opacity": 0.85,
+            },
+            "fillPaint": {
+                "fill-color": "#000000",
+                "fill-opacity": 0.0,
+            },
+        }
+
+    boundary_overlays = []
+
+    # Always provide Welsh LHB boundaries so they are visible when zooming out from any centre.
+    boundary_overlays.append(
+        _build_boundary_overlay(
+            overlay_id="lhb-boundaries",
+            boundary_type="Local Health Board",
+            region_key="lhb",
+            abstraction_enum=EnumAbstractionLevel.LOCAL_HEALTH_BOARD,
+            identifier_property="ods_code",
+            line_color="#2e7d32",
+        )
+    )
+
+    # Use centre geography to choose trust/LHB denominator for completion summary cards.
     if selected_organisation.country.boundary_identifier == "W92000004":  # Wales
         abstraction_level = "local_health_board"
-        # generate choropleth map of case counts for each level of abstraction
-        lhb_heatmap = generate_case_count_choropleth_map(
-            properties="ods_code",
-            abstraction_level=EnumAbstractionLevel.LOCAL_HEALTH_BOARD,
-            organisation=selected_organisation,
-            cohort=cohort_number,
-        )
     else:
-        # generate choropleth map of case counts for each level of abstraction
-        if selected_organisation.ods_code == "RGT1W":
-            # Jersey is a special case and although is mapped to England, is in the Channel Islands and has no ICB, NHS Region or LHB
-            abstraction_level = "trust"
-        else:
-            abstraction_level = "trust"
-            icb_heatmap = generate_case_count_choropleth_map(
-                properties="ods_code",
-                abstraction_level=EnumAbstractionLevel.ICB,
-                organisation=selected_organisation,
-                cohort=cohort_number,
-            )
-            nhsregion_heatmap = generate_case_count_choropleth_map(
-                properties="region_code",
-                abstraction_level=EnumAbstractionLevel.NHS_ENGLAND_REGION,
-                organisation=selected_organisation,
-                cohort=cohort_number,
-            )
+        abstraction_level = "trust"
 
-    country_heatmap = generate_case_count_choropleth_map(
-        properties="boundary_identifier",
-        abstraction_level=EnumAbstractionLevel.COUNTRY,
-        organisation=selected_organisation,
-        cohort=cohort_number,
-    )
+    # Add English hierarchy overlays for contextual tooltips (not applicable to Jersey).
+    if selected_organisation.ods_code != "RGT1W":
+        boundary_overlays.append(
+            _build_boundary_overlay(
+                overlay_id="icb-boundaries",
+                boundary_type="Integrated Care Board",
+                region_key="icb",
+                abstraction_enum=EnumAbstractionLevel.ICB,
+                identifier_property="ods_code",
+                line_color="#7a1f2b",
+            )
+        )
+        boundary_overlays.append(
+            _build_boundary_overlay(
+                overlay_id="nhs-region-boundaries",
+                boundary_type="NHS England Region",
+                region_key="nhs_england_region",
+                abstraction_enum=EnumAbstractionLevel.NHS_ENGLAND_REGION,
+                identifier_property="region_code",
+                line_color="#6b7280",
+            )
+        )
 
     # query to return all completed E12 cases in the current cohort in this organisation
     count_of_current_cohort_registered_completed_cases_in_this_organisation = (
@@ -402,30 +461,15 @@ def selected_organisation_summary(request, organisation_id):
         "count_of_current_cohort_registered_completed_cases_in_this_trust": count_of_current_cohort_registered_completed_cases_in_this_trust,
         "individual_kpi_choices": INDIVIDUAL_KPI_MEASURES,
         "cases_geojson": cases_geojson,
+        "boundary_overlays_geojson": json.dumps(boundary_overlays),
         "imd_tile_era": imd_tile_era,
         "deprivation_tiles_url": settings.RCPCH_DEPRIVATION_TILES_URL,
         "org_lat": selected_organisation.latitude,
         "org_lng": selected_organisation.longitude,
         "org_name": selected_organisation.name,
         "aggregated_distances": aggregated_distances,
-        "country_heatmap": country_heatmap,
         "organisational_audit_submission_period": organisational_audit_submission_period,
     }
-    if selected_organisation.country.boundary_identifier == "W92000004":
-        context["lhb_heatmap"] = lhb_heatmap
-        context["trust_heatmap"] = None
-        context["icb_heatmap"] = None
-        context["nhsregion_heatmap"] = None
-    else:
-        if selected_organisation.ods_code == "RGT1W":
-            # Jersey is a special case as it is in the Channel Islands and has no ICB, NHS Region or LHB
-            context["trust_heatmap"] = None
-            context["icb_heatmap"] = None
-            context["nhsregion_heatmap"] = None
-        else:
-            context["lhb_heatmap"] = None
-            context["icb_heatmap"] = icb_heatmap
-            context["nhsregion_heatmap"] = nhsregion_heatmap
 
     return render(
         request=request,
