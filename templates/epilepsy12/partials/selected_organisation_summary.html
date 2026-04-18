@@ -612,7 +612,7 @@
                 "source-layer": layerName,
                 paint: {
                     "fill-color": imdFillColor(),
-                    "fill-opacity": 0.65,
+                    "fill-opacity": 0.45,
                     "fill-outline-color": "rgba(255,255,255,0.15)",
                 },
             }, beforeId);   // insert below case dots when beforeId is provided
@@ -691,12 +691,36 @@
                 popup.remove();
             });
 
+            map.on("mousemove", "org-layer", function (e) {
+                map.getCanvas().style.cursor = "pointer";
+                const props = e.features[0].properties;
+                popup.setLngLat(e.lngLat)
+                    .setHTML(`<strong>Lead centre</strong><br>${props.name || ORG_NAME}`)
+                    .addTo(map);
+            });
+            map.on("mouseleave", "org-layer", function () {
+                map.getCanvas().style.cursor = "";
+                popup.remove();
+            });
+
             map.on("mousemove", "deprivation-layer", function (e) {
+                // If cursor is over a case/lead-centre point, keep point popups on top.
+                const topPointFeatures = map.queryRenderedFeatures(e.point, {
+                    layers: ["org-layer", "cases-layer"],
+                });
+                if (topPointFeatures && topPointFeatures.length > 0) {
+                    return;
+                }
+
                 map.getCanvas().style.cursor = "pointer";
                 const props  = e.features[0].properties;
+                const areaName = props["area_name"] || "Unknown area";
+                const areaCode = props["code"] || "—";
+                const laName = props["la_name"] || "N/A";
+                const laCode = props["la_code"] || "N/A";
                 const decile = props["imd_decile"] === 0 ? "No data" : props["imd_decile"];
                 popup.setLngLat(e.lngLat)
-                    .setHTML(`<strong>${(props["nation"] || "").toUpperCase()} LSOA</strong><br>IMD decile: ${decile}`)
+                    .setHTML(`<strong>${areaName}</strong><br>Code: ${areaCode}<br>LA: ${laName} (${laCode})<br>IMD decile: ${decile}`)
                     .addTo(map);
             });
             map.on("mouseleave", "deprivation-layer", function () {
