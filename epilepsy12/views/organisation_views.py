@@ -181,9 +181,12 @@ def selected_organisation_summary(request, organisation_id):
         )
     )
 
-    # IMD tile era: cohorts < 8 use 2011 LSOA boundaries (2019 IMD),
-    # cohorts >= 8 use 2021 LSOA boundaries (2025 IMD)
-    imd_tile_era = "2011" if cohort_number < 8 else "2021"
+    # IMD tile era selection:
+    # - England: cohort < 8 -> 2011 boundaries (2019 IMD), cohort >= 8 -> 2021 boundaries (2025 IMD)
+    # - Wales: all cohorts -> 2011 boundaries (2019 WIMD)
+    # - Other nations: default to 2011 boundaries
+    is_england = selected_organisation.country.boundary_identifier == "E92000001"
+    imd_tile_era = "2021" if (is_england and cohort_number >= 8) else "2011"
 
     # Serialise case locations as GeoJSON for the MapLibre deprivation map
     _case_features = []

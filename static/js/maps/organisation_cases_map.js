@@ -139,7 +139,12 @@
       zoom: 8,
     });
 
-    let activeLayerName = null;
+    const DEPRIVATION_PRIMARY_SOURCE_ID = "deprivation-source-primary";
+    const DEPRIVATION_PRIMARY_LAYER_ID = "deprivation-layer-primary";
+    const DEPRIVATION_SECONDARY_SOURCE_ID = "deprivation-source-secondary";
+    const DEPRIVATION_SECONDARY_LAYER_ID = "deprivation-layer-secondary";
+    let activeLayerSignature = null;
+    let forcedPrimaryLayerName = null;
 
     function addBoundaryOverlays(overlays) {
       if (!Array.isArray(overlays) || overlays.length === 0) {
@@ -197,44 +202,101 @@
       });
     }
 
-    function addDeprivationLayer(beforeId, forcedLayerName) {
-      const layerName = forcedLayerName || getLayerName(imdEra, map.getZoom());
-
-      // Avoid rebuilding the same layer/source on every zoomend.
-      if (activeLayerName === layerName && map.getLayer("deprivation-layer")) {
-        return;
+    function removeDeprivationLayersAndSources() {
+      if (map.getLayer(DEPRIVATION_PRIMARY_LAYER_ID)) {
+        map.removeLayer(DEPRIVATION_PRIMARY_LAYER_ID);
       }
-
-      if (map.getLayer("deprivation-layer")) {
-        map.removeLayer("deprivation-layer");
+      if (map.getLayer(DEPRIVATION_SECONDARY_LAYER_ID)) {
+        map.removeLayer(DEPRIVATION_SECONDARY_LAYER_ID);
       }
-      if (map.getSource("deprivation-source")) {
-        map.removeSource("deprivation-source");
+      if (map.getSource(DEPRIVATION_PRIMARY_SOURCE_ID)) {
+        map.removeSource(DEPRIVATION_PRIMARY_SOURCE_ID);
       }
+      if (map.getSource(DEPRIVATION_SECONDARY_SOURCE_ID)) {
+        map.removeSource(DEPRIVATION_SECONDARY_SOURCE_ID);
+      }
+    }
 
-      map.addSource("deprivation-source", {
+    function addDeprivationFillLayer(
+      sourceId,
+      layerId,
+      sourceLayer,
+      beforeId,
+      filter,
+    ) {
+      map.addSource(sourceId, {
         type: "vector",
-        tiles: [`${tilesBaseUrl}/${layerName}/{z}/{x}/{y}.pbf`],
+        tiles: [`${tilesBaseUrl}/${sourceLayer}/{z}/{x}/{y}.pbf`],
         minzoom: 0,
         maxzoom: 14,
       });
 
-      map.addLayer(
-        {
-          id: "deprivation-layer",
-          type: "fill",
-          source: "deprivation-source",
-          "source-layer": layerName,
-          paint: {
-            "fill-color": imdFillColor(),
-            "fill-opacity": 0.45,
-            "fill-outline-color": "rgba(255,255,255,0.15)",
-          },
+      const layerConfig = {
+        id: layerId,
+        type: "fill",
+        source: sourceId,
+        "source-layer": sourceLayer,
+        paint: {
+          "fill-color": imdFillColor(),
+          "fill-opacity": 0.45,
+          "fill-outline-color": "rgba(255,255,255,0.15)",
         },
-        beforeId,
-      );
+      };
 
-      activeLayerName = layerName;
+      if (filter) {
+        layerConfig.filter = filter;
+      }
+
+      map.addLayer(layerConfig, beforeId);
+    }
+
+    function addDeprivationLayers(beforeId) {
+      const primaryLayerName =
+        forcedPrimaryLayerName || getLayerName(imdEra, map.getZoom());
+      const useEngland2025OverlayMode = imdEra === "2021";
+      const secondaryLayerName = getLayerName("2011", map.getZoom());
+      const nextSignature = useEngland2025OverlayMode
+        ? `${primaryLayerName}|${secondaryLayerName}`
+        : primaryLayerName;
+
+      // Avoid rebuilding the same layer/source on every zoomend.
+      if (
+        activeLayerSignature === nextSignature &&
+        map.getLayer(DEPRIVATION_PRIMARY_LAYER_ID)
+      ) {
+        return;
+      }
+
+      removeDeprivationLayersAndSources();
+
+      if (useEngland2025OverlayMode) {
+        // Draw non-England nations from 2011-era (Wales/Scotland/N. Ireland).
+        addDeprivationFillLayer(
+          DEPRIVATION_SECONDARY_SOURCE_ID,
+          DEPRIVATION_SECONDARY_LAYER_ID,
+          secondaryLayerName,
+          beforeId,
+          ["!=", ["get", "nation"], "england"],
+        );
+
+        // Draw England from 2021-era (2025 IMD) on top.
+        addDeprivationFillLayer(
+          DEPRIVATION_PRIMARY_SOURCE_ID,
+          DEPRIVATION_PRIMARY_LAYER_ID,
+          primaryLayerName,
+          beforeId,
+          ["==", ["get", "nation"], "england"],
+        );
+      } else {
+        addDeprivationFillLayer(
+          DEPRIVATION_PRIMARY_SOURCE_ID,
+          DEPRIVATION_PRIMARY_LAYER_ID,
+          primaryLayerName,
+          beforeId,
+        );
+      }
+
+      activeLayerSignature = nextSignature;
     }
 
     map.on("error", function (e) {
@@ -242,15 +304,17 @@
 
       // If the high-detail layer intermittently 500s, gracefully fall back.
       if (msg.includes("public.uk_master_") && msg.includes("_z8_10")) {
-        addDeprivationLayer("cases-layer", `public.uk_master_${imdEra}_z5_7`);
+        forcedPrimaryLayerName = `public.uk_master_${imdEra}_z5_7`;
+        addDeprivationLayers("cases-layer");
       }
     });
 
     map.on("load", function () {
       // 1. Deprivation tiles (no beforeId yet - cases-layer added next)
-      addDeprivationLayer();
+      addDeprivationLayers();
       map.on("zoomend", function () {
-        addDeprivationLayer("cases-layer");
+        forcedPrimaryLayerName = null;
+        addDeprivationLayers("cases-layer");
       });
 
       // 2. Case locations (patients)
@@ -338,7 +402,18 @@
         popup.remove();
       });
 
-      map.on("mousemove", "deprivation-layer", function (e) {
+      function handleDeprivationHover(e) {
+        const availableDeprivationLayers = [
+          DEPRIVATION_PRIMARY_LAYER_ID,
+          DEPRIVATION_SECONDARY_LAYER_ID,
+        ].filter(function (layerId) {
+          return !!map.getLayer(layerId);
+        });
+
+        if (availableDeprivationLayers.length === 0) {
+          return;
+        }
+
         // If cursor is over a case/lead-centre point, keep point popups on top.
         const topPointFeatures = map.queryRenderedFeatures(e.point, {
           layers: ["org-layer", "cases-layer"],
@@ -347,8 +422,16 @@
           return;
         }
 
+        const deprivationFeatures = map.queryRenderedFeatures(e.point, {
+          layers: availableDeprivationLayers,
+        });
+        if (!deprivationFeatures || deprivationFeatures.length === 0) {
+          popup.remove();
+          return;
+        }
+
         map.getCanvas().style.cursor = "pointer";
-        const props = e.features[0].properties;
+        const props = deprivationFeatures[0].properties;
         const areaName = props["area_name"] || "Unknown area";
         const areaCode = props["code"] || "-";
         const laName = props["la_name"] || "N/A";
@@ -361,8 +444,12 @@
             `<strong>${areaName}</strong><br>Code: ${areaCode}<br>LA: ${laName} (${laCode})<br>IMD decile: ${decile}`,
           )
           .addTo(map);
+      }
+
+      map.on("mousemove", function (e) {
+        handleDeprivationHover(e);
       });
-      map.on("mouseleave", "deprivation-layer", function () {
+      map.on("mouseout", function () {
         map.getCanvas().style.cursor = "";
         popup.remove();
       });
