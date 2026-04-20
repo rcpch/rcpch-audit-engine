@@ -232,7 +232,7 @@ def lookup_child_if_user_has_permission(request_kwargs, user):
 
     lookup = {
         "registration_id": (Registration, lambda reg: reg.case),
-        "management_id": (Management, via_management),
+        "management_id": (Management, via_registration),
         "investigations_id": (Investigations, via_registration),
         "first_paediatric_assessment_id": (FirstPaediatricAssessment, via_registration),
         "epilepsy_context_id": (EpilepsyContext, via_registration),
