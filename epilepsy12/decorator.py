@@ -302,6 +302,21 @@ def user_may_view_this_child():
             permissions = lookup_user_permissions_on_child(request, kwargs)
 
             if permissions["can_view"]:
+                return view(request, permissions["can_edit"], *args, **kwargs)
+            
+            raise PermissionDenied()
+
+        return wrapper
+
+    return decorator
+
+
+def user_may_edit_this_child():
+    def decorator(view):
+        def wrapper(request, *args, **kwargs):
+            permissions = lookup_user_permissions_on_child(request, kwargs)
+
+            if permissions["can_edit"]:
                 return view(request, *args, **kwargs)
             
             raise PermissionDenied()
