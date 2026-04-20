@@ -49,7 +49,7 @@ def first_paediatric_assessment(request, can_edit, case_id) -> HttpResponse:
         "audit_progress": registration.audit_progress,
         "active_template": "first_paediatric_assessment",
         "organisation_id": organisation_id,
-        "can_edit": can_edit,
+        "can_edit": can_edit and request.user.has_perm("epilepsy12.change_firstpaediatricassessment"),
     }
 
     response = recalculate_form_generate_response(

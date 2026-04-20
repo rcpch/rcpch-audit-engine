@@ -156,7 +156,7 @@ def register(request, can_edit, case_id):
         "active_template": active_template,
         # pass back organisation_id to steps for return to cases button
         "organisation_id": lead_site.organisation.pk,
-        "can_edit": can_edit,
+        "can_edit": can_edit and request.user.has_perm("epilepsy12.change_registration"),
     }
 
     template_name = "epilepsy12/register.html"

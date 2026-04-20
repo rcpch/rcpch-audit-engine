@@ -33,7 +33,7 @@ def epilepsy_context(request, can_edit, case_id):
         "audit_progress": epilepsy_context.registration.audit_progress,
         "active_template": "epilepsy_context",
         "organisation_id": organisation_id,
-        "can_edit": can_edit,
+        "can_edit": can_edit and request.user.has_perm("epilepsy12.change_epilepsycontext"),
     }
 
     response = recalculate_form_generate_response(
