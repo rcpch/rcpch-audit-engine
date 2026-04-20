@@ -60,7 +60,11 @@
                 {% else %}
                     <div class="inline field">
                         <div
-                            class="ui rcpch_primary button"
+                            {% if can_edit %}
+                                class="ui rcpch_primary button"
+                            {% else %}
+                                class="ui disabled rcpch_primary button"
+                            {% endif %}
                             hx-post={% url 'childrens_epilepsy_surgical_service_review_date_status' assessment_id=assessment.pk status="known" %}
                             hx-trigger="click"
                             hx-swap="innerHTML"
