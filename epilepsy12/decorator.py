@@ -309,21 +309,6 @@ def user_may_view_this_child():
     return decorator
 
 
-def user_may_edit_this_child():
-    def decorator(view):
-        def wrapper(request, *args, **kwargs):
-            permissions = lookup_user_permissions_on_child(request, kwargs)
-
-            if permissions["can_edit"]:
-                return view(request, *args, **kwargs)
-            
-            raise PermissionDenied()
-
-        return wrapper
-
-    return decorator
-
-
 def rcpch_full_access_only():
     """
     Only permits access to rcpch_audit_team_full_access group members

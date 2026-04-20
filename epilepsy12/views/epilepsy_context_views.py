@@ -1,5 +1,5 @@
 from django.contrib.auth.decorators import permission_required
-from ..decorator import user_may_view_this_child, user_may_edit_this_child, login_and_otp_required
+from ..decorator import user_may_view_this_child, login_and_otp_required
 from epilepsy12.constants.common import OPT_OUT_UNCERTAIN
 from ..models import EpilepsyContext, Registration, Site
 from ..common_view_functions import (
@@ -47,9 +47,9 @@ def epilepsy_context(request, can_edit, case_id):
 
 
 @login_and_otp_required()
-@user_may_edit_this_child()
+@user_may_view_this_child()
 @permission_required("epilepsy12.change_epilepsycontext", raise_exception=True)
-def previous_febrile_seizure(request, epilepsy_context_id):
+def previous_febrile_seizure(request, can_edit, epilepsy_context_id):
     """
     HTMX callback from the previous_febrile_seizure partial,
     parent of single_choice_multiple_toggle
@@ -74,7 +74,7 @@ def previous_febrile_seizure(request, epilepsy_context_id):
     context = {
         "epilepsy_context": epilepsy_context,
         "uncertain_choices": OPT_OUT_UNCERTAIN,
-        "can_edit": True
+        "can_edit": can_edit
     }
 
     response = recalculate_form_generate_response(
@@ -89,9 +89,9 @@ def previous_febrile_seizure(request, epilepsy_context_id):
 
 
 @login_and_otp_required()
-@user_may_edit_this_child()
+@user_may_view_this_child()
 @permission_required("epilepsy12.change_epilepsycontext", raise_exception=True)
-def previous_acute_symptomatic_seizure(request, epilepsy_context_id):
+def previous_acute_symptomatic_seizure(request, can_edit, epilepsy_context_id):
     """
     HTMX callback from the previous_febrile_seizure partial,
     parent of single_choice_multiple_toggle
@@ -116,7 +116,7 @@ def previous_acute_symptomatic_seizure(request, epilepsy_context_id):
     context = {
         "epilepsy_context": epilepsy_context,
         "uncertain_choices": OPT_OUT_UNCERTAIN,
-        "can_edit": True
+        "can_edit": can_edit
     }
 
     response = recalculate_form_generate_response(
@@ -131,9 +131,9 @@ def previous_acute_symptomatic_seizure(request, epilepsy_context_id):
 
 
 @login_and_otp_required()
-@user_may_edit_this_child()
+@user_may_view_this_child()
 @permission_required("epilepsy12.change_epilepsycontext", raise_exception=True)
-def is_there_a_family_history_of_epilepsy(request, epilepsy_context_id):
+def is_there_a_family_history_of_epilepsy(request, can_edit, epilepsy_context_id):
     """
     HTMX callback from the previous_febrile_seizure partial,
     parent of single_choice_multiple_toggle
@@ -158,7 +158,7 @@ def is_there_a_family_history_of_epilepsy(request, epilepsy_context_id):
     context = {
         "epilepsy_context": epilepsy_context,
         "uncertain_choices": OPT_OUT_UNCERTAIN,
-        "can_edit": True
+        "can_edit": can_edit
     }
 
     response = recalculate_form_generate_response(
@@ -173,9 +173,9 @@ def is_there_a_family_history_of_epilepsy(request, epilepsy_context_id):
 
 
 @login_and_otp_required()
-@user_may_edit_this_child()
+@user_may_view_this_child()
 @permission_required("epilepsy12.change_epilepsycontext", raise_exception=True)
-def previous_neonatal_seizures(request, epilepsy_context_id):
+def previous_neonatal_seizures(request, can_edit, epilepsy_context_id):
     """
     HTMX callback from the previous_febrile_seizure partial,
     parent of single_choice_multiple_toggle
@@ -200,7 +200,7 @@ def previous_neonatal_seizures(request, epilepsy_context_id):
     context = {
         "epilepsy_context": epilepsy_context,
         "uncertain_choices": OPT_OUT_UNCERTAIN,
-        "can_edit": True
+        "can_edit": can_edit
     }
 
     response = recalculate_form_generate_response(
@@ -215,9 +215,9 @@ def previous_neonatal_seizures(request, epilepsy_context_id):
 
 
 @login_and_otp_required()
-@user_may_edit_this_child()
+@user_may_view_this_child()
 @permission_required("epilepsy12.change_epilepsycontext", raise_exception=True)
-def were_any_of_the_epileptic_seizures_convulsive(request, epilepsy_context_id):
+def were_any_of_the_epileptic_seizures_convulsive(request, can_edit, epilepsy_context_id):
     """
     Post request from multiple choice toggle within epilepsy partial.
     Updates the model and returns the epilepsy partial and parameters
@@ -241,7 +241,7 @@ def were_any_of_the_epileptic_seizures_convulsive(request, epilepsy_context_id):
     context = {
         "epilepsy_context": epilepsy_context,
         "uncertain_choices": OPT_OUT_UNCERTAIN,
-        "can_edit": True
+        "can_edit": can_edit
     }
 
     response = recalculate_form_generate_response(
@@ -256,9 +256,9 @@ def were_any_of_the_epileptic_seizures_convulsive(request, epilepsy_context_id):
 
 
 @login_and_otp_required()
-@user_may_edit_this_child()
+@user_may_view_this_child()
 @permission_required("epilepsy12.change_epilepsycontext", raise_exception=True)
-def experienced_prolonged_generalized_convulsive_seizures(request, epilepsy_context_id):
+def experienced_prolonged_generalized_convulsive_seizures(request, can_edit, epilepsy_context_id):
     """
     HTMX callback from the experienced_prolonged_generalized_convulsive_seizures partial,
     parent of single_choice_multiple_toggle
@@ -283,7 +283,7 @@ def experienced_prolonged_generalized_convulsive_seizures(request, epilepsy_cont
     context = {
         "epilepsy_context": epilepsy_context,
         "uncertain_choices": OPT_OUT_UNCERTAIN,
-        "can_edit": True
+        "can_edit": can_edit
     }
 
     response = recalculate_form_generate_response(
@@ -298,9 +298,9 @@ def experienced_prolonged_generalized_convulsive_seizures(request, epilepsy_cont
 
 
 @login_and_otp_required()
-@user_may_edit_this_child()
+@user_may_view_this_child()
 @permission_required("epilepsy12.change_epilepsycontext", raise_exception=True)
-def experienced_prolonged_focal_seizures(request, epilepsy_context_id):
+def experienced_prolonged_focal_seizures(request, can_edit, epilepsy_context_id):
     """
     HTMX callback from the experienced_prolonged_focal_seizures partial,
     parent of single_choice_multiple_toggle
@@ -325,7 +325,7 @@ def experienced_prolonged_focal_seizures(request, epilepsy_context_id):
     context = {
         "epilepsy_context": epilepsy_context,
         "uncertain_choices": OPT_OUT_UNCERTAIN,
-        "can_edit": True
+        "can_edit": can_edit
     }
 
     response = recalculate_form_generate_response(
@@ -340,9 +340,9 @@ def experienced_prolonged_focal_seizures(request, epilepsy_context_id):
 
 
 @login_and_otp_required()
-@user_may_edit_this_child()
+@user_may_view_this_child()
 @permission_required("epilepsy12.change_epilepsycontext", raise_exception=True)
-def diagnosis_of_epilepsy_withdrawn(request, epilepsy_context_id):
+def diagnosis_of_epilepsy_withdrawn(request, can_edit, epilepsy_context_id):
     """
     HTMX callback from the previous_febrile_seizure partial,
     parent of single_choice_multiple_toggle
@@ -366,7 +366,7 @@ def diagnosis_of_epilepsy_withdrawn(request, epilepsy_context_id):
 
     context = {
         "epilepsy_context": epilepsy_context,
-        "can_edit": True
+        "can_edit": can_edit
     }
 
     response = recalculate_form_generate_response(

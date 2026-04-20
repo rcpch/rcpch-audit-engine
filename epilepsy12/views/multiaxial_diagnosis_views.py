@@ -43,7 +43,7 @@ from ..common_view_functions import (
     recalculate_form_generate_response,
     completed_fields,
 )
-from ..decorator import user_may_view_this_child, user_may_edit_this_child, login_and_otp_required
+from ..decorator import user_may_view_this_child, login_and_otp_required
 
 """
 Constants for selections
