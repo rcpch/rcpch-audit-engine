@@ -21,7 +21,7 @@
             <div>
               <div class="ui buttons">
                 <button 
-                  {% if perms.epilepsy12.can_consent_to_audit_participation %}
+                  {% if can_edit %}
                     class="ui rcpch_primary button"
                   {% else %}
                     class="ui rcpch_primary disabled button"
@@ -32,7 +32,7 @@
                   hx-trigger="click">I confirm all criteria are present
                 </button>
                 <button 
-                  {% if perms.epilepsy12.can_consent_to_audit_participation %}
+                  {% if can_edit %}
                     class="ui rcpch_dark_blue lighter_font button"
                   {% else %}
                     class="ui rcpch_dark_blue disabled button"
@@ -43,7 +43,7 @@
                   hx-trigger="click">I do not consent
                 </button>
               </div>
-              {% if not perms.epilepsy12.can_consent_to_audit_participation %}
+              {% if not can_edit %}
                 <small class='rcpch_warning_label'>Your access level does not allow you to consent to participation in Epilepsy12</small>
               {% endif %}
             </div>
