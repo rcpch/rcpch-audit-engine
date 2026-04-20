@@ -532,8 +532,6 @@ def filter_completed_cases_at_one_year_by_abstraction_level(
     Case = apps.get_model("epilepsy12", "Case")
 
     all_cases = Case.objects.filter(
-        epilepsy12_sites__site_is_actively_involved_in_epilepsy_care=True,
-        epilepsy12_sites__site_is_primary_centre_of_epilepsy_care=True,
         registration__id__isnull=False,
         registration__cohort=cohort,
         registration__completed_first_year_of_care_date__lte=date.today(),
@@ -772,38 +770,51 @@ def get_abstraction_filter_for_organisation_and_level(
     organisation: Organisation,
     abstraction_level: EnumAbstractionLevel
 ):
+    abstraction_filter = None
+
     match abstraction_level:
         case EnumAbstractionLevel.ORGANISATION:
-            return {
+            abstraction_filter = {
                 f"epilepsy12_sites__organisation": organisation
             }
         case EnumAbstractionLevel.TRUST if organisation.trust:
-            return {
+            abstraction_filter = {
                 f"epilepsy12_sites__organisation__trust": organisation.trust
             }
         case EnumAbstractionLevel.LOCAL_HEALTH_BOARD if organisation.local_health_board:
-            return {
+            abstraction_filter = {
                 f"epilepsy12_sites__organisation__local_health_board": organisation.local_health_board
             }
         case EnumAbstractionLevel.ICB if organisation.integrated_care_board:
-            return {
+            abstraction_filter = {
                 f"epilepsy12_sites__organisation__integrated_care_board": organisation.integrated_care_board
             }
         case EnumAbstractionLevel.NHS_ENGLAND_REGION if organisation.nhs_england_region:
-            return {
+            abstraction_filter = {
                 f"epilepsy12_sites__organisation__nhs_england_region": organisation.nhs_england_region
             }
+        # Jersey is in the SWIPE Open UK network but we exclude it from the KPI calculations
         case EnumAbstractionLevel.OPEN_UK if organisation.openuk_network:
-            return {
-                f"epilepsy12_sites__organisation__openuk_network": organisation.openuk_network
+            abstraction_filter = {
+                f"epilepsy12_sites__organisation__openuk_network": organisation.openuk_network,
+                f"epilepsy12_sites__organisation__country__boundary_identifier__in": ["E92000001", "W92000004"]
             }
         case EnumAbstractionLevel.COUNTRY:
-            return {
+            abstraction_filter = {
                 f"epilepsy12_sites__organisation__country": organisation.country
             }
-        # national
-        case _:
-            return None
+        # We exclude Jersey from the "National" KPI agg
+        # (it's really England and Wales, the name is confusing because it predates us adding Jersey to the audit)
+        case EnumAbstractionLevel.NATIONAL:
+            abstraction_filter = {
+                f"epilepsy12_sites__organisation__country__boundary_identifier__in": ["E92000001", "W92000004"]
+            }
+    
+    if abstraction_filter:
+        abstraction_filter["epilepsy12_sites__site_is_primary_centre_of_epilepsy_care"] = True
+        abstraction_filter["epilepsy12_sites__site_is_actively_involved_in_epilepsy_care"] = True
+
+    return abstraction_filter
 
 
 def _calculate_all_kpis():
@@ -928,7 +939,9 @@ def _seed_all_aggregation_models(cohort=None) -> None:
 
             logger.info(f"Created {new_agg_model}")
 
-    # National handled separately as it has no abstraction relation field
+    # National handled separately as it has no abstraction relation field.
+    # The name of the NationalKPIAggregation model is confusing because it comes from before we added
+    # Jersey. It really means "England and Wales", as per the row name in the KPI export spreadsheet.
     if NationalKPIAggregation.objects.filter(
         cohort=requested_cohort,
     ).exists():
@@ -1147,7 +1160,9 @@ def create_totals_dataframe(cohort, abstraction_level):
             organisation_count=Count("organisation")
         ).filter(organisation_count__gt=0)
     elif abstraction_level == "country":
-        query_set = Country.objects.annotate(
+        query_set = Country.objects.exclude(
+            organisation__country__boundary_identifier="JEY"
+        ).annotate(
             organisation_count=Count("organisation")
         ).filter(organisation_count__gt=0)
 

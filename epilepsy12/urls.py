@@ -323,7 +323,7 @@ organisation_patterns = [
         name="child_organisation_select",
     ),
     path(
-    "organisations/filter_by_parent/<int:parent_id>/<str:parent_type>",
+        "organisations/filter_by_parent/<int:parent_id>/<str:parent_type>",
         view=filter_organisations_by_parent,
         name="filter_organisations_by_parent",
     ),
@@ -937,11 +937,6 @@ epilepsy_causes_patterns = [
         "multiaxial_diagnosis/<int:multiaxial_diagnosis_id>/epilepsy_cause_known",
         epilepsy_cause_known,
         name="epilepsy_cause_known",
-    ),
-    path(
-        "multiaxial_diagnosis/<int:multiaxial_diagnosis_id>/epilepsy_cause",
-        epilepsy_cause,
-        name="epilepsy_cause",
     ),
     path(
         "multiaxial_diagnosis/<int:multiaxial_diagnosis_id>/epilepsy_cause_categories",

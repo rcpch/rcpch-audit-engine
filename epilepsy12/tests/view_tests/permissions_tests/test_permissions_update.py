@@ -291,7 +291,6 @@ def test_users_update_users_forbidden(
     client,
     seed_groups_fixture,
     seed_users_fixture,
-    seed_cases_fixture,
 ):
     """
     Simulating different E12 Users attempting to update users in Epilepsy12
@@ -673,6 +672,7 @@ def test_users_update_users_success(
 @pytest.mark.django_db
 def test_users_update_cases_forbidden(
     client,
+    e12_case_factory,
 ):
     """
     Simulating different E12 Users attempting to update cases in Epilepsy12
@@ -693,8 +693,9 @@ def test_users_update_cases_forbidden(
         trust__ods_code="RGT",
     )
 
-    CASE_FROM_DIFF_ORG = Case.objects.get(
-        first_name=f"child_{DIFF_TRUST_DIFF_ORGANISATION.name}"
+    CASE_FROM_DIFF_ORG = e12_case_factory(
+        first_name=f"child_{DIFF_TRUST_DIFF_ORGANISATION.name}",
+        organisations__organisation=DIFF_TRUST_DIFF_ORGANISATION,
     )
 
     user_first_names_for_test = [
@@ -737,6 +738,7 @@ def test_users_update_cases_forbidden(
 @pytest.mark.django_db
 def test_users_update_cases_success(
     client,
+    e12_case_factory,
 ):
     """
     Simulating different E12 Users attempting to update cases in Epilepsy12
@@ -751,8 +753,9 @@ def test_users_update_cases_success(
         ods_code="RP401",
         trust__ods_code="RP4",
     )
-    CASE_FROM_SAME_ORG = Case.objects.get(
-        first_name=f"child_{TEST_USER_ORGANISATION.name}"
+    CASE_FROM_SAME_ORG = e12_case_factory(
+        first_name=f"child_{TEST_USER_ORGANISATION.name}",
+        organisations__organisation=TEST_USER_ORGANISATION,
     )
 
     users = Epilepsy12User.objects.filter(
@@ -792,7 +795,7 @@ def test_users_update_cases_success(
 
 
 @pytest.mark.django_db
-def test_users_update_first_paediatric_assessment_forbidden(client):
+def test_users_update_first_paediatric_assessment_forbidden(client, e12_case_factory):
     """
     Simulating different E12 Users attempting to update first paediatric assessment in Epilepsy12
 
@@ -811,8 +814,9 @@ def test_users_update_first_paediatric_assessment_forbidden(client):
         trust__ods_code="RGT",
     )
 
-    CASE_FROM_DIFF_ORG = Case.objects.get(
-        first_name=f"child_{DIFF_TRUST_DIFF_ORGANISATION.name}"
+    CASE_FROM_DIFF_ORG = e12_case_factory(
+        first_name=f"child_{DIFF_TRUST_DIFF_ORGANISATION.name}",
+        organisations__organisation=DIFF_TRUST_DIFF_ORGANISATION,
     )
 
     user_first_names_for_test = [
@@ -863,7 +867,7 @@ def test_users_update_first_paediatric_assessment_forbidden(client):
 
 
 @pytest.mark.django_db
-def test_users_update_first_paediatric_assessment_success(client):
+def test_users_update_first_paediatric_assessment_success(client, e12_case_factory):
     """
     Simulating different E12 Users attempting to update first paediatric assessment in Epilepsy12
 
@@ -875,8 +879,9 @@ def test_users_update_first_paediatric_assessment_success(client):
         ods_code="RP401",
         trust__ods_code="RP4",
     )
-    CASE_FROM_SAME_ORG = Case.objects.get(
-        first_name=f"child_{TEST_USER_ORGANISATION.name}"
+    CASE_FROM_SAME_ORG = e12_case_factory(
+        first_name=f"child_{TEST_USER_ORGANISATION.name}",
+        organisations__organisation=TEST_USER_ORGANISATION,
     )
 
     # https://github.com/rcpch/rcpch-audit-engine/pull/1346
@@ -947,7 +952,7 @@ def test_users_update_first_paediatric_assessment_success(client):
 
 
 @pytest.mark.django_db
-def test_users_update_first_epilepsy_context_forbidden(client):
+def test_users_update_first_epilepsy_context_forbidden(client, e12_case_factory):
     """
     Simulating different E12 Users attempting to update epilepsy context in Epilepsy12
 
@@ -965,8 +970,9 @@ def test_users_update_first_epilepsy_context_forbidden(client):
         trust__ods_code="RGT",
     )
 
-    CASE_FROM_DIFF_ORG = Case.objects.get(
-        first_name=f"child_{DIFF_TRUST_DIFF_ORGANISATION.name}"
+    CASE_FROM_DIFF_ORG = e12_case_factory(
+        first_name=f"child_{DIFF_TRUST_DIFF_ORGANISATION.name}",
+        organisations__organisation=DIFF_TRUST_DIFF_ORGANISATION,
     )
 
     user_first_names_for_test = [
@@ -1019,7 +1025,7 @@ def test_users_update_first_epilepsy_context_forbidden(client):
 
 
 @pytest.mark.django_db
-def test_users_update_epilepsy_context_success(client):
+def test_users_update_epilepsy_context_success(client, e12_case_factory):
     """
     Simulating different E12 Users attempting to update epilepsy context in Epilepsy12
 
@@ -1031,8 +1037,9 @@ def test_users_update_epilepsy_context_success(client):
         ods_code="RP401",
         trust__ods_code="RP4",
     )
-    CASE_FROM_SAME_ORG = Case.objects.get(
-        first_name=f"child_{TEST_USER_ORGANISATION.name}"
+    CASE_FROM_SAME_ORG = e12_case_factory(
+        first_name=f"child_{TEST_USER_ORGANISATION.name}",
+        organisations__organisation=TEST_USER_ORGANISATION,
     )
 
     # https://github.com/rcpch/rcpch-audit-engine/pull/1346
@@ -1114,7 +1121,7 @@ def test_users_update_epilepsy_context_success(client):
 
 
 @pytest.mark.django_db
-def test_users_update_first_multiaxial_diagnosis_forbidden(client):
+def test_users_update_first_multiaxial_diagnosis_forbidden(client, e12_case_factory):
     """
     Simulating different E12 Users attempting to update multiaxial diagnosis in Epilepsy12
 
@@ -1132,8 +1139,9 @@ def test_users_update_first_multiaxial_diagnosis_forbidden(client):
         trust__ods_code="RGT",
     )
 
-    CASE_FROM_DIFF_ORG = Case.objects.get(
-        first_name=f"child_{DIFF_TRUST_DIFF_ORGANISATION.name}"
+    CASE_FROM_DIFF_ORG = e12_case_factory(
+        first_name=f"child_{DIFF_TRUST_DIFF_ORGANISATION.name}",
+        organisations__organisation=DIFF_TRUST_DIFF_ORGANISATION,
     )
 
     user_first_names_for_test = [
@@ -1149,7 +1157,6 @@ def test_users_update_first_multiaxial_diagnosis_forbidden(client):
 
     URLS = [
         "epilepsy_cause_known",
-        "epilepsy_cause",
         "epilepsy_cause_categories",
         "relevant_impairments_behavioural_educational",
         "mental_health_screen",
@@ -1188,7 +1195,7 @@ def test_users_update_first_multiaxial_diagnosis_forbidden(client):
 
 
 @pytest.mark.django_db
-def test_users_update_multiaxial_diagnosis_success(client):
+def test_users_update_multiaxial_diagnosis_success(client, e12_case_factory):
     """
     Simulating different E12 Users attempting to update multiaxial diagnosis in Epilepsy12
 
@@ -1200,8 +1207,9 @@ def test_users_update_multiaxial_diagnosis_success(client):
         ods_code="RP401",
         trust__ods_code="RP4",
     )
-    CASE_FROM_SAME_ORG = Case.objects.get(
-        first_name=f"child_{TEST_USER_ORGANISATION.name}"
+    CASE_FROM_SAME_ORG = e12_case_factory(
+        first_name=f"child_{TEST_USER_ORGANISATION.name}",
+        organisations__organisation=TEST_USER_ORGANISATION,
     )
 
     user_first_names_for_test = [
@@ -1218,7 +1226,6 @@ def test_users_update_multiaxial_diagnosis_success(client):
 
     URLS = [
         "epilepsy_cause_known",
-        "epilepsy_cause",
         "epilepsy_cause_categories",
         "relevant_impairments_behavioural_educational",
         "mental_health_screen",
@@ -1306,7 +1313,7 @@ def test_users_update_multiaxial_diagnosis_success(client):
 
 
 @pytest.mark.django_db
-def test_update_multiaxial_diagnosis_cause_success(client):
+def test_update_multiaxial_diagnosis_cause_success(client, e12_case_factory):
     """
     Assert different E12 Users can update Cause section of multiaxial diagnosis.
 
@@ -1314,7 +1321,6 @@ def test_update_multiaxial_diagnosis_cause_success(client):
 
         'epilepsy_cause_known',
         'epilepsy_cause_categories',
-        'epilepsy_cause'
     """
 
     # GOSH
@@ -1322,8 +1328,9 @@ def test_update_multiaxial_diagnosis_cause_success(client):
         ods_code="RP401",
         trust__ods_code="RP4",
     )
-    CASE_FROM_SAME_ORG = Case.objects.get(
-        first_name=f"child_{TEST_USER_ORGANISATION.name}"
+    CASE_FROM_SAME_ORG = e12_case_factory(
+        first_name=f"child_{TEST_USER_ORGANISATION.name}",
+        organisations__organisation=TEST_USER_ORGANISATION,
     )
 
     user_first_names_for_test = [
@@ -1338,7 +1345,7 @@ def test_update_multiaxial_diagnosis_cause_success(client):
         user_first_names_for_test
     ), f"Incorrect queryset of test users. Requested {len(user_first_names_for_test)} users, queryset includes {len(users)}: {users}"
 
-    EPILEPSY_CAUSE_ENTITY = EpilepsyCause.objects.first()
+    #  EPILEPSY_CAUSE_ENTITY = EpilepsyCause.objects.first()
 
     for test_user in users:
         client.force_login(test_user)
@@ -1384,24 +1391,6 @@ def test_update_multiaxial_diagnosis_cause_success(client):
             "Gen"
         ], f"{test_user} from {test_user.organisation_employer} attempted POST `Gen` to epilepsy_cause_categories but model did not update."
 
-        response_epilepsy_cause = client.post(
-            reverse(
-                "epilepsy_cause",
-                kwargs={
-                    "multiaxial_diagnosis_id": CASE_FROM_SAME_ORG.registration.multiaxialdiagnosis.id,
-                },
-            ),
-            headers={"Hx-Trigger-Name": "epilepsy_cause", "Hx-Request": "true"},
-            data={"epilepsy_cause": f"{EPILEPSY_CAUSE_ENTITY.id}"},
-        )
-
-        assert (
-            MultiaxialDiagnosis.objects.get(
-                registration=CASE_FROM_SAME_ORG.registration
-            ).epilepsy_cause
-            == EPILEPSY_CAUSE_ENTITY
-        ), f"{test_user} from {test_user.organisation_employer} attempted POST `epilepsy_cause:{EPILEPSY_CAUSE_ENTITY.id}` but MultiaxialDiagnosis model field did not update."
-
         # Reset answers for next User
         MultiaxialDiagnosis.objects.filter(
             registration=CASE_FROM_SAME_ORG.registration
@@ -1413,7 +1402,7 @@ def test_update_multiaxial_diagnosis_cause_success(client):
 
 
 @pytest.mark.django_db
-def test_users_update_episode_forbidden(client):
+def test_users_update_episode_forbidden(client, e12_case_factory):
     """
     Simulating different E12 Users attempting to update episode in Epilepsy12
 
@@ -1431,8 +1420,9 @@ def test_users_update_episode_forbidden(client):
         trust__ods_code="RGT",
     )
 
-    CASE_FROM_DIFF_ORG = Case.objects.get(
-        first_name=f"child_{DIFF_TRUST_DIFF_ORGANISATION.name}"
+    CASE_FROM_DIFF_ORG = e12_case_factory(
+        first_name=f"child_{DIFF_TRUST_DIFF_ORGANISATION.name}",
+        organisations__organisation=DIFF_TRUST_DIFF_ORGANISATION,
     )
 
     user_first_names_for_test = [
@@ -1507,7 +1497,7 @@ def test_users_update_episode_forbidden(client):
 
 
 @pytest.mark.django_db
-def test_users_update_episode_success(client):
+def test_users_update_episode_success(client, e12_case_factory):
     """
     Simulating different E12 Users attempting to update episode in Epilepsy12
 
@@ -1519,8 +1509,9 @@ def test_users_update_episode_success(client):
         ods_code="RP401",
         trust__ods_code="RP4",
     )
-    CASE_FROM_SAME_ORG = Case.objects.get(
-        first_name=f"child_{TEST_USER_ORGANISATION.name}"
+    CASE_FROM_SAME_ORG = e12_case_factory(
+        first_name=f"child_{TEST_USER_ORGANISATION.name}",
+        organisations__organisation=TEST_USER_ORGANISATION,
     )
 
     user_first_names_for_test = [
@@ -1685,7 +1676,7 @@ def test_users_update_episode_success(client):
 
 
 @pytest.mark.django_db
-def test_users_update_comorbidity_forbidden(client):
+def test_users_update_comorbidity_forbidden(client, e12_case_factory):
     """
     Simulating different E12 Users attempting to update comorbidity in Epilepsy12
 
@@ -1703,8 +1694,9 @@ def test_users_update_comorbidity_forbidden(client):
         trust__ods_code="RGT",
     )
 
-    CASE_FROM_DIFF_ORG = Case.objects.get(
-        first_name=f"child_{DIFF_TRUST_DIFF_ORGANISATION.name}"
+    CASE_FROM_DIFF_ORG = e12_case_factory(
+        first_name=f"child_{DIFF_TRUST_DIFF_ORGANISATION.name}",
+        organisations__organisation=DIFF_TRUST_DIFF_ORGANISATION,
     )
 
     user_first_names_for_test = [
@@ -1772,7 +1764,7 @@ def test_users_update_comorbidity_forbidden(client):
 
 
 @pytest.mark.django_db
-def test_users_update_comorbidity_success(client):
+def test_users_update_comorbidity_success(client, e12_case_factory):
     """
     Simulating different E12 Users attempting to update comorbidity in Epilepsy12
 
@@ -1784,8 +1776,9 @@ def test_users_update_comorbidity_success(client):
         ods_code="RP401",
         trust__ods_code="RP4",
     )
-    CASE_FROM_SAME_ORG = Case.objects.get(
-        first_name=f"child_{TEST_USER_ORGANISATION.name}"
+    CASE_FROM_SAME_ORG = e12_case_factory(
+        first_name=f"child_{TEST_USER_ORGANISATION.name}",
+        organisations__organisation=TEST_USER_ORGANISATION,
     )
 
     user_first_names_for_test = [
@@ -1854,7 +1847,7 @@ def test_users_update_comorbidity_success(client):
 
 
 @pytest.mark.django_db
-def test_users_update_assessment_forbidden(client):
+def test_users_update_assessment_forbidden(client, e12_case_factory):
     """
     Simulating different E12 Users attempting to update assessment in Epilepsy12
 
@@ -1872,8 +1865,9 @@ def test_users_update_assessment_forbidden(client):
         trust__ods_code="RGT",
     )
 
-    CASE_FROM_DIFF_ORG = Case.objects.get(
-        first_name=f"child_{DIFF_TRUST_DIFF_ORGANISATION.name}"
+    CASE_FROM_DIFF_ORG = e12_case_factory(
+        first_name=f"child_{DIFF_TRUST_DIFF_ORGANISATION.name}",
+        organisations__organisation=DIFF_TRUST_DIFF_ORGANISATION,
     )
 
     user_first_names_for_test = [
@@ -2056,7 +2050,7 @@ def test_users_update_assessment_forbidden(client):
 
 
 @pytest.mark.django_db
-def test_users_update_assessment_success(client):
+def test_users_update_assessment_success(client, e12_case_factory):
     """
     Simulating different E12 Users attempting to update assessment in Epilepsy12
 
@@ -2068,8 +2062,9 @@ def test_users_update_assessment_success(client):
         ods_code="RP401",
         trust__ods_code="RP4",
     )
-    CASE_FROM_SAME_ORG = Case.objects.get(
-        first_name=f"child_{TEST_USER_ORGANISATION.name}"
+    CASE_FROM_SAME_ORG = e12_case_factory(
+        first_name=f"child_{TEST_USER_ORGANISATION.name}",
+        organisations__organisation=TEST_USER_ORGANISATION,
     )
 
     user_first_names_for_test = [
@@ -2253,7 +2248,7 @@ def test_users_update_assessment_success(client):
 
 
 @pytest.mark.django_db
-def test_users_update_investigations_forbidden(client):
+def test_users_update_investigations_forbidden(client, e12_case_factory):
     """
     Simulating different E12 Users attempting to update investigations in Epilepsy12
 
@@ -2272,8 +2267,9 @@ def test_users_update_investigations_forbidden(client):
         trust__ods_code="RGT",
     )
 
-    CASE_FROM_DIFF_ORG = Case.objects.get(
-        first_name=f"child_{DIFF_TRUST_DIFF_ORGANISATION.name}"
+    CASE_FROM_DIFF_ORG = e12_case_factory(
+        first_name=f"child_{DIFF_TRUST_DIFF_ORGANISATION.name}",
+        organisations__organisation=DIFF_TRUST_DIFF_ORGANISATION,
     )
 
     user_first_names_for_test = [
@@ -2384,7 +2380,7 @@ def test_users_update_investigations_forbidden(client):
 
 
 @pytest.mark.django_db
-def test_users_update_investigations_success(client):
+def test_users_update_investigations_success(client, e12_case_factory):
     """
     Simulating different E12 Users attempting to update investigations in Epilepsy12
 
@@ -2396,8 +2392,9 @@ def test_users_update_investigations_success(client):
         ods_code="RP401",
         trust__ods_code="RP4",
     )
-    CASE_FROM_SAME_ORG = Case.objects.get(
-        first_name=f"child_{TEST_USER_ORGANISATION.name}"
+    CASE_FROM_SAME_ORG = e12_case_factory(
+        first_name=f"child_{TEST_USER_ORGANISATION.name}",
+        organisations__organisation=TEST_USER_ORGANISATION,
     )
 
     user_first_names_for_test = [
@@ -2509,7 +2506,7 @@ def test_users_update_investigations_success(client):
 
 
 @pytest.mark.django_db
-def test_users_update_management_forbidden(client):
+def test_users_update_management_forbidden(client, e12_case_factory):
     """
     Simulating different E12 Users attempting to update management in Epilepsy12
 
@@ -2527,8 +2524,9 @@ def test_users_update_management_forbidden(client):
         trust__ods_code="RGT",
     )
 
-    CASE_FROM_DIFFERENT_ORG = Case.objects.get(
-        first_name=f"child_{DIFF_TRUST_DIFF_ORGANISATION.name}"
+    CASE_FROM_DIFFERENT_ORG = e12_case_factory(
+        first_name=f"child_{DIFF_TRUST_DIFF_ORGANISATION.name}",
+        organisations__organisation=DIFF_TRUST_DIFF_ORGANISATION,
     )
 
     user_first_names_for_test = [
@@ -2605,7 +2603,7 @@ def test_users_update_management_forbidden(client):
 
 
 @pytest.mark.django_db
-def test_users_update_management_success(client):
+def test_users_update_management_success(client, e12_case_factory):
     """
     Simulating different E12 Users attempting to update management in Epilepsy12
 
@@ -2617,8 +2615,9 @@ def test_users_update_management_success(client):
         ods_code="RP401",
         trust__ods_code="RP4",
     )
-    CASE_FROM_SAME_ORG = Case.objects.get(
-        first_name=f"child_{TEST_USER_ORGANISATION.name}"
+    CASE_FROM_SAME_ORG = e12_case_factory(
+        first_name=f"child_{TEST_USER_ORGANISATION.name}",
+        organisations__organisation=TEST_USER_ORGANISATION,
     )
 
     user_first_names_for_test = [
@@ -2696,7 +2695,7 @@ def test_users_update_management_success(client):
 
 
 @pytest.mark.django_db
-def test_users_update_antiepilepsymedicine_forbidden(client):
+def test_users_update_antiepilepsymedicine_forbidden(client, e12_case_factory):
     """
     Simulating different E12 Users attempting to update antiepilepsymedicine in Epilepsy12
 
@@ -2714,8 +2713,9 @@ def test_users_update_antiepilepsymedicine_forbidden(client):
         trust__ods_code="RGT",
     )
 
-    CASE_FROM_DIFFERENT_ORG = Case.objects.get(
-        first_name=f"child_{DIFF_TRUST_DIFF_ORGANISATION.name}"
+    CASE_FROM_DIFFERENT_ORG = e12_case_factory(
+        first_name=f"child_{DIFF_TRUST_DIFF_ORGANISATION.name}",
+        organisations__organisation=DIFF_TRUST_DIFF_ORGANISATION,
     )
 
     user_first_names_for_test = [
@@ -2823,7 +2823,7 @@ def test_users_update_antiepilepsymedicine_forbidden(client):
 
 
 @pytest.mark.django_db
-def test_users_update_antiepilepsymedicine_success(client):
+def test_users_update_antiepilepsymedicine_success(client, e12_case_factory):
     """
     Simulating different E12 Users attempting to update antiepilepsymedicine in Epilepsy12
 
@@ -2835,8 +2835,9 @@ def test_users_update_antiepilepsymedicine_success(client):
         ods_code="RP401",
         trust__ods_code="RP4",
     )
-    CASE_FROM_SAME_ORG = Case.objects.get(
-        first_name=f"child_{TEST_USER_ORGANISATION.name}"
+    CASE_FROM_SAME_ORG = e12_case_factory(
+        first_name=f"child_{TEST_USER_ORGANISATION.name}",
+        organisations__organisation=TEST_USER_ORGANISATION,
     )
 
     user_first_names_for_test = [

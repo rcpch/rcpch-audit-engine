@@ -27,8 +27,7 @@ from epilepsy12.tests.view_tests.permissions_tests.perm_tests_utils import (
 def test_download_button_access(
     client,
     seed_groups_fixture,
-    seed_users_fixture,
-    seed_cases_fixture,
+    seed_users_fixture
 ):
     """Only RCPCH team and superusers should be able to download full E12Users list."""
 

@@ -6,7 +6,7 @@
     [] Assert user can change user email
     [] Assert user can change user role
     [] Assert user can resend create_user email
-    
+
 
 # Cases
     [] Assert user can change child first_name
@@ -20,7 +20,7 @@
     [] Assert user can change child nhs_number
     [] Assert user can change child ethnicity
     [] Assert user can opt child out of Epilepsy12
-    
+
 
 # First Paediatric Assessment
     for field in fields: [
@@ -44,10 +44,10 @@
     [x] Assert user can change 'developmental_learning_or_schooling_problems' to False
     [x] Assert user can change 'behavioural_or_emotional_problems' to True
     [x] Assert user can change 'behavioural_or_emotional_problems' to False
-    
+
 # Epilepsy Context
     for field in fields: [
-        'previous_febrile_seizure',                                 single_choice_multiple_toggle_button 
+        'previous_febrile_seizure',                                 single_choice_multiple_toggle_button
         'previous_acute_symptomatic_seizure',                       single_choice_multiple_toggle_button
         'is_there_a_family_history_of_epilepsy',                    single_choice_multiple_toggle_button
         'previous_neonatal_seizures',                               single_choice_multiple_toggle_button
@@ -182,11 +182,11 @@
     [x] Assert user can change 'nonepileptic_seizure_subtype' to NON_EPILEPSY_SEIZURE_TYPE[5][0]=='PMD' ('Paroxysmal Movement Disorders')]], tuple[Literal['Oth'], Literal['Other']]]
     [x] Assert user can change 'nonepileptic_seizure_subtype' to NON_EPILEPSY_SEIZURE_TYPE[6][0]=='Oth' ('Other')
 
-    
+
     [] Assert user cannot change 'seizure_onset_date' to before Case.date_of_birth (raise ValidationError)
     [] Assert user cannot change 'seizure_onset_date' to before Registration.first_paediatric_assessment_date (raise ValidationError)
     [] Assert user cannot change 'seizure_onset_date' to future date (raise ValidationError)
-    
+
 
 # Comorbidity
     for field in fields: [
@@ -208,7 +208,7 @@
     ]
     [] Assert user can change  ..
     [] Assert user can change  ..
-    
+
 
 # Assessment
     for field in fields: [
@@ -222,17 +222,17 @@
         'paediatric_neurologist_referral_date',                                 date_field
         'paediatric_neurologist_input_date',                                    date_field
         'paediatric_neurology_centre',                                          button click
-        'edit_paediatric_neurology_centre',                                     button click    
+        'edit_paediatric_neurology_centre',                                     button click
         'update_paediatric_neurology_centre_pressed',                           button click (action:edit/cancel)
-        'childrens_epilepsy_surgical_service_referral_criteria_met',            toggle_button                
-        'childrens_epilepsy_surgical_service_referral_made',                    toggle_button        
-        'childrens_epilepsy_surgical_service_referral_date',                    date_field    
+        'childrens_epilepsy_surgical_service_referral_criteria_met',            toggle_button
+        'childrens_epilepsy_surgical_service_referral_made',                    toggle_button
+        'childrens_epilepsy_surgical_service_referral_date',                    date_field
         'childrens_epilepsy_surgical_service_input_date',                       date_field
         'epilepsy_surgery_centre',                                              button click
         'edit_epilepsy_surgery_centre',                                         button click
-        'update_epilepsy_surgery_centre_pressed',                               button click (action:edit/cancel)            
+        'update_epilepsy_surgery_centre_pressed',                               button click (action:edit/cancel)
         'epilepsy_specialist_nurse_referral_made',                              toggle_button
-        'epilepsy_specialist_nurse_referral_date',                              date_field    
+        'epilepsy_specialist_nurse_referral_date',                              date_field
         'epilepsy_specialist_nurse_input_date',                                 date_field
     ]
     [x] Assert user can change 'consultant_paediatrician_referral_made' to True
@@ -268,10 +268,10 @@
     for field in fields: [
         'eeg_indicated',                                                        toggle_button
         'eeg_request_date',                                                     date_field
-        'eeg_performed_date',                                                   date_field    
+        'eeg_performed_date',                                                   date_field
         'eeg_declined',                                                         button click (confirm:edit/decline)
-        'twelve_lead_ecg_status',                                               toggle_button        
-        'ct_head_scan_status',                                                  toggle_button    
+        'twelve_lead_ecg_status',                                               toggle_button
+        'ct_head_scan_status',                                                  toggle_button
         'mri_indicated',                                                        toggle_button
         'mri_brain_requested_date',                                             date_field
         'mri_brain_reported_date',                                              date_field
@@ -302,10 +302,10 @@
         'individualised_care_plan_parental_prolonged_seizure_care',             toggle_button
         'individualised_care_plan_includes_general_participation_risk',         toggle_button
         'individualised_care_plan_addresses_water_safety',                      toggle_button
-        'individualised_care_plan_addresses_sudep',                             toggle_button    
-        'individualised_care_plan_includes_ehcp',                               toggle_button    
-        'has_individualised_care_plan_been_updated_in_the_last_year',           toggle_button                        
-        'has_been_referred_for_mental_health_support',                          toggle_button        
+        'individualised_care_plan_addresses_sudep',                             toggle_button
+        'individualised_care_plan_includes_ehcp',                               toggle_button
+        'has_individualised_care_plan_been_updated_in_the_last_year',           toggle_button
+        'has_been_referred_for_mental_health_support',                          toggle_button
         'has_support_for_mental_health_support',                                toggle_button
         'has_an_aed_been_given',                                                toggle_button
         'has_rescue_medication_been_prescribed',                                toggle_button
@@ -707,12 +707,6 @@ TOGGLES = (
 
 SELECTS = (
     {
-        "field_name": "epilepsy_cause",
-        "param": "multiaxial_diagnosis_id",
-        "model": "multiaxialdiagnosis",
-        "choices": None,
-    },
-    {
         "field_name": "comorbidity_diagnosis",
         "param": "comorbidity_id",
         "model": "comorbidity",
@@ -753,7 +747,7 @@ SELECTS = (
 
 @pytest.mark.django_db
 def test_user_updates_single_choice_multiple_toggle_success(
-    client, seed_groups_fixture, seed_users_fixture, seed_cases_fixture
+    client, seed_groups_fixture, seed_users_fixture
 ):
     """
     Assert for each single_choice_multiple_toggle choice selection, value stored in model is correct selection value
@@ -800,7 +794,7 @@ def test_user_updates_single_choice_multiple_toggle_success(
 
 @pytest.mark.django_db
 def test_user_updates_single_choice_multiple_toggle_fail(
-    client, seed_groups_fixture, seed_users_fixture, seed_cases_fixture
+    client, seed_groups_fixture, seed_users_fixture
 ):
     """
     Assert for each single_choice_multiple_toggle choice selection, value stored in model is correct selection value
@@ -1177,13 +1171,7 @@ def test_user_updates_select_fail(
                 model_name=url.get("model"),
             )
 
-            if url.get("field_name") == "epilepsy_cause":
-                data = {"epilepsy_cause": 134}  # Aicardi's sy.
-                expected_result = EpilepsyCause.objects.get(
-                    pk=135
-                )  # Dysmorphic sialidosis with renal involvement
-                htmx_trigger = "epilepsy_cause"
-            elif url.get("field_name") == "comorbidity_diagnosis":
+            if url.get("field_name") == "comorbidity_diagnosis":
                 data = {"comorbidityentity": 134}
                 expected_result = ComorbidityList.objects.get(
                     pk=35

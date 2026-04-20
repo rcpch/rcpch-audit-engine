@@ -5,7 +5,7 @@ requests==2.32.4
 # third party imports
 ## django and misc
 dj_database_url==2.3.0
-django==5.2.9
+django==5.2.13
 django-auto-logout==0.5.1
 django-filter==25.1
 django-htmx==1.23.0
@@ -39,7 +39,7 @@ gunicorn==23.0.0
 
 # code linting and formatting
 autopep8==2.3.2
-black==25.1.0
+black==26.3.1
 
 # testing and code analysis
 coverage==7.8.0
