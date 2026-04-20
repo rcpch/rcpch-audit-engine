@@ -114,8 +114,6 @@ def multiaxial_diagnosis(request, case_id):
 
     keyword_choices = Keyword.objects.all()
 
-    epilepsy_causes = EpilepsyCause.objects.all().order_by("preferredTerm")
-
     site = Site.objects.filter(
         site_is_actively_involved_in_epilepsy_care=True,
         site_is_primary_centre_of_epilepsy_care=True,
@@ -132,7 +130,6 @@ def multiaxial_diagnosis(request, case_id):
         "comorbidities": comorbidities,
         "keyword_choices": keyword_choices,
         "epilepsy_cause_selection": EPILEPSY_CAUSES,
-        "epilepsy_causes": epilepsy_causes,
         "case_id": case_id,
         "audit_progress": registration.audit_progress,
         "active_template": "multiaxial_diagnosis",
@@ -1362,12 +1359,9 @@ def epilepsy_cause_known(request, multiaxial_diagnosis_id):
 
     multiaxial_diagnosis = MultiaxialDiagnosis.objects.get(pk=multiaxial_diagnosis_id)
 
-    epilepsy_causes = EpilepsyCause.objects.all().order_by("preferredTerm")
-
     context = {
         "multiaxial_diagnosis": multiaxial_diagnosis,
         "epilepsy_cause_selection": EPILEPSY_CAUSES,
-        "epilepsy_causes": epilepsy_causes,
     }
 
     response = recalculate_form_generate_response(
@@ -1380,46 +1374,46 @@ def epilepsy_cause_known(request, multiaxial_diagnosis_id):
     return response
 
 
-@login_and_otp_required()
-@user_may_view_this_child()
-@permission_required("epilepsy12.change_multiaxialdiagnosis", raise_exception=True)
-def epilepsy_cause(request, multiaxial_diagnosis_id):
-    """
-    POST request on change select from epilepsy_causes partial
-    Choices for causes come from EpilepsyCause table
-    """
+# @login_and_otp_required()
+# @user_may_view_this_child()
+# @permission_required("epilepsy12.change_multiaxialdiagnosis", raise_exception=True)
+# def epilepsy_cause(request, multiaxial_diagnosis_id):
+#     """
+#     POST request on change select from epilepsy_causes partial
+#     Choices for causes come from EpilepsyCause table
+#     """
 
-    try:
-        error_message = None
-        validate_and_update_model(
-            request=request,
-            model=MultiaxialDiagnosis,
-            model_id=multiaxial_diagnosis_id,
-            field_name="epilepsy_cause",
-            page_element="select",
-        )
-    except ValueError as error:
-        error_message = error
+#     try:
+#         error_message = None
+#         validate_and_update_model(
+#             request=request,
+#             model=MultiaxialDiagnosis,
+#             model_id=multiaxial_diagnosis_id,
+#             field_name="epilepsy_cause",
+#             page_element="select",
+#         )
+#     except ValueError as error:
+#         error_message = error
 
-    epilepsy_causes = EpilepsyCause.objects.all().order_by("preferredTerm")
+#
 
-    multiaxial_diagnosis = MultiaxialDiagnosis.objects.get(pk=multiaxial_diagnosis_id)
+#     multiaxial_diagnosis = MultiaxialDiagnosis.objects.get(pk=multiaxial_diagnosis_id)
 
-    context = {
-        "epilepsy_causes": epilepsy_causes,
-        "multiaxial_diagnosis": multiaxial_diagnosis,
-        "epilepsy_cause_selection": EPILEPSY_CAUSES,
-    }
+#     context = {
+#
+#         "multiaxial_diagnosis": multiaxial_diagnosis,
+#         "epilepsy_cause_selection": EPILEPSY_CAUSES,
+#     }
 
-    response = recalculate_form_generate_response(
-        model_instance=multiaxial_diagnosis,
-        request=request,
-        template="epilepsy12/partials/multiaxial_diagnosis/epilepsy_causes/epilepsy_causes.html",
-        context=context,
-        error_message=error_message,
-    )
+#     response = recalculate_form_generate_response(
+#         model_instance=multiaxial_diagnosis,
+#         request=request,
+#         template="epilepsy12/partials/multiaxial_diagnosis/epilepsy_causes/epilepsy_causes.html",
+#         context=context,
+#         error_message=error_message,
+#     )
 
-    return response
+#     return response
 
 
 @login_and_otp_required()
@@ -1697,7 +1691,7 @@ def comorbidity_diagnosis_date(request, comorbidity_id):
 def comorbidity_diagnosis(request, comorbidity_id):
     """
     POST request on change select from comorbidity partial
-    Choices for causes fed from SNOMED server
+    Choices for comorbidities fed from SNOMED server
     """
 
     # 35919005 |Pervasive developmental disorder (disorder)|

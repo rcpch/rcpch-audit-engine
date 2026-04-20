@@ -1147,7 +1147,6 @@ def test_users_update_first_multiaxial_diagnosis_forbidden(client, e12_case_fact
 
     URLS = [
         "epilepsy_cause_known",
-        "epilepsy_cause",
         "epilepsy_cause_categories",
         "relevant_impairments_behavioural_educational",
         "mental_health_screen",
@@ -1217,7 +1216,6 @@ def test_users_update_multiaxial_diagnosis_success(client, e12_case_factory):
 
     URLS = [
         "epilepsy_cause_known",
-        "epilepsy_cause",
         "epilepsy_cause_categories",
         "relevant_impairments_behavioural_educational",
         "mental_health_screen",
@@ -1313,7 +1311,6 @@ def test_update_multiaxial_diagnosis_cause_success(client, e12_case_factory):
 
         'epilepsy_cause_known',
         'epilepsy_cause_categories',
-        'epilepsy_cause'
     """
 
     # GOSH
@@ -1338,7 +1335,7 @@ def test_update_multiaxial_diagnosis_cause_success(client, e12_case_factory):
         user_first_names_for_test
     ), f"Incorrect queryset of test users. Requested {len(user_first_names_for_test)} users, queryset includes {len(users)}: {users}"
 
-    EPILEPSY_CAUSE_ENTITY = EpilepsyCause.objects.first()
+    #  EPILEPSY_CAUSE_ENTITY = EpilepsyCause.objects.first()
 
     for test_user in users:
         client.force_login(test_user)
@@ -1383,24 +1380,6 @@ def test_update_multiaxial_diagnosis_cause_success(client, e12_case_factory):
         ).epilepsy_cause_categories == [
             "Gen"
         ], f"{test_user} from {test_user.organisation_employer} attempted POST `Gen` to epilepsy_cause_categories but model did not update."
-
-        response_epilepsy_cause = client.post(
-            reverse(
-                "epilepsy_cause",
-                kwargs={
-                    "multiaxial_diagnosis_id": CASE_FROM_SAME_ORG.registration.multiaxialdiagnosis.id,
-                },
-            ),
-            headers={"Hx-Trigger-Name": "epilepsy_cause", "Hx-Request": "true"},
-            data={"epilepsy_cause": f"{EPILEPSY_CAUSE_ENTITY.id}"},
-        )
-
-        assert (
-            MultiaxialDiagnosis.objects.get(
-                registration=CASE_FROM_SAME_ORG.registration
-            ).epilepsy_cause
-            == EPILEPSY_CAUSE_ENTITY
-        ), f"{test_user} from {test_user.organisation_employer} attempted POST `epilepsy_cause:{EPILEPSY_CAUSE_ENTITY.id}` but MultiaxialDiagnosis model field did not update."
 
         # Reset answers for next User
         MultiaxialDiagnosis.objects.filter(
