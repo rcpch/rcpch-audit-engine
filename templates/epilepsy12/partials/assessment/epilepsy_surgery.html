@@ -17,26 +17,26 @@
         <li>Children with epilepsy associated with hypothalamic hamartoma</li>
       </ol>
         {% url 'childrens_epilepsy_surgical_service_referral_criteria_met' assessment_id=assessment.pk as hx_post %}
-        {% include 'epilepsy12/partials/page_elements/toggle_button.html' with test_positive=assessment.childrens_epilepsy_surgical_service_referral_criteria_met hx_post=hx_post hx_swap="innerHTML" hx_target="#childrens_epilepsy_surgical_service" hx_trigger="click" tooltip_id='childrens_epilepsy_surgical_service_referral_criteria_met_tooltip' label=assessment.get_childrens_epilepsy_surgical_service_referral_criteria_met_help_label_text reference=assessment.get_childrens_epilepsy_surgical_service_referral_criteria_met_help_reference_text data_position="top left" enabled=perms.epilepsy12.change_assessment %}
+        {% include 'epilepsy12/partials/page_elements/toggle_button.html' with test_positive=assessment.childrens_epilepsy_surgical_service_referral_criteria_met hx_post=hx_post hx_swap="innerHTML" hx_target="#childrens_epilepsy_surgical_service" hx_trigger="click" tooltip_id='childrens_epilepsy_surgical_service_referral_criteria_met_tooltip' label=assessment.get_childrens_epilepsy_surgical_service_referral_criteria_met_help_label_text reference=assessment.get_childrens_epilepsy_surgical_service_referral_criteria_met_help_reference_text data_position="top left" enabled=can_edit %}
 
   </div>
 
 
         {% url 'childrens_epilepsy_surgical_service_referral_made' assessment_id=assessment.pk as hx_post %}
-        {% include 'epilepsy12/partials/page_elements/toggle_button.html' with test_positive=assessment.childrens_epilepsy_surgical_service_referral_made hx_post=hx_post hx_swap="innerHTML" hx_target="#childrens_epilepsy_surgical_service" hx_trigger="click" tooltip_id='childrens_epilepsy_surgical_service_tooltip' label=assessment.get_childrens_epilepsy_surgical_service_referral_made_help_label_text reference=assessment.get_childrens_epilepsy_surgical_service_referral_made_help_reference_text data_position="top left" enabled=perms.epilepsy12.change_assessment %}
+        {% include 'epilepsy12/partials/page_elements/toggle_button.html' with test_positive=assessment.childrens_epilepsy_surgical_service_referral_made hx_post=hx_post hx_swap="innerHTML" hx_target="#childrens_epilepsy_surgical_service" hx_trigger="click" tooltip_id='childrens_epilepsy_surgical_service_tooltip' label=assessment.get_childrens_epilepsy_surgical_service_referral_made_help_label_text reference=assessment.get_childrens_epilepsy_surgical_service_referral_made_help_reference_text data_position="top left" enabled=can_edit %}
 
         {% if assessment.childrens_epilepsy_surgical_service_referral_made %}
 
             <div class="ui rcpch_important message">
 
                 {% url 'childrens_epilepsy_surgical_service_referral_date' assessment_id=assessment.pk as hx_post %}
-                {% include 'epilepsy12/partials/page_elements/date_field.html' with hx_post=hx_post hx_swap="innerHTML" hx_target="#childrens_epilepsy_surgical_service" hx_trigger="change delay:1s" label=assessment.get_childrens_epilepsy_surgical_service_referral_date_help_label_text reference=assessment.get_childrens_epilepsy_surgical_service_referral_date_help_reference_text date_value=assessment.childrens_epilepsy_surgical_service_referral_date input_date_field_name="childrens_epilepsy_surgical_service_referral_date" error_message=error_message enabled=perms.epilepsy12.change_assessment has_permission=perms.epilepsy12.change_assessment %}
+                {% include 'epilepsy12/partials/page_elements/date_field.html' with hx_post=hx_post hx_swap="innerHTML" hx_target="#childrens_epilepsy_surgical_service" hx_trigger="change delay:1s" label=assessment.get_childrens_epilepsy_surgical_service_referral_date_help_label_text reference=assessment.get_childrens_epilepsy_surgical_service_referral_date_help_reference_text date_value=assessment.childrens_epilepsy_surgical_service_referral_date input_date_field_name="childrens_epilepsy_surgical_service_referral_date" error_message=error_message enabled=can_edit has_permission=can_edit %}
 
                 {% if show_input_date %}
                     <div class="two fields">
                         <div class="ten wide field">
                             {% url 'childrens_epilepsy_surgical_service_input_date' assessment_id=assessment.pk as hx_post %}
-                            {% include 'epilepsy12/partials/page_elements/date_field.html' with hx_post=hx_post hx_swap="innerHTML" hx_target="#childrens_epilepsy_surgical_service" hx_trigger="change delay:1s" label=assessment.get_childrens_epilepsy_surgical_service_input_date_help_label_text reference=assessment.get_childrens_epilepsy_surgical_service_input_date_help_reference_text date_value=assessment.childrens_epilepsy_surgical_service_input_date input_date_field_name="childrens_epilepsy_surgical_service_input_date" error_message=error_message enabled=perms.epilepsy12.change_assessment has_permission=perms.epilepsy12.change_assessment %}
+                            {% include 'epilepsy12/partials/page_elements/date_field.html' with hx_post=hx_post hx_swap="innerHTML" hx_target="#childrens_epilepsy_surgical_service" hx_trigger="change delay:1s" label=assessment.get_childrens_epilepsy_surgical_service_input_date_help_label_text reference=assessment.get_childrens_epilepsy_surgical_service_input_date_help_reference_text date_value=assessment.childrens_epilepsy_surgical_service_input_date input_date_field_name="childrens_epilepsy_surgical_service_input_date" error_message=error_message enabled=can_edit has_permission=can_edit %}
                         </div>
                         <div class="six wide field">
                             <label class='toggle_button_label'>Time to Review</label>
@@ -45,7 +45,7 @@
                     </div>
                     <div class="field">
                         <div
-                            {% if perms.epilepsy12.change_assessment %}
+                            {% if can_edit %}
                                 class="ui rcpch_primary button"
                             {% else %}
                                 class="ui disabled rcpch_primary button"
@@ -92,7 +92,7 @@
                                     {% if not surgery_edit_active %}
 
                                         <button
-                                            {% if perms.epilepsy12.change_assessment %}
+                                            {% if can_edit %}
                                                 class="ui rcpch_primary button"
                                             {% else %}
                                                 class="ui rcpch_primary disabled button"
@@ -104,7 +104,7 @@
                                         >Edit</button>
 
                                         <button
-                                            {% if perms.epilepsy12.delete_site %}
+                                            {% if can_edit %}
                                                 class="ui rcpch_danger button"
                                             {% else %}
                                                 class="ui rcpch_danger disabled button"
@@ -128,7 +128,7 @@
                         <div class="field" id="allocate_surgical_centre">
                             {% url 'edit_epilepsy_surgery_centre' assessment_id=assessment.pk site_id=active_surgical_site.pk as hx_post %}
                             {% url 'update_epilepsy_surgery_centre_pressed' assessment_id=assessment.pk site_id=active_surgical_site.pk action='cancel' as hx_cancel %}
-                            {% include 'epilepsy12/partials/page_elements/organisations_select.html' with organisation_list=organisation_list hx_post=hx_post hx_target="#childrens_epilepsy_surgical_service" hx_trigger="click" hx_swap="innerHTML" hx_name="edit_epilepsy_surgery_centre" test_positive=active_surgical_site.pk label="Update Children's Surgical Centre" hx_default_text="Search children's surgical centres..." data_position="top left" enabled=perms.epilepsy12.change_assessment has_permission=perms.epilepsy12.change_assessment %}
+                            {% include 'epilepsy12/partials/page_elements/organisations_select.html' with organisation_list=organisation_list hx_post=hx_post hx_target="#childrens_epilepsy_surgical_service" hx_trigger="click" hx_swap="innerHTML" hx_name="edit_epilepsy_surgery_centre" test_positive=active_surgical_site.pk label="Update Children's Surgical Centre" hx_default_text="Search children's surgical centres..." data_position="top left" enabled=can_edit has_permission=can_edit %}
                         </div>
 
                     {% endif %}
@@ -142,7 +142,7 @@
                         </span>
                         {% url 'epilepsy_surgery_centre' assessment_id=assessment.pk as hx_post %}
                         {% url 'update_epilepsy_surgery_centre_pressed' assessment_id=assessment.pk site_id=active_surgical_site.pk action='cancel' as hx_cancel %}
-                        {% include 'epilepsy12/partials/page_elements/organisations_select.html' with organisation_list=organisation_list hx_post=hx_post hx_target="#childrens_epilepsy_surgical_service" hx_trigger="click" hx_swap="innerHTML" hx_name="epilepsy_surgery_centre" test_positive=None label="Allocate Children's Surgical Centre" hx_default_text="Search children's surgical centres..." data_position="top left" enabled=perms.epilepsy12.change_assessment has_permission=perms.epilepsy12.change_assessment %}
+                        {% include 'epilepsy12/partials/page_elements/organisations_select.html' with organisation_list=organisation_list hx_post=hx_post hx_target="#childrens_epilepsy_surgical_service" hx_trigger="click" hx_swap="innerHTML" hx_name="epilepsy_surgery_centre" test_positive=None label="Allocate Children's Surgical Centre" hx_default_text="Search children's surgical centres..." data_position="top left" enabled=can_edit has_permission=can_edit %}
                     </div>
 
                 {% endif %}

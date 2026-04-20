@@ -154,7 +154,7 @@ def update_site_model(
 @login_and_otp_required()
 @permission_required("epilepsy12.change_assessment", raise_exception=True)
 @user_may_view_this_child()
-def consultant_paediatrician_referral_made(request, assessment_id):
+def consultant_paediatrician_referral_made(request, can_edit, assessment_id):
     """
     POST request callback from toggle_button in consultant_paediatrician partial
     """
@@ -212,7 +212,7 @@ def consultant_paediatrician_referral_made(request, assessment_id):
             else:
                 site.delete()
 
-    context = {"assessment": assessment, "organisation_list": Organisation.objects.get_organisation_list() }
+    context = {"can_edit": can_edit, "assessment": assessment, "organisation_list": Organisation.objects.get_organisation_list() }
 
     # add previous and current sites to context
     sites_context = add_sites_and_site_history_to_context(assessment.registration.case)
@@ -235,7 +235,7 @@ def consultant_paediatrician_referral_made(request, assessment_id):
 @login_and_otp_required()
 @permission_required("epilepsy12.change_assessment", raise_exception=True)
 @user_may_view_this_child()
-def consultant_paediatrician_referral_date(request, assessment_id):
+def consultant_paediatrician_referral_date(request, can_edit, assessment_id):
     """
     This is an HTMX callback from the consultant_paediatrician partial template
     It is triggered by a change in custom date input in the partial, generating a post request.
@@ -262,6 +262,7 @@ def consultant_paediatrician_referral_date(request, assessment_id):
     assessment = Assessment.objects.get(pk=assessment_id)
 
     context = {
+        "can_edit": can_edit,
         "assessment": assessment,
         "general_paediatric_edit_active": False,
         "organisation_list": Organisation.objects.get_organisation_list(),
@@ -288,7 +289,7 @@ def consultant_paediatrician_referral_date(request, assessment_id):
 @login_and_otp_required()
 @permission_required("epilepsy12.change_assessment", raise_exception=True)
 @user_may_view_this_child()
-def consultant_paediatrician_input_achieved(request, assessment_id):
+def consultant_paediatrician_input_achieved(request, can_edit, assessment_id):
     """
     This is an HTMX callback from the consultant_paediatrician partial template
     It is triggered by a change in input achieved toggle in the partial, generating a post request.
@@ -323,6 +324,7 @@ def consultant_paediatrician_input_achieved(request, assessment_id):
     assessment = Assessment.objects.get(pk=assessment_id)
 
     context = {
+        "can_edit": can_edit,
         "assessment": assessment,
         "general_paediatric_edit_active": False,
         "organisation_list": organisation_list,
@@ -349,7 +351,7 @@ def consultant_paediatrician_input_achieved(request, assessment_id):
 @login_and_otp_required()
 @permission_required("epilepsy12.change_assessment", raise_exception=True)
 @user_may_view_this_child()
-def consultant_paediatrician_input_date(request, assessment_id):
+def consultant_paediatrician_input_date(request, can_edit, assessment_id):
     """
     This is an HTMX callback from the consultant_paediatrician partial template
     It is triggered by a change in custom date input in the partial, generating a post request.
@@ -379,6 +381,7 @@ def consultant_paediatrician_input_date(request, assessment_id):
     organisation_list = Organisation.objects.get_organisation_list()
 
     context = {
+        "can_edit": can_edit,
         "assessment": Assessment.objects.get(pk=assessment_id),
         "general_paediatric_edit_active": False,
         "organisation_list": organisation_list,
@@ -408,7 +411,7 @@ def consultant_paediatrician_input_date(request, assessment_id):
 @login_and_otp_required()
 @permission_required("epilepsy12.change_assessment", raise_exception=True)
 @user_may_view_this_child()
-def general_paediatric_centre(request, assessment_id):
+def general_paediatric_centre(request, can_edit, assessment_id):
     """
     HTMX call back from organisation_list partial.
     POST request to update/save centre in Site model
@@ -434,6 +437,7 @@ def general_paediatric_centre(request, assessment_id):
     )
 
     context = {
+        "can_edit": can_edit,
         "assessment": Assessment.objects.get(pk=assessment_id),
         "general_paediatric_edit_active": False,
         "organisation_list": organisation_list,
@@ -459,7 +463,7 @@ def general_paediatric_centre(request, assessment_id):
 @login_and_otp_required()
 @permission_required("epilepsy12.change_assessment", raise_exception=True)
 @user_may_view_this_child()
-def edit_general_paediatric_centre(request, assessment_id, site_id):
+def edit_general_paediatric_centre(request, can_edit, assessment_id, site_id):
     """
     HTMX call back from consultant_paediatrician partial template. This is a POST request on button click.
     It updates the Site object and returns the same partial template.
@@ -485,6 +489,7 @@ def edit_general_paediatric_centre(request, assessment_id, site_id):
     )
 
     context = {
+        "can_edit": can_edit,
         "assessment": Assessment.objects.get(pk=assessment_id),
         "general_paediatric_edit_active": False,
         "organisation_list": organisation_list,
@@ -510,7 +515,7 @@ def edit_general_paediatric_centre(request, assessment_id, site_id):
 @login_and_otp_required()
 @permission_required("epilepsy12.change_assessment", raise_exception=True)
 @user_may_view_this_child()
-def update_general_paediatric_centre_pressed(request, assessment_id, site_id, action):
+def update_general_paediatric_centre_pressed(request, can_edit, assessment_id, site_id, action):
     """
     HTMX callback from consultant_paediatrician partial on click of Update or Cancel
     (action is 'edit' or 'cancel') to change the general_paediatric_edit_active flag
@@ -533,6 +538,7 @@ def update_general_paediatric_centre_pressed(request, assessment_id, site_id, ac
     )
 
     context = {
+        "can_edit": can_edit,
         "assessment": assessment,
         "general_paediatric_edit_active": general_paediatric_edit_active,
         "organisation_list": organisation_list,
@@ -558,7 +564,7 @@ def update_general_paediatric_centre_pressed(request, assessment_id, site_id, ac
 @login_and_otp_required()
 @permission_required("epilepsy12.change_assessment", raise_exception=True)
 @user_may_view_this_child()
-def delete_general_paediatric_centre(request, assessment_id, site_id):
+def delete_general_paediatric_centre(request, can_edit, assessment_id, site_id):
     """
     HTMX call back from organisations_select partial template.
     This is a POST request on button click.
@@ -595,6 +601,7 @@ def delete_general_paediatric_centre(request, assessment_id, site_id):
     organisation_list = Organisation.objects.get_organisation_list()
 
     context = {
+        "can_edit": can_edit,
         "assessment": assessment,
         "general_paediatric_edit_active": False,
         "error": error_message,
@@ -626,7 +633,7 @@ def delete_general_paediatric_centre(request, assessment_id, site_id):
 @login_and_otp_required()
 @permission_required("epilepsy12.change_assessment", raise_exception=True)
 @user_may_view_this_child()
-def paediatric_neurologist_referral_made(request, assessment_id):
+def paediatric_neurologist_referral_made(request, can_edit, assessment_id):
     """
     This is an HTMX callback from the paediatric_neurologist partial template
     It is triggered by a toggle in the partial generating a post request
@@ -686,7 +693,7 @@ def paediatric_neurologist_referral_made(request, assessment_id):
     # filter list to include only NHS organisations
     organisation_list = Organisation.objects.get_organisation_list()
 
-    context = {"assessment": assessment, "organisation_list": organisation_list}
+    context = {"can_edit": can_edit, "assessment": assessment, "organisation_list": organisation_list}
 
     # add previous and current sites to context
     sites_context = add_sites_and_site_history_to_context(assessment.registration.case)
@@ -709,7 +716,7 @@ def paediatric_neurologist_referral_made(request, assessment_id):
 @login_and_otp_required()
 @permission_required("epilepsy12.change_assessment", raise_exception=True)
 @user_may_view_this_child()
-def paediatric_neurologist_referral_date(request, assessment_id):
+def paediatric_neurologist_referral_date(request, can_edit, assessment_id):
     """
     This is an HTMX callback from the paediatric_neurologist partial template
     It is triggered by a change in custom date input in the partial, generating a post request.
@@ -742,6 +749,7 @@ def paediatric_neurologist_referral_date(request, assessment_id):
     organisation_list = Organisation.objects.get_organisation_list()
 
     context = {
+        "can_edit": can_edit,
         "assessment": assessment,
         "neurology_edit_active": False,
         "organisation_list": organisation_list,
@@ -768,7 +776,7 @@ def paediatric_neurologist_referral_date(request, assessment_id):
 @login_and_otp_required()
 @permission_required("epilepsy12.change_assessment", raise_exception=True)
 @user_may_view_this_child()
-def paediatric_neurologist_input_date(request, assessment_id):
+def paediatric_neurologist_input_date(request, can_edit, assessment_id):
     """
     This is an HTMX callback from the paediatric_neurologist partial template
     It is triggered by a change in custom date input in the partial, generating a post request.
@@ -805,6 +813,7 @@ def paediatric_neurologist_input_date(request, assessment_id):
     organisation_list = Organisation.objects.get_organisation_list()
 
     context = {
+        "can_edit": can_edit,
         "assessment": assessment,
         "neurology_edit_active": False,
         "organisation_list": organisation_list,
@@ -831,7 +840,7 @@ def paediatric_neurologist_input_date(request, assessment_id):
 @login_and_otp_required()
 @permission_required("epilepsy12.change_assessment", raise_exception=True)
 @user_may_view_this_child()
-def paediatric_neurologist_input_achieved(request, assessment_id):
+def paediatric_neurologist_input_achieved(request, can_edit, assessment_id):
     """
     This is an HTMX callback from the paediatric_neurologist partial template
     It is triggered by a change in input achieved toggle in the partial, generating a post request.
@@ -867,6 +876,7 @@ def paediatric_neurologist_input_achieved(request, assessment_id):
     assessment = Assessment.objects.get(pk=assessment_id)
 
     context = {
+        "can_edit": can_edit,
         "assessment": assessment,
         "neurology_edit_active": False,
         "organisation_list": organisation_list,
@@ -896,7 +906,7 @@ def paediatric_neurologist_input_achieved(request, assessment_id):
 @login_and_otp_required()
 @permission_required("epilepsy12.change_assessment", raise_exception=True)
 @user_may_view_this_child()
-def paediatric_neurology_centre(request, assessment_id):
+def paediatric_neurology_centre(request, can_edit, assessment_id):
     """
     HTMX call back from organisation_list partial.
     POST request to update/save centre in Site model
@@ -919,6 +929,7 @@ def paediatric_neurology_centre(request, assessment_id):
     organisation_list = Organisation.objects.get_organisation_list()
 
     context = {
+        "can_edit": can_edit,
         "assessment": assessment,
         "neurology_edit_active": False,
         "organisation_list": organisation_list,
@@ -944,7 +955,7 @@ def paediatric_neurology_centre(request, assessment_id):
 @login_and_otp_required()
 @permission_required("epilepsy12.change_assessment", raise_exception=True)
 @user_may_view_this_child()
-def edit_paediatric_neurology_centre(request, assessment_id, site_id):
+def edit_paediatric_neurology_centre(request, can_edit, assessment_id, site_id):
     """
     HTMX call back from epilepsy_surgery partial template. This is a POST request on button click.
     It updates the Site object and returns the same partial template.
@@ -967,6 +978,7 @@ def edit_paediatric_neurology_centre(request, assessment_id, site_id):
     organisation_list = Organisation.objects.get_organisation_list()
 
     context = {
+        "can_edit": can_edit,
         "assessment": assessment,
         "neurology_edit_active": False,
         "organisation_list": organisation_list,
@@ -992,7 +1004,7 @@ def edit_paediatric_neurology_centre(request, assessment_id, site_id):
 @login_and_otp_required()
 @permission_required("epilepsy12.change_assessment", raise_exception=True)
 @user_may_view_this_child()
-def update_paediatric_neurology_centre_pressed(request, assessment_id, site_id, action):
+def update_paediatric_neurology_centre_pressed(request, can_edit, assessment_id, site_id, action):
     """
     HTMX callback from paediatric_neurology partial on click of Update or Cancel
     (action is 'edit' or 'cancel') to change the neurology_edit_active flag
@@ -1010,6 +1022,7 @@ def update_paediatric_neurology_centre_pressed(request, assessment_id, site_id, 
     organisation_list = Organisation.objects.get_organisation_list()
 
     context = {
+        "can_edit": can_edit,
         "assessment": assessment,
         "neurology_edit_active": neurology_edit_active,
         "organisation_list": organisation_list,
@@ -1035,7 +1048,7 @@ def update_paediatric_neurology_centre_pressed(request, assessment_id, site_id, 
 @login_and_otp_required()
 @permission_required("epilepsy12.change_assessment", raise_exception=True)
 @user_may_view_this_child()
-def delete_paediatric_neurology_centre(request, assessment_id, site_id):
+def delete_paediatric_neurology_centre(request, can_edit, assessment_id, site_id):
     """
     HTMX call back from epilepsy_surgery partial template.
     This is a POST request on button click.
@@ -1072,6 +1085,7 @@ def delete_paediatric_neurology_centre(request, assessment_id, site_id):
     organisation_list = Organisation.objects.get_organisation_list()
 
     context = {
+        "can_edit": can_edit,
         "assessment": assessment,
         "surgery_edit_active": False,
         "error": error_message,
@@ -1103,7 +1117,7 @@ def delete_paediatric_neurology_centre(request, assessment_id, site_id):
 @login_and_otp_required()
 @permission_required("epilepsy12.change_assessment", raise_exception=True)
 @user_may_view_this_child()
-def childrens_epilepsy_surgical_service_referral_criteria_met(request, assessment_id):
+def childrens_epilepsy_surgical_service_referral_criteria_met(request, can_edit, assessment_id):
     """
     This is an HTMX callback from the epilepsy_surgery partial template
     It is triggered by a toggle in the partial generating a post request
@@ -1127,6 +1141,7 @@ def childrens_epilepsy_surgical_service_referral_criteria_met(request, assessmen
     organisation_list = Organisation.objects.get_organisation_list()
 
     context = {
+        "can_edit": can_edit,
         "assessment": assessment,
         "organisation_list": organisation_list,
         "show_input_date": assessment.childrens_epilepsy_surgical_service_input_date
@@ -1149,7 +1164,7 @@ def childrens_epilepsy_surgical_service_referral_criteria_met(request, assessmen
 @login_and_otp_required()
 @permission_required("epilepsy12.change_assessment", raise_exception=True)
 @user_may_view_this_child()
-def childrens_epilepsy_surgical_service_referral_made(request, assessment_id):
+def childrens_epilepsy_surgical_service_referral_made(request, can_edit, assessment_id):
     """
     This is an HTMX callback from the paediatric_neurologist partial template
     It is triggered by a toggle in the partial generating a post request
@@ -1215,6 +1230,7 @@ def childrens_epilepsy_surgical_service_referral_made(request, assessment_id):
     organisation_list = Organisation.objects.get_organisation_list()
 
     context = {
+        "can_edit": can_edit,
         "assessment": assessment,
         "surgery_edit_active": False,
         "error": None,
@@ -1244,7 +1260,7 @@ def childrens_epilepsy_surgical_service_referral_made(request, assessment_id):
 @login_and_otp_required()
 @permission_required("epilepsy12.change_assessment", raise_exception=True)
 @user_may_view_this_child()
-def childrens_epilepsy_surgical_service_referral_date(request, assessment_id):
+def childrens_epilepsy_surgical_service_referral_date(request, can_edit, assessment_id):
     """
     This is an HTMX callback from the epilepsy_surgery partial template
     It is triggered by a change in custom date input in the partial, generating a post request.
@@ -1273,6 +1289,7 @@ def childrens_epilepsy_surgical_service_referral_date(request, assessment_id):
     organisation_list = Organisation.objects.get_organisation_list()
 
     context = {
+        "can_edit": can_edit,
         "assessment": assessment,
         "surgery_edit_active": False,
         "error": None,
@@ -1303,7 +1320,7 @@ def childrens_epilepsy_surgical_service_referral_date(request, assessment_id):
 @permission_required("epilepsy12.change_assessment", raise_exception=True)
 @user_may_view_this_child()
 def childrens_epilepsy_surgical_service_review_date_status(
-    request, assessment_id, status
+    request, can_edit, assessment_id, status
 ):
     """
     This is an HTMX callback from the epilepsy_surgery partial template
@@ -1327,6 +1344,7 @@ def childrens_epilepsy_surgical_service_review_date_status(
         assessment.save()
 
     context = {
+        "can_edit": can_edit,
         "assessment": assessment,
         "surgery_edit_active": False,
         "error": None,
@@ -1355,7 +1373,7 @@ def childrens_epilepsy_surgical_service_review_date_status(
 @login_and_otp_required()
 @permission_required("epilepsy12.change_assessment", raise_exception=True)
 @user_may_view_this_child()
-def childrens_epilepsy_surgical_service_input_date(request, assessment_id):
+def childrens_epilepsy_surgical_service_input_date(request, can_edit, assessment_id):
     """
     This is an HTMX callback from the epilepsy_surgery partial template
     It is triggered by a change in custom date input in the partial, generating a post request.
@@ -1384,6 +1402,7 @@ def childrens_epilepsy_surgical_service_input_date(request, assessment_id):
     organisation_list = Organisation.objects.get_organisation_list()
 
     context = {
+        "can_edit": can_edit,
         "assessment": assessment,
         "surgery_edit_active": False,
         "error": None,
@@ -1413,7 +1432,7 @@ def childrens_epilepsy_surgical_service_input_date(request, assessment_id):
 @login_and_otp_required()
 @permission_required("epilepsy12.change_assessment", raise_exception=True)
 @user_may_view_this_child()
-def epilepsy_surgery_centre(request, assessment_id):
+def epilepsy_surgery_centre(request, can_edit, assessment_id):
     """
     HTMX call back from organisation_list partial.
     POST request to update/save centre in Site model
@@ -1436,6 +1455,7 @@ def epilepsy_surgery_centre(request, assessment_id):
     organisation_list = Organisation.objects.get_organisation_list()
 
     context = {
+        "can_edit": can_edit,
         "assessment": assessment,
         "surgery_edit_active": False,
         "error": None,
@@ -1464,7 +1484,7 @@ def epilepsy_surgery_centre(request, assessment_id):
 @login_and_otp_required()
 @permission_required("epilepsy12.change_assessment", raise_exception=True)
 @user_may_view_this_child()
-def edit_epilepsy_surgery_centre(request, assessment_id, site_id):
+def edit_epilepsy_surgery_centre(request, can_edit, assessment_id, site_id):
     """
     HTMX call back from epilepsy_surgery partial template.
     This is a POST request on button click.
@@ -1489,6 +1509,7 @@ def edit_epilepsy_surgery_centre(request, assessment_id, site_id):
     organisation_list = Organisation.objects.get_organisation_list()
 
     context = {
+        "can_edit": can_edit,
         "assessment": assessment,
         "surgery_edit_active": False,
         "error": None,
@@ -1517,7 +1538,7 @@ def edit_epilepsy_surgery_centre(request, assessment_id, site_id):
 @login_and_otp_required()
 @permission_required("epilepsy12.change_assessment", raise_exception=True)
 @user_may_view_this_child()
-def update_epilepsy_surgery_centre_pressed(request, assessment_id, site_id, action):
+def update_epilepsy_surgery_centre_pressed(request, can_edit, assessment_id, site_id, action):
     """
     HTMX callback from epilepsy_surgery partial on click of Update or Cancel
     (action is 'edit' or 'cancel') to change the surgery_edit_active flag
@@ -1533,6 +1554,7 @@ def update_epilepsy_surgery_centre_pressed(request, assessment_id, site_id, acti
     organisation_list = Organisation.objects.get_organisation_list()
 
     context = {
+        "can_edit": can_edit,
         "assessment": Assessment.objects.get(pk=assessment_id),
         "surgery_edit_active": surgery_edit_active,
         "error": None,
@@ -1561,7 +1583,7 @@ def update_epilepsy_surgery_centre_pressed(request, assessment_id, site_id, acti
 @login_and_otp_required()
 @permission_required("epilepsy12.change_assessment", raise_exception=True)
 @user_may_view_this_child()
-def delete_epilepsy_surgery_centre(request, assessment_id, site_id):
+def delete_epilepsy_surgery_centre(request, can_edit, assessment_id, site_id):
     """
     HTMX call back from epilepsy_surgery partial template.
     This is a POST request on button click.
@@ -1598,6 +1620,7 @@ def delete_epilepsy_surgery_centre(request, assessment_id, site_id):
     organisation_list = Organisation.objects.get_organisation_list()
 
     context = {
+        "can_edit": can_edit,
         "assessment": Assessment.objects.get(pk=assessment_id),
         "surgery_edit_active": False,
         "error": error_message,
@@ -1631,7 +1654,7 @@ def delete_epilepsy_surgery_centre(request, assessment_id, site_id):
 @login_and_otp_required()
 @permission_required("epilepsy12.change_assessment", raise_exception=True)
 @user_may_view_this_child()
-def epilepsy_specialist_nurse_referral_made(request, assessment_id):
+def epilepsy_specialist_nurse_referral_made(request, can_edit, assessment_id):
     """
     This is an HTMX callback from the epilepsy_nurse partial template
     It is triggered by a toggle in the partial generating a post request
@@ -1666,7 +1689,7 @@ def epilepsy_specialist_nurse_referral_made(request, assessment_id):
 
     assessment = Assessment.objects.get(pk=assessment_id)
 
-    context = {"assessment": assessment}
+    context = {"can_edit": can_edit, "assessment": assessment}
 
     template_name = "epilepsy12/partials/assessment/epilepsy_nurse.html"
 
@@ -1684,7 +1707,7 @@ def epilepsy_specialist_nurse_referral_made(request, assessment_id):
 @login_and_otp_required()
 @permission_required("epilepsy12.change_assessment", raise_exception=True)
 @user_may_view_this_child()
-def epilepsy_specialist_nurse_referral_date(request, assessment_id):
+def epilepsy_specialist_nurse_referral_date(request, can_edit, assessment_id):
     """
     This is an HTMX callback from the epilepsy_nurse partial template
     It is triggered by a change in custom date input in the partial, generating a post request.
@@ -1709,7 +1732,7 @@ def epilepsy_specialist_nurse_referral_date(request, assessment_id):
 
     assessment = Assessment.objects.get(pk=assessment_id)
 
-    context = {"assessment": assessment}
+    context = {"can_edit": can_edit, "assessment": assessment}
 
     template_name = "epilepsy12/partials/assessment/epilepsy_nurse.html"
 
@@ -1727,7 +1750,7 @@ def epilepsy_specialist_nurse_referral_date(request, assessment_id):
 @login_and_otp_required()
 @permission_required("epilepsy12.change_assessment", raise_exception=True)
 @user_may_view_this_child()
-def epilepsy_specialist_nurse_input_achieved(request, assessment_id):
+def epilepsy_specialist_nurse_input_achieved(request, can_edit, assessment_id):
     """
     This is an HTMX callback from the epilepsy_nurse partial template
     It is triggered by a change in the input achieved toggle in the partial, generating a post request.
@@ -1760,6 +1783,7 @@ def epilepsy_specialist_nurse_input_achieved(request, assessment_id):
     template_name = "epilepsy12/partials/assessment/epilepsy_nurse.html"
 
     context = {
+        "can_edit": can_edit,
         "assessment": assessment,
     }
 
@@ -1777,7 +1801,7 @@ def epilepsy_specialist_nurse_input_achieved(request, assessment_id):
 @login_and_otp_required()
 @permission_required("epilepsy12.change_assessment", raise_exception=True)
 @user_may_view_this_child()
-def epilepsy_specialist_nurse_input_date(request, assessment_id):
+def epilepsy_specialist_nurse_input_date(request, can_edit, assessment_id):
     """
     This is an HTMX callback from the epilepsy_nurse partial template
     It is triggered by a change in custom date input in the partial, generating a post request.
@@ -1802,7 +1826,7 @@ def epilepsy_specialist_nurse_input_date(request, assessment_id):
 
     assessment = Assessment.objects.get(pk=assessment_id)
 
-    context = {"assessment": assessment}
+    context = {"can_edit": can_edit, "assessment": assessment}
 
     template_name = "epilepsy12/partials/assessment/epilepsy_nurse.html"
 
@@ -1820,7 +1844,7 @@ def epilepsy_specialist_nurse_input_date(request, assessment_id):
 @login_and_otp_required()
 @permission_required("epilepsy12.view_assessment", raise_exception=True)
 @user_may_view_this_child()
-def assessment(request, case_id):
+def assessment(request, can_edit, case_id):
     case = Case.objects.get(pk=case_id)
     registration = Registration.objects.filter(case=case).get()
 
@@ -1842,6 +1866,7 @@ def assessment(request, case_id):
     organisation_id = site.organisation.pk
 
     context = {
+        "can_edit": can_edit and request.user.has_perm("epilepsy12.change_assessment"),
         "case_id": case_id,
         "assessment": assessment,
         "registration": assessment.registration,
