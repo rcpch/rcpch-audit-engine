@@ -49,6 +49,7 @@ def first_paediatric_assessment(request, can_edit, case_id) -> HttpResponse:
         "audit_progress": registration.audit_progress,
         "active_template": "first_paediatric_assessment",
         "organisation_id": organisation_id,
+        "can_edit": can_edit,
     }
 
     response = recalculate_form_generate_response(
@@ -95,7 +96,7 @@ def first_paediatric_assessment_in_acute_or_nonacute_setting(
     context = {
         "chronicity_selection": CHRONICITY,
         "first_paediatric_assessment": first_paediatric_assessment,
-        "enabled": True
+        "can_edit": True
     }
 
     response = recalculate_form_generate_response(
@@ -141,7 +142,7 @@ def has_number_of_episodes_since_the_first_been_documented(
     context = {
         "first_paediatric_assessment": first_paediatric_assessment,
         "diagnostic_status_selection": DIAGNOSTIC_STATUS,
-        "enabled": True
+        "can_edit": True
     }
 
     response = recalculate_form_generate_response(
@@ -184,7 +185,7 @@ def general_examination_performed(request, first_paediatric_assessment_id):
     context = {
         "first_paediatric_assessment": first_paediatric_assessment,
         "diagnostic_status_selection": DIAGNOSTIC_STATUS,
-        "enabled": True
+        "can_edit": True
     }
 
     response = recalculate_form_generate_response(
@@ -227,7 +228,7 @@ def neurological_examination_performed(request, first_paediatric_assessment_id):
     context = {
         "first_paediatric_assessment": first_paediatric_assessment,
         "diagnostic_status_selection": DIAGNOSTIC_STATUS,
-        "enabled": True
+        "can_edit": True
     }
 
     response = recalculate_form_generate_response(
@@ -272,7 +273,7 @@ def developmental_learning_or_schooling_problems(
     context = {
         "first_paediatric_assessment": first_paediatric_assessment,
         "diagnostic_status_selection": DIAGNOSTIC_STATUS,
-        "enabled": True
+        "can_edit": True
     }
 
     response = recalculate_form_generate_response(
@@ -315,7 +316,7 @@ def behavioural_or_emotional_problems(request, first_paediatric_assessment_id):
     context = {
         "first_paediatric_assessment": first_paediatric_assessment,
         "diagnostic_status_selection": DIAGNOSTIC_STATUS,
-        "enabled": True
+        "can_edit": True
     }
 
     response = recalculate_form_generate_response(
