@@ -226,33 +226,31 @@ def user_may_view_organisational_audit(parent_model, parent_type):
 
 
 def lookup_child_if_user_has_permission(request_kwargs, user):
+    via_registration = lambda obj: obj.registration.case
+    via_multiaxial_dagnosis = lambda obj: obj.multiaxial_diagnosis.registration.case
+    via_management = lambda obj: obj.management.registration.case
+
     lookup = {
-        "registration_id": Registration,
-        "management_id": Management,
-        "investigations_id": Investigations,
-        "first_paediatric_assessment_id": FirstPaediatricAssessment,
-        "epilepsy_context_id": EpilepsyContext,
-        "multiaxial_diagnosis_id": MultiaxialDiagnosis,
-        "episode_id": Episode,
-        "syndrome_id": Syndrome,
-        "comorbidity_id": Comorbidity,
-        "antiepilepsy_medicine_id": AntiEpilepsyMedicine,
-        "assessment_id": Assessment,
-        "case_id": Case,
+        "registration_id": (Registration, lambda reg: reg.case),
+        "management_id": (Management, via_management),
+        "investigations_id": (Investigations, via_registration),
+        "first_paediatric_assessment_id": (FirstPaediatricAssessment, via_registration),
+        "epilepsy_context_id": (EpilepsyContext, via_registration),
+        "multiaxial_diagnosis_id": (MultiaxialDiagnosis, via_registration),
+        "episode_id": (Episode, via_multiaxial_dagnosis),
+        "syndrome_id": (Syndrome, via_multiaxial_dagnosis),
+        "comorbidity_id": (Comorbidity, via_multiaxial_dagnosis),
+        "antiepilepsy_medicine_id": (AntiEpilepsyMedicine, via_management),
+        "assessment_id": (Assessment, via_registration),
+        "case_id": (Case, lambda o: o),
     }
 
-    for key, model in lookup.items():
+    for key, (model, via_fn) in lookup.items():
         pk = request_kwargs.get(key)
 
         if pk is not None:
             obj = model.objects.get(pk=pk)
-
-            if model == Registration:
-                child = obj.case
-            elif model == Case:
-                child = obj
-            else:
-                child = obj.registration.case
+            child = via_fn(obj)
             
             org_filters = {
                 "cases": child,
