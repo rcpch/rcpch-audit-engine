@@ -681,7 +681,7 @@ def edit_description(request, can_edit, episode_id):
 @login_and_otp_required()
 @user_may_view_this_child()
 @permission_required("epilepsy12.change_episode", raise_exception=True)
-def delete_description_keyword(request, episode_id, description_keyword_id):
+def delete_description_keyword(request, can_edit, episode_id, description_keyword_id):
     """
     This function is triggered by an htmx post request from the partials/desscribe/description.html form for the desscribe description_keyword.
     This component comprises the input free text describing a seizure episode and labels for each of the keywords identified.
@@ -1928,7 +1928,7 @@ def mental_health_issues(request, can_edit, multiaxial_diagnosis_id):
 @user_may_view_this_child()
 @permission_required("epilepsy12.change_multiaxialdiagnosis", raise_exception=True)
 def global_developmental_delay_or_learning_difficulties(
-    request, multiaxial_diagnosis_id
+    request, can_edit, multiaxial_diagnosis_id
 ):
     """
     POST request callback for mental_health_issue_identified toggle
@@ -1980,7 +1980,7 @@ def global_developmental_delay_or_learning_difficulties(
 @user_may_view_this_child()
 @permission_required("epilepsy12.change_multiaxialdiagnosis", raise_exception=True)
 def global_developmental_delay_or_learning_difficulties_severity(
-    request, multiaxial_diagnosis_id
+    request, can_edit, multiaxial_diagnosis_id
 ):
     """
     POST callback from global_developmental_delay_or_learning_difficulties_severity multiple toggle
