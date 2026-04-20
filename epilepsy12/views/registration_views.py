@@ -28,7 +28,11 @@ from ..common_view_functions import (
     validate_and_update_model,
     recalculate_form_generate_response,
 )
-from ..decorator import user_may_view_this_child, login_and_otp_required
+from ..decorator import (
+    user_may_view_this_child, 
+    user_may_edit_this_child,
+    login_and_otp_required
+)
 from ..general_functions import (
     construct_transfer_epilepsy12_site_email,
     cohorts_and_dates,
@@ -39,7 +43,7 @@ from ..general_functions import (
 @login_and_otp_required()
 @permission_required("epilepsy12.view_registration", raise_exception=True)
 @user_may_view_this_child()
-def register(request, case_id):
+def register(request, can_edit, case_id):
     """
     Called on registration form page load. If first time, creates new Registration object KPI object and
     AuditProgress object. Creates a new Site with selected organisation and associates with this case.
@@ -152,7 +156,7 @@ def register(request, case_id):
         "active_template": active_template,
         # pass back organisation_id to steps for return to cases button
         "organisation_id": lead_site.organisation.pk,
-        "field_enabled": False,
+        "can_edit": can_edit,
     }
 
     template_name = "epilepsy12/register.html"
@@ -176,7 +180,7 @@ Lead site allocation, deletion, updating and transfer
 
 
 @login_and_otp_required()
-@user_may_view_this_child()
+@user_may_edit_this_child()
 @permission_required("epilepsy12.can_edit_epilepsy12_lead_centre", raise_exception=True)
 def allocate_lead_site(request, registration_id):
     """
@@ -256,7 +260,7 @@ def allocate_lead_site(request, registration_id):
 
 
 @login_and_otp_required()
-@user_may_view_this_child()
+@user_may_edit_this_child()
 @permission_required(
     "epilepsy12.can_transfer_epilepsy12_lead_centre", raise_exception=True
 )
@@ -297,7 +301,7 @@ def transfer_lead_site(request, registration_id, site_id):
 
 
 @login_and_otp_required()
-@user_may_view_this_child()
+@user_may_edit_this_child()
 @permission_required("epilepsy12.view_registration", raise_exception=True)
 def cancel_lead_site(request, registration_id, site_id):
     registration = Registration.objects.get(pk=registration_id)
@@ -325,7 +329,7 @@ def cancel_lead_site(request, registration_id, site_id):
 
 
 @login_and_otp_required()
-@user_may_view_this_child()
+@user_may_edit_this_child()
 @permission_required(
     "epilepsy12.can_transfer_epilepsy12_lead_centre", raise_exception=True
 )
@@ -482,7 +486,7 @@ def update_lead_site(request, registration_id, site_id, update):
 
 
 @login_and_otp_required()
-@user_may_view_this_child()
+@user_may_edit_this_child()
 @permission_required("epilepsy12.view_registration", raise_exception=True)
 def previous_sites(request, registration_id):
     registration = Registration.objects.get(pk=registration_id)
@@ -515,7 +519,7 @@ Validation process
 
 
 @login_and_otp_required()
-@user_may_view_this_child()
+@user_may_edit_this_child()
 @permission_required(
     "epilepsy12.can_register_child_in_epilepsy12", raise_exception=True
 )
@@ -565,7 +569,7 @@ def confirm_eligible(request, registration_id):
 
 
 @login_and_otp_required()
-@user_may_view_this_child()
+@user_may_edit_this_child()
 @permission_required("epilepsy12.change_registration", raise_exception=True)
 def registration_status(request, registration_id):
     registration = Registration.objects.get(pk=registration_id)
@@ -586,7 +590,7 @@ def registration_status(request, registration_id):
 
 
 @login_and_otp_required()
-@user_may_view_this_child()
+@user_may_edit_this_child()
 @permission_required(
     "epilepsy12.can_register_child_in_epilepsy12", raise_exception=True
 )
