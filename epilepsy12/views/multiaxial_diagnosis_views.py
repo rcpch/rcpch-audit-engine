@@ -43,7 +43,7 @@ from ..common_view_functions import (
     recalculate_form_generate_response,
     completed_fields,
 )
-from ..decorator import user_may_view_this_child, login_and_otp_required
+from ..decorator import user_may_view_this_child, user_may_edit_this_child, login_and_otp_required
 
 """
 Constants for selections
@@ -78,7 +78,7 @@ ALL_FIELDS = NONEPILEPSY_FIELDS + EPILEPSY_FIELDS
 @login_and_otp_required()
 @permission_required("epilepsy12.view_multiaxialdiagnosis", raise_exception=True)
 @user_may_view_this_child()
-def multiaxial_diagnosis(request, case_id):
+def multiaxial_diagnosis(request, can_edit, case_id):
     """
     Called on load of form. If no instance exists, one is created.
 
@@ -137,6 +137,7 @@ def multiaxial_diagnosis(request, case_id):
         "mental_health_issues_choices": NEUROPSYCHIATRIC,
         "global_developmental_delay_or_learning_difficulties_severity_choices": SEVERITY,
         "organisation_id": organisation_id,
+        "can_edit": can_edit and request.user.has_perm("epilepsy12.change_multiaxialdiagnosis"),
     }
 
     response = recalculate_form_generate_response(
@@ -150,7 +151,7 @@ def multiaxial_diagnosis(request, case_id):
 
 
 @login_and_otp_required()
-@user_may_view_this_child()
+@user_may_edit_this_child()
 @permission_required("epilepsy12.add_episode", raise_exception=True)
 def add_episode(request, multiaxial_diagnosis_id):
     """
@@ -293,7 +294,7 @@ def edit_episode(request, episode_id):
 
 
 @login_and_otp_required()
-@user_may_view_this_child()
+@user_may_edit_this_child()
 @permission_required("epilepsy12.delete_episode", raise_exception=True)
 def remove_episode(request, episode_id):
     """
@@ -362,7 +363,7 @@ def close_episode(request, episode_id):
 
 
 @login_and_otp_required()
-@user_may_view_this_child()
+@user_may_edit_this_child()
 @permission_required("epilepsy12.change_episode", raise_exception=True)
 def seizure_onset_date(request, episode_id):
     """
@@ -427,7 +428,7 @@ def seizure_onset_date(request, episode_id):
 
 
 @login_and_otp_required()
-@user_may_view_this_child()
+@user_may_edit_this_child()
 @permission_required("epilepsy12.change_episode", raise_exception=True)
 def seizure_onset_date_confidence(request, episode_id):
     """
@@ -491,7 +492,7 @@ def seizure_onset_date_confidence(request, episode_id):
 
 
 @login_and_otp_required()
-@user_may_view_this_child()
+@user_may_edit_this_child()
 @permission_required("epilepsy12.change_episode", raise_exception=True)
 def episode_definition(request, episode_id):
     """
@@ -555,7 +556,7 @@ def episode_definition(request, episode_id):
 
 
 @login_and_otp_required()
-@user_may_view_this_child()
+@user_may_edit_this_child()
 @permission_required("epilepsy12.change_episode", raise_exception=True)
 def has_description_of_the_episode_or_episodes_been_gathered(request, episode_id):
     """
@@ -631,7 +632,7 @@ Description fields
 
 
 @login_and_otp_required()
-@user_may_view_this_child()
+@user_may_edit_this_child()
 @permission_required("epilepsy12.change_episode", raise_exception=True)
 def edit_description(request, episode_id):
     """
@@ -670,7 +671,7 @@ def edit_description(request, episode_id):
 
 
 @login_and_otp_required()
-@user_may_view_this_child()
+@user_may_edit_this_child()
 @permission_required("epilepsy12.change_episode", raise_exception=True)
 def delete_description_keyword(request, episode_id, description_keyword_id):
     """
@@ -713,7 +714,7 @@ Epilepsy status
 
 
 @login_and_otp_required()
-@user_may_view_this_child()
+@user_may_edit_this_child()
 @permission_required("epilepsy12.change_episode", raise_exception=True)
 def epilepsy_or_nonepilepsy_status(request, episode_id):
     """
@@ -792,7 +793,7 @@ Epilepsy fields
 
 
 @login_and_otp_required()
-@user_may_view_this_child()
+@user_may_edit_this_child()
 @permission_required("epilepsy12.change_episode", raise_exception=True)
 def epileptic_seizure_onset_type(request, episode_id):
     """
@@ -860,7 +861,7 @@ def epileptic_seizure_onset_type(request, episode_id):
 
 
 @login_and_otp_required()
-@user_may_view_this_child()
+@user_may_edit_this_child()
 @permission_required("epilepsy12.change_episode", raise_exception=True)
 def focal_onset_epilepsy_checked_changed(request, episode_id):
     """
@@ -926,7 +927,7 @@ def focal_onset_epilepsy_checked_changed(request, episode_id):
 
 
 @login_and_otp_required()
-@user_may_view_this_child()
+@user_may_edit_this_child()
 @permission_required("epilepsy12.change_episode", raise_exception=True)
 def epileptic_generalised_onset(request, episode_id):
     """
@@ -973,7 +974,7 @@ Nonepilepsy
 
 
 @login_and_otp_required()
-@user_may_view_this_child()
+@user_may_edit_this_child()
 @permission_required("epilepsy12.change_episode", raise_exception=True)
 def nonepilepsy_generalised_onset(request, episode_id):
     """
@@ -1020,7 +1021,7 @@ def nonepilepsy_generalised_onset(request, episode_id):
 
 
 @login_and_otp_required()
-@user_may_view_this_child()
+@user_may_edit_this_child()
 @permission_required("epilepsy12.change_episode", raise_exception=True)
 def nonepileptic_seizure_type(request, episode_id):
     """
@@ -1079,7 +1080,7 @@ def nonepileptic_seizure_type(request, episode_id):
 
 
 @login_and_otp_required()
-@user_may_view_this_child()
+@user_may_edit_this_child()
 @permission_required("epilepsy12.change_episode", raise_exception=True)
 def nonepileptic_seizure_subtype(request, episode_id):
     """
@@ -1132,7 +1133,7 @@ Syndromes
 
 
 @login_and_otp_required()
-@user_may_view_this_child()
+@user_may_edit_this_child()
 @permission_required("epilepsy12.add_syndrome", raise_exception=True)
 def add_syndrome(request, multiaxial_diagnosis_id):
     """
@@ -1234,7 +1235,7 @@ def edit_syndrome(request, syndrome_id):
 
 
 @login_and_otp_required()
-@user_may_view_this_child()
+@user_may_edit_this_child()
 @permission_required("epilepsy12.delete_syndrome", raise_exception=True)
 def remove_syndrome(request, syndrome_id):
     """
@@ -1292,7 +1293,7 @@ def close_syndrome(request, syndrome_id):
 
 
 @login_and_otp_required()
-@user_may_view_this_child()
+@user_may_edit_this_child()
 @permission_required("epilepsy12.change_multiaxialdiagnosis", raise_exception=True)
 def syndrome_present(request, multiaxial_diagnosis_id):
     """
@@ -1334,7 +1335,7 @@ def syndrome_present(request, multiaxial_diagnosis_id):
 
 
 @login_and_otp_required()
-@user_may_view_this_child()
+@user_may_edit_this_child()
 @permission_required("epilepsy12.change_multiaxialdiagnosis", raise_exception=True)
 def epilepsy_cause_known(request, multiaxial_diagnosis_id):
     """
@@ -1417,7 +1418,7 @@ def epilepsy_cause_known(request, multiaxial_diagnosis_id):
 
 
 @login_and_otp_required()
-@user_may_view_this_child()
+@user_may_edit_this_child()
 @permission_required("epilepsy12.change_multiaxialdiagnosis", raise_exception=True)
 def epilepsy_cause_categories(request, multiaxial_diagnosis_id):
     """
@@ -1468,7 +1469,7 @@ Comorbidities
 
 
 @login_and_otp_required()
-@user_may_view_this_child()
+@user_may_edit_this_child()
 @permission_required("epilepsy12.change_multiaxialdiagnosis", raise_exception=True)
 def relevant_impairments_behavioural_educational(request, multiaxial_diagnosis_id):
     """
@@ -1514,7 +1515,7 @@ def relevant_impairments_behavioural_educational(request, multiaxial_diagnosis_i
 
 
 @login_and_otp_required()
-@user_may_view_this_child()
+@user_may_edit_this_child()
 @permission_required("epilepsy12.add_comorbidity", raise_exception=True)
 def add_comorbidity(request, multiaxial_diagnosis_id):
     """
@@ -1574,7 +1575,7 @@ def edit_comorbidity(request, comorbidity_id):
 
 
 @login_and_otp_required()
-@user_may_view_this_child()
+@user_may_edit_this_child()
 @permission_required("epilepsy12.delete_comorbidity", raise_exception=True)
 def remove_comorbidity(request, comorbidity_id):
     """
@@ -1643,7 +1644,7 @@ def close_comorbidity(request, comorbidity_id):
 
 
 @login_and_otp_required()
-@user_may_view_this_child()
+@user_may_edit_this_child()
 @permission_required("epilepsy12.change_comorbidity", raise_exception=True)
 def comorbidity_diagnosis_date(request, comorbidity_id):
     """
@@ -1686,7 +1687,7 @@ def comorbidity_diagnosis_date(request, comorbidity_id):
 
 
 @login_and_otp_required()
-@user_may_view_this_child()
+@user_may_edit_this_child()
 @permission_required("epilepsy12.change_comorbidity", raise_exception=True)
 def comorbidity_diagnosis(request, comorbidity_id):
     """
@@ -1761,7 +1762,7 @@ def comorbidities(request, multiaxial_diagnosis_id):
 
 
 @login_and_otp_required()
-@user_may_view_this_child()
+@user_may_edit_this_child()
 @permission_required("epilepsy12.change_multiaxialdiagnosis", raise_exception=True)
 def mental_health_screen(request, multiaxial_diagnosis_id):
     """
@@ -1800,7 +1801,7 @@ def mental_health_screen(request, multiaxial_diagnosis_id):
 
 
 @login_and_otp_required()
-@user_may_view_this_child()
+@user_may_edit_this_child()
 @permission_required("epilepsy12.change_multiaxialdiagnosis", raise_exception=True)
 def mental_health_issue_identified(request, multiaxial_diagnosis_id):
     """
@@ -1847,7 +1848,7 @@ def mental_health_issue_identified(request, multiaxial_diagnosis_id):
 
 
 @login_and_otp_required()
-@user_may_view_this_child()
+@user_may_edit_this_child()
 @permission_required("epilepsy12.change_multiaxialdiagnosis", raise_exception=True)
 def mental_health_issues(request, multiaxial_diagnosis_id):
     """
@@ -1896,7 +1897,7 @@ def mental_health_issues(request, multiaxial_diagnosis_id):
 
 
 @login_and_otp_required()
-@user_may_view_this_child()
+@user_may_edit_this_child()
 @permission_required("epilepsy12.change_multiaxialdiagnosis", raise_exception=True)
 def global_developmental_delay_or_learning_difficulties(
     request, multiaxial_diagnosis_id
@@ -1947,7 +1948,7 @@ def global_developmental_delay_or_learning_difficulties(
 
 
 @login_and_otp_required()
-@user_may_view_this_child()
+@user_may_edit_this_child()
 @permission_required("epilepsy12.change_multiaxialdiagnosis", raise_exception=True)
 def global_developmental_delay_or_learning_difficulties_severity(
     request, multiaxial_diagnosis_id
@@ -1988,7 +1989,7 @@ def global_developmental_delay_or_learning_difficulties_severity(
 
 
 @login_and_otp_required()
-@user_may_view_this_child()
+@user_may_edit_this_child()
 @permission_required("epilepsy12.change_multiaxialdiagnosis", raise_exception=True)
 def autistic_spectrum_disorder(request, multiaxial_diagnosis_id):
     """

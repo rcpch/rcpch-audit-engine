@@ -54,7 +54,7 @@
                             Edit
                         </button>
                         <button
-                            {% if not perms.epilepsy12.delete_comorbidity %}
+                            {% if not can_edit %}
                                 class="ui rcpch_red icon disabled button"
                             {% else %}
                                 class="ui rcpch_red icon button"
@@ -83,7 +83,7 @@
     {% endif %}
     <div class='field'>
         <button
-            {% if not perms.epilepsy12.add_comorbidity %}
+            {% if not can_edit %}
             class="ui rcpch_primary disabled button"
             {% else %}
             class="ui rcpch_primary button"
@@ -98,6 +98,6 @@
         </button>
     </div>
 </div>
-{% if not perms.epilepsy12.add_comorbidity or not perms.epilepsy12.change_comorbidity or not perms.epilepsy12.delete_comorbidity %}
-    <small class='rcpch_warning_label'>{% permission_text perms.epilepsy12.add_comorbidity perms.epilepsy12.change_comorbidity perms.epilepsy12.delete_comorbidity 'comorbidities' %}</small>
+{% if not can_edit %}
+    <small class='rcpch_warning_label'>You do not have permission to add, change or delete comorbidities.</small>
 {% endif %}

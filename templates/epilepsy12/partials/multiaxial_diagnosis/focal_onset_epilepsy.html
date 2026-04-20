@@ -1,5 +1,5 @@
 <div class="ui grid">
-    {% if not perms.epilepsy12.change_episode %}
+    {% if not can_edit %}
         <div class="sixteen wide column">
             <div class='ui rcpch_warning basic label'>You do not have permission to update this field</div>
         </div>
@@ -20,7 +20,7 @@
             <div class="container">
                 <div class="radio-tile-group">
                 {% url 'focal_onset_epilepsy_checked_changed' episode_id=episode.pk as hx_post %}
-                {% include 'epilepsy12/partials/page_elements/check_box_group.html' with hx_post=hx_post hx_target="#focal_epilepsy" hx_model=episode hx_field_list=LATERALITY hx_field_list_name="LATERALITY" enabled=perms.epilepsy12.change_episode %}
+                {% include 'epilepsy12/partials/page_elements/check_box_group.html' with hx_post=hx_post hx_target="#focal_epilepsy" hx_model=episode hx_field_list=LATERALITY hx_field_list_name="LATERALITY" enabled=can_edit %}
                 </div>
             </div>
     
@@ -32,7 +32,7 @@
         </h5>
 
             {% url 'focal_onset_epilepsy_checked_changed' episode_id=episode.pk as hx_post %}
-            {% include 'epilepsy12/partials/page_elements/check_box_group.html' with hx_post=hx_post hx_target="#focal_epilepsy" hx_model=episode hx_field_list=FOCAL_EPILEPSY_MOTOR_MANIFESTATIONS hx_field_list_name="FOCAL_EPILEPSY_MOTOR_MANIFESTATIONS" enabled=perms.epilepsy12.change_episode %}
+            {% include 'epilepsy12/partials/page_elements/check_box_group.html' with hx_post=hx_post hx_target="#focal_epilepsy" hx_model=episode hx_field_list=FOCAL_EPILEPSY_MOTOR_MANIFESTATIONS hx_field_list_name="FOCAL_EPILEPSY_MOTOR_MANIFESTATIONS" enabled=can_edit %}
     </div>
 
     <div class="four wide column">
@@ -44,7 +44,7 @@
             <div class="container">
                 <div class="radio-tile-group">
                     {% url 'focal_onset_epilepsy_checked_changed' episode_id=episode.pk as hx_post %}
-                    {% include 'epilepsy12/partials/page_elements/check_box_group.html' with hx_post=hx_post hx_target="#focal_epilepsy" hx_model=episode hx_field_list=FOCAL_EPILEPSY_NONMOTOR_MANIFESTATIONS hx_field_list_name="FOCAL_EPILEPSY_NONMOTOR_MANIFESTATIONS" enabled=perms.epilepsy12.change_episode %}
+                    {% include 'epilepsy12/partials/page_elements/check_box_group.html' with hx_post=hx_post hx_target="#focal_epilepsy" hx_model=episode hx_field_list=FOCAL_EPILEPSY_NONMOTOR_MANIFESTATIONS hx_field_list_name="FOCAL_EPILEPSY_NONMOTOR_MANIFESTATIONS" enabled=can_edit %}
                 </div>
             </div>
     
@@ -59,7 +59,7 @@
             <div class="container">
                 <div class="radio-tile-group">
                     {% url 'focal_onset_epilepsy_checked_changed' episode_id=episode.pk as hx_post %}
-                    {% include 'epilepsy12/partials/page_elements/check_box_group.html' with hx_post=hx_post hx_target="#focal_epilepsy" hx_model=episode hx_field_list=FOCAL_EPILEPSY_EEG_MANIFESTATIONS hx_field_list_name="FOCAL_EPILEPSY_EEG_MANIFESTATIONS" enabled=perms.epilepsy12.change_episode %}
+                    {% include 'epilepsy12/partials/page_elements/check_box_group.html' with hx_post=hx_post hx_target="#focal_epilepsy" hx_model=episode hx_field_list=FOCAL_EPILEPSY_EEG_MANIFESTATIONS hx_field_list_name="FOCAL_EPILEPSY_EEG_MANIFESTATIONS" enabled=can_edit %}
                 </div>
             </div>
     

@@ -33,7 +33,7 @@
             <div 
                 class='ui rcpch_light_blue label'
             >{{keyword}}
-                {% if perms.epilepsy12.change_episode %}
+                {% if can_edit %}
                     <i 
                         class='icon close' 
                         hx-post='{{hx_post}}' 

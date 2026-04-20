@@ -16,7 +16,7 @@
         </div>
         <div class="field">
             {% url 'comorbidity_diagnosis_date' comorbidity_id=comorbidity.pk as hx_post %}
-            {% include 'epilepsy12/partials/page_elements/date_field.html' with hx_post=hx_post hx_target='#comorbidities' hx_trigger='change delay:1s' hx_swap="innerHTML" date_value=comorbidity.comorbidity_diagnosis_date label=comorbidity.get_comorbidity_diagnosis_date_help_label_text reference=comorbidity.get_comorbidity_diagnosis_date_help_reference_text input_date_field_name='comorbidity_diagnosis_date' enabled=perms.epilepsy12.change_comorbidity has_permission=perms.epilepsy12.change_comorbidity %}
+            {% include 'epilepsy12/partials/page_elements/date_field.html' with hx_post=hx_post hx_target='#comorbidities' hx_trigger='change delay:1s' hx_swap="innerHTML" date_value=comorbidity.comorbidity_diagnosis_date label=comorbidity.get_comorbidity_diagnosis_date_help_label_text reference=comorbidity.get_comorbidity_diagnosis_date_help_reference_text input_date_field_name='comorbidity_diagnosis_date' enabled=can_edit has_permission=can_edit %}
         </div>
         {% if error_message %}
             <div class='ui rcpch_warning message'>
@@ -26,7 +26,7 @@
 
         <div class="field">
             {% url 'comorbidity_diagnosis' comorbidity_id=comorbidity.pk as hx_post %}
-            {% include 'epilepsy12/partials/page_elements/select_model.html' with choices=comorbidity_choices hx_post=hx_post hx_target="#comorbidities" hx_trigger='change' hx_swap="innerHTML" hx_name='comorbidityentity' field_name='preferredTerm' field_name2='term' hx_default_text="Select a comorbidity..." test_positive=comorbidity.comorbidityentity.pk label=comorbidity.get_comorbidityentity_help_label_text reference=comorbidity.get_comorbidityentity_help_reference_text data_position='top left' enabled=perms.epilepsy12.change_comorbidity %}
+            {% include 'epilepsy12/partials/page_elements/select_model.html' with choices=comorbidity_choices hx_post=hx_post hx_target="#comorbidities" hx_trigger='change' hx_swap="innerHTML" hx_name='comorbidityentity' field_name='preferredTerm' field_name2='term' hx_default_text="Select a comorbidity..." test_positive=comorbidity.comorbidityentity.pk label=comorbidity.get_comorbidityentity_help_label_text reference=comorbidity.get_comorbidityentity_help_reference_text data_position='top left' enabled=can_edit %}
         </div>
 
         <div class="fields">
