@@ -18,7 +18,7 @@
               <input 
                   type="checkbox" 
                   name="were_any_of_the_epileptic_seizures_convulsive"
-                  {% if not perms.epilepsy12.change_assessment %}
+                  {% if not can_edit %}
                   disabled
                   {% endif %}
               />
@@ -44,7 +44,7 @@
               <input 
                   type="checkbox" 
                   name="prolonged_generalized_convulsive_seizures"
-                  {% if not perms.epilepsy12.change_assessment %}
+                  {% if not can_edit %}
                   disabled
                   {% endif %}
               />
@@ -70,7 +70,7 @@
               <input 
                   type="checkbox" 
                   name="experienced_prolonged_focal_seizures"
-                  {% if not perms.epilepsy12.change_assessment %}
+                  {% if not can_edit %}
                   disabled
                   {% endif %}
               />

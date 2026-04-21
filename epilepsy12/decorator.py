@@ -225,94 +225,99 @@ def user_may_view_organisational_audit(parent_model, parent_type):
     return decorator
 
 
-def user_may_view_this_child():
-    # decorator receives case_id or registration_id from view as argument.
-    # access is granted only to users who are either:
+def lookup_child_if_user_has_permission(request_kwargs, user):
+    # Guard against users with no active primary employer
+    if not user.organisation_employer:
+        return None
+    
+    via_registration = lambda obj: obj.registration.case
+    via_multiaxial_dagnosis = lambda obj: obj.multiaxial_diagnosis.registration.case
+    via_management = lambda obj: obj.management.registration.case
+
+    lookup = {
+        "registration_id": (Registration, lambda reg: reg.case),
+        "management_id": (Management, via_registration),
+        "investigations_id": (Investigations, via_registration),
+        "first_paediatric_assessment_id": (FirstPaediatricAssessment, via_registration),
+        "epilepsy_context_id": (EpilepsyContext, via_registration),
+        "multiaxial_diagnosis_id": (MultiaxialDiagnosis, via_registration),
+        "episode_id": (Episode, via_multiaxial_dagnosis),
+        "syndrome_id": (Syndrome, via_multiaxial_dagnosis),
+        "comorbidity_id": (Comorbidity, via_multiaxial_dagnosis),
+        "antiepilepsy_medicine_id": (AntiEpilepsyMedicine, via_management),
+        "assessment_id": (Assessment, via_registration),
+        "case_id": (Case, lambda o: o),
+    }
+
+    for key, (model, via_fn) in lookup.items():
+        pk = request_kwargs.get(key)
+
+        if pk is not None:
+            obj = model.objects.get(pk=pk)
+            child = via_fn(obj)
+            
+            org_filters = {
+                "cases": child,
+                "patient_sites__site_is_actively_involved_in_epilepsy_care": True,
+                "patient_sites__site_is_primary_centre_of_epilepsy_care": True,
+                # Access is sliced by trust - so members of other organisations in that trust can see data
+                "trust": user.organisation_employer.trust,
+            }
+
+            if Organisation.objects.filter(**org_filters).exists():
+                return child
+
+
+def lookup_user_permissions_on_child(request, request_kwargs):
+    # Lookup sub object by id and walk backwards to case.
+    # Access is granted only to users who are either:
     # 1. superusers
-    # 2. Active RCPCH audit members
-    # 3. Active trust level users where their trust is the same as the child
+    # 2. Active RCPCH audit members with confirmed email
+    # 3. Active trust level users with confirmed email where their trust is the same as the child
+    # Editing is allowed if the cohort is still open or if you are an RCPCH audit member
+    user = request.user
+    
+    # Check user is active and has confirmed their email (unless superuser)
+    if not user.is_superuser and not (user.is_active and user.email_confirmed):
+        return {
+            "can_view": False,
+            "can_edit": False,
+        }
+    
+    is_admin = user.is_rcpch_audit_team_member or user.is_rcpch_staff or user.is_superuser
+
+    if is_admin:
+        return {
+            "can_view": True,
+            "can_edit": True,
+        }
+
+    child = lookup_child_if_user_has_permission(request_kwargs, request.user)
+    
+    if child:
+        return {
+            "can_view": True,
+            "can_edit": child.editable(),
+        }
+
+    return {
+        "can_view": False,
+        "can_edit": False,
+    }
+
+
+def user_may_view_this_child():
     def decorator(view):
         def wrapper(request, *args, **kwargs):
-            user = request.user
-            if (user.is_active and user.email_confirmed) or user.is_superuser:
-                # user is registered and active or a superuser
-                if kwargs.get("registration_id") is not None:
-                    registration = Registration.objects.get(
-                        pk=kwargs.get("registration_id")
-                    )
-                    child = registration.case
-                elif kwargs.get("management_id") is not None:
-                    management = Management.objects.get(pk=kwargs.get("management_id"))
-                    child = management.registration.case
-                elif kwargs.get("investigations_id") is not None:
-                    investigations = Investigations.objects.get(
-                        pk=kwargs.get("investigations_id")
-                    )
-                    child = investigations.registration.case
-                elif kwargs.get("first_paediatric_assessment_id") is not None:
-                    first_paediatric_assessment = FirstPaediatricAssessment.objects.get(
-                        pk=kwargs.get("first_paediatric_assessment_id")
-                    )
-                    child = first_paediatric_assessment.registration.case
-                elif kwargs.get("epilepsy_context_id") is not None:
-                    epilepsy_context = EpilepsyContext.objects.get(
-                        pk=kwargs.get("epilepsy_context_id")
-                    )
-                    child = epilepsy_context.registration.case
-                elif kwargs.get("multiaxial_diagnosis_id") is not None:
-                    multiaxial_diagnosis = MultiaxialDiagnosis.objects.get(
-                        pk=kwargs.get("multiaxial_diagnosis_id")
-                    )
-                    child = multiaxial_diagnosis.registration.case
-                elif kwargs.get("episode_id") is not None:
-                    episode = Episode.objects.get(pk=kwargs.get("episode_id"))
-                    child = episode.multiaxial_diagnosis.registration.case
-                elif kwargs.get("syndrome_id") is not None:
-                    syndrome = Syndrome.objects.get(pk=kwargs.get("syndrome_id"))
-                    child = syndrome.multiaxial_diagnosis.registration.case
-                elif kwargs.get("comorbidity_id") is not None:
-                    comorbidity = Comorbidity.objects.get(
-                        pk=kwargs.get("comorbidity_id")
-                    )
-                    child = comorbidity.multiaxial_diagnosis.registration.case
-                elif kwargs.get("antiepilepsy_medicine_id") is not None:
-                    antiepilepsy_medicine = AntiEpilepsyMedicine.objects.get(
-                        pk=kwargs.get("antiepilepsy_medicine_id")
-                    )
-                    child = antiepilepsy_medicine.management.registration.case
-                elif kwargs.get("assessment_id") is not None:
-                    assessment = Assessment.objects.get(pk=kwargs.get("assessment_id"))
-                    child = assessment.registration.case
-                elif kwargs.get("case_id") is not None:
-                    case = Case.objects.get(pk=kwargs.get("case_id"))
-                    child = case
+            permissions = lookup_user_permissions_on_child(request, kwargs)
 
-                if user.is_rcpch_audit_team_member:
-                    organisation = Organisation.objects.filter(
-                        cases=child,
-                        patient_sites__site_is_actively_involved_in_epilepsy_care=True,
-                        patient_sites__site_is_primary_centre_of_epilepsy_care=True,
-                    )
-                else:
-                    # filter for object where trust (not just organisation) where case is registered is the same as that of user
-                    organisation = Organisation.objects.filter(
-                        cases=child,
-                        patient_sites__site_is_actively_involved_in_epilepsy_care=True,
-                        patient_sites__site_is_primary_centre_of_epilepsy_care=True,
-                        trust=request.user.organisation_employer.trust,
-                    )
-
-                if (
-                    organisation.exists()
-                    or user.is_rcpch_audit_team_member
-                    or user.is_rcpch_staff
-                    or user.is_superuser
-                ):
-                    return view(request, *args, **kwargs)
-                else:
-                    raise PermissionDenied()
-            else:
+            if request.method not in ["GET", "HEAD", "OPTIONS"] and not permissions["can_edit"]:
                 raise PermissionDenied()
+
+            if permissions["can_view"]:
+                return view(request, permissions["can_edit"], *args, **kwargs)
+            
+            raise PermissionDenied()
 
         return wrapper
 

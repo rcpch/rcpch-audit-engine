@@ -14,7 +14,7 @@
     <div class="ui left icon input">
 
       <textarea
-        {% if not perms.epilepsy12.change_multiaxialdiagnosis %}
+        {% if not can_edit %}
         disabled
         {% endif %}
         type="text"
@@ -28,7 +28,7 @@
       >
     </div>
 
-    {% if not perms.epilepsy12.change_multiaxialdiagnosis %}
+    {% if not can_edit %}
     <small class="rcpch_warning_label"
       >You do not have permission to update this field</small
     >

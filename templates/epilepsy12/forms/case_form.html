@@ -80,7 +80,7 @@
       </div>
 
     <div id="postcode_options">
-      {% include 'epilepsy12/cases/postcode_options.html' with choices=choices test_positive=test_positive child_has_unknown_postcode=child_has_unknown_postcode %}
+      {% include 'epilepsy12/cases/postcode_options.html' with choices=choices test_positive=test_positive child_has_unknown_postcode=child_has_unknown_postcode can_edit=can_edit %}
     </div>
 
   </div>
@@ -131,6 +131,7 @@
           time. Should {{case}} or their family choose to do so, all records
           relating to {{case}}'s epilepsy care will be removed from RCPCH servers.
         </p>
+        {% if can_edit %}
         <button
           hx-post="{% url 'opt_out' organisation_id case.pk %}"
           hx-trigger="click"
@@ -142,6 +143,7 @@
         >
           Opt out of Epilepsy12
         </button>
+        {% endif %}
       </div>
     </div>
 
@@ -174,20 +176,21 @@
         href="{% url 'cases' organisation_id %}" class="ui rcpch_negative button">
         Cancel
       </a>
-      {% if perms.epilepsy12.change_case or perms.epilepsy12.add_case %}
-        <button 
-        id="create_update_case_button"
-        type="submit" 
-        class="ui rcpch_primary button" 
-        name="update" 
-        _="on click toggle .disabled on me">
-          Save
-        </button>
-    
+      {% if can_edit %}
+        {% if perms.epilepsy12.change_case or perms.epilepsy12.add_case %}
+          <button 
+          id="create_update_case_button"
+          type="submit" 
+          class="ui rcpch_primary button" 
+          name="update" 
+          _="on click toggle .disabled on me">
+            Save
+          </button>
+        {% endif %}
       {% endif %}
       
       {% if case %}
-        {% if perms.epilepsy12.delete_case %}
+        {% if can_edit and perms.epilepsy12.delete_case %}
           <button
             hx-post="{% url 'update_case' organisation_id case.pk %}"
             hx-trigger="click"

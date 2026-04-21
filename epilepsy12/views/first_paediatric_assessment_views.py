@@ -6,13 +6,16 @@ from ..common_view_functions import (
     recalculate_form_generate_response,
 )
 from ..models import Registration, FirstPaediatricAssessment, Site
-from ..decorator import user_may_view_this_child, login_and_otp_required
+from ..decorator import (
+    user_may_view_this_child,
+    login_and_otp_required
+)
 
 
 @login_and_otp_required()
 @permission_required("epilepsy12.view_firstpaediatricassessment", raise_exception=True)
 @user_may_view_this_child()
-def first_paediatric_assessment(request, case_id) -> HttpResponse:
+def first_paediatric_assessment(request, can_edit, case_id) -> HttpResponse:
     registration = Registration.objects.get(case=case_id)
 
     if FirstPaediatricAssessment.objects.filter(registration=registration).exists():
@@ -45,6 +48,7 @@ def first_paediatric_assessment(request, case_id) -> HttpResponse:
         "audit_progress": registration.audit_progress,
         "active_template": "first_paediatric_assessment",
         "organisation_id": organisation_id,
+        "can_edit": can_edit and request.user.has_perm("epilepsy12.change_firstpaediatricassessment"),
     }
 
     response = recalculate_form_generate_response(
@@ -63,7 +67,7 @@ def first_paediatric_assessment(request, case_id) -> HttpResponse:
     "epilepsy12.change_firstpaediatricassessment", raise_exception=True
 )
 def first_paediatric_assessment_in_acute_or_nonacute_setting(
-    request, first_paediatric_assessment_id
+    request, can_edit, first_paediatric_assessment_id
 ):
     """
     HTMX callback from first_paediatric_assessment_in_acute_or_nonacute_setting partial, itself
@@ -91,6 +95,7 @@ def first_paediatric_assessment_in_acute_or_nonacute_setting(
     context = {
         "chronicity_selection": CHRONICITY,
         "first_paediatric_assessment": first_paediatric_assessment,
+        "can_edit": can_edit
     }
 
     response = recalculate_form_generate_response(
@@ -110,7 +115,7 @@ def first_paediatric_assessment_in_acute_or_nonacute_setting(
     "epilepsy12.change_firstpaediatricassessment", raise_exception=True
 )
 def has_number_of_episodes_since_the_first_been_documented(
-    request, first_paediatric_assessment_id
+    request, can_edit, first_paediatric_assessment_id
 ):
     """
     POST request from toggle in has_number_of_episodes_since_the_first_been_documented partial
@@ -136,6 +141,7 @@ def has_number_of_episodes_since_the_first_been_documented(
     context = {
         "first_paediatric_assessment": first_paediatric_assessment,
         "diagnostic_status_selection": DIAGNOSTIC_STATUS,
+        "can_edit": can_edit
     }
 
     response = recalculate_form_generate_response(
@@ -154,7 +160,7 @@ def has_number_of_episodes_since_the_first_been_documented(
 @permission_required(
     "epilepsy12.change_firstpaediatricassessment", raise_exception=True
 )
-def general_examination_performed(request, first_paediatric_assessment_id):
+def general_examination_performed(request, can_edit, first_paediatric_assessment_id):
     """
     POST request from toggle in has_general_examination_performed partial
     """
@@ -178,6 +184,7 @@ def general_examination_performed(request, first_paediatric_assessment_id):
     context = {
         "first_paediatric_assessment": first_paediatric_assessment,
         "diagnostic_status_selection": DIAGNOSTIC_STATUS,
+        "can_edit": can_edit
     }
 
     response = recalculate_form_generate_response(
@@ -196,7 +203,7 @@ def general_examination_performed(request, first_paediatric_assessment_id):
 @permission_required(
     "epilepsy12.change_firstpaediatricassessment", raise_exception=True
 )
-def neurological_examination_performed(request, first_paediatric_assessment_id):
+def neurological_examination_performed(request, can_edit, first_paediatric_assessment_id):
     """
     POST request from toggle in neurological_examination_performed partial
     """
@@ -220,6 +227,7 @@ def neurological_examination_performed(request, first_paediatric_assessment_id):
     context = {
         "first_paediatric_assessment": first_paediatric_assessment,
         "diagnostic_status_selection": DIAGNOSTIC_STATUS,
+        "can_edit": can_edit
     }
 
     response = recalculate_form_generate_response(
@@ -239,7 +247,7 @@ def neurological_examination_performed(request, first_paediatric_assessment_id):
     "epilepsy12.change_firstpaediatricassessment", raise_exception=True
 )
 def developmental_learning_or_schooling_problems(
-    request, first_paediatric_assessment_id
+    request, can_edit, first_paediatric_assessment_id
 ):
     """
     POST request from toggle in developmental_learning_or_schooling_problems partial
@@ -264,6 +272,7 @@ def developmental_learning_or_schooling_problems(
     context = {
         "first_paediatric_assessment": first_paediatric_assessment,
         "diagnostic_status_selection": DIAGNOSTIC_STATUS,
+        "can_edit": can_edit
     }
 
     response = recalculate_form_generate_response(
@@ -282,7 +291,7 @@ def developmental_learning_or_schooling_problems(
 @permission_required(
     "epilepsy12.change_firstpaediatricassessment", raise_exception=True
 )
-def behavioural_or_emotional_problems(request, first_paediatric_assessment_id):
+def behavioural_or_emotional_problems(request, can_edit, first_paediatric_assessment_id):
     """
     POST request from toggle in developmental_learning_or_schooling_problems partial
     """
@@ -306,6 +315,7 @@ def behavioural_or_emotional_problems(request, first_paediatric_assessment_id):
     context = {
         "first_paediatric_assessment": first_paediatric_assessment,
         "diagnostic_status_selection": DIAGNOSTIC_STATUS,
+        "can_edit": can_edit
     }
 
     response = recalculate_form_generate_response(

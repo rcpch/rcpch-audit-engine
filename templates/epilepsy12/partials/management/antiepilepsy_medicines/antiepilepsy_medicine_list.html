@@ -43,7 +43,7 @@
                     <div 
                         class="ui rcpch_light_blue buttons">
                         <button 
-                            {% if not perms.epilepsy12.change_antiepilepsymedicine %}
+                            {% if not can_edit %}
                                 class="ui rcpch_primary disabled button"
                             {% else %}
                                 class="ui rcpch_primary button"
@@ -60,7 +60,7 @@
                             Edit
                         </button>
                         <button
-                            {% if not perms.epilepsy12.delete_antiepilepsymedicine %}
+                            {% if not can_edit %}
                                 class="ui rcpch_red icon disabled button"
                             {% else %}
                                 class="ui rcpch_red icon button"
@@ -92,7 +92,7 @@
     {% endif %}
     <div class='field'>
         <button
-            {% if perms.epilepsy12.add_antiepilepsymedicine %}
+            {% if can_edit %}
                 class="ui rcpch_primary button"
             {% else %}
                 class="ui rcpch_primary disabled button"
@@ -114,7 +114,7 @@
         {% endif %}
         </button>
     </div>
-    {% if not perms.epilepsy12.add_antiepilepsymedicine or not perms.epilepsy12.change_antiepilepsymedicine or not perms.epilepsy12.delete_aantiepilepsymedicine %}
-        <small class='rcpch_warning_label'>{% permission_text perms.epilepsy12.add_antiepilepsymedicine perms.epilepsy12.change_antiepilepsymedicine perms.epilepsy12.delete_antiepilepsymedicine 'antiepilepsy/seizure medicines' %}</small>
+    {% if not can_edit %}
+        <small class='rcpch_warning_label'>You do not have permission to add, change, or delete antiepilepsy/seizure medicines.</small>
     {% endif %}
 </div>

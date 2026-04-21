@@ -22,7 +22,7 @@ from ..decorator import user_may_view_this_child, login_and_otp_required
 @login_and_otp_required()
 @user_may_view_this_child()
 @permission_required("epilepsy12.view_management", raise_exception=True)
-def management(request, case_id):
+def management(request, can_edit, case_id):
     # function called on form load
     # creates a new management object if one does not exist
     # loads historical medicines and passes them to template
@@ -51,6 +51,7 @@ def management(request, case_id):
     organisation_id = site.organisation.pk
 
     context = {
+        "can_edit": can_edit and request.user.has_perm("epilepsy12.change_management"),
         "case_id": case_id,
         "registration": registration,
         "management": management,
@@ -81,7 +82,7 @@ Fields relating to rescue medication begin here
 @login_and_otp_required()
 @user_may_view_this_child()
 @permission_required("epilepsy12.change_antiepilepsymedicine", raise_exception=True)
-def has_an_aed_been_given(request, management_id):
+def has_an_aed_been_given(request, can_edit, management_id):
     # HTMX call back from management template
     # POST request on toggle button click
     # if AED has been prescribed returns partial template comprising AED search box and dropdown
@@ -115,6 +116,7 @@ def has_an_aed_been_given(request, management_id):
     ).order_by("-antiepilepsy_medicine_start_date")
 
     context = {
+        "can_edit": can_edit,
         "management": management,
         "antiepilepsy_medicines": antiepilepsy_medicines,
     }
@@ -135,7 +137,7 @@ def has_an_aed_been_given(request, management_id):
 @login_and_otp_required()
 @user_may_view_this_child()
 @permission_required("epilepsy12.add_antiepilepsymedicine", raise_exception=True)
-def add_antiepilepsy_medicine(request, management_id, is_rescue_medicine):
+def add_antiepilepsy_medicine(request, can_edit, management_id, is_rescue_medicine):
     """
     Callback POST request from aed_list.html partial to add new AEM to antiepilepsy_medicine model
     """
@@ -167,6 +169,7 @@ def add_antiepilepsy_medicine(request, management_id, is_rescue_medicine):
     )
 
     context = {
+        "can_edit": can_edit,
         "choices": choices,
         "antiepilepsy_medicine": antiepilepsy_medicine,
         "management_id": management_id,
@@ -188,7 +191,7 @@ def add_antiepilepsy_medicine(request, management_id, is_rescue_medicine):
 @login_and_otp_required()
 @user_may_view_this_child()
 @permission_required("epilepsy12.delete_antiepilepsymedicine", raise_exception=True)
-def remove_antiepilepsy_medicine(request, antiepilepsy_medicine_id):
+def remove_antiepilepsy_medicine(request, can_edit, antiepilepsy_medicine_id):
     """
     POST request from either the rescue_medicine_list or the epilepsy_medicine_list
     Returns the epilepsy_medicine_list template filtered with a list of medicines depending whether are rescue
@@ -209,6 +212,7 @@ def remove_antiepilepsy_medicine(request, antiepilepsy_medicine_id):
     ).order_by("-antiepilepsy_medicine_start_date")
 
     context = {
+        "can_edit": can_edit,
         "medicines": antiepilepsy_medicines,
         "management_id": management.pk,
         "is_rescue_medicine": is_rescue_medicine,
@@ -229,7 +233,7 @@ def remove_antiepilepsy_medicine(request, antiepilepsy_medicine_id):
 @login_and_otp_required()
 @user_may_view_this_child()
 @permission_required("epilepsy12.view_antiepilepsymedicine", raise_exception=True)
-def edit_antiepilepsy_medicine(request, antiepilepsy_medicine_id):
+def edit_antiepilepsy_medicine(request, can_edit, antiepilepsy_medicine_id):
     """
     Call back from onclick of edit button in antiepilepsy_medicine_list partial
     returns the antiepilepsy_medicine partial form populated with the medicine fields for editing
@@ -254,6 +258,7 @@ def edit_antiepilepsy_medicine(request, antiepilepsy_medicine_id):
         show_end_date = False
 
     context = {
+        "can_edit": can_edit,
         "choices": choices,
         "antiepilepsy_medicine": antiepilepsy_medicine,
         "is_rescue_medicine": antiepilepsy_medicine.is_rescue_medicine,
@@ -275,7 +280,7 @@ def edit_antiepilepsy_medicine(request, antiepilepsy_medicine_id):
 @login_and_otp_required()
 @user_may_view_this_child()
 @permission_required("epilepsy12.view_antiepilepsymedicine", raise_exception=True)
-def close_antiepilepsy_medicine(request, antiepilepsy_medicine_id):
+def close_antiepilepsy_medicine(request, can_edit, antiepilepsy_medicine_id):
     """
     Call back from onclick of edit button in antiepilepsy_medicine_list partial
     returns the antiepilepsy_medicine partial form populated with the medicine fields for editing
@@ -301,6 +306,7 @@ def close_antiepilepsy_medicine(request, antiepilepsy_medicine_id):
     ).order_by("-antiepilepsy_medicine_start_date")
 
     context = {
+        "can_edit": can_edit,
         "medicines": antiepilepsy_medicines,
         "management_id": antiepilepsy_medicine.management.pk,
         "is_rescue_medicine": is_rescue_medicine,
@@ -321,7 +327,7 @@ def close_antiepilepsy_medicine(request, antiepilepsy_medicine_id):
 @login_and_otp_required()
 @user_may_view_this_child()
 @permission_required("epilepsy12.change_antiepilepsymedicine", raise_exception=True)
-def medicine_id(request, antiepilepsy_medicine_id, medicine_status):
+def medicine_id(request, can_edit, antiepilepsy_medicine_id, medicine_status):
     """
     POST callback from antiepilepsy_medicine.html partial to update medicine_name
     medicine_status is a string that is either 'rescue' or 'antiepilepsy'
@@ -426,6 +432,7 @@ def medicine_id(request, antiepilepsy_medicine_id, medicine_status):
         show_end_date = False
 
     context = {
+        "can_edit": can_edit,
         "choices": choices,
         "antiepilepsy_medicine": antiepilepsy_medicine,
         "is_rescue_medicine": is_rescue,
@@ -447,7 +454,7 @@ def medicine_id(request, antiepilepsy_medicine_id, medicine_status):
 @login_and_otp_required()
 @user_may_view_this_child()
 @permission_required("epilepsy12.change_antiepilepsymedicine", raise_exception=True)
-def antiepilepsy_medicine_start_date(request, antiepilepsy_medicine_id):
+def antiepilepsy_medicine_start_date(request, can_edit, antiepilepsy_medicine_id):
     """
     POST callback from antiepilepsy_medicine.html partial to update antiepilepsy_medicine_start_date
     """
@@ -489,6 +496,7 @@ def antiepilepsy_medicine_start_date(request, antiepilepsy_medicine_id):
         show_end_date = False
 
     context = {
+        "can_edit": can_edit,
         "choices": choices,
         "antiepilepsy_medicine": antiepilepsy_medicine,
         "is_rescue_medicine": antiepilepsy_medicine.is_rescue_medicine,
@@ -511,7 +519,7 @@ def antiepilepsy_medicine_start_date(request, antiepilepsy_medicine_id):
 @login_and_otp_required()
 @user_may_view_this_child()
 @permission_required("epilepsy12.change_antiepilepsymedicine", raise_exception=True)
-def antiepilepsy_medicine_add_stop_date(request, antiepilepsy_medicine_id):
+def antiepilepsy_medicine_add_stop_date(request, can_edit, antiepilepsy_medicine_id):
     """
     POST callback from antiepilepsy_medicine.html partial to toggle antiepilepsy_medicine_end_date
     """
@@ -531,6 +539,7 @@ def antiepilepsy_medicine_add_stop_date(request, antiepilepsy_medicine_id):
     )
 
     context = {
+        "can_edit": can_edit,
         "choices": choices,
         "antiepilepsy_medicine": antiepilepsy_medicine,
         "is_rescue_medicine": antiepilepsy_medicine.is_rescue_medicine,
@@ -553,7 +562,7 @@ def antiepilepsy_medicine_add_stop_date(request, antiepilepsy_medicine_id):
 @login_and_otp_required()
 @user_may_view_this_child()
 @permission_required("epilepsy12.change_antiepilepsymedicine", raise_exception=True)
-def antiepilepsy_medicine_remove_stop_date(request, antiepilepsy_medicine_id):
+def antiepilepsy_medicine_remove_stop_date(request, can_edit, antiepilepsy_medicine_id):
     """
     POST callback from antiepilepsy_medicine.html partial to toggle closed antiepilepsy_medicine_end_date
     """
@@ -577,6 +586,7 @@ def antiepilepsy_medicine_remove_stop_date(request, antiepilepsy_medicine_id):
     )
 
     context = {
+        "can_edit": can_edit,
         "choices": choices,
         "antiepilepsy_medicine": antiepilepsy_medicine,
         "is_rescue_medicine": antiepilepsy_medicine.is_rescue_medicine,
@@ -599,7 +609,7 @@ def antiepilepsy_medicine_remove_stop_date(request, antiepilepsy_medicine_id):
 @login_and_otp_required()
 @user_may_view_this_child()
 @permission_required("epilepsy12.change_antiepilepsymedicine", raise_exception=True)
-def antiepilepsy_medicine_stop_date(request, antiepilepsy_medicine_id):
+def antiepilepsy_medicine_stop_date(request, can_edit, antiepilepsy_medicine_id):
     """
     POST callback from antiepilepsy_medicine.html partial to update antiepilepsy_medicine_stop_date
     """
@@ -635,6 +645,7 @@ def antiepilepsy_medicine_stop_date(request, antiepilepsy_medicine_id):
     )
 
     context = {
+        "can_edit": can_edit,
         "choices": choices,
         "antiepilepsy_medicine": antiepilepsy_medicine,
         "is_rescue_medicine": antiepilepsy_medicine.is_rescue_medicine,
@@ -657,7 +668,7 @@ def antiepilepsy_medicine_stop_date(request, antiepilepsy_medicine_id):
 @login_and_otp_required()
 @user_may_view_this_child()
 @permission_required("epilepsy12.change_antiepilepsymedicine", raise_exception=True)
-def antiepilepsy_medicine_risk_discussed(request, antiepilepsy_medicine_id):
+def antiepilepsy_medicine_risk_discussed(request, can_edit, antiepilepsy_medicine_id):
     """
     POST callback from antiepilepsy_medicine.html partial to update antiepilepsy_medicine_risk_discussed
     """
@@ -692,6 +703,7 @@ def antiepilepsy_medicine_risk_discussed(request, antiepilepsy_medicine_id):
         show_end_date = False
 
     context = {
+        "can_edit": can_edit,
         "choices": choices,
         "antiepilepsy_medicine": antiepilepsy_medicine,
         "is_rescue_medicine": antiepilepsy_medicine.is_rescue_medicine,
@@ -714,7 +726,7 @@ def antiepilepsy_medicine_risk_discussed(request, antiepilepsy_medicine_id):
 @login_and_otp_required()
 @user_may_view_this_child()
 @permission_required("epilepsy12.change_antiepilepsymedicine", raise_exception=True)
-def is_a_pregnancy_prevention_programme_in_place(request, antiepilepsy_medicine_id):
+def is_a_pregnancy_prevention_programme_in_place(request, can_edit, antiepilepsy_medicine_id):
     """
     POST callback from antiepilepsy_medicine.html partial to update is_a_pregnancy_prevention_programme_in_place
     """
@@ -749,6 +761,7 @@ def is_a_pregnancy_prevention_programme_in_place(request, antiepilepsy_medicine_
         show_end_date = False
 
     context = {
+        "can_edit": can_edit,
         "choices": choices,
         "antiepilepsy_medicine": antiepilepsy_medicine,
         "is_rescue_medicine": antiepilepsy_medicine.is_rescue_medicine,
@@ -772,7 +785,7 @@ def is_a_pregnancy_prevention_programme_in_place(request, antiepilepsy_medicine_
 @user_may_view_this_child()
 @permission_required("epilepsy12.change_antiepilepsymedicine", raise_exception=True)
 def has_a_valproate_annual_risk_acknowledgement_form_been_completed(
-    request, antiepilepsy_medicine_id
+    request, can_edit, antiepilepsy_medicine_id
 ):
     """
     POST callback from antiepilepsy_medicine.html partial to update has_a_valproate_annual_risk_acknowledgement_form_been_completed
@@ -808,6 +821,7 @@ def has_a_valproate_annual_risk_acknowledgement_form_been_completed(
         show_end_date = False
 
     context = {
+        "can_edit": can_edit,
         "choices": choices,
         "antiepilepsy_medicine": antiepilepsy_medicine,
         "is_rescue_medicine": antiepilepsy_medicine.is_rescue_medicine,
@@ -835,7 +849,7 @@ Fields relating to rescue medication begin here
 @login_and_otp_required()
 @user_may_view_this_child()
 @permission_required("epilepsy12.change_antiepilepsymedicine", raise_exception=True)
-def has_rescue_medication_been_prescribed(request, management_id):
+def has_rescue_medication_been_prescribed(request, can_edit, management_id):
     """
     HTMX call from management template
     POST request on toggle button click
@@ -870,6 +884,7 @@ def has_rescue_medication_been_prescribed(request, management_id):
     ).all()
 
     context = {
+        "can_edit": can_edit,
         "management": management,
         "rescue_medicines": rescue_medicines,
     }
@@ -897,7 +912,7 @@ Fields relating to individual care plans begin here
 @login_and_otp_required()
 @user_may_view_this_child()
 @permission_required("epilepsy12.change_management", raise_exception=True)
-def individualised_care_plan_in_place(request, management_id):
+def individualised_care_plan_in_place(request, can_edit, management_id):
     """
     This is an HTMX callback from the individualised_care_plan partial template
     It is triggered by a toggle in the partial generating a post request
@@ -938,7 +953,7 @@ def individualised_care_plan_in_place(request, management_id):
 
     management = Management.objects.get(pk=management_id)
 
-    context = {"management": management}
+    context = {"can_edit": can_edit, "management": management}
 
     template_name = "epilepsy12/partials/management/individualised_care_plan.html"
 
@@ -956,7 +971,7 @@ def individualised_care_plan_in_place(request, management_id):
 @login_and_otp_required()
 @user_may_view_this_child()
 @permission_required("epilepsy12.change_management", raise_exception=True)
-def individualised_care_plan_date(request, management_id):
+def individualised_care_plan_date(request, can_edit, management_id):
     """
     This is an HTMX callback from the individualised_care_plan partial template
     It is triggered by a toggle in the partial generating a post request
@@ -981,7 +996,7 @@ def individualised_care_plan_date(request, management_id):
 
     management = Management.objects.get(pk=management_id)
 
-    context = {"management": management}
+    context = {"can_edit": can_edit, "management": management}
 
     template_name = "epilepsy12/partials/management/individualised_care_plan.html"
 
@@ -999,7 +1014,7 @@ def individualised_care_plan_date(request, management_id):
 @login_and_otp_required()
 @user_may_view_this_child()
 @permission_required("epilepsy12.change_management", raise_exception=True)
-def individualised_care_plan_has_parent_carer_child_agreement(request, management_id):
+def individualised_care_plan_has_parent_carer_child_agreement(request, can_edit, management_id):
     """
     This is an HTMX callback from the individualised_care_plan partial template
     It is triggered by a toggle in the partial generating a post request
@@ -1020,7 +1035,7 @@ def individualised_care_plan_has_parent_carer_child_agreement(request, managemen
 
     management = Management.objects.get(pk=management_id)
 
-    context = {"management": management}
+    context = {"can_edit": can_edit, "management": management}
 
     template_name = "epilepsy12/partials/management/individualised_care_plan.html"
 
@@ -1038,7 +1053,7 @@ def individualised_care_plan_has_parent_carer_child_agreement(request, managemen
 @login_and_otp_required()
 @user_may_view_this_child()
 @permission_required("epilepsy12.change_management", raise_exception=True)
-def individualised_care_plan_includes_service_contact_details(request, management_id):
+def individualised_care_plan_includes_service_contact_details(request, can_edit, management_id):
     """
     This is an HTMX callback from the individualised_care_plan partial template
     It is triggered by a toggle in the partial generating a post request
@@ -1058,7 +1073,7 @@ def individualised_care_plan_includes_service_contact_details(request, managemen
         error_message = error
 
     management = Management.objects.get(pk=management_id)
-    context = {"management": management}
+    context = {"can_edit": can_edit, "management": management}
 
     template_name = "epilepsy12/partials/management/individualised_care_plan.html"
 
@@ -1076,7 +1091,7 @@ def individualised_care_plan_includes_service_contact_details(request, managemen
 @login_and_otp_required()
 @user_may_view_this_child()
 @permission_required("epilepsy12.change_management", raise_exception=True)
-def individualised_care_plan_include_first_aid(request, management_id):
+def individualised_care_plan_include_first_aid(request, can_edit, management_id):
     """
     This is an HTMX callback from the individualised_care_plan partial template
     It is triggered by a toggle in the partial generating a post request
@@ -1095,7 +1110,7 @@ def individualised_care_plan_include_first_aid(request, management_id):
         error_message = error
 
     management = Management.objects.get(pk=management_id)
-    context = {"management": management}
+    context = {"can_edit": can_edit, "management": management}
 
     template_name = "epilepsy12/partials/management/individualised_care_plan.html"
 
@@ -1113,7 +1128,7 @@ def individualised_care_plan_include_first_aid(request, management_id):
 @login_and_otp_required()
 @user_may_view_this_child()
 @permission_required("epilepsy12.change_management", raise_exception=True)
-def individualised_care_plan_parental_prolonged_seizure_care(request, management_id):
+def individualised_care_plan_parental_prolonged_seizure_care(request, can_edit, management_id):
     """
     This is an HTMX callback from the individualised_care_plan partial template
     It is triggered by a toggle in the partial generating a post request
@@ -1133,7 +1148,7 @@ def individualised_care_plan_parental_prolonged_seizure_care(request, management
         error_message = error
 
     management = Management.objects.get(pk=management_id)
-    context = {"management": management}
+    context = {"can_edit": can_edit, "management": management}
 
     template_name = "epilepsy12/partials/management/individualised_care_plan.html"
 
@@ -1152,7 +1167,7 @@ def individualised_care_plan_parental_prolonged_seizure_care(request, management
 @user_may_view_this_child()
 @permission_required("epilepsy12.change_management", raise_exception=True)
 def individualised_care_plan_includes_general_participation_risk(
-    request, management_id
+    request, can_edit, management_id
 ):
     """
     This is an HTMX callback from the individualised_care_plan partial template
@@ -1172,7 +1187,7 @@ def individualised_care_plan_includes_general_participation_risk(
         error_message = error
 
     management = Management.objects.get(pk=management_id)
-    context = {"management": management}
+    context = {"can_edit": can_edit, "management": management}
 
     template_name = "epilepsy12/partials/management/individualised_care_plan.html"
 
@@ -1190,7 +1205,7 @@ def individualised_care_plan_includes_general_participation_risk(
 @login_and_otp_required()
 @user_may_view_this_child()
 @permission_required("epilepsy12.change_management", raise_exception=True)
-def individualised_care_plan_addresses_water_safety(request, management_id):
+def individualised_care_plan_addresses_water_safety(request, can_edit, management_id):
     """
     This is an HTMX callback from the individualised_care_plan partial template
     It is triggered by a toggle in the partial generating a post request
@@ -1209,7 +1224,7 @@ def individualised_care_plan_addresses_water_safety(request, management_id):
         error_message = error
 
     management = Management.objects.get(pk=management_id)
-    context = {"management": management}
+    context = {"can_edit": can_edit, "management": management}
 
     template_name = "epilepsy12/partials/management/individualised_care_plan.html"
 
@@ -1227,7 +1242,7 @@ def individualised_care_plan_addresses_water_safety(request, management_id):
 @login_and_otp_required()
 @user_may_view_this_child()
 @permission_required("epilepsy12.change_management", raise_exception=True)
-def individualised_care_plan_addresses_sudep(request, management_id):
+def individualised_care_plan_addresses_sudep(request, can_edit, management_id):
     """
     This is an HTMX callback from the individualised_care_plan partial template
     It is triggered by a toggle in the partial generating a post request
@@ -1246,7 +1261,7 @@ def individualised_care_plan_addresses_sudep(request, management_id):
         error_message = error
 
     management = Management.objects.get(pk=management_id)
-    context = {"management": management}
+    context = {"can_edit": can_edit, "management": management}
 
     template_name = "epilepsy12/partials/management/individualised_care_plan.html"
 
@@ -1264,7 +1279,7 @@ def individualised_care_plan_addresses_sudep(request, management_id):
 @login_and_otp_required()
 @user_may_view_this_child()
 @permission_required("epilepsy12.change_management", raise_exception=True)
-def individualised_care_plan_includes_ehcp(request, management_id):
+def individualised_care_plan_includes_ehcp(request, can_edit, management_id):
     """
     This is an HTMX callback from the individualised_care_plan partial template
     It is triggered by a toggle in the partial generating a post request
@@ -1283,7 +1298,7 @@ def individualised_care_plan_includes_ehcp(request, management_id):
         error_message = error
 
     management = Management.objects.get(pk=management_id)
-    context = {"management": management}
+    context = {"can_edit": can_edit, "management": management}
 
     template_name = "epilepsy12/partials/management/individualised_care_plan.html"
 
@@ -1301,7 +1316,7 @@ def individualised_care_plan_includes_ehcp(request, management_id):
 @login_and_otp_required()
 @user_may_view_this_child()
 @permission_required("epilepsy12.change_management", raise_exception=True)
-def has_individualised_care_plan_been_updated_in_the_last_year(request, management_id):
+def has_individualised_care_plan_been_updated_in_the_last_year(request, can_edit, management_id):
     """
     This is an HTMX callback from the individualised_care_plan partial template
     It is triggered by a toggle in the partial generating a post request
@@ -1321,7 +1336,7 @@ def has_individualised_care_plan_been_updated_in_the_last_year(request, manageme
 
     management = Management.objects.get(pk=management_id)
 
-    context = {"management": management}
+    context = {"can_edit": can_edit, "management": management}
 
     template_name = "epilepsy12/partials/management/individualised_care_plan.html"
 
@@ -1339,7 +1354,7 @@ def has_individualised_care_plan_been_updated_in_the_last_year(request, manageme
 @login_and_otp_required()
 @user_may_view_this_child()
 @permission_required("epilepsy12.change_management", raise_exception=True)
-def has_been_referred_for_mental_health_support(request, management_id):
+def has_been_referred_for_mental_health_support(request, can_edit, management_id):
     """
     This is an HTMX callback from the has_been_referred_for_mental_health_support partial template
     It is triggered by a toggle in the partial generating a post request
@@ -1359,7 +1374,7 @@ def has_been_referred_for_mental_health_support(request, management_id):
 
     management = Management.objects.get(pk=management_id)
 
-    context = {"management": management}
+    context = {"can_edit": can_edit, "management": management}
 
     template_name = "epilepsy12/partials/management/mental_health_support.html"
 
@@ -1377,7 +1392,7 @@ def has_been_referred_for_mental_health_support(request, management_id):
 @login_and_otp_required()
 @user_may_view_this_child()
 @permission_required("epilepsy12.change_management", raise_exception=True)
-def has_support_for_mental_health_support(request, management_id):
+def has_support_for_mental_health_support(request, can_edit, management_id):
     """
     This is an HTMX callback from the has_support_for_mental_health_support partial template
     It is triggered by a toggle in the partial generating a post request
@@ -1397,7 +1412,7 @@ def has_support_for_mental_health_support(request, management_id):
 
     management = Management.objects.get(pk=management_id)
 
-    context = {"management": management}
+    context = {"can_edit": can_edit, "management": management}
 
     template_name = "epilepsy12/partials/management/mental_health_support.html"
 

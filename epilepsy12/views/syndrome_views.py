@@ -12,7 +12,7 @@ from ..decorator import user_may_view_this_child, login_and_otp_required
 @login_and_otp_required()
 @user_may_view_this_child()
 @permission_required("epilepsy12.add_syndrome", raise_exception=True)
-def syndrome_diagnosis_date(request, syndrome_id):
+def syndrome_diagnosis_date(request, can_edit, syndrome_id):
     """
     HTMX post request from syndrome.html partial on date change
     """
@@ -45,6 +45,7 @@ def syndrome_diagnosis_date(request, syndrome_id):
     ).order_by("syndrome_name")
 
     context = {
+        "can_edit": can_edit,
         "syndrome_selection": syndrome_selection,
         "syndrome": syndrome,
     }
@@ -63,7 +64,7 @@ def syndrome_diagnosis_date(request, syndrome_id):
 @login_and_otp_required()
 @user_may_view_this_child()
 @permission_required("epilepsy12.change_syndrome", raise_exception=True)
-def syndrome_name(request, syndrome_id):
+def syndrome_name(request, can_edit, syndrome_id):
     """
     HTMX post request from syndrome.html partial on syndrome name change
     """
@@ -94,6 +95,7 @@ def syndrome_name(request, syndrome_id):
     ).order_by("syndrome_name")
 
     context = {
+        "can_edit": can_edit,
         "syndrome_selection": syndrome_selection,
         "syndrome": syndrome,
     }

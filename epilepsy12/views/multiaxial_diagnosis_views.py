@@ -78,7 +78,7 @@ ALL_FIELDS = NONEPILEPSY_FIELDS + EPILEPSY_FIELDS
 @login_and_otp_required()
 @permission_required("epilepsy12.view_multiaxialdiagnosis", raise_exception=True)
 @user_may_view_this_child()
-def multiaxial_diagnosis(request, case_id):
+def multiaxial_diagnosis(request, can_edit, case_id):
     """
     Called on load of form. If no instance exists, one is created.
 
@@ -137,6 +137,7 @@ def multiaxial_diagnosis(request, case_id):
         "mental_health_issues_choices": NEUROPSYCHIATRIC,
         "global_developmental_delay_or_learning_difficulties_severity_choices": SEVERITY,
         "organisation_id": organisation_id,
+        "can_edit": can_edit and request.user.has_perm("epilepsy12.change_multiaxialdiagnosis"),
     }
 
     response = recalculate_form_generate_response(
@@ -152,7 +153,7 @@ def multiaxial_diagnosis(request, case_id):
 @login_and_otp_required()
 @user_may_view_this_child()
 @permission_required("epilepsy12.add_episode", raise_exception=True)
-def add_episode(request, multiaxial_diagnosis_id):
+def add_episode(request, can_edit, multiaxial_diagnosis_id):
     """
     HTMX post request from episodes.html partial on button click to add new episode
     """
@@ -205,6 +206,7 @@ def add_episode(request, multiaxial_diagnosis_id):
     keywords = Keyword.objects.all()
 
     context = {
+        "can_edit": can_edit,
         "episode": new_episode,
         "seizure_onset_date_confidence_selection": DATE_ACCURACY,
         "episode_definition_selection": EPISODE_DEFINITION,
@@ -245,7 +247,7 @@ def add_episode(request, multiaxial_diagnosis_id):
 @login_and_otp_required()
 @user_may_view_this_child()
 @permission_required("epilepsy12.view_episode", raise_exception=True)
-def edit_episode(request, episode_id):
+def edit_episode(request, can_edit, episode_id):
     """
     HTMX post request from episodes.html partial on button click to add new episode
     """
@@ -254,6 +256,7 @@ def edit_episode(request, episode_id):
     keywords = Keyword.objects.all()
 
     context = {
+        "can_edit": can_edit,
         "episode": episode,
         "seizure_onset_date_confidence_selection": DATE_ACCURACY,
         "episode_definition_selection": EPISODE_DEFINITION,
@@ -295,7 +298,7 @@ def edit_episode(request, episode_id):
 @login_and_otp_required()
 @user_may_view_this_child()
 @permission_required("epilepsy12.delete_episode", raise_exception=True)
-def remove_episode(request, episode_id):
+def remove_episode(request, can_edit, episode_id):
     """
     POST request on button click from episodes partial in multiaxial_diagnosis form
     Deletes episode from table
@@ -308,6 +311,7 @@ def remove_episode(request, episode_id):
     ).order_by("seizure_onset_date")
 
     context = {
+        "can_edit": can_edit,
         "multiaxial_diagnosis": multiaxial_diagnosis,
         "episodes": episodes,
     }
@@ -325,7 +329,7 @@ def remove_episode(request, episode_id):
 @login_and_otp_required()
 @user_may_view_this_child()
 @permission_required("epilepsy12.view_episode", raise_exception=True)
-def close_episode(request, episode_id):
+def close_episode(request, can_edit, episode_id):
     """
     Call back from onclick of close episode in episode.html
     returns the episodes list partial
@@ -346,6 +350,7 @@ def close_episode(request, episode_id):
     ).exists()
 
     context = {
+        "can_edit": can_edit,
         "multiaxial_diagnosis": multiaxial_diagnosis,
         "episodes": episodes,
         "there_are_epileptic_episodes": there_are_epileptic_episodes,
@@ -364,7 +369,7 @@ def close_episode(request, episode_id):
 @login_and_otp_required()
 @user_may_view_this_child()
 @permission_required("epilepsy12.change_episode", raise_exception=True)
-def seizure_onset_date(request, episode_id):
+def seizure_onset_date(request, can_edit, episode_id):
     """
     HTMX post request from episode.html partial on date change
     """
@@ -387,6 +392,7 @@ def seizure_onset_date(request, episode_id):
     episode = Episode.objects.get(pk=episode_id)
 
     context = {
+        "can_edit": can_edit,
         "episode": episode,
         "seizure_onset_date_confidence_selection": DATE_ACCURACY,
         "episode_definition_selection": EPISODE_DEFINITION,
@@ -429,7 +435,7 @@ def seizure_onset_date(request, episode_id):
 @login_and_otp_required()
 @user_may_view_this_child()
 @permission_required("epilepsy12.change_episode", raise_exception=True)
-def seizure_onset_date_confidence(request, episode_id):
+def seizure_onset_date_confidence(request, can_edit, episode_id):
     """
     HTMX post request from episode.html partial on toggle click
     """
@@ -451,6 +457,7 @@ def seizure_onset_date_confidence(request, episode_id):
     keywords = Keyword.objects.all()
 
     context = {
+        "can_edit": can_edit,
         "episode": episode,
         "seizure_onset_date_confidence_selection": DATE_ACCURACY,
         "episode_definition_selection": EPISODE_DEFINITION,
@@ -493,7 +500,7 @@ def seizure_onset_date_confidence(request, episode_id):
 @login_and_otp_required()
 @user_may_view_this_child()
 @permission_required("epilepsy12.change_episode", raise_exception=True)
-def episode_definition(request, episode_id):
+def episode_definition(request, can_edit, episode_id):
     """
     HTMX post request from episode.html partial on toggle click
     """
@@ -515,6 +522,7 @@ def episode_definition(request, episode_id):
     keywords = Keyword.objects.all()
 
     context = {
+        "can_edit": can_edit,
         "episode": episode,
         "seizure_onset_date_confidence_selection": DATE_ACCURACY,
         "episode_definition_selection": EPISODE_DEFINITION,
@@ -557,7 +565,7 @@ def episode_definition(request, episode_id):
 @login_and_otp_required()
 @user_may_view_this_child()
 @permission_required("epilepsy12.change_episode", raise_exception=True)
-def has_description_of_the_episode_or_episodes_been_gathered(request, episode_id):
+def has_description_of_the_episode_or_episodes_been_gathered(request, can_edit, episode_id):
     """
     HTMX post request from episode.html partial on toggle click
     """
@@ -586,6 +594,7 @@ def has_description_of_the_episode_or_episodes_been_gathered(request, episode_id
         episode.save()
 
     context = {
+        "can_edit": can_edit,
         "episode": episode,
         "seizure_onset_date_confidence_selection": DATE_ACCURACY,
         "episode_definition_selection": EPISODE_DEFINITION,
@@ -633,7 +642,7 @@ Description fields
 @login_and_otp_required()
 @user_may_view_this_child()
 @permission_required("epilepsy12.change_episode", raise_exception=True)
-def edit_description(request, episode_id):
+def edit_description(request, can_edit, episode_id):
     """
     This function is triggered by an htmx post request from the partials/episode/description.html form for the desscribe description.
     This component comprises the input free text describing a seizure episode and labels for each of the keywords identified.
@@ -657,7 +666,7 @@ def edit_description(request, episode_id):
 
     episode = Episode.objects.get(pk=episode_id)
 
-    context = {"episode": episode, "keyword_selection": keywords}
+    context = {"can_edit": can_edit, "episode": episode, "keyword_selection": keywords}
 
     response = recalculate_form_generate_response(
         model_instance=episode.multiaxial_diagnosis,
@@ -672,7 +681,7 @@ def edit_description(request, episode_id):
 @login_and_otp_required()
 @user_may_view_this_child()
 @permission_required("epilepsy12.change_episode", raise_exception=True)
-def delete_description_keyword(request, episode_id, description_keyword_id):
+def delete_description_keyword(request, can_edit, episode_id, description_keyword_id):
     """
     This function is triggered by an htmx post request from the partials/desscribe/description.html form for the desscribe description_keyword.
     This component comprises the input free text describing a seizure episode and labels for each of the keywords identified.
@@ -695,7 +704,7 @@ def delete_description_keyword(request, episode_id, description_keyword_id):
 
     keywords = Keyword.objects.all()
 
-    context = {"episode": episode, "keyword_selection": keywords}
+    context = {"can_edit": can_edit, "episode": episode, "keyword_selection": keywords}
 
     response = recalculate_form_generate_response(
         model_instance=episode.multiaxial_diagnosis,
@@ -715,7 +724,7 @@ Epilepsy status
 @login_and_otp_required()
 @user_may_view_this_child()
 @permission_required("epilepsy12.change_episode", raise_exception=True)
-def epilepsy_or_nonepilepsy_status(request, episode_id):
+def epilepsy_or_nonepilepsy_status(request, can_edit, episode_id):
     """
     Function triggered by a click in the epilepsy_or_nonepilepsy_status partial leading to a post request.
     The episode_id is also passed in allowing update of the model.
@@ -751,6 +760,7 @@ def epilepsy_or_nonepilepsy_status(request, episode_id):
         "epilepsy12/partials/multiaxial_diagnosis/epilepsy_or_nonepilepsy_status.html"
     )
     context = {
+        "can_edit": can_edit,
         "epilepsy_or_nonepilepsy_status_choices": sorted(
             EPILEPSY_DIAGNOSIS_STATUS, key=itemgetter(1)
         ),
@@ -794,7 +804,7 @@ Epilepsy fields
 @login_and_otp_required()
 @user_may_view_this_child()
 @permission_required("epilepsy12.change_episode", raise_exception=True)
-def epileptic_seizure_onset_type(request, episode_id):
+def epileptic_seizure_onset_type(request, can_edit, episode_id):
     """
     Defines type of onset if considered to be epilepsy
     Accepts POST request from epilepsy partial and returns the same having
@@ -835,6 +845,7 @@ def epileptic_seizure_onset_type(request, episode_id):
     episode = Episode.objects.get(pk=episode_id)
 
     context = {
+        "can_edit": can_edit,
         "episode": episode,
         "epileptic_seizure_onset_types": sorted(
             EPILEPSY_SEIZURE_TYPE, key=itemgetter(1)
@@ -862,7 +873,7 @@ def epileptic_seizure_onset_type(request, episode_id):
 @login_and_otp_required()
 @user_may_view_this_child()
 @permission_required("epilepsy12.change_episode", raise_exception=True)
-def focal_onset_epilepsy_checked_changed(request, episode_id):
+def focal_onset_epilepsy_checked_changed(request, can_edit, episode_id):
     """
     Function triggered by a change in any checkbox/toggle in the focal_onset_epilepsy template leading to a post request.
     The episode_id is also passed in allowing update of the model.
@@ -908,6 +919,7 @@ def focal_onset_epilepsy_checked_changed(request, episode_id):
     episode = Episode.objects.get(pk=episode_id)
 
     context = {
+        "can_edit": can_edit,
         "episode": episode,
         "LATERALITY": LATERALITY,
         "FOCAL_EPILEPSY_MOTOR_MANIFESTATIONS": FOCAL_EPILEPSY_MOTOR_MANIFESTATIONS,
@@ -928,7 +940,7 @@ def focal_onset_epilepsy_checked_changed(request, episode_id):
 @login_and_otp_required()
 @user_may_view_this_child()
 @permission_required("epilepsy12.change_episode", raise_exception=True)
-def epileptic_generalised_onset(request, episode_id):
+def epileptic_generalised_onset(request, can_edit, episode_id):
     """
     POST request from epileptic_generalised_onset field in generalised_onset_epilepsy
     """
@@ -948,6 +960,7 @@ def epileptic_generalised_onset(request, episode_id):
     episode = Episode.objects.get(pk=episode_id)
 
     context = {
+        "can_edit": can_edit,
         "episode": episode,
         "GENERALISED_SEIZURE_TYPE": sorted(GENERALISED_SEIZURE_TYPE),
     }
@@ -975,7 +988,7 @@ Nonepilepsy
 @login_and_otp_required()
 @user_may_view_this_child()
 @permission_required("epilepsy12.change_episode", raise_exception=True)
-def nonepilepsy_generalised_onset(request, episode_id):
+def nonepilepsy_generalised_onset(request, can_edit, episode_id):
     """
     POST request from toggle
     """
@@ -995,6 +1008,7 @@ def nonepilepsy_generalised_onset(request, episode_id):
     episode = Episode.objects.get(id=episode_id)
 
     context = {
+        "can_edit": can_edit,
         "nonepilepsy_onset_types": NON_EPILEPSY_SEIZURE_ONSET,
         "nonepilepsy_types": sorted(NON_EPILEPSY_SEIZURE_TYPE, key=itemgetter(1)),
         "syncopes": sorted(NON_EPILEPTIC_SYNCOPES, key=itemgetter(1)),
@@ -1022,7 +1036,7 @@ def nonepilepsy_generalised_onset(request, episode_id):
 @login_and_otp_required()
 @user_may_view_this_child()
 @permission_required("epilepsy12.change_episode", raise_exception=True)
-def nonepileptic_seizure_type(request, episode_id):
+def nonepileptic_seizure_type(request, can_edit, episode_id):
     """
     POST request from select element within nonepilepsy partial
     Returns one of the select options:
@@ -1055,6 +1069,7 @@ def nonepileptic_seizure_type(request, episode_id):
     episode = Episode.objects.get(pk=episode_id)
 
     context = {
+        "can_edit": can_edit,
         "nonepilepsy_onset_types": NON_EPILEPSY_SEIZURE_ONSET,
         "nonepilepsy_types": sorted(NON_EPILEPSY_SEIZURE_TYPE, key=itemgetter(1)),
         "syncopes": sorted(NON_EPILEPTIC_SYNCOPES, key=itemgetter(1)),
@@ -1081,7 +1096,7 @@ def nonepileptic_seizure_type(request, episode_id):
 @login_and_otp_required()
 @user_may_view_this_child()
 @permission_required("epilepsy12.change_episode", raise_exception=True)
-def nonepileptic_seizure_subtype(request, episode_id):
+def nonepileptic_seizure_subtype(request, can_edit, episode_id):
     """
     POST request from the nonepileptic_seizure_subtype partial select component
     in the nonepilepsy partial
@@ -1103,6 +1118,7 @@ def nonepileptic_seizure_subtype(request, episode_id):
     episode = Episode.objects.get(pk=episode_id)
 
     context = {
+        "can_edit": can_edit,
         "nonepilepsy_onset_types": NON_EPILEPSY_SEIZURE_ONSET,
         "nonepilepsy_types": sorted(NON_EPILEPSY_SEIZURE_TYPE, key=itemgetter(1)),
         "syncopes": sorted(NON_EPILEPTIC_SYNCOPES, key=itemgetter(1)),
@@ -1134,7 +1150,7 @@ Syndromes
 @login_and_otp_required()
 @user_may_view_this_child()
 @permission_required("epilepsy12.add_syndrome", raise_exception=True)
-def add_syndrome(request, multiaxial_diagnosis_id):
+def add_syndrome(request, can_edit, multiaxial_diagnosis_id):
     """
     HTMX post request from syndromes.html partial on button click to add new syndrome
     """
@@ -1158,6 +1174,7 @@ def add_syndrome(request, multiaxial_diagnosis_id):
     ).order_by("syndrome_name")
 
     context = {
+        "can_edit": can_edit,
         "syndrome": syndrome,
         "syndrome_selection": syndrome_selection,
     }
@@ -1175,7 +1192,7 @@ def add_syndrome(request, multiaxial_diagnosis_id):
 @login_and_otp_required()
 @user_may_view_this_child()
 @permission_required("epilepsy12.view_syndrome", raise_exception=True)
-def edit_syndrome(request, syndrome_id):
+def edit_syndrome(request, can_edit, syndrome_id):
     """
     HTMX post request from episodes.html partial on button click to add new episode
     """
@@ -1195,6 +1212,7 @@ def edit_syndrome(request, syndrome_id):
     ).order_by("syndrome_name")
 
     context = {
+        "can_edit": can_edit,
         "syndrome": syndrome,
         "syndrome_selection": syndrome_selection,
         "seizure_onset_date_confidence_selection": DATE_ACCURACY,
@@ -1236,7 +1254,7 @@ def edit_syndrome(request, syndrome_id):
 @login_and_otp_required()
 @user_may_view_this_child()
 @permission_required("epilepsy12.delete_syndrome", raise_exception=True)
-def remove_syndrome(request, syndrome_id):
+def remove_syndrome(request, can_edit, syndrome_id):
     """
     POST request on button click from episodes partial in multiaxial_diagnosis form
     Deletes syndrome from table
@@ -1248,7 +1266,7 @@ def remove_syndrome(request, syndrome_id):
         multiaxial_diagnosis=multiaxial_diagnosis
     ).order_by("-syndrome_diagnosis_date")
 
-    context = {"multiaxial_diagnosis": multiaxial_diagnosis, "syndromes": syndromes}
+    context = {"can_edit": can_edit, "multiaxial_diagnosis": multiaxial_diagnosis, "syndromes": syndromes}
 
     response = recalculate_form_generate_response(
         model_instance=syndrome.multiaxial_diagnosis,
@@ -1263,7 +1281,7 @@ def remove_syndrome(request, syndrome_id):
 @login_and_otp_required()
 @user_may_view_this_child()
 @permission_required("epilepsy12.view_episode", raise_exception=True)
-def close_syndrome(request, syndrome_id):
+def close_syndrome(request, can_edit, syndrome_id):
     """
     Call back from onclick of close episode in episode.html
     returns the episodes list partial
@@ -1279,7 +1297,7 @@ def close_syndrome(request, syndrome_id):
         multiaxial_diagnosis=multiaxial_diagnosis
     ).order_by("-syndrome_diagnosis_date")
 
-    context = {"multiaxial_diagnosis": multiaxial_diagnosis, "syndromes": syndromes}
+    context = {"can_edit": can_edit, "multiaxial_diagnosis": multiaxial_diagnosis, "syndromes": syndromes}
 
     response = recalculate_form_generate_response(
         model_instance=syndrome.multiaxial_diagnosis,
@@ -1294,7 +1312,7 @@ def close_syndrome(request, syndrome_id):
 @login_and_otp_required()
 @user_may_view_this_child()
 @permission_required("epilepsy12.change_multiaxialdiagnosis", raise_exception=True)
-def syndrome_present(request, multiaxial_diagnosis_id):
+def syndrome_present(request, can_edit, multiaxial_diagnosis_id):
     """
     # POST request from the syndrome partial in the multiaxial_description_form
     # Updates model and returns the syndrome partial"""
@@ -1321,7 +1339,7 @@ def syndrome_present(request, multiaxial_diagnosis_id):
         multiaxial_diagnosis=multiaxial_diagnosis
     ).order_by("-syndrome_diagnosis_date")
 
-    context = {"multiaxial_diagnosis": multiaxial_diagnosis, "syndromes": syndromes}
+    context = {"can_edit": can_edit, "multiaxial_diagnosis": multiaxial_diagnosis, "syndromes": syndromes}
 
     response = recalculate_form_generate_response(
         model_instance=multiaxial_diagnosis,
@@ -1336,7 +1354,7 @@ def syndrome_present(request, multiaxial_diagnosis_id):
 @login_and_otp_required()
 @user_may_view_this_child()
 @permission_required("epilepsy12.change_multiaxialdiagnosis", raise_exception=True)
-def epilepsy_cause_known(request, multiaxial_diagnosis_id):
+def epilepsy_cause_known(request, can_edit, multiaxial_diagnosis_id):
     """
     # POST request from the syndrome partial in the multiaxial_description_form
     # Updates model and returns the syndrome partial"""
@@ -1360,6 +1378,7 @@ def epilepsy_cause_known(request, multiaxial_diagnosis_id):
     multiaxial_diagnosis = MultiaxialDiagnosis.objects.get(pk=multiaxial_diagnosis_id)
 
     context = {
+        "can_edit": can_edit,
         "multiaxial_diagnosis": multiaxial_diagnosis,
         "epilepsy_cause_selection": EPILEPSY_CAUSES,
     }
@@ -1400,6 +1419,7 @@ def epilepsy_cause_known(request, multiaxial_diagnosis_id):
 #     multiaxial_diagnosis = MultiaxialDiagnosis.objects.get(pk=multiaxial_diagnosis_id)
 
 #     context = {
+#         "can_edit": can_edit,
 #
 #         "multiaxial_diagnosis": multiaxial_diagnosis,
 #         "epilepsy_cause_selection": EPILEPSY_CAUSES,
@@ -1419,7 +1439,7 @@ def epilepsy_cause_known(request, multiaxial_diagnosis_id):
 @login_and_otp_required()
 @user_may_view_this_child()
 @permission_required("epilepsy12.change_multiaxialdiagnosis", raise_exception=True)
-def epilepsy_cause_categories(request, multiaxial_diagnosis_id):
+def epilepsy_cause_categories(request, can_edit, multiaxial_diagnosis_id):
     """
     POST from multiple select in epilepsy_causes partial
     """
@@ -1447,6 +1467,7 @@ def epilepsy_cause_categories(request, multiaxial_diagnosis_id):
         )
 
     context = {
+        "can_edit": can_edit,
         "epilepsy_cause_selection": EPILEPSY_CAUSES,
         "multiaxial_diagnosis": multiaxial_diagnosis,
         # 'epilepsy_causes': sorted(epilepsy_causes, key=itemgetter('preferredTerm')),
@@ -1470,7 +1491,7 @@ Comorbidities
 @login_and_otp_required()
 @user_may_view_this_child()
 @permission_required("epilepsy12.change_multiaxialdiagnosis", raise_exception=True)
-def relevant_impairments_behavioural_educational(request, multiaxial_diagnosis_id):
+def relevant_impairments_behavioural_educational(request, can_edit, multiaxial_diagnosis_id):
     """
     POST request from
     """
@@ -1497,6 +1518,7 @@ def relevant_impairments_behavioural_educational(request, multiaxial_diagnosis_i
         )
 
     context = {
+        "can_edit": can_edit,
         "multiaxial_diagnosis": multiaxial_diagnosis,
         "comorbidities": Comorbidity.objects.filter(
             multiaxial_diagnosis=multiaxial_diagnosis
@@ -1516,7 +1538,7 @@ def relevant_impairments_behavioural_educational(request, multiaxial_diagnosis_i
 @login_and_otp_required()
 @user_may_view_this_child()
 @permission_required("epilepsy12.add_comorbidity", raise_exception=True)
-def add_comorbidity(request, multiaxial_diagnosis_id):
+def add_comorbidity(request, can_edit, multiaxial_diagnosis_id):
     """
     POST request from comorbidities_section partial
     """
@@ -1536,7 +1558,7 @@ def add_comorbidity(request, multiaxial_diagnosis_id):
         multiaxial_diagnosis=multiaxial_diagnosis
     )
 
-    context = {"comorbidity": comorbidity, "comorbidity_choices": comorbidity_choices}
+    context = {"can_edit": can_edit, "comorbidity": comorbidity, "comorbidity_choices": comorbidity_choices}
 
     response = recalculate_form_generate_response(
         model_instance=comorbidity.multiaxial_diagnosis,
@@ -1551,7 +1573,7 @@ def add_comorbidity(request, multiaxial_diagnosis_id):
 @login_and_otp_required()
 @user_may_view_this_child()
 @permission_required("epilepsy12.view_comorbidity", raise_exception=True)
-def edit_comorbidity(request, comorbidity_id):
+def edit_comorbidity(request, can_edit, comorbidity_id):
     """
     POST request from comorbidities.html partial on button click to edit episode
     """
@@ -1561,7 +1583,7 @@ def edit_comorbidity(request, comorbidity_id):
     comorbidity_choices = get_comorbidity_choices(
         multiaxial_diagnosis=multiaxial_diagnosis, comorbidity_id=comorbidity_id
     )
-    context = {"comorbidity": comorbidity, "comorbidity_choices": comorbidity_choices}
+    context = {"can_edit": can_edit, "comorbidity": comorbidity, "comorbidity_choices": comorbidity_choices}
 
     response = recalculate_form_generate_response(
         model_instance=comorbidity.multiaxial_diagnosis,
@@ -1576,7 +1598,7 @@ def edit_comorbidity(request, comorbidity_id):
 @login_and_otp_required()
 @user_may_view_this_child()
 @permission_required("epilepsy12.delete_comorbidity", raise_exception=True)
-def remove_comorbidity(request, comorbidity_id):
+def remove_comorbidity(request, can_edit, comorbidity_id):
     """
     POST request from comorbidities.html partial on button click to edit episode
     """
@@ -1591,6 +1613,7 @@ def remove_comorbidity(request, comorbidity_id):
     ).all()
 
     context = {
+        "can_edit": can_edit,
         "multiaxial_diagnosis": multiaxial_diagnosis,
         "comorbidities": comorbidities,
     }
@@ -1608,7 +1631,7 @@ def remove_comorbidity(request, comorbidity_id):
 @login_and_otp_required()
 @user_may_view_this_child()
 @permission_required("epilepsy12.view_comorbidity", raise_exception=True)
-def close_comorbidity(request, comorbidity_id):
+def close_comorbidity(request, can_edit, comorbidity_id):
     """
     Call back from onclick of close comorbidity in comorbidity.html
     returns the episodes list partial
@@ -1628,6 +1651,7 @@ def close_comorbidity(request, comorbidity_id):
     ).order_by("-comorbidity_diagnosis_date")
 
     context = {
+        "can_edit": can_edit,
         "multiaxial_diagnosis": multiaxial_diagnosis,
         "comorbidities": comorbidities,
     }
@@ -1645,7 +1669,7 @@ def close_comorbidity(request, comorbidity_id):
 @login_and_otp_required()
 @user_may_view_this_child()
 @permission_required("epilepsy12.change_comorbidity", raise_exception=True)
-def comorbidity_diagnosis_date(request, comorbidity_id):
+def comorbidity_diagnosis_date(request, can_edit, comorbidity_id):
     """
     POST request from comorbidity partial with comorbidity_diagnosis_date
     """
@@ -1672,7 +1696,7 @@ def comorbidity_diagnosis_date(request, comorbidity_id):
         multiaxial_diagnosis=multiaxial_diagnosis, comorbidity_id=comorbidity_id
     )
 
-    context = {"comorbidity": comorbidity, "comorbidity_choices": comorbidity_choices}
+    context = {"can_edit": can_edit, "comorbidity": comorbidity, "comorbidity_choices": comorbidity_choices}
 
     response = recalculate_form_generate_response(
         model_instance=comorbidity.multiaxial_diagnosis,
@@ -1688,7 +1712,7 @@ def comorbidity_diagnosis_date(request, comorbidity_id):
 @login_and_otp_required()
 @user_may_view_this_child()
 @permission_required("epilepsy12.change_comorbidity", raise_exception=True)
-def comorbidity_diagnosis(request, comorbidity_id):
+def comorbidity_diagnosis(request, can_edit, comorbidity_id):
     """
     POST request on change select from comorbidity partial
     Choices for comorbidities fed from SNOMED server
@@ -1718,6 +1742,7 @@ def comorbidity_diagnosis(request, comorbidity_id):
     )
 
     context = {
+        "can_edit": can_edit,
         "comorbidity_choices": comorbidity_choices,
         "comorbidity": comorbidity,
     }
@@ -1736,7 +1761,7 @@ def comorbidity_diagnosis(request, comorbidity_id):
 @login_and_otp_required()
 @user_may_view_this_child()
 @permission_required("epilepsy12.view_comorbidity", raise_exception=True)
-def comorbidities(request, multiaxial_diagnosis_id):
+def comorbidities(request, can_edit, multiaxial_diagnosis_id):
     """
     POST request from comorbidity partial to replace it with table
     """
@@ -1746,6 +1771,7 @@ def comorbidities(request, multiaxial_diagnosis_id):
     ).order_by("-comorbidity_diagnosis_date")
 
     context = {
+        "can_edit": can_edit,
         "multiaxial_diagnosis": multiaxial_diagnosis,
         "comorbidities": comorbidities,
     }
@@ -1763,7 +1789,7 @@ def comorbidities(request, multiaxial_diagnosis_id):
 @login_and_otp_required()
 @user_may_view_this_child()
 @permission_required("epilepsy12.change_multiaxialdiagnosis", raise_exception=True)
-def mental_health_screen(request, multiaxial_diagnosis_id):
+def mental_health_screen(request, can_edit, multiaxial_diagnosis_id):
     """
     POST request callback for mental_health_screen toggle
     """
@@ -1783,6 +1809,7 @@ def mental_health_screen(request, multiaxial_diagnosis_id):
     multiaxial_diagnosis = MultiaxialDiagnosis.objects.get(pk=multiaxial_diagnosis_id)
 
     context = {
+        "can_edit": can_edit,
         "multiaxial_diagnosis": multiaxial_diagnosis,
         "mental_health_issues_choices": NEUROPSYCHIATRIC,
         "global_developmental_delay_or_learning_difficulties_severity_choices": SEVERITY,
@@ -1802,7 +1829,7 @@ def mental_health_screen(request, multiaxial_diagnosis_id):
 @login_and_otp_required()
 @user_may_view_this_child()
 @permission_required("epilepsy12.change_multiaxialdiagnosis", raise_exception=True)
-def mental_health_issue_identified(request, multiaxial_diagnosis_id):
+def mental_health_issue_identified(request, can_edit, multiaxial_diagnosis_id):
     """
     POST request callback for mental_health_issue_identified toggle
     """
@@ -1830,6 +1857,7 @@ def mental_health_issue_identified(request, multiaxial_diagnosis_id):
         multiaxial_diagnosis.save()
 
     context = {
+        "can_edit": can_edit,
         "multiaxial_diagnosis": multiaxial_diagnosis,
         "mental_health_issues_choices": NEUROPSYCHIATRIC,
         "global_developmental_delay_or_learning_difficulties_severity_choices": SEVERITY,
@@ -1849,7 +1877,7 @@ def mental_health_issue_identified(request, multiaxial_diagnosis_id):
 @login_and_otp_required()
 @user_may_view_this_child()
 @permission_required("epilepsy12.change_multiaxialdiagnosis", raise_exception=True)
-def mental_health_issues(request, multiaxial_diagnosis_id):
+def mental_health_issues(request, can_edit, multiaxial_diagnosis_id):
     """
     POST callback from mental_health_issue multiple choice multiple toggle
     hx_name of the individual issue is mental_health_issue
@@ -1879,6 +1907,7 @@ def mental_health_issues(request, multiaxial_diagnosis_id):
     multiaxial_diagnosis = MultiaxialDiagnosis.objects.get(pk=multiaxial_diagnosis_id)
 
     context = {
+        "can_edit": can_edit,
         "multiaxial_diagnosis": multiaxial_diagnosis,
         "mental_health_issues_choices": NEUROPSYCHIATRIC,
         "global_developmental_delay_or_learning_difficulties_severity_choices": SEVERITY,
@@ -1899,7 +1928,7 @@ def mental_health_issues(request, multiaxial_diagnosis_id):
 @user_may_view_this_child()
 @permission_required("epilepsy12.change_multiaxialdiagnosis", raise_exception=True)
 def global_developmental_delay_or_learning_difficulties(
-    request, multiaxial_diagnosis_id
+    request, can_edit, multiaxial_diagnosis_id
 ):
     """
     POST request callback for mental_health_issue_identified toggle
@@ -1930,6 +1959,7 @@ def global_developmental_delay_or_learning_difficulties(
         multiaxial_diagnosis.save()
 
     context = {
+        "can_edit": can_edit,
         "multiaxial_diagnosis": multiaxial_diagnosis,
         "mental_health_issues_choices": NEUROPSYCHIATRIC,
         "global_developmental_delay_or_learning_difficulties_severity_choices": SEVERITY,
@@ -1950,7 +1980,7 @@ def global_developmental_delay_or_learning_difficulties(
 @user_may_view_this_child()
 @permission_required("epilepsy12.change_multiaxialdiagnosis", raise_exception=True)
 def global_developmental_delay_or_learning_difficulties_severity(
-    request, multiaxial_diagnosis_id
+    request, can_edit, multiaxial_diagnosis_id
 ):
     """
     POST callback from global_developmental_delay_or_learning_difficulties_severity multiple toggle
@@ -1971,6 +2001,7 @@ def global_developmental_delay_or_learning_difficulties_severity(
     multiaxial_diagnosis = MultiaxialDiagnosis.objects.get(pk=multiaxial_diagnosis_id)
 
     context = {
+        "can_edit": can_edit,
         "multiaxial_diagnosis": multiaxial_diagnosis,
         "mental_health_issues_choices": NEUROPSYCHIATRIC,
         "global_developmental_delay_or_learning_difficulties_severity_choices": SEVERITY,
@@ -1990,7 +2021,7 @@ def global_developmental_delay_or_learning_difficulties_severity(
 @login_and_otp_required()
 @user_may_view_this_child()
 @permission_required("epilepsy12.change_multiaxialdiagnosis", raise_exception=True)
-def autistic_spectrum_disorder(request, multiaxial_diagnosis_id):
+def autistic_spectrum_disorder(request, can_edit, multiaxial_diagnosis_id):
     """
     POST callback from autistic_spectrum_disorder multiple toggle
     """
@@ -2009,6 +2040,7 @@ def autistic_spectrum_disorder(request, multiaxial_diagnosis_id):
     multiaxial_diagnosis = MultiaxialDiagnosis.objects.get(pk=multiaxial_diagnosis_id)
 
     context = {
+        "can_edit": can_edit,
         "multiaxial_diagnosis": multiaxial_diagnosis,
         "mental_health_issues_choices": NEUROPSYCHIATRIC,
         "global_developmental_delay_or_learning_difficulties_severity_choices": SEVERITY,

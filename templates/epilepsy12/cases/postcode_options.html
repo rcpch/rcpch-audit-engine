@@ -16,7 +16,8 @@
         </label>
         <button
             style="margin-top: 1.5em;"
-            class="ui large rcpch_primary button"
+            class="ui large rcpch_primary button{% if not can_edit %} disabled{% endif %}"
+            {% if not can_edit %}disabled{% endif %}
             _="on click 
               halt the event then 
               set id_postcode.value to '' then
@@ -30,7 +31,8 @@
     <div class="row">
         <button 
           id="add_postcode" 
-          class="ui rcpch_primary button"
+          class="ui rcpch_primary button{% if not can_edit %} disabled{% endif %}"
+          {% if not can_edit %}disabled{% endif %}
           _="on click 
             halt the event then 
             set id_postcode.value to '' then

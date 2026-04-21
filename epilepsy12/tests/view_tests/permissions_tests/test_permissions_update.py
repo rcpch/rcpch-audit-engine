@@ -696,6 +696,7 @@ def test_users_update_cases_forbidden(
     CASE_FROM_DIFF_ORG = e12_case_factory(
         first_name=f"child_{DIFF_TRUST_DIFF_ORGANISATION.name}",
         organisations__organisation=DIFF_TRUST_DIFF_ORGANISATION,
+        registration__first_paediatric_assessment_date=date.today(),
     )
 
     user_first_names_for_test = [
@@ -756,6 +757,7 @@ def test_users_update_cases_success(
     CASE_FROM_SAME_ORG = e12_case_factory(
         first_name=f"child_{TEST_USER_ORGANISATION.name}",
         organisations__organisation=TEST_USER_ORGANISATION,
+        registration__first_paediatric_assessment_date=date.today(),
     )
 
     users = Epilepsy12User.objects.filter(
@@ -817,6 +819,7 @@ def test_users_update_first_paediatric_assessment_forbidden(client, e12_case_fac
     CASE_FROM_DIFF_ORG = e12_case_factory(
         first_name=f"child_{DIFF_TRUST_DIFF_ORGANISATION.name}",
         organisations__organisation=DIFF_TRUST_DIFF_ORGANISATION,
+        registration__first_paediatric_assessment_date=date.today(),
     )
 
     user_first_names_for_test = [
@@ -882,6 +885,7 @@ def test_users_update_first_paediatric_assessment_success(client, e12_case_facto
     CASE_FROM_SAME_ORG = e12_case_factory(
         first_name=f"child_{TEST_USER_ORGANISATION.name}",
         organisations__organisation=TEST_USER_ORGANISATION,
+        registration__first_paediatric_assessment_date=date.today(),
     )
 
     user_first_names_for_test = [
@@ -968,6 +972,7 @@ def test_users_update_first_epilepsy_context_forbidden(client, e12_case_factory)
     CASE_FROM_DIFF_ORG = e12_case_factory(
         first_name=f"child_{DIFF_TRUST_DIFF_ORGANISATION.name}",
         organisations__organisation=DIFF_TRUST_DIFF_ORGANISATION,
+        registration__first_paediatric_assessment_date=date.today(),
     )
 
     user_first_names_for_test = [
@@ -1035,6 +1040,7 @@ def test_users_update_epilepsy_context_success(client, e12_case_factory):
     CASE_FROM_SAME_ORG = e12_case_factory(
         first_name=f"child_{TEST_USER_ORGANISATION.name}",
         organisations__organisation=TEST_USER_ORGANISATION,
+        registration__first_paediatric_assessment_date=date.today(),
     )
 
     user_first_names_for_test = [
@@ -1132,6 +1138,7 @@ def test_users_update_first_multiaxial_diagnosis_forbidden(client, e12_case_fact
     CASE_FROM_DIFF_ORG = e12_case_factory(
         first_name=f"child_{DIFF_TRUST_DIFF_ORGANISATION.name}",
         organisations__organisation=DIFF_TRUST_DIFF_ORGANISATION,
+        registration__first_paediatric_assessment_date=date.today(),
     )
 
     user_first_names_for_test = [
@@ -1200,6 +1207,7 @@ def test_users_update_multiaxial_diagnosis_success(client, e12_case_factory):
     CASE_FROM_SAME_ORG = e12_case_factory(
         first_name=f"child_{TEST_USER_ORGANISATION.name}",
         organisations__organisation=TEST_USER_ORGANISATION,
+        registration__first_paediatric_assessment_date=date.today(),
     )
 
     user_first_names_for_test = [
@@ -1321,6 +1329,7 @@ def test_update_multiaxial_diagnosis_cause_success(client, e12_case_factory):
     CASE_FROM_SAME_ORG = e12_case_factory(
         first_name=f"child_{TEST_USER_ORGANISATION.name}",
         organisations__organisation=TEST_USER_ORGANISATION,
+        registration__first_paediatric_assessment_date=date.today(),
     )
 
     user_first_names_for_test = [
@@ -1413,6 +1422,7 @@ def test_users_update_episode_forbidden(client, e12_case_factory):
     CASE_FROM_DIFF_ORG = e12_case_factory(
         first_name=f"child_{DIFF_TRUST_DIFF_ORGANISATION.name}",
         organisations__organisation=DIFF_TRUST_DIFF_ORGANISATION,
+        registration__first_paediatric_assessment_date=date.today(),
     )
 
     user_first_names_for_test = [
@@ -1502,6 +1512,7 @@ def test_users_update_episode_success(client, e12_case_factory):
     CASE_FROM_SAME_ORG = e12_case_factory(
         first_name=f"child_{TEST_USER_ORGANISATION.name}",
         organisations__organisation=TEST_USER_ORGANISATION,
+        registration__first_paediatric_assessment_date=date.today(),
     )
 
     user_first_names_for_test = [
@@ -1687,6 +1698,7 @@ def test_users_update_comorbidity_forbidden(client, e12_case_factory):
     CASE_FROM_DIFF_ORG = e12_case_factory(
         first_name=f"child_{DIFF_TRUST_DIFF_ORGANISATION.name}",
         organisations__organisation=DIFF_TRUST_DIFF_ORGANISATION,
+        registration__first_paediatric_assessment_date=date.today(),
     )
 
     user_first_names_for_test = [
@@ -1769,6 +1781,7 @@ def test_users_update_comorbidity_success(client, e12_case_factory):
     CASE_FROM_SAME_ORG = e12_case_factory(
         first_name=f"child_{TEST_USER_ORGANISATION.name}",
         organisations__organisation=TEST_USER_ORGANISATION,
+        registration__first_paediatric_assessment_date=date.today(),
     )
 
     user_first_names_for_test = [
@@ -1858,6 +1871,7 @@ def test_users_update_assessment_forbidden(client, e12_case_factory):
     CASE_FROM_DIFF_ORG = e12_case_factory(
         first_name=f"child_{DIFF_TRUST_DIFF_ORGANISATION.name}",
         organisations__organisation=DIFF_TRUST_DIFF_ORGANISATION,
+        registration__first_paediatric_assessment_date=date.today(),
     )
 
     user_first_names_for_test = [
@@ -2055,6 +2069,7 @@ def test_users_update_assessment_success(client, e12_case_factory):
     CASE_FROM_SAME_ORG = e12_case_factory(
         first_name=f"child_{TEST_USER_ORGANISATION.name}",
         organisations__organisation=TEST_USER_ORGANISATION,
+        registration__first_paediatric_assessment_date=date.today(),
     )
 
     user_first_names_for_test = [
@@ -2260,6 +2275,7 @@ def test_users_update_investigations_forbidden(client, e12_case_factory):
     CASE_FROM_DIFF_ORG = e12_case_factory(
         first_name=f"child_{DIFF_TRUST_DIFF_ORGANISATION.name}",
         organisations__organisation=DIFF_TRUST_DIFF_ORGANISATION,
+        registration__first_paediatric_assessment_date=date.today(),
     )
 
     user_first_names_for_test = [
@@ -2385,6 +2401,7 @@ def test_users_update_investigations_success(client, e12_case_factory):
     CASE_FROM_SAME_ORG = e12_case_factory(
         first_name=f"child_{TEST_USER_ORGANISATION.name}",
         organisations__organisation=TEST_USER_ORGANISATION,
+        registration__first_paediatric_assessment_date=date.today(),
     )
 
     user_first_names_for_test = [
@@ -2517,6 +2534,7 @@ def test_users_update_management_forbidden(client, e12_case_factory):
     CASE_FROM_DIFFERENT_ORG = e12_case_factory(
         first_name=f"child_{DIFF_TRUST_DIFF_ORGANISATION.name}",
         organisations__organisation=DIFF_TRUST_DIFF_ORGANISATION,
+        registration__first_paediatric_assessment_date=date.today(),
     )
 
     user_first_names_for_test = [
@@ -2608,6 +2626,7 @@ def test_users_update_management_success(client, e12_case_factory):
     CASE_FROM_SAME_ORG = e12_case_factory(
         first_name=f"child_{TEST_USER_ORGANISATION.name}",
         organisations__organisation=TEST_USER_ORGANISATION,
+        registration__first_paediatric_assessment_date=date.today(),
     )
 
     user_first_names_for_test = [
@@ -2706,6 +2725,7 @@ def test_users_update_antiepilepsymedicine_forbidden(client, e12_case_factory):
     CASE_FROM_DIFFERENT_ORG = e12_case_factory(
         first_name=f"child_{DIFF_TRUST_DIFF_ORGANISATION.name}",
         organisations__organisation=DIFF_TRUST_DIFF_ORGANISATION,
+        registration__first_paediatric_assessment_date=date.today(),
     )
 
     user_first_names_for_test = [
@@ -2828,6 +2848,7 @@ def test_users_update_antiepilepsymedicine_success(client, e12_case_factory):
     CASE_FROM_SAME_ORG = e12_case_factory(
         first_name=f"child_{TEST_USER_ORGANISATION.name}",
         organisations__organisation=TEST_USER_ORGANISATION,
+        registration__first_paediatric_assessment_date=date.today(),
     )
 
     user_first_names_for_test = [

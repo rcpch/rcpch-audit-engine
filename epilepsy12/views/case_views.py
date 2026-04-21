@@ -482,7 +482,7 @@ def case_statistics(request, organisation_id):
 @permission_required(
     "epilepsy12.can_transfer_epilepsy12_lead_centre", raise_exception=True
 )
-def transfer_response(request, organisation_id, case_id, organisation_response):
+def transfer_response(request, can_edit, organisation_id, case_id, organisation_response):
     """
     POST callback from case table on click of accept/reject buttons against transfer request
     Updates associated Site instance and redirects back to case table
@@ -630,7 +630,7 @@ def transfer_response(request, organisation_id, case_id, organisation_response):
 @permission_required(
     "epilepsy12.change_case",
 )
-def case_submit(request, organisation_id, case_id):
+def case_submit(request, can_edit, organisation_id, case_id):
     """
     POST request callback from submit button in case_list partial.
     Disables further editing of case information. Case considered submitted
@@ -657,7 +657,7 @@ def case_submit(request, organisation_id, case_id):
 @login_and_otp_required()
 @user_may_view_this_child()
 @permission_required("epilepsy12.view_case")
-def case_performance_summary(request, case_id):
+def case_performance_summary(request, can_edit, case_id):
     case = Case.objects.get(pk=case_id)
     site = Site.objects.filter(
         site_is_actively_involved_in_epilepsy_care=True,
@@ -667,6 +667,7 @@ def case_performance_summary(request, case_id):
     organisation_id = site.organisation.pk
 
     context = {
+        "can_edit": can_edit,
         "case": case,
         "case_id": case.pk,
         "active_template": "case_performance_summary",
@@ -754,6 +755,7 @@ def create_case(request, organisation_id):
         "form": form,
         "choices": choices,
         "child_has_unknown_postcode": False,
+        "can_edit": True,  # Always allow editing when creating a new case
     }
     return render(request=request, template_name=template_name, context=context)
 
@@ -762,13 +764,13 @@ def create_case(request, organisation_id):
 @user_may_view_this_child()
 @user_may_view_this_organisation()
 @permission_required("epilepsy12.change_case", raise_exception=True)
-def update_case(request, organisation_id, case_id):
+def update_case(request, can_edit, organisation_id, case_id):
     """
     Django function based view. Receives POST request to update view or delete
     """
     organisation = Organisation.objects.filter(pk=organisation_id, active=True).get()
     case = get_object_or_404(Case, pk=case_id)
-    form = CaseForm(instance=case, organisation_id=organisation_id)
+    form = CaseForm(instance=case, organisation_id=organisation_id, can_edit=can_edit)
 
     # set select boxes for situations when postcode unknown
     country_choice = (
@@ -800,7 +802,7 @@ def update_case(request, organisation_id, case_id):
         return HttpResponseClientRedirect(redirect_to=url, status=200)
 
     if request.method == "POST":
-        form = CaseForm(request.POST, instance=case, organisation_id=organisation_id)
+        form = CaseForm(request.POST, instance=case, organisation_id=organisation_id, can_edit=can_edit)
         if form.is_valid():
             obj = form.save()
             if case.locked != obj.locked:
@@ -824,6 +826,7 @@ def update_case(request, organisation_id, case_id):
         test_positive = case.postcode
 
     context = {
+        "can_edit": can_edit,
         "organisation_id": organisation_id,
         "organisation": organisation,
         "form": form,
@@ -875,7 +878,7 @@ def unknown_postcode(request, organisation_id):
 @permission_required(
     "epilepsy12.can_opt_out_child_from_inclusion_in_audit", raise_exception=True
 )
-def opt_out(request, organisation_id, case_id):
+def opt_out(request, can_edit, organisation_id, case_id):
     """
     This child has opted out of Epilepsy12
     Their unique E12 ID will be retained but all associated fields will be set to None, and associated records deleted except their
@@ -927,7 +930,7 @@ def opt_out(request, organisation_id, case_id):
 @permission_required(
     "epilepsy12.can_consent_to_audit_participation", raise_exception=True
 )
-def consent(request, case_id):
+def consent(request, can_edit, case_id):
     case = Case.objects.get(pk=case_id)
     site = Site.objects.filter(
         site_is_actively_involved_in_epilepsy_care=True,
@@ -937,6 +940,7 @@ def consent(request, case_id):
     organisation_id = site.organisation.pk
 
     context = {
+        "can_edit": can_edit,
         "case": case,
         "case_id": case.pk,
         "active_template": "consent",
@@ -961,7 +965,7 @@ def consent(request, case_id):
 @permission_required(
     "epilepsy12.can_consent_to_audit_participation", raise_exception=True
 )
-def consent_confirmation(request, case_id, consent_type):
+def consent_confirmation(request, can_edit, case_id, consent_type):
     """
     POST request on click of confirm button in patient_confirmation.html template
     params: consent_type is one of 'consent', 'denied'
@@ -994,6 +998,7 @@ def consent_confirmation(request, case_id, consent_type):
         case = Case.objects.get(pk=case_id)
 
     context = {
+        "can_edit": can_edit,
         "case": case,
         "case_id": case.pk,
         "active_template": "consent",

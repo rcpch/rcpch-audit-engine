@@ -28,7 +28,10 @@ from ..common_view_functions import (
     validate_and_update_model,
     recalculate_form_generate_response,
 )
-from ..decorator import user_may_view_this_child, login_and_otp_required
+from ..decorator import (
+    user_may_view_this_child, 
+    login_and_otp_required
+)
 from ..general_functions import (
     construct_transfer_epilepsy12_site_email,
     cohorts_and_dates,
@@ -39,7 +42,7 @@ from ..general_functions import (
 @login_and_otp_required()
 @permission_required("epilepsy12.view_registration", raise_exception=True)
 @user_may_view_this_child()
-def register(request, case_id):
+def register(request, can_edit, case_id):
     """
     Called on registration form page load. If first time, creates new Registration object KPI object and
     AuditProgress object. Creates a new Site with selected organisation and associates with this case.
@@ -152,7 +155,7 @@ def register(request, case_id):
         "active_template": active_template,
         # pass back organisation_id to steps for return to cases button
         "organisation_id": lead_site.organisation.pk,
-        "field_enabled": False,
+        "can_edit": can_edit and request.user.has_perm("epilepsy12.change_registration"),
     }
 
     template_name = "epilepsy12/register.html"
@@ -178,7 +181,7 @@ Lead site allocation, deletion, updating and transfer
 @login_and_otp_required()
 @user_may_view_this_child()
 @permission_required("epilepsy12.can_edit_epilepsy12_lead_centre", raise_exception=True)
-def allocate_lead_site(request, registration_id):
+def allocate_lead_site(request, can_edit, registration_id):
     """
     Allocate site when none have been assigned
     """
@@ -236,6 +239,7 @@ def allocate_lead_site(request, registration_id):
     organisation_list = Organisation.objects.get_organisation_list()
 
     context = {
+        "can_edit": can_edit,
         "organisation_list": organisation_list,
         "registration": registration,
         "site": site,
@@ -260,7 +264,7 @@ def allocate_lead_site(request, registration_id):
 @permission_required(
     "epilepsy12.can_transfer_epilepsy12_lead_centre", raise_exception=True
 )
-def transfer_lead_site(request, registration_id, site_id):
+def transfer_lead_site(request, can_edit, registration_id, site_id):
     """
     POST request from lead_site.html on click of transfer lead centre button
     Does not update model
@@ -274,6 +278,7 @@ def transfer_lead_site(request, registration_id, site_id):
     organisation_list = Organisation.objects.get_organisation_list(exclude_pk=site.organisation.pk)
 
     context = {
+        "can_edit": can_edit,
         "organisation_list": organisation_list,
         "registration": registration,
         "site": site,
@@ -299,12 +304,13 @@ def transfer_lead_site(request, registration_id, site_id):
 @login_and_otp_required()
 @user_may_view_this_child()
 @permission_required("epilepsy12.view_registration", raise_exception=True)
-def cancel_lead_site(request, registration_id, site_id):
+def cancel_lead_site(request, can_edit, registration_id, site_id):
     registration = Registration.objects.get(pk=registration_id)
     site = Site.objects.get(pk=site_id)
     organisation_list = Organisation.objects.get_organisation_list()
 
     context = {
+        "can_edit": can_edit,
         "registration": registration,
         "site": site,
         "edit": False,
@@ -329,7 +335,7 @@ def cancel_lead_site(request, registration_id, site_id):
 @permission_required(
     "epilepsy12.can_transfer_epilepsy12_lead_centre", raise_exception=True
 )
-def update_lead_site(request, registration_id, site_id, update):
+def update_lead_site(request, can_edit, registration_id, site_id, update):
     """
     HTMX POST request on button click from the lead_site partial
     If the update parameter is 'transfer',
@@ -484,7 +490,7 @@ def update_lead_site(request, registration_id, site_id, update):
 @login_and_otp_required()
 @user_may_view_this_child()
 @permission_required("epilepsy12.view_registration", raise_exception=True)
-def previous_sites(request, registration_id):
+def previous_sites(request, can_edit, registration_id):
     registration = Registration.objects.get(pk=registration_id)
     previous_sites = Site.objects.filter(
         case=registration.case,
@@ -493,6 +499,7 @@ def previous_sites(request, registration_id):
     )
 
     context = {
+        "can_edit": can_edit,
         "previously_registered_sites": previous_sites,
         "registration": registration,
     }
@@ -519,7 +526,7 @@ Validation process
 @permission_required(
     "epilepsy12.can_register_child_in_epilepsy12", raise_exception=True
 )
-def confirm_eligible(request, registration_id):
+def confirm_eligible(request, can_edit, registration_id):
     """
     HTMX POST request on button press in registration_form confirming child
     meets eligibility criteria of the audit.
@@ -528,6 +535,7 @@ def confirm_eligible(request, registration_id):
     eligibility. The button will not be shown again.
     """
     context = {
+        "can_edit": can_edit,
         "has_error": False,
         "message": "Eligibility Criteria Confirmed.",
         "is_positive": True,
@@ -537,7 +545,7 @@ def confirm_eligible(request, registration_id):
             pk=registration_id, defaults={"eligibility_criteria_met": True}
         )
     except Exception as error:
-        context = {"has_error": True, "message": error, "is_positive": False}
+        context = {"can_edit": can_edit, "has_error": True, "message": error, "is_positive": False}
 
     registration = Registration.objects.filter(pk=registration_id).get()
 
@@ -567,11 +575,11 @@ def confirm_eligible(request, registration_id):
 @login_and_otp_required()
 @user_may_view_this_child()
 @permission_required("epilepsy12.change_registration", raise_exception=True)
-def registration_status(request, registration_id):
+def registration_status(request, can_edit, registration_id):
     registration = Registration.objects.get(pk=registration_id)
     case = registration.case
 
-    context = {"case_id": case.pk, "registration": registration}
+    context = {"can_edit": can_edit, "case_id": case.pk, "registration": registration}
 
     template_name = "epilepsy12/partials/registration/registration_dates.html"
 
@@ -590,7 +598,7 @@ def registration_status(request, registration_id):
 @permission_required(
     "epilepsy12.can_register_child_in_epilepsy12", raise_exception=True
 )
-def first_paediatric_assessment_date(request, case_id):
+def first_paediatric_assessment_date(request, can_edit, case_id):
     """
     This defines registration in the audit and refers to the date of first paediatric assessment.
     Call back from POST request on button press of register button
@@ -630,7 +638,7 @@ def first_paediatric_assessment_date(request, case_id):
     # requery to get most up to date instance
     registration = Registration.objects.filter(case=case).get()
 
-    context = {"case_id": case_id, "registration": registration}
+    context = {"can_edit": can_edit, "case_id": case_id, "registration": registration}
 
     template_name = "epilepsy12/partials/registration/registration_dates.html"
 

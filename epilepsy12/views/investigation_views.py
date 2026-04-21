@@ -12,7 +12,7 @@ from ..decorator import user_may_view_this_child, login_and_otp_required
 @login_and_otp_required()
 @permission_required("epilepsy12.view_investigations", raise_exception=True)
 @user_may_view_this_child()
-def investigations(request, case_id):
+def investigations(request, can_edit, case_id):
     registration = Registration.objects.filter(case=case_id).first()
 
     investigations, created = Investigations.objects.get_or_create(
@@ -37,6 +37,7 @@ def investigations(request, case_id):
         mri_brain_declined = False
 
     context = {
+        "can_edit": can_edit and request.user.has_perm("epilepsy12.change_investigations"),
         "case_id": case_id,
         "registration": registration,
         "investigations": investigations,
@@ -63,7 +64,7 @@ def investigations(request, case_id):
 @login_and_otp_required()
 @user_may_view_this_child()
 @permission_required("epilepsy12.change_investigations", raise_exception=True)
-def eeg_indicated(request, investigations_id):
+def eeg_indicated(request, can_edit, investigations_id):
     """
     This is an HTMX callback from the eeg_information.html partial template
     It is triggered by a toggle in the partial generating a post request
@@ -98,7 +99,7 @@ def eeg_indicated(request, investigations_id):
     else:
         eeg_declined = False
 
-    context = {"investigations": investigations, "eeg_declined": eeg_declined}
+    context = {"can_edit": can_edit, "investigations": investigations, "eeg_declined": eeg_declined}
 
     template_name = "epilepsy12/partials/investigations/eeg_information.html"
 
@@ -116,7 +117,7 @@ def eeg_indicated(request, investigations_id):
 @login_and_otp_required()
 @user_may_view_this_child()
 @permission_required("epilepsy12.change_investigations", raise_exception=True)
-def eeg_request_date(request, investigations_id):
+def eeg_request_date(request, can_edit, investigations_id):
     """
     This is an HTMX callback from the ecg_information.html partial template
     which contains fields on eeg_indicated, eeg_request_date and eeg_performed_date.
@@ -150,7 +151,7 @@ def eeg_request_date(request, investigations_id):
     else:
         eeg_declined = False
 
-    context = {"investigations": investigations, "eeg_declined": eeg_declined}
+    context = {"can_edit": can_edit, "investigations": investigations, "eeg_declined": eeg_declined}
 
     response = recalculate_form_generate_response(
         model_instance=investigations,
@@ -166,7 +167,7 @@ def eeg_request_date(request, investigations_id):
 @login_and_otp_required()
 @user_may_view_this_child()
 @permission_required("epilepsy12.change_investigations", raise_exception=True)
-def eeg_performed_date(request, investigations_id):
+def eeg_performed_date(request, can_edit, investigations_id):
     """
     This is an HTMX callback from the ecg_information.html partial template
     which contains fields on eeg_indicated, eeg_request_date and eeg_performed_date.
@@ -199,7 +200,7 @@ def eeg_performed_date(request, investigations_id):
     else:
         eeg_declined = False
 
-    context = {"investigations": investigations, "eeg_declined": eeg_declined}
+    context = {"can_edit": can_edit, "investigations": investigations, "eeg_declined": eeg_declined}
 
     template_name = "epilepsy12/partials/investigations/eeg_information.html"
 
@@ -217,7 +218,7 @@ def eeg_performed_date(request, investigations_id):
 @login_and_otp_required()
 @user_may_view_this_child()
 @permission_required("epilepsy12.change_investigations", raise_exception=True)
-def eeg_declined(request, investigations_id, confirm):
+def eeg_declined(request, can_edit, investigations_id, confirm):
     """
     This is an HTMX callback from the ecg_information.html partial template
     which contains fields on eeg_indicated, eeg_request_date and eeg_performed_date.
@@ -244,7 +245,7 @@ def eeg_declined(request, investigations_id, confirm):
 
     investigations.save()
 
-    context = {"investigations": investigations, "eeg_declined": eeg_declined}
+    context = {"can_edit": can_edit, "investigations": investigations, "eeg_declined": eeg_declined}
 
     template_name = "epilepsy12/partials/investigations/eeg_information.html"
 
@@ -262,7 +263,7 @@ def eeg_declined(request, investigations_id, confirm):
 @login_and_otp_required()
 @user_may_view_this_child()
 @permission_required("epilepsy12.change_investigations", raise_exception=True)
-def twelve_lead_ecg_status(request, investigations_id):
+def twelve_lead_ecg_status(request, can_edit, investigations_id):
     """
     This is an HTMX callback from the ecg_status.html partial template
     It is triggered by a toggle in the partial generating a post request
@@ -285,7 +286,7 @@ def twelve_lead_ecg_status(request, investigations_id):
 
     investigations = Investigations.objects.get(pk=investigations_id)
 
-    context = {"investigations": investigations}
+    context = {"can_edit": can_edit, "investigations": investigations}
 
     template_name = "epilepsy12/partials/investigations/ecg_status.html"
 
@@ -303,7 +304,7 @@ def twelve_lead_ecg_status(request, investigations_id):
 @login_and_otp_required()
 @user_may_view_this_child()
 @permission_required("epilepsy12.change_investigations", raise_exception=True)
-def ct_head_scan_status(request, investigations_id):
+def ct_head_scan_status(request, can_edit, investigations_id):
     """
     This is an HTMX callback from the ct_head_status.html partial template
     It is triggered by a toggle in the partial generating a post request
@@ -326,7 +327,7 @@ def ct_head_scan_status(request, investigations_id):
 
     investigations = Investigations.objects.get(pk=investigations_id)
 
-    context = {"investigations": investigations}
+    context = {"can_edit": can_edit, "investigations": investigations}
 
     template_name = "epilepsy12/partials/investigations/ct_head_status.html"
 
@@ -344,7 +345,7 @@ def ct_head_scan_status(request, investigations_id):
 @login_and_otp_required()
 @user_may_view_this_child()
 @permission_required("epilepsy12.change_investigations", raise_exception=True)
-def mri_indicated(request, investigations_id):
+def mri_indicated(request, can_edit, investigations_id):
     """
     This is an HTMX callback from the mri_brain_information.html partial template
     It is triggered by a toggle in the partial generating a post request
@@ -381,6 +382,7 @@ def mri_indicated(request, investigations_id):
         mri_brain_declined = False
 
     context = {
+        "can_edit": can_edit,
         "investigations": investigations,
         "mri_brain_declined": mri_brain_declined,
     }
@@ -401,7 +403,7 @@ def mri_indicated(request, investigations_id):
 @login_and_otp_required()
 @user_may_view_this_child()
 @permission_required("epilepsy12.change_investigations", raise_exception=True)
-def mri_brain_requested_date(request, investigations_id):
+def mri_brain_requested_date(request, can_edit, investigations_id):
     """
     This is an HTMX callback from the mri_brain_information.html partial template
     It is triggered by a change in the date_input_field partial generating a post request
@@ -433,6 +435,7 @@ def mri_brain_requested_date(request, investigations_id):
         mri_brain_declined = False
 
     context = {
+        "can_edit": can_edit,
         "investigations": investigations,
         "mri_brain_declined": mri_brain_declined,
     }
@@ -453,7 +456,7 @@ def mri_brain_requested_date(request, investigations_id):
 @login_and_otp_required()
 @user_may_view_this_child()
 @permission_required("epilepsy12.change_investigations", raise_exception=True)
-def mri_brain_reported_date(request, investigations_id):
+def mri_brain_reported_date(request, can_edit, investigations_id):
     """
     This is an HTMX callback from the mri_brain_information.html partial template
     It is triggered by a change in the date_input_field partial generating a post request
@@ -485,6 +488,7 @@ def mri_brain_reported_date(request, investigations_id):
         mri_brain_declined = False
 
     context = {
+        "can_edit": can_edit,
         "investigations": investigations,
         "mri_brain_declined": mri_brain_declined,
     }
@@ -505,7 +509,7 @@ def mri_brain_reported_date(request, investigations_id):
 @login_and_otp_required()
 @user_may_view_this_child()
 @permission_required("epilepsy12.change_investigations", raise_exception=True)
-def mri_brain_declined(request, investigations_id, confirm):
+def mri_brain_declined(request, can_edit, investigations_id, confirm):
     """
     This is an HTMX callback from the mri_brain_information.html partial template
     which contains fields on mri_indicated, mri_request_date and mri_performed_date.
@@ -537,6 +541,7 @@ def mri_brain_declined(request, investigations_id, confirm):
         mri_brain_declined = False
 
     context = {
+        "can_edit": can_edit,
         "investigations": investigations,
         "mri_brain_declined": mri_brain_declined,
     }
