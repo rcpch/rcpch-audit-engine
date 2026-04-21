@@ -755,6 +755,7 @@ def create_case(request, organisation_id):
         "form": form,
         "choices": choices,
         "child_has_unknown_postcode": False,
+        "can_edit": True,  # Always allow editing when creating a new case
     }
     return render(request=request, template_name=template_name, context=context)
 
@@ -769,7 +770,7 @@ def update_case(request, can_edit, organisation_id, case_id):
     """
     organisation = Organisation.objects.filter(pk=organisation_id, active=True).get()
     case = get_object_or_404(Case, pk=case_id)
-    form = CaseForm(instance=case, organisation_id=organisation_id)
+    form = CaseForm(instance=case, organisation_id=organisation_id, can_edit=can_edit)
 
     # set select boxes for situations when postcode unknown
     country_choice = (
@@ -801,7 +802,7 @@ def update_case(request, can_edit, organisation_id, case_id):
         return HttpResponseClientRedirect(redirect_to=url, status=200)
 
     if request.method == "POST":
-        form = CaseForm(request.POST, instance=case, organisation_id=organisation_id)
+        form = CaseForm(request.POST, instance=case, organisation_id=organisation_id, can_edit=can_edit)
         if form.is_valid():
             obj = form.save()
             if case.locked != obj.locked:

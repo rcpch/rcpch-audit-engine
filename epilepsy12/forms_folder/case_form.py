@@ -87,6 +87,7 @@ class CaseForm(forms.ModelForm):
         self.organisation_id = kwargs.pop(
             "organisation_id", None
         )  # This is the organisation_id
+        can_edit = kwargs.pop("can_edit", True)  # Default to True if not provided
 
         # set a flag to check if this is Jersey
         self.is_jersey = (
@@ -98,6 +99,13 @@ class CaseForm(forms.ModelForm):
         super(CaseForm, self).__init__(*args, **kwargs)
         self.existing_nhs_number = self.instance.nhs_number
         self.fields["ethnicity"].widget.attrs.update({"class": "ui rcpch dropdown"})
+        
+        # Disable all fields if user cannot edit
+        if not can_edit:
+            for field_name, field in self.fields.items():
+                field.widget.attrs['disabled'] = True
+                field.widget.attrs['readonly'] = True
+        
         if self.is_jersey:
             # this is Jersey - hide the NHS number field
             self.fields["nhs_number"].widget = forms.HiddenInput()
