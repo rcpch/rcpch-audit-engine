@@ -226,6 +226,10 @@ def user_may_view_organisational_audit(parent_model, parent_type):
 
 
 def lookup_child_if_user_has_permission(request_kwargs, user):
+    # Guard against users with no active primary employer
+    if not user.organisation_employer:
+        return None
+    
     via_registration = lambda obj: obj.registration.case
     via_multiaxial_dagnosis = lambda obj: obj.multiaxial_diagnosis.registration.case
     via_management = lambda obj: obj.management.registration.case
@@ -258,6 +262,7 @@ def lookup_child_if_user_has_permission(request_kwargs, user):
                 "patient_sites__site_is_primary_centre_of_epilepsy_care": True,
                 # Access is sliced by trust - so members of other organisations in that trust can see data
                 "trust": user.organisation_employer.trust,
+                "active": True,
             }
 
             if Organisation.objects.filter(**org_filters).exists():
@@ -268,10 +273,18 @@ def lookup_user_permissions_on_child(request, request_kwargs):
     # Lookup sub object by id and walk backwards to case.
     # Access is granted only to users who are either:
     # 1. superusers
-    # 2. Active RCPCH audit members
-    # 3. Active trust level users where their trust is the same as the child
+    # 2. Active RCPCH audit members with confirmed email
+    # 3. Active trust level users with confirmed email where their trust is the same as the child
     # Editing is allowed if the cohort is still open or if you are an RCPCH audit member
     user = request.user
+    
+    # Check user is active and has confirmed their email (unless superuser)
+    if not user.is_superuser and not (user.is_active and user.email_confirmed):
+        return {
+            "can_view": False,
+            "can_edit": False,
+        }
+    
     is_admin = user.is_rcpch_audit_team_member or user.is_rcpch_staff or user.is_superuser
 
     if is_admin:
