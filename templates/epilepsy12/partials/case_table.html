@@ -133,21 +133,28 @@
           <td class='two wide'>
             <div class='ui buttons'>
               <button 
-                data-tooltip='Edit or delete child.'
+                {% if case.editable or request.user.is_superuser or request.user.is_rcpch_audit_team_member %}
+                  data-tooltip='Edit or delete child.'
+                {% else %}
+                  data-tooltip='View child details.'
+                {% endif %}
                 class="ui rcpch_purple icon button"
                 tabindexed="0"
-                {% if not perms.epilepsy12.change_case or not case.editable and not request.user.is_rcpch_audit_team_member %}disabled{% endif %}>
+                {% if not perms.epilepsy12.change_case %}disabled{% endif %}>
                 <a href="{% url 'update_case' organisation_id=organisation_id case_id=case.id%}" class="rcpch_purple half_button">
-                  <i class="edit outline icon icon_white"></i>
-                  Edit
+                  <i class="{% if case.editable or request.user.is_superuser or request.user.is_rcpch_audit_team_member %}edit outline{% else %}eye{% endif %} icon icon_white"></i>
+                  {% if case.editable or request.user.is_superuser or request.user.is_rcpch_audit_team_member %}Edit{% else %}View{% endif %}
                 </a>
               </button>
               <button 
-                  data-tooltip='Complete audit details.'
+                  {% if case.editable or request.user.is_superuser or request.user.is_rcpch_audit_team_member %}
+                    data-tooltip='Complete audit details.'
+                  {% else %}
+                    data-tooltip='View audit details.'
+                  {% endif %}
                   class="ui rcpch_dark_purple button" 
                   tabindexed="2" 
                   onclick="location.href='{% url 'register'  case.id %}'"
-                  {% if not case.editable and not request.user.is_rcpch_audit_team_member %} disabled {% endif %}
                 >Audit</button>
             </div>
 
