@@ -462,9 +462,7 @@ def _send_admin_notification(user, changes, current_user):
     try:
         if settings.CHANGE_NOTIFICATION_EMAILS:
             send_email_to_recipients(
-                recipients=settings.CHANGE_NOTIFICATION_EMAILS,
-                subject=subject,
-                message=message,
+                recipients=settings.CHANGE_NOTIFICATION_EMAILS, subject=subject, message=message
             )
             logger.info(f"Admin notification sent for user changes: {user.email}")
     except Exception as e:
@@ -488,9 +486,7 @@ def _send_user_creation_notification(user, current_user):
     try:
         if settings.CHANGE_NOTIFICATION_EMAILS:
             send_email_to_recipients(
-                recipients=settings.CHANGE_NOTIFICATION_EMAILS,
-                subject=subject,
-                message=message,
+                recipients=settings.CHANGE_NOTIFICATION_EMAILS, subject=subject, message=message
             )
             logger.info(f"User creation notification sent for: {user.email}")
     except Exception as e:
@@ -572,80 +568,10 @@ def _send_employer_assignment_notification(
     try:
         if settings.CHANGE_NOTIFICATION_EMAILS:
             send_email_to_recipients(
-                recipients=settings.CHANGE_NOTIFICATION_EMAILS,
-                subject=subject,
-                message=message,
+                recipients=settings.CHANGE_NOTIFICATION_EMAILS, subject=subject, message=message
             )
             logger.info(f"Employer assignment notification sent for: {user.email}")
     except Exception as e:
         logger.error(
             f"Failed to send Employer assignment notification for user {user.email}: {e}"
         )
-
-
-# ── IMD recalculation signals ─────────────────────────────────────────────────
-# IMD is computed in one place (recalculate_imd_for_case) and triggered by
-# two events: the postcode on Case changing, or the cohort-determining
-# first_paediatric_assessment_date on Registration changing.
-
-
-def _normalise_postcode(postcode: str | None) -> str | None:
-    """Return a space/dash/case-normalised postcode, or None."""
-    if postcode is None:
-        return None
-    return postcode.replace(" ", "").replace("-", "").upper()
-
-
-@receiver(pre_save, sender="epilepsy12.Case")
-def _capture_case_postcode(sender, instance, **kwargs):
-    """Store the current DB postcode before save so we can detect changes."""
-    if instance.pk:
-        try:
-            instance._original_postcode = sender.objects.get(pk=instance.pk).postcode
-        except sender.DoesNotExist:
-            instance._original_postcode = None
-    else:
-        instance._original_postcode = None
-
-
-@receiver(post_save, sender="epilepsy12.Case")
-def _recalculate_imd_on_case_save(sender, instance, created, **kwargs):
-    """Trigger IMD recalculation when the postcode has changed."""
-    original = _normalise_postcode(getattr(instance, "_original_postcode", None))
-    current = _normalise_postcode(instance.postcode)
-    if created or current != original:
-        from .general_functions.index_multiple_deprivation import (
-            recalculate_imd_for_case,
-        )
-
-        recalculate_imd_for_case(instance)
-
-
-@receiver(pre_save, sender="epilepsy12.Registration")
-def _capture_registration_assessment_date(sender, instance, **kwargs):
-    """Store the current first_paediatric_assessment_date before save."""
-    if instance.pk:
-        try:
-            instance._original_assessment_date = sender.objects.get(
-                pk=instance.pk
-            ).first_paediatric_assessment_date
-        except sender.DoesNotExist:
-            instance._original_assessment_date = None
-    else:
-        instance._original_assessment_date = None
-
-
-@receiver(post_save, sender="epilepsy12.Registration")
-def _recalculate_imd_on_registration_save(sender, instance, created, **kwargs):
-    """Trigger IMD recalculation when first_paediatric_assessment_date changes."""
-    original = getattr(instance, "_original_assessment_date", None)
-    if created or instance.first_paediatric_assessment_date != original:
-        from .general_functions.index_multiple_deprivation import (
-            recalculate_imd_for_case,
-        )
-
-        try:
-            recalculate_imd_for_case(instance.case)
-        except Exception:
-            # case may not be accessible on the instance in unusual states
-            pass

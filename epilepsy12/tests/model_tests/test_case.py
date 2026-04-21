@@ -55,17 +55,8 @@ def test_case_save_unknown_postcode(e12_case_factory):
 
 
 @pytest.mark.django_db
-@patch("epilepsy12.models_folder.case.coordinates_for_postcode")
-@patch("epilepsy12.general_functions.index_multiple_deprivation.imd_for_postcode")
-def test_case_save_unknown_postcode_when_imd_not_none(
-    mock_imd_for_postcode, mock_coordinates_for_postcode, e12_case_factory
-):
-    # Tests that switching to an unknown postcode clears the IMD quintile.
-    # Mocks are needed because factory creates a Case with a real postcode,
-    # which triggers an IMD lookup via the Registration post_save signal.
-    mock_coordinates_for_postcode.return_value = (-0.1234, 51.5678)
-    mock_imd_for_postcode.return_value = 4
-
+def test_case_save_unknown_postcode_when_imd_not_none(e12_case_factory):
+    # Tests that the save method works as expected using one of the 'unknown' postcodes
     e12Case = e12_case_factory(
         postcode="WC1X 8SH", index_of_multiple_deprivation_quintile=4
     )
@@ -76,14 +67,13 @@ def test_case_save_unknown_postcode_when_imd_not_none(
 
 @pytest.mark.django_db
 @patch("epilepsy12.models_folder.case.coordinates_for_postcode")
-@patch("epilepsy12.general_functions.index_multiple_deprivation.imd_for_postcode")
+@patch("epilepsy12.models_folder.case.imd_for_postcode")
 def test_case_save_postcode_obtain_imdq(
     mock_imd_for_postcode, mock_coordinates_for_postcode, e12_case_factory
 ):
     """
     Tests that the save method works as expected using a known postcode IMD.
     Mocks both the coordinates API and the IMD calculation API.
-    IMD is now calculated via recalculate_imd_for_case (called from post_save signal).
     """
     # Mock the coordinates API response
     mock_coordinates_for_postcode.return_value = (-0.1234, 51.5678)
@@ -97,19 +87,15 @@ def test_case_save_postcode_obtain_imdq(
 
     # Verify both mocks were called
     mock_coordinates_for_postcode.assert_called_once_with(postcode="WC1X8SH")
-    mock_imd_for_postcode.assert_called_once_with("WC1X8SH", year=2019)
+    mock_imd_for_postcode.assert_called_once_with("WC1X8SH")
 
     # Verify the IMD was set correctly
     assert e12Case.index_of_multiple_deprivation_quintile == 4
 
 
 @pytest.mark.django_db
-@patch("epilepsy12.general_functions.index_multiple_deprivation.imd_for_postcode")
-def test_case_save_invalid_postcode(mock_imd_for_postcode, e12_case_factory):
-    # Tests that the save method works as expected using an invalid postcode.
-    # IMD is mocked to avoid real network calls; invalid postcodes return None.
-    mock_imd_for_postcode.return_value = None
-
+def test_case_save_invalid_postcode(e12_case_factory):
+    # Tests that the save method works as expected using an invalid postcode
     e12Case = e12_case_factory(index_of_multiple_deprivation_quintile=None)
     e12Case.postcode = "GARBAGE"
     e12Case.save()
@@ -119,7 +105,7 @@ def test_case_save_invalid_postcode(mock_imd_for_postcode, e12_case_factory):
 
 @pytest.mark.django_db
 @patch("epilepsy12.models_folder.case.coordinates_for_postcode")
-@patch("epilepsy12.general_functions.index_multiple_deprivation.imd_for_postcode")
+@patch("epilepsy12.models_folder.case.imd_for_postcode")
 def test_case_overwrite_index_of_multiple_deprivation_quintile(
     mock_imd_for_postcode, mock_coordinates_for_postcode, e12_case_factory
 ):
@@ -135,6 +121,6 @@ def test_case_overwrite_index_of_multiple_deprivation_quintile(
     e12Case.save()
     # Verify both mocks were called
     mock_coordinates_for_postcode.assert_called_once_with(postcode="WC1X8SH")
-    mock_imd_for_postcode.assert_called_once_with("WC1X8SH", year=2019)
+    mock_imd_for_postcode.assert_called_once_with("WC1X8SH")
     assert e12Case.postcode == "WC1X8SH"
     assert e12Case.index_of_multiple_deprivation_quintile == 4

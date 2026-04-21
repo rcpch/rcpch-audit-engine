@@ -1,6 +1,5 @@
 import pytest
 import nhs_number
-from unittest.mock import patch
 
 from django.urls import reverse
 
@@ -95,11 +94,9 @@ def test_mainland_patients_cant_have_urn(
 
 
 @pytest.mark.django_db
-@patch("epilepsy12.models_folder.case.coordinates_for_postcode")
 def test_mix_of_mainland_and_jersey_patients(
-    mock_coords, client, seed_groups_fixture, seed_users_fixture
+    client, seed_groups_fixture, seed_users_fixture
 ):
-    mock_coords.return_value = (-0.1234, 51.5678)
     KINGS = Organisation.objects.get(ods_code="RJZ01")
     JERSEY = Organisation.objects.get(ods_code="RGT1W")
 
@@ -150,11 +147,7 @@ def test_mix_of_mainland_and_jersey_patients(
 
 # https://github.com/rcpch/rcpch-audit-engine/issues/1190
 @pytest.mark.django_db
-@patch("epilepsy12.models_folder.case.coordinates_for_postcode")
-def test_create_two_patients(
-    mock_coords, client, seed_groups_fixture, seed_users_fixture
-):
-    mock_coords.return_value = (-0.1234, 51.5678)
+def test_create_two_patients(client, seed_groups_fixture, seed_users_fixture):
     KINGS = Organisation.objects.get(ods_code="RJZ01")
 
     test_user = Epilepsy12User.objects.filter(role=AUDIT_CENTRE_LEAD_CLINICIAN).first()

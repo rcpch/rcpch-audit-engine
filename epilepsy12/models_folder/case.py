@@ -9,7 +9,6 @@ from django.contrib.gis.geos import Point
 from django.conf import settings
 
 # 3rd party
-from gunicorn import app
 from simple_history.models import HistoricalRecords
 
 # epilepsy12
@@ -24,6 +23,7 @@ from ..constants import (
     CAN_CONSENT_TO_AUDIT_PARTICIPATION,
 )
 from ..general_functions import (
+    imd_for_postcode,
     coordinates_for_postcode,
     stringify_time_elapsed,
 )
@@ -187,20 +187,32 @@ class Case(TimeStampAbstractBaseClass, UserStampAbstractBaseClass, HelpTextMixin
         return self.registration.days_remaining_before_submission > 0
 
     def save(self, *args, **kwargs) -> None:
-        # Normalise postcode and update geolocation coordinates.
-        # IMD quintile is calculated separately via post_save signals on Case and Registration
-        # (see epilepsy12/signals.py and general_functions/index_multiple_deprivation.py).
+        # calculate the index of multiple deprivation quintile if the postcode is present
+        # Skips the calculation if the postcode is on the 'unknown' list
         if self.postcode:
             if (
                 str(self.postcode).replace(" ", "").replace("-", "")
                 not in UNKNOWN_POSTCODES_NO_SPACES
             ):
-                # Capitalise all characters, remove dashes and spaces
+                # capitalize all characters, remove dashes and spaces
                 self.postcode = (
                     str(self.postcode).replace(" ", "").replace("-", "").upper()
                 )
 
-                # Update the longitude and latitude
+                # get IMD for postcode from census platform: note, assumes postcode is valid
+                try:
+                    self.index_of_multiple_deprivation_quintile = imd_for_postcode(
+                        self.postcode
+                    )
+                except Exception as error:
+                    # Deprivation score not persisted if deprivation score server down
+                    self.index_of_multiple_deprivation_quintile = None
+                    logger.exception(
+                        f"Cannot calculate deprivation score for {self.postcode}: {error}"
+                    )
+                    pass
+
+                # update the longitude and latitude
                 """
                 The SRID (Spatial Reference System Identifier) 27700 refers to the British National Grid (BNG), a common system used for mapping in the UK. It uses Eastings and Northings, rather than longitude & latitude.
                 This system is different from the more common geographic coordinate systems like WGS 84 (SRID 4326), which is used by most global datasets including GPS and many web APIs.
@@ -236,7 +248,8 @@ class Case(TimeStampAbstractBaseClass, UserStampAbstractBaseClass, HelpTextMixin
                     )
                     pass
             else:
-                # Postcode is an unknown/placeholder — clear IMD and location
+                # if the IMD quintile has previously been added and postcode now unknown, set
+                # index_of_multiple_deprivation_quintile back to None
                 self.index_of_multiple_deprivation_quintile = None
                 self.location_wgs84 = None
                 self.location_bng = None

@@ -1,10 +1,7 @@
 # Python imports
 from datetime import date
-import json
-import math
 
 # third party libraries
-from django.conf import settings
 from django.shortcuts import render
 from django.urls import reverse
 from django.contrib.auth.decorators import permission_required
@@ -19,13 +16,7 @@ from epilepsy12.models_folder.entities.local_health_board import LocalHealthBoar
 # E12 imports
 from ..decorator import user_may_view_this_organisation, login_and_otp_required
 from epilepsy12.constants import INDIVIDUAL_KPI_MEASURES, EnumAbstractionLevel
-from epilepsy12.models import (
-    Organisation,
-    KPI,
-    OrganisationKPIAggregation,
-    OrganisationalAuditSubmissionPeriod,
-    Trust,
-)
+from epilepsy12.models import Organisation, KPI, OrganisationKPIAggregation, OrganisationalAuditSubmissionPeriod, Trust
 from ..common_view_functions import (
     cases_aggregated_by_sex,
     cases_aggregated_by_ethnicity,
@@ -36,6 +27,8 @@ from ..common_view_functions import (
     logged_in_user_may_access_this_organisation,
     filter_all_registered_cases_by_active_lead_site_and_cohort_and_level_of_abstraction,
     generate_dataframe_and_aggregated_distance_data_from_cases,
+    generate_distance_from_organisation_scatterplot_figure,
+    generate_case_count_choropleth_map,
     piechart_plot_cases_by_ethnicity,
     piechart_plot_cases_by_index_of_multiple_deprivation,
     piechart_plot_cases_by_sex,
@@ -53,10 +46,6 @@ from ..general_functions import (
 from ..kpi import download_kpi_summary_as_csv
 from epilepsy12.common_view_functions.aggregate_by import (
     update_all_kpi_agg_models,
-)
-from epilepsy12.common_view_functions.tiles_for_region import return_tile_for_region
-from epilepsy12.common_view_functions.map_from_shape_file import (
-    generate_case_counts_for_each_region_in_each_abstraction_level,
 )
 
 
@@ -76,49 +65,44 @@ def selected_organisation_summary_select(request):
     )
     return HttpResponseClientRedirect(response)
 
-
 @login_and_otp_required()
 def filter_organisations_by_parent(request, parent_id, parent_type):
     """
     HTMX callback when parent dropdown changes.
     Since the entire dashboard is tied to the selected organisation,
     we redirect to the first organisation in the selected parent.
-
+    
     Params:
     parent_id: primary key of selected parent trust or local health board
     parent_type: string, one of ['trust', 'local_health_board']
     """
-
+    
     # If HTMX posts the selected parent in the body, extract both id and type
     # Format: "parent_id:parent_type" (e.g., "5:trust" or "12:local_health_board")
     posted_parent = request.POST.get("selected_parent_summary_select")
-    if posted_parent and ":" in posted_parent:
+    if posted_parent and ':' in posted_parent:
         try:
-            parent_id_str, parent_type = posted_parent.split(":", 1)
+            parent_id_str, parent_type = posted_parent.split(':', 1)
             parent_id = int(parent_id_str)
         except (ValueError, TypeError):
             # Ignore and use URL parameters
             pass
 
     # Filter organisations by parent type
-    if parent_type == "trust":
+    if parent_type == 'trust':
         organisations = Organisation.objects.filter(trust__id=parent_id, active=True)
     else:  # local_health_board
-        organisations = Organisation.objects.filter(
-            local_health_board__id=parent_id, active=True
-        )
+        organisations = Organisation.objects.filter(local_health_board__id=parent_id, active=True)
 
     # Apply user access restrictions if not admin
     if not (request.user.is_rcpch_staff or request.user.is_superuser):
         allowed_orgs = organisation_white_list_for_user(request.user)
-        organisations = organisations.filter(
-            id__in=allowed_orgs.values_list("id", flat=True)
-        )
-
+        organisations = organisations.filter(id__in=allowed_orgs.values_list('id', flat=True))
+    
     # Get the first organisation in the filtered list and redirect to it
     # This triggers a full page reload with all the organisation-specific data
-    selected_organisation = organisations.order_by("name").first()
-
+    selected_organisation = organisations.order_by('name').first()
+    
     if selected_organisation:
         response = reverse(
             "selected_organisation_summary",
@@ -129,11 +113,10 @@ def filter_organisations_by_parent(request, parent_id, parent_type):
         # No organisations found for this parent
         # This should not happen if parent_list is properly filtered
         from django.http import HttpResponse
-
         return HttpResponse(
             f"No organisations found for the selected {'trust' if parent_type == 'trust' else 'local health board'}. "
-            "Please contact support if this issue persists.",
-            status=404,
+            "Please contact support if this issue persists.", 
+            status=404
         )
 
 
@@ -184,144 +167,50 @@ def selected_organisation_summary(request, organisation_id):
         )
     )
 
-    # IMD tile era selection:
-    # - England: cohort < 8 -> 2011 boundaries (2019 IMD), cohort >= 8 -> 2021 boundaries (2025 IMD)
-    # - Wales: all cohorts -> 2011 boundaries (2019 WIMD)
-    # - Other nations: default to 2011 boundaries
-    is_england = selected_organisation.country.boundary_identifier == "E92000001"
-    imd_tile_era = "2021" if (is_england and cohort_number >= 8) else "2011"
+    # generate scatterplot of cases by distance from the selected organisation
 
-    # Serialise case locations as GeoJSON for the MapLibre deprivation map
-    _case_features = []
-    if not case_distances_dataframe.empty:
-        _required = {"latitude", "longitude"}
-        if _required.issubset(case_distances_dataframe.columns):
-            for _, _row in case_distances_dataframe.dropna(
-                subset=["latitude", "longitude"]
-            ).iterrows():
-                _props = {}
-                for _col in (
-                    "pk",
-                    "distance_mi",
-                    "distance_km",
-                    "epilepsy12_sites__organisation__name",
-                ):
-                    if _col in case_distances_dataframe.columns:
-                        _val = _row[_col]
-                        _props[_col] = (
-                            None
-                            if (isinstance(_val, float) and math.isnan(_val))
-                            else _val
-                        )
-                _case_features.append(
-                    {
-                        "type": "Feature",
-                        "geometry": {
-                            "type": "Point",
-                            "coordinates": [
-                                float(_row["longitude"]),
-                                float(_row["latitude"]),
-                            ],
-                        },
-                        "properties": _props,
-                    }
-                )
-    cases_geojson = json.dumps(
-        {"type": "FeatureCollection", "features": _case_features}
-    )
-
-    def _build_boundary_overlay(
-        *,
-        overlay_id,
-        boundary_type,
-        region_key,
-        abstraction_enum,
-        identifier_property,
-        line_color,
-    ):
-        """Create a boundary overlay payload for the frontend map."""
-        region_geojson = json.loads(return_tile_for_region(region_key))
-        case_counts_df = generate_case_counts_for_each_region_in_each_abstraction_level(
-            abstraction_level=abstraction_enum,
-            cohort=cohort_number,
-            organisation=selected_organisation,
-        )
-
-        case_count_by_identifier = {}
-        if not case_counts_df.empty:
-            for _, count_row in case_counts_df.iterrows():
-                identifier = count_row.get("identifier")
-                if identifier is None:
-                    continue
-                raw_cases = count_row.get("cases", 0)
-                case_count_by_identifier[str(identifier)] = int(raw_cases or 0)
-
-        for feature in region_geojson.get("features", []):
-            props = feature.setdefault("properties", {})
-            identifier = props.get(identifier_property)
-            props["boundary_type"] = boundary_type
-            props["boundary_name"] = props.get("name", "Unknown boundary")
-            props["boundary_code"] = identifier if identifier is not None else "N/A"
-            props["case_count"] = case_count_by_identifier.get(str(identifier), 0)
-
-        return {
-            "id": overlay_id,
-            "sourceType": "geojson",
-            "data": region_geojson,
-            "beforeLayerId": "cases-layer",
-            "linePaint": {
-                "line-color": line_color,
-                "line-width": 2,
-                "line-opacity": 0.85,
-            },
-            "fillPaint": {
-                "fill-color": "#000000",
-                "fill-opacity": 0.0,
-            },
-        }
-
-    boundary_overlays = []
-
-    # Always provide Welsh LHB boundaries so they are visible when zooming out from any centre.
-    boundary_overlays.append(
-        _build_boundary_overlay(
-            overlay_id="lhb-boundaries",
-            boundary_type="Local Health Board",
-            region_key="lhb",
-            abstraction_enum=EnumAbstractionLevel.LOCAL_HEALTH_BOARD,
-            identifier_property="ods_code",
-            line_color="#2e7d32",
+    scatterplot_of_cases_for_selected_organisation = (
+        generate_distance_from_organisation_scatterplot_figure(
+            geo_df=case_distances_dataframe, organisation=selected_organisation
         )
     )
 
-    # Use centre geography to choose trust/LHB denominator for completion summary cards.
+    # differentiate between England and Wales
     if selected_organisation.country.boundary_identifier == "W92000004":  # Wales
         abstraction_level = "local_health_board"
+        # generate choropleth map of case counts for each level of abstraction
+        lhb_heatmap = generate_case_count_choropleth_map(
+            properties="ods_code",
+            abstraction_level=EnumAbstractionLevel.LOCAL_HEALTH_BOARD,
+            organisation=selected_organisation,
+            cohort=cohort_number,
+        )
     else:
-        abstraction_level = "trust"
+        # generate choropleth map of case counts for each level of abstraction
+        if selected_organisation.ods_code == "RGT1W":
+            # Jersey is a special case and although is mapped to England, is in the Channel Islands and has no ICB, NHS Region or LHB
+            abstraction_level = "trust"
+        else:
+            abstraction_level = "trust"
+            icb_heatmap = generate_case_count_choropleth_map(
+                properties="ods_code",
+                abstraction_level=EnumAbstractionLevel.ICB,
+                organisation=selected_organisation,
+                cohort=cohort_number,
+            )
+            nhsregion_heatmap = generate_case_count_choropleth_map(
+                properties="region_code",
+                abstraction_level=EnumAbstractionLevel.NHS_ENGLAND_REGION,
+                organisation=selected_organisation,
+                cohort=cohort_number,
+            )
 
-    # Add English hierarchy overlays for contextual tooltips (not applicable to Jersey).
-    if selected_organisation.ods_code != "RGT1W":
-        boundary_overlays.append(
-            _build_boundary_overlay(
-                overlay_id="icb-boundaries",
-                boundary_type="Integrated Care Board",
-                region_key="icb",
-                abstraction_enum=EnumAbstractionLevel.ICB,
-                identifier_property="ods_code",
-                line_color="#7a1f2b",
-            )
-        )
-        boundary_overlays.append(
-            _build_boundary_overlay(
-                overlay_id="nhs-region-boundaries",
-                boundary_type="NHS England Region",
-                region_key="nhs_england_region",
-                abstraction_enum=EnumAbstractionLevel.NHS_ENGLAND_REGION,
-                identifier_property="region_code",
-                line_color="#6b7280",
-            )
-        )
+    country_heatmap = generate_case_count_choropleth_map(
+        properties="boundary_identifier",
+        abstraction_level=EnumAbstractionLevel.COUNTRY,
+        organisation=selected_organisation,
+        cohort=cohort_number,
+    )
 
     # query to return all completed E12 cases in the current cohort in this organisation
     count_of_current_cohort_registered_completed_cases_in_this_organisation = (
@@ -394,7 +283,8 @@ def selected_organisation_summary(request, organisation_id):
         organisation_list = Organisation.objects.get_organisation_list()
         # Get merged parent list for all active organisations
         parent_list = merged_parent_list_for_user(
-            epilepsy12_user=request.user, organisation_list=organisation_list
+            epilepsy12_user=request.user,
+            organisation_list=organisation_list
         )
     else:
         # Regular users: organisation list is scoped to the organisations in the user's organisation_employer list and their siblings
@@ -403,23 +293,26 @@ def selected_organisation_summary(request, organisation_id):
         )
         # Get merged parent list only for organisations the user has access to
         parent_list = merged_parent_list_for_user(
-            epilepsy12_user=request.user, organisation_list=organisation_list
+            epilepsy12_user=request.user,
+            organisation_list=organisation_list
         )
 
     # Filter organisation_list to only show organisations within the selected parent
     # This makes the organisation dropdown dependent on the parent dropdown
     if selected_organisation.trust:
         organisation_list = organisation_list.filter(trust=selected_parent)
-        parent_type = "trust"
+        parent_type = 'trust'
     elif selected_organisation.local_health_board:
         organisation_list = organisation_list.filter(local_health_board=selected_parent)
-        parent_type = "local_health_board"
+        parent_type = 'local_health_board'
     else:
         # Organisation has no parent (shouldn't happen in practice)
         parent_type = None
 
     organisational_audit_submission_period = (
-        OrganisationalAuditSubmissionPeriod.objects.order_by("-year").first()
+        OrganisationalAuditSubmissionPeriod.objects
+        .order_by("-year")
+        .first()
     )
 
     context = {
@@ -460,16 +353,26 @@ def selected_organisation_summary(request, organisation_id):
         "count_of_all_current_cohort_registered_cases_in_this_trust": count_of_all_current_cohort_registered_cases_in_this_trust,
         "count_of_current_cohort_registered_completed_cases_in_this_trust": count_of_current_cohort_registered_completed_cases_in_this_trust,
         "individual_kpi_choices": INDIVIDUAL_KPI_MEASURES,
-        "cases_geojson": cases_geojson,
-        "boundary_overlays_geojson": json.dumps(boundary_overlays),
-        "imd_tile_era": imd_tile_era,
-        "deprivation_tiles_url": settings.RCPCH_DEPRIVATION_TILES_URL,
-        "org_lat": selected_organisation.latitude,
-        "org_lng": selected_organisation.longitude,
-        "org_name": selected_organisation.name,
+        "organisation_cases_map": scatterplot_of_cases_for_selected_organisation,
         "aggregated_distances": aggregated_distances,
+        "country_heatmap": country_heatmap,
         "organisational_audit_submission_period": organisational_audit_submission_period,
     }
+    if selected_organisation.country.boundary_identifier == "W92000004":
+        context["lhb_heatmap"] = lhb_heatmap
+        context["trust_heatmap"] = None
+        context["icb_heatmap"] = None
+        context["nhsregion_heatmap"] = None
+    else:
+        if selected_organisation.ods_code == "RGT1W":
+            # Jersey is a special case as it is in the Channel Islands and has no ICB, NHS Region or LHB
+            context["trust_heatmap"] = None
+            context["icb_heatmap"] = None
+            context["nhsregion_heatmap"] = None
+        else:
+            context["lhb_heatmap"] = None
+            context["icb_heatmap"] = icb_heatmap
+            context["nhsregion_heatmap"] = nhsregion_heatmap
 
     return render(
         request=request,
@@ -515,9 +418,7 @@ def publish_kpis(request, organisation_id):
     organisation = Organisation.objects.get(pk=organisation_id)
 
     # perform aggregations and update all the KPIAggregation models only for clinicians
-    update_all_kpi_agg_models(
-        organisation=organisation, cohort=cohort_number, open_access=True
-    )
+    update_all_kpi_agg_models(organisation=organisation, cohort=cohort_number, open_access=True)
 
     return render(
         request=request,
@@ -571,9 +472,7 @@ def selected_trust_kpis(request, organisation_id, access):
 
         if access == "private":
             # perform aggregations and update all the KPIAggregation models only for clinicians
-            update_all_kpi_agg_models(
-                organisation=organisation, cohort=cohort_number, open_access=False
-            )
+            update_all_kpi_agg_models(organisation=organisation, cohort=cohort_number, open_access=False)
 
         # Gather relevant data specific for this view - still show only published data if this is public view
         all_data = get_all_kpi_aggregation_data_for_view(
