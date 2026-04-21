@@ -352,6 +352,7 @@ def test_patient_delete_success(
         temp_pt_same_org = E12CaseFactory(
             first_name=f"child_{TEST_USER_ORGANISATION.name}",
             organisations__organisation=TEST_USER_ORGANISATION,
+            registration__first_paediatric_assessment_date=date.today(),
         )
 
         url = reverse(
@@ -380,6 +381,7 @@ def test_patient_delete_success(
             temp_pt_diff_org = E12CaseFactory(
                 first_name=f"child_{DIFF_TRUST_DIFF_ORGANISATION.name}",
                 organisations__organisation=DIFF_TRUST_DIFF_ORGANISATION,
+                registration__first_paediatric_assessment_date=date.today(),
             )
 
             url = reverse(
@@ -436,11 +438,13 @@ def test_patient_delete_forbidden(
     temp_pt_same_org = E12CaseFactory(
         first_name=f"child_{TEST_USER_ORGANISATION.name}",
         organisations__organisation=TEST_USER_ORGANISATION,
+        registration__first_paediatric_assessment_date=date.today(),
     )
     # Seed a temp pt to be deleted
     temp_pt_diff_org = E12CaseFactory(
         first_name=f"child_{DIFF_TRUST_DIFF_ORGANISATION.name}",
         organisations__organisation=DIFF_TRUST_DIFF_ORGANISATION,
+        registration__first_paediatric_assessment_date=date.today(),
     )
 
     for test_user in users:
@@ -538,6 +542,7 @@ def test_episode_delete_success(
         CASE_FROM_SAME_ORG = E12CaseFactory(
             first_name=f"temp_{TEST_USER_ORGANISATION}",
             organisations__organisation=TEST_USER_ORGANISATION,
+            registration__first_paediatric_assessment_date=date.today(),
         )
         # Create objs to search for
         episode = Episode.objects.create(
@@ -599,6 +604,7 @@ def test_episode_delete_success(
             CASE_FROM_DIFF_ORG = E12CaseFactory(
                 first_name=f"temp_{DIFF_TRUST_DIFF_ORGANISATION}",
                 organisations__organisation=DIFF_TRUST_DIFF_ORGANISATION,
+                registration__first_paediatric_assessment_date=date.today(),
             )
             # Create objs to search for
             episode = Episode.objects.create(

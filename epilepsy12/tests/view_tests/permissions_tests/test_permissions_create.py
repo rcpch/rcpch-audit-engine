@@ -665,6 +665,7 @@ def test_add_episode_comorbidity_syndrome_aem_success(client, e12_case_factory):
     CASE_FROM_SAME_ORG = e12_case_factory(
         first_name=f"child_{TEST_USER_ORGANISATION.name}",
         organisations__organisation=TEST_USER_ORGANISATION,
+        registration__first_paediatric_assessment_date=date.today(),
     )
 
     URLS = [
