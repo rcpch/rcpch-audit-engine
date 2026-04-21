@@ -816,10 +816,15 @@ investigations_patterns = [
         mri_brain_declined,
         name="mri_brain_declined",
     ),
-     path(
+    path(
         "investigations/<int:investigations_id>/genome_sequencing_requested",
         genome_sequencing_requested,
         name="genome_sequencing_requested",
+    ),
+    path(
+        "investigations/<int:investigations_id>/genetic_testing/<str:test_name>/<str:field>",
+        genetic_testing_callback,
+        name="genetic_testing_callback",
     ),
 ]
 

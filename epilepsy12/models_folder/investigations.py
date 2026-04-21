@@ -115,7 +115,7 @@ class Investigations(
         blank=True,
     )
 
-    r14_test_request_date = models.DateField(
+    r14_test_requested_date = models.DateField(
         help_text={
             "label": "Date R14 test requested",
         },
@@ -124,7 +124,7 @@ class Investigations(
         blank=True,
     )
 
-    r14_test_result_achieved = models.BooleanField(
+    r14_test_achieved = models.BooleanField(
         help_text={
             "label": "R14 test result achieved"
         },
@@ -133,7 +133,7 @@ class Investigations(
         blank=True,
     )
 
-    r14_test_result_date = models.DateField(
+    r14_test_achieved_date = models.DateField(
         help_text={
             "label": "Date R14 test result achieved",
         },

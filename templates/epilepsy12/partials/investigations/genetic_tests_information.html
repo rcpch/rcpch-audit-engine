@@ -6,24 +6,33 @@
         <div class="field">
 
             {% url 'genome_sequencing_requested' investigations_id=investigations.pk as hx_post %}
-            {% include 'epilepsy12/partials/page_elements/toggle_button.html' with hx_post=hx_post hx_target="#genetic_tests_information" hx_trigger="click" hx_swap="innerHTML" test_positive=investigations.genome_sequencing_requested tooltip_id='genome_sequencing_requested_tooltip' label=investigations.get_genome_sequencing_requested_help_label_text data_position="top left" enabled=can_edit %}
+            {% include 'epilepsy12/partials/page_elements/toggle_button.html' with hx_post=hx_post hx_target="#genetic_tests_information" hx_trigger="click" hx_swap="innerHTML" test_positive=investigations.genome_sequencing_requested label=investigations.get_genome_sequencing_requested_help_label_text enabled=can_edit %}
 
         </div>
 
         {% if investigations.genome_sequencing_requested %}
 
-        <div class="three fields">
+            <div class="two fields">
 
-            TODO MRB: the rest of the genetic testing questions
+                {% url 'genetic_testing_callback' investigations_id=investigations.pk test_name="r14" requested_or_achieved="requested" as hx_post %}
+                {% include 'epilepsy12/partials/page_elements/toggle_button.html' with hx_post=hx_post hx_target="#genetic_tests_information" hx_trigger="click" hx_swap="innerHTML" test_positive=investigations.r14_test_requested label=investigations.get_r14_test_requested_help_label_text enabled=can_edit %}
 
-        </div>
+                {% if investigations.r14_test_requested %}
+                    {% url 'genetic_testing_date_callback' investigations_id=investigations.pk test_name="r14" requested_or_achieved="requested" as hx_post %}
+                    {% include 'epilepsy12/partials/page_elements/date_field.html' with hx_post=hx_post hx_target="#genetic_tests_information" hx_trigger="change delay:1s" hx_swap="innerHTML" date_value=investigations.r14_test_requested_date label=investigations.get_r14_test_requested_date_help_label_text input_date_field_name='r14_test_requested_date' error_messages=error_messages enabled=can_edit has_permission=can_edit %}
+                {% endif %}
+
+
+                TODO MRB: the rest of the genetic testing questions
+
+            </div>
+
+        {% endif %}
 
         {% if error_message %}
             <div class='ui rcpch_warning message'>
                 {{ error_message }}
             </div>
-        {% endif %}
-
         {% endif %}
 
     </div>
