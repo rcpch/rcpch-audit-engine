@@ -1,7 +1,7 @@
 """Factory fn to create new E12 Registrations"""
 
 # standard imports
-from datetime import date, timedelta
+from datetime import date
 
 # third-party imports
 import factory
@@ -30,14 +30,9 @@ class E12RegistrationFactory(factory.django.DjangoModelFactory):
     case = None
 
     # Sets the minimal 'required' fields for a registration to be valid
-    # Use a recent first_paediatric_assessment_date so the calculated cohort is still open
-    # (Cohorts close 1 year after 30 Nov, with submission in January of following year)
-    first_paediatric_assessment_date = factory.LazyFunction(lambda: date.today() - timedelta(days=60))
+    first_paediatric_assessment_date = date(2023, 1, 1)
     eligibility_criteria_met = True
     audit_progress = factory.SubFactory(E12AuditProgressFactory)
-    
-    # Note: audit_submission_date is automatically calculated in Registration.save()
-    # based on first_paediatric_assessment_date, so we don't set it explicitly here
 
     # Getting the KPI organisation requires a more complex operation so we use the .lazy_attribute decorator. Once a Registration is .create()'d, filter Sites using the related Case to find the lead organisation - which is used to generate the kpi model.
     @factory.lazy_attribute
