@@ -86,6 +86,12 @@ RCPCH_HERMES_SERVER_URL = os.getenv("RCPCH_HERMES_SERVER_URL")
 # Mapbox
 MAPBOX_API_KEY = os.getenv("MAPBOX_API_KEY")
 
+# RCPCH Census Platform - deprivation vector tile service
+RCPCH_DEPRIVATION_TILES_URL = os.getenv(
+    "RCPCH_DEPRIVATION_TILES_URL",
+    "https://api.rcpch.ac.uk/deprivation/v2/tiles",
+)
+
 # Application definition
 
 INSTALLED_APPS = [
