@@ -557,3 +557,45 @@ def mri_brain_declined(request, can_edit, investigations_id, confirm):
     )
 
     return response
+
+
+@login_and_otp_required()
+@user_may_view_this_child()
+@permission_required("epilepsy12.change_investigations", raise_exception=True)
+def genome_sequencing_requested(request, can_edit, investigations_id):
+    """
+    This is an HTMX callback from the genome_sequencing_requested.html partial template
+    It is triggered by a change in the date_input_field partial generating a post request
+    This returns a date value which is stored in the model and returns the same partial.
+    """
+
+    try:
+        error_message = None
+        validate_and_update_model(
+            request,
+            investigations_id,
+            Investigations,
+            field_name="genome_sequencing_requested",
+            page_element="toggle_button",
+        )
+
+    except ValueError as error:
+        error_message = error
+
+    investigations = Investigations.objects.get(pk=investigations_id)
+    # TODO MRB: if no, clear out old data on genetic testing fields if previously selected
+
+    context = {"can_edit": can_edit, "investigations": investigations}
+
+    template_name = "epilepsy12/partials/investigations/genetic_tests_information.html"
+
+    # TODO MRB: update this to take genetic testing questions into account
+    response = recalculate_form_generate_response(
+        model_instance=investigations,
+        request=request,
+        context=context,
+        template=template_name,
+        error_message=error_message,
+    )
+
+    return response

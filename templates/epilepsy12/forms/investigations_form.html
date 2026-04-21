@@ -14,4 +14,10 @@
     <div id="mri_brain_information" class="field" >
         {% include 'epilepsy12/partials/investigations/mri_brain_information.html' with investigations_id=investigations.pk mri_brain_declined=mri_brain_declined %}
     </div>
+
+    {% if registration.cohort >= 8 %}
+        <div id="genetic_tests_information" class="field" >
+            {% include 'epilepsy12/partials/investigations/genetic_tests_information.html' with investigations_id=investigations.pk %}
+        </div>
+    {% endif %}
 </div>

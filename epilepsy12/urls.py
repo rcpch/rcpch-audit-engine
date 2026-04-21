@@ -816,6 +816,11 @@ investigations_patterns = [
         mri_brain_declined,
         name="mri_brain_declined",
     ),
+     path(
+        "investigations/<int:investigations_id>/genome_sequencing_requested",
+        genome_sequencing_requested,
+        name="genome_sequencing_requested",
+    ),
 ]
 
 episode_patterns = [

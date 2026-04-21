@@ -96,6 +96,52 @@ class Investigations(
         blank=True,
     )
 
+    # Cohort 8+ (https://github.com/rcpch/rcpch-audit-engine/issues/1074)
+    genome_sequencing_requested = models.BooleanField(
+        help_text={
+            "label": "Has epilepsy related Whole Genome Sequencing been requested?"
+        },
+        default=None,
+        null=True,
+        blank=True,
+    )
+
+    r14_test_requested = models.BooleanField(
+        help_text={
+            "label": "R14 test requested"
+        },
+        default=None,
+        null=True,
+        blank=True,
+    )
+
+    r14_test_request_date = models.DateField(
+        help_text={
+            "label": "Date R14 test requested",
+        },
+        default=None,
+        null=True,
+        blank=True,
+    )
+
+    r14_test_result_achieved = models.BooleanField(
+        help_text={
+            "label": "R14 test result achieved"
+        },
+        default=None,
+        null=True,
+        blank=True,
+    )
+
+    r14_test_result_date = models.DateField(
+        help_text={
+            "label": "Date R14 test result achieved",
+        },
+        default=None,
+        null=True,
+        blank=True,
+    )
+
     history = HistoricalRecords(cascade_delete_history=True)
 
     @property
