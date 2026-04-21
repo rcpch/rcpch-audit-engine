@@ -299,6 +299,9 @@ def user_may_view_this_child():
         def wrapper(request, *args, **kwargs):
             permissions = lookup_user_permissions_on_child(request, kwargs)
 
+            if request.method not in ["GET", "HEAD", "OPTIONS"] and not permissions["can_edit"]:
+                raise PermissionDenied()
+
             if permissions["can_view"]:
                 return view(request, permissions["can_edit"], *args, **kwargs)
             
