@@ -262,7 +262,6 @@ def lookup_child_if_user_has_permission(request_kwargs, user):
                 "patient_sites__site_is_primary_centre_of_epilepsy_care": True,
                 # Access is sliced by trust - so members of other organisations in that trust can see data
                 "trust": user.organisation_employer.trust,
-                "active": True,
             }
 
             if Organisation.objects.filter(**org_filters).exists():
