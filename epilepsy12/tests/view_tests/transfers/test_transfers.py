@@ -58,7 +58,7 @@ def create_case_with_lead_site(case_factory, organisation):
         organisations__organisation=organisation,
         organisations__site_is_primary_centre_of_epilepsy_care=True,
         organisations__site_is_actively_involved_in_epilepsy_care=True,
-        registration__first_paediatric_assessment_date=date(2021, 1, 1),
+        registration__first_paediatric_assessment_date=date.today(),
     )
     return case
 
@@ -78,7 +78,7 @@ def test_allocate_lead_site_creates_transfer_request(
     # Create case without a lead site
     case = e12_case_factory(
         first_name="test_child_no_lead",
-        registration__first_paediatric_assessment_date=date(2021, 1, 1),
+        registration__first_paediatric_assessment_date=date.today(),
     )
     
     # Create and login user
@@ -434,7 +434,7 @@ def test_transfer_preserves_origin_organisation_additional_responsibilities(
         organisations__site_is_primary_centre_of_epilepsy_care=True,
         organisations__site_is_actively_involved_in_epilepsy_care=True,
         organisations__site_is_childrens_epilepsy_surgery_centre=True,
-        registration__first_paediatric_assessment_date=date(2021, 1, 1),
+        registration__first_paediatric_assessment_date=date.today(),
     )
     
     original_site = Site.objects.get(
@@ -647,7 +647,7 @@ def test_lead_centre_retains_responsibilities_when_transferring_lead_status(
         organisations__site_is_paediatric_neurology_centre=True,
         organisations__site_is_childrens_epilepsy_surgery_centre=True,
         organisations__site_is_general_paediatric_centre=True,
-        registration__first_paediatric_assessment_date=date(2021, 1, 1),
+        registration__first_paediatric_assessment_date=date.today(),
     )
     
     original_site = Site.objects.get(
@@ -781,7 +781,7 @@ def test_non_lead_responsibility_changes_do_not_affect_lead_status(
         organisations__site_is_primary_centre_of_epilepsy_care=True,
         organisations__site_is_actively_involved_in_epilepsy_care=True,
         organisations__site_is_paediatric_neurology_centre=True,
-        registration__first_paediatric_assessment_date=date(2021, 1, 1),
+        registration__first_paediatric_assessment_date=date.today(),
     )
     
     lead_site = Site.objects.get(
@@ -867,7 +867,7 @@ def test_inactive_site_loses_all_responsibilities_including_lead(
         organisations__site_is_actively_involved_in_epilepsy_care=True,
         organisations__site_is_paediatric_neurology_centre=True,
         organisations__site_is_childrens_epilepsy_surgery_centre=True,
-        registration__first_paediatric_assessment_date=date(2021, 1, 1),
+        registration__first_paediatric_assessment_date=date.today(),
     )
     
     site = Site.objects.get(
@@ -909,7 +909,7 @@ def test_transfer_with_partial_responsibilities_at_both_sites(
         organisations__site_is_primary_centre_of_epilepsy_care=True,
         organisations__site_is_actively_involved_in_epilepsy_care=True,
         organisations__site_is_paediatric_neurology_centre=True,
-        registration__first_paediatric_assessment_date=date(2021, 1, 1),
+        registration__first_paediatric_assessment_date=date.today(),
     )
     
     # Target org already provides surgery services
@@ -984,7 +984,7 @@ def test_rejected_transfer_maintains_all_original_responsibilities(
         organisations__site_is_actively_involved_in_epilepsy_care=True,
         organisations__site_is_paediatric_neurology_centre=True,
         organisations__site_is_general_paediatric_centre=True,
-        registration__first_paediatric_assessment_date=date(2021, 1, 1),
+        registration__first_paediatric_assessment_date=date.today(),
     )
     
     original_site = Site.objects.get(

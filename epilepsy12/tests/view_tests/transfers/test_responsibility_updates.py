@@ -56,7 +56,7 @@ def create_case_with_lead_site(case_factory, organisation):
         organisations__organisation=organisation,
         organisations__site_is_primary_centre_of_epilepsy_care=True,
         organisations__site_is_actively_involved_in_epilepsy_care=True,
-        registration__first_paediatric_assessment_date=date(2021, 1, 1),
+        registration__first_paediatric_assessment_date=date.today(),
     )
     return case
 
