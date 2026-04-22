@@ -160,6 +160,63 @@ This wraps `manage.py recalculate_imd --all` / `--cohort N` (`epilepsy12/managem
 
 ---
 
+## Organisation Dashboard — Cases Map (`@rcpch/imd-map`)
+
+The organisation dashboard (`epilepsy12/views/organisation_views.py` → `selected_organisation_summary`) renders a choropleth deprivation map showing case locations against IMD tiles. This is implemented using the [`@rcpch/imd-map`](https://github.com/rcpch/rcpch-mapping-component) browser library, **not** a server-side mapping tool.
+
+### Architecture
+
+The backend prepares a plain JSON payload; the browser library does all tile streaming and WebGL rendering.
+
+```
+View (organisation_views.py)
+  └── builds organisation_cases_imd_payload:
+        { initialNation, initialEra, patients: [{id, lat, lon, ...}], leadCentre: {lat, lon, label} }
+        → passed to template via Django json_script (XSS-safe)
+
+Template (selected_organisation_summary.html)
+  └── CDN: @rcpch/imd-map UMD bundle (includes MapLibre GL)
+  └── <div id="organisation_cases_map"> — mount point
+  └── <script> IIFE:
+        RcpchImdMap.createImdMap({ container, tilesBaseUrl, initialNation, initialEra, ... })
+        map.setPatients(payload.patients)
+        map.setLeadCentre(payload.leadCentre)
+        map.fitToData()
+        stored on window._organisationCasesImdMap for HTMX-safe destroy/recreate
+```
+
+### Nation and era rules
+
+The library selects the correct IMD tile era based on `initialNation` + `initialEra` passed from the view:
+
+- England, cohort ≥ 8 → `initialEra: "2021"` (2021 LSOA boundaries, 2025 IMD)
+- England, cohort < 8 → `initialEra: "2011"` (2011 LSOA boundaries, 2019 IMD)
+- Wales / Scotland / N. Ireland → always `"2011"` (library enforces this regardless of era passed)
+
+`initialNation` is derived from `selected_organisation.country.boundary_identifier` via a lookup dict in the view.
+
+### Boundary overlays
+
+NHS Region, ICB, and LHB boundary overlays are rendered by the library itself via `enableHealthOverlays: true`. The view **no longer** builds or serialises boundary GeoJSON — the old `_build_boundary_overlay()` function and `return_tile_for_region` / `generate_case_counts_for_each_region_in_each_abstraction_level` calls have been removed.
+
+### Tile server
+
+`tilesBaseUrl` is read from `settings.RCPCH_DEPRIVATION_TILES_URL` (env var `RCPCH_DEPRIVATION_TILES_URL`) and passed directly from view context to the template JS. The library also reads `window.RCPCH_DEPRIVATION_TILES_URL` as a fallback.
+
+### Key files
+
+| File | Role |
+|---|---|
+| `epilepsy12/views/organisation_views.py` | Builds `organisation_cases_imd_payload` context key |
+| `templates/epilepsy12/partials/selected_organisation_summary.html` | Map mount point + init script |
+| `rcpch-audit-engine/settings.py` | `RCPCH_DEPRIVATION_TILES_URL` setting |
+
+### What was removed
+
+The old hand-rolled `static/js/maps/organisation_cases_map.js` (which exposed `window.RCPCHMaps.initialiseOrganisationCasesMap`) has been deleted. Do not attempt to restore it or reference `window.RCPCHMaps` — use `window.RcpchImdMap.createImdMap` instead.
+
+---
+
 ## Areas to Expand
 
 The following sections will be added over time:
