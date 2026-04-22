@@ -1,3 +1,4 @@
+import json
 from datetime import date
 from django.utils import timezone
 from django.contrib.auth.decorators import permission_required
@@ -7,29 +8,43 @@ from ..common_view_functions import (
     recalculate_form_generate_response,
 )
 from ..decorator import user_may_view_this_child, login_and_otp_required
+from ..constants.common import GENOME_TEST_CHOICES
 
 
 def genome_sequencing_context(can_edit, investigations):
     genome_tests = []
 
     for test in ["r14", "r27", "r59"]:
-        test_requested = getattr(investigations, f"{test}_test_requested")
-        test_achieved = getattr(investigations, f"{test}_test_achieved")
+        field_name = f"{test}_test_status"
+
+        test_status = getattr(investigations, field_name)
+
+        label_text = Investigations._meta.get_field(field_name).help_text["label"]
+
+        test_requested_date_field_name = f"{test}_test_requested_date"
+        test_requested_date = getattr(investigations, test_requested_date_field_name)
+
+        test_achieved_date_field_name = f"{test}_test_achieved_date"
+        test_achieved_date = getattr(investigations, test_achieved_date_field_name)
 
         genome_tests.append(
             {
                 "test_name": test,
-                "test_requested": test_requested,
-                "test_requested_date": getattr(investigations, f"{test}_test_requested_date"),
-                "test_requested_date_enabled": can_edit and test_requested,
-                "test_achieved": test_achieved,
-                "test_achieved_enabled": can_edit and test_requested,
-                "test_achieved_date": getattr(investigations, f"{test}_test_achieved_date"),
-                "test_achieved_date_enabled": can_edit and test_achieved,
+                "test_status": test_status,
+                "label_text": label_text,
+                "test_requested_date": test_requested_date,
+                "test_requested_date_enabled": test_status in ["R", "A"],
+                "test_requested_date_field_name": test_requested_date_field_name,
+                "test_achieved_date": test_achieved_date,
+                "test_achieved_date_enabled": test_status == "A",
+                "test_achieved_date_field_name": test_achieved_date_field_name,
             }
         )
 
-    return genome_tests
+    return {
+        "genome_tests": genome_tests,
+        "genome_test_choices": GENOME_TEST_CHOICES,
+    }
 
 
 @login_and_otp_required()
@@ -71,7 +86,7 @@ def investigations(request, can_edit, case_id):
         "mri_brain_declined": mri_brain_declined,
     }
 
-    context = context | {"genome_tests": genome_sequencing_context(can_edit, investigations)}    
+    context = context | genome_sequencing_context(can_edit, investigations)
 
     template_name = "epilepsy12/investigations.html"
 
@@ -604,13 +619,12 @@ def genome_sequencing_requested(request, can_edit, investigations_id):
     investigations = Investigations.objects.get(pk=investigations_id)
     # TODO MRB: if no, clear out old data on genetic testing fields if previously selected
 
-    genome_tests = genome_sequencing_context(can_edit, investigations)
+    genome_context = genome_sequencing_context(can_edit, investigations)
 
     context = {
         "can_edit": can_edit,
         "investigations": investigations,
-        "genome_tests": genome_tests
-    }
+    } | genome_context
 
     template_name = "epilepsy12/partials/investigations/genetic_tests_information.html"
 
@@ -629,7 +643,7 @@ def genome_sequencing_requested(request, can_edit, investigations_id):
 @login_and_otp_required()
 @user_may_view_this_child()
 @permission_required("epilepsy12.change_investigations", raise_exception=True)
-def genetic_testing_status_callback(request, can_edit, investigations_id, test_name, requested_or_achieved):
+def genetic_testing_status_callback(request, can_edit, investigations_id, test_name):
     try:
         error_message = None
 
@@ -637,8 +651,8 @@ def genetic_testing_status_callback(request, can_edit, investigations_id, test_n
             request,
             investigations_id,
             Investigations,
-            field_name=f"{test_name}_test_{requested_or_achieved}",
-            page_element="toggle_button",
+            field_name=f"{test_name}_test_status",
+            page_element="single_choice_multiple_toggle_button",
         )
 
     except ValueError as error:
@@ -647,13 +661,12 @@ def genetic_testing_status_callback(request, can_edit, investigations_id, test_n
     investigations = Investigations.objects.get(pk=investigations_id)
     # TODO MRB: if no, clear out date
 
-    genome_tests = genome_sequencing_context(can_edit, investigations)
+    genome_context = genome_sequencing_context(can_edit, investigations)
 
     context = {
         "can_edit": can_edit,
         "investigations": investigations,
-        "genome_tests": genome_tests
-    }
+    } | genome_context
 
     template_name = "epilepsy12/partials/investigations/genetic_tests_information.html"
 
@@ -702,13 +715,12 @@ def genetic_testing_date_callback(request, can_edit, investigations_id, test_nam
 
     investigations = Investigations.objects.get(pk=investigations_id)
 
-    genome_tests = genome_sequencing_context(can_edit, investigations)
+    genome_context = genome_sequencing_context(can_edit, investigations)
 
     context = {
         "can_edit": can_edit,
         "investigations": investigations,
-        "genome_tests": genome_tests
-    }
+    } | genome_context
 
     template_name = "epilepsy12/partials/investigations/genetic_tests_information.html"
 

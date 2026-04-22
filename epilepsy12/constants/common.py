@@ -44,6 +44,12 @@ DATE_ACCURACY = (
     ("NK", "Not known"),
 )
 
+GENOME_TEST_CHOICES = (
+    ("R", "Requested"),
+    ("A", "Requested & Achieved"),
+    ("N", "Not Requested")
+)
+
 
 @dataclass
 class DEPRIVATION_QUINTILES_DATACLASS:

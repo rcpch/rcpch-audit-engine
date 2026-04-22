@@ -12,6 +12,7 @@ from simple_history.models import HistoricalRecords
 from .help_text_mixin import HelpTextMixin
 from ..general_functions import stringify_time_elapsed
 from .time_and_user_abstract_base_classes import *
+from ..constants.common import GENOME_TEST_CHOICES
 
 
 class Investigations(
@@ -106,27 +107,19 @@ class Investigations(
         blank=True,
     )
 
-    r14_test_requested = models.BooleanField(
+    r14_test_status = models.CharField(
         help_text={
-            "label": "R14 test requested"
+            "label": "Was an R14 test requested?",
         },
+        max_length=2,
+        choices=GENOME_TEST_CHOICES,
         default=None,
         null=True,
-        blank=True,
     )
 
     r14_test_requested_date = models.DateField(
         help_text={
-            "label": "Date R14 test requested",
-        },
-        default=None,
-        null=True,
-        blank=True,
-    )
-
-    r14_test_achieved = models.BooleanField(
-        help_text={
-            "label": "R14 test result achieved"
+            "label": "Date of decision to request R14 test",
         },
         default=None,
         null=True,
@@ -142,27 +135,19 @@ class Investigations(
         blank=True,
     )
 
-    r27_test_requested = models.BooleanField(
+    r27_test_status = models.CharField(
         help_text={
-            "label": "R27 test requested"
+            "label": "Was an R27 test requested?",
         },
+        max_length=2,
+        choices=GENOME_TEST_CHOICES,
         default=None,
         null=True,
-        blank=True,
     )
 
     r27_test_requested_date = models.DateField(
         help_text={
-            "label": "Date R27 test requested",
-        },
-        default=None,
-        null=True,
-        blank=True,
-    )
-
-    r27_test_achieved = models.BooleanField(
-        help_text={
-            "label": "R27 test result achieved"
+            "label": "Date of decision to request R27 test",
         },
         default=None,
         null=True,
@@ -178,27 +163,19 @@ class Investigations(
         blank=True,
     )
 
-    r59_test_requested = models.BooleanField(
+    r59_test_status = models.CharField(
         help_text={
-            "label": "R59 test requested"
+            "label": "Was an R59 test requested?",
         },
+        max_length=2,
+        choices=GENOME_TEST_CHOICES,
         default=None,
         null=True,
-        blank=True,
     )
 
     r59_test_requested_date = models.DateField(
         help_text={
-            "label": "Date R59 test requested",
-        },
-        default=None,
-        null=True,
-        blank=True,
-    )
-
-    r59_test_achieved = models.BooleanField(
-        help_text={
-            "label": "R59 test result achieved"
+            "label": "Date of decision to request R59 test",
         },
         default=None,
         null=True,
