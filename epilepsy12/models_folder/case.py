@@ -184,7 +184,13 @@ class Case(TimeStampAbstractBaseClass, UserStampAbstractBaseClass, HelpTextMixin
         if not hasattr(self, "registration"):
             return True
 
-        return self.registration.days_remaining_before_submission > 0
+        days_remaining = self.registration.days_remaining_before_submission
+
+        # https://github.com/rcpch/rcpch-audit-engine/issues/1373
+        if days_remaining is None:
+            return True
+
+        return days_remaining > 0
 
     def save(self, *args, **kwargs) -> None:
         # Normalise postcode and update geolocation coordinates.
