@@ -263,6 +263,24 @@ def total_fields_expected(model_instance):
             # add essential fields: request date, performed_date
             cumulative_score += 2
 
+        # Genome sequencing fields (Cohort 8+)
+        if model_instance.registration.cohort >= 8:
+            # genome_sequencing_requested is always scorable for cohort 8+
+            cumulative_score += 1
+            if model_instance.genome_sequencing_requested:
+                # add essential fields: r14, r27, r59 test statuses
+                cumulative_score += 3
+                for test in ["r14", "r27", "r59"]:
+                    test_status = getattr(
+                        model_instance, f"{test}_test_status"
+                    )
+                    if test_status in ["R", "A"]:
+                        # add essential field: requested_date
+                        cumulative_score += 1
+                    if test_status == "A":
+                        # add essential field: achieved_date
+                        cumulative_score += 1
+
     elif model_class_name == "Management":
         # also need to count associated records in AntiepilepsyMedicines
         if model_instance.has_an_aed_been_given:

@@ -1,6 +1,4 @@
 <div class="ui rcpch_pink segment">
-    <div class="ui header">{{genome_test.test_name}}</div>
-
     {% url 'genetic_testing_status_callback' investigations_id=investigations.pk test_name=genome_test.test_name as hx_post %}
     {% include 'epilepsy12/partials/page_elements/single_choice_multiple_toggle_button.html' with choices=genome_test_choices hx_post=hx_post hx_target="#genetic_tests_information" hx_trigger="click" hx_swap="innerHTML" test_positive=genome_test.test_status label=genome_test.label_text enabled=can_edit %}
     

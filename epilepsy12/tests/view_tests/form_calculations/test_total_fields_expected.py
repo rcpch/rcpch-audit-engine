@@ -440,7 +440,196 @@ def test_total_fields_expected_investigations(e12_case_factory, GOSH):
 
 
 @pytest.mark.django_db
-def test_total_fields_expected_registration(e12_case_factory, GOSH):
+def test_total_fields_expected_investigations_cohort8_no_genome_answer(
+    e12_case_factory, GOSH
+):
+    """
+    Tests total_fields_expected(investigations) for cohort 8 when genome_sequencing_requested
+    has not been answered yet. Should add 1 for the genome_sequencing_requested field itself.
+    """
+
+    CASE = e12_case_factory(
+        first_name=f"temp_child_{GOSH.name}",
+        organisations__organisation=GOSH,
+    )
+
+    CASE.registration.first_paediatric_assessment_date = date(2025, 1, 1)
+    CASE.registration.save()
+
+    assert CASE.registration.cohort == 8
+
+    investigations = CASE.registration.investigations
+
+    # 4 base fields + 1 for genome_sequencing_requested = 5
+    expected_value = 5
+    return_value = total_fields_expected(investigations)
+
+    assert (
+        return_value == expected_value
+    ), f"total_fields_expected(investigations) cohort 8, genome not answered: expected {expected_value} but got {return_value}"
+
+
+@pytest.mark.django_db
+def test_total_fields_expected_investigations_cohort8_genome_requested_true(
+    e12_case_factory, GOSH
+):
+    """
+    Tests total_fields_expected(investigations) for cohort 8 when genome_sequencing_requested
+    is True but no individual test statuses have been set. Should add fields for the 3 test statuses.
+    """
+
+    CASE = e12_case_factory(
+        first_name=f"temp_child_{GOSH.name}",
+        organisations__organisation=GOSH,
+        registration__investigations__genome_sequencing_requested=True,
+    )
+
+    CASE.registration.first_paediatric_assessment_date = date(2025, 1, 1)
+    CASE.registration.save()
+
+    assert CASE.registration.cohort == 8
+
+    investigations = CASE.registration.investigations
+
+    # 4 base + 1 genome_sequencing_requested + 3 test statuses = 8
+    expected_value = 8
+    return_value = total_fields_expected(investigations)
+
+    assert (
+        return_value == expected_value
+    ), f"total_fields_expected(investigations) cohort 8, genome requested, no test statuses: expected {expected_value} but got {return_value}"
+
+
+@pytest.mark.parametrize(
+    "r14_status, r27_status, r59_status, extra_fields",
+    [
+        ("N", "N", "N", 0),  # all not requested: no date fields
+        ("R", "N", "N", 1),  # one requested: +1 requested_date
+        ("A", "N", "N", 2),  # one achieved: +1 requested_date +1 achieved_date
+        ("R", "R", "N", 2),  # two requested: +2 requested_dates
+        ("R", "R", "R", 3),  # all requested: +3 requested_dates
+        ("A", "A", "A", 6),  # all achieved: +3 requested_dates +3 achieved_dates
+        ("A", "R", "N", 3),  # mixed: +2 for A (req+ach) +1 for R (req)
+    ],
+    ids=[
+        "all_not_requested",
+        "one_requested",
+        "one_achieved",
+        "two_requested",
+        "all_requested",
+        "all_achieved",
+        "mixed_statuses",
+    ],
+)
+@pytest.mark.django_db
+def test_total_fields_expected_investigations_cohort8_genome_test_statuses(
+    e12_case_factory,
+    GOSH,
+    r14_status,
+    r27_status,
+    r59_status,
+    extra_fields,
+):
+    """
+    Tests total_fields_expected(investigations) for cohort 8 with various genome test statuses.
+    Each "R" (Requested) status adds 1 date field (requested_date).
+    Each "A" (Achieved) status adds 2 date fields (requested_date + achieved_date).
+    """
+
+    CASE = e12_case_factory(
+        first_name=f"temp_child_{GOSH.name}",
+        organisations__organisation=GOSH,
+        registration__investigations__genome_sequencing_requested=True,
+        registration__investigations__r14_test_status=r14_status,
+        registration__investigations__r27_test_status=r27_status,
+        registration__investigations__r59_test_status=r59_status,
+    )
+
+    CASE.registration.first_paediatric_assessment_date = date(2025, 1, 1)
+    CASE.registration.save()
+
+    assert CASE.registration.cohort == 8
+
+    investigations = CASE.registration.investigations
+
+    # 4 base + 1 genome_sequencing_requested + 3 test statuses + extra date fields
+    expected_value = 8 + extra_fields
+    return_value = total_fields_expected(investigations)
+
+    assert return_value == expected_value, (
+        f"total_fields_expected(investigations) cohort 8, "
+        f"statuses=({r14_status},{r27_status},{r59_status}): "
+        f"expected {expected_value} but got {return_value}"
+    )
+
+
+@pytest.mark.django_db
+def test_total_fields_expected_investigations_pre_cohort8_ignores_genome(
+    e12_case_factory, GOSH
+):
+    """
+    Tests that genome sequencing fields are NOT scored for cohorts below 8,
+    even if genome_sequencing_requested is True.
+    """
+
+    CASE = e12_case_factory(
+        first_name=f"temp_child_{GOSH.name}",
+        organisations__organisation=GOSH,
+        registration__investigations__genome_sequencing_requested=True,
+        registration__investigations__r14_test_status="A",
+        registration__investigations__r27_test_status="R",
+        registration__investigations__r59_test_status="N",
+    )
+
+    # Default factory date gives cohort 6
+    assert CASE.registration.cohort < 8
+
+    investigations = CASE.registration.investigations
+
+    # Only 4 base fields, genome fields should not be scored
+    expected_value = 4
+    return_value = total_fields_expected(investigations)
+
+    assert (
+        return_value == expected_value
+    ), f"total_fields_expected(investigations) cohort <8 should ignore genome fields: expected {expected_value} but got {return_value}"
+
+
+@pytest.mark.django_db
+def test_total_fields_expected_investigations_cohort8_with_eeg_and_mri(
+    e12_case_factory, GOSH
+):
+    """
+    Tests total_fields_expected(investigations) for cohort 8 with EEG, MRI, and genome fields
+    all active to verify they combine correctly.
+    """
+
+    CASE = e12_case_factory(
+        first_name=f"temp_child_{GOSH.name}",
+        organisations__organisation=GOSH,
+        registration__investigations__eeg_indicated=True,
+        registration__investigations__mri_indicated=True,
+        registration__investigations__genome_sequencing_requested=True,
+        registration__investigations__r14_test_status="A",
+        registration__investigations__r27_test_status="R",
+        registration__investigations__r59_test_status="N",
+    )
+
+    CASE.registration.first_paediatric_assessment_date = date(2025, 1, 1)
+    CASE.registration.save()
+
+    assert CASE.registration.cohort == 8
+
+    investigations = CASE.registration.investigations
+
+    # 4 base + 2 eeg + 2 mri + 1 genome_sequencing_requested
+    # + 3 test statuses + 2 (A: req+ach) + 1 (R: req) + 0 (N) = 15
+    expected_value = 15
+    return_value = total_fields_expected(investigations)
+
+    assert (
+        return_value == expected_value
+    ), f"total_fields_expected(investigations) cohort 8, eeg+mri+genome: expected {expected_value} but got {return_value}"
     """
     Tests total_fields_expected(registration) returns correct expected output, with all  fields all True.
     """
