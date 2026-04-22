@@ -190,15 +190,50 @@ def selected_organisation_summary(request, organisation_id):
     # - Other nations: default to 2011 boundaries
     is_england = selected_organisation.country.boundary_identifier == "E92000001"
     imd_tile_era = "2021" if (is_england and cohort_number >= 8) else "2011"
+    nation_by_boundary_identifier = {
+        "E92000001": "england",
+        "W92000004": "wales",
+        "S92000003": "scotland",
+        "N92000002": "northern_ireland",
+    }
+    imd_initial_nation = nation_by_boundary_identifier.get(
+        selected_organisation.country.boundary_identifier, "all"
+    )
 
     # Serialise case locations as GeoJSON for the MapLibre deprivation map
     _case_features = []
+    imd_map_patients = []
     if not case_distances_dataframe.empty:
         _required = {"latitude", "longitude"}
         if _required.issubset(case_distances_dataframe.columns):
             for _, _row in case_distances_dataframe.dropna(
                 subset=["latitude", "longitude"]
             ).iterrows():
+                patient_lat = float(_row["latitude"])
+                patient_lon = float(_row["longitude"])
+                patient_id = (
+                    _row["pk"] if "pk" in case_distances_dataframe.columns else None
+                )
+                if patient_id is None or (
+                    isinstance(patient_id, float) and math.isnan(patient_id)
+                ):
+                    patient_id = f"case-{len(imd_map_patients) + 1}"
+
+                imd_map_patient = {
+                    "id": str(patient_id),
+                    "lat": patient_lat,
+                    "lon": patient_lon,
+                }
+                if "distance_mi" in case_distances_dataframe.columns:
+                    distance_mi = _row["distance_mi"]
+                    if not (isinstance(distance_mi, float) and math.isnan(distance_mi)):
+                        imd_map_patient["distance_mi"] = float(distance_mi)
+                if "distance_km" in case_distances_dataframe.columns:
+                    distance_km = _row["distance_km"]
+                    if not (isinstance(distance_km, float) and math.isnan(distance_km)):
+                        imd_map_patient["distance_km"] = float(distance_km)
+                imd_map_patients.append(imd_map_patient)
+
                 _props = {}
                 for _col in (
                     "pk",
@@ -218,10 +253,7 @@ def selected_organisation_summary(request, organisation_id):
                         "type": "Feature",
                         "geometry": {
                             "type": "Point",
-                            "coordinates": [
-                                float(_row["longitude"]),
-                                float(_row["latitude"]),
-                            ],
+                            "coordinates": [patient_lon, patient_lat],
                         },
                         "properties": _props,
                     }
@@ -229,6 +261,23 @@ def selected_organisation_summary(request, organisation_id):
     cases_geojson = json.dumps(
         {"type": "FeatureCollection", "features": _case_features}
     )
+    imd_map_lead_centre = None
+    if (
+        selected_organisation.latitude is not None
+        and selected_organisation.longitude is not None
+    ):
+        imd_map_lead_centre = {
+            "lat": float(selected_organisation.latitude),
+            "lon": float(selected_organisation.longitude),
+            "label": selected_organisation.name,
+        }
+
+    organisation_cases_imd_payload = {
+        "initialNation": imd_initial_nation,
+        "initialEra": imd_tile_era,
+        "patients": imd_map_patients,
+        "leadCentre": imd_map_lead_centre,
+    }
 
     def _build_boundary_overlay(
         *,
@@ -467,6 +516,7 @@ def selected_organisation_summary(request, organisation_id):
         "org_lat": selected_organisation.latitude,
         "org_lng": selected_organisation.longitude,
         "org_name": selected_organisation.name,
+        "organisation_cases_imd_payload": organisation_cases_imd_payload,
         "aggregated_distances": aggregated_distances,
         "organisational_audit_submission_period": organisational_audit_submission_period,
     }
