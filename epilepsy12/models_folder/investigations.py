@@ -217,6 +217,14 @@ class Investigations(
 
     def get_current_date(self):
         return date.today()
+    
+    def clear_genetic_testing_questions(self):
+        self.genome_sequencing_requested = None
+
+        for test in ["r14", "r27", "r59"]:
+            setattr(self, f"{test}_test_status", None)
+            setattr(self, f"{test}_test_requested_date", None)
+            setattr(self, f"{test}_test_achieved_date", None)
 
     # relationships
     registration = models.OneToOneField(

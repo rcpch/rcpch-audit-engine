@@ -617,7 +617,10 @@ def genome_sequencing_requested(request, can_edit, investigations_id):
         error_message = error
 
     investigations = Investigations.objects.get(pk=investigations_id)
-    # TODO MRB: if no, clear out old data on genetic testing fields if previously selected
+
+    if not investigations.genome_sequencing_requested:
+        investigations.clear_genetic_testing_questions()
+        investigations.save()
 
     genome_context = genome_sequencing_context(can_edit, investigations)
 
@@ -659,7 +662,19 @@ def genetic_testing_status_callback(request, can_edit, investigations_id, test_n
         error_message = error
 
     investigations = Investigations.objects.get(pk=investigations_id)
-    # TODO MRB: if no, clear out date
+    
+    test_status = getattr(investigations, f"{test_name}_test_status")
+
+    date_requested_field_name = f"{test_name}_test_requested_date"
+    date_achieved_field_name = f"{test_name}_test_achieved_date"
+
+    if test_status in ["R", "N"]:
+        setattr(investigations, date_achieved_field_name, None)
+    
+    if test_status == "N":
+        setattr(investigations, date_requested_field_name, None)
+
+    investigations.save()
 
     genome_context = genome_sequencing_context(can_edit, investigations)
 
