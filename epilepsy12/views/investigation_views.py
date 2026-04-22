@@ -9,6 +9,29 @@ from ..common_view_functions import (
 from ..decorator import user_may_view_this_child, login_and_otp_required
 
 
+def genome_sequencing_context(can_edit, investigations):
+    genome_tests = []
+
+    for test in ["r14", "r27", "r59"]:
+        test_requested = getattr(investigations, f"{test}_test_requested")
+        test_achieved = getattr(investigations, f"{test}_test_achieved")
+
+        genome_tests.append(
+            {
+                "test_name": test,
+                "test_requested": test_requested,
+                "test_requested_date": getattr(investigations, f"{test}_test_requested_date"),
+                "test_requested_date_enabled": can_edit and test_requested,
+                "test_achieved": test_achieved,
+                "test_achieved_enabled": can_edit and test_requested,
+                "test_achieved_date": getattr(investigations, f"{test}_test_achieved_date"),
+                "test_achieved_date_enabled": can_edit and test_achieved,
+            }
+        )
+
+    return genome_tests
+
+
 @login_and_otp_required()
 @permission_required("epilepsy12.view_investigations", raise_exception=True)
 @user_may_view_this_child()
@@ -47,6 +70,8 @@ def investigations(request, can_edit, case_id):
         "eeg_declined": eeg_declined,
         "mri_brain_declined": mri_brain_declined,
     }
+
+    context = context | {"genome_tests": genome_sequencing_context(can_edit, investigations)}    
 
     template_name = "epilepsy12/investigations.html"
 
@@ -579,7 +604,13 @@ def genome_sequencing_requested(request, can_edit, investigations_id):
     investigations = Investigations.objects.get(pk=investigations_id)
     # TODO MRB: if no, clear out old data on genetic testing fields if previously selected
 
-    context = {"can_edit": can_edit, "investigations": investigations}
+    genome_tests = genome_sequencing_context(can_edit, investigations)
+
+    context = {
+        "can_edit": can_edit,
+        "investigations": investigations,
+        "genome_tests": genome_tests
+    }
 
     template_name = "epilepsy12/partials/investigations/genetic_tests_information.html"
 
@@ -616,10 +647,17 @@ def genetic_testing_status_callback(request, can_edit, investigations_id, test_n
     investigations = Investigations.objects.get(pk=investigations_id)
     # TODO MRB: if no, clear out date
 
-    context = {"can_edit": can_edit, "investigations": investigations}
+    genome_tests = genome_sequencing_context(can_edit, investigations)
+
+    context = {
+        "can_edit": can_edit,
+        "investigations": investigations,
+        "genome_tests": genome_tests
+    }
 
     template_name = "epilepsy12/partials/investigations/genetic_tests_information.html"
 
+    # TODO MRB: update this to take genetic testing questions into account
     response = recalculate_form_generate_response(
         model_instance=investigations,
         request=request,
@@ -664,10 +702,17 @@ def genetic_testing_date_callback(request, can_edit, investigations_id, test_nam
 
     investigations = Investigations.objects.get(pk=investigations_id)
 
-    context = {"can_edit": can_edit, "investigations": investigations}
+    genome_tests = genome_sequencing_context(can_edit, investigations)
+
+    context = {
+        "can_edit": can_edit,
+        "investigations": investigations,
+        "genome_tests": genome_tests
+    }
 
     template_name = "epilepsy12/partials/investigations/genetic_tests_information.html"
 
+    # TODO MRB: update this to take genetic testing questions into account
     response = recalculate_form_generate_response(
         model_instance=investigations,
         request=request,
