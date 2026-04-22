@@ -822,9 +822,14 @@ investigations_patterns = [
         name="genome_sequencing_requested",
     ),
     path(
-        "investigations/<int:investigations_id>/genetic_testing/<str:test_name>/<str:field>",
-        genetic_testing_callback,
-        name="genetic_testing_callback",
+        "investigations/<int:investigations_id>/genetic_testing/<str:test_name>/<str:requested_or_achieved>/status",
+        genetic_testing_status_callback,
+        name="genetic_testing_status_callback",
+    ),
+    path(
+        "investigations/<int:investigations_id>/genetic_testing/<str:test_name>/<str:requested_or_achieved>/date",
+        genetic_testing_date_callback,
+        name="genetic_testing_date_callback",
     ),
 ]
 

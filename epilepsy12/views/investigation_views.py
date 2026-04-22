@@ -598,20 +598,9 @@ def genome_sequencing_requested(request, can_edit, investigations_id):
 @login_and_otp_required()
 @user_may_view_this_child()
 @permission_required("epilepsy12.change_investigations", raise_exception=True)
-def genetic_testing_callback(request, can_edit, investigations_id, test_name, field):
+def genetic_testing_status_callback(request, can_edit, investigations_id, test_name, requested_or_achieved):
     try:
         error_message = None
-
-        validation_args = {
-            "field_name": f"{test_name}_test_{field}",
-        }
-
-        match field:
-            case "requested":
-                validation_args["page_element"] = "toggle_button"
-            case "achieved":
-                validation_args["page_element"] = "toggle_button"
-            case "date":
 
         validate_and_update_model(
             request,
@@ -645,7 +634,7 @@ def genetic_testing_callback(request, can_edit, investigations_id, test_name, fi
 @login_and_otp_required()
 @user_may_view_this_child()
 @permission_required("epilepsy12.change_investigations", raise_exception=True)
-def genetic_testing_date_callback(request, can_edit, investigations_id, test_name, field):
+def genetic_testing_date_callback(request, can_edit, investigations_id, test_name, requested_or_achieved):
     try:
         error_message = None
         investigations = Investigations.objects.get(pk=investigations_id)

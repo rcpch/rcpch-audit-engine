@@ -14,7 +14,7 @@
 
             <div class="two fields">
 
-                {% url 'genetic_testing_callback' investigations_id=investigations.pk test_name="r14" requested_or_achieved="requested" as hx_post %}
+                {% url 'genetic_testing_status_callback' investigations_id=investigations.pk test_name="r14" requested_or_achieved="requested" as hx_post %}
                 {% include 'epilepsy12/partials/page_elements/toggle_button.html' with hx_post=hx_post hx_target="#genetic_tests_information" hx_trigger="click" hx_swap="innerHTML" test_positive=investigations.r14_test_requested label=investigations.get_r14_test_requested_help_label_text enabled=can_edit %}
 
                 {% if investigations.r14_test_requested %}
