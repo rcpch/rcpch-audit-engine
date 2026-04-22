@@ -24,7 +24,6 @@
     [x] Assert an audit centre clinician CANNOT create patients outside own Trust - response.status_code == HTTPStatus.FORBIDDEN
     [x] Assert an Audit Centre Lead Clinician CANNOT create patients outside own Trust - response.status_code == HTTPStatus.FORBIDDEN
 
-
     [ ] Assert an Audit Centre Clinician can create patient records inside own Trust - response.status_code == HTTPStatus.OK
     [ ] Assert an Audit Centre Lead Clinician can create patient records inside own Trust - response.status_code == HTTPStatus.OK
     [ ] Assert RCPCH Audit Team can create patient records nationally, inside own Trust, and outside  - response.status_code == HTTPStatus.OK
@@ -111,11 +110,15 @@ from epilepsy12.models import (
     Epilepsy12User,
     Organisation,
     Case,
+    Registration,
+    AuditProgress,
+    KPI,
 )
 from epilepsy12.constants.user_types import RCPCH_AUDIT_TEAM
 from epilepsy12.tests.view_tests.permissions_tests.perm_tests_utils import (
     twofactor_signin,
 )
+from epilepsy12.tests.factories import E12CaseFactory
 
 
 @pytest.mark.django_db
@@ -838,3 +841,65 @@ def test_add_episode_comorbidity_syndrome_aem_forbidden(client, e12_case_factory
             assert (
                 response.status_code == HTTPStatus.FORBIDDEN
             ), f"{test_user} from {test_user.organisation_employer} with perms {test_user.groups.all()} request.POSTed to `{url}` for Case from {CASE.organisations.all()}. Expected {HTTPStatus.FORBIDDEN}, received {response.status_code}"
+
+
+# https://github.com/rcpch/rcpch-audit-engine/issues/1373
+@pytest.mark.django_db
+def test_lead_clinicians_can_confirm_eligibility(client, seed_groups_fixture, seed_users_fixture):
+    # Set up test organisation (GOSH)
+    TEST_USER_ORGANISATION = Organisation.objects.get(
+        ods_code="RP401",
+        trust__ods_code="RP4",
+    )
+    
+    # Get the lead clinician test user
+    lead_clinician = Epilepsy12User.objects.get(
+        first_name=test_user_audit_centre_lead_clinician_data.role_str
+    )
+    
+    # Set organisation employer for the lead clinician
+    lead_clinician.set_organisation_employer(
+        organisation_employer=TEST_USER_ORGANISATION,
+        is_primary=True
+    )
+    
+    # Create a Case without a Registration (registration=None prevents auto-creation)
+    case = E12CaseFactory.create(
+        first_name="TestChild",
+        surname="ForRegistration",
+        organisations__organisation=TEST_USER_ORGANISATION,
+        registration=None,  # Prevent factory from auto-creating registration
+    )
+    
+    # Verify no registration exists
+    assert not Registration.objects.filter(case=case).exists(), \
+        "Registration should not exist before accessing register endpoint"
+    
+    # Log in as lead clinician
+    client.force_login(lead_clinician)
+    
+    # Enable 2FA
+    twofactor_signin(client, lead_clinician)
+    
+    # Access the register endpoint (GET request creates Registration)
+    response = client.get(
+        reverse("register", kwargs={"case_id": case.id})
+    )
+    
+    # Assert successful response
+    assert response.status_code == HTTPStatus.OK, \
+        f"Lead clinician should be able to access register page. Expected {HTTPStatus.OK}, received {response.status_code}"
+    
+    # Verify Registration was created
+    assert Registration.objects.filter(case=case).exists(), \
+        "Registration should be created when lead clinician accesses register endpoint"
+    
+    registration = Registration.objects.get(case=case)
+    
+    # Confirm eligibility - this was crashing in https://github.com/rcpch/rcpch-audit-engine/issues/1373
+    response = client.get(
+        reverse("register", kwargs={"case_id": case.id})
+    )
+
+    assert response.status_code == HTTPStatus.OK, \
+        f"Lead clinician should be able to confirm eligibility. Expected {HTTPStatus.OK}, received {response.status_code}"
