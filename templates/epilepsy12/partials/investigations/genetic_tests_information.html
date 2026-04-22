@@ -20,10 +20,15 @@
                 {% if investigations.r14_test_requested %}
                     {% url 'genetic_testing_date_callback' investigations_id=investigations.pk test_name="r14" requested_or_achieved="requested" as hx_post %}
                     {% include 'epilepsy12/partials/page_elements/date_field.html' with hx_post=hx_post hx_target="#genetic_tests_information" hx_trigger="change delay:1s" hx_swap="innerHTML" date_value=investigations.r14_test_requested_date label=investigations.get_r14_test_requested_date_help_label_text input_date_field_name='r14_test_requested_date' error_messages=error_messages enabled=can_edit has_permission=can_edit %}
+
+                    {% url 'genetic_testing_status_callback' investigations_id=investigations.pk test_name="r14" requested_or_achieved="achieved" as hx_post %}
+                    {% include 'epilepsy12/partials/page_elements/toggle_button.html' with hx_post=hx_post hx_target="#genetic_tests_information" hx_trigger="click" hx_swap="innerHTML" test_positive=investigations.r14_test_achieved label=investigations.get_r14_test_achieved_help_label_text enabled=can_edit %}
+
+                    {% if investigations.r14_test_achieved %}
+                        {% url 'genetic_testing_date_callback' investigations_id=investigations.pk test_name="r14" requested_or_achieved="achieved" as hx_post %}
+                        {% include 'epilepsy12/partials/page_elements/date_field.html' with hx_post=hx_post hx_target="#genetic_tests_information" hx_trigger="change delay:1s" hx_swap="innerHTML" date_value=investigations.r14_test_achieved_date label=investigations.get_r14_test_achieved_date_help_label_text input_date_field_name='r14_test_achieved_date' error_messages=error_messages enabled=can_edit has_permission=can_edit %}
+                    {% endif %}
                 {% endif %}
-
-
-                TODO MRB: the rest of the genetic testing questions
 
             </div>
 

@@ -142,6 +142,78 @@ class Investigations(
         blank=True,
     )
 
+    r27_test_requested = models.BooleanField(
+        help_text={
+            "label": "R27 test requested"
+        },
+        default=None,
+        null=True,
+        blank=True,
+    )
+
+    r27_test_requested_date = models.DateField(
+        help_text={
+            "label": "Date R27 test requested",
+        },
+        default=None,
+        null=True,
+        blank=True,
+    )
+
+    r27_test_achieved = models.BooleanField(
+        help_text={
+            "label": "R27 test result achieved"
+        },
+        default=None,
+        null=True,
+        blank=True,
+    )
+
+    r27_test_achieved_date = models.DateField(
+        help_text={
+            "label": "Date R27 test result achieved",
+        },
+        default=None,
+        null=True,
+        blank=True,
+    )
+
+    r59_test_requested = models.BooleanField(
+        help_text={
+            "label": "R59 test requested"
+        },
+        default=None,
+        null=True,
+        blank=True,
+    )
+
+    r59_test_requested_date = models.DateField(
+        help_text={
+            "label": "Date R59 test requested",
+        },
+        default=None,
+        null=True,
+        blank=True,
+    )
+
+    r59_test_achieved = models.BooleanField(
+        help_text={
+            "label": "R59 test result achieved"
+        },
+        default=None,
+        null=True,
+        blank=True,
+    )
+
+    r59_test_achieved_date = models.DateField(
+        help_text={
+            "label": "Date R59 test result achieved",
+        },
+        default=None,
+        null=True,
+        blank=True,
+    )
+
     history = HistoricalRecords(cascade_delete_history=True)
 
     @property
