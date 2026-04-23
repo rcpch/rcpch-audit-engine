@@ -5,7 +5,7 @@
 {# MapLibre GL JS — loaded here so it is available for the deprivation map below #}
 <link rel="stylesheet" href="https://unpkg.com/maplibre-gl@4/dist/maplibre-gl.css" />
 <script src="https://unpkg.com/maplibre-gl@4/dist/maplibre-gl.js"></script>
-<script src="{% static 'js/maps/organisation_cases_map.js' %}"></script>
+<script src="https://cdn.jsdelivr.net/npm/@rcpch/imd-map@0.1.0/dist/umd/rcpch-imd-map.min.js" integrity="sha512-HxvDiTxqY6tdsC/YuL6B7y9f5gOq2/s+WcJn+TyN19kD/ftFC4AqYIG287jSIJK70ijmJbNavuLWj13ukb6vNg==" crossorigin="anonymous"> </script>
 
 <div class="ui grid container selected_organisation_container">
         <div class="fluid row stackable three column grid">
@@ -347,37 +347,8 @@
                 </div>
                 <div style="position: relative; width: 100%; height: 760px;">
                     <div id="organisation_cases_map" style="width:100%; height: 100%;"></div>
-                    <div
-                        style="position:absolute; left:12px; bottom:12px; z-index:2; max-width:340px; background:rgba(255,255,255,0.92); color:#222; border-radius:0; padding:10px 12px; box-shadow:0 2px 8px rgba(0,0,0,0.2); font-family:Montserrat-Regular; font-size:0.85rem; line-height:1.35;"
-                    >
-                        <details open>
-                            <summary style="font-weight:700; cursor:pointer; margin-bottom:6px;">Map legend</summary>
-                            <div style="margin-bottom:6px;">
-                                <strong>IMD:</strong> dark = more deprived, light = least deprived
-                            </div>
-                            <div style="margin-bottom:6px; font-size:0.8rem;">
-                                <strong>†</strong> IMD Decile 1 = most deprived, 10 = least deprived
-                            </div>
-                            <div style="margin-bottom:6px;">
-                                <strong>Nations:</strong> England reds, Wales greens, Scotland blues, N. Ireland oranges
-                            </div>
-                            <div>
-                                <strong>Boundaries:</strong>
-                                <div style="margin-top:6px; display:flex; flex-wrap:wrap; gap:6px;">
-                                    <button type="button" data-boundary-toggle="nhs-region-boundaries" aria-pressed="true" style="border:1px solid #aaa; background:#fff; padding:2px 6px; cursor:pointer; font-family:Montserrat-Regular; font-size:0.8rem;">
-                                        <span style="display:inline-block;width:12px;height:3px;background:#6b7280;vertical-align:middle;margin-right:6px;"></span>NHS Region
-                                    </button>
-                                    <button type="button" data-boundary-toggle="icb-boundaries" aria-pressed="true" style="border:1px solid #aaa; background:#fff; padding:2px 6px; cursor:pointer; font-family:Montserrat-Regular; font-size:0.8rem;">
-                                        <span style="display:inline-block;width:12px;height:3px;background:#7a1f2b;vertical-align:middle;margin-right:6px;"></span>ICB
-                                    </button>
-                                    <button type="button" data-boundary-toggle="lhb-boundaries" aria-pressed="true" style="border:1px solid #aaa; background:#fff; padding:2px 6px; cursor:pointer; font-family:Montserrat-Regular; font-size:0.8rem;">
-                                        <span style="display:inline-block;width:12px;height:3px;background:#2e7d32;vertical-align:middle;margin-right:6px;"></span>LHB
-                                    </button>
-                                </div>
-                            </div>
-                        </details>
-                    </div>
                 </div>
+                {{ organisation_cases_imd_payload|json_script:"organisation-cases-map-payload" }}
                 <div class="extra content">
                     <p style="color: white; font-family: Montserrat-Regular;">
                         Max: {{ aggregated_distances.max_distance_travelled_mi }} mi 
@@ -443,17 +414,67 @@
 </div>
 
 <script>
-    // Deprivation + Cases map initialised from local static frontend module.
-    window.RCPCHMaps.initialiseOrganisationCasesMap({
-        containerId: "organisation_cases_map",
+    (function () {
+        var container = document.getElementById("organisation_cases_map");
+        var payloadNode = document.getElementById("organisation-cases-map-payload");
+
+        if (!container || !payloadNode) return;
+        if (!window.RcpchImdMap || typeof window.RcpchImdMap.createImdMap !== "function") {
+            console.error("[rcpch-imd-map] UMD bundle is unavailable.");
+            return;
+        }
+
+        if (
+            window._organisationCasesImdMap
+            && typeof window._organisationCasesImdMap.destroy === "function"
+        ) {
+            window._organisationCasesImdMap.destroy();
+            window._organisationCasesImdMap = null;
+        }
+
+        var payload = JSON.parse(payloadNode.textContent || "{}");
+        var token = {
+            patientLabel: "{% templatetag openvariable %}patientLabel{% templatetag closevariable %}",
+            id: "{% templatetag openvariable %}id{% templatetag closevariable %}",
+            leadCentreLabel: "{% templatetag openvariable %}leadCentreLabel{% templatetag closevariable %}",
+            label: "{% templatetag openvariable %}label{% templatetag closevariable %}"
+        };
+
+        var map = window.RcpchImdMap.createImdMap({
+            container: "organisation_cases_map",
         tilesBaseUrl: "{{ deprivation_tiles_url }}",
-        imdEra: "{{ imd_tile_era }}",
-        orgLng: {{ org_lng|default:"null" }},
-        orgLat: {{ org_lat|default:"null" }},
-        orgName: "{{ org_name|escapejs }}",
-        casesGeojson: {{ cases_geojson|safe }},
-        boundaryOverlays: {{ boundary_overlays_geojson|safe }},
-    });
+            initialNation: payload.initialNation || "all",
+            initialEra: payload.initialEra || "2011",
+            enableHealthOverlays: true,
+            showLegend: true,
+            style: {
+                boundaries: {
+                    nhserColor: "#6b7280",
+                    icbColor: "#7a1f2b",
+                    lhbColor: "#2e7d32"
+                },
+                tooltip: {
+                    areaLabel: "Area",
+                    decileLabel: "IMD decile",
+                    patientTooltipText: token.patientLabel + ": " + token.id,
+                    leadCentreTooltipText: token.leadCentreLabel + ": " + token.label
+                }
+            },
+            onWarning: function (warning) {
+                console.warn("[rcpch-imd-map]", warning.code, warning.message);
+            }
+        });
+
+        map.setPatients(payload.patients || []);
+        if (payload.leadCentre) {
+            map.setLeadCentre(payload.leadCentre);
+        }
+        if (typeof map.fitToData === "function") {
+            map.fitToData();
+        }
+
+        window._organisationCasesImdMap = map;
+    })();
 
     // ── Remaining Plotly charts ───────────────────────────────────────────────
     var index_of_multiple_deprivation_score_piechart = {{ index_of_multiple_deprivation_score_piechart|safe }};

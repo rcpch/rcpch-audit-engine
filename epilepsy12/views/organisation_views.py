@@ -1,6 +1,5 @@
 # Python imports
 from datetime import date
-import json
 import math
 
 # third party libraries
@@ -18,7 +17,7 @@ from epilepsy12.models_folder.entities.local_health_board import LocalHealthBoar
 
 # E12 imports
 from ..decorator import user_may_view_this_organisation, login_and_otp_required
-from epilepsy12.constants import INDIVIDUAL_KPI_MEASURES, EnumAbstractionLevel
+from epilepsy12.constants import INDIVIDUAL_KPI_MEASURES
 from epilepsy12.models import (
     Organisation,
     KPI,
@@ -53,10 +52,6 @@ from ..general_functions import (
 from ..kpi import download_kpi_summary_as_csv
 from epilepsy12.common_view_functions.aggregate_by import (
     update_all_kpi_agg_models,
-)
-from epilepsy12.common_view_functions.tiles_for_region import return_tile_for_region
-from epilepsy12.common_view_functions.map_from_shape_file import (
-    generate_case_counts_for_each_region_in_each_abstraction_level,
 )
 
 
@@ -190,138 +185,71 @@ def selected_organisation_summary(request, organisation_id):
     # - Other nations: default to 2011 boundaries
     is_england = selected_organisation.country.boundary_identifier == "E92000001"
     imd_tile_era = "2021" if (is_england and cohort_number >= 8) else "2011"
+    nation_by_boundary_identifier = {
+        "E92000001": "england",
+        "W92000004": "wales",
+        "S92000003": "scotland",
+        "N92000002": "northern_ireland",
+    }
+    imd_initial_nation = nation_by_boundary_identifier.get(
+        selected_organisation.country.boundary_identifier, "all"
+    )
 
-    # Serialise case locations as GeoJSON for the MapLibre deprivation map
-    _case_features = []
+    # Build patient list for the IMD map
+    imd_map_patients = []
     if not case_distances_dataframe.empty:
         _required = {"latitude", "longitude"}
         if _required.issubset(case_distances_dataframe.columns):
             for _, _row in case_distances_dataframe.dropna(
                 subset=["latitude", "longitude"]
             ).iterrows():
-                _props = {}
-                for _col in (
-                    "pk",
-                    "distance_mi",
-                    "distance_km",
-                    "epilepsy12_sites__organisation__name",
-                ):
-                    if _col in case_distances_dataframe.columns:
-                        _val = _row[_col]
-                        _props[_col] = (
-                            None
-                            if (isinstance(_val, float) and math.isnan(_val))
-                            else _val
-                        )
-                _case_features.append(
-                    {
-                        "type": "Feature",
-                        "geometry": {
-                            "type": "Point",
-                            "coordinates": [
-                                float(_row["longitude"]),
-                                float(_row["latitude"]),
-                            ],
-                        },
-                        "properties": _props,
-                    }
+                patient_lat = float(_row["latitude"])
+                patient_lon = float(_row["longitude"])
+                patient_id = (
+                    _row["pk"] if "pk" in case_distances_dataframe.columns else None
                 )
-    cases_geojson = json.dumps(
-        {"type": "FeatureCollection", "features": _case_features}
-    )
+                if patient_id is None or (
+                    isinstance(patient_id, float) and math.isnan(patient_id)
+                ):
+                    patient_id = f"case-{len(imd_map_patients) + 1}"
 
-    def _build_boundary_overlay(
-        *,
-        overlay_id,
-        boundary_type,
-        region_key,
-        abstraction_enum,
-        identifier_property,
-        line_color,
+                imd_map_patient = {
+                    "id": str(patient_id),
+                    "lat": patient_lat,
+                    "lon": patient_lon,
+                }
+                if "distance_mi" in case_distances_dataframe.columns:
+                    distance_mi = _row["distance_mi"]
+                    if not (isinstance(distance_mi, float) and math.isnan(distance_mi)):
+                        imd_map_patient["distance_mi"] = float(distance_mi)
+                if "distance_km" in case_distances_dataframe.columns:
+                    distance_km = _row["distance_km"]
+                    if not (isinstance(distance_km, float) and math.isnan(distance_km)):
+                        imd_map_patient["distance_km"] = float(distance_km)
+                imd_map_patients.append(imd_map_patient)
+    imd_map_lead_centre = None
+    if (
+        selected_organisation.latitude is not None
+        and selected_organisation.longitude is not None
     ):
-        """Create a boundary overlay payload for the frontend map."""
-        region_geojson = json.loads(return_tile_for_region(region_key))
-        case_counts_df = generate_case_counts_for_each_region_in_each_abstraction_level(
-            abstraction_level=abstraction_enum,
-            cohort=cohort_number,
-            organisation=selected_organisation,
-        )
-
-        case_count_by_identifier = {}
-        if not case_counts_df.empty:
-            for _, count_row in case_counts_df.iterrows():
-                identifier = count_row.get("identifier")
-                if identifier is None:
-                    continue
-                raw_cases = count_row.get("cases", 0)
-                case_count_by_identifier[str(identifier)] = int(raw_cases or 0)
-
-        for feature in region_geojson.get("features", []):
-            props = feature.setdefault("properties", {})
-            identifier = props.get(identifier_property)
-            props["boundary_type"] = boundary_type
-            props["boundary_name"] = props.get("name", "Unknown boundary")
-            props["boundary_code"] = identifier if identifier is not None else "N/A"
-            props["case_count"] = case_count_by_identifier.get(str(identifier), 0)
-
-        return {
-            "id": overlay_id,
-            "sourceType": "geojson",
-            "data": region_geojson,
-            "beforeLayerId": "cases-layer",
-            "linePaint": {
-                "line-color": line_color,
-                "line-width": 2,
-                "line-opacity": 0.85,
-            },
-            "fillPaint": {
-                "fill-color": "#000000",
-                "fill-opacity": 0.0,
-            },
+        imd_map_lead_centre = {
+            "lat": float(selected_organisation.latitude),
+            "lon": float(selected_organisation.longitude),
+            "label": selected_organisation.name,
         }
 
-    boundary_overlays = []
-
-    # Always provide Welsh LHB boundaries so they are visible when zooming out from any centre.
-    boundary_overlays.append(
-        _build_boundary_overlay(
-            overlay_id="lhb-boundaries",
-            boundary_type="Local Health Board",
-            region_key="lhb",
-            abstraction_enum=EnumAbstractionLevel.LOCAL_HEALTH_BOARD,
-            identifier_property="ods_code",
-            line_color="#2e7d32",
-        )
-    )
+    organisation_cases_imd_payload = {
+        "initialNation": imd_initial_nation,
+        "initialEra": imd_tile_era,
+        "patients": imd_map_patients,
+        "leadCentre": imd_map_lead_centre,
+    }
 
     # Use centre geography to choose trust/LHB denominator for completion summary cards.
     if selected_organisation.country.boundary_identifier == "W92000004":  # Wales
         abstraction_level = "local_health_board"
     else:
         abstraction_level = "trust"
-
-    # Add English hierarchy overlays for contextual tooltips (not applicable to Jersey).
-    if selected_organisation.ods_code != "RGT1W":
-        boundary_overlays.append(
-            _build_boundary_overlay(
-                overlay_id="icb-boundaries",
-                boundary_type="Integrated Care Board",
-                region_key="icb",
-                abstraction_enum=EnumAbstractionLevel.ICB,
-                identifier_property="ods_code",
-                line_color="#7a1f2b",
-            )
-        )
-        boundary_overlays.append(
-            _build_boundary_overlay(
-                overlay_id="nhs-region-boundaries",
-                boundary_type="NHS England Region",
-                region_key="nhs_england_region",
-                abstraction_enum=EnumAbstractionLevel.NHS_ENGLAND_REGION,
-                identifier_property="region_code",
-                line_color="#6b7280",
-            )
-        )
 
     # query to return all completed E12 cases in the current cohort in this organisation
     count_of_current_cohort_registered_completed_cases_in_this_organisation = (
@@ -460,13 +388,8 @@ def selected_organisation_summary(request, organisation_id):
         "count_of_all_current_cohort_registered_cases_in_this_trust": count_of_all_current_cohort_registered_cases_in_this_trust,
         "count_of_current_cohort_registered_completed_cases_in_this_trust": count_of_current_cohort_registered_completed_cases_in_this_trust,
         "individual_kpi_choices": INDIVIDUAL_KPI_MEASURES,
-        "cases_geojson": cases_geojson,
-        "boundary_overlays_geojson": json.dumps(boundary_overlays),
-        "imd_tile_era": imd_tile_era,
         "deprivation_tiles_url": settings.RCPCH_DEPRIVATION_TILES_URL,
-        "org_lat": selected_organisation.latitude,
-        "org_lng": selected_organisation.longitude,
-        "org_name": selected_organisation.name,
+        "organisation_cases_imd_payload": organisation_cases_imd_payload,
         "aggregated_distances": aggregated_distances,
         "organisational_audit_submission_period": organisational_audit_submission_period,
     }
