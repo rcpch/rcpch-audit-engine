@@ -11,6 +11,7 @@
         input_date_field_name: the name of the input element - should match the field name being updated
         enabled
         hx_confirm
+        hx_preserve: attach hx_preserve to avoid deleting the value and leaving set disabled on a swap (e.g genetic test dates)
         tooltip_id: this is the name of the field to update
         has_permission: boolean
     NOTE - in the view, the value of the date can be retrieved by request.POST.get(FIELD_NAME_AS_A_STRING)
@@ -36,6 +37,8 @@
         {% endif %}
             <div class='ui left icon input'>
                 <input
+                    id="{{input_date_field_name}}_input_id"
+                    {% if hx_preserve %}hx-preserve{% endif %}
                     {% if not enabled %}disabled{% endif %}
                     _="on keyup or change if my value remove @disabled from #{{input_date_field_name}}{{tooltip_id}}_id"
                     type="date"
@@ -61,6 +64,7 @@
                     hx-target="{{hx_target}}"
                     hx-trigger="click"
                     hx-include="[name='{{input_date_field_name}}']"
+                    {% if hx_preserve %}hx-preserve{% endif %}
                     {% if hx_confirm %}
                     _="on htmx:confirm(issueRequest)
                         halt the event
