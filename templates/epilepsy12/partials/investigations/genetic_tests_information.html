@@ -1,0 +1,27 @@
+{% load epilepsy12_template_tags %}
+<div class="ui form" hx-headers='{"X-CSRFToken": "{{ csrf_token }}"}'>
+
+    <div class="ui segment">
+
+        <div class="field">
+
+            {% url 'genome_sequencing_requested' investigations_id=investigations.pk as hx_post %}
+            {% include 'epilepsy12/partials/page_elements/toggle_button.html' with hx_post=hx_post hx_target="#genetic_tests_information" hx_trigger="click" hx_swap="innerHTML" test_positive=investigations.genome_sequencing_requested label=investigations.get_genome_sequencing_requested_help_label_text enabled=can_edit %}
+
+        </div>
+
+        {% if investigations.genome_sequencing_requested %}
+            {% for genome_test in genome_tests %}
+                {% include 'epilepsy12/partials/investigations/genetic_test_questions.html' with genome_test=genome_test %}
+            {% endfor %}
+        {% endif %}
+
+        {% if error_message %}
+            <div class='ui rcpch_warning message'>
+                {{ error_message }}
+            </div>
+        {% endif %}
+
+    </div>
+
+</div>

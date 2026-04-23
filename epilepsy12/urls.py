@@ -816,6 +816,21 @@ investigations_patterns = [
         mri_brain_declined,
         name="mri_brain_declined",
     ),
+    path(
+        "investigations/<int:investigations_id>/genome_sequencing_requested",
+        genome_sequencing_requested,
+        name="genome_sequencing_requested",
+    ),
+    path(
+        "investigations/<int:investigations_id>/genetic_testing/<str:test_name>/status",
+        genetic_testing_status_callback,
+        name="genetic_testing_status_callback",
+    ),
+    path(
+        "investigations/<int:investigations_id>/genetic_testing/<str:test_name>/<str:requested_or_achieved>/date",
+        genetic_testing_date_callback,
+        name="genetic_testing_date_callback",
+    ),
 ]
 
 episode_patterns = [

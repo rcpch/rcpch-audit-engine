@@ -1,3 +1,4 @@
+import json
 from datetime import date
 from django.utils import timezone
 from django.contrib.auth.decorators import permission_required
@@ -7,6 +8,43 @@ from ..common_view_functions import (
     recalculate_form_generate_response,
 )
 from ..decorator import user_may_view_this_child, login_and_otp_required
+from ..constants.common import GENOME_TEST_CHOICES
+
+
+def genome_sequencing_context(can_edit, investigations):
+    genome_tests = []
+
+    for test in ["r14", "r27", "r59"]:
+        field_name = f"{test}_test_status"
+
+        test_status = getattr(investigations, field_name)
+
+        label_text = Investigations._meta.get_field(field_name).help_text["label"]
+
+        test_requested_date_field_name = f"{test}_test_requested_date"
+        test_requested_date = getattr(investigations, test_requested_date_field_name)
+
+        test_achieved_date_field_name = f"{test}_test_achieved_date"
+        test_achieved_date = getattr(investigations, test_achieved_date_field_name)
+
+        genome_tests.append(
+            {
+                "test_name": test,
+                "test_status": test_status,
+                "label_text": label_text,
+                "test_requested_date": test_requested_date,
+                "test_requested_date_enabled": test_status in ["R", "A"],
+                "test_requested_date_field_name": test_requested_date_field_name,
+                "test_achieved_date": test_achieved_date,
+                "test_achieved_date_enabled": test_status == "A",
+                "test_achieved_date_field_name": test_achieved_date_field_name,
+            }
+        )
+
+    return {
+        "genome_tests": genome_tests,
+        "genome_test_choices": GENOME_TEST_CHOICES,
+    }
 
 
 @login_and_otp_required()
@@ -47,6 +85,8 @@ def investigations(request, can_edit, case_id):
         "eeg_declined": eeg_declined,
         "mri_brain_declined": mri_brain_declined,
     }
+
+    context = context | genome_sequencing_context(can_edit, investigations)
 
     template_name = "epilepsy12/investigations.html"
 
@@ -548,6 +588,158 @@ def mri_brain_declined(request, can_edit, investigations_id, confirm):
 
     template_name = "epilepsy12/partials/investigations/mri_brain_information.html"
 
+    response = recalculate_form_generate_response(
+        model_instance=investigations,
+        request=request,
+        context=context,
+        template=template_name,
+        error_message=error_message,
+    )
+
+    return response
+
+
+@login_and_otp_required()
+@user_may_view_this_child()
+@permission_required("epilepsy12.change_investigations", raise_exception=True)
+def genome_sequencing_requested(request, can_edit, investigations_id):
+    try:
+        error_message = None
+        validate_and_update_model(
+            request,
+            investigations_id,
+            Investigations,
+            field_name="genome_sequencing_requested",
+            page_element="toggle_button",
+        )
+
+    except ValueError as error:
+        error_message = error
+
+    investigations = Investigations.objects.get(pk=investigations_id)
+
+    if not investigations.genome_sequencing_requested:
+        investigations.clear_genetic_testing_questions()
+        investigations.save()
+
+    genome_context = genome_sequencing_context(can_edit, investigations)
+
+    context = {
+        "can_edit": can_edit,
+        "investigations": investigations,
+    } | genome_context
+
+    template_name = "epilepsy12/partials/investigations/genetic_tests_information.html"
+
+    # TODO MRB: update this to take genetic testing questions into account
+    response = recalculate_form_generate_response(
+        model_instance=investigations,
+        request=request,
+        context=context,
+        template=template_name,
+        error_message=error_message,
+    )
+
+    return response
+
+
+@login_and_otp_required()
+@user_may_view_this_child()
+@permission_required("epilepsy12.change_investigations", raise_exception=True)
+def genetic_testing_status_callback(request, can_edit, investigations_id, test_name):
+    try:
+        error_message = None
+
+        validate_and_update_model(
+            request,
+            investigations_id,
+            Investigations,
+            field_name=f"{test_name}_test_status",
+            page_element="single_choice_multiple_toggle_button",
+        )
+
+    except ValueError as error:
+        error_message = error
+
+    investigations = Investigations.objects.get(pk=investigations_id)
+    
+    test_status = getattr(investigations, f"{test_name}_test_status")
+
+    date_requested_field_name = f"{test_name}_test_requested_date"
+    date_achieved_field_name = f"{test_name}_test_achieved_date"
+
+    if test_status in ["R", "N"]:
+        setattr(investigations, date_achieved_field_name, None)
+    
+    if test_status == "N":
+        setattr(investigations, date_requested_field_name, None)
+
+    investigations.save()
+
+    genome_context = genome_sequencing_context(can_edit, investigations)
+
+    context = {
+        "can_edit": can_edit,
+        "investigations": investigations,
+    } | genome_context
+
+    template_name = "epilepsy12/partials/investigations/genetic_tests_information.html"
+
+    # TODO MRB: update this to take genetic testing questions into account
+    response = recalculate_form_generate_response(
+        model_instance=investigations,
+        request=request,
+        context=context,
+        template=template_name,
+        error_message=error_message,
+    )
+
+    return response
+
+
+@login_and_otp_required()
+@user_may_view_this_child()
+@permission_required("epilepsy12.change_investigations", raise_exception=True)
+def genetic_testing_date_callback(request, can_edit, investigations_id, test_name, requested_or_achieved):
+    try:
+        error_message = None
+        investigations = Investigations.objects.get(pk=investigations_id)
+        
+        if requested_or_achieved == "achieved":
+            comparison_date_field_name=f"{test_name}_test_requested_date"
+        else:
+            comparison_date_field_name=None
+
+        validation_args = {
+            "field_name": f"{test_name}_test_{requested_or_achieved}_date",
+            "page_element": "date_field",
+            "comparison_date_field_name": comparison_date_field_name,
+            "is_earliest_date": True,
+            "earliest_allowable_date": investigations.registration.case.date_of_birth,
+        }
+
+        validate_and_update_model(
+            request,
+            investigations_id,
+            Investigations,
+            **validation_args
+        )
+
+    except ValueError as error:
+        error_message = error
+
+    investigations = Investigations.objects.get(pk=investigations_id)
+
+    genome_context = genome_sequencing_context(can_edit, investigations)
+
+    context = {
+        "can_edit": can_edit,
+        "investigations": investigations,
+    } | genome_context
+
+    template_name = "epilepsy12/partials/investigations/genetic_tests_information.html"
+
+    # TODO MRB: update this to take genetic testing questions into account
     response = recalculate_form_generate_response(
         model_instance=investigations,
         request=request,

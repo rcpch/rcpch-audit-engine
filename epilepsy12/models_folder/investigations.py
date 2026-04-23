@@ -12,6 +12,7 @@ from simple_history.models import HistoricalRecords
 from .help_text_mixin import HelpTextMixin
 from ..general_functions import stringify_time_elapsed
 from .time_and_user_abstract_base_classes import *
+from ..constants.common import GENOME_TEST_CHOICES
 
 
 class Investigations(
@@ -96,6 +97,100 @@ class Investigations(
         blank=True,
     )
 
+    # Cohort 8+ (https://github.com/rcpch/rcpch-audit-engine/issues/1074)
+    genome_sequencing_requested = models.BooleanField(
+        help_text={
+            "label": "Has epilepsy related Whole Genome Sequencing been requested?"
+        },
+        default=None,
+        null=True,
+        blank=True,
+    )
+
+    r14_test_status = models.CharField(
+        help_text={
+            "label": "Was an R14 test requested?",
+        },
+        max_length=2,
+        choices=GENOME_TEST_CHOICES,
+        default=None,
+        null=True,
+    )
+
+    r14_test_requested_date = models.DateField(
+        help_text={
+            "label": "Date of decision to request R14 test",
+        },
+        default=None,
+        null=True,
+        blank=True,
+    )
+
+    r14_test_achieved_date = models.DateField(
+        help_text={
+            "label": "Date R14 test result achieved",
+        },
+        default=None,
+        null=True,
+        blank=True,
+    )
+
+    r27_test_status = models.CharField(
+        help_text={
+            "label": "Was an R27 test requested?",
+        },
+        max_length=2,
+        choices=GENOME_TEST_CHOICES,
+        default=None,
+        null=True,
+    )
+
+    r27_test_requested_date = models.DateField(
+        help_text={
+            "label": "Date of decision to request R27 test",
+        },
+        default=None,
+        null=True,
+        blank=True,
+    )
+
+    r27_test_achieved_date = models.DateField(
+        help_text={
+            "label": "Date R27 test result achieved",
+        },
+        default=None,
+        null=True,
+        blank=True,
+    )
+
+    r59_test_status = models.CharField(
+        help_text={
+            "label": "Was an R59 test requested?",
+        },
+        max_length=2,
+        choices=GENOME_TEST_CHOICES,
+        default=None,
+        null=True,
+    )
+
+    r59_test_requested_date = models.DateField(
+        help_text={
+            "label": "Date of decision to request R59 test",
+        },
+        default=None,
+        null=True,
+        blank=True,
+    )
+
+    r59_test_achieved_date = models.DateField(
+        help_text={
+            "label": "Date R59 test result achieved",
+        },
+        default=None,
+        null=True,
+        blank=True,
+    )
+
     history = HistoricalRecords(cascade_delete_history=True)
 
     @property
@@ -122,6 +217,12 @@ class Investigations(
 
     def get_current_date(self):
         return date.today()
+    
+    def clear_genetic_testing_questions(self):
+        for test in ["r14", "r27", "r59"]:
+            setattr(self, f"{test}_test_status", None)
+            setattr(self, f"{test}_test_requested_date", None)
+            setattr(self, f"{test}_test_achieved_date", None)
 
     # relationships
     registration = models.OneToOneField(
