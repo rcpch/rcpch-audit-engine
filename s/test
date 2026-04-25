@@ -6,9 +6,87 @@ set -e  # Exit on error
 # scripts may need to be made executable on some platforms before they can be run
 # chmod +x <filename> is the command to do this on unixy systems
 
-# runs tests in the context of the django development server
+# runs tests in the context of the django development server by default
 # by default the --verbose flag is passed to pytest for more detailed output
-# $@ means all further arguments passed to s/test are passed to docker compose pytest ...
+# pytest args are passed through after optional script flags
 
-# *** The project's containers MUST BE RUNNING to execute tests inside it! ***
-docker compose exec django pytest -v "$@"
+usage() {
+	cat <<EOF
+Usage: s/test [MODE] [pytest args...]
+
+Runs pytest with -v.
+
+Modes (pick one):
+	--container, --in-container
+		Run in an already-running django container (default).
+	--local, --host, --outside-container
+		Run directly on the host machine.
+	--spin-up, --up, --with-up
+		Spin up an isolated test-only compose project (django+postgis), run tests,
+		and tear it down automatically.
+
+Options:
+	-h, --help
+			Show this help message.
+
+Examples:
+	s/test
+	s/test -k imd
+	s/test --local epilepsy12/tests/model_tests/test_imd.py
+	s/test --spin-up -m 'not slow'
+EOF
+}
+
+MODE="container"
+PYTEST_ARGS=()
+SPIN_UP_PROJECT=""
+
+set_mode() {
+	local requested_mode="$1"
+	if [ "$MODE" != "container" ] && [ "$MODE" != "$requested_mode" ]; then
+		echo "Error: choose only one mode flag (--local/--host, --container, or --spin-up)."
+		exit 2
+	fi
+	MODE="$requested_mode"
+}
+
+cleanup_spin_up_project() {
+	if [ -n "$SPIN_UP_PROJECT" ]; then
+		docker compose -p "$SPIN_UP_PROJECT" down -v >/dev/null 2>&1 || true
+	fi
+}
+
+for arg in "$@"; do
+	case "$arg" in
+		--local|--host|--outside-container)
+			set_mode "local"
+			;;
+		--container|--in-container)
+			set_mode "container"
+			;;
+		--spin-up|--up|--with-up)
+			set_mode "spin-up"
+			;;
+		-h|--help)
+			usage
+			exit 0
+			;;
+		*)
+			PYTEST_ARGS+=("$arg")
+			;;
+	esac
+done
+
+if [ "$MODE" = "local" ]; then
+	pytest -v "${PYTEST_ARGS[@]}"
+elif [ "$MODE" = "spin-up" ]; then
+	SPIN_UP_PROJECT="e12-test-$$"
+	trap cleanup_spin_up_project EXIT
+
+	# Start only what tests need in an isolated compose project.
+	DJANGO_START_COMMAND='s/start-test' docker compose -p "$SPIN_UP_PROJECT" up -d --wait django
+	docker compose -p "$SPIN_UP_PROJECT" exec django pytest -v "${PYTEST_ARGS[@]}"
+else
+	# *** The project's containers MUST BE RUNNING to execute tests inside it! ***
+	docker compose exec django pytest -v "${PYTEST_ARGS[@]}"
+fi

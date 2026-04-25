@@ -26,6 +26,7 @@ from epilepsy12.general_functions.index_multiple_deprivation import (
 
 IMD_PATCH = "epilepsy12.general_functions.index_multiple_deprivation.imd_for_postcode"
 COORDS_PATCH = "epilepsy12.models_folder.case.coordinates_for_postcode"
+COUNTRY_PATCH = "epilepsy12.general_functions.index_multiple_deprivation.country_boundary_identifier_for_postcode"
 
 
 # ── Correct year selection ──────────────────────────────────────────────────
@@ -53,7 +54,10 @@ def test_imd_uses_2019_for_cohort_below_8(mock_imd, mock_coords, e12_case_factor
 @pytest.mark.django_db
 @patch(COORDS_PATCH)
 @patch(IMD_PATCH)
-def test_imd_uses_2025_for_cohort_8_and_above(mock_imd, mock_coords, e12_case_factory):
+@patch(COUNTRY_PATCH, return_value="E92000001")
+def test_imd_uses_2025_for_cohort_8_and_above(
+    mock_country, mock_imd, mock_coords, e12_case_factory
+):
     """Cohort 8 (assessment date in 2025) should call the API with year=2025."""
     mock_coords.return_value = (-0.1234, 51.5678)
     mock_imd.return_value = 2
@@ -72,8 +76,9 @@ def test_imd_uses_2025_for_cohort_8_and_above(mock_imd, mock_coords, e12_case_fa
 @pytest.mark.django_db
 @patch(COORDS_PATCH)
 @patch(IMD_PATCH)
+@patch(COUNTRY_PATCH, return_value="E92000001")
 def test_imd_recalculated_when_assessment_date_changes_cohort(
-    mock_imd, mock_coords, e12_case_factory
+    mock_country, mock_imd, mock_coords, e12_case_factory
 ):
     """Changing first_paediatric_assessment_date across the cohort 7→8 boundary
     should trigger a new IMD call with year=2025."""
@@ -97,6 +102,28 @@ def test_imd_recalculated_when_assessment_date_changes_cohort(
     assert case.registration.cohort == 8
     mock_imd.assert_called_with("WC1X8SH", year=2025)
     assert case.index_of_multiple_deprivation_quintile == 5
+
+
+@pytest.mark.django_db
+@patch(COORDS_PATCH)
+@patch(IMD_PATCH)
+@patch(COUNTRY_PATCH, return_value="W92000004")
+def test_imd_uses_2019_for_cohort_8_when_country_not_england(
+    mock_country, mock_imd, mock_coords, e12_case_factory
+):
+    """Cohort 8 should still use year=2019 outside England (e.g. Wales)."""
+    mock_coords.return_value = (-0.1234, 51.5678)
+    mock_imd.return_value = 2
+
+    case = e12_case_factory(
+        postcode="CF10 1AA",
+        registration__first_paediatric_assessment_date=date(2025, 3, 1),  # cohort 8
+    )
+
+    case.refresh_from_db()
+    assert case.registration.cohort == 8
+    mock_imd.assert_called_with("CF101AA", year=2019)
+    assert case.index_of_multiple_deprivation_quintile == 2
 
 
 # ── Postcode triggers ───────────────────────────────────────────────────────
