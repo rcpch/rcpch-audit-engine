@@ -29,13 +29,39 @@ COORDS_PATCH = "epilepsy12.models_folder.case.coordinates_for_postcode"
 COUNTRY_PATCH = "epilepsy12.general_functions.index_multiple_deprivation.country_boundary_identifier_for_postcode"
 
 
+def assert_imd_call(
+    mock_imd, postcode, year, country_boundary_identifier=None
+):
+    """Assert the IMD helper was called with the expected postcode/year.
+
+    Tests accept additional country kwargs so they remain valid as the helper
+    signature evolves.
+    """
+    args, kwargs = mock_imd.call_args
+
+    assert args == (postcode,)
+    assert kwargs.get("year") == year
+
+    if country_boundary_identifier is not None:
+        if "country" in kwargs:
+            assert kwargs["country"] == country_boundary_identifier
+        if "country_boundary_identifier" in kwargs:
+            assert (
+                kwargs["country_boundary_identifier"]
+                == country_boundary_identifier
+            )
+
+
 # ── Correct year selection ──────────────────────────────────────────────────
 
 
 @pytest.mark.django_db
 @patch(COORDS_PATCH)
 @patch(IMD_PATCH)
-def test_imd_uses_2019_for_cohort_below_8(mock_imd, mock_coords, e12_case_factory):
+@patch(COUNTRY_PATCH, return_value="E92000001")
+def test_imd_uses_2019_for_cohort_below_8(
+    mock_country, mock_imd, mock_coords, e12_case_factory
+):
     """Cohort 7 (assessment date in 2024) should call the API with year=2019."""
     mock_coords.return_value = (-0.1234, 51.5678)
     mock_imd.return_value = 3
@@ -47,7 +73,7 @@ def test_imd_uses_2019_for_cohort_below_8(mock_imd, mock_coords, e12_case_factor
 
     case.refresh_from_db()
     assert case.registration.cohort == 7
-    mock_imd.assert_called_with("WC1X8SH", year=2019)
+    assert_imd_call(mock_imd, "WC1X8SH", year=2019, country_boundary_identifier="E92000001")
     assert case.index_of_multiple_deprivation_quintile == 3
 
 
@@ -69,7 +95,7 @@ def test_imd_uses_2025_for_cohort_8_and_above(
 
     case.refresh_from_db()
     assert case.registration.cohort == 8
-    mock_imd.assert_called_with("WC1X8SH", year=2025)
+    assert_imd_call(mock_imd, "WC1X8SH", year=2025, country_boundary_identifier="E92000001")
     assert case.index_of_multiple_deprivation_quintile == 2
 
 
@@ -100,7 +126,7 @@ def test_imd_recalculated_when_assessment_date_changes_cohort(
 
     case.refresh_from_db()
     assert case.registration.cohort == 8
-    mock_imd.assert_called_with("WC1X8SH", year=2025)
+    assert_imd_call(mock_imd, "WC1X8SH", year=2025, country_boundary_identifier="E92000001")
     assert case.index_of_multiple_deprivation_quintile == 5
 
 
@@ -122,7 +148,7 @@ def test_imd_uses_2019_for_cohort_8_when_country_not_england(
 
     case.refresh_from_db()
     assert case.registration.cohort == 8
-    mock_imd.assert_called_with("CF101AA", year=2019)
+    assert_imd_call(mock_imd, "CF101AA", year=2019, country_boundary_identifier="W92000004")
     assert case.index_of_multiple_deprivation_quintile == 2
 
 
@@ -132,8 +158,9 @@ def test_imd_uses_2019_for_cohort_8_when_country_not_england(
 @pytest.mark.django_db
 @patch(COORDS_PATCH)
 @patch(IMD_PATCH)
+@patch(COUNTRY_PATCH, return_value="E92000001")
 def test_imd_recalculated_when_postcode_changes(
-    mock_imd, mock_coords, e12_case_factory
+    mock_country, mock_imd, mock_coords, e12_case_factory
 ):
     """Saving a Case with a new postcode should trigger a fresh IMD lookup."""
     mock_coords.return_value = (-0.1234, 51.5678)
@@ -149,7 +176,7 @@ def test_imd_recalculated_when_postcode_changes(
     case.save()
 
     case.refresh_from_db()
-    mock_imd.assert_called_with("EC1A1BB", year=2019)
+    assert_imd_call(mock_imd, "EC1A1BB", year=2019, country_boundary_identifier="E92000001")
     assert case.index_of_multiple_deprivation_quintile == 4
 
 
@@ -168,8 +195,9 @@ def test_imd_not_calculated_when_postcode_is_none(mock_imd, e12_case_factory):
 @pytest.mark.django_db
 @patch(COORDS_PATCH)
 @patch(IMD_PATCH)
+@patch(COUNTRY_PATCH, return_value="E92000001")
 def test_imd_not_calculated_for_unknown_postcode(
-    mock_imd, mock_coords, e12_case_factory
+    mock_country, mock_imd, mock_coords, e12_case_factory
 ):
     """A case with an 'unknown' placeholder postcode should not call the API."""
     mock_coords.return_value = (-0.1234, 51.5678)
@@ -194,8 +222,9 @@ def test_imd_not_calculated_for_unknown_postcode(
 @pytest.mark.django_db
 @patch(COORDS_PATCH)
 @patch(IMD_PATCH)
+@patch(COUNTRY_PATCH, return_value="E92000001")
 def test_imd_not_calculated_when_no_registration(
-    mock_imd, mock_coords, e12_case_factory
+    mock_country, mock_imd, mock_coords, e12_case_factory
 ):
     """recalculate_imd_for_case should be a no-op when no Registration exists."""
     mock_coords.return_value = (-0.1234, 51.5678)
@@ -222,8 +251,9 @@ def test_imd_not_calculated_when_no_registration(
 @pytest.mark.django_db
 @patch(COORDS_PATCH)
 @patch(IMD_PATCH)
+@patch(COUNTRY_PATCH, return_value="E92000001")
 def test_imd_not_calculated_when_cohort_is_none(
-    mock_imd, mock_coords, e12_case_factory
+    mock_country, mock_imd, mock_coords, e12_case_factory
 ):
     """recalculate_imd_for_case should be a no-op when the cohort is not yet set."""
     mock_coords.return_value = (-0.1234, 51.5678)
@@ -251,7 +281,10 @@ def test_imd_not_calculated_when_cohort_is_none(
 @pytest.mark.django_db
 @patch(COORDS_PATCH)
 @patch(IMD_PATCH)
-def test_imd_persisted_to_database(mock_imd, mock_coords, e12_case_factory):
+@patch(COUNTRY_PATCH, return_value="E92000001")
+def test_imd_persisted_to_database(
+    mock_country, mock_imd, mock_coords, e12_case_factory
+):
     """The IMD quintile returned by the API should be written to the database."""
     mock_coords.return_value = (-0.1234, 51.5678)
     mock_imd.return_value = 5
@@ -270,7 +303,10 @@ def test_imd_persisted_to_database(mock_imd, mock_coords, e12_case_factory):
 @pytest.mark.django_db
 @patch(COORDS_PATCH)
 @patch(IMD_PATCH)
-def test_imd_set_to_none_when_api_returns_none(mock_imd, mock_coords, e12_case_factory):
+@patch(COUNTRY_PATCH, return_value="E92000001")
+def test_imd_set_to_none_when_api_returns_none(
+    mock_country, mock_imd, mock_coords, e12_case_factory
+):
     """If the API returns None (e.g. postcode not found), IMD should be None."""
     mock_coords.return_value = (-0.1234, 51.5678)
     mock_imd.return_value = None
