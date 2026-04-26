@@ -35,10 +35,7 @@ def assert_imd_call(
         if "country" in kwargs:
             assert kwargs["country"] == country_boundary_identifier
         if "country_boundary_identifier" in kwargs:
-            assert (
-                kwargs["country_boundary_identifier"]
-                == country_boundary_identifier
-            )
+            assert kwargs["country_boundary_identifier"] == country_boundary_identifier
 
 
 @pytest.mark.django_db

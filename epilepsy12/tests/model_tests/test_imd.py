@@ -29,9 +29,7 @@ COORDS_PATCH = "epilepsy12.models_folder.case.coordinates_for_postcode"
 COUNTRY_PATCH = "epilepsy12.general_functions.index_multiple_deprivation.country_boundary_identifier_for_postcode"
 
 
-def assert_imd_call(
-    mock_imd, postcode, year, country_boundary_identifier=None
-):
+def assert_imd_call(mock_imd, postcode, year, country_boundary_identifier=None):
     """Assert the IMD helper was called with the expected postcode/year.
 
     Tests accept additional country kwargs so they remain valid as the helper
@@ -46,10 +44,7 @@ def assert_imd_call(
         if "country" in kwargs:
             assert kwargs["country"] == country_boundary_identifier
         if "country_boundary_identifier" in kwargs:
-            assert (
-                kwargs["country_boundary_identifier"]
-                == country_boundary_identifier
-            )
+            assert kwargs["country_boundary_identifier"] == country_boundary_identifier
 
 
 # ── Correct year selection ──────────────────────────────────────────────────
@@ -73,7 +68,9 @@ def test_imd_uses_2019_for_cohort_below_8(
 
     case.refresh_from_db()
     assert case.registration.cohort == 7
-    assert_imd_call(mock_imd, "WC1X8SH", year=2019, country_boundary_identifier="E92000001")
+    assert_imd_call(
+        mock_imd, "WC1X8SH", year=2019, country_boundary_identifier="E92000001"
+    )
     assert case.index_of_multiple_deprivation_quintile == 3
 
 
@@ -95,7 +92,9 @@ def test_imd_uses_2025_for_cohort_8_and_above(
 
     case.refresh_from_db()
     assert case.registration.cohort == 8
-    assert_imd_call(mock_imd, "WC1X8SH", year=2025, country_boundary_identifier="E92000001")
+    assert_imd_call(
+        mock_imd, "WC1X8SH", year=2025, country_boundary_identifier="E92000001"
+    )
     assert case.index_of_multiple_deprivation_quintile == 2
 
 
@@ -126,7 +125,9 @@ def test_imd_recalculated_when_assessment_date_changes_cohort(
 
     case.refresh_from_db()
     assert case.registration.cohort == 8
-    assert_imd_call(mock_imd, "WC1X8SH", year=2025, country_boundary_identifier="E92000001")
+    assert_imd_call(
+        mock_imd, "WC1X8SH", year=2025, country_boundary_identifier="E92000001"
+    )
     assert case.index_of_multiple_deprivation_quintile == 5
 
 
@@ -148,7 +149,9 @@ def test_imd_uses_2019_for_cohort_8_when_country_not_england(
 
     case.refresh_from_db()
     assert case.registration.cohort == 8
-    assert_imd_call(mock_imd, "CF101AA", year=2019, country_boundary_identifier="W92000004")
+    assert_imd_call(
+        mock_imd, "CF101AA", year=2019, country_boundary_identifier="W92000004"
+    )
     assert case.index_of_multiple_deprivation_quintile == 2
 
 
@@ -176,7 +179,9 @@ def test_imd_recalculated_when_postcode_changes(
     case.save()
 
     case.refresh_from_db()
-    assert_imd_call(mock_imd, "EC1A1BB", year=2019, country_boundary_identifier="E92000001")
+    assert_imd_call(
+        mock_imd, "EC1A1BB", year=2019, country_boundary_identifier="E92000001"
+    )
     assert case.index_of_multiple_deprivation_quintile == 4
 
 
