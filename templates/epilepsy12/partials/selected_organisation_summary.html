@@ -5,7 +5,7 @@
 {# MapLibre GL JS — loaded here so it is available for the deprivation map below #}
 <link rel="stylesheet" href="https://unpkg.com/maplibre-gl@4/dist/maplibre-gl.css" />
 <script src="https://unpkg.com/maplibre-gl@4/dist/maplibre-gl.js"></script>
-<script src="https://cdn.jsdelivr.net/npm/@rcpch/imd-map@0.1.2/dist/umd/rcpch-imd-map.min.js" integrity="sha256-1Y0CR334ohKEHd4FjtpiyTM48wruCG/+9qpgrqCTp+Y=" crossorigin="anonymous"></script>
+<script src="https://cdn.jsdelivr.net/npm/@rcpch/imd-map@0.2.1/dist/umd/rcpch-imd-map.min.js" integrity="sha256-NPAJtBYlHWLlW27+go2Impz/wiD6r9aSqE/SF8nudYo=" crossorigin="anonymous"></script>
 
 <div class="ui grid container selected_organisation_container">
         <div class="fluid row stackable three column grid">
@@ -433,6 +433,10 @@
         }
 
         var payload = JSON.parse(payloadNode.textContent || "{}");
+        var leadCentreZoom = 11;
+        var initialCenter = payload.leadCentre
+            ? [payload.leadCentre.lon, payload.leadCentre.lat]
+            : undefined;
         var token = {
             patientLabel: "{% templatetag openvariable %}patientLabel{% templatetag closevariable %}",
             id: "{% templatetag openvariable %}id{% templatetag closevariable %}",
@@ -442,9 +446,11 @@
 
         var map = window.RcpchImdMap.createImdMap({
             container: "organisation_cases_map",
-        tilesBaseUrl: "{{ deprivation_tiles_url }}",
+            tilesBaseUrl: "{{ deprivation_tiles_url }}",
             initialNation: payload.initialNation || "all",
             initialEra: payload.initialEra || "2011",
+            center: initialCenter,
+            zoom: initialCenter ? leadCentreZoom : undefined,
             enableHealthOverlays: true,
             showLegend: true,
             style: {
@@ -469,7 +475,7 @@
         if (payload.leadCentre) {
             map.setLeadCentre(payload.leadCentre);
         }
-        if (typeof map.fitToData === "function") {
+        if (!payload.leadCentre && typeof map.fitToData === "function") {
             map.fitToData();
         }
 
