@@ -4,5 +4,8 @@
 
 All documentation for this project is at <https://e12.rcpch.ac.uk/docs>
 
+<!-- LLM/agent note: put agent-specific operational guidance in agents.md, not README.md. -->
+
+
 ![alt text RCPCH](./static/images/pixelated_rcpch.png)
 RCPCH Incubator

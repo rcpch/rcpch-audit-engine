@@ -37,7 +37,7 @@ All developer and CI operations are driven by short shell scripts in `s/`. These
 | `s/start-prod` | Django entrypoint for production |
 | `s/start-test` | Django entrypoint used during test runs: `collectstatic` then sleeps (keeps container alive for pytest) |
 | `s/seed` | Seeds 200 cases and registrations into a running django container via `manage.py seed` |
-| `s/test` | Runs `pytest -v` inside the running django container; passes all extra args through (e.g. `-m slow`) |
+| `s/test` | Runs `pytest -v` in the running django container by default (`--container` / `--in-container`); use `--local` / `--host` / `--outside-container` for host mode, or `--spin-up` / `--up` / `--with-up` to start an isolated test compose project, run tests, and tear it down |
 | `s/pr-check` | Used in CI on PRs: spins up compose with `start-test`, runs `not slow` then `slow` test markers, tears down |
 | `s/ci` | Full deployment pipeline script (see CI section below) |
 | `s/logs` | Tails all compose service logs with timestamps |
