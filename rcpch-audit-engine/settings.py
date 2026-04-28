@@ -98,7 +98,7 @@ RCPCH_DEPRIVATION_TILES_API_KEY = os.getenv(
 )
 RCPCH_DEPRIVATION_TILES_API_KEY_PARAM = os.getenv(
     "RCPCH_DEPRIVATION_TILES_API_KEY_PARAM",
-    "api_key",
+    "subscription-key",
 )
 
 # Application definition

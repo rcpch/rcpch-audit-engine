@@ -16,7 +16,7 @@ TLS_SOURCE="internal" # for localhost with SSL, or use "acme" for LetsEncrypt in
 RCPCH_CENSUS_PLATFORM_TOKEN= # API key for RCPCH Census Platform (Deprivation scoring service API)
 RCPCH_CENSUS_PLATFORM_URL="https://api.rcpch.ac.uk/deprivation/v1"
 RCPCH_DEPRIVATION_TILES_API_KEY= # Optional browser tile API key override; defaults to RCPCH_CENSUS_PLATFORM_TOKEN
-RCPCH_DEPRIVATION_TILES_API_KEY_PARAM="api_key" # Query parameter name used for RCPCH_DEPRIVATION_TILES_API_KEY
+RCPCH_DEPRIVATION_TILES_API_KEY_PARAM="subscription-key" # Query parameter name used for RCPCH_DEPRIVATION_TILES_API_KEY
 
 # DJANGO
 AUTO_LOGOUT_DELAY_SECONDS=1800 # default 30 minutes

@@ -448,7 +448,7 @@
             container: "organisation_cases_map",
             tilesBaseUrl: "{{ deprivation_tiles_url }}",
             tilesApiKey: "{{ deprivation_tiles_api_key|default_if_none:''|escapejs }}" || undefined,
-            tilesApiKeyParam: "{{ deprivation_tiles_api_key_param|default_if_none:'api_key'|escapejs }}",
+            tilesApiKeyParam: "{{ deprivation_tiles_api_key_param|default_if_none:'subscription-key'|escapejs }}",
             initialNation: payload.initialNation || "all",
             initialEra: payload.initialEra || "2011",
             center: initialCenter,
