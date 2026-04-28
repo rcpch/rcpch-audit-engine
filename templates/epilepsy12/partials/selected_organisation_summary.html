@@ -5,7 +5,7 @@
 {# MapLibre GL JS — loaded here so it is available for the deprivation map below #}
 <link rel="stylesheet" href="https://unpkg.com/maplibre-gl@4/dist/maplibre-gl.css" />
 <script src="https://unpkg.com/maplibre-gl@4/dist/maplibre-gl.js"></script>
-<script src="https://cdn.jsdelivr.net/npm/@rcpch/imd-map@0.3.0/dist/umd/rcpch-imd-map.min.js" integrity="sha256-VZtQVL5s2CyUmYlw24U2h7pqrj02sMLNqk+7P+1T7j4=" crossorigin="anonymous"></script>
+<script src="https://cdn.jsdelivr.net/npm/@rcpch/imd-map@0.3.1/dist/umd/rcpch-imd-map.min.js" integrity="sha256-P5JNAUmWKj87ZCq/unS5ukm9/VHgYVzOpJIyuBe+Qaw=" crossorigin="anonymous"></script>
 
 <div class="ui grid container selected_organisation_container">
         <div class="fluid row stackable three column grid">
@@ -447,6 +447,8 @@
         var map = window.RcpchImdMap.createImdMap({
             container: "organisation_cases_map",
             tilesBaseUrl: "{{ deprivation_tiles_url }}",
+            tilesApiKey: "{{ deprivation_tiles_api_key|default_if_none:''|escapejs }}" || undefined,
+            tilesApiKeyParam: "{{ deprivation_tiles_api_key_param|default_if_none:'api_key'|escapejs }}",
             initialNation: payload.initialNation || "all",
             initialEra: payload.initialEra || "2011",
             center: initialCenter,

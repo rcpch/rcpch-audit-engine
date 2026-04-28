@@ -389,6 +389,8 @@ def selected_organisation_summary(request, organisation_id):
         "count_of_current_cohort_registered_completed_cases_in_this_trust": count_of_current_cohort_registered_completed_cases_in_this_trust,
         "individual_kpi_choices": INDIVIDUAL_KPI_MEASURES,
         "deprivation_tiles_url": settings.RCPCH_DEPRIVATION_TILES_URL,
+        "deprivation_tiles_api_key": settings.RCPCH_DEPRIVATION_TILES_API_KEY,
+        "deprivation_tiles_api_key_param": settings.RCPCH_DEPRIVATION_TILES_API_KEY_PARAM,
         "organisation_cases_imd_payload": organisation_cases_imd_payload,
         "aggregated_distances": aggregated_distances,
         "organisational_audit_submission_period": organisational_audit_submission_period,

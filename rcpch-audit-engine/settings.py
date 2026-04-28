@@ -91,6 +91,15 @@ RCPCH_DEPRIVATION_TILES_URL = os.getenv(
     "RCPCH_DEPRIVATION_TILES_URL",
     "https://api.rcpch.ac.uk/deprivation/v2/tiles",
 )
+# Browser map tile auth query options for @rcpch/imd-map
+RCPCH_DEPRIVATION_TILES_API_KEY = os.getenv(
+    "RCPCH_DEPRIVATION_TILES_API_KEY",
+    RCPCH_CENSUS_PLATFORM_TOKEN,
+)
+RCPCH_DEPRIVATION_TILES_API_KEY_PARAM = os.getenv(
+    "RCPCH_DEPRIVATION_TILES_API_KEY_PARAM",
+    "api_key",
+)
 
 # Application definition
 
