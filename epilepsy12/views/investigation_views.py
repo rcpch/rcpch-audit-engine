@@ -75,7 +75,8 @@ def investigations(request, can_edit, case_id):
         mri_brain_declined = False
 
     context = {
-        "can_edit": can_edit and request.user.has_perm("epilepsy12.change_investigations"),
+        "can_edit": can_edit
+        and request.user.has_perm("epilepsy12.change_investigations"),
         "case_id": case_id,
         "registration": registration,
         "investigations": investigations,
@@ -139,7 +140,11 @@ def eeg_indicated(request, can_edit, investigations_id):
     else:
         eeg_declined = False
 
-    context = {"can_edit": can_edit, "investigations": investigations, "eeg_declined": eeg_declined}
+    context = {
+        "can_edit": can_edit,
+        "investigations": investigations,
+        "eeg_declined": eeg_declined,
+    }
 
     template_name = "epilepsy12/partials/investigations/eeg_information.html"
 
@@ -191,7 +196,11 @@ def eeg_request_date(request, can_edit, investigations_id):
     else:
         eeg_declined = False
 
-    context = {"can_edit": can_edit, "investigations": investigations, "eeg_declined": eeg_declined}
+    context = {
+        "can_edit": can_edit,
+        "investigations": investigations,
+        "eeg_declined": eeg_declined,
+    }
 
     response = recalculate_form_generate_response(
         model_instance=investigations,
@@ -240,7 +249,11 @@ def eeg_performed_date(request, can_edit, investigations_id):
     else:
         eeg_declined = False
 
-    context = {"can_edit": can_edit, "investigations": investigations, "eeg_declined": eeg_declined}
+    context = {
+        "can_edit": can_edit,
+        "investigations": investigations,
+        "eeg_declined": eeg_declined,
+    }
 
     template_name = "epilepsy12/partials/investigations/eeg_information.html"
 
@@ -285,7 +298,11 @@ def eeg_declined(request, can_edit, investigations_id, confirm):
 
     investigations.save()
 
-    context = {"can_edit": can_edit, "investigations": investigations, "eeg_declined": eeg_declined}
+    context = {
+        "can_edit": can_edit,
+        "investigations": investigations,
+        "eeg_declined": eeg_declined,
+    }
 
     template_name = "epilepsy12/partials/investigations/eeg_information.html"
 
@@ -662,7 +679,7 @@ def genetic_testing_status_callback(request, can_edit, investigations_id, test_n
         error_message = error
 
     investigations = Investigations.objects.get(pk=investigations_id)
-    
+
     test_status = getattr(investigations, f"{test_name}_test_status")
 
     date_requested_field_name = f"{test_name}_test_requested_date"
@@ -670,7 +687,7 @@ def genetic_testing_status_callback(request, can_edit, investigations_id, test_n
 
     if test_status in ["R", "N"]:
         setattr(investigations, date_achieved_field_name, None)
-    
+
     if test_status == "N":
         setattr(investigations, date_requested_field_name, None)
 
@@ -700,29 +717,34 @@ def genetic_testing_status_callback(request, can_edit, investigations_id, test_n
 @login_and_otp_required()
 @user_may_view_this_child()
 @permission_required("epilepsy12.change_investigations", raise_exception=True)
-def genetic_testing_date_callback(request, can_edit, investigations_id, test_name, requested_or_achieved):
+def genetic_testing_date_callback(
+    request, can_edit, investigations_id, test_name, requested_or_achieved
+):
     try:
         error_message = None
         investigations = Investigations.objects.get(pk=investigations_id)
-        
-        if requested_or_achieved == "achieved":
-            comparison_date_field_name=f"{test_name}_test_requested_date"
+
+        if requested_or_achieved == "requested":
+            comparison_date_field_name = f"{test_name}_test_achieved_date"
+            is_earliest_date = True
+        elif requested_or_achieved == "achieved":
+            comparison_date_field_name = f"{test_name}_test_requested_date"
+            is_earliest_date = False
         else:
-            comparison_date_field_name=None
+            raise ValueError(
+                f"Invalid date type '{requested_or_achieved}'. Expected 'requested' or 'achieved'."
+            )
 
         validation_args = {
             "field_name": f"{test_name}_test_{requested_or_achieved}_date",
             "page_element": "date_field",
             "comparison_date_field_name": comparison_date_field_name,
-            "is_earliest_date": True,
+            "is_earliest_date": is_earliest_date,
             "earliest_allowable_date": investigations.registration.case.date_of_birth,
         }
 
         validate_and_update_model(
-            request,
-            investigations_id,
-            Investigations,
-            **validation_args
+            request, investigations_id, Investigations, **validation_args
         )
 
     except ValueError as error:
