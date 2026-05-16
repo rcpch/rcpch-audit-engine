@@ -190,6 +190,7 @@ def selected_organisation_summary(request, organisation_id):
         "W92000004": "wales",
         "S92000003": "scotland",
         "N92000002": "northern_ireland",
+        "JEY": "channel_islands",
     }
     imd_initial_nation = nation_by_boundary_identifier.get(
         selected_organisation.country.boundary_identifier, "all"
