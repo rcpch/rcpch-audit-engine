@@ -3,7 +3,6 @@
     It accepts the following parameters
         hx_post: the url posted to including parameters
         hx_target: the id of the html element to target the server response
-        hx_trigger: usually 'change' but can be any event
         label: this is the label text (accessed from the help text in the model)
         reference: this is the reference text (accessed from the help text in the model)
         date_value: date value
@@ -11,10 +10,13 @@
         input_date_field_name: the name of the input element - should match the field name being updated
         enabled
         hx_confirm
-        hx_preserve: attach hx_preserve to avoid deleting the value and leaving set disabled on a swap (e.g genetic test dates)
+        min_date: optional minimum date (YYYY-MM-DD). Defaults to 1900-01-01 to prevent browser accepting partial years like 0002.
+        max_date: optional maximum date (YYYY-MM-DD)
         tooltip_id: this is the name of the field to update
         has_permission: boolean
     NOTE - in the view, the value of the date can be retrieved by request.POST.get(FIELD_NAME_AS_A_STRING)
+    The POST is triggered automatically when a valid, complete date is entered (via datepicker or keyboard),
+    using hx-trigger="change[event.target.validity.valid]" — a native browser Constraint Validation API check.
 {% endcomment %}
 
     <div class="field">
@@ -38,33 +40,17 @@
             <div class='ui left icon input'>
                 <input
                     id="{{input_date_field_name}}_input_id"
-                    {% if hx_preserve %}hx-preserve{% endif %}
                     {% if not enabled %}disabled{% endif %}
-                    _="on keyup or change if my value remove @disabled from #{{input_date_field_name}}{{tooltip_id}}_id"
                     type="date"
                     name="{{input_date_field_name}}"
-                    value="{{date_value|date:'Y-m-d'}}">
-                    {% if date_value is None or error_message %}
-                        <span class="episode-date" data-tooltip="This field is mandatory" data-inverted="" data-position="top left">
-                            <i class="rcpch_light_blue dot circle outline icon" ></i>
-                        </span>
-                    {% else %}
-                        <i class="rcpch_pink check circle outline icon"></i>
-                    {% endif %}
-                </input>
-                <i class="htmx-indicator spinner loading icon" id="spinner"></i>
-                <button 
-                    id= "{{input_date_field_name}}{{tooltip_id}}_id"
-                    class="ui rcpch_light_blue button"
-                    {% if not enabled or date_value is None %}disabled{% endif %}
+                    value="{{date_value|date:'Y-m-d'}}"
+                    min="{% if min_date %}{{min_date}}{% else %}1900-01-01{% endif %}"
+                    {% if max_date %}max="{{max_date}}"{% endif %}
                     hx-headers='{"X-CSRFToken": "{{ csrf_token }}"}'
                     hx-swap="{{hx_swap}}"
-                    name="{{input_date_field_name}}"
                     hx-post="{{hx_post}}"
                     hx-target="{{hx_target}}"
-                    hx-trigger="click"
-                    hx-include="[name='{{input_date_field_name}}']"
-                    {% if hx_preserve %}hx-preserve{% endif %}
+                    hx-trigger="change[event.target.validity.valid]"
                     {% if hx_confirm %}
                     _="on htmx:confirm(issueRequest)
                         halt the event
@@ -81,7 +67,16 @@
                           })
                         if result.isConfirmed issueRequest()"
                     {% endif %}
-                >Set</button>
+                >
+                    {% if date_value is None or error_message %}
+                        <span class="episode-date" data-tooltip="This field is mandatory" data-inverted="" data-position="top left">
+                            <i class="rcpch_light_blue dot circle outline icon" ></i>
+                        </span>
+                    {% else %}
+                        <i class="rcpch_pink check circle outline icon"></i>
+                    {% endif %}
+                </input>
+                <i class="htmx-indicator spinner loading icon" id="spinner"></i>
             </div>
 
             {% if error_message %}
@@ -95,14 +90,3 @@
 
     </div>
 
-
-    <div class="ui mini modal">
-        <div class="header">Confirmation Required</div>
-        <div class="content">
-          <span><p></p></span>
-        </div>
-        <div class="actions">
-          <div class="ui approve button">The date is correct</div>
-          <div class="ui cancel button">Cancel</div>
-        </div>
-    </div>
