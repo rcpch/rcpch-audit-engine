@@ -966,6 +966,7 @@ def remaining_measure_categories(case):
     ]
     categories = []
     if case.registration.audit_progress.total_expected_fields > 0:
+        categories.append(f"<div class='header'>Incomplete measures:</div>")
         for field in fields:
             if not field["is_complete"]:
                 completed_fields = getattr(
@@ -978,7 +979,7 @@ def remaining_measure_categories(case):
                 )
                 if expected_fields > completed_fields or expected_fields == 0:
                     categories.append(
-                        f"<p>{field['name']} - {expected_fields - completed_fields} fields remaining</p>"
+                        f"<div>{field['name']} ({expected_fields - completed_fields})</div>"
                     )
         html = (
             "".join(categories)
