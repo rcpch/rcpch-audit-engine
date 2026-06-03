@@ -7,7 +7,7 @@
 # *** ALL NEW ENV VARS NEED TO BE ADDED TO .github/workflows/run-docker-compose-test-on-pr.yml ***
 
 # CADDY (WEB SERVER & HTTPS)
-SITE_DOMAIN="example.com" # the domain the site is being served from - this configures Caddy. This should also be in DJANGO_ALLOWED_HOSTS and DJANGO_CSRF_TRUSTED_ORIGINS
+SITE_DOMAIN="e12.localhost" # the domain the site is being served from - this configures Caddy. This should also be in DJANGO_ALLOWED_HOSTS and DJANGO_CSRF_TRUSTED_ORIGINS
 LETSENCRYPT_EMAIL_ADDRESS="letsencrypt@example.com" # the email address to send LetsEncrypt notifications to
 LETSENCRYPT_ENDPOINT="https://acme-staging-v02.api.letsencrypt.org/directory" # Optionally set to Letsencrypt staging endpoint for testing (https://acme-staging-v02.api.letsencrypt.org/directory)
 TLS_SOURCE="internal" # for localhost with SSL, or use "acme" for LetsEncrypt in production
@@ -25,7 +25,7 @@ DJANGO_ALLOWED_HOSTS="${SITE_DOMAIN}"
 DJANGO_CSRF_TRUSTED_ORIGINS="https://${SITE_DOMAIN}"
 DJANGO_STARTUP_COMMAND="python manage.py runserver 0.0.0.0:8000" # for local development with auto-reload
 # DJANGO_STARTUP_COMMAND="gunicorn --bind=0.0.0.0:8000 --timeout 600 rcpch-audit-engine.wsgi" # for live deployment
-DJANGO_SECRET_KEY= # secret key for Django
+DJANGO_SECRET_KEY=reallyverysecret # secret key for Django
 SITE_CONTACT_EMAIL="sitecontactemail@example.com" # email address for site contact
 
 # DJANGO LOGGING
@@ -55,7 +55,7 @@ PASSWORD_RESET_TIMEOUT=259200
 
 
 # HERMES (SNOMED CT)
-RCPCH_HERMES_SERVER_URL= # SNOMED server API URL
+RCPCH_HERMES_SERVER_URL=http://rcpch-hermes.uksouth.azurecontainer.io:8080/v1/snomed # SNOMED server API URL
 
 # NHS ODS API
 NHS_ODS_API_URL="https://directory.spineservices.nhs.uk/ORD/2-0-0"
@@ -66,7 +66,6 @@ ENABLE_PDF_EXPORT=1 # Disables automatic PDF generation
 DOCS_URL="https://${SITE_DOMAIN}/docs" # URL of the documentation site
 
 # POSTCODES API
-POSTCODE_API_BASE_URL="https://findthatpostcode.uk" # deprecated 5/5/25
 POSTCODES_IO_API_URL="https://api.rcpch.ac.uk/postcodes"
 POSTCODES_IO_API_KEY="ADD YOUR API KEY HERE" # alternatively you can use the free API at https://postcodes.io
 
