@@ -42,11 +42,11 @@ autopep8==2.3.2
 black==26.3.1
 
 # testing and code analysis
-coverage==7.8.0
-pytest==8.3.5 # Unpin once https://github.com/pytest-dev/pytest-factoryboy/issues/232 is resolved
-pytest-django==4.11.1
-pytest-factoryboy==2.7.0
-rapidfuzz==3.13.0
+coverage==7.14.1
+pytest==9.0.3
+pytest-django==4.12.0
+pytest-factoryboy==2.8.1
+rapidfuzz==3.14.5
 
 mkdocs-material==9.6.12
 mkdocs-git-committers-plugin-2==2.5.0 # displays authors at the bottom of the page
