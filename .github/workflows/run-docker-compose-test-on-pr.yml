@@ -17,10 +17,9 @@ jobs:
         with:
           fetch-depth: 0 # to allow git_context_processor.py to still work
 
-      - name: Create .env file from repo secrets
+      - name: Create .env file
         run: |
-          echo -e "${{ secrets.ENVIRONMENT }}" | base64 -d > envs/.env
-          cat envs/.env
+          cp envs/env-template envs/.env
 
       - name: Run PR check script
         run: |
