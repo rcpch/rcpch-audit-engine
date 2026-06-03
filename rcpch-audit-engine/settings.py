@@ -104,7 +104,6 @@ RCPCH_DEPRIVATION_TILES_API_KEY_PARAM = os.getenv(
 # Application definition
 
 INSTALLED_APPS = [
-    "whitenoise.runserver_nostatic",
     "silk",
     "semantic_admin",
     "django.contrib.gis",
@@ -116,6 +115,7 @@ INSTALLED_APPS = [
     "django.contrib.admindocs",
     "django.contrib.humanize",
     "rest_framework",
+    "whitenoise.runserver_nostatic",
     "django.contrib.staticfiles",
     # third party
     "widget_tweaks",
@@ -325,9 +325,6 @@ STATIC_ROOT = str(BASE_DIR.joinpath("staticfiles"))
 WHITENOISE_ROOT = os.path.join(BASE_DIR, "static/root")
 
 STORAGES = {
-    "default": {
-        "BACKEND": "django.core.files.storage.FileSystemStorage",
-    },
     "staticfiles": {
         "BACKEND": "whitenoise.storage.CompressedManifestStaticFilesStorage",
     },
