@@ -1,0 +1,1562 @@
+[
+    {
+        "conceptId": "873711000000102",
+        "term": "Electronic brain stimulator in situ",
+        "preferredTerm": "Electronic brain stimulator in situ"
+    },
+    {
+        "conceptId": "877191000000104",
+        "term": "Bilateral profound sensorineural hearing loss",
+        "preferredTerm": "Bilateral profound sensorineural hearing loss"
+    },
+    {
+        "conceptId": "881541000000101",
+        "term": "Gross Motor Function Classification System for Cerebral Palsy level II",
+        "preferredTerm": "Gross Motor Function Classification System for Cerebral Palsy level II"
+    },
+    {
+        "conceptId": "882021000000108",
+        "term": "Gross Motor Function Classification System for Cerebral Palsy level III",
+        "preferredTerm": "Gross Motor Function Classification System for Cerebral Palsy level III"
+    },
+    {
+        "conceptId": "882041000000101",
+        "term": "Gross Motor Function Classification System for Cerebral Palsy level IV",
+        "preferredTerm": "Gross Motor Function Classification System for Cerebral Palsy level IV"
+    },
+    {
+        "conceptId": "885831000000109",
+        "term": "Choreo-athetotic cerebral palsy",
+        "preferredTerm": "Choreoathetoid cerebral palsy"
+    },
+    {
+        "conceptId": "909651000000105",
+        "term": "Imaging of brain normal",
+        "preferredTerm": "Imaging of brain normal"
+    },
+    {
+        "conceptId": "914431000000104",
+        "term": "Surveillance of Cerebral Palsy in Europe classification - predominant pattern B - predominant white matter injury",
+        "preferredTerm": "Surveillance of Cerebral Palsy in Europe classification - predominant pattern B - predominant white matter injury"
+    },
+    {
+        "conceptId": "914451000000106",
+        "term": "Surveillance of Cerebral Palsy in Europe classification - predominant pattern C - predominant grey matter injury",
+        "preferredTerm": "Surveillance of Cerebral Palsy in Europe classification - predominant pattern C - predominant grey matter injury"
+    },
+    {
+        "conceptId": "909621000000100",
+        "term": "Neuromuscular disorder",
+        "preferredTerm": "Neuromuscular disorder"
+    },
+    {
+        "conceptId": "914491000000103",
+        "term": "Surveillance of Cerebral Palsy in Europe classification - predominant pattern D - unspecified",
+        "preferredTerm": "Surveillance of Cerebral Palsy in Europe classification - predominant pattern D - unspecified"
+    },
+    {
+        "conceptId": "764911000000108",
+        "term": "High risk of malnutrition",
+        "preferredTerm": "High risk of malnutrition"
+    },
+    {
+        "conceptId": "813891000000107",
+        "term": "Moderate binocular visual impairment",
+        "preferredTerm": "Moderate binocular visual impairment"
+    },
+    {
+        "conceptId": "864041000000108",
+        "term": "Intrathecal drug delivery device in situ",
+        "preferredTerm": "Intrathecal drug delivery device in situ"
+    },
+    {
+        "conceptId": "882061000000100",
+        "term": "Gross Motor Function Classification System for Cerebral Palsy level V",
+        "preferredTerm": "Gross Motor Function Classification System for Cerebral Palsy level V"
+    },
+    {
+        "conceptId": "886371000000105",
+        "term": "On drug therapy for ADHD (attention deficit hyperactivity disorder)",
+        "preferredTerm": "On drug therapy for ADHD (attention deficit hyperactivity disorder)"
+    },
+    {
+        "conceptId": "886411000000109",
+        "term": "On non-stimulant drug therapy for ADHD (attention deficit hyperactivity disorder)",
+        "preferredTerm": "On non-stimulant drug therapy for ADHD (attention deficit hyperactivity disorder)"
+    },
+    {
+        "conceptId": "887881000000101",
+        "term": "On melatonin for sleep disorder",
+        "preferredTerm": "On melatonin for sleep disorder"
+    },
+    {
+        "conceptId": "889211000000104",
+        "term": "Specific learning disability",
+        "preferredTerm": "Specific learning disability"
+    },
+    {
+        "conceptId": "889941000000106",
+        "term": "Meets criteria for referral to Children's Epilepsy Surgery Service",
+        "preferredTerm": "Meets criteria for referral to Children's Epilepsy Surgery Service"
+    },
+    {
+        "conceptId": "898091000000107",
+        "term": "Organic aciduria",
+        "preferredTerm": "Organic acidaemia"
+    },
+    {
+        "conceptId": "904531000000100",
+        "term": "Bilateral spastic cerebral palsy",
+        "preferredTerm": "Bilateral spastic cerebral palsy"
+    },
+    {
+        "conceptId": "909661000000108",
+        "term": "Faltering growth rate",
+        "preferredTerm": "Faltering growth rate"
+    },
+    {
+        "conceptId": "984051000000100",
+        "term": "Learning disability excluded",
+        "preferredTerm": "Learning disability excluded"
+    },
+    {
+        "conceptId": "764901000000106",
+        "term": "Medium risk of malnutrition",
+        "preferredTerm": "Medium risk of malnutrition"
+    },
+    {
+        "conceptId": "877211000000100",
+        "term": "Bilateral congenital sensorineural hearing loss",
+        "preferredTerm": "Bilateral congenital sensorineural hearing loss"
+    },
+    {
+        "conceptId": "886391000000109",
+        "term": "On stimulant drug therapy for ADHD (attention deficit hyperactivity disorder)",
+        "preferredTerm": "On stimulant drug therapy for ADHD (attention deficit hyperactivity disorder)"
+    },
+    {
+        "conceptId": "887441000000107",
+        "term": "On parenteral nutrition",
+        "preferredTerm": "On parenteral nutrition"
+    },
+    {
+        "conceptId": "887761000000101",
+        "term": "Medically unexplained symptoms",
+        "preferredTerm": "Medically unexplained symptoms"
+    },
+    {
+        "conceptId": "889921000000104",
+        "term": "Meets criteria for referral to paediatric neurology epilepsy specialist",
+        "preferredTerm": "Meets criteria for referral to paediatric neurology epilepsy specialist"
+    },
+    {
+        "conceptId": "898051000000104",
+        "term": "Speech and language developmental delay",
+        "preferredTerm": "Speech and language developmental delay"
+    },
+    {
+        "conceptId": "898061000000101",
+        "term": "Bilateral severe sensorineural hearing loss",
+        "preferredTerm": "Bilateral severe sensorineural hearing loss"
+    },
+    {
+        "conceptId": "898071000000108",
+        "term": "Bilateral moderate sensorineural hearing loss",
+        "preferredTerm": "Bilateral moderate sensorineural hearing loss"
+    },
+    {
+        "conceptId": "898081000000105",
+        "term": "Bilateral mild sensorineural hearing loss",
+        "preferredTerm": "Bilateral mild sensorineural hearing loss"
+    },
+    {
+        "conceptId": "761541000000100",
+        "term": "Uses alternative communication skill",
+        "preferredTerm": "Uses alternative communication skill"
+    },
+    {
+        "conceptId": "764891000000105",
+        "term": "Low risk of malnutrition",
+        "preferredTerm": "Low risk of malnutrition"
+    },
+    {
+        "conceptId": "785101000000105",
+        "term": "Victim of sexual exploitation",
+        "preferredTerm": "Victim of sexual exploitation"
+    },
+    {
+        "conceptId": "811871000000107",
+        "term": "Health and social care plan agreed",
+        "preferredTerm": "Health and social care plan agreed"
+    },
+    {
+        "conceptId": "813871000000108",
+        "term": "Severe binocular visual impairment",
+        "preferredTerm": "Severe binocular visual impairment"
+    },
+    {
+        "conceptId": "813881000000105",
+        "term": "Severe monocular visual impairment",
+        "preferredTerm": "Severe monocular visual impairment"
+    },
+    {
+        "conceptId": "881521000000108",
+        "term": "Gross Motor Function Classification System for Cerebral Palsy level I",
+        "preferredTerm": "Gross Motor Function Classification System for Cerebral Palsy level I"
+    },
+    {
+        "conceptId": "914411000000107",
+        "term": "Surveillance of Cerebral Palsy in Europe classification - predominant pattern A - maldevelopment",
+        "preferredTerm": "Surveillance of Cerebral Palsy in Europe classification - predominant pattern A - maldevelopment"
+    },
+    {
+        "conceptId": "914931000000105",
+        "term": "Surveillance of Cerebral Palsy in Europe classification - predominant pattern E - normal",
+        "preferredTerm": "Surveillance of Cerebral Palsy in Europe classification - predominant pattern E - normal"
+    },
+    {
+        "conceptId": "442731005",
+        "term": "Imaging of brain abnormal",
+        "preferredTerm": "Imaging of brain abnormal"
+    },
+    {
+        "conceptId": "448739000",
+        "term": "Recurrent lower respiratory tract infection",
+        "preferredTerm": "Recurrent lower respiratory tract infection"
+    },
+    {
+        "conceptId": "449818005",
+        "term": "22q11 partial monosomy syndrome",
+        "preferredTerm": "22q11 deletion syndrome"
+    },
+    {
+        "conceptId": "449840001",
+        "term": "Cochlear prosthesis in situ",
+        "preferredTerm": "Cochlear prosthesis in situ"
+    },
+    {
+        "conceptId": "449842009",
+        "term": "Nasogastric tube in situ",
+        "preferredTerm": "Nasogastric tube in situ"
+    },
+    {
+        "conceptId": "700213005",
+        "term": "Avoidant restrictive food intake disorder",
+        "preferredTerm": "Avoidant restrictive food intake disorder"
+    },
+    {
+        "conceptId": "700210008",
+        "term": "Vagal nerve stimulator in situ",
+        "preferredTerm": "Vagal nerve stimulator in situ"
+    },
+    {
+        "conceptId": "700224007",
+        "term": "Carer does not understand care plan",
+        "preferredTerm": "Carer does not understand care plan"
+    },
+    {
+        "conceptId": "700506009",
+        "term": "Non-accidental traumatic head injury to child",
+        "preferredTerm": "Non-accidental traumatic head injury to child"
+    },
+    {
+        "conceptId": "702779007",
+        "term": "EHCP (Emergency health care plan) agreed",
+        "preferredTerm": "Emergency health care plan agreed"
+    },
+    {
+        "conceptId": "702816000",
+        "term": "Methyl-CpG (cytosine phosphate guanine) binding protein-2 duplication syndrome",
+        "preferredTerm": "Methyl-cytosine phosphate guanine binding protein-2 duplication syndrome"
+    },
+    {
+        "conceptId": "716335003",
+        "term": "Congenital suprabulbar paresis",
+        "preferredTerm": "Worster Drought syndrome"
+    },
+    {
+        "conceptId": "717952004",
+        "term": "Acquired hydronephrosis due to ureteropelvic junction obstruction",
+        "preferredTerm": "Acquired hydronephrosis due to ureteropelvic junction obstruction"
+    },
+    {
+        "conceptId": "720824009",
+        "term": "Victim of child neglect",
+        "preferredTerm": "Victim of child neglect"
+    },
+    {
+        "conceptId": "721168004",
+        "term": "Hydronephrosis due to congenital ureteropelvic junction obstruction",
+        "preferredTerm": "Congenital hydronephrosis due to ureteropelvic junction obstruction"
+    },
+    {
+        "conceptId": "723663001",
+        "term": "Diagnosis not made",
+        "preferredTerm": "Diagnosis not made"
+    },
+    {
+        "conceptId": "700132008",
+        "term": "Ventriculoperitoneal catheter in situ",
+        "preferredTerm": "Ventriculoperitoneal shunt in situ"
+    },
+    {
+        "conceptId": "700225008",
+        "term": "Carer understands care plan",
+        "preferredTerm": "Carer understands care plan"
+    },
+    {
+        "conceptId": "700229002",
+        "term": "Victim of child sexual abuse",
+        "preferredTerm": "Victim of child sexual abuse"
+    },
+    {
+        "conceptId": "702315006",
+        "term": "Dystonic cerebral palsy",
+        "preferredTerm": "Dystonic cerebral palsy"
+    },
+    {
+        "conceptId": "703977005",
+        "term": "Weight gain diet",
+        "preferredTerm": "Weight gain diet"
+    },
+    {
+        "conceptId": "709044004",
+        "term": "Chronic kidney disease",
+        "preferredTerm": "Chronic kidney disease"
+    },
+    {
+        "conceptId": "1010442006",
+        "term": "Sensorineural hearing loss of left ear with normal hearing on right side",
+        "preferredTerm": "Sensorineural hearing loss of left ear with normal hearing on right side"
+    },
+    {
+        "conceptId": "1119386008",
+        "term": "Sensorineural hearing loss of right ear",
+        "preferredTerm": "Sensorineural hearing loss of right ear"
+    },
+    {
+        "conceptId": "1148758003",
+        "term": "Congenital microcephalus",
+        "preferredTerm": "Congenital microcephaly"
+    },
+    {
+        "conceptId": "782555009",
+        "term": "Allergy to cow's milk protein",
+        "preferredTerm": "Allergy to cow's milk protein"
+    },
+    {
+        "conceptId": "782964007",
+        "term": "Genetic disease",
+        "preferredTerm": "Genetic disease"
+    },
+    {
+        "conceptId": "860642002",
+        "term": "No neurodevelopmental disorder present",
+        "preferredTerm": "No neurodevelopmental disorder present"
+    },
+    {
+        "conceptId": "1010441004",
+        "term": "Sensorineural hearing loss of right ear with normal hearing on left side",
+        "preferredTerm": "Sensorineural hearing loss of right ear with normal hearing on left side"
+    },
+    {
+        "conceptId": "774149004",
+        "term": "IQSEC2 (IQ motif and Sec7 domain 2) related syndromic intellectual disability",
+        "preferredTerm": "Severe intellectual disability, progressive postnatal microcephaly, midline stereotypic hand movements syndrome"
+    },
+    {
+        "conceptId": "778011005",
+        "term": "Severe intellectual disability and progressive spastic paraplegia",
+        "preferredTerm": "Severe intellectual disability and progressive spastic paraplegia"
+    },
+    {
+        "conceptId": "781067001",
+        "term": "Polycystic ovary",
+        "preferredTerm": "Polycystic ovary"
+    },
+    {
+        "conceptId": "782723007",
+        "term": "Severe intellectual disability, progressive spastic diplegia syndrome",
+        "preferredTerm": "Severe intellectual disability, progressive spastic diplegia syndrome"
+    },
+    {
+        "conceptId": "782755007",
+        "term": "Primary microcephaly, mild intellectual disability, young-onset diabetes syndrome",
+        "preferredTerm": "Primary microcephaly, mild intellectual disability, young-onset diabetes syndrome"
+    },
+    {
+        "conceptId": "414916001",
+        "term": "Obesity",
+        "preferredTerm": "Obesity"
+    },
+    {
+        "conceptId": "414285001",
+        "term": "Food allergy",
+        "preferredTerm": "Allergy to food"
+    },
+    {
+        "conceptId": "417357006",
+        "term": "Sickling disorder due to hemoglobin S",
+        "preferredTerm": "Sickling disorder due to haemoglobin S"
+    },
+    {
+        "conceptId": "439469002",
+        "term": "Recurrent abdominal pain",
+        "preferredTerm": "Recurrent abdominal pain"
+    },
+    {
+        "conceptId": "444905003",
+        "term": "Mass of soft tissue",
+        "preferredTerm": "Mass of soft tissue"
+    },
+    {
+        "conceptId": "444932008",
+        "term": "Dependence on ventilator",
+        "preferredTerm": "Dependence on ventilator"
+    },
+    {
+        "conceptId": "419916003",
+        "term": "Victim of emotional abuse",
+        "preferredTerm": "Victim of emotional abuse"
+    },
+    {
+        "conceptId": "429487005",
+        "term": "Dependence on continuous positive airway pressure (CPAP) ventilation",
+        "preferredTerm": "Dependence on continuous positive airway pressure ventilation"
+    },
+    {
+        "conceptId": "430985005",
+        "term": "Bilateral sensory hearing loss",
+        "preferredTerm": "Bilateral sensory hearing loss"
+    },
+    {
+        "conceptId": "415073005",
+        "term": "Perinatal disorder",
+        "preferredTerm": "Perinatal disorder"
+    },
+    {
+        "conceptId": "230780007",
+        "term": "Dyskinetic cerebral palsy",
+        "preferredTerm": "Dyskinetic cerebral palsy"
+    },
+    {
+        "conceptId": "232209000",
+        "term": "Nasal obstruction",
+        "preferredTerm": "Nasal obstruction"
+    },
+    {
+        "conceptId": "195677001",
+        "term": "Recurrent acute tonsillitis",
+        "preferredTerm": "Recurrent acute tonsillitis"
+    },
+    {
+        "conceptId": "197480006",
+        "term": "Anxiety disorder",
+        "preferredTerm": "Anxiety disorder"
+    },
+    {
+        "conceptId": "204878001",
+        "term": "Undescended testicle",
+        "preferredTerm": "Undescended testicle"
+    },
+    {
+        "conceptId": "225818009",
+        "term": "Victim of other person's behaviour",
+        "preferredTerm": "Victim of other person's behaviour"
+    },
+    {
+        "conceptId": "226213003",
+        "term": "Thickened fluids diet",
+        "preferredTerm": "Thickened fluids diet"
+    },
+    {
+        "conceptId": "230745008",
+        "term": "Hydrocephalus",
+        "preferredTerm": "Hydrocephalus"
+    },
+    {
+        "conceptId": "230773005",
+        "term": "Spastic cerebral palsy",
+        "preferredTerm": "Spastic cerebral palsy"
+    },
+    {
+        "conceptId": "248539004",
+        "term": "Family problems",
+        "preferredTerm": "Family problems"
+    },
+    {
+        "conceptId": "235595009",
+        "term": "Gastroesophageal reflux disease",
+        "preferredTerm": "Gastrooesophageal reflux disease"
+    },
+    {
+        "conceptId": "237055002",
+        "term": "Polycystic ovary syndrome",
+        "preferredTerm": "Polycystic ovary syndrome"
+    },
+    {
+        "conceptId": "237836003",
+        "term": "Small stature",
+        "preferredTerm": "Short stature disorder"
+    },
+    {
+        "conceptId": "248050007",
+        "term": "Intentional non-attendance at school",
+        "preferredTerm": "School non-attendance"
+    },
+    {
+        "conceptId": "237751000",
+        "term": "Congenital adrenal hyperplasia",
+        "preferredTerm": "Congenital adrenal hyperplasia"
+    },
+    {
+        "conceptId": "238958004",
+        "term": "Repetitive self-excoriation",
+        "preferredTerm": "Repetitive self-excoriation"
+    },
+    {
+        "conceptId": "237986005",
+        "term": "Disorder of mitochondrial respiratory chain complexes",
+        "preferredTerm": "Disorder of mitochondrial respiratory chain complexes"
+    },
+    {
+        "conceptId": "248044002",
+        "term": "Disruptive behavior",
+        "preferredTerm": "Disruptive behaviour"
+    },
+    {
+        "conceptId": "248062006",
+        "term": "Deliberate self-harm",
+        "preferredTerm": "Self-injurious behaviour"
+    },
+    {
+        "conceptId": "248228001",
+        "term": "Funny turn",
+        "preferredTerm": "Funny turn"
+    },
+    {
+        "conceptId": "249366005",
+        "term": "Bleeding from nose",
+        "preferredTerm": "Bleeding from nose"
+    },
+    {
+        "conceptId": "253978002",
+        "term": "Dysmorphic features",
+        "preferredTerm": "Dysmorphic features"
+    },
+    {
+        "conceptId": "287085006",
+        "term": "Genitourinary congenital anomalies",
+        "preferredTerm": "Congenital genitourinary anomaly"
+    },
+    {
+        "conceptId": "276654001",
+        "term": "Congenital malformation",
+        "preferredTerm": "Congenital malformation"
+    },
+    {
+        "conceptId": "278285008",
+        "term": "Left hemiplegia",
+        "preferredTerm": "Left hemiplegia"
+    },
+    {
+        "conceptId": "280032002",
+        "term": "Developmental language disorder",
+        "preferredTerm": "Developmental language disorder"
+    },
+    {
+        "conceptId": "281900007",
+        "term": "No abnormality detected",
+        "preferredTerm": "No abnormality detected"
+    },
+    {
+        "conceptId": "285055002",
+        "term": "Uses hearing aid",
+        "preferredTerm": "Does use hearing aid"
+    },
+    {
+        "conceptId": "271737000",
+        "term": "Anemia",
+        "preferredTerm": "Anaemia"
+    },
+    {
+        "conceptId": "300742006",
+        "term": "Difficulty participating in leisure activities",
+        "preferredTerm": "Difficulty participating in leisure activities"
+    },
+    {
+        "conceptId": "301471002",
+        "term": "Enlarged tonsil",
+        "preferredTerm": "Enlarged tonsil"
+    },
+    {
+        "conceptId": "302108003",
+        "term": "Tracheostomy present",
+        "preferredTerm": "Tracheostomy present"
+    },
+    {
+        "conceptId": "302110001",
+        "term": "Jejunostomy present",
+        "preferredTerm": "Jejunostomy present"
+    },
+    {
+        "conceptId": "268664001",
+        "term": "Childhood emotional disorder",
+        "preferredTerm": "Childhood emotional disorder"
+    },
+    {
+        "conceptId": "271594007",
+        "term": "Syncope attack",
+        "preferredTerm": "Syncope"
+    },
+    {
+        "conceptId": "277843001",
+        "term": "Problem behaviour",
+        "preferredTerm": "Problem behaviour"
+    },
+    {
+        "conceptId": "297982009",
+        "term": "Skin problem",
+        "preferredTerm": "Skin problem"
+    },
+    {
+        "conceptId": "298203008",
+        "term": "Joint laxity",
+        "preferredTerm": "Joint laxity"
+    },
+    {
+        "conceptId": "278284007",
+        "term": "Right hemiplegia",
+        "preferredTerm": "Right hemiplegia"
+    },
+    {
+        "conceptId": "278512001",
+        "term": "Ataxic cerebral palsy",
+        "preferredTerm": "Ataxic cerebral palsy"
+    },
+    {
+        "conceptId": "279069000",
+        "term": "Musculoskeletal pain",
+        "preferredTerm": "Musculoskeletal pain"
+    },
+    {
+        "conceptId": "225823009",
+        "term": "Victim of exploitation",
+        "preferredTerm": "Victim of exploitation"
+    },
+    {
+        "conceptId": "400179000",
+        "term": "Precocious puberty",
+        "preferredTerm": "Precocious puberty"
+    },
+    {
+        "conceptId": "396331005",
+        "term": "Coeliac disease",
+        "preferredTerm": "Coeliac disease"
+    },
+    {
+        "conceptId": "397540003",
+        "term": "Visual impairment",
+        "preferredTerm": "Visual impairment"
+    },
+    {
+        "conceptId": "400003000",
+        "term": "Delayed puberty",
+        "preferredTerm": "Delayed puberty"
+    },
+    {
+        "conceptId": "397827003",
+        "term": "Growth hormone deficiency",
+        "preferredTerm": "Growth hormone deficiency"
+    },
+    {
+        "conceptId": "398057008",
+        "term": "Tension-type headache",
+        "preferredTerm": "Tension-type headache"
+    },
+    {
+        "conceptId": "400210000",
+        "term": "Haemangioma",
+        "preferredTerm": "Haemangioma"
+    },
+    {
+        "conceptId": "405651005",
+        "term": "Equipment problem",
+        "preferredTerm": "Equipment problem"
+    },
+    {
+        "conceptId": "406506008",
+        "term": "Attention deficit hyperactivity disorder",
+        "preferredTerm": "Attention deficit hyperactivity disorder"
+    },
+    {
+        "conceptId": "409709004",
+        "term": "Chromosomal disorder",
+        "preferredTerm": "Chromosomal disorder"
+    },
+    {
+        "conceptId": "386804004",
+        "term": "Disorder of menstruation",
+        "preferredTerm": "Disorder of menstruation"
+    },
+    {
+        "conceptId": "395091006",
+        "term": "Preferred place of death",
+        "preferredTerm": "Preferred place of death"
+    },
+    {
+        "conceptId": "395687000",
+        "term": "Preferred place of death discussed with patient",
+        "preferredTerm": "Preferred place of death discussed with patient"
+    },
+    {
+        "conceptId": "413924001",
+        "term": "Cortical visual impairment",
+        "preferredTerm": "Cortical visual impairment"
+    },
+    {
+        "conceptId": "398309008",
+        "term": "Talipes",
+        "preferredTerm": "Talipes"
+    },
+    {
+        "conceptId": "195967001",
+        "term": "Airway hyperreactivity",
+        "preferredTerm": "Asthma"
+    },
+    {
+        "conceptId": "190905008",
+        "term": "Cystic fibrosis",
+        "preferredTerm": "Cystic fibrosis"
+    },
+    {
+        "conceptId": "191306005",
+        "term": "Henoch-Schonlein purpura",
+        "preferredTerm": "Immunoglobulin A vasculitis"
+    },
+    {
+        "conceptId": "191736004",
+        "term": "Anancastic neurosis",
+        "preferredTerm": "Obsessive-compulsive disorder"
+    },
+    {
+        "conceptId": "160877008",
+        "term": "Child at risk",
+        "preferredTerm": "Child at risk"
+    },
+    {
+        "conceptId": "162596006",
+        "term": "Suspected child abuse",
+        "preferredTerm": "Suspected victim of child abuse"
+    },
+    {
+        "conceptId": "161129001",
+        "term": "LD - Learning difficulties",
+        "preferredTerm": "Learning difficulties"
+    },
+    {
+        "conceptId": "165232002",
+        "term": "Bladder: incontinent",
+        "preferredTerm": "Urinary incontinence"
+    },
+    {
+        "conceptId": "192127007",
+        "term": "Child attention deficit disorder",
+        "preferredTerm": "Child attention deficit disorder"
+    },
+    {
+        "conceptId": "197764002",
+        "term": "Non-obstructive reflux-associated chronic pyelonephritis",
+        "preferredTerm": "Non-obstructive reflux-associated chronic pyelonephritis"
+    },
+    {
+        "conceptId": "362969004",
+        "term": "Disorder of endocrine system",
+        "preferredTerm": "Disorder of endocrine system"
+    },
+    {
+        "conceptId": "363732003",
+        "term": "Addison's disease",
+        "preferredTerm": "Addison's disease"
+    },
+    {
+        "conceptId": "373584008",
+        "term": "Congenital pelviureteric junction obstruction",
+        "preferredTerm": "Congenital obstruction of ureteropelvic junction"
+    },
+    {
+        "conceptId": "386584007",
+        "term": "Adrenal cortical hypofunction",
+        "preferredTerm": "Adrenal cortical hypofunction"
+    },
+    {
+        "conceptId": "225826001",
+        "term": "Victim of sexual abuse",
+        "preferredTerm": "Victim of sexual abuse"
+    },
+    {
+        "conceptId": "229621000",
+        "term": "Disorder of fluency",
+        "preferredTerm": "Disorder of fluency"
+    },
+    {
+        "conceptId": "230777006",
+        "term": "Monoplegic cerebral palsy affecting upper limb",
+        "preferredTerm": "Monoplegic cerebral palsy affecting upper limb"
+    },
+    {
+        "conceptId": "230778001",
+        "term": "Monoplegic cerebral palsy affecting lower limb",
+        "preferredTerm": "Monoplegic cerebral palsy affecting lower limb"
+    },
+    {
+        "conceptId": "232208008",
+        "term": "Ear, nose and throat disorder",
+        "preferredTerm": "Ear, nose and throat disorder"
+    },
+    {
+        "conceptId": "298382003",
+        "term": "Scoliosis deformity of spine",
+        "preferredTerm": "Scoliosis deformity of spine"
+    },
+    {
+        "conceptId": "302109006",
+        "term": "Gastrostomy present",
+        "preferredTerm": "Gastrostomy present"
+    },
+    {
+        "conceptId": "302226006",
+        "term": "Peripheral nerve disease",
+        "preferredTerm": "Peripheral nerve disease"
+    },
+    {
+        "conceptId": "307653008",
+        "term": "Clumsiness - motor retardation",
+        "preferredTerm": "Clumsiness - motor delay"
+    },
+    {
+        "conceptId": "310661005",
+        "term": "Premature infant 28-37 weeks",
+        "preferredTerm": "Premature infant 28-37 weeks"
+    },
+    {
+        "conceptId": "304868003",
+        "term": "Insecure attachment",
+        "preferredTerm": "Insecure attachment"
+    },
+    {
+        "conceptId": "313384009",
+        "term": "Place of death",
+        "preferredTerm": "Place of death"
+    },
+    {
+        "conceptId": "315018008",
+        "term": "Dizzy spells",
+        "preferredTerm": "Dizzy spells"
+    },
+    {
+        "conceptId": "157265008",
+        "term": "Dislocation of hip joint",
+        "preferredTerm": "Dislocation of hip joint"
+    },
+    {
+        "conceptId": "165179006",
+        "term": "IQ - intelligence quotient normal",
+        "preferredTerm": "IQ - intelligence quotient normal"
+    },
+    {
+        "conceptId": "158094009",
+        "term": "Non-accidental injury to child",
+        "preferredTerm": "Non-accidental injury to child"
+    },
+    {
+        "conceptId": "161062006",
+        "term": "Child abuse in family",
+        "preferredTerm": "Child abuse in family"
+    },
+    {
+        "conceptId": "161155000",
+        "term": "School problem",
+        "preferredTerm": "School problem"
+    },
+    {
+        "conceptId": "128188000",
+        "term": "Cerebral palsy",
+        "preferredTerm": "Cerebral palsy"
+    },
+    {
+        "conceptId": "129689002",
+        "term": "At risk for nutritional problem",
+        "preferredTerm": "At risk for nutritional problem"
+    },
+    {
+        "conceptId": "105986008",
+        "term": "Skeletal dysplasia",
+        "preferredTerm": "Skeletal dysplasia"
+    },
+    {
+        "conceptId": "41497008",
+        "term": "Febrile convulsion",
+        "preferredTerm": "Febrile convulsion"
+    },
+    {
+        "conceptId": "44054006",
+        "term": "Diabetes mellitus type II",
+        "preferredTerm": "Type 2 diabetes mellitus"
+    },
+    {
+        "conceptId": "47505003",
+        "term": "Posttraumatic stress disorder",
+        "preferredTerm": "Posttraumatic stress disorder"
+    },
+    {
+        "conceptId": "38086007",
+        "term": "Laryngomalacia",
+        "preferredTerm": "Laryngomalacia"
+    },
+    {
+        "conceptId": "40700009",
+        "term": "Severe mental retardation (I.Q. 20-34)",
+        "preferredTerm": "Severe learning disability"
+    },
+    {
+        "conceptId": "32390006",
+        "term": "Panhypopituitarism",
+        "preferredTerm": "Panhypopituitarism"
+    },
+    {
+        "conceptId": "34436003",
+        "term": "Hematuria",
+        "preferredTerm": "Blood in urine"
+    },
+    {
+        "conceptId": "40108008",
+        "term": "Thalassemia",
+        "preferredTerm": "Thalassaemia"
+    },
+    {
+        "conceptId": "43116000",
+        "term": "Eczema",
+        "preferredTerm": "Eczema"
+    },
+    {
+        "conceptId": "43486001",
+        "term": "Hemiplegic cerebral palsy",
+        "preferredTerm": "Hemiplegic cerebral palsy"
+    },
+    {
+        "conceptId": "37796009",
+        "term": "Migraine",
+        "preferredTerm": "Migraine"
+    },
+    {
+        "conceptId": "39579001",
+        "term": "Anaphylaxis",
+        "preferredTerm": "Anaphylaxis"
+    },
+    {
+        "conceptId": "39912006",
+        "term": "Hereditary spastic paraplegia",
+        "preferredTerm": "Hereditary spastic paraplegia"
+    },
+    {
+        "conceptId": "42030000",
+        "term": "Disease of the genitourinary system",
+        "preferredTerm": "Disorder of the genitourinary system"
+    },
+    {
+        "conceptId": "44057004",
+        "term": "Conductive hearing loss",
+        "preferredTerm": "Conductive hearing loss"
+    },
+    {
+        "conceptId": "40930008",
+        "term": "Hypothyroidism",
+        "preferredTerm": "Hypothyroidism"
+    },
+    {
+        "conceptId": "41040004",
+        "term": "Complete trisomy 21 syndrome",
+        "preferredTerm": "Complete trisomy 21 syndrome"
+    },
+    {
+        "conceptId": "46635009",
+        "term": "Insulin dependent diabetes mellitus",
+        "preferredTerm": "Type 1 diabetes mellitus"
+    },
+    {
+        "conceptId": "30288003",
+        "term": "Ventricular septal defect",
+        "preferredTerm": "Ventricular septal defect"
+    },
+    {
+        "conceptId": "34713006",
+        "term": "Vitamin D deficiency",
+        "preferredTerm": "Vitamin D deficiency"
+    },
+    {
+        "conceptId": "35489007",
+        "term": "Depressive disorder",
+        "preferredTerm": "Depression"
+    },
+    {
+        "conceptId": "38804009",
+        "term": "Turner syndrome",
+        "preferredTerm": "Turner syndrome"
+    },
+    {
+        "conceptId": "29753000",
+        "term": "Partial seizures",
+        "preferredTerm": "Partial seizure"
+    },
+    {
+        "conceptId": "39898005",
+        "term": "Sleep disorder",
+        "preferredTerm": "Sleep disorder"
+    },
+    {
+        "conceptId": "44513007",
+        "term": "Congenital anomaly of the kidney",
+        "preferredTerm": "Congenital anomaly of the kidney"
+    },
+    {
+        "conceptId": "48334007",
+        "term": "Congenital dislocation of hip",
+        "preferredTerm": "Congenital dislocation of hip"
+    },
+    {
+        "conceptId": "54840006",
+        "term": "Failure to thrive syndrome",
+        "preferredTerm": "Failure to thrive"
+    },
+    {
+        "conceptId": "68566005",
+        "term": "Urinary tract infectious disease",
+        "preferredTerm": "UTI - Urinary tract infection"
+    },
+    {
+        "conceptId": "71959007",
+        "term": "Elective mutism",
+        "preferredTerm": "Elective mutism"
+    },
+    {
+        "conceptId": "74728003",
+        "term": "Hypopituitarism",
+        "preferredTerm": "Hypopituitarism"
+    },
+    {
+        "conceptId": "78164000",
+        "term": "Feeding problem",
+        "preferredTerm": "Feeding problem"
+    },
+    {
+        "conceptId": "70070008",
+        "term": "Torticollis",
+        "preferredTerm": "Torticollis"
+    },
+    {
+        "conceptId": "77287004",
+        "term": "Borderline mental retardation (I.Q. 70-85)",
+        "preferredTerm": "Borderline learning disability"
+    },
+    {
+        "conceptId": "73573004",
+        "term": "Congenital anomaly of musculoskeletal system",
+        "preferredTerm": "Congenital anomaly of musculoskeletal system"
+    },
+    {
+        "conceptId": "67531005",
+        "term": "Spina bifida",
+        "preferredTerm": "Spina bifida"
+    },
+    {
+        "conceptId": "72042002",
+        "term": "Alteration in bowel elimination: incontinence",
+        "preferredTerm": "Incontinence of faeces"
+    },
+    {
+        "conceptId": "72366004",
+        "term": "Eating disorder",
+        "preferredTerm": "Eating disorder"
+    },
+    {
+        "conceptId": "76670001",
+        "term": "Duchenne muscular dystrophy",
+        "preferredTerm": "Duchenne muscular dystrophy"
+    },
+    {
+        "conceptId": "78150000",
+        "term": "Soft diet",
+        "preferredTerm": "Soft diet"
+    },
+    {
+        "conceptId": "19598007",
+        "term": "Generalized epilepsy",
+        "preferredTerm": "Generalised epilepsy"
+    },
+    {
+        "conceptId": "7006003",
+        "term": "Clumsiness",
+        "preferredTerm": "Clumsiness"
+    },
+    {
+        "conceptId": "7724006",
+        "term": "Nephritic syndrome",
+        "preferredTerm": "Nephritic syndrome"
+    },
+    {
+        "conceptId": "10888001",
+        "term": "Liquid diet",
+        "preferredTerm": "Liquid diet"
+    },
+    {
+        "conceptId": "4754008",
+        "term": "Gynecomastia",
+        "preferredTerm": "Gynaecomastia"
+    },
+    {
+        "conceptId": "13213009",
+        "term": "Congenital heart disease",
+        "preferredTerm": "Congenital heart disease"
+    },
+    {
+        "conceptId": "14760008",
+        "term": "Constipation",
+        "preferredTerm": "Constipation"
+    },
+    {
+        "conceptId": "15188001",
+        "term": "Deafness",
+        "preferredTerm": "Hearing loss"
+    },
+    {
+        "conceptId": "15771004",
+        "term": "Diabetes insipidus",
+        "preferredTerm": "Diabetes insipidus"
+    },
+    {
+        "conceptId": "18941000",
+        "term": "Oppositional defiant disorder",
+        "preferredTerm": "Oppositional defiant disorder"
+    },
+    {
+        "conceptId": "1855002",
+        "term": "Developmental academic disorder",
+        "preferredTerm": "Developmental academic disorder"
+    },
+    {
+        "conceptId": "7461003",
+        "term": "Attention deficit hyperactivity disorder, predominantly hyperactive impulsive type",
+        "preferredTerm": "Attention deficit hyperactivity disorder, predominantly hyperactive impulsive type"
+    },
+    {
+        "conceptId": "9414007",
+        "term": "Impaired glucose tolerance",
+        "preferredTerm": "Impaired glucose tolerance"
+    },
+    {
+        "conceptId": "568005",
+        "term": "Tic disorder",
+        "preferredTerm": "Tic disorder"
+    },
+    {
+        "conceptId": "613003",
+        "term": "Fragile X syndrome",
+        "preferredTerm": "Fragile X syndrome"
+    },
+    {
+        "conceptId": "1145003",
+        "term": "Developmental speech disorder",
+        "preferredTerm": "Developmental speech disorder"
+    },
+    {
+        "conceptId": "50417007",
+        "term": "Lower respiratory tract infection",
+        "preferredTerm": "Lower respiratory tract infection"
+    },
+    {
+        "conceptId": "56018004",
+        "term": "Wheezing",
+        "preferredTerm": "Wheezing"
+    },
+    {
+        "conceptId": "49727002",
+        "term": "Cough",
+        "preferredTerm": "Cough"
+    },
+    {
+        "conceptId": "50711007",
+        "term": "Viral hepatitis C",
+        "preferredTerm": "Viral hepatitis C"
+    },
+    {
+        "conceptId": "52702003",
+        "term": "Iceland disease",
+        "preferredTerm": "Chronic fatigue syndrome"
+    },
+    {
+        "conceptId": "57219006",
+        "term": "Craniosynostosis syndrome",
+        "preferredTerm": "Craniosynostosis syndrome"
+    },
+    {
+        "conceptId": "55300003",
+        "term": "Cramp",
+        "preferredTerm": "Cramp"
+    },
+    {
+        "conceptId": "62718007",
+        "term": "Drool",
+        "preferredTerm": "Dribbling from mouth"
+    },
+    {
+        "conceptId": "64165008",
+        "term": "Avoidant disorder of childhood",
+        "preferredTerm": "Avoidant disorder of childhood"
+    },
+    {
+        "conceptId": "60342002",
+        "term": "Movement disorder",
+        "preferredTerm": "Movement disorder"
+    },
+    {
+        "conceptId": "61582004",
+        "term": "Allergic rhinitis",
+        "preferredTerm": "Allergic rhinitis"
+    },
+    {
+        "conceptId": "56409008",
+        "term": "Monoplegic cerebral palsy",
+        "preferredTerm": "Monoplegic cerebral palsy"
+    },
+    {
+        "conceptId": "64779008",
+        "term": "Blood coagulation disorder",
+        "preferredTerm": "Blood coagulation disorder"
+    },
+    {
+        "conceptId": "66071002",
+        "term": "Type B viral hepatitis",
+        "preferredTerm": "Type B viral hepatitis"
+    },
+    {
+        "conceptId": "52254009",
+        "term": "Nephrotic syndrome",
+        "preferredTerm": "Nephrotic syndrome"
+    },
+    {
+        "conceptId": "55640002",
+        "term": "Dyscalculia",
+        "preferredTerm": "Dyscalculia"
+    },
+    {
+        "conceptId": "57148006",
+        "term": "Congenital anomaly of brain",
+        "preferredTerm": "Congenital malformation of brain"
+    },
+    {
+        "conceptId": "60700002",
+        "term": "Sensorineural hearing loss",
+        "preferredTerm": "Sensorineural hearing loss"
+    },
+    {
+        "conceptId": "62315008",
+        "term": "Diarrhea",
+        "preferredTerm": "Diarrhoea"
+    },
+    {
+        "conceptId": "59770006",
+        "term": "Dyslexia",
+        "preferredTerm": "Dyslexia"
+    },
+    {
+        "conceptId": "61152003",
+        "term": "Moderate mental retardation (I.Q. 35-49)",
+        "preferredTerm": "Moderate learning disability"
+    },
+    {
+        "conceptId": "66214007",
+        "term": "Substance abuse",
+        "preferredTerm": "Substance misuse"
+    },
+    {
+        "conceptId": "3723001",
+        "term": "Arthritis",
+        "preferredTerm": "Inflammatory arthritis"
+    },
+    {
+        "conceptId": "7199000",
+        "term": "Tuberous sclerosis syndrome",
+        "preferredTerm": "Tuberous sclerosis syndrome"
+    },
+    {
+        "conceptId": "8009008",
+        "term": "Nocturnal only enuresis",
+        "preferredTerm": "Nocturnal enuresis"
+    },
+    {
+        "conceptId": "14077003",
+        "term": "Pica",
+        "preferredTerm": "Pica"
+    },
+    {
+        "conceptId": "24526004",
+        "term": "Inflammatory bowel disease",
+        "preferredTerm": "Inflammatory bowel disease"
+    },
+    {
+        "conceptId": "20957000",
+        "term": "Disorder of carbohydrate metabolism",
+        "preferredTerm": "Disorder of carbohydrate metabolism"
+    },
+    {
+        "conceptId": "25622003",
+        "term": "Support system deficit",
+        "preferredTerm": "Support system deficit"
+    },
+    {
+        "conceptId": "22325002",
+        "term": "Gait abnormality",
+        "preferredTerm": "Abnormal gait"
+    },
+    {
+        "conceptId": "28055006",
+        "term": "West syndrome",
+        "preferredTerm": "West syndrome"
+    },
+    {
+        "conceptId": "33010005",
+        "term": "Floppy infant syndrome",
+        "preferredTerm": "Floppy infant syndrome"
+    },
+    {
+        "conceptId": "35253001",
+        "term": "Attention deficit hyperactivity disorder, predominantly inattentive type",
+        "preferredTerm": "Attention deficit hyperactivity disorder, predominantly inattentive type"
+    },
+    {
+        "conceptId": "36440009",
+        "term": "Failure to gain weight",
+        "preferredTerm": "Failure to gain weight"
+    },
+    {
+        "conceptId": "36444000",
+        "term": "Disorder of the urea cycle metabolism",
+        "preferredTerm": "Disorder of the urea cycle metabolism"
+    },
+    {
+        "conceptId": "22253000",
+        "term": "Pain",
+        "preferredTerm": "Pain"
+    },
+    {
+        "conceptId": "22716005",
+        "term": "Platelet disorder",
+        "preferredTerm": "Platelet disorder"
+    },
+    {
+        "conceptId": "21850008",
+        "term": "Plagiocephaly",
+        "preferredTerm": "Plagiocephaly"
+    },
+    {
+        "conceptId": "27544004",
+        "term": "Developmental coordination disorder",
+        "preferredTerm": "DCD - developmental coordination disorder"
+    },
+    {
+        "conceptId": "30746006",
+        "term": "Enlargement of lymph nodes",
+        "preferredTerm": "Lymphadenopathy"
+    },
+    {
+        "conceptId": "31216003",
+        "term": "Profound mental retardation (I.Q. below 20)",
+        "preferredTerm": "Profound learning disability"
+    },
+    {
+        "conceptId": "34014006",
+        "term": "Viral disease",
+        "preferredTerm": "Viral disease"
+    },
+    {
+        "conceptId": "34486009",
+        "term": "Hyperthyroidism",
+        "preferredTerm": "Hyperthyroidism"
+    },
+    {
+        "conceptId": "88278002",
+        "term": "Dysgraphia",
+        "preferredTerm": "Dysgraphia"
+    },
+    {
+        "conceptId": "89362005",
+        "term": "Decreased body weight",
+        "preferredTerm": "Weight loss"
+    },
+    {
+        "conceptId": "82525005",
+        "term": "Congenital cystic kidney disease",
+        "preferredTerm": "Congenital cystic kidney disease"
+    },
+    {
+        "conceptId": "85898001",
+        "term": "Cardiomyopathy",
+        "preferredTerm": "Cardiomyopathy"
+    },
+    {
+        "conceptId": "87979003",
+        "term": "Cleft palate",
+        "preferredTerm": "Cleft palate"
+    },
+    {
+        "conceptId": "79631006",
+        "term": "Absence seizures",
+        "preferredTerm": "Absence seizure"
+    },
+    {
+        "conceptId": "80313002",
+        "term": "Palpitations",
+        "preferredTerm": "Palpitations"
+    },
+    {
+        "conceptId": "86406008",
+        "term": "Human immunodeficiency virus infection",
+        "preferredTerm": "Human immunodeficiency virus infection"
+    },
+    {
+        "conceptId": "87522002",
+        "term": "Iron deficiency anemia",
+        "preferredTerm": "Iron deficiency anaemia"
+    },
+    {
+        "conceptId": "92824003",
+        "term": "Neurofibromatosis, type 1",
+        "preferredTerm": "Neurofibromatosis type 1"
+    },
+    {
+        "conceptId": "105531004",
+        "term": "Living in unsatisfactory surroundings",
+        "preferredTerm": "Housing unsatisfactory"
+    },
+    {
+        "conceptId": "87290003",
+        "term": "Congenital anomaly of head",
+        "preferredTerm": "Congenital anomaly of head"
+    },
+    {
+        "conceptId": "80327007",
+        "term": "Serous otitis media",
+        "preferredTerm": "Serous otitis media"
+    },
+    {
+        "conceptId": "82353009",
+        "term": "Congenital infectious disease",
+        "preferredTerm": "Congenital infectious disease"
+    },
+    {
+        "conceptId": "84757009",
+        "term": "Epilepsy",
+        "preferredTerm": "Epilepsy"
+    },
+    {
+        "conceptId": "86095007",
+        "term": "Inborn error of metabolism",
+        "preferredTerm": "Inborn error of metabolism"
+    },
+    {
+        "conceptId": "86765009",
+        "term": "Mild mental retardation (I.Q. 50-70)",
+        "preferredTerm": "Mild learning disability"
+    },
+    {
+        "conceptId": "88598008",
+        "term": "Impaired social interaction",
+        "preferredTerm": "Impaired social interaction"
+    },
+    {
+        "conceptId": "88610006",
+        "term": "Cardiac murmur",
+        "preferredTerm": "Heart murmur"
+    },
+    {
+        "conceptId": "95575002",
+        "term": "Obstruction of pelviureteric junction",
+        "preferredTerm": "Obstruction of pelviureteric junction"
+    },
+    {
+        "conceptId": "111501005",
+        "term": "Congenital hereditary muscular dystrophy",
+        "preferredTerm": "Congenital hereditary muscular dystrophy"
+    },
+    {
+        "conceptId": "118940003",
+        "term": "Disease of nervous system",
+        "preferredTerm": "Disorder of nervous system"
+    },
+    {
+        "conceptId": "127294003",
+        "term": "Brain injury",
+        "preferredTerm": "Traumatic or nontraumatic brain injury"
+    },
+    {
+        "conceptId": "126945001",
+        "term": "Perinatal anoxic-ischemic brain injury",
+        "preferredTerm": "Perinatal anoxic-ischaemic brain injury"
+    },
+    {
+        "conceptId": "128213006",
+        "term": "Neuromuscular junction disorder",
+        "preferredTerm": "Neuromuscular junction disorder"
+    },
+    {
+        "conceptId": "118947000",
+        "term": "Disease of upper extremity",
+        "preferredTerm": "Disorder of upper extremity"
+    },
+    {
+        "conceptId": "127295002",
+        "term": "Traumatic brain injury",
+        "preferredTerm": "Traumatic brain injury"
+    },
+    {
+        "conceptId": "197521000000108",
+        "term": "Physical disability",
+        "preferredTerm": "Physical disability"
+    },
+    {
+        "conceptId": "240451000000106",
+        "term": "Requires constant supervision",
+        "preferredTerm": "Requires constant supervision"
+    },
+    {
+        "conceptId": "325651000000108",
+        "term": "Contact allergy",
+        "preferredTerm": "Contact allergy"
+    },
+    {
+        "conceptId": "205171000000107",
+        "term": "Victim of domestic violence",
+        "preferredTerm": "Victim of domestic violence"
+    },
+    {
+        "conceptId": "1091000119108",
+        "term": "Obstructive sleep apnoea of child",
+        "preferredTerm": "Obstructive sleep apnoea of child"
+    },
+    {
+        "conceptId": "1119387004",
+        "term": "Sensorineural hearing loss of left ear",
+        "preferredTerm": "Sensorineural hearing loss of left ear"
+    },
+    {
+        "conceptId": "1148757008",
+        "term": "Microcephalus",
+        "preferredTerm": "Microcephaly"
+    },
+    {
+        "conceptId": "-1",
+        "term": "Other",
+        "preferredTerm": "Other"
+    }
+]

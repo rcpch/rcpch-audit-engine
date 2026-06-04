@@ -16,7 +16,6 @@ from ...general_functions import (
     dates_for_cohort,
     return_random_postcode,
     random_date,
-    add_epilepsy_cause_list_by_sctid,
 )
 from ...constants import (
     ETHNICITIES,
@@ -83,13 +82,6 @@ class Command(BaseCommand):
             action="store_true",
             help="Optional parameter. Set to ensure all cases being registered have completed a full year of care. Default is True.",
             default=False,
-        )
-        parser.add_argument(
-            "-sctids",
-            "--snomedctids",
-            nargs="+",
-            help="List of SNOMED-CT ids to update the epilepsy causes with.",
-            type=int,
         )
         parser.add_argument(
             "-orgs",

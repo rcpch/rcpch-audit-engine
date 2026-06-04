@@ -6,10 +6,15 @@ from django.db import migrations
 
 # RCPCH Imports
 from ..constants import SNOMED_BENZODIAZEPINE_TYPES, SNOMED_ANTIEPILEPSY_MEDICINE_TYPES
-from ..general_functions import fetch_ecl
 
 # Logging setup
 logger = logging.getLogger(__name__)
+
+import json
+import os
+
+with open(os.path.abspath("epilepsy12/constants/medicines.json"), "r") as f:
+    medicines_data = json.load(f)
 
 
 def seed_medicines(apps, schema_editor):
@@ -27,55 +32,31 @@ def seed_medicines(apps, schema_editor):
     logger.info(
         "\033[33m Seeding all the medicines from SNOMED and local Epilepsy12 list... \033[33m",
     )
-    for benzo in SNOMED_BENZODIAZEPINE_TYPES:
-        if not Medicine.objects.filter(medicine_name=benzo[1]).exists():
-            # if the drug is not in the database already
-            if benzo[0] not in [1001, 1002]:
-                concept = fetch_ecl(benzo[0])
-                new_drug = Medicine(
-                    medicine_name=benzo[1],
-                    is_rescue=True,
-                    conceptId=concept[0]["conceptId"],
-                    term=concept[0]["term"],
-                    preferredTerm=concept[0]["preferredTerm"],
-                )
-                new_drug.save()
-            else:
-                # these are for options other or unknown
-                new_drug = Medicine(
-                    medicine_name=benzo[1],
-                    is_rescue=True,
-                    conceptId=None,
-                    term=None,
-                    preferredTerm=None,
-                )
-                new_drug.save()
+    for medicine in medicines_data:
+        if Medicine.objects.filter(medicine_name=medicine["medicine_name"]).exists():
+            logger.info(f"{medicine['medicine_name']} exists. Skipping...")
         else:
-            logger.info(f"{benzo[1]} exists. Skipping...")
-    for aem in SNOMED_ANTIEPILEPSY_MEDICINE_TYPES:
-        if not Medicine.objects.filter(medicine_name=aem[1], is_rescue=False).exists():
-            # if the drug is not in the database already
-            if aem[0] not in [1001, 1002]:
-                concept = fetch_ecl(aem[0])
-                aem_drug = Medicine(
-                    is_rescue=False,
-                    medicine_name=aem[1],
-                    conceptId=concept[0]["conceptId"],
-                    term=concept[0]["term"],
-                    preferredTerm=concept[0]["preferredTerm"],
-                )
-                aem_drug.save()
-            else:
-                aem_drug = Medicine(
-                    medicine_name=aem[1],
-                    conceptId=None,
-                    term=None,
-                    preferredTerm=None,
-                    is_rescue=False,
-                )
-                aem_drug.save()
-        else:
-            logger.info(f"{aem_drug[1]} exists. Skipping...")
+            is_rescue = False
+            if medicine["medicine_name"] in [
+                benzo[1] for benzo in SNOMED_BENZODIAZEPINE_TYPES
+            ]:
+                is_rescue = True
+            elif medicine["medicine_name"] in [
+                aem[1] for aem in SNOMED_ANTIEPILEPSY_MEDICINE_TYPES
+            ]:
+                is_rescue = False
+            new_medicine = Medicine(
+                medicine_name=medicine["medicine_name"],
+                is_rescue=is_rescue,
+                conceptId=medicine["conceptId"],
+                term=medicine["term"],
+                preferredTerm=medicine["preferredTerm"],
+            )
+            try:
+                new_medicine.save()
+            except Exception as e:
+                logger.info(f"Medicine {medicine['medicine_name']} not added. {e}")
+
     logger.info("All medicines added.")
 
 

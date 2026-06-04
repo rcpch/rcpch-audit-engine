@@ -3,12 +3,6 @@ import logging
 
 from django.db import migrations
 
-from ..general_functions import (
-    fetch_ecl,
-    add_epilepsy_cause_list_by_sctid,
-    add_epilepsy_causes_without_snomedct_ids,
-)
-
 # Logging setup
 logger = logging.getLogger(__name__)
 
@@ -27,9 +21,14 @@ def seed_epilepsy_causes(apps, schema_editor):
         logger.info("Causes already exist. Skipping this step...")
         return
     index = 0
-    ecl = "<< 363235000"
-    # calls the rcpch deprivare server for a list of causes using ECL query language
-    epilepsy_causes = fetch_ecl(ecl)
+    import json
+    from django.conf import settings
+
+    # settings.BASE_DIR points to 'rcpch-audit-engine'
+    # .parent takes you up to the workspace root, then we navigate into epilepsy12
+    path = settings.BASE_DIR / "epilepsy12" / "constants" / "epilepsycauses.json"
+    with open(path, "r") as file:
+        epilepsy_causes = json.load(file)
     for cause in epilepsy_causes:
         if EpilepsyCause.objects.filter(conceptId=cause["conceptId"]).exists():
             # duplicate conceptId
@@ -46,243 +45,6 @@ def seed_epilepsy_causes(apps, schema_editor):
             except Exception as e:
                 logger.info(f"Epilepsy cause {cause['preferredTerm']} not added. {e}")
     logger.info(f"{index} epilepsy causes added")
-
-    """
-    These are additional causes added after go live
-    Added here now so that any development work where the database has been reseeded
-    remains in sync with what is live
-    """
-
-    # Additional causes added after go live - some of these are not in the SNOMED CT server and are added manually
-    """
-    Workflow to add a new cause:
-    1. Navigate to the SNOMED CT browser: https://browser.ihtsdotools.org/ and search for the cause and get the SCTID
-    2. Add the SCTID to the extra_concept_ids list below with the appropriate name in the comments as a fallback. Should include the SCTID, the term and the preferred term
-    3. if the cause is not in the SNOMED CT server, add it manually to the extra_causes_without_concept_ids list below. Should include the term and the preferred term
-    4. REMEMBER: adding causes here will not add them to the database, and is only for reference should the database be reseeded
-    5. To add the causes to the database depends on whether the cause has a SCTID or not:
-        - If the cause has an SCTID, on the commandline in the epilepsy12 app, run the command: 
-        python manage.py seed --mode=add_new_epilepsy_causes -sctids <list of SCTIDs> [e.g. python manage.py seed --mode=add_new_epilepsy_causes -sctids 764946008 52767006]
-         - if the cause does not have an SCTID, use the django shell:
-        python manage.py shell
-        from epilepsy12.general_functions import add_epilepsy_causes_without_snomedct_ids
-        causes = [{"preferredTerm": "Cause name", "term": "Cause name"}]
-        add_epilepsy_causes_without_snomedct_ids(causes)
-    6. Check the database to ensure the causes have been added (a summary of the causes added will be printed to the console)
-    """
-
-    # Constitutional mismatch repair deficiency syndrome (CMMRD) - 764946008
-    # Neonatal hypoglycaemia - 52767006
-    # Hypoxic ischaemic encephalopathy - 703300001
-    # Perinatal arterial ischaemic stroke - 722929005
-    # Non-accidental injury to child - 158094009
-    # Periventricular leukomalacia - 230769007
-    # Neonatal cerebral haemorrhage - 261808007
-    # Cornelia de Lange Syndrome (CdLS) - 40354009
-    # Anoxic encephalopathy - 389098007
-    # Congenital Melanocytic Naevus – 398696001
-    # Megalencephalic leukoencephalopathy with subcortical cysts - 703536004
-    # Cerebral ischemic stroke due to global hypoperfusion with watershed infarct - 788882003
-    # Schizencephaly (disorder) - 253159001
-    # Tetrasomy 12p syndrome (disorder) - 9527009
-    # Klinefelter syndrome (disorder)	22053006
-    # Hypothalamic neuronal hamartoma (disorder)	230791000
-    # Traumatic brain injury (disorder)	127295002
-    # Angelman syndrome (disorder)	76880004
-    # Rett's disorder (disorder)	68618008
-    # Neuronal ceroid lipofuscinosis (disorder)	42012007
-    # UBE3A 722056009
-    # GLUT1 445252005
-    # SLC2A1 782911008
-    # MECP2 702816000
-    # SCN1A 230437002
-    # STXBP1 768666006
-    # CDKL5 773230003
-    # KCNQ2 778001003
-    # SCN2A 778002005
-    # KCNT1 no code - NOTE THIS NEEDS ADDING TO THE DATABASE MANUALLY
-    # ARX 725163002
-    # FOXG1 702450004
-    # PCDH19 888801000000105
-    # GRIN2A 770431001
-    # Dysembryoplastic neuroepithelial neoplasm of brain (disorder) 1196837008 - NOTE THIS DOES NOT EXIST IN CURRENT SNOMED TERMINOLOGY SERVER: ADD MANUALLY
-    # Cavernous hemangioma (disorder) SCTID: 416824008
-    # Chromosome 11p13 deletion syndrome (disorder) SCTID: 715215007
-    # Cortical dysplasia (disorder) SCTID: 253153000
-    # 2q23.3 Microdeletion Syndrome - NOTE THIS NEEDS ADDING TO THE DATABASE MANUALLY AS THERE IS NO SNOMED CODE
-    # 14q32 deletion syndrome (disorder) SCTID: 879939002
-    # 16p11.2 deletion syndrome is 699307007
-    # 16p11.2 microduplication syndrome 765142003
-    # Mesial temporal lobe epilepsy with hippocampal sclerosis 770643005
-    # Interstitial heterozygous deletion 2q13 to 2q14.1 1196837008 - NOTE THIS DOES NOT EXIST IN CURRENT SNOMED TERMINOLOGY SERVER: ADD MANUALLY
-    # POLG mitochondrial disorder - NOTE THIS NEEDS ADDING TO THE DATABASE MANUALLY AS THERE IS NO SNOMED CODE
-    # PPRT2 associated disorder - NOTE THIS NEEDS ADDING TO THE DATABASE MANUALLY AS THERE IS NO SNOMED CODE
-    # 10p 15.3 microdeletion syndrome - NOTE THIS NEEDS ADDING TO THE DATABASE MANUALLY AS THERE IS NO SNOMED CODE
-    #  16q 24.3 microdeletion syndrome - NOTE THIS NEEDS ADDING TO THE DATABASE MANUALLY AS THERE IS NO SNOMED CODE
-    # Usmani-Riazuddin syndrome  - NOTE THIS NEEDS ADDING TO THE DATABASE MANUALLY AS THERE IS NO SNOMED CODE
-    #  Craniopharyngioma SCTID: 189179009
-    # 15q 13.3 microdeletion syndrome SCTID: 699254009
-    # ReNU syndrome (Neurodevelopmental disorder with hypotonia, brain anomalies, distinctive facies, and absent language (NEDHAFA)) - THIS NEEDS ADDING TO THE DATABASE MANUALLY AS THERE IS NO SNOMED CODE
-    # GNB1-related disorder - NOTE THIS NEEDS ADDING TO THE DATABASE MANUALLY AS THERE IS NO SNOMED CODE
-
-    #  Autosomal dominant KCNK4-related disease	NOTE NO SNOMED CODE add as KCNK4-related neurodevelopmental disease
-    # Autoimmune encephalitis	SCTID: 95643007
-    # ALDH7A1 related pyridoxine dependent epilepsy	SCTID: 734434007	Pyridoxine-dependent epilepsy (disorder)	ALDH7A1 not covered
-    # NPRL3 gene (familial focal epilepsy with variable foci).	SCTID: 764522009	Familial focal epilepsy with variable foci (disorder)	NPRL3 gene not covered
-    # EEF1A2 – related neurodevelopmental disorder	NOTE NO SNOMED CODE add as EEF1A2-Related Neurodevelopmental Disorder
-    # KCNH1 related epilepsy	NOTE NO SNOMED CODE add as KCNH1-related epileptic encephalopathy
-    # Phelan McDermid Syndrome (22q13 deletion syndrome)	SCTID: 699310000
-    # Chromosomal disorder 22q11 deletion syndrome	SCTID: 767263007
-    # 2p13.3 deletion NOTE NO SNOMED CODE: add as 2p13.3 (NRXN1) deletions
-    # foetal valproate syndrome	SCTID: 17231009
-    # COL4A2	NOTE NO SNOMED CODE] add as COL4A1 or COL4A2-related disorder
-    # Trisomy 21	SCTID: 41040004
-    # Ganglioglioma	SCTID: 87191000119100
-    # Congenital bilateral perisylvian syndrome	SCTID: 438583008
-    # microgyria	SCTID: 4945003
-    # Neonatal stroke	SCTID: 371121002
-    # PHF21A abnormality  NOTE No SNOMED CT code add as PHF21A-related disorder
-
-    extra_causes_without_concept_ids = [
-        {
-            "preferredTerm": "KCNT1-related epilepsy",
-            "term": "KCNT1-related epilepsy",
-            "conceptId": None,
-        },
-        {
-            "preferredTerm": "Dysembryoplastic neuroepithelial neoplasm of brain (disorder)",
-            "term": "Dysembryoplastic neuroepithelial neoplasm of brain (disorder)",
-            "conceptId": None,
-        },
-        {
-            "preferredTerm": "2q23.3 Microdeletion Syndrome",
-            "term": "2q23.3 Microdeletion Syndrome",
-            "conceptId": None,
-        },
-        {
-            "preferredTerm": "POLG mitochondrial disorder",
-            "term": "POLG mitochondrial disorder",
-            "conceptId": None,
-        },
-        {
-            "preferredTerm": "PPRT2 associated disorder",
-            "term": "PPRT2 associated disorder",
-            "conceptId": None,
-        },
-        {
-            "preferredTerm": "10p 15.3 microdeletion syndrome",
-            "term": "10p 15.3 microdeletion syndrome",
-            "conceptId": None,
-        },
-        {
-            "preferredTerm": "16q 24.3 microdeletion syndrome",
-            "term": "16q 24.3 microdeletion syndrome",
-            "conceptId": None,
-        },
-        {
-            "preferredTerm": "Usmani-Riazuddin syndrome",
-            "term": "Usmani-Riazuddin syndrome",
-            "conceptId": None,
-        },
-        {
-            "preferredTerm": "ReNU syndrome",
-            "term": "ReNU syndrome (Neurodevelopmental disorder with hypotonia, brain anomalies, distinctive facies, and absent language (NEDHAFA))",
-            "conceptId": None,
-        },
-        {
-            "preferredTerm": "GNB1-related disorder",
-            "term": "GNB1-related disorder",
-            "conceptId": None,
-        },
-        {
-            "preferredTerm": "KCNK4-related neurodevelopmental disease",
-            "term": "Autosomal dominant KCNK4-related disease",
-            "conceptId": None,
-        },
-        {
-            "preferredTerm": "EEF1A2–Related Neurodevelopmental Disorder",
-            "term": "EEF1A2-Related Neurodevelopmental Disorder",
-            "conceptId": None,
-        },
-        {
-            "preferredTerm": "KCNH1-related epileptic encephalopathy",
-            "term": "KCNH1-related epileptic encephalopathy",
-            "conceptId": None,
-        },
-        {
-            "preferredTerm": "2p13.3 deletion",
-            "term": "2p13.3 deletion",
-            "conceptId": None,
-        },
-        {
-            "preferredTerm": "COL4A1 or COL4A2-related disorder",
-            "term": "COL4A1 or COL4A2-related disorder",
-            "conceptId": None,
-        },
-        {
-            "preferredTerm": "PHF21A-related disorder",
-            "term": "PHF21A-related disorder",
-            "conceptId": None,
-        },
-    ]
-
-    extra_concept_ids = [
-        764946008,
-        52767006,
-        703300001,
-        722929005,
-        158094009,
-        230769007,
-        261808007,
-        40354009,
-        389098007,
-        398696001,
-        703536004,
-        788882003,
-        253159001,
-        9527009,
-        22053006,
-        230791000,
-        127295002,
-        76880004,
-        68618008,
-        42012007,
-        722056009,
-        445252005,
-        782911008,
-        702816000,
-        230437002,
-        768666006,
-        773230003,
-        778001003,
-        778002005,
-        725163002,
-        702450004,
-        888801000000105,
-        770431001,
-        416824008,
-        715215007,
-        253153000,
-        879939002,
-        699307007,
-        765142003,
-        770643005,
-        28781004,
-        699254009,
-        95643007,
-        734434007,
-        764522009,
-        699310000,
-        767263007,
-        17231009,
-        41040004,
-        87191000119100,
-        438583008,
-        4945003,
-        371121002,
-    ]
-    add_epilepsy_cause_list_by_sctid(extra_concept_ids=extra_concept_ids)
-    add_epilepsy_causes_without_snomedct_ids(extra_causes_without_concept_ids)
 
 
 class Migration(migrations.Migration):
