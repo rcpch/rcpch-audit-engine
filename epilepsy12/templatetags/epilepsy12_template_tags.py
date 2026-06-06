@@ -7,6 +7,7 @@ from django.utils.safestring import mark_safe
 from django.conf import settings
 
 from epilepsy12.constants.kpi import KPI_MAP
+from epilepsy12.models_folder.case import Case
 from ..models import (
     Country,
     IntegratedCareBoard,
@@ -987,3 +988,101 @@ def remaining_measure_categories(case):
             else "<p>All measure categories complete</p>"
         )
         return mark_safe(html)
+
+
+@register.simple_tag
+def missing_completed_fields_for_model(case_id, model):
+    """
+    Returns HTML listing incomplete fields for *model* on the given case.
+
+    For 1-to-1 models (e.g. "multiaxialdiagnosis", "management") the output
+    is a flat list of field labels.
+
+    For 1-to-many related models ("episode", "syndrome", "comorbidity",
+    "antiepilepsymedicine") the output is grouped by instance.
+    """
+
+    def _render_grouped_missing_fields(instances_data):
+        if not instances_data:
+            return ""
+        html = ""
+        for item in instances_data:
+            html += f"<div class='sub-header'>{item['label']}</div>"
+            for field in item["incomplete"]:
+                html += f"<div>{field}</div>"
+        return html
+
+    related_model_aliases = {
+        "episodes": "episode",
+        "syndromes": "syndrome",
+        "comorbidities": "comorbidity",
+        "antiepilepsymedicines": "antiepilepsymedicine",
+    }
+    related_models = {
+        "episode",
+        "syndrome",
+        "comorbidity",
+        "antiepilepsymedicine",
+        "epilepsycause",
+    }
+    case = Case.objects.get(id=case_id)
+    if not hasattr(case, "registration") or not hasattr(
+        case.registration, "audit_progress"
+    ):
+        return mark_safe("")
+    audit_progress = case.registration.audit_progress
+    normalized_model = (model or "").strip().lower()
+    normalized_model = related_model_aliases.get(normalized_model, normalized_model)
+
+    if normalized_model in related_models:
+        instances_data = audit_progress.audit_progress_related_instances_incomplete(
+            related_model_name=normalized_model
+        )
+        if not instances_data:
+            return mark_safe("<p>All expected fields completed for this model</p>")
+        html = "<div class='header'>Missing fields:</div>"
+        html += _render_grouped_missing_fields(instances_data)
+        return mark_safe(html)
+
+    missing_fields = audit_progress.audit_progress_fields_incomplete(
+        model_name=normalized_model
+    )
+
+    # Include related collections under the parent section tooltips.
+    related_groups = []
+    if normalized_model == "multiaxialdiagnosis":
+        related_groups.extend(
+            [
+                audit_progress.audit_progress_related_instances_incomplete(
+                    related_model_name="episode"
+                ),
+                audit_progress.audit_progress_related_instances_incomplete(
+                    related_model_name="comorbidity"
+                ),
+                audit_progress.audit_progress_related_instances_incomplete(
+                    related_model_name="syndrome"
+                ),
+                audit_progress.audit_progress_related_instances_incomplete(
+                    related_model_name="epilepsycause"
+                ),
+            ]
+        )
+    elif normalized_model == "management":
+        related_groups.append(
+            audit_progress.audit_progress_related_instances_incomplete(
+                related_model_name="antiepilepsymedicine"
+            )
+        )
+
+    related_html = "".join(
+        _render_grouped_missing_fields(group) for group in related_groups if group
+    )
+
+    if missing_fields or related_html:
+        html = "<div class='header'>Missing fields:</div>"
+        for field in missing_fields:
+            html += f"<div>{field}</div>"
+        html += related_html
+        return mark_safe(html)
+
+    return mark_safe("<p>All expected fields completed for this model</p>")

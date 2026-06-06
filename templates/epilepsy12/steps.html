@@ -65,31 +65,31 @@
         
 
     {% if active_template == "register" %}
-        {% include 'epilepsy12/progress_wheel.html' with total_expected_fields=audit_progress.registration_total_expected_fields total_completed_fields=audit_progress.registration_total_completed_fields title="Verification and registration" %}
+        {% include 'epilepsy12/progress_wheel.html' with total_expected_fields=audit_progress.registration_total_expected_fields total_completed_fields=audit_progress.registration_total_completed_fields title="Verification and registration" case_id=case_id model="registration"%}
     {% endif %}
     
     {% if active_template == "first_paediatric_assessment" %}
-        {% include 'epilepsy12/progress_wheel.html' with total_expected_fields=audit_progress.first_paediatric_assessment_total_expected_fields total_completed_fields=audit_progress.first_paediatric_assessment_total_completed_fields title="First paediatric assessment" %}
+        {% include 'epilepsy12/progress_wheel.html' with total_expected_fields=audit_progress.first_paediatric_assessment_total_expected_fields total_completed_fields=audit_progress.first_paediatric_assessment_total_completed_fields title="First paediatric assessment" case_id=case_id model="firstpaediatricassessment"%}
     {% endif %}
     
     {% if active_template == "epilepsy_context" %}
-        {% include 'epilepsy12/progress_wheel.html' with total_expected_fields=audit_progress.epilepsy_context_total_expected_fields total_completed_fields=audit_progress.epilepsy_context_total_completed_fields title="The epilepsy context" %}
+        {% include 'epilepsy12/progress_wheel.html' with total_expected_fields=audit_progress.epilepsy_context_total_expected_fields total_completed_fields=audit_progress.epilepsy_context_total_completed_fields title="The epilepsy context" case_id=case_id model="epilepsycontext"%}
     {% endif %}
     
     {% if active_template == "multiaxial_diagnosis" %}
-        {% include 'epilepsy12/progress_wheel.html' with total_expected_fields=audit_progress.multiaxial_diagnosis_total_expected_fields total_completed_fields=audit_progress.multiaxial_diagnosis_total_completed_fields title="Multiaxial diagnosis" %}
+        {% include 'epilepsy12/progress_wheel.html' with total_expected_fields=audit_progress.multiaxial_diagnosis_total_expected_fields total_completed_fields=audit_progress.multiaxial_diagnosis_total_completed_fields title="Multiaxial diagnosis" case_id=case_id model="multiaxialdiagnosis"%}
     {% endif %}
     
     {% if active_template == "assessment" %}
-        {% include 'epilepsy12/progress_wheel.html' with total_expected_fields=audit_progress.assessment_total_expected_fields total_completed_fields=audit_progress.assessment_total_completed_fields title="Milestones" %}
+        {% include 'epilepsy12/progress_wheel.html' with total_expected_fields=audit_progress.assessment_total_expected_fields total_completed_fields=audit_progress.assessment_total_completed_fields title="Milestones" case_id=case_id model="assessment"%}
     {% endif %}
     
     {% if active_template == "investigations" %}
-        {% include 'epilepsy12/progress_wheel.html' with total_expected_fields=audit_progress.investigations_total_expected_fields total_completed_fields=audit_progress.investigations_total_completed_fields title="Tests" %}
+        {% include 'epilepsy12/progress_wheel.html' with total_expected_fields=audit_progress.investigations_total_expected_fields total_completed_fields=audit_progress.investigations_total_completed_fields title="Tests" case_id=case_id model="investigations"%}
     {% endif %}
     
     {% if active_template == "management" %}
-        {% include 'epilepsy12/progress_wheel.html' with total_expected_fields=audit_progress.management_total_expected_fields total_completed_fields=audit_progress.management_total_completed_fields title="Treatment and care planning" %}
+        {% include 'epilepsy12/progress_wheel.html' with total_expected_fields=audit_progress.management_total_expected_fields total_completed_fields=audit_progress.management_total_completed_fields title="Treatment and care planning" case_id=case_id model="management"%}
     {% endif %}
 
   </div>

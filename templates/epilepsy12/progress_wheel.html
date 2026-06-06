@@ -3,7 +3,7 @@
     {% with numerator=total_completed_fields %}
         <div id="progress">
             {% percentage_of_total numerator denominator as total_percent %}
-            {% include 'epilepsy12/partials/charts/progress.html' with numerator=numerator denominator=denominator percentage=total_percent title=title pie_size='small' %}
+            {% include 'epilepsy12/partials/charts/progress.html' with numerator=numerator denominator=denominator percentage=total_percent title=title pie_size='small' case_id=case_id model=model %}
         </div>
     {% endwith %}
 {% endwith %}

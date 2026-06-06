@@ -3,9 +3,10 @@ pie chart or progress wheel
 accepts numerator and denominator params
 also accepts sizes - big, med, small
 {% endcomment %}
+{% load epilepsy12_template_tags %}
 <div class="pie-box">
     <div class={{pie_size}}>
-        <div class="pie pie--value" style="--percent:{{percentage}};"></div>
-        <div class="rcpch_pie_label">{{numerator}}/{{denominator}}</div>
+        <div class="pie pie--value tooltip-class" style="--percent:{{percentage}};" data-html="{% missing_completed_fields_for_model case_id model %}" _="init js $('.tooltip-class').popup();"></div>
+        <div class="rcpch_pie_label ">{{numerator}}/{{denominator}}</div>
     </div>
 </div>
