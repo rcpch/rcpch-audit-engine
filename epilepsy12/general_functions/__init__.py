@@ -8,8 +8,6 @@ from .construct_confirm_email import *
 from .construct_transfer_email import *
 from .date_functions import *
 from .email import *
-from .epilepsy_causes import *
-from .fetch_snomed import *
 from .fuzzy_matching import *
 from .has_all_attributes import *
 from .index_multiple_deprivation import *

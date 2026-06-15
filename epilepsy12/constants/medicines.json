@@ -1,0 +1,254 @@
+[
+    {
+        "medicine_name": "Buccal midazolam",
+        "conceptId": "776785007",
+        "term": "Midazolam only product",
+        "preferredTerm": "Midazolam only product",
+        "is_rescue": true
+    },
+    {
+        "medicine_name": "Rectal diazepam",
+        "conceptId": "775545008",
+        "term": "Diazepam only product",
+        "preferredTerm": "Diazepam only product",
+        "is_rescue": true
+    },
+    {
+        "medicine_name": "Other",
+        "conceptId": null,
+        "term": null,
+        "preferredTerm": null,
+        "is_rescue": true
+    },
+    {
+        "medicine_name": "Lorazepam",
+        "conceptId": "776574008",
+        "term": "Lorazepam only product",
+        "preferredTerm": "Lorazepam only product",
+        "is_rescue": true
+    },
+    {
+        "medicine_name": "Acetazolamide",
+        "conceptId": "774413005",
+        "term": "Acetazolamide only product",
+        "preferredTerm": "Acetazolamide only product",
+        "is_rescue": false
+    },
+    {
+        "medicine_name": "ACTH",
+        "conceptId": "40789008",
+        "term": "ACTH",
+        "preferredTerm": "Corticotropin",
+        "is_rescue": false
+    },
+    {
+        "medicine_name": "Brivaracetam",
+        "conceptId": "774912006",
+        "term": "Brivaracetam only product",
+        "preferredTerm": "Brivaracetam only product",
+        "is_rescue": false
+    },
+    {
+        "medicine_name": "Carbamazepine",
+        "conceptId": "775043009",
+        "term": "Carbamazepine only product",
+        "preferredTerm": "Carbamazepine only product",
+        "is_rescue": false
+    },
+    {
+        "medicine_name": "Cenobamate",
+        "conceptId": "830245002",
+        "term": "Cenobamate only product",
+        "preferredTerm": "Cenobamate only product",
+        "is_rescue": false
+    },
+    {
+        "medicine_name": "Clobazam",
+        "conceptId": "775294007",
+        "term": "Clobazam only product",
+        "preferredTerm": "Clobazam only product",
+        "is_rescue": false
+    },
+    {
+        "medicine_name": "Clonazepam",
+        "conceptId": "775309006",
+        "term": "Clonazepam only product",
+        "preferredTerm": "Clonazepam only product",
+        "is_rescue": false
+    },
+    {
+        "medicine_name": "Eslicarbazepine acetate",
+        "conceptId": "775832002",
+        "term": "Eslicarbazepine only product",
+        "preferredTerm": "Eslicarbazepine only product",
+        "is_rescue": false
+    },
+    {
+        "medicine_name": "Ethosuximide",
+        "conceptId": "775876009",
+        "term": "Ethosuximide only product",
+        "preferredTerm": "Ethosuximide only product",
+        "is_rescue": false
+    },
+    {
+        "medicine_name": "Gabapentin",
+        "conceptId": "776060008",
+        "term": "Gabapentin only product",
+        "preferredTerm": "Gabapentin only product",
+        "is_rescue": false
+    },
+    {
+        "medicine_name": "Lacosamide",
+        "conceptId": "776457006",
+        "term": "Lacosamide only product",
+        "preferredTerm": "Lacosamide only product",
+        "is_rescue": false
+    },
+    {
+        "medicine_name": "Lamotrigine",
+        "conceptId": "776470002",
+        "term": "Lamotrigine only product",
+        "preferredTerm": "Lamotrigine only product",
+        "is_rescue": false
+    },
+    {
+        "medicine_name": "Levetiracetam",
+        "conceptId": "776508005",
+        "term": "Levetiracetam only product",
+        "preferredTerm": "Levetiracetam only product",
+        "is_rescue": false
+    },
+    {
+        "medicine_name": "Methylprednisolone",
+        "conceptId": "776754003",
+        "term": "Methylprednisolone only product",
+        "preferredTerm": "Methylprednisolone only product",
+        "is_rescue": false
+    },
+    {
+        "medicine_name": "Nitrazepam",
+        "conceptId": "776924001",
+        "term": "Nitrazepam only product",
+        "preferredTerm": "Nitrazepam only product",
+        "is_rescue": false
+    },
+    {
+        "medicine_name": "Oxcarbazepine",
+        "conceptId": "777017007",
+        "term": "Oxcarbazepine only product",
+        "preferredTerm": "Oxcarbazepine only product",
+        "is_rescue": false
+    },
+    {
+        "medicine_name": "Perampanel",
+        "conceptId": "777126008",
+        "term": "Perampanel only product",
+        "preferredTerm": "Perampanel only product",
+        "is_rescue": false
+    },
+    {
+        "medicine_name": "Piracetam",
+        "conceptId": "777218005",
+        "term": "Piracetam only product",
+        "preferredTerm": "Piracetam only product",
+        "is_rescue": false
+    },
+    {
+        "medicine_name": "Phenobarbital",
+        "conceptId": "777167003",
+        "term": "Phenobarbital only product",
+        "preferredTerm": "Phenobarbital only product",
+        "is_rescue": false
+    },
+    {
+        "medicine_name": "Phenytoin",
+        "conceptId": "777187002",
+        "term": "Phenytoin only product",
+        "preferredTerm": "Phenytoin only product",
+        "is_rescue": false
+    },
+    {
+        "medicine_name": "Pregabalin",
+        "conceptId": "777311001",
+        "term": "Pregabalin only product",
+        "preferredTerm": "Pregabalin only product",
+        "is_rescue": false
+    },
+    {
+        "medicine_name": "Prednisolone",
+        "conceptId": "777309005",
+        "term": "Prednisolone only product",
+        "preferredTerm": "Prednisolone only product",
+        "is_rescue": false
+    },
+    {
+        "medicine_name": "Primidone",
+        "conceptId": "777315005",
+        "term": "Primidone only product",
+        "preferredTerm": "Primidone only product",
+        "is_rescue": false
+    },
+    {
+        "medicine_name": "Rufinamide",
+        "conceptId": "777475004",
+        "term": "Rufinamide only product",
+        "preferredTerm": "Rufinamide only product",
+        "is_rescue": false
+    },
+    {
+        "medicine_name": "Sodium valproate",
+        "conceptId": "387481005",
+        "term": "DPA sodium",
+        "preferredTerm": "Sodium valproate",
+        "is_rescue": false
+    },
+    {
+        "medicine_name": "Stiripentol",
+        "conceptId": "777610008",
+        "term": "Stiripentol only product",
+        "preferredTerm": "Stiripentol only product",
+        "is_rescue": false
+    },
+    {
+        "medicine_name": "Sulthiame",
+        "conceptId": "50580004",
+        "term": "Sultiame",
+        "preferredTerm": "Sultiame",
+        "is_rescue": false
+    },
+    {
+        "medicine_name": "Tiagabine",
+        "conceptId": "777762000",
+        "term": "Tiagabine only product",
+        "preferredTerm": "Tiagabine only product",
+        "is_rescue": false
+    },
+    {
+        "medicine_name": "Topiramate",
+        "conceptId": "777808008",
+        "term": "Topiramate only product",
+        "preferredTerm": "Topiramate only product",
+        "is_rescue": false
+    },
+    {
+        "medicine_name": "Vigabatrin",
+        "conceptId": "777931009",
+        "term": "Vigabatrin only product",
+        "preferredTerm": "Vigabatrin only product",
+        "is_rescue": false
+    },
+    {
+        "medicine_name": "Zonisamide",
+        "conceptId": "777991006",
+        "term": "Zonisamide only product",
+        "preferredTerm": "Zonisamide only product",
+        "is_rescue": false
+    },
+    {
+        "medicine_name": "Other",
+        "conceptId": null,
+        "term": null,
+        "preferredTerm": null,
+        "is_rescue": false
+    }
+]
