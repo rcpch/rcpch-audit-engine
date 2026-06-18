@@ -32,6 +32,60 @@ from epilepsy12.constants import (
 logger = logging.getLogger(__name__)
 
 
+def _is_conditional_aem_field_expected(medicine_instance, field_name):
+    """
+    Returns whether a conditional AntiEpilepsyMedicine field should count towards
+    completion under the same cohort/sex/age rules used for expected scoring.
+    """
+    if field_name not in [
+        "has_a_valproate_annual_risk_acknowledgement_form_been_completed",
+        "is_a_pregnancy_prevention_programme_in_place",
+    ]:
+        return True
+
+    if medicine_instance.medicine_entity is None:
+        return False
+
+    cohort = medicine_instance.management.registration.cohort
+    sex = medicine_instance.management.registration.case.sex
+    concept_id = medicine_instance.medicine_entity.conceptId
+
+    today = date.today()
+    calculated_age = relativedelta.relativedelta(
+        today, medicine_instance.management.registration.case.date_of_birth
+    )
+
+    is_valproate_or_topiramate = concept_id in ["387481005", "777808008"]
+
+    if field_name == "has_a_valproate_annual_risk_acknowledgement_form_been_completed":
+        if cohort > 6:
+            return is_valproate_or_topiramate
+
+        return (
+            sex == 2
+            and calculated_age.years >= 12
+            and concept_id == "387481005"
+            and bool(medicine_instance.is_a_pregnancy_prevention_programme_needed)
+        )
+
+    # field_name == "is_a_pregnancy_prevention_programme_in_place"
+    if cohort > 6:
+        if sex != 2:
+            return False
+        if concept_id == "387481005":
+            return bool(medicine_instance.is_a_pregnancy_prevention_programme_needed)
+        if concept_id == "777808008" and calculated_age.years >= 12:
+            return bool(medicine_instance.is_a_pregnancy_prevention_programme_needed)
+        return False
+
+    return (
+        sex == 2
+        and calculated_age.years >= 12
+        and concept_id == "387481005"
+        and bool(medicine_instance.is_a_pregnancy_prevention_programme_needed)
+    )
+
+
 def recalculate_form_generate_response(
     model_instance, request, context, template, error_message=None
 ):
@@ -125,6 +179,15 @@ def completed_fields(model_instance):
                     if len(getattr(model_instance, field.name)) > 0:
                         counter += 1
                 else:
+                    if (
+                        model_instance.__class__.__name__ == "AntiEpilepsyMedicine"
+                        and not _is_conditional_aem_field_expected(
+                            medicine_instance=model_instance,
+                            field_name=field.name,
+                        )
+                    ):
+                        continue
+
                     if field.name in [
                         "focal_onset_atonic",
                         "focal_onset_clonic",
@@ -271,9 +334,7 @@ def total_fields_expected(model_instance):
                 # add essential fields: r14, r27, r59 test statuses
                 cumulative_score += 3
                 for test in ["r14", "r27", "r59"]:
-                    test_status = getattr(
-                        model_instance, f"{test}_test_status"
-                    )
+                    test_status = getattr(model_instance, f"{test}_test_status")
                     if test_status in ["R", "A"]:
                         # add essential field: requested_date
                         cumulative_score += 1
@@ -458,7 +519,6 @@ def avoid_fields(model_instance):
         ]
 
     elif model_class_name == "AntiEpilepsyMedicine":
-        print("Avoiding fields for AntiEpilepsyMedicine")
         return META_VARIABLES + [
             "management",
             "is_rescue_medicine",

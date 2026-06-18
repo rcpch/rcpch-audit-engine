@@ -1,4 +1,4 @@
-""" Tests for `number_of_completed_fields_in_related_models` fn.
+"""Tests for `number_of_completed_fields_in_related_models` fn.
 
     MultiaxialDiagnosis - DONE
         - `Episode`
@@ -39,7 +39,7 @@
                         # nonepileptic_seizure_paroxysmal or
                         # nonepileptic_seizure_sleep
                         # nonepileptic_seizure_syncope
-                        
+
                         if episode.nonepileptic_seizure_type == "Oth":
                             EXPECTED_SCORE += 2
                         else:
@@ -61,12 +61,13 @@
             "comorbidity__comorbidityentity__conceptId"
 Management
 Registration
-    
+
 """
 
 # python imports
 import pytest
 from datetime import date
+from dateutil.relativedelta import relativedelta
 import random
 
 # django imports
@@ -528,9 +529,15 @@ def test_related_model_fields_count_management(
     CASE = e12_case_factory(
         first_name=f"temp_child_{GOSH.name}",
         organisations__organisation=GOSH,
+        date_of_birth=date.today() - relativedelta(years=13),
         sex=SEX_TYPE[2][0],
     )
     management = CASE.registration.management
+
+    CASE.registration.first_paediatric_assessment_date = date(2024, 5, 1)
+    CASE.registration.cohort = 7
+    CASE.registration.save()
+
     return_value = number_of_completed_fields_in_related_models(management)
     assert (
         return_value == 0
@@ -544,6 +551,7 @@ def test_related_model_fields_count_management(
         "medicine_entity": Medicine.objects.get(medicine_name="Sodium valproate"),
         "antiepilepsy_medicine_start_date": date(2023, 1, 1),
         "antiepilepsy_medicine_risk_discussed": True,
+        "is_a_pregnancy_prevention_programme_needed": True,
         "is_a_pregnancy_prevention_programme_in_place": True,
         "has_a_valproate_annual_risk_acknowledgement_form_been_completed": True,
     }
@@ -564,7 +572,8 @@ def test_related_model_fields_count_management(
     )
     return_value = number_of_completed_fields_in_related_models(management)
 
-    expected_value = len(rescue_medicine_answers) + len(aed_answers)
+    # is_a_pregnancy_prevention_programme_needed is not scoreable in completed_fields
+    expected_value = len(rescue_medicine_answers) + len(aed_answers) - 1
 
     assert (
         return_value == expected_value
