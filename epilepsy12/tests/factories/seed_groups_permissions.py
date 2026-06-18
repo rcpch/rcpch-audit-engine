@@ -4,7 +4,7 @@ from django.contrib.auth.models import Group
 
 from epilepsy12.management.commands.create_groups import groups_seeder
 
-@pytest.mark.django_db
+
 @pytest.fixture(scope="session")
 def seed_groups_fixture(django_db_setup, django_db_blocker):
     """
