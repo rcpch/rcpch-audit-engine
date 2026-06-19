@@ -27,6 +27,7 @@ from epilepsy12.models import (
 )
 from epilepsy12.common_view_functions.recalculate_form_generate_response import (
     completed_fields,
+    number_of_completed_fields_in_related_models,
     scoreable_fields_for_model_class_name,
     total_fields_expected,
     count_episode_fields,
@@ -788,11 +789,11 @@ def test_total_fields_expected_topiramate_or_valproate_for_sex_and_age_cohort_7(
     assert (
         CASE.registration.cohort == 7
     ), "Cohort should be 7 for first paediatric assessment date of 2024-05-01"
-    
+
     # Calculate age at the assessment date, not at current time
     assessment_date = CASE.registration.first_paediatric_assessment_date
     age_at_assessment = CASE.age_days(today_date=assessment_date)
-    
+
     if age_over_12:
         assert age_at_assessment > (
             12 * 365.25
@@ -887,11 +888,11 @@ def test_total_fields_expected_topiramate_or_valproate_for_sex_and_age_cohort_6(
     assert (
         CASE.registration.cohort == 6
     ), f"Cohort should be 6 for first paediatric assessment date of 2023-05-01, but got {CASE.registration.cohort}"
-    
+
     # Calculate age at the assessment date, not at current time
     assessment_date = CASE.registration.first_paediatric_assessment_date
     age_at_assessment = CASE.age_days(today_date=assessment_date)
-    
+
     if age_over_12:
         assert age_at_assessment > (
             12 * 365.25
@@ -907,3 +908,76 @@ def test_total_fields_expected_topiramate_or_valproate_for_sex_and_age_cohort_6(
     assert (
         return_value == expected_value
     ), f"total_fields_expected(management) expected {expected_value} but got {return_value}. >12yo girl registered with Topiramate AED"
+
+
+@pytest.mark.django_db
+def test_management_valproate_fields_do_not_overcount_when_not_expected(
+    e12_case_factory,
+    e12_anti_epilepsy_medicine_factory,
+    GOSH,
+):
+    """
+    Regression test for Management scoring: completed fields must not exceed expected fields.
+
+    Cohort 6, under-12 female with multiple AEDs (including valproate) should not
+    overcount conditional valproate/topiramate fields when those are not expected.
+    """
+    CASE = e12_case_factory(
+        first_name=f"temp_child_{GOSH.name}",
+        date_of_birth=date(2014, 1, 1),
+        organisations__organisation=GOSH,
+        sex=SEX_TYPE[2][0],
+    )
+
+    CASE.registration.first_paediatric_assessment_date = date(2023, 5, 1)
+    CASE.registration.cohort = 6
+    CASE.registration.management.has_an_aed_been_given = True
+    CASE.registration.management.has_rescue_medication_been_prescribed = False
+    CASE.registration.management.save()
+    CASE.registration.save()
+
+    # Valproate (not expected to require these extra fields in cohort 6 for under-12 girls)
+    e12_anti_epilepsy_medicine_factory(
+        management=CASE.registration.management,
+        is_rescue_medicine=False,
+        medicine_entity=Medicine.objects.get(conceptId="387481005"),
+        antiepilepsy_medicine_start_date=date(2023, 6, 1),
+        antiepilepsy_medicine_risk_discussed=True,
+        is_a_pregnancy_prevention_programme_needed=False,
+        has_a_valproate_annual_risk_acknowledgement_form_been_completed=True,
+        is_a_pregnancy_prevention_programme_in_place=True,
+    )
+
+    # Topiramate with conditional fields filled
+    e12_anti_epilepsy_medicine_factory(
+        management=CASE.registration.management,
+        is_rescue_medicine=False,
+        medicine_entity=Medicine.objects.get(conceptId="777808008"),
+        antiepilepsy_medicine_start_date=date(2023, 6, 1),
+        antiepilepsy_medicine_risk_discussed=True,
+        is_a_pregnancy_prevention_programme_needed=False,
+        has_a_valproate_annual_risk_acknowledgement_form_been_completed=True,
+        is_a_pregnancy_prevention_programme_in_place=True,
+    )
+
+    # Third non-valproate AED with conditional fields populated
+    e12_anti_epilepsy_medicine_factory(
+        management=CASE.registration.management,
+        is_rescue_medicine=False,
+        medicine_entity=Medicine.objects.get(medicine_name="Levetiracetam"),
+        antiepilepsy_medicine_start_date=date(2023, 6, 1),
+        antiepilepsy_medicine_risk_discussed=True,
+        is_a_pregnancy_prevention_programme_needed=False,
+        has_a_valproate_annual_risk_acknowledgement_form_been_completed=True,
+        is_a_pregnancy_prevention_programme_in_place=True,
+    )
+
+    management = CASE.registration.management
+    all_completed_fields = completed_fields(
+        management
+    ) + number_of_completed_fields_in_related_models(management)
+    all_expected_fields = total_fields_expected(management)
+
+    assert (
+        all_completed_fields <= all_expected_fields
+    ), f"Management overcount: completed={all_completed_fields}, expected={all_expected_fields}"

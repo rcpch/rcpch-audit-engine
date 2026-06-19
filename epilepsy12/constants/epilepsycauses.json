@@ -1,0 +1,1082 @@
+[
+    {
+        "conceptId": "111385000",
+        "term": "TSD",
+        "preferredTerm": "Tay-Sachs disease"
+    },
+    {
+        "conceptId": "92503002",
+        "term": "NF2",
+        "preferredTerm": "Neurofibromatosis type 2"
+    },
+    {
+        "conceptId": "92824003",
+        "term": "NF1",
+        "preferredTerm": "Neurofibromatosis type 1"
+    },
+    {
+        "conceptId": "398100001",
+        "term": "HSMN",
+        "preferredTerm": "Hereditary motor and sensory neuropathy"
+    },
+    {
+        "conceptId": "128205005",
+        "term": "HSAN",
+        "preferredTerm": "Hereditary sensory and autonomic neuropathy"
+    },
+    {
+        "conceptId": "54280009",
+        "term": "SMA3",
+        "preferredTerm": "Kugelberg-Welander disease"
+    },
+    {
+        "conceptId": "21634003",
+        "term": "BFLS",
+        "preferredTerm": "Borjeson-Forssman-Lehmann syndrome"
+    },
+    {
+        "conceptId": "128212001",
+        "term": "SMA2",
+        "preferredTerm": "Spinal muscular atrophy, type II"
+    },
+    {
+        "conceptId": "698279003",
+        "term": "Lubag",
+        "preferredTerm": "X-linked dystonia parkinsonism"
+    },
+    {
+        "conceptId": "45639009",
+        "term": "HCHWA",
+        "preferredTerm": "Hereditary cerebral amyloid angiopathy, Icelandic type"
+    },
+    {
+        "conceptId": "230553002",
+        "term": "HSAN I",
+        "preferredTerm": "Autosomal dominant sensory neuropathy"
+    },
+    {
+        "conceptId": "128206006",
+        "term": "HSAN V",
+        "preferredTerm": "Congenital sensory neuropathy with selective loss of small myelinated fibres"
+    },
+    {
+        "conceptId": "237961001",
+        "term": "L-2-HGA",
+        "preferredTerm": "L-2(OH) glutaric aciduria"
+    },
+    {
+        "conceptId": "128203003",
+        "term": "HMSN VI",
+        "preferredTerm": "Hereditary motor and sensory neuropathy with optic atrophy"
+    },
+    {
+        "conceptId": "62985007",
+        "term": "HSAN IV",
+        "preferredTerm": "Hereditary insensitivity to pain with anhidrosis"
+    },
+    {
+        "conceptId": "7199000",
+        "term": "Epiloia",
+        "preferredTerm": "Tuberous sclerosis syndrome"
+    },
+    {
+        "conceptId": "25362006",
+        "term": "HMSN IV",
+        "preferredTerm": "Phytanic acid storage disease"
+    },
+    {
+        "conceptId": "128204009",
+        "term": "HSMN VII",
+        "preferredTerm": "Hereditary motor and sensory neuropathy with retinitis pigmentosa"
+    },
+    {
+        "conceptId": "29159009",
+        "term": "HSAN III",
+        "preferredTerm": "Familial dysautonomia"
+    },
+    {
+        "conceptId": "111499002",
+        "term": "HSMN III",
+        "preferredTerm": "D\u00e9j\u00e9rine-Sottas disease"
+    },
+    {
+        "conceptId": "23849003",
+        "term": "O variant",
+        "preferredTerm": "Sandhoff disease"
+    },
+    {
+        "conceptId": "702448007",
+        "term": "Dystonia 6",
+        "preferredTerm": "Dystonia 6"
+    },
+    {
+        "conceptId": "715564000",
+        "term": "Dystonia 9",
+        "preferredTerm": "Paroxysmal dystonic choreoathetosis with episodic ataxia and spasticity"
+    },
+    {
+        "conceptId": "38795005",
+        "term": "Sialidosis",
+        "preferredTerm": "Sialidosis"
+    },
+    {
+        "conceptId": "71253000",
+        "term": "AB variant",
+        "preferredTerm": "Tay-Sachs disease, variant AB"
+    },
+    {
+        "conceptId": "702323008",
+        "term": "Dystonia 12",
+        "preferredTerm": "Rapid onset dystonia parkinsonism"
+    },
+    {
+        "conceptId": "721846006",
+        "term": "4H syndrome",
+        "preferredTerm": "Hypomyelination, hypogonadotropic hypogonadism, hypodontia syndrome"
+    },
+    {
+        "conceptId": "722435003",
+        "term": "Dystonia 16",
+        "preferredTerm": "Dystonia 16"
+    },
+    {
+        "conceptId": "724351008",
+        "term": "Kok disease",
+        "preferredTerm": "Hereditary hyperekplexia"
+    },
+    {
+        "conceptId": "716996008",
+        "term": "L1 syndrome",
+        "preferredTerm": "L1 syndrome"
+    },
+    {
+        "conceptId": "783242003",
+        "term": "Dystonia 23",
+        "preferredTerm": "Adult-onset cervical dystonia DYT23 type"
+    },
+    {
+        "conceptId": "783179009",
+        "term": "Dystonia 24",
+        "preferredTerm": "Cranio-cervical dystonia with laryngeal and upper limb involvement"
+    },
+    {
+        "conceptId": "23501004",
+        "term": "Argininemia",
+        "preferredTerm": "Arginase deficiency"
+    },
+    {
+        "conceptId": "723309006",
+        "term": "ECO syndrome",
+        "preferredTerm": "Endocrine-cerebro-osteodysplasia syndrome"
+    },
+    {
+        "conceptId": "782721009",
+        "term": "Salih ataxia",
+        "preferredTerm": "Autosomal recessive cerebellar ataxia, epilepsy, intellectual disability syndrome due to RUBCN deficiency"
+    },
+    {
+        "conceptId": "770941005",
+        "term": "ANE syndrome",
+        "preferredTerm": "Alopecia, progressive neurological defect, endocrinopathy syndrome"
+    },
+    {
+        "conceptId": "763895001",
+        "term": "Myosclerosis",
+        "preferredTerm": "Myosclerosis"
+    },
+    {
+        "conceptId": "398040009",
+        "term": "HSMN, type I",
+        "preferredTerm": "Charcot-Marie-Tooth disease, type I"
+    },
+    {
+        "conceptId": "79385002",
+        "term": "Lowe disease",
+        "preferredTerm": "Lowe syndrome"
+    },
+    {
+        "conceptId": "2355008",
+        "term": "Rud syndrome",
+        "preferredTerm": "Rud's syndrome"
+    },
+    {
+        "conceptId": "702441001",
+        "term": "Arts syndrome",
+        "preferredTerm": "Arts syndrome"
+    },
+    {
+        "conceptId": "719824001",
+        "term": "Vici syndrome",
+        "preferredTerm": "Vici syndrome"
+    },
+    {
+        "conceptId": "721843003",
+        "term": "GAPO syndrome",
+        "preferredTerm": "GAPO syndrome"
+    },
+    {
+        "conceptId": "711158005",
+        "term": "Asidan ataxia",
+        "preferredTerm": "Spinocerebellar ataxia type 36"
+    },
+    {
+        "conceptId": "717332007",
+        "term": "Cayman ataxia",
+        "preferredTerm": "Cerebellar ataxia Cayman type"
+    },
+    {
+        "conceptId": "764734003",
+        "term": "Mast syndrome",
+        "preferredTerm": "Autosomal recessive spastic paraplegia type 21"
+    },
+    {
+        "conceptId": "1003447007",
+        "term": "Null syndrome",
+        "preferredTerm": "Pelizaeus-Merzbacher disease null syndrome"
+    },
+    {
+        "conceptId": "789657008",
+        "term": "CLN12 disease",
+        "preferredTerm": "ATPase cation transporting 13A2 related juvenile neuronal ceroid lipofuscinosis"
+    },
+    {
+        "conceptId": "838441009",
+        "term": "MASA syndrome",
+        "preferredTerm": "MASA syndrome"
+    },
+    {
+        "conceptId": "442511009",
+        "term": "PEHO syndrome",
+        "preferredTerm": "Progressive encephalopathy with oedema, hypsarrhythmia and optic atrophy syndrome"
+    },
+    {
+        "conceptId": "36025004",
+        "term": "Pringle tumor",
+        "preferredTerm": "Fibrous skin tumour of tuberous sclerosis"
+    },
+    {
+        "conceptId": "75968004",
+        "term": "Soto syndrome",
+        "preferredTerm": "Sotos' syndrome"
+    },
+    {
+        "conceptId": "62009002",
+        "term": "Kufs' disease",
+        "preferredTerm": "Adult neuronal ceroid lipofuscinosis"
+    },
+    {
+        "conceptId": "29570005",
+        "term": "Leigh disease",
+        "preferredTerm": "Leigh's disease"
+    },
+    {
+        "conceptId": "791000124107",
+        "term": "HSD10 disease",
+        "preferredTerm": "2-methyl-3-hydroxybutyric aciduria"
+    },
+    {
+        "conceptId": "702356009",
+        "term": "PPM-X syndrome",
+        "preferredTerm": "PPM-X syndrome"
+    },
+    {
+        "conceptId": "702450004",
+        "term": "FOXG1 syndrome",
+        "preferredTerm": "FOXG1 syndrome"
+    },
+    {
+        "conceptId": "719136005",
+        "term": "OPHN1 syndrome",
+        "preferredTerm": "X-linked intellectual disability with cerebellar hypoplasia syndrome"
+    },
+    {
+        "conceptId": "720576001",
+        "term": "Rajab syndrome",
+        "preferredTerm": "Brain calcification Rajab type"
+    },
+    {
+        "conceptId": "718610008",
+        "term": "Norman disease",
+        "preferredTerm": "Congenital pontocerebellar hypoplasia type 1"
+    },
+    {
+        "conceptId": "723306004",
+        "term": "FOSMN syndrome",
+        "preferredTerm": "Facial onset sensory and motor neuronopathy syndrome"
+    },
+    {
+        "conceptId": "723999009",
+        "term": "RHYNS syndrome",
+        "preferredTerm": "RHYNS syndrome"
+    },
+    {
+        "conceptId": "724227000",
+        "term": "Ohaha syndrome",
+        "preferredTerm": "Infantile onset spinocerebellar ataxia"
+    },
+    {
+        "conceptId": "721847002",
+        "term": "COACH syndrome",
+        "preferredTerm": "Joubert syndrome with congenital hepatic fibrosis"
+    },
+    {
+        "conceptId": "721862000",
+        "term": "Arima syndrome",
+        "preferredTerm": "Joubert syndrome with oculorenal defect"
+    },
+    {
+        "conceptId": "726031001",
+        "term": "CAMOS syndrome",
+        "preferredTerm": "CAMOS syndrome"
+    },
+    {
+        "conceptId": "726608002",
+        "term": "Lison syndrome",
+        "preferredTerm": "Autosomal recessive spastic paraplegia type 23"
+    },
+    {
+        "conceptId": "722381004",
+        "term": "Crome syndrome",
+        "preferredTerm": "Crome syndrome"
+    },
+    {
+        "conceptId": "723452007",
+        "term": "PHARC syndrome",
+        "preferredTerm": "Polyneuropathy, hearing loss, ataxia, retinitis pigmentosa, cataract syndrome"
+    },
+    {
+        "conceptId": "880093002",
+        "term": "Monosomy 17q11",
+        "preferredTerm": "17q11 deletion syndrome"
+    },
+    {
+        "conceptId": "784391002",
+        "term": "Finkel disease",
+        "preferredTerm": "Autosomal dominant adult-onset proximal spinal muscular atrophy"
+    },
+    {
+        "conceptId": "772224009",
+        "term": "Micro syndrome",
+        "preferredTerm": "Warburg micro syndrome"
+    },
+    {
+        "conceptId": "763797003",
+        "term": "Proud syndrome",
+        "preferredTerm": "Agenesis of corpus callosum and abnormal genitalia syndrome"
+    },
+    {
+        "conceptId": "230263009",
+        "term": "Silver disease",
+        "preferredTerm": "Autosomal dominant spastic paraplegia type 17"
+    },
+    {
+        "conceptId": "192782005",
+        "term": "Krabbe disease",
+        "preferredTerm": "Galactosylceramide beta-galactosidase deficiency"
+    },
+    {
+        "conceptId": "20415001",
+        "term": "Poliodystrophy",
+        "preferredTerm": "Progressive sclerosing poliodystrophy"
+    },
+    {
+        "conceptId": "59178007",
+        "term": "Menkes disease",
+        "preferredTerm": "Menkes kinky-hair syndrome"
+    },
+    {
+        "conceptId": "50967008",
+        "term": "Gangliosidosis",
+        "preferredTerm": "Gangliosidosis"
+    },
+    {
+        "conceptId": "88518009",
+        "term": "Wilson disease",
+        "preferredTerm": "Wilson's disease"
+    },
+    {
+        "conceptId": "721207002",
+        "term": "SESAME syndrome",
+        "preferredTerm": "Seizure, sensorineural deafness, ataxia, intellectual disability, electrolyte imbalance syndrome"
+    },
+    {
+        "conceptId": "721873007",
+        "term": "Varadi syndrome",
+        "preferredTerm": "Joubert syndrome with orofaciodigital defect"
+    },
+    {
+        "conceptId": "722385008",
+        "term": "CEDNIK syndrome",
+        "preferredTerm": "CEDNIK syndrome"
+    },
+    {
+        "conceptId": "711409002",
+        "term": "MEGDEL syndrome",
+        "preferredTerm": "3-methylglutaconic aciduria type IV with sensorineural deafness, encephalopathy and Leigh-like syndrome"
+    },
+    {
+        "conceptId": "771263004",
+        "term": "Tucker syndrome",
+        "preferredTerm": "Ptosis and vocal cord paralysis syndrome"
+    },
+    {
+        "conceptId": "782754006",
+        "term": "FHONDA syndrome",
+        "preferredTerm": "Foveal hypoplasia, optic nerve decussation defect, anterior segment dysgenesis syndrome"
+    },
+    {
+        "conceptId": "421455009",
+        "term": "Episodic ataxia",
+        "preferredTerm": "Episodic ataxia"
+    },
+    {
+        "conceptId": "445252005",
+        "term": "De Vivo disease",
+        "preferredTerm": "Glucose transporter protein type 1 deficiency syndrome"
+    },
+    {
+        "conceptId": "43532007",
+        "term": "Amyloidosis VII",
+        "preferredTerm": "Hereditary oculoleptomeningeal amyloid angiopathy"
+    },
+    {
+        "conceptId": "46659004",
+        "term": "Lindau' disease",
+        "preferredTerm": "Von Hippel-Lindau syndrome"
+    },
+    {
+        "conceptId": "69463008",
+        "term": "ARSB deficiency",
+        "preferredTerm": "Maroteaux-Lamy syndrome"
+    },
+    {
+        "conceptId": "29145002",
+        "term": "Burton syndrome",
+        "preferredTerm": "Schwartz-Jampel syndrome"
+    },
+    {
+        "conceptId": "91952008",
+        "term": "Azorean disease",
+        "preferredTerm": "Azorean disease"
+    },
+    {
+        "conceptId": "718210003",
+        "term": "Brunner syndrome",
+        "preferredTerm": "Brunner syndrome"
+    },
+    {
+        "conceptId": "719947004",
+        "term": "Temtamy syndrome",
+        "preferredTerm": "Temtamy syndrome"
+    },
+    {
+        "conceptId": "724091002",
+        "term": "Elejalde disease",
+        "preferredTerm": "Neuroectodermal melanolysosomal disease"
+    },
+    {
+        "conceptId": "716107009",
+        "term": "Waisman syndrome",
+        "preferredTerm": "Early onset parkinsonism and intellectual disability syndrome"
+    },
+    {
+        "conceptId": "716997004",
+        "term": "Joubert syndrome",
+        "preferredTerm": "Joubert syndrome"
+    },
+    {
+        "conceptId": "783258000",
+        "term": "ADan amyloidosis",
+        "preferredTerm": "ADan amyloidosis"
+    },
+    {
+        "conceptId": "783161005",
+        "term": "ABri amyloidosis",
+        "preferredTerm": "ABri amyloidosis"
+    },
+    {
+        "conceptId": "783160006",
+        "term": "AGel amyloidosis",
+        "preferredTerm": "AGel amyloidosis"
+    },
+    {
+        "conceptId": "772225005",
+        "term": "RAB18 deficiency",
+        "preferredTerm": "RAB18 deficiency"
+    },
+    {
+        "conceptId": "764686003",
+        "term": "Kjellin syndrome",
+        "preferredTerm": "Autosomal recessive spastic paraplegia type 15"
+    },
+    {
+        "conceptId": "766987006",
+        "term": "Moebius syndrome",
+        "preferredTerm": "Moebius syndrome"
+    },
+    {
+        "conceptId": "398229007",
+        "term": "Andrade syndrome",
+        "preferredTerm": "Amyloid polyneuropathy type I"
+    },
+    {
+        "conceptId": "230253001",
+        "term": "Kennedy syndrome",
+        "preferredTerm": "Bulbospinal neuronopathy"
+    },
+    {
+        "conceptId": "80651009",
+        "term": "Aicardi syndrome",
+        "preferredTerm": "Aicardi's syndrome"
+    },
+    {
+        "conceptId": "81896006",
+        "term": "Nephrosialidosis",
+        "preferredTerm": "Dysmorphic sialidosis with renal involvement"
+    },
+    {
+        "conceptId": "70694009",
+        "term": "DIDMOAD syndrome",
+        "preferredTerm": "Diabetes mellitus AND insipidus with optic atrophy AND deafness"
+    },
+    {
+        "conceptId": "21086008",
+        "term": "Cokayne syndrome",
+        "preferredTerm": "Cockayne syndrome"
+    },
+    {
+        "conceptId": "23150001",
+        "term": "Proteus syndrome",
+        "preferredTerm": "Proteus syndrome"
+    },
+    {
+        "conceptId": "93559003",
+        "term": "Kallman syndrome",
+        "preferredTerm": "Hypogonadism with anosmia"
+    },
+    {
+        "conceptId": "703526007",
+        "term": "Northern epilepsy",
+        "preferredTerm": "Neuronal ceroid lipofuscinosis 8"
+    },
+    {
+        "conceptId": "703542000",
+        "term": "Knobloch syndrome",
+        "preferredTerm": "Retinal detachment and occipital encephalocoele"
+    },
+    {
+        "conceptId": "721297008",
+        "term": "Galloway syndrome",
+        "preferredTerm": "Galloway Mowat syndrome"
+    },
+    {
+        "conceptId": "725097006",
+        "term": "Crisponi syndrome",
+        "preferredTerm": "Crisponi syndrome"
+    },
+    {
+        "conceptId": "702363009",
+        "term": "Crisponi syndrome",
+        "preferredTerm": "Cold-induced sweating syndrome"
+    },
+    {
+        "conceptId": "722380003",
+        "term": "Martsolf syndrome",
+        "preferredTerm": "Martsolf syndrome"
+    },
+    {
+        "conceptId": "723675006",
+        "term": "Sialidosis type 1",
+        "preferredTerm": "Sialidosis type 1"
+    },
+    {
+        "conceptId": "722455002",
+        "term": "Da Silva syndrome",
+        "preferredTerm": "Intellectual disability, hypoplastic corpus callosum, preauricular tag syndrome"
+    },
+    {
+        "conceptId": "763400005",
+        "term": "Cowchock syndrome",
+        "preferredTerm": "X-linked Charcot-Marie-Tooth disease type 4"
+    },
+    {
+        "conceptId": "763597000",
+        "term": "Hereditary ataxia",
+        "preferredTerm": "Hereditary ataxia"
+    },
+    {
+        "conceptId": "733094005",
+        "term": "Pierquin syndrome",
+        "preferredTerm": "Dandy-Walker malformation with postaxial polydactyly syndrome"
+    },
+    {
+        "conceptId": "773737004",
+        "term": "Goldston syndrome",
+        "preferredTerm": "NPHP3-related Meckel-like syndrome"
+    },
+    {
+        "conceptId": "784346006",
+        "term": "Navajo neuropathy",
+        "preferredTerm": "Navajo neurohepatopathy"
+    },
+    {
+        "conceptId": "782670003",
+        "term": "Strumpell disease",
+        "preferredTerm": "Autosomal dominant spastic paraplegia type 3"
+    },
+    {
+        "conceptId": "788417006",
+        "term": "Moynahan syndrome",
+        "preferredTerm": "Alopecia, epilepsy, intellectual disability syndrome Moynahan type"
+    },
+    {
+        "conceptId": "238048001",
+        "term": "Schindler disease",
+        "preferredTerm": "Alpha-N-acetylgalactosaminidase deficiency"
+    },
+    {
+        "conceptId": "237612000",
+        "term": "Herrmann syndrome",
+        "preferredTerm": "Photomyoclonus, diabetes mellitus, deafness, nephropathy and cerebral dysfunction"
+    },
+    {
+        "conceptId": "39912006",
+        "term": "Strumpell disease",
+        "preferredTerm": "Hereditary spastic paraplegia"
+    },
+    {
+        "conceptId": "58756001",
+        "term": "Huntington chorea",
+        "preferredTerm": "Huntington's chorea"
+    },
+    {
+        "conceptId": "35691006",
+        "term": "Goldberg syndrome",
+        "preferredTerm": "Combined deficiency of sialidase AND beta galactosidase"
+    },
+    {
+        "conceptId": "81854007",
+        "term": "Alexander disease",
+        "preferredTerm": "Alexander's disease"
+    },
+    {
+        "conceptId": "702439002",
+        "term": "Charlevoix disease",
+        "preferredTerm": "Andermann syndrome"
+    },
+    {
+        "conceptId": "717336005",
+        "term": "Kjer optic atrophy",
+        "preferredTerm": "Autosomal dominant optic atrophy classic form"
+    },
+    {
+        "conceptId": "719139003",
+        "term": "Pettigrew syndrome",
+        "preferredTerm": "Pettigrew syndrome"
+    },
+    {
+        "conceptId": "719430008",
+        "term": "Leber plus disease",
+        "preferredTerm": "Leber plus disease"
+    },
+    {
+        "conceptId": "722006004",
+        "term": "Kawashima syndrome",
+        "preferredTerm": "Isotretinoin-like syndrome"
+    },
+    {
+        "conceptId": "716108004",
+        "term": "Fryns macrocephaly",
+        "preferredTerm": "Fryns macrocephaly"
+    },
+    {
+        "conceptId": "763861000",
+        "term": "Kuzniecky syndrome",
+        "preferredTerm": "Pachygyria, intellectual disability, epilepsy syndrome"
+    },
+    {
+        "conceptId": "782690007",
+        "term": "Gemignani syndrome",
+        "preferredTerm": "Gemignani syndrome"
+    },
+    {
+        "conceptId": "770678005",
+        "term": "PEHO-like syndrome",
+        "preferredTerm": "Progressive encephalopathy with oedema, hypsarrhythmia, and optic atrophy-like syndrome"
+    },
+    {
+        "conceptId": "254092004",
+        "term": "Conorenal syndrome",
+        "preferredTerm": "Saldino-Mainzer dysplasia"
+    },
+    {
+        "conceptId": "238025006",
+        "term": "GM1 gangliosidosis",
+        "preferredTerm": "GM1 gangliosidosis"
+    },
+    {
+        "conceptId": "68116008",
+        "term": "Haw river syndrome",
+        "preferredTerm": "Dentatorubropallidoluysian degeneration"
+    },
+    {
+        "conceptId": "52186006",
+        "term": "Sialidosis, type 2",
+        "preferredTerm": "Dysmorphic sialidosis"
+    },
+    {
+        "conceptId": "58258004",
+        "term": "Santavuori disease",
+        "preferredTerm": "Infantile neuronal ceroid lipofuscinosis"
+    },
+    {
+        "conceptId": "68504005",
+        "term": "Louis-Bar syndrome",
+        "preferredTerm": "Ataxia-telangiectasia syndrome"
+    },
+    {
+        "conceptId": "33316007",
+        "term": "GM2 gangliosidosis",
+        "preferredTerm": "GM2 gangliosidosis"
+    },
+    {
+        "conceptId": "16517004",
+        "term": "Cerebral lipidosis",
+        "preferredTerm": "Cerebral lipidosis"
+    },
+    {
+        "conceptId": "95656000",
+        "term": "M\u00f6bius' syndrome I",
+        "preferredTerm": "Familial hemiplegic migraine"
+    },
+    {
+        "conceptId": "764946008",
+        "term": "CMMR-D (constitutional mismatch repair deficiency) syndrome",
+        "preferredTerm": "Constitutional mismatch repair deficiency syndrome"
+    },
+    {
+        "conceptId": "52767006",
+        "term": "Neonatal hypoglycemia",
+        "preferredTerm": "Neonatal hypoglycaemia"
+    },
+    {
+        "conceptId": "703300001",
+        "term": "Hypoxic ischemic encephalopathy",
+        "preferredTerm": "Hypoxic ischaemic encephalopathy"
+    },
+    {
+        "conceptId": "722929005",
+        "term": "Perinatal arterial ischemic stroke",
+        "preferredTerm": "Perinatal arterial ischaemic stroke"
+    },
+    {
+        "conceptId": "158094009",
+        "term": "Non-accidental injury to child",
+        "preferredTerm": "Non-accidental injury to child"
+    },
+    {
+        "conceptId": "230769007",
+        "term": "Periventricular leucomalacia",
+        "preferredTerm": "Periventricular leucomalacia"
+    },
+    {
+        "conceptId": "261808007",
+        "term": "Neonatal cerebral hemorrhage",
+        "preferredTerm": "Neonatal cerebral haemorrhage"
+    },
+    {
+        "conceptId": "40354009",
+        "term": "De Lange syndrome",
+        "preferredTerm": "De Lange syndrome"
+    },
+    {
+        "conceptId": "389098007",
+        "term": "Anoxic encephalopathy",
+        "preferredTerm": "Anoxic encephalopathy"
+    },
+    {
+        "conceptId": "398696001",
+        "term": "Congenital pigmented melanocytic naevus",
+        "preferredTerm": "Congenital pigmented melanocytic naevus"
+    },
+    {
+        "conceptId": "703536004",
+        "term": "Infantile leukoencephalopathy and megalencephaly",
+        "preferredTerm": "Megalencephalic leucoencephalopathy with subcortical cysts"
+    },
+    {
+        "conceptId": "788882003",
+        "term": "Cerebral ischemic stroke due to global hypoperfusion with watershed infarct",
+        "preferredTerm": "Cerebral ischaemic stroke due to global hypoperfusion with watershed infarct"
+    },
+    {
+        "conceptId": "253159001",
+        "term": "Schizencephaly",
+        "preferredTerm": "Schizencephaly"
+    },
+    {
+        "conceptId": "9527009",
+        "term": "Tetrasomy 12p",
+        "preferredTerm": "Tetrasomy 12p"
+    },
+    {
+        "conceptId": "22053006",
+        "term": "Klinefelter syndrome",
+        "preferredTerm": "Klinefelter syndrome"
+    },
+    {
+        "conceptId": "230791000",
+        "term": "Hypothalamic neuronal hamartoma",
+        "preferredTerm": "Hypothalamic neuronal hamartoma"
+    },
+    {
+        "conceptId": "127295002",
+        "term": "Traumatic brain injury",
+        "preferredTerm": "Traumatic brain injury"
+    },
+    {
+        "conceptId": "76880004",
+        "term": "Angelman syndrome",
+        "preferredTerm": "Angelman syndrome"
+    },
+    {
+        "conceptId": "68618008",
+        "term": "Rett's disorder",
+        "preferredTerm": "Rett's disorder"
+    },
+    {
+        "conceptId": "42012007",
+        "term": "Neuronal ceroid lipofuscinosis",
+        "preferredTerm": "Neuronal ceroid lipofuscinosis"
+    },
+    {
+        "conceptId": "722056009",
+        "term": "Oculocerebrofacial syndrome Kaufman type",
+        "preferredTerm": "Oculocerebrofacial syndrome Kaufman type"
+    },
+    {
+        "conceptId": "782911008",
+        "term": "Hereditary cryohydrocytosis with reduced stomatin",
+        "preferredTerm": "Hereditary cryohydrocytosis with reduced stomatin"
+    },
+    {
+        "conceptId": "702816000",
+        "term": "Methyl-CpG (cytosine phosphate guanine) binding protein-2 duplication syndrome",
+        "preferredTerm": "Methyl-cytosine phosphate guanine binding protein-2 duplication syndrome"
+    },
+    {
+        "conceptId": "230437002",
+        "term": "Severe myoclonic epilepsy in infancy",
+        "preferredTerm": "Severe myoclonic epilepsy in infancy"
+    },
+    {
+        "conceptId": "768666006",
+        "term": "STXBP1-related early-onset encephalopathy",
+        "preferredTerm": "STXBP1 encephalopathy with epilepsy"
+    },
+    {
+        "conceptId": "773230003",
+        "term": "CDKL5 (cyclin-dependent kinase-like 5) deficiency",
+        "preferredTerm": "Cyclin-dependent kinase-like 5 deficiency"
+    },
+    {
+        "conceptId": "778001003",
+        "term": "KCNQ2-related neonatal epileptic encephalopathy",
+        "preferredTerm": "KCNQ2-related epileptic encephalopathy"
+    },
+    {
+        "conceptId": "778002005",
+        "term": "SCN2A encephalopathy",
+        "preferredTerm": "SCN2A encephalopathy"
+    },
+    {
+        "conceptId": "725163002",
+        "term": "X-linked spasticity, intellectual disability, epilepsy syndrome",
+        "preferredTerm": "X-linked spasticity, intellectual disability, epilepsy syndrome"
+    },
+    {
+        "conceptId": "888801000000105",
+        "term": "Protocadherin 19 mutation analysis",
+        "preferredTerm": "Protocadherin 19 mutation analysis"
+    },
+    {
+        "conceptId": "770431001",
+        "term": "Early-onset epileptic encephalopathy and intellectual disability due to GRIN2A mutation",
+        "preferredTerm": "Early-onset epileptic encephalopathy and intellectual disability due to GRIN2A mutation"
+    },
+    {
+        "conceptId": "416824008",
+        "term": "Cavernous hemangioma",
+        "preferredTerm": "Cavernous haemangioma"
+    },
+    {
+        "conceptId": "715215007",
+        "term": "Chromosome 11p13 deletion syndrome",
+        "preferredTerm": "WAGR syndrome"
+    },
+    {
+        "conceptId": "253153000",
+        "term": "Cortical dysplasia",
+        "preferredTerm": "Cortical dysplasia"
+    },
+    {
+        "conceptId": "879939002",
+        "term": "14q32 deletion syndrome",
+        "preferredTerm": "14q32 deletion syndrome"
+    },
+    {
+        "conceptId": "699307007",
+        "term": "Chromosome 16p11.2 deletion syndrome",
+        "preferredTerm": "Chromosome 16p11.2 deletion syndrome"
+    },
+    {
+        "conceptId": "765142003",
+        "term": "Proximal 16p11.2 microduplication syndrome",
+        "preferredTerm": "Proximal 16p11.2 microduplication syndrome"
+    },
+    {
+        "conceptId": "770643005",
+        "term": "Mesial temporal lobe epilepsy with hippocampal sclerosis",
+        "preferredTerm": "Mesial temporal lobe epilepsy with hippocampal sclerosis"
+    },
+    {
+        "conceptId": "699254009",
+        "term": "15q13.3 deletion syndrome",
+        "preferredTerm": "15q13.3 microdeletion"
+    },
+    {
+        "conceptId": "95643007",
+        "term": "Autoimmune encephalitis",
+        "preferredTerm": "Autoimmune encephalitis"
+    },
+    {
+        "conceptId": "734434007",
+        "term": "Pyridoxine-dependent epilepsy",
+        "preferredTerm": "Pyridoxine-dependent epilepsy"
+    },
+    {
+        "conceptId": "764522009",
+        "term": "FFEVF - familial focal epilepsy with variable foci",
+        "preferredTerm": "Familial focal epilepsy with variable foci"
+    },
+    {
+        "conceptId": "699310000",
+        "term": "Phelan-McDermid syndrome",
+        "preferredTerm": "22q13.3 deletion syndrome"
+    },
+    {
+        "conceptId": "767263007",
+        "term": "Velocardiofacial syndrome",
+        "preferredTerm": "22q11.2 deletion syndrome"
+    },
+    {
+        "conceptId": "17231009",
+        "term": "Fetal valproate syndrome",
+        "preferredTerm": "Fetal valproate syndrome"
+    },
+    {
+        "conceptId": "41040004",
+        "term": "Complete trisomy 21 syndrome",
+        "preferredTerm": "Complete trisomy 21 syndrome"
+    },
+    {
+        "conceptId": "87191000119100",
+        "term": "Ganglioglioma",
+        "preferredTerm": "Ganglioglioma"
+    },
+    {
+        "conceptId": "438583008",
+        "term": "Congenital bilateral perisylvian syndrome",
+        "preferredTerm": "Congenital bilateral perisylvian syndrome"
+    },
+    {
+        "conceptId": "4945003",
+        "term": "Microgyria",
+        "preferredTerm": "Microgyria"
+    },
+    {
+        "conceptId": "371121002",
+        "term": "Neonatal stroke",
+        "preferredTerm": "Neonatal stroke"
+    },
+    {
+        "conceptId": null,
+        "term": "KCNT1-related epilepsy",
+        "preferredTerm": "KCNT1-related epilepsy"
+    },
+    {
+        "conceptId": null,
+        "term": "Dysembryoplastic neuroepithelial neoplasm of brain (disorder)",
+        "preferredTerm": "Dysembryoplastic neuroepithelial neoplasm of brain (disorder)"
+    },
+    {
+        "conceptId": null,
+        "term": "2q23.3 Microdeletion Syndrome",
+        "preferredTerm": "2q23.3 Microdeletion Syndrome"
+    },
+    {
+        "conceptId": null,
+        "term": "POLG mitochondrial disorder",
+        "preferredTerm": "POLG mitochondrial disorder"
+    },
+    {
+        "conceptId": null,
+        "term": "PPRT2 associated disorder",
+        "preferredTerm": "PPRT2 associated disorder"
+    },
+    {
+        "conceptId": null,
+        "term": "10p 15.3 microdeletion syndrome",
+        "preferredTerm": "10p 15.3 microdeletion syndrome"
+    },
+    {
+        "conceptId": null,
+        "term": "16q 24.3 microdeletion syndrome",
+        "preferredTerm": "16q 24.3 microdeletion syndrome"
+    },
+    {
+        "conceptId": null,
+        "term": "Usmani-Riazuddin syndrome",
+        "preferredTerm": "Usmani-Riazuddin syndrome"
+    },
+    {
+        "conceptId": null,
+        "term": "ReNU syndrome (Neurodevelopmental disorder with hypotonia, brain anomalies, distinctive facies, and absent language (NEDHAFA))",
+        "preferredTerm": "ReNU syndrome"
+    },
+    {
+        "conceptId": null,
+        "term": "GNB1-related disorder",
+        "preferredTerm": "GNB1-related disorder"
+    },
+    {
+        "conceptId": null,
+        "term": "Autosomal dominant KCNK4-related disease",
+        "preferredTerm": "KCNK4-related neurodevelopmental disease"
+    },
+    {
+        "conceptId": null,
+        "term": "EEF1A2-Related Neurodevelopmental Disorder",
+        "preferredTerm": "EEF1A2\u2013Related Neurodevelopmental Disorder"
+    },
+    {
+        "conceptId": null,
+        "term": "KCNH1-related epileptic encephalopathy",
+        "preferredTerm": "KCNH1-related epileptic encephalopathy"
+    },
+    {
+        "conceptId": null,
+        "term": "2p13.3 deletion",
+        "preferredTerm": "2p13.3 deletion"
+    },
+    {
+        "conceptId": null,
+        "term": "COL4A1 or COL4A2-related disorder",
+        "preferredTerm": "COL4A1 or COL4A2-related disorder"
+    },
+    {
+        "conceptId": null,
+        "term": "PHF21A-related disorder",
+        "preferredTerm": "PHF21A-related disorder"
+    }
+]

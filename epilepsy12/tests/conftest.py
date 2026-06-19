@@ -51,7 +51,6 @@ register(E12UserFactory)  # => e12_user_factory
 
 
 @pytest.fixture
-@pytest.mark.django_db
 def GOSH():
     return Organisation.objects.get(
         ods_code="RP401",
@@ -60,13 +59,11 @@ def GOSH():
 
 
 @pytest.fixture
-@pytest.mark.django_db
 def CASE_GOSH(GOSH):
     return Case.objects.get(first_name=f"child_{GOSH.name}")
 
 
 @pytest.fixture
-@pytest.mark.django_db
 def ADDENBROOKES():
     return Organisation.objects.get(
         ods_code="RGT01",
@@ -75,6 +72,5 @@ def ADDENBROOKES():
 
 
 @pytest.fixture
-@pytest.mark.django_db
 def CASE_ADDENBROOKES(ADDENBROOKES):
     return Case.objects.get(first_name=f"child_{ADDENBROOKES.name}")
