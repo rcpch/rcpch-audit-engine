@@ -1,13 +1,15 @@
-import re
 import math
+import re
 
-from django.apps import apps
 from django import template
-from django.utils.safestring import mark_safe
+from django.apps import apps
 from django.conf import settings
+from django.utils.safestring import mark_safe
 
 from epilepsy12.constants.kpi import KPI_MAP
 from epilepsy12.models_folder.case import Case
+
+from ..constants import ETHNICITIES, KPI_LABEL_MAP, SEX_TYPE
 from ..models import (
     Country,
     IntegratedCareBoard,
@@ -16,7 +18,6 @@ from ..models import (
     Site,
     Trust,
 )
-from ..constants import ETHNICITIES, SEX_TYPE, KPI_LABEL_MAP
 
 register = template.Library()
 
@@ -972,11 +973,11 @@ def remaining_measure_categories(case):
             if not field["is_complete"]:
                 completed_fields = getattr(
                     case.registration.audit_progress,
-                    f'{field["field"]}_total_completed_fields',
+                    f"{field['field']}_total_completed_fields",
                 )
                 expected_fields = getattr(
                     case.registration.audit_progress,
-                    f'{field["field"]}_total_expected_fields',
+                    f"{field['field']}_total_expected_fields",
                 )
                 if expected_fields > completed_fields or expected_fields == 0:
                     categories.append(
@@ -1001,6 +1002,9 @@ def missing_completed_fields_for_model(case_id, model):
     For 1-to-many related models ("episode", "syndrome", "comorbidity",
     "antiepilepsymedicine") the output is grouped by instance.
     """
+    if case_id is None or case_id == "":
+        print(case_id, model)
+        return
 
     def _render_grouped_missing_fields(instances_data):
         if not instances_data:

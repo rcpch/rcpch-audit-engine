@@ -1,33 +1,35 @@
-from dateutil import relativedelta
-from datetime import date
 import logging
+from datetime import date
+
+from dateutil import relativedelta
+from django.shortcuts import render
 
 # 3rd Party Imports
 from django_htmx.http import trigger_client_event
-from django.shortcuts import render
 from psycopg2 import DatabaseError
+
+from epilepsy12.constants import (
+    AntiEpilepsyMedicine_minimum_scorable_fields,
+    Assessment_minimum_scorable_fields,
+    Comorbidity_minimum_scorable_fields,
+    EpilepsyContext_minimum_scorable_fields,
+    Episode_minimum_scorable_fields,
+    FirstPaediatricAssessment_minimum_scorable_fields,
+    Investigations_minimum_scorable_fields,
+    Management_minimum_scorable_fields,
+    MultiaxialDiagnosis_minimum_scorable_fields,
+    Registration_minimum_scorable_fields,
+    Syndrome_minimum_scorable_fields,
+)
+from epilepsy12.models_folder.antiepilepsy_medicine import AntiEpilepsyMedicine
 from epilepsy12.models_folder.audit_progress import AuditProgress
+from epilepsy12.models_folder.comorbidity import Comorbidity
+from epilepsy12.models_folder.epilepsy12_site import Site
 from epilepsy12.models_folder.episode import Episode
 from epilepsy12.models_folder.syndrome import Syndrome
-from epilepsy12.models_folder.comorbidity import Comorbidity
-from epilepsy12.models_folder.antiepilepsy_medicine import AntiEpilepsyMedicine
-from epilepsy12.models_folder.epilepsy12_site import Site
 
 # E12 imports
 from .calculate_kpis import calculate_kpis
-from epilepsy12.constants import (
-    Registration_minimum_scorable_fields,
-    EpilepsyContext_minimum_scorable_fields,
-    FirstPaediatricAssessment_minimum_scorable_fields,
-    MultiaxialDiagnosis_minimum_scorable_fields,
-    Episode_minimum_scorable_fields,
-    Syndrome_minimum_scorable_fields,
-    Comorbidity_minimum_scorable_fields,
-    Assessment_minimum_scorable_fields,
-    Investigations_minimum_scorable_fields,
-    Management_minimum_scorable_fields,
-    AntiEpilepsyMedicine_minimum_scorable_fields,
-)
 
 logger = logging.getLogger(__name__)
 
@@ -271,9 +273,7 @@ def total_fields_expected(model_instance):
                 # add essential fields: r14, r27, r59 test statuses
                 cumulative_score += 3
                 for test in ["r14", "r27", "r59"]:
-                    test_status = getattr(
-                        model_instance, f"{test}_test_status"
-                    )
+                    test_status = getattr(model_instance, f"{test}_test_status")
                     if test_status in ["R", "A"]:
                         # add essential field: requested_date
                         cumulative_score += 1
@@ -316,9 +316,12 @@ def total_fields_expected(model_instance):
                     if model_instance.registration.cohort > 6:
                         if medicine.medicine_entity is not None:
                             if (
-                                medicine.medicine_entity.conceptId
-                                == "777808008"  # topiramate
-                            ) or medicine.medicine_entity.conceptId == "387481005":  # valproate
+                                (
+                                    medicine.medicine_entity.conceptId
+                                    == "777808008"  # topiramate
+                                )
+                                or medicine.medicine_entity.conceptId == "387481005"
+                            ):  # valproate
                                 # essential fields are:
                                 # has_a_valproate_annual_risk_acknowledgement_form_been_completed
                                 cumulative_score += 1
@@ -334,9 +337,7 @@ def total_fields_expected(model_instance):
                                         )
                                     ):  # valproate or topiramate
                                         # if patient is a girl and either she is on valproate or she is 12 years or older and on topiramate
-                                        if (
-                                            medicine.is_a_pregnancy_prevention_programme_needed
-                                        ):
+                                        if medicine.is_a_pregnancy_prevention_programme_needed:
                                             # essential fields are:
                                             # 'is_a_pregnancy_prevention_programme_in_place
                                             cumulative_score += 1
@@ -354,9 +355,7 @@ def total_fields_expected(model_instance):
                                 if medicine.medicine_entity.conceptId == "387481005":
                                     # essential fields are:
                                     # 'is_a_pregnancy_prevention_programme_needed' - this is not scored
-                                    if (
-                                        medicine.is_a_pregnancy_prevention_programme_needed
-                                    ):
+                                    if medicine.is_a_pregnancy_prevention_programme_needed:
                                         # essential fields are:
                                         # 'is_a_pregnancy_prevention_programme_in_place, 'has_a_valproate_annual_risk_acknowledgement_form_been_completed'
                                         cumulative_score += 2
@@ -458,7 +457,6 @@ def avoid_fields(model_instance):
         ]
 
     elif model_class_name == "AntiEpilepsyMedicine":
-        print("Avoiding fields for AntiEpilepsyMedicine")
         return META_VARIABLES + [
             "management",
             "is_rescue_medicine",
