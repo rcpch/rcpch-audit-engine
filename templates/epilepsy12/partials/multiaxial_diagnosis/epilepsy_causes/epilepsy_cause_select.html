@@ -1,0 +1,21 @@
+
+
+
+            {% url 'epilepsy_cause' multiaxial_diagnosis_id=multiaxial_diagnosis.pk as hx_post %}
+            {% include 'epilepsy12/partials/page_elements/select_model.html' with choices=choices hx_post=hx_post hx_target='#epilepsy_cause_selection' hx_trigger='change' hx_swap='innerHTML' hx_name='epilepsy_cause' field_name='preferredTerm' field_name2='' test_positive=multiaxial_diagnosis.epilepsy_cause.pk label=multiaxial_diagnosis.get_epilepsy_cause_help_label_text reference=multiaxial_diagnosis.get_epilepsy_cause_help_reference_text hx_default_text='Epilepsy Causes' data_position='top left' enabled=can_edit %}
+            {% if multiaxial_diagnosis.epilepsy_cause %}
+            <button
+                {% if can_edit %}
+                    class="ui floating right attached rcpch_danger button"
+                {% else %}
+                    class="ui floating right attached rcpch_danger disabled button"
+                {% endif %}
+                hx-post="{% url 'delete_epilepsy_cause' multiaxial_diagnosis_id=multiaxial_diagnosis.pk %}"
+                hx-target="#epilepsy_cause_selection"
+                hx-name="delete-epilepsy-cause-button"
+                hx-include="delete-epilepsy-cause"
+                hx-swap="innerHTML"
+                hx-trigger="click"
+                type="button"
+            >Delete epilepsy cause</button>
+            {% endif %}

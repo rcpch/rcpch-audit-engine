@@ -7,6 +7,6 @@
 
 {% if multiaxial_diagnosis.epilepsy_cause_known %}
     <div class='field' id='epilepsy_causes'>
-        {% include 'epilepsy12/partials/multiaxial_diagnosis/epilepsy_causes/epilepsy_causes.html' with multiaxial_diagnosis=multiaxial_diagnosis %}
+        {% include 'epilepsy12/partials/multiaxial_diagnosis/epilepsy_causes/epilepsy_causes.html' with multiaxial_diagnosis=multiaxial_diagnosis choices=choices %}
     </div>
 {% endif %}
