@@ -1,17 +1,17 @@
 # python imports
 from datetime import datetime
+
 from dateutil.relativedelta import relativedelta
+from django.apps import apps
 
 # django imports
 from django.utils import timezone
-from django.apps import apps
 
 # third party imports
 from psycopg2 import DatabaseError
 
 # RCPCH imports
 from ..general_functions import cohorts_and_dates
-
 from ..validators import epilepsy12_date_validator
 
 
@@ -97,6 +97,10 @@ def validate_and_update_model(
         else:
             field_value = request.POST.get(request.htmx.trigger_name)
 
+    if page_element == "button":
+        if "epilepsy_cause" in request.POST:
+            model.objects.filter(pk=model_id).update(epilepsy_cause=None)
+        return
     # validate
 
     if page_element == "date_field":
@@ -160,12 +164,12 @@ def validate_and_update_model(
         if (
             field_value < child_cohort_data["currently_recruiting_cohort_start_date"]
         ):  # represents the cohort that was actively recruiting at the time of first paediatric assessment
-            errors = f'The date you entered cannot be before the cohort {{registration.cohort}} start date ({child_cohort_data["currently_recruiting_cohort_start_date"].strftime("%d %B %Y")})'
+            errors = f"The date you entered cannot be before the cohort {{registration.cohort}} start date ({child_cohort_data['currently_recruiting_cohort_start_date'].strftime('%d %B %Y')})"
             raise ValueError(errors)
         elif (
             field_value > child_cohort_data["currently_recruiting_cohort_end_date"]
         ):  # represents the cohort that was closing at the time of first paediatric assessment
-            errors = f'The date you entered cannot be after the current cohort end date ({child_cohort_data["currently_recruiting_cohort_end_date"].strftime("%d %B %Y")})'
+            errors = f"The date you entered cannot be after the current cohort end date ({child_cohort_data['currently_recruiting_cohort_end_date'].strftime('%d %B %Y')})"
             raise ValueError(errors)
 
         else:
