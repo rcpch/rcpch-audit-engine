@@ -5,6 +5,7 @@
             class="pie pie--value tooltip-class"
             style="--percent:{{percentage}};"
             data-html="{% missing_completed_fields_for_model case_id model %}"
+            data-variation="flowing"
             _="init js $('.tooltip-class').popup();"
         ></div>
         <div class="rcpch_pie_label">{{numerator}}/{{denominator}}</div>

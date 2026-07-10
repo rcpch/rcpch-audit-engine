@@ -1045,7 +1045,7 @@ def missing_completed_fields_for_model(case_id, model):
         if not instances_data:
             return mark_safe("<p>All expected fields completed for this model</p>")
         html = "<div class='header'>Missing fields:</div>"
-        html += _render_grouped_missing_fields(instances_data)
+        html += f"<div style='max-height: 300px; overflow-y: auto; overflow-x: hidden;'>{_render_grouped_missing_fields(instances_data)}</div>"
         return mark_safe(html)
 
     missing_fields = audit_progress.audit_progress_fields_incomplete(
@@ -1084,9 +1084,14 @@ def missing_completed_fields_for_model(case_id, model):
 
     if missing_fields or related_html:
         html = "<div class='header'>Missing fields:</div>"
-        for field in missing_fields:
-            html += f"<div>{field}</div>"
+        html += "<div style='max-height: 70vh; overflow-y: auto; overflow-x: hidden;'>"
+        if missing_fields:
+            html += "<ul style='margin-left: 5px; padding-left: 5px'>"
+            for field in missing_fields:
+                html += f"<li>{field}</li>"
+            html += "</ul>"
         html += related_html
+        html += "</div>"
         return mark_safe(html)
 
     return mark_safe("<p>All expected fields completed for this model</p>")
