@@ -1,29 +1,29 @@
 from django.conf.urls import include
+from django.contrib.auth import urls as auth_urls
+from django.contrib.auth import views as auth_views
+from django.urls import path
+from rest_framework import routers, urls
+from rest_framework.authtoken.views import obtain_auth_token
+
+from .forms import Epilepsy12UserUpdatePasswordForm
 from .views import *
-from .views.api.epilepsy12user_viewset import Epilepsy12UserViewSet
+from .views.api.assessment_viewset import AssessmentViewSet
+from .views.api.audit_progress_viewset import AuditProgressViewSet
 from .views.api.case_viewset import CaseViewSet
-from .views.api.registration_viewset import RegistrationViewSet
+from .views.api.comorbidity_viewset import ComorbidityEntityViewSet, ComorbidityViewSet
 from .views.api.entity_viewsets import (
+    AntiEpilepsyMedicineViewSet,
     EpilepsyCauseEntityViewSet,
     KeywordViewSet,
     OrganisationViewSet,
-    AntiEpilepsyMedicineViewSet,
 )
+from .views.api.epilepsy12user_viewset import Epilepsy12UserViewSet
 from .views.api.episode_viewset import EpisodeViewSet
-from .views.api.syndrome_viewset import SyndromeViewSet, SyndromeViewSet
-from .views.api.comorbidity_viewset import ComorbidityViewSet, ComorbidityEntityViewSet
-from .views.api.assessment_viewset import AssessmentViewSet
-from .views.api.management_viewset import ManagementViewSet
 from .views.api.investigations_viewset import InvestigationsViewSet
+from .views.api.management_viewset import ManagementViewSet
+from .views.api.registration_viewset import RegistrationViewSet
 from .views.api.site_viewset import SiteViewSet
-from .views.api.audit_progress_viewset import AuditProgressViewSet
-
-from rest_framework import routers, urls
-from rest_framework.authtoken.views import obtain_auth_token
-from django.urls import path
-from django.contrib.auth import urls as auth_urls
-from django.contrib.auth import views as auth_views
-from .forms import Epilepsy12UserUpdatePasswordForm
+from .views.api.syndrome_viewset import SyndromeViewSet
 
 # router = routers.DefaultRouter()
 
@@ -957,6 +957,16 @@ epilepsy_causes_patterns = [
         "multiaxial_diagnosis/<int:multiaxial_diagnosis_id>/epilepsy_cause_categories",
         epilepsy_cause_categories,
         name="epilepsy_cause_categories",
+    ),
+    path(
+        "multiaxial_diagnosis/<int:multiaxial_diagnosis_id>/epilepsy_cause",
+        epilepsy_cause,
+        name="epilepsy_cause",
+    ),
+    path(
+        "multiaxial_diagnosis/<int:multiaxial_diagnosis_id>/epilepsy_cause/delete",
+        delete_epilepsy_cause,
+        name="delete_epilepsy_cause",
     ),
 ]
 

@@ -1,12 +1,15 @@
-import re
 import math
+import re
 
-from django.apps import apps
 from django import template
-from django.utils.safestring import mark_safe
+from django.apps import apps
 from django.conf import settings
+from django.utils.safestring import mark_safe
 
 from epilepsy12.constants.kpi import KPI_MAP
+from epilepsy12.models_folder.case import Case
+
+from ..constants import ETHNICITIES, KPI_LABEL_MAP, SEX_TYPE
 from ..models import (
     Country,
     IntegratedCareBoard,
@@ -15,7 +18,6 @@ from ..models import (
     Site,
     Trust,
 )
-from ..constants import ETHNICITIES, SEX_TYPE, KPI_LABEL_MAP
 
 register = template.Library()
 
@@ -55,9 +57,10 @@ def characters_left(description):
 
 @register.simple_tag
 def percentage_of_total(numerator, denominator):
-    if numerator and denominator:
-        if int(denominator) > 0:
-            return round(int(numerator) / int(denominator) * 100)
+    if denominator and int(denominator) > 0:
+        safe_numerator = int(numerator or 0)
+        return round(safe_numerator / int(denominator) * 100)
+    return 0
 
 
 @register.simple_tag
@@ -305,53 +308,43 @@ def none_percentage(field):
 @register.filter(name="icon_for_score")
 def icon_for_score(score):
     if score is None:
-        return mark_safe(
-            """Data Incomplete
-            """
-        )
+        return mark_safe("""Data Incomplete
+            """)
     if score < 1:
-        return mark_safe(
-            """<i
+        return mark_safe("""<i
                     class='rcpch_light_blue exclamation triangle icon'
                     data-title="Not achieved"
                     data-content="This measure has not been achieved for this child."
                     data-position="top right"
                     _="init js $('.rcpch_light_blue.exclamation.triangle.icon').popup(); end"
                 ></i>
-            """
-        )
+            """)
     elif score > 1:
-        return mark_safe(
-            """<i
+        return mark_safe("""<i
                     class='rcpch_light_grey ban icon'
                     data-title="Not applicable"
                     data-content="This measure does not apply to this child."
                     data-position="top right"
                     _="init js $('.rcpch_light_grey.ban.icon').popup(); end"
-                ></i>"""
-        )
+                ></i>""")
     elif score == 1:
-        return mark_safe(
-            """<i
+        return mark_safe("""<i
                 class='check circle outline rcpch_pink icon'
                 data-title="Achieved"
                 data-content="This child's care has met the Epilepsy12 standard for this measure."
                 data-position="top right"
                 _="init js $('.check.circle.outline.rcpch_pink.icon').popup(); end"
                 ></i>
-                """
-        )
+                """)
     else:
-        return mark_safe(
-            """<i
+        return mark_safe("""<i
                 class='rcpch dot circle icon'
                 data-title="Unscored"
                 data-content="This measure has not yet been scored."
                 data-position="top right"
                 _="init js $('.rcpch.dot.circle.icon').popup(); end"
                 ></i>
-                """
-        )
+                """)
 
 
 @register.simple_tag
@@ -467,11 +460,9 @@ def no_eligible_cases(aggregation_model, kpi_name: str):
     n_ineligible = getattr(aggregation_model, f"{kpi_name}_ineligible")
     n_incomplete = getattr(aggregation_model, f"{kpi_name}_incomplete")
 
-    return mark_safe(
-        f"""No eligible Cases to score.<br>
+    return mark_safe(f"""No eligible Cases to score.<br>
         <b>{n_ineligible}</b> case{_plural(n_ineligible)} ineligible.<br>
-        <b>{n_incomplete}</b> case{_plural(n_incomplete)} incomplete."""
-    )
+        <b>{n_incomplete}</b> case{_plural(n_incomplete)} incomplete.""")
 
 
 # A filter which fully capitalises specific words in the organisation name
@@ -936,3 +927,171 @@ def organisation_label(parent_name, organisation_count):
     else:
         label = f"<strong>Organisations in {parent_name}</strong>"
     return mark_safe(label)
+
+
+@register.simple_tag
+def remaining_measure_categories(case):
+    """
+    Returns a list of the measure categories for which a case has not yet achieved all KPIs.
+    """
+    fields = [
+        {
+            "name": "First Paediatric Assessment",
+            "field": "registration",
+            "is_complete": case.registration.audit_progress.first_paediatric_assessment_complete,
+        },
+        {
+            "name": "Epilepsy Context",
+            "field": "epilepsy_context",
+            "is_complete": case.registration.audit_progress.epilepsy_context_complete,
+        },
+        {
+            "name": "Multiaxial Diagnosis",
+            "field": "multiaxial_diagnosis",
+            "is_complete": case.registration.audit_progress.multiaxial_diagnosis_complete,
+        },
+        {
+            "name": "Assessment",
+            "field": "assessment",
+            "is_complete": case.registration.audit_progress.assessment_complete,
+        },
+        {
+            "name": "Investigations",
+            "field": "investigations",
+            "is_complete": case.registration.audit_progress.investigations_complete,
+        },
+        {
+            "name": "Management",
+            "field": "management",
+            "is_complete": case.registration.audit_progress.management_complete,
+        },
+    ]
+    categories = []
+    if case.registration.audit_progress.total_expected_fields > 0:
+        categories.append(f"<div class='header'>Incomplete measures:</div>")
+        for field in fields:
+            if not field["is_complete"]:
+                completed_fields = getattr(
+                    case.registration.audit_progress,
+                    f"{field['field']}_total_completed_fields",
+                )
+                expected_fields = getattr(
+                    case.registration.audit_progress,
+                    f"{field['field']}_total_expected_fields",
+                )
+                if expected_fields > completed_fields or expected_fields == 0:
+                    categories.append(
+                        f"<div>{field['name']} ({expected_fields - completed_fields})</div>"
+                    )
+        html = (
+            "".join(categories)
+            if categories
+            else "<p>All measure categories complete</p>"
+        )
+        return mark_safe(html)
+
+
+@register.simple_tag
+def missing_completed_fields_for_model(case_id, model):
+    """
+    Returns HTML listing incomplete fields for *model* on the given case.
+
+    For 1-to-1 models (e.g. "multiaxialdiagnosis", "management") the output
+    is a flat list of field labels.
+
+    For 1-to-many related models ("episode", "syndrome", "comorbidity",
+    "antiepilepsymedicine") the output is grouped by instance.
+    """
+    if case_id is None or case_id == "":
+        print(case_id, model)
+        return
+
+    def _render_grouped_missing_fields(instances_data):
+        if not instances_data:
+            return ""
+        html = ""
+        for item in instances_data:
+            html += f"<div class='header'><i>{item['label']}</i></div>"
+            for field in item["incomplete"]:
+                html += f"<div>{field}</div>"
+        return html
+
+    related_model_aliases = {
+        "episodes": "episode",
+        "syndromes": "syndrome",
+        "comorbidities": "comorbidity",
+        "antiepilepsymedicines": "antiepilepsymedicine",
+    }
+    related_models = {
+        "episode",
+        "syndrome",
+        "comorbidity",
+        "antiepilepsymedicine",
+        "epilepsycause",
+    }
+    case = Case.objects.get(id=case_id)
+    if not hasattr(case, "registration") or not hasattr(
+        case.registration, "audit_progress"
+    ):
+        return mark_safe("")
+    audit_progress = case.registration.audit_progress
+    normalized_model = (model or "").strip().lower()
+    normalized_model = related_model_aliases.get(normalized_model, normalized_model)
+
+    if normalized_model in related_models:
+        instances_data = audit_progress.audit_progress_related_instances_incomplete(
+            related_model_name=normalized_model
+        )
+        if not instances_data:
+            return mark_safe("<p>All expected fields completed for this model</p>")
+        html = "<div class='header'>Missing fields:</div>"
+        html += f"<div style='max-height: 300px; overflow-y: auto; overflow-x: hidden;'>{_render_grouped_missing_fields(instances_data)}</div>"
+        return mark_safe(html)
+
+    missing_fields = audit_progress.audit_progress_fields_incomplete(
+        model_name=normalized_model
+    )
+
+    # Include related collections under the parent section tooltips.
+    related_groups = []
+    if normalized_model == "multiaxialdiagnosis":
+        related_groups.extend(
+            [
+                audit_progress.audit_progress_related_instances_incomplete(
+                    related_model_name="episode"
+                ),
+                audit_progress.audit_progress_related_instances_incomplete(
+                    related_model_name="comorbidity"
+                ),
+                audit_progress.audit_progress_related_instances_incomplete(
+                    related_model_name="syndrome"
+                ),
+                audit_progress.audit_progress_related_instances_incomplete(
+                    related_model_name="epilepsycause"
+                ),
+            ]
+        )
+    elif normalized_model == "management":
+        related_groups.append(
+            audit_progress.audit_progress_related_instances_incomplete(
+                related_model_name="antiepilepsymedicine"
+            )
+        )
+
+    related_html = "".join(
+        _render_grouped_missing_fields(group) for group in related_groups if group
+    )
+
+    if missing_fields or related_html:
+        html = "<div class='header'>Missing fields:</div>"
+        html += "<div style='max-height: 70vh; overflow-y: auto; overflow-x: hidden;'>"
+        if missing_fields:
+            html += "<ul style='margin-left: 5px; padding-left: 5px'>"
+            for field in missing_fields:
+                html += f"<li>{field}</li>"
+            html += "</ul>"
+        html += related_html
+        html += "</div>"
+        return mark_safe(html)
+
+    return mark_safe("<p>All expected fields completed for this model</p>")

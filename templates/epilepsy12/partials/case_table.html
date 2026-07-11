@@ -200,7 +200,7 @@
           {% else %}
             <td>
               {% if not case.registration.audit_progress.audit_complete and not case.locked and case.registration.first_paediatric_assessment_date %}
-                <h6>{{total_percent}}% ({{case.registration.audit_progress.total_completed_fields}}/{{case.registration.audit_progress.total_expected_fields}})</h6>
+              <h6 class="tooltip-class" _="init js $('.tooltip-class').popup();" data-html="{% remaining_measure_categories case %}" data-position="bottom right">{{total_percent}}% ({{case.registration.audit_progress.total_completed_fields}}/{{case.registration.audit_progress.total_expected_fields}})</h6>
               {% endif %}
             </td>
           {% endif %}

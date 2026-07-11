@@ -1,11 +1,9 @@
-from django.utils import timezone
 from operator import itemgetter
-from django.http import HttpResponse
+
 from django.contrib.auth.decorators import permission_required
+from django.http import HttpResponse
+from django.utils import timezone
 
-from epilepsy12.constants.comorbidities import NEUROPSYCHIATRIC
-
-from ..constants import EPILEPSY_CAUSES, GENERALISED_SEIZURE_TYPE, SEVERITY
 from epilepsy12.constants import (
     EPILEPSY_SEIZURE_TYPE,
     EPIS_MISC,
@@ -19,44 +17,50 @@ from epilepsy12.constants import (
     NONEPILEPSY_FIELDS,
     NONEPILEPSY_SEIZURE_TYPES,
 )
+from epilepsy12.constants.comorbidities import NEUROPSYCHIATRIC
 
 # from epilepsy12.constants.syndromes import SYNDROMES
 from epilepsy12.constants.epilepsy_types import EPILEPSY_DIAGNOSIS_STATUS
-from ..constants import DATE_ACCURACY, EPISODE_DEFINITION
-from ..general_functions import fuzzy_scan_for_keywords
-from ..common_view_functions import get_comorbidity_choices
 
+from ..common_view_functions import (
+    completed_fields,
+    get_comorbidity_choices,
+    recalculate_form_generate_response,
+    validate_and_update_model,
+)
+from ..constants import (
+    DATE_ACCURACY,
+    EPILEPSY_CAUSES,
+    EPISODE_DEFINITION,
+    GENERALISED_SEIZURE_TYPE,
+    SEVERITY,
+)
+from ..decorator import login_and_otp_required, user_may_view_this_child
+from ..general_functions import fuzzy_scan_for_keywords
 from ..models import (
-    Registration,
-    Keyword,
     Comorbidity,
+    ComorbidityList,
+    EpilepsyCause,
     Episode,
+    Keyword,
     MultiaxialDiagnosis,
+    Registration,
     Site,
     Syndrome,
     SyndromeList,
-    ComorbidityList,
-    EpilepsyCause,
 )
-from ..common_view_functions import (
-    validate_and_update_model,
-    recalculate_form_generate_response,
-    completed_fields,
-)
-from ..decorator import user_may_view_this_child, login_and_otp_required
 
 """
 Constants for selections
 """
 # fields for radio buttons
 from ..constants import (
+    FOCAL_EPILEPSY_EEG_MANIFESTATIONS,
+    FOCAL_EPILEPSY_FIELDS,
     FOCAL_EPILEPSY_MOTOR_MANIFESTATIONS,
     FOCAL_EPILEPSY_NONMOTOR_MANIFESTATIONS,
-    FOCAL_EPILEPSY_EEG_MANIFESTATIONS,
     LATERALITY,
-    FOCAL_EPILEPSY_FIELDS,
 )
-
 
 # fields to update in model
 
@@ -112,6 +116,8 @@ def multiaxial_diagnosis(request, can_edit, case_id):
         multiaxial_diagnosis=multiaxial_diagnosis
     ).order_by("-comorbidity_diagnosis_date")
 
+    epilepsy_causes = EpilepsyCause.objects.all().order_by("preferredTerm")
+
     keyword_choices = Keyword.objects.all()
 
     site = Site.objects.filter(
@@ -129,6 +135,7 @@ def multiaxial_diagnosis(request, can_edit, case_id):
         "syndromes": syndromes,
         "comorbidities": comorbidities,
         "keyword_choices": keyword_choices,
+        "epilepsy_causes": epilepsy_causes,
         "epilepsy_cause_selection": EPILEPSY_CAUSES,
         "case_id": case_id,
         "audit_progress": registration.audit_progress,
@@ -137,7 +144,8 @@ def multiaxial_diagnosis(request, can_edit, case_id):
         "mental_health_issues_choices": NEUROPSYCHIATRIC,
         "global_developmental_delay_or_learning_difficulties_severity_choices": SEVERITY,
         "organisation_id": organisation_id,
-        "can_edit": can_edit and request.user.has_perm("epilepsy12.change_multiaxialdiagnosis"),
+        "can_edit": can_edit
+        and request.user.has_perm("epilepsy12.change_multiaxialdiagnosis"),
     }
 
     response = recalculate_form_generate_response(
@@ -565,7 +573,9 @@ def episode_definition(request, can_edit, episode_id):
 @login_and_otp_required()
 @user_may_view_this_child()
 @permission_required("epilepsy12.change_episode", raise_exception=True)
-def has_description_of_the_episode_or_episodes_been_gathered(request, can_edit, episode_id):
+def has_description_of_the_episode_or_episodes_been_gathered(
+    request, can_edit, episode_id
+):
     """
     HTMX post request from episode.html partial on toggle click
     """
@@ -1266,7 +1276,11 @@ def remove_syndrome(request, can_edit, syndrome_id):
         multiaxial_diagnosis=multiaxial_diagnosis
     ).order_by("-syndrome_diagnosis_date")
 
-    context = {"can_edit": can_edit, "multiaxial_diagnosis": multiaxial_diagnosis, "syndromes": syndromes}
+    context = {
+        "can_edit": can_edit,
+        "multiaxial_diagnosis": multiaxial_diagnosis,
+        "syndromes": syndromes,
+    }
 
     response = recalculate_form_generate_response(
         model_instance=syndrome.multiaxial_diagnosis,
@@ -1297,7 +1311,11 @@ def close_syndrome(request, can_edit, syndrome_id):
         multiaxial_diagnosis=multiaxial_diagnosis
     ).order_by("-syndrome_diagnosis_date")
 
-    context = {"can_edit": can_edit, "multiaxial_diagnosis": multiaxial_diagnosis, "syndromes": syndromes}
+    context = {
+        "can_edit": can_edit,
+        "multiaxial_diagnosis": multiaxial_diagnosis,
+        "syndromes": syndromes,
+    }
 
     response = recalculate_form_generate_response(
         model_instance=syndrome.multiaxial_diagnosis,
@@ -1339,7 +1357,11 @@ def syndrome_present(request, can_edit, multiaxial_diagnosis_id):
         multiaxial_diagnosis=multiaxial_diagnosis
     ).order_by("-syndrome_diagnosis_date")
 
-    context = {"can_edit": can_edit, "multiaxial_diagnosis": multiaxial_diagnosis, "syndromes": syndromes}
+    context = {
+        "can_edit": can_edit,
+        "multiaxial_diagnosis": multiaxial_diagnosis,
+        "syndromes": syndromes,
+    }
 
     response = recalculate_form_generate_response(
         model_instance=multiaxial_diagnosis,
@@ -1377,10 +1399,13 @@ def epilepsy_cause_known(request, can_edit, multiaxial_diagnosis_id):
 
     multiaxial_diagnosis = MultiaxialDiagnosis.objects.get(pk=multiaxial_diagnosis_id)
 
+    epilepsy_causes = EpilepsyCause.objects.all().order_by("preferredTerm")
+
     context = {
         "can_edit": can_edit,
         "multiaxial_diagnosis": multiaxial_diagnosis,
         "epilepsy_cause_selection": EPILEPSY_CAUSES,
+        "choices": epilepsy_causes,
     }
 
     response = recalculate_form_generate_response(
@@ -1393,47 +1418,91 @@ def epilepsy_cause_known(request, can_edit, multiaxial_diagnosis_id):
     return response
 
 
-# @login_and_otp_required()
-# @user_may_view_this_child()
-# @permission_required("epilepsy12.change_multiaxialdiagnosis", raise_exception=True)
-# def epilepsy_cause(request, multiaxial_diagnosis_id):
-#     """
-#     POST request on change select from epilepsy_causes partial
-#     Choices for causes come from EpilepsyCause table
-#     """
+# Commenting this back in
+@login_and_otp_required()
+@user_may_view_this_child()
+@permission_required("epilepsy12.change_multiaxialdiagnosis", raise_exception=True)
+def epilepsy_cause(request, can_edit, multiaxial_diagnosis_id):
+    """
+    POST request on change select from epilepsy_causes partial
+    Choices for causes come from EpilepsyCause table
+    """
+    try:
+        error_message = None
+        validate_and_update_model(
+            request=request,
+            model=MultiaxialDiagnosis,
+            model_id=multiaxial_diagnosis_id,
+            field_name="epilepsy_cause",
+            page_element="select",
+        )
+    except ValueError as error:
+        print(f"posting {request.POST}")
+        error_message = error
 
-#     try:
-#         error_message = None
-#         validate_and_update_model(
-#             request=request,
-#             model=MultiaxialDiagnosis,
-#             model_id=multiaxial_diagnosis_id,
-#             field_name="epilepsy_cause",
-#             page_element="select",
-#         )
-#     except ValueError as error:
-#         error_message = error
+    multiaxial_diagnosis = MultiaxialDiagnosis.objects.get(pk=multiaxial_diagnosis_id)
 
-#
+    epilepsy_causes = EpilepsyCause.objects.all().order_by("preferredTerm")
 
-#     multiaxial_diagnosis = MultiaxialDiagnosis.objects.get(pk=multiaxial_diagnosis_id)
+    context = {
+        "can_edit": can_edit,
+        "choices": epilepsy_causes,
+        "multiaxial_diagnosis": multiaxial_diagnosis,
+        "epilepsy_cause_selection": EPILEPSY_CAUSES,
+    }
 
-#     context = {
-#         "can_edit": can_edit,
-#
-#         "multiaxial_diagnosis": multiaxial_diagnosis,
-#         "epilepsy_cause_selection": EPILEPSY_CAUSES,
-#     }
+    response = recalculate_form_generate_response(
+        model_instance=multiaxial_diagnosis,
+        request=request,
+        template="epilepsy12/partials/multiaxial_diagnosis/epilepsy_causes/epilepsy_cause_select.html",
+        context=context,
+        error_message=error_message,
+    )
 
-#     response = recalculate_form_generate_response(
-#         model_instance=multiaxial_diagnosis,
-#         request=request,
-#         template="epilepsy12/partials/multiaxial_diagnosis/epilepsy_causes/epilepsy_causes.html",
-#         context=context,
-#         error_message=error_message,
-#     )
+    return response
 
-#     return response
+
+@login_and_otp_required()
+@user_may_view_this_child()
+@permission_required("epilepsy12.change_multiaxialdiagnosis", raise_exception=True)
+def delete_epilepsy_cause(request, can_edit, multiaxial_diagnosis_id):
+    """
+    POST request on change select from epilepsy_causes partial
+    Choices for causes come from EpilepsyCause table
+    """
+    try:
+        error_message = None
+        validate_and_update_model(
+            request=request,
+            model=MultiaxialDiagnosis,
+            model_id=multiaxial_diagnosis_id,
+            field_name="epilepsy_cause",
+            page_element="button",
+        )
+    except ValueError as error:
+        print(f"posting {request.POST}")
+        error_message = error
+
+    multiaxial_diagnosis = MultiaxialDiagnosis.objects.get(pk=multiaxial_diagnosis_id)
+
+    epilepsy_causes = EpilepsyCause.objects.all().order_by("preferredTerm")
+
+    context = {
+        "can_edit": can_edit,
+        "choices": epilepsy_causes,
+        "multiaxial_diagnosis": multiaxial_diagnosis,
+        "epilepsy_cause_selection": EPILEPSY_CAUSES,
+    }
+
+    response = recalculate_form_generate_response(
+        model_instance=multiaxial_diagnosis,
+        request=request,
+        template="epilepsy12/partials/multiaxial_diagnosis/epilepsy_causes/epilepsy_cause_select.html",
+        context=context,
+        error_message=error_message,
+    )
+
+    return response
 
 
 @login_and_otp_required()
@@ -1491,7 +1560,9 @@ Comorbidities
 @login_and_otp_required()
 @user_may_view_this_child()
 @permission_required("epilepsy12.change_multiaxialdiagnosis", raise_exception=True)
-def relevant_impairments_behavioural_educational(request, can_edit, multiaxial_diagnosis_id):
+def relevant_impairments_behavioural_educational(
+    request, can_edit, multiaxial_diagnosis_id
+):
     """
     POST request from
     """
@@ -1558,7 +1629,11 @@ def add_comorbidity(request, can_edit, multiaxial_diagnosis_id):
         multiaxial_diagnosis=multiaxial_diagnosis
     )
 
-    context = {"can_edit": can_edit, "comorbidity": comorbidity, "comorbidity_choices": comorbidity_choices}
+    context = {
+        "can_edit": can_edit,
+        "comorbidity": comorbidity,
+        "comorbidity_choices": comorbidity_choices,
+    }
 
     response = recalculate_form_generate_response(
         model_instance=comorbidity.multiaxial_diagnosis,
@@ -1583,7 +1658,11 @@ def edit_comorbidity(request, can_edit, comorbidity_id):
     comorbidity_choices = get_comorbidity_choices(
         multiaxial_diagnosis=multiaxial_diagnosis, comorbidity_id=comorbidity_id
     )
-    context = {"can_edit": can_edit, "comorbidity": comorbidity, "comorbidity_choices": comorbidity_choices}
+    context = {
+        "can_edit": can_edit,
+        "comorbidity": comorbidity,
+        "comorbidity_choices": comorbidity_choices,
+    }
 
     response = recalculate_form_generate_response(
         model_instance=comorbidity.multiaxial_diagnosis,
@@ -1696,7 +1775,11 @@ def comorbidity_diagnosis_date(request, can_edit, comorbidity_id):
         multiaxial_diagnosis=multiaxial_diagnosis, comorbidity_id=comorbidity_id
     )
 
-    context = {"can_edit": can_edit, "comorbidity": comorbidity, "comorbidity_choices": comorbidity_choices}
+    context = {
+        "can_edit": can_edit,
+        "comorbidity": comorbidity,
+        "comorbidity_choices": comorbidity_choices,
+    }
 
     response = recalculate_form_generate_response(
         model_instance=comorbidity.multiaxial_diagnosis,
@@ -1951,9 +2034,7 @@ def global_developmental_delay_or_learning_difficulties(
     # tidy up
     if not multiaxial_diagnosis.global_developmental_delay_or_learning_difficulties:
         # if no issue identified, remove any previously stored mental health issues
-        multiaxial_diagnosis.global_developmental_delay_or_learning_difficulties_severity = (
-            None
-        )
+        multiaxial_diagnosis.global_developmental_delay_or_learning_difficulties_severity = None
         multiaxial_diagnosis.updated_at = (timezone.now(),)
         multiaxial_diagnosis.updated_by = request.user
         multiaxial_diagnosis.save()
