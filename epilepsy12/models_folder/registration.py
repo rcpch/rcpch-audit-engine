@@ -1,5 +1,9 @@
 # python
 from datetime import datetime, date
+from time import timezone
+from .epilepsy12_site import Site
+from .audit_period import AuditPeriod
+
 from dateutil.relativedelta import relativedelta
 
 # django
@@ -75,12 +79,20 @@ class Registration(
     def _history_user(self, value):
         self.updated_by = value
 
-    def get_current_date(self):
-        return datetime.now().date()
+    def get_current_date(self) -> date:
+        return timezone.now().date()
 
     @property
     def days_remaining_before_submission(self) -> int:
-        return days_remaining_before_submission(self.audit_submission_date, self.get_current_date())
+        if self.audit_period_id is None:
+            # legacy fallback
+            return days_remaining_before_submission(
+                self.audit_submission_date,
+                self.get_current_date()
+            )
+        return self.audit_period.days_until_submission_deadline_for_organisation(
+            self.lead_organisation()
+        )
 
     # relationships
     case = models.OneToOneField("epilepsy12.Case", on_delete=models.PROTECT, null=True)
@@ -90,6 +102,10 @@ class Registration(
     )
 
     kpi = models.OneToOneField("epilepsy12.KPI", on_delete=models.CASCADE, null=True)
+
+    audit_period = models.ForeignKey(
+        "epilepsy12.AuditPeriod", on_delete=models.PROTECT, null=True, related_name="registrations"
+    )
 
     class Meta:
         verbose_name = "Registration"
@@ -104,14 +120,18 @@ class Registration(
 
     def save(self, *args, **kwargs) -> None:
         if self.first_paediatric_assessment_date is not None:
-            self.cohort = cohort_number_from_first_paediatric_assessment_date(
+            self.audit_period = AuditPeriod.objects.for_first_paediatric_assessment_date(
                 self.first_paediatric_assessment_date
             )
-            cohort_data = dates_for_cohort(self.cohort)
+            self.cohort = self.audit_period.cohort_number if self.audit_period else None
+
             self.completed_first_year_of_care_date = (
                 self.first_paediatric_assessment_date + relativedelta(years=1)
             )
-            self.audit_submission_date = cohort_data["submission_date"]
+
+            if self.audit_period:
+                self.audit_submission_date = self.audit_period.submission_deadline
+
 
         return super().save(*args, **kwargs)
 
@@ -120,3 +140,11 @@ class Registration(
             return f"Epilepsy12 registration for {self.pk} - {self.case} on {self.first_paediatric_assessment_date}"
         else:
             return f"Epilepsy12 registration for {self.case} incomplete."
+
+    def lead_organisation(self):
+        site = Site.objects.filter(
+            case=self.case,
+            site_is_primary_centre_of_epilepsy_care=True,
+            site_is_actively_involved_in_epilepsy_care=True,
+        ).first()
+        return site.organisation if site else None
