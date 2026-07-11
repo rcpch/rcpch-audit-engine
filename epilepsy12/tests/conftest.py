@@ -16,6 +16,7 @@ from epilepsy12.tests.factories import (
     seed_users_fixture,
     E12AntiEpilepsyMedicineFactory,
     E12AssessmentFactory,
+    E12AuditPeriodFactory,
     E12CaseFactory,
     E12ComorbidityFactory,
     E12EpilepsyContextFactory,
@@ -70,6 +71,7 @@ def seed_audit_periods_fixture(django_db_blocker):
 # factory object becomes lowercase-underscore form of the class name
 register(E12AntiEpilepsyMedicineFactory)  # => e12_anti_epilepsy_medicine_factory
 register(E12AssessmentFactory)  # => e12_assessment_factory
+register(E12AuditPeriodFactory)  # => e12_audit_period_factory
 register(E12CaseFactory)  # => e12_case_factory
 register(E12ComorbidityFactory)  # => e12_comborbidity_factory
 register(E12EpilepsyContextFactory)  # => e12_epilepsy_context

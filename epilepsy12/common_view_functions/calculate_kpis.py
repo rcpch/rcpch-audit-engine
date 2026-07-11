@@ -75,6 +75,11 @@ def calculate_kpis(registration_instance):
     school_individual_healthcare_plan = KPI_SCORE["NOT_SCORED"]
 
     # Get cohort from registration_instance
+    if registration_instance.audit_period is None:
+        # Registration has no first_paediatric_assessment_date yet (or the
+        # AuditPeriod could not be resolved), so cohort is unknown and KPIs
+        # cannot be scored.
+        return None
     cohort = registration_instance.audit_period.cohort_number
 
     # important metric for calculations that follow

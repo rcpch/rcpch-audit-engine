@@ -91,7 +91,7 @@ class Registration(
                 self.get_current_date()
             )
         return self.audit_period.days_until_submission_deadline_for_organisation(
-            self.lead_organisation()
+            self.lead_organisation(), current_date=self.get_current_date()
         )
 
     # relationships

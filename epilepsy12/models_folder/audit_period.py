@@ -233,7 +233,7 @@ class AuditPeriod(
         return self.submission_deadline
 
     def days_until_submission_deadline_for_organisation(
-        self, organisation: Organisation | None
+        self, organisation: Organisation | None, current_date: date | None = None
     ) -> int:
         """
         Returns the number of days until the effective submission deadline for a
@@ -241,8 +241,10 @@ class AuditPeriod(
         Inclusive of the deadline day itself (submission is possible on the last
         day), clamped at zero once the deadline has passed.
         """
+        if current_date is None:
+            current_date = timezone.now().date()
         deadline = self.submission_deadline_for_organisation(organisation)
-        return max(0, (deadline - timezone.now().date()).days + 1)
+        return max(0, (deadline - current_date).days + 1)
 
 
     def clean(self):

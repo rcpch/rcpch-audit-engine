@@ -269,10 +269,10 @@ def test_imd_not_calculated_when_cohort_is_none(
         registration__first_paediatric_assessment_date=date(2024, 6, 1),
     )
 
-    # Force cohort to None without triggering signals
+    # Force audit_period to None without triggering signals
     from epilepsy12.models import Registration
 
-    Registration.objects.filter(pk=case.registration.pk).get().audit_period.cohort_number = None
+    Registration.objects.filter(pk=case.registration.pk).update(audit_period=None)
     case.registration.refresh_from_db()
     mock_imd.reset_mock()
 

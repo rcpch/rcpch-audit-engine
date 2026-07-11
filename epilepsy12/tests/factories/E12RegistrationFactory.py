@@ -17,6 +17,7 @@ from .E12MultiaxialDiagnosisFactory import E12MultiaxialDiagnosisFactory
 from .E12InvestigationsFactory import E12InvestigationsFactory
 from .E12ManagementFactory import E12ManagementFactory
 from .E12AssessmentFactory import E12AssessmentFactory
+from .E12AuditPeriodFactory import E12AuditPeriodFactory
 from .E12FirstPaediatricAssessmentFactory import E12FirstPaediatricAssessmentFactory
 from .E12EpilepsyContextFactory import E12EpilepsyContextFactory
 
@@ -33,6 +34,7 @@ class E12RegistrationFactory(factory.django.DjangoModelFactory):
     first_paediatric_assessment_date = date(2023, 1, 1)
     eligibility_criteria_met = True
     audit_progress = factory.SubFactory(E12AuditProgressFactory)
+    audit_period = factory.SubFactory(E12AuditPeriodFactory)
 
     # Getting the KPI organisation requires a more complex operation so we use the .lazy_attribute decorator. Once a Registration is .create()'d, filter Sites using the related Case to find the lead organisation - which is used to generate the kpi model.
     @factory.lazy_attribute
