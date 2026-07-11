@@ -1,5 +1,6 @@
 from datetime import date, timedelta
 from django.utils import timezone
+from django.apps import apps
 
 from django.contrib.gis.db import models
 from django.core.exceptions import ValidationError
@@ -49,6 +50,83 @@ class AuditPeriodManager(models.Manager):
 
     def visible(self):
         return self.filter(is_visible=True)
+
+    def cohort_summary(self):
+        """
+        Returns a dict describing the currently-recruiting, currently-submitting
+        and grace-period cohorts, mirroring the shape historically produced by
+        ``cohorts_and_dates`` so templates and views can be migrated piecemeal.
+
+        Keys:
+            currently_recruiting_cohort          -> int | None
+            currently_recruiting_cohort_start_date -> date | None
+            currently_recruiting_cohort_end_date   -> date | None
+            currently_recruiting_cohort_submission_date -> date | None
+            currently_recruiting_cohort_days_remaining -> int | None
+            currently_recruiting_cohort_dates     -> dict (card shape) | {}
+            submitting_cohort                     -> int | None
+            submitting_cohort_start_date          -> date | None
+            submitting_cohort_end_date            -> date | None
+            submitting_cohort_submission_date      -> date | None
+            submitting_cohort_days_remaining      -> int | None
+            submitting_cohort_dates               -> dict (card shape) | {}
+            grace_cohort                          -> dict (card shape) | {}
+            within_grace_period                   -> bool
+            today                                 -> date
+        """
+        today = date.today()
+
+        recruiting = self.currently_recruiting()
+        submitting = self.currently_submitting()
+        grace = self.is_grace_period()
+
+        return {
+            "currently_recruiting_cohort": recruiting.cohort_number if recruiting else None,
+            "currently_recruiting_cohort_start_date": recruiting.recruitment_start_date if recruiting else None,
+            "currently_recruiting_cohort_end_date": recruiting.recruitment_end_date if recruiting else None,
+            "currently_recruiting_cohort_submission_date": recruiting.submission_deadline if recruiting else None,
+            "currently_recruiting_cohort_days_remaining": recruiting.days_until_submission_deadline_for_organisation(None, current_date=today) if recruiting else None,
+            "currently_recruiting_cohort_dates": recruiting.as_cohort_card_dict(today=today) if recruiting else {},
+            "submitting_cohort": submitting.cohort_number if submitting else None,
+            "submitting_cohort_start_date": submitting.recruitment_start_date if submitting else None,
+            "submitting_cohort_end_date": submitting.recruitment_end_date if submitting else None,
+            "submitting_cohort_submission_date": submitting.submission_deadline if submitting else None,
+            "submitting_cohort_days_remaining": submitting.days_until_submission_deadline_for_organisation(None, current_date=today) if submitting else None,
+            "submitting_cohort_dates": submitting.as_cohort_card_dict(today=today) if submitting else {},
+            "grace_cohort": grace.as_cohort_card_dict(today=today) if grace else {},
+            "within_grace_period": grace is not None,
+            "today": today,
+        }
+
+    def all_cohorts_list(self):
+        """
+        Return a list of ``{"cohort": int, "has_data": bool}`` for every
+        AuditPeriod from the earliest cohort up to the latest cohort that has
+        registrations, mirroring the shape historically produced by
+        ``get_all_cohort_list``.
+        """
+        Registration = apps.get_model("epilepsy12", "Registration")
+        earliest_cohort = 6
+
+        latest = (
+            Registration.objects.filter(audit_period__isnull=False)
+            .values("audit_period__cohort_number")
+            .order_by("audit_period__cohort_number")
+            .last()
+        )
+        latest_cohort = (
+            latest["audit_period__cohort_number"] if latest else earliest_cohort
+        )
+
+        return [
+            {
+                "cohort": cohort,
+                "has_data": Registration.objects.filter(
+                    audit_period__cohort_number=cohort
+                ).exists(),
+            }
+            for cohort in range(earliest_cohort, latest_cohort + 1)
+        ]
 
 
 class AuditPeriod(
@@ -203,6 +281,25 @@ class AuditPeriod(
     def is_complete(self) -> bool:
         """No data entry possible anywhere, including any per-site extensions."""
         return timezone.now().date() > self.effective_latest_submission_date
+
+    def as_cohort_card_dict(self, today: date | None = None) -> dict:
+        """
+        Returns this AuditPeriod as a dict in the shape consumed by the
+        ``cohort_card.html`` template and historically produced by
+        ``dates_for_cohort``. ``today`` defaults to today and is used to
+        compute ``days_remaining``.
+        """
+        if today is None:
+            today = date.today()
+        return {
+            "cohort": self.cohort_number,
+            "cohort_start_date": self.recruitment_start_date,
+            "cohort_end_date": self.recruitment_end_date,
+            "submission_date": self.submission_deadline,
+            "days_remaining": self.days_until_submission_deadline_for_organisation(
+                None, current_date=today
+            ),
+        }
 
     # ------------------------------------------------------------------
     # deadline resolution

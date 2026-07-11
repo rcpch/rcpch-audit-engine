@@ -1,5 +1,5 @@
 # python imports
-from datetime import datetime, date
+from datetime import datetime
 import logging
 from silk.profiling.profiler import silk_profile
 
@@ -21,8 +21,8 @@ from django_htmx.http import trigger_client_event, HttpResponseClientRedirect
 
 # RCPCH imports
 from epilepsy12.forms import CaseForm
-from epilepsy12.general_functions.cohort_number import cohorts_and_dates
 from epilepsy12.models import (
+    AuditPeriod,
     AuditProgress,
     Case,
     Epilepsy12User,
@@ -384,7 +384,7 @@ def case_list(request, organisation_id):
                 (1, "Trust level"),
             )
 
-    current_submitting_cohort = cohorts_and_dates(date.today()).get("submitting_cohort")
+    current_submitting_cohort = AuditPeriod.objects.cohort_summary().get("submitting_cohort")
 
     filtered_totals = CaseFilterMethods.get_all_registration_related_counts(
         queryset=all_cases
@@ -396,7 +396,7 @@ def case_list(request, organisation_id):
             "has_data": cohort["has_data"],
             "count": filtered_totals["cohort_counts"].get(cohort["cohort"], 0),
         }
-        for cohort in get_all_cohort_list()
+        for cohort in AuditPeriod.objects.all_cohorts_list()
     ]
 
     context = {
@@ -1145,7 +1145,7 @@ class CaseListView(LoginAndOTPRequiredMixin, PermissionRequiredMixin, Organisati
 
         # Add cohort distribution - assuming cohorts 5-7
         cohort_counts = []
-        cohort_list = get_all_cohort_list()
+        cohort_list = AuditPeriod.objects.all_cohorts_list()
         for cohort in cohort_list:
             count = registration_counts.get("cohort_counts", {}).get(
                 cohort["cohort"], 0

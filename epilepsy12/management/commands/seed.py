@@ -5,7 +5,7 @@ from random import randint
 import logging
 from dateutil.relativedelta import relativedelta
 from epilepsy12.models import AuditPeriod
-from epilepsy12.general_functions.cohort_number import nth_tuesday_of_year, dates_for_cohort
+from epilepsy12.general_functions.date_functions import nth_tuesday_of_year
 
 from django.core.management.base import BaseCommand
 
@@ -13,7 +13,6 @@ from django.core.management.base import BaseCommand
 logger = logging.getLogger(__name__)
 
 from ...general_functions import (
-    cohort_number_from_first_paediatric_assessment_date,
     return_random_postcode,
     random_date,
 )
@@ -226,16 +225,22 @@ def complete_registrations(verbose=True, cohort=None, full_year=False):
         )
 
     # Cohort number if today is date of FPA
-    current_cohort_number = cohort_number_from_first_paediatric_assessment_date(
-        date.today()
-    )
+    current_recruiting = AuditPeriod.objects.currently_recruiting()
+    current_cohort_number = current_recruiting.cohort_number if current_recruiting else None
 
     if cohort is None:
         # Generate cohort data for current cohort
-        current_cohort = current_cohort_number
-        cohort_data = dates_for_cohort(current_cohort)
+        target_cohort = current_cohort_number
     else:
-        cohort_data = dates_for_cohort(cohort=cohort)
+        target_cohort = cohort
+
+    audit_period = AuditPeriod.objects.by_cohort(target_cohort)
+    if audit_period is None:
+        logger.warning(
+            f"No AuditPeriod found for cohort {target_cohort}; skipping registrations."
+        )
+        return
+    cohort_data = audit_period.as_cohort_card_dict()
 
     for registration in Registration.objects.all():
 

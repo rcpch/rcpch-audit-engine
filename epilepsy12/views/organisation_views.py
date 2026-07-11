@@ -1,5 +1,4 @@
 # Python imports
-from datetime import date
 import math
 
 # third party libraries
@@ -19,6 +18,7 @@ from epilepsy12.models_folder.entities.local_health_board import LocalHealthBoar
 from ..decorator import user_may_view_this_organisation, login_and_otp_required
 from epilepsy12.constants import INDIVIDUAL_KPI_MEASURES
 from epilepsy12.models import (
+    AuditPeriod,
     Organisation,
     KPI,
     OrganisationKPIAggregation,
@@ -47,7 +47,6 @@ from epilepsy12.common_view_functions.sanction_user_access import (
 )
 from ..general_functions import (
     value_from_key,
-    cohorts_and_dates,
 )
 from ..kpi import download_kpi_summary_as_csv
 from epilepsy12.common_view_functions.aggregate_by import (
@@ -152,7 +151,7 @@ def selected_organisation_summary(request, organisation_id):
     template_name = "epilepsy12/organisation.html"
 
     # Dates for the closed, data collection ongoing and actively recruiting cohorts
-    cohort_data = cohorts_and_dates(first_paediatric_assessment_date=date.today())
+    cohort_data = AuditPeriod.objects.cohort_summary()
 
     # Where dashboard data is filtered by cohort, which cohort?
     # Users still want to see dashboard data even when data collection is complete.
@@ -412,7 +411,7 @@ def individual_metrics(request, organisation_id):
     context = {
         "selected_organisation": Organisation.objects.get(pk=organisation_id),
         "cohort_number": request.GET.get("cohort"),
-        "cohort_data": cohorts_and_dates(first_paediatric_assessment_date=date.today()),
+        "cohort_data": AuditPeriod.objects.cohort_summary(),
         "individual_kpi_choices": INDIVIDUAL_KPI_MEASURES,
     }
     template = "epilepsy12/partials/organisation/individual_metrics.html"
@@ -430,7 +429,7 @@ def publish_kpis(request, organisation_id):
     """
 
     # get submitting_cohort number - in future will be selectable
-    cohort_data = cohorts_and_dates(first_paediatric_assessment_date=date.today())
+    cohort_data = AuditPeriod.objects.cohort_summary()
 
     cohort_number = (
         cohort_data["grace_cohort"]["cohort"]
@@ -478,7 +477,7 @@ def selected_trust_kpis(request, organisation_id, access):
     # Get all relevant data for submission cohort
     requested_cohort_number = request.GET.get("cohort")
 
-    cohort_data = cohorts_and_dates(first_paediatric_assessment_date=date.today())
+    cohort_data = AuditPeriod.objects.cohort_summary()
     submitting_cohort_number = (
         cohort_data["grace_cohort"]["cohort"]
         if cohort_data["within_grace_period"]
@@ -627,7 +626,7 @@ def selected_trust_select_kpi(request, organisation_id):
     if requested_cohort_number:
         cohort_number = int(requested_cohort_number)
     else:
-        cohort_data = cohorts_and_dates(first_paediatric_assessment_date=date.today())
+        cohort_data = AuditPeriod.objects.cohort_summary()
         cohort_number = (
             cohort_data["grace_cohort"]["cohort"]
             if cohort_data["within_grace_period"]

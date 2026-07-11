@@ -21,11 +21,6 @@ from ..constants import (
     CAN_CONSENT_TO_AUDIT_PARTICIPATION,
 )
 from .time_and_user_abstract_base_classes import *
-from ..general_functions import (
-    dates_for_cohort,
-    cohort_number_from_first_paediatric_assessment_date,
-    days_remaining_before_submission
-)
 from ..validators import not_in_the_future_validator
 
 
@@ -85,10 +80,14 @@ class Registration(
     @property
     def days_remaining_before_submission(self) -> int:
         if self.audit_period_id is None:
-            # legacy fallback
-            return days_remaining_before_submission(
-                self.audit_submission_date,
-                self.get_current_date()
+            # legacy fallback for registrations without an audit_period:
+            # days remaining until audit_submission_date, clamped at zero,
+            # inclusive of the deadline day itself.
+            if not self.audit_submission_date:
+                return None
+            return max(
+                0,
+                (self.audit_submission_date - self.get_current_date()).days + 1,
             )
         return self.audit_period.days_until_submission_deadline_for_organisation(
             self.lead_organisation(), current_date=self.get_current_date()

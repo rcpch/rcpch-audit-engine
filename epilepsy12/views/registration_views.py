@@ -1,5 +1,4 @@
 # python
-from datetime import date
 
 # django imports
 from django.shortcuts import render
@@ -16,6 +15,7 @@ from django_htmx.http import HttpResponseClientRedirect
 
 # RCPCH
 from ..models import (
+    AuditPeriod,
     Case,
     AuditProgress,
     Organisation,
@@ -34,7 +34,6 @@ from ..decorator import (
 )
 from ..general_functions import (
     construct_transfer_epilepsy12_site_email,
-    cohorts_and_dates,
     send_email_to_recipients,
 )
 
@@ -615,7 +614,7 @@ def first_paediatric_assessment_date(request, can_edit, case_id):
     else:
         # registering a new child in the audit by a clinical team
         # sets the minimum allowable date to the currently submitting cohort start date or the start of the previous cohort if it is still within its grace period
-        cohort_dates = cohorts_and_dates(first_paediatric_assessment_date=date.today())
+        cohort_dates = AuditPeriod.objects.cohort_summary()
         if cohort_dates["within_grace_period"]:
             earliest_allowable_date = cohort_dates["grace_cohort"]["cohort_start_date"]
         else:
