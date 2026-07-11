@@ -168,7 +168,7 @@ class AuditPeriod(
                 name="audit_period_start_date_before_end_date",
             ),
             models.CheckConstraint(
-                check=models.Q(recruitment_end_date__gt=models.F("data_collection_end_date")),
+                check=models.Q(data_collection_end_date__gt=models.F("recruitment_end_date")),
                 name="audit_period_data_collection_end_date_after_recruitment_end_date",
             ),
             models.CheckConstraint(
