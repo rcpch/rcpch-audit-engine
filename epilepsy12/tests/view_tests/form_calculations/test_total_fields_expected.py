@@ -457,7 +457,7 @@ def test_total_fields_expected_investigations_cohort8_no_genome_answer(
     CASE.registration.first_paediatric_assessment_date = date(2025, 1, 1)
     CASE.registration.save()
 
-    assert CASE.registration.cohort == 8
+    assert CASE.registration.audit_period.cohort_number == 8
 
     investigations = CASE.registration.investigations
 
@@ -488,7 +488,7 @@ def test_total_fields_expected_investigations_cohort8_genome_requested_true(
     CASE.registration.first_paediatric_assessment_date = date(2025, 1, 1)
     CASE.registration.save()
 
-    assert CASE.registration.cohort == 8
+    assert CASE.registration.audit_period.cohort_number == 8
 
     investigations = CASE.registration.investigations
 
@@ -549,7 +549,7 @@ def test_total_fields_expected_investigations_cohort8_genome_test_statuses(
     CASE.registration.first_paediatric_assessment_date = date(2025, 1, 1)
     CASE.registration.save()
 
-    assert CASE.registration.cohort == 8
+    assert CASE.registration.audit_period.cohort_number == 8
 
     investigations = CASE.registration.investigations
 
@@ -583,7 +583,7 @@ def test_total_fields_expected_investigations_pre_cohort8_ignores_genome(
     )
 
     # Default factory date gives cohort 6
-    assert CASE.registration.cohort < 8
+    assert CASE.registration.audit_period.cohort_number < 8
 
     investigations = CASE.registration.investigations
 
@@ -619,7 +619,7 @@ def test_total_fields_expected_investigations_cohort8_with_eeg_and_mri(
     CASE.registration.first_paediatric_assessment_date = date(2025, 1, 1)
     CASE.registration.save()
 
-    assert CASE.registration.cohort == 8
+    assert CASE.registration.audit_period.cohort_number == 8
 
     investigations = CASE.registration.investigations
 
@@ -752,7 +752,7 @@ def test_total_fields_expected_topiramate_or_valproate_for_sex_and_age_cohort_7(
     )
 
     CASE.registration.first_paediatric_assessment_date = date(2024, 5, 1)
-    CASE.registration.cohort = 7
+    CASE.registration.audit_period.cohort_number = 7
     CASE.registration.management.has_an_aed_been_given = True
     CASE.registration.save()
 
@@ -787,7 +787,7 @@ def test_total_fields_expected_topiramate_or_valproate_for_sex_and_age_cohort_7(
     return_value = total_fields_expected(CASE.registration.management)
 
     assert (
-        CASE.registration.cohort == 7
+        CASE.registration.audit_period.cohort_number == 7
     ), "Cohort should be 7 for first paediatric assessment date of 2024-05-01"
 
     # Calculate age at the assessment date, not at current time
@@ -853,7 +853,7 @@ def test_total_fields_expected_topiramate_or_valproate_for_sex_and_age_cohort_6(
     )
 
     CASE.registration.first_paediatric_assessment_date = date(2023, 5, 1)
-    CASE.registration.cohort = 6
+    CASE.registration.audit_period.cohort_number = 6
     CASE.registration.management.has_an_aed_been_given = True
     CASE.registration.save()
 
@@ -886,8 +886,8 @@ def test_total_fields_expected_topiramate_or_valproate_for_sex_and_age_cohort_6(
     return_value = total_fields_expected(CASE.registration.management)
 
     assert (
-        CASE.registration.cohort == 6
-    ), f"Cohort should be 6 for first paediatric assessment date of 2023-05-01, but got {CASE.registration.cohort}"
+        CASE.registration.audit_period.cohort_number == 6
+    ), f"Cohort should be 6 for first paediatric assessment date of 2023-05-01, but got {CASE.registration.audit_period.cohort_number}"
 
     # Calculate age at the assessment date, not at current time
     assessment_date = CASE.registration.first_paediatric_assessment_date
@@ -930,7 +930,7 @@ def test_management_valproate_fields_do_not_overcount_when_not_expected(
     )
 
     CASE.registration.first_paediatric_assessment_date = date(2023, 5, 1)
-    CASE.registration.cohort = 6
+    CASE.registration.audit_period.cohort_number = 6
     CASE.registration.management.has_an_aed_been_given = True
     CASE.registration.management.has_rescue_medication_been_prescribed = False
     CASE.registration.management.save()

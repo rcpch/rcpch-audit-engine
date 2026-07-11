@@ -254,7 +254,7 @@ class KPI(models.Model, HelpTextMixin):
         null=True,
     )
 
-    """    
+    """
     9Biii. First Aid
 
     Percentage of children and young people with epilepsy with evidence of discussion regarding first aid.
@@ -296,7 +296,7 @@ class KPI(models.Model, HelpTextMixin):
         null=True,
     )
 
-    """    
+    """
     9Bvi. Service contact details
 
     Percentage of children and young people with epilepsy with evidence of being given service contact details.
@@ -314,7 +314,7 @@ class KPI(models.Model, HelpTextMixin):
     """
     10. School Individual Healthcare Plan
 
-    Percentage of children and young people with epilepsy aged 4 years and above with evidence of a school individual healthcare plan by 1 year after first paediatric assessment.	
+    Percentage of children and young people with epilepsy aged 4 years and above with evidence of a school individual healthcare plan by 1 year after first paediatric assessment.
     """
     school_individual_healthcare_plan = models.IntegerField(
         help_text={
@@ -367,8 +367,8 @@ class KPI(models.Model, HelpTextMixin):
     def __str__(self):
         if hasattr(self, "registration"):
             if self.organisation.trust:
-                return f"KPI for {self.registration.case} in {self.organisation.name}({self.organisation.trust.name})[cohort {self.registration.cohort}]"
+                return f"KPI for {self.registration.case} in {self.organisation.name}({self.organisation.trust.name})[cohort {self.registration.audit_period.cohort_number}]"
             else:
-                return f"KPI for {self.registration.case} in {self.organisation.name}({self.organisation.local_health_board.name})[cohort {self.registration.cohort}]"
+                return f"KPI for {self.registration.case} in {self.organisation.name}({self.organisation.local_health_board.name})[cohort {self.registration.audit_period.cohort_number}]"
         else:
             return "There is no Registration associated with this KPI"

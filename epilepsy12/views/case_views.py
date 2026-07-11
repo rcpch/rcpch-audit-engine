@@ -78,10 +78,10 @@ def case_list(request, organisation_id):
     elif cohort_filter_term == "all_children":
         selected_cohort = "all_children"
     elif cohort_filter_term == "all_cohorts":
-        cohort_filter = Q(registration__cohort__isnull=False)
+        cohort_filter = Q(registration__audit_period__cohort_number__isnull=False)
         selected_cohort = "all_cohorts"
     else:
-        cohort_filter = Q(registration__cohort=cohort_filter_term)
+        cohort_filter = Q(registration__audit_period__cohort_number=cohort_filter_term)
         selected_cohort = cohort_filter_term
 
     # get currently selected organisation

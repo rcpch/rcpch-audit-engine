@@ -1,6 +1,6 @@
 # python
 from datetime import datetime, date
-from time import timezone
+from django.utils import timezone
 from .epilepsy12_site import Site
 from .audit_period import AuditPeriod
 

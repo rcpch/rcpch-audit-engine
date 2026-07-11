@@ -43,7 +43,7 @@
                     <div class="four wide field">
                         <label>Cohort</label>
                         <div class="ui rcpch input">
-                            <input type="text" readonly="" placeholder="{% if registration.cohort %}{{registration.cohort}}{% else %}-{% endif %}" />
+                            <input type="text" readonly="" placeholder="{% if registration.audit_period.cohort_number %}{{registration.audit_period.cohort_number}}{% else %}-{% endif %}" />
                         </div>
                     </div>
 

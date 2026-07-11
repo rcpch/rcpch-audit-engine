@@ -325,7 +325,7 @@ class AuditProgress(models.Model, HelpTextMixin):
         try:
             registration = aem.management.registration
             case = registration.case
-            cohort = registration.cohort
+            cohort = registration.audit_period.cohort_number
             sex = case.sex
             child_over_12 = case.age_days() >= 365.25 * 12
             concept_id = (

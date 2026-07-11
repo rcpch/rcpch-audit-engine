@@ -137,17 +137,17 @@ def recalculate_imd_for_case(case) -> None:
         # No registration exists yet — IMD will be recalculated once Registration is saved.
         return
 
-    if registration is None or registration.cohort is None:
+    if registration is None or registration.audit_period.cohort_number is None:
         return
 
-    if registration.cohort >= 8:
+    if registration.audit_period.cohort_number >= 8:
         country_boundary_identifier = country_boundary_identifier_for_postcode(
             normalised
         )
         if country_boundary_identifier is None:
             country_boundary_identifier = country_boundary_identifier_for_case(case)
         imd_year = imd_year_for_case(
-            cohort=registration.cohort,
+            cohort=registration.audit_period.cohort_number,
             country_boundary_identifier=country_boundary_identifier,
         )
     else:

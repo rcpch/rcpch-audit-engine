@@ -44,7 +44,7 @@ def test_remove_jersey_patients_from_kpi_export(
     )
 
     calculate_kpis(english_case.registration)
-    update_all_kpi_agg_models(organisation=english_org, cohort=english_case.registration.cohort, open_access=False)
+    update_all_kpi_agg_models(organisation=english_org, cohort=english_case.registration.audit_period.cohort_number, open_access=False)
 
     jersey_case = e12_case_factory(
         date_of_birth=date(2013, 1, 1),
@@ -57,9 +57,9 @@ def test_remove_jersey_patients_from_kpi_export(
     )
 
     calculate_kpis(jersey_case.registration)
-    update_all_kpi_agg_models(organisation=jersey_org, cohort=english_case.registration.cohort, open_access=False)
+    update_all_kpi_agg_models(organisation=jersey_org, cohort=english_case.registration.audit_period.cohort_number, open_access=False)
 
-    assert english_case.registration.cohort == jersey_case.registration.cohort
+    assert english_case.registration.audit_period.cohort_number == jersey_case.registration.audit_period.cohort_number
 
     (
         country_df,
@@ -75,7 +75,7 @@ def test_remove_jersey_patients_from_kpi_export(
         nhs_england_region_totals_df,
         openuk_network_totals_df,
         country_totals_df,
-    ) = download_kpi_summary_as_csv(cohort=english_case.registration.cohort)
+    ) = download_kpi_summary_as_csv(cohort=english_case.registration.audit_period.cohort_number)
 
     countries = set(country_df["Country"])
     assert "England" in countries

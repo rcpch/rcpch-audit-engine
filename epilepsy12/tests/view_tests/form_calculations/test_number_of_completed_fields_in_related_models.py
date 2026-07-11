@@ -535,7 +535,7 @@ def test_related_model_fields_count_management(
     management = CASE.registration.management
 
     CASE.registration.first_paediatric_assessment_date = date(2024, 5, 1)
-    CASE.registration.cohort = 7
+    CASE.registration.audit_period.cohort_number = 7
     CASE.registration.save()
 
     return_value = number_of_completed_fields_in_related_models(management)

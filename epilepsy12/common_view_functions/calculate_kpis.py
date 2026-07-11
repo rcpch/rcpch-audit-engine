@@ -75,7 +75,7 @@ def calculate_kpis(registration_instance):
     school_individual_healthcare_plan = KPI_SCORE["NOT_SCORED"]
 
     # Get cohort from registration_instance
-    cohort = registration_instance.cohort
+    cohort = registration_instance.audit_period.cohort_number
 
     # important metric for calculations that follow
     age_at_first_paediatric_assessment = (

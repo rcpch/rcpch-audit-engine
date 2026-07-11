@@ -48,7 +48,7 @@ def _is_conditional_aem_field_expected(medicine_instance, field_name):
     if medicine_instance.medicine_entity is None:
         return False
 
-    cohort = medicine_instance.management.registration.cohort
+    cohort = medicine_instance.management.registration.audit_period.cohort_number
     sex = medicine_instance.management.registration.case.sex
     concept_id = medicine_instance.medicine_entity.conceptId
 
@@ -329,7 +329,7 @@ def total_fields_expected(model_instance):
             cumulative_score += 2
 
         # Genome sequencing fields (Cohort 8+)
-        if model_instance.registration.cohort >= 8:
+        if model_instance.registration.audit_period.cohort_number >= 8:
             # genome_sequencing_requested is always scorable for cohort 8+
             cumulative_score += 1
             if model_instance.genome_sequencing_requested:
@@ -376,7 +376,7 @@ def total_fields_expected(model_instance):
                     - the Annual Risk Acknowledgment Form question appear for males on topiramate (the pregnancy prevention programme doesn't apply to males)
                     """
                     # by this stage cumulative score must already be +3 for medicine name, start date,  risk discussed
-                    if model_instance.registration.cohort > 6:
+                    if model_instance.registration.audit_period.cohort_number > 6:
                         if medicine.medicine_entity is not None:
                             if (
                                 (
@@ -538,6 +538,7 @@ def avoid_fields(model_instance):
             "firstpaediatricassessment",
             "completed_first_year_of_care_date",
             "audit_submission_date",
+            "audit_period",
             "cohort",
             "case",
             "audit_progress",

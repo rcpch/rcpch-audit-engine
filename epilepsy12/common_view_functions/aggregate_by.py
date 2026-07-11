@@ -24,8 +24,9 @@ from epilepsy12.constants import (
     SEX_TYPE,
     EnumAbstractionLevel,
 )
-from epilepsy12.general_functions import cohorts_and_dates
+
 from epilepsy12.common_view_functions import calculate_kpis
+from epilepsy12.models_folder.audit_period import AuditPeriod
 from epilepsy12.models_folder.entities.organisation import Organisation
 
 # Logging setup
@@ -271,7 +272,7 @@ def update_all_kpi_agg_models(
         """
 
         abstraction_filter = get_abstraction_filter_for_organisation_and_level(
-            organisation, ABSTRACTION_LEVEL 
+            organisation, ABSTRACTION_LEVEL
         )
 
         all_cases = filter_completed_cases_at_one_year_by_abstraction_level(
@@ -587,7 +588,7 @@ def get_filtered_cases_queryset_for(
         # epilepsy12_sites__organisation__country__boundary_identifier="E92000001",
         epilepsy12_sites__site_is_actively_involved_in_epilepsy_care=True,
         epilepsy12_sites__site_is_primary_centre_of_epilepsy_care=True,
-        registration__cohort=cohort,
+        registration__audit_period__cohort_number=cohort,
         registration__completed_first_year_of_care_date__lte=date.today(),
         registration__audit_progress__registration_complete=True,
         registration__audit_progress__first_paediatric_assessment_complete=True,
@@ -809,7 +810,7 @@ def get_abstraction_filter_for_organisation_and_level(
             abstraction_filter = {
                 f"epilepsy12_sites__organisation__country__boundary_identifier__in": ["E92000001", "W92000004"]
             }
-    
+
     if abstraction_filter:
         abstraction_filter["epilepsy12_sites__site_is_primary_centre_of_epilepsy_care"] = True
         abstraction_filter["epilepsy12_sites__site_is_actively_involved_in_epilepsy_care"] = True
@@ -881,10 +882,24 @@ def _seed_all_aggregation_models(cohort=None) -> None:
     if cohort:
         requested_cohort = cohort
     else:
-        cohort = cohorts_and_dates(
-            first_paediatric_assessment_date=date.today()
-        )  # gets current recruiting and submitting cohorts
-        requested_cohort = cohort["currently_recruiting_cohort"]
+        # AuditPeriod is created by migration 0062, but this function may be
+        # called by earlier migrations (e.g. 0024) during a fresh DB build,
+        # before the table exists. Skip seeding in that case rather than crash
+        # (a failed query would poison the surrounding migration transaction).
+        from django.db import connection
+        table_exists = "epilepsy12_auditperiod" in connection.introspection.table_names()
+        if not table_exists:
+            logger.warning(
+                "AuditPeriod table does not exist yet; skipping KPI aggregation seeding."
+            )
+            return
+        current = AuditPeriod.objects.currently_recruiting()
+        if current is None:
+            logger.warning(
+                "No currently recruiting AuditPeriod; skipping KPI aggregation seeding."
+            )
+            return
+        requested_cohort = current.cohort_number
 
     all_orgs = Organisation.objects.all().distinct()
     all_trusts = Trust.objects.all().distinct()

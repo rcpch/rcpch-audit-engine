@@ -11,7 +11,7 @@ from django.utils import timezone
 from psycopg2 import DatabaseError
 
 # RCPCH imports
-from ..general_functions import cohorts_and_dates
+
 from ..validators import epilepsy12_date_validator
 
 
