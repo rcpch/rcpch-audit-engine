@@ -1011,7 +1011,7 @@ def missing_completed_fields_for_model(case_id, model):
             return ""
         html = ""
         for item in instances_data:
-            html += f"<div class='sub-header'>{item['label']}</div>"
+            html += f"<div class='header'><i>{item['label']}</i></div>"
             for field in item["incomplete"]:
                 html += f"<div>{field}</div>"
         return html
