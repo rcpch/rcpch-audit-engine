@@ -255,7 +255,7 @@ class AuditPeriod(
 
     def save(self, *args, **kwargs):
         if not self.slug:
-            self.slug = slugify(self.cohort_number)
+            self.slug = slugify(self.name) if self.name else f"cohort-{self.cohort_number}"
         super().save(*args, **kwargs)
 
     def __str__(self):
