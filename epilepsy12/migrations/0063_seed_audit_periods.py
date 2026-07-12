@@ -4,18 +4,13 @@ from django.db import migrations
 
 # Historical facts, deliberately hardcoded
 # which may change or be removed. recruitment start/end, data collection end, deadline.
-COHORTS = {
-    4:  (date(2020, 12, 1), date(2021, 11, 30), date(2022, 11, 30), date(2023, 1, 10)),
-    5:  (date(2021, 12, 1), date(2022, 11, 30), date(2023, 11, 30), date(2024, 1, 9)),
-    6:  (date(2022, 12, 1), date(2023, 11, 30), date(2024, 11, 30), date(2025, 1, 14)),
-    7:  (date(2023, 12, 1), date(2024, 11, 30), date(2025, 11, 30), date(2026, 1, 13)),
-    8:  (date(2024, 12, 1), date(2025, 11, 30), date(2026, 11, 30), date(2027, 1, 12)),
-    9:  (date(2025, 12, 1), date(2026, 11, 30), date(2027, 11, 30), date(2028, 1, 11)),
-}
+# only goes up to cohort 9
+from epilepsy12.constants.audit_period_dates import AUDIT_PERIODS
+
 
 def seed_audit_periods(apps, schema_editor):
     AuditPeriod = apps.get_model("epilepsy12", "AuditPeriod")
-    for cohort_number, (rec_start, rec_end, dc_end, deadline) in COHORTS.items():
+    for cohort_number, (rec_start, rec_end, dc_end, deadline) in AUDIT_PERIODS.items():
         AuditPeriod.objects.get_or_create(
             cohort_number=cohort_number,
             defaults={
