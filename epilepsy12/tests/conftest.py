@@ -47,7 +47,7 @@ _AUDIT_PERIODS = {
 
 
 @pytest.fixture(scope="session", autouse=True)
-def seed_audit_periods_fixture(django_db_blocker):
+def seed_audit_periods_fixture(django_db_setup,django_db_blocker):
     """Ensure AuditPeriod rows exist in the test DB so Registration.save()
     can resolve audit_period from first_paediatric_assessment_date.
     Idempotent: safe with --reuse-db."""
