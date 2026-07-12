@@ -6,6 +6,7 @@ import logging
 from dateutil.relativedelta import relativedelta
 from epilepsy12.models import AuditPeriod
 from epilepsy12.general_functions.date_functions import nth_tuesday_of_year
+from epilepsy12.constants.audit_period_dates import AUDIT_PERIODS
 
 from django.core.management.base import BaseCommand
 
@@ -95,6 +96,12 @@ class Command(BaseCommand):
             help="To seed audit periods up to a given cohort.",
             type=int
         )
+        parser.add_argument(
+            "--force",
+            action="store_true",
+            help="Force update of existing audit periods.",
+        )
+
 
     def handle(self, *args, **options):
         if options["mode"] == "cases":
@@ -136,7 +143,8 @@ class Command(BaseCommand):
             insert_user_data()
         elif options["mode"] == "seed_audit_periods":
             up_to_cohort = options["up_to_cohort"]
-            seed_audit_periods(up_to_cohort=up_to_cohort)
+            force = options["force"]
+            seed_audit_periods(up_to_cohort=up_to_cohort, force=force)
             print(image())
         else:
             self.stdout.write("No options supplied...")
@@ -278,33 +286,55 @@ def complete_registrations(verbose=True, cohort=None, full_year=False):
 
 
 
-def seed_audit_periods(up_to_cohort: int=0):
+def seed_audit_periods(up_to_cohort: int=0, force: bool=False):
     """Create any missing AuditPeriods up to the given cohort using the
     E12 convention. NEVER updates existing rows: deadlines may have been
-    deliberately edited by the RCPCH audit team."""
+    deliberately edited by the RCPCH audit team UNLESS the --force option is used."""
     if not up_to_cohort:
         # default: everything up to the currently recruiting cohort
         today = date.today()
-        up_to_cohort = today.year - 2016 if today.month == 12 else today.year - 2017
+        up_to_cohort = today.year - 2016
 
     if up_to_cohort < 4:
         print("No need to seed audit periods: cohort is before 4.")
         return
     for n in range(4, up_to_cohort + 1):
-        rec_end = date(2016 + n + 1, 11, 30)
-        audit_period, created = AuditPeriod.objects.get_or_create(
-            cohort_number=n,
-            defaults={
-                "recruitment_start_date": date(2016 + n, 12, 1),
-                "recruitment_end_date": rec_end,
-                "data_collection_end_date": date(2016 + n + 2, 11, 30),
-                "submission_deadline": nth_tuesday_of_year(rec_end.year + 2, n=2),
-            },
-        )
-        if created:
-            print(f"Created AuditPeriod for cohort {n} - {audit_period}")
+        if n < 10: # for cohorts upto 9 we use the hard coded list
+            (rec_start, rec_end, dc_end, deadline) = AUDIT_PERIODS[n]
         else:
-            print(f"Using existing AuditPeriod for cohort {n} - {audit_period}")
+            rec_start = date(2016 + n + 1, 1, 1)
+            rec_end = date(2016 + n + 1, 12, 31)
+            dc_end = date(2016 + n + 2, 12, 31)
+            deadline = nth_tuesday_of_year(dc_end.year + 1, n=2)
+        if force:
+            audit_period, created = AuditPeriod.objects.update_or_create(
+                cohort_number=n,
+                defaults={
+                    "recruitment_start_date": rec_start,
+                    "recruitment_end_date": rec_end,
+                    "data_collection_end_date": dc_end,
+                    "submission_deadline": deadline,
+                    "slug": f"cohort-{n}",
+                    "is_visible": True,
+                },
+            )
+        else:
+            audit_period, created = AuditPeriod.objects.get_or_create(
+                cohort_number=n,
+                defaults={
+                    "recruitment_start_date": rec_start,
+                    "recruitment_end_date": rec_end,
+                    "data_collection_end_date": dc_end,
+                    "submission_deadline": deadline,
+                    "slug": f"cohort-{n}",
+                    "is_visible": True,
+                },
+            )
+        force_string = " (forced)" if force else ""
+        if created:
+            print(f"Created AuditPeriod for cohort {n} - {audit_period}{force_string}")
+        else:
+            print(f"Using existing AuditPeriod for cohort {n} - {audit_period}{force_string}")
 
 
 

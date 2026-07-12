@@ -19,7 +19,7 @@ def seed_audit_periods(apps, schema_editor):
                 "data_collection_end_date": dc_end,
                 "submission_deadline": deadline,
                 "slug": f"cohort-{cohort_number}",   # save() is NOT called by historical models
-                "is_visible": False,
+                "is_visible": True,
             },
         )
 
