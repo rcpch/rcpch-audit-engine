@@ -242,15 +242,15 @@ class AuditPeriod(
         verbose_name_plural = "Audit periods"
         constraints = [
             models.CheckConstraint(
-                check=models.Q(recruitment_start_date__lt=models.F("recruitment_end_date")),
+                condition=models.Q(recruitment_start_date__lt=models.F("recruitment_end_date")),
                 name="audit_period_start_date_before_end_date",
             ),
             models.CheckConstraint(
-                check=models.Q(data_collection_end_date__gt=models.F("recruitment_end_date")),
+                condition=models.Q(data_collection_end_date__gt=models.F("recruitment_end_date")),
                 name="audit_period_data_collection_end_date_after_recruitment_end_date",
             ),
             models.CheckConstraint(
-                check=models.Q(submission_deadline__gt=models.F("data_collection_end_date")),
+                condition=models.Q(submission_deadline__gt=models.F("data_collection_end_date")),
                 name="audit_period_submission_deadline_after_data_collection_end_date",
             ),
         ]
