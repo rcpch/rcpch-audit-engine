@@ -30,20 +30,12 @@ from epilepsy12.tests.factories import (
     E12UserFactory,
 )
 from epilepsy12.models import AuditPeriod, Organisation, Case
-
-
 # Historical cohort definitions, kept in sync with migration
 # 0063_seed_audit_periods.py. Registration.save() looks up the AuditPeriod
 # for a given first_paediatric_assessment_date, so the test DB must contain
 # these rows or every Registration ends up with audit_period=None.
-_AUDIT_PERIODS = {
-    4:  (date(2020, 12, 1), date(2021, 11, 30), date(2022, 11, 30), date(2023, 1, 10)),
-    5:  (date(2021, 12, 1), date(2022, 11, 30), date(2023, 11, 30), date(2024, 1, 9)),
-    6:  (date(2022, 12, 1), date(2023, 11, 30), date(2024, 11, 30), date(2025, 1, 14)),
-    7:  (date(2023, 12, 1), date(2024, 11, 30), date(2025, 11, 30), date(2026, 1, 13)),
-    8:  (date(2024, 12, 1), date(2025, 11, 30), date(2026, 11, 30), date(2027, 1, 12)),
-    9:  (date(2025, 12, 1), date(2026, 11, 30), date(2027, 11, 30), date(2028, 1, 11)),
-}
+from epilepsy12.constants.audit_period_dates import AUDIT_PERIODS
+
 
 
 @pytest.fixture(scope="session", autouse=True)
@@ -52,7 +44,7 @@ def seed_audit_periods_fixture(django_db_setup,django_db_blocker):
     can resolve audit_period from first_paediatric_assessment_date.
     Idempotent: safe with --reuse-db."""
     with django_db_blocker.unblock():
-        for cohort_number, (rec_start, rec_end, dc_end, deadline) in _AUDIT_PERIODS.items():
+        for cohort_number, (rec_start, rec_end, dc_end, deadline) in AUDIT_PERIODS.items():
             AuditPeriod.objects.get_or_create(
                 cohort_number=cohort_number,
                 defaults={
