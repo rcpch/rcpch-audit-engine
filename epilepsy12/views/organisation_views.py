@@ -568,6 +568,8 @@ def selected_trust_open_select(request, organisation_id):
     return HttpResponseClientRedirect(url)
 
 
+@login_and_otp_required()
+@user_may_view_this_organisation()
 def selected_trust_select_kpi(request, organisation_id):
     """
     POST request from dropdown in selected_organisation_summary.html returning the individual kpis data and visualisations.
