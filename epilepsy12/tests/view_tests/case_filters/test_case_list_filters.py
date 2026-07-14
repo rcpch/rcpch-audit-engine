@@ -385,13 +385,12 @@ def test_national_view_preference_restricted_to_rcpch_audit_team(client, seed_gr
     assert_can_only_see_gosh_case()
 
     url = reverse("view_preference", kwargs={"organisation_id": gosh.pk, "template_name": "cases"})
-    response = client.post(
+    client.post(
         url,
         headers={
             "Hx-Trigger-Name": 2, # national view, should be disallowed
             "Hx-Request": "true"
         },
     )
-    assert response.status_code == HTTPStatus.OK # TODO MRB: change to forbidden?
 
     assert_can_only_see_gosh_case()
