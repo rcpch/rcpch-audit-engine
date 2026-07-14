@@ -327,3 +327,71 @@ def test_individual_cohort_filtering(client, seed_groups_fixture, seed_users_fix
     assert c5.id not in ids_c7
     assert c6.id not in ids_c7
     assert c7.id in ids_c7
+
+
+@pytest.mark.django_db
+def test_national_view_preference_restricted_to_rcpch_audit_team(client, seed_groups_fixture, seed_users_fixture):
+    """Only RCPCH audit team members should be able to set national view preference."""
+
+    gosh = Organisation.objects.get(ods_code="RP401", trust__ods_code="RP4")
+    addenbrookes = Organisation.objects.get(ods_code="RGT01", trust__ods_code="RGT")
+
+    group = Group.objects.get(name="trust_audit_team_edit_access")
+
+    # Create a non-RCPCH audit team user
+    user = E12UserFactory(
+        first_name="NationalViewTest",
+        surname="User",
+        email="national_view_test_user@test.com",
+        role=1,
+        is_staff=False,
+        is_rcpch_audit_team_member=False,
+        view_preference=0,
+        groups=[group],
+    )
+    user.set_organisation_employer(organisation_employer=gosh, is_primary=True)
+
+    gosh_case = E12CaseFactory(
+        first_name="gosh",
+        surname="A",
+        organisations__organisation=gosh,
+    )
+    gosh_case.registration.cohort = 6
+    gosh_case.registration.first_paediatric_assessment_date = date(2023, 1, 15)
+    gosh_case.registration.save()
+
+    addenbrookes_case = E12CaseFactory(
+        first_name="Addenbrookes",
+        surname="B",
+        organisations__organisation=addenbrookes,
+    )
+    addenbrookes_case.registration.cohort = 6
+    addenbrookes_case.registration.first_paediatric_assessment_date = date(2023, 1, 15)
+    addenbrookes_case.registration.save()
+
+    client.force_login(user)
+    twofactor_signin(client, user)
+
+    def assert_can_only_see_gosh_case():
+        url = reverse("cases", kwargs={"organisation_id": gosh.pk})
+        response = client.get(url, {"cohort": "6"})
+        assert response.status_code == HTTPStatus.OK
+
+        case_ids = {c.id for c in response.context["case_list"]}
+        assert gosh_case.id in case_ids
+        assert addenbrookes_case.id not in case_ids
+
+
+    assert_can_only_see_gosh_case()
+
+    url = reverse("view_preference", kwargs={"organisation_id": gosh.pk, "template_name": "cases"})
+    response = client.post(
+        url,
+        headers={
+            "Hx-Trigger-Name": 2, # national view, should be disallowed
+            "Hx-Request": "true"
+        },
+    )
+    assert response.status_code == HTTPStatus.OK # TODO MRB: change to forbidden?
+
+    assert_can_only_see_gosh_case()
