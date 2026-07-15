@@ -49,6 +49,7 @@ from epilepsy12.constants import (
     NON_EPILEPSY_SEIZURE_ONSET,
     NON_EPILEPSY_SEIZURE_TYPE,
 )
+from epilepsy12.models import Registration
 from epilepsy12.models_folder.management import Management
 from epilepsy12.tests.view_tests.form_calculations.test_number_of_completed_fields_in_related_models import (
     get_random_answers_update_counter,
@@ -981,3 +982,92 @@ def test_management_valproate_fields_do_not_overcount_when_not_expected(
     assert (
         all_completed_fields <= all_expected_fields
     ), f"Management overcount: completed={all_completed_fields}, expected={all_expected_fields}"
+
+
+# ---------------------------------------------------------------------------
+# None audit_period regression tests
+#
+# These pin the defensive guard added to total_fields_expected and
+# _is_conditional_aem_field_expected: a registration without an audit_period
+# (no first paediatric assessment date, or legacy/test data) must not raise
+# AttributeError/TypeError. None cohort is treated as "not cohort 8" for
+# Investigations and as "cohort <= 6" for Management, matching the fallback
+# semantics documented in exclude_fields_from_audit_progress.
+# ---------------------------------------------------------------------------
+
+
+@pytest.mark.django_db
+def test_total_fields_expected_investigations_no_audit_period(e12_case_factory, GOSH):
+    """
+    Regression: total_fields_expected(investigations) must not crash when the
+    registration has no audit_period. Genome fields are excluded (treated as
+    not cohort 8), so only the 4 base fields are expected.
+    """
+    CASE = e12_case_factory(
+        first_name=f"temp_child_{GOSH.name}",
+        organisations__organisation=GOSH,
+        registration__investigations__genome_sequencing_requested=True,
+        registration__investigations__r14_test_status="A",
+    )
+    Registration.objects.filter(pk=CASE.registration.pk).update(audit_period=None)
+    CASE.registration.refresh_from_db()
+    assert CASE.registration.audit_period is None
+
+    investigations = CASE.registration.investigations
+
+    # 4 base fields only; genome family excluded because cohort is None.
+    expected_value = 4
+    return_value = total_fields_expected(investigations)
+
+    assert return_value == expected_value, (
+        f"total_fields_expected(investigations) with no audit_period: "
+        f"expected {expected_value} but got {return_value}"
+    )
+
+
+@pytest.mark.django_db
+def test_total_fields_expected_management_no_audit_period(
+    e12_case_factory, e12_anti_epilepsy_medicine_factory, GOSH
+):
+    """
+    Regression: total_fields_expected(management) must not crash when the
+    registration has no audit_period. Cohort is treated as <= 6 (the
+    pre-cohort-7 fallback), so a 13yo female on valproate scores under the
+    cohort-6 rules: +3 base AED fields, +2 for valproate in a >=12yo female
+    with PPP needed (annual risk form is NOT scored in cohort 6).
+    """
+    CASE = e12_case_factory(
+        first_name=f"temp_child_{GOSH.name}",
+        date_of_birth=date.today() - relativedelta(years=13),
+        organisations__organisation=GOSH,
+        sex=SEX_TYPE[2][0],
+        registration__management__has_an_aed_been_given=True,
+        registration__management__has_rescue_medication_been_prescribed=False,
+    )
+    Registration.objects.filter(pk=CASE.registration.pk).update(audit_period=None)
+    CASE.registration.refresh_from_db()
+    assert CASE.registration.audit_period is None
+
+    management = CASE.registration.management
+    e12_anti_epilepsy_medicine_factory(
+        management=management,
+        is_rescue_medicine=False,
+        medicine_entity=Medicine.objects.get(conceptId="387481005"),
+        antiepilepsy_medicine_start_date=date(2023, 6, 1),
+        antiepilepsy_medicine_risk_discussed=True,
+        is_a_pregnancy_prevention_programme_needed=True,
+        is_a_pregnancy_prevention_programme_in_place=True,
+        has_a_valproate_annual_risk_acknowledgement_form_been_completed=True,
+    )
+
+    # Must not raise. Under cohort-6 rules: minimum 5 + 3 (AED base) + 2
+    # (valproate, >=12yo female, PPP needed -> PPP in place + annual risk form)
+    # = 10. (If the guard regresses and cohort is None hits `> 6`, this raises.)
+    return_value = total_fields_expected(management)
+
+    # Cohort-6 expected: 5 (management minimum) + 3 (AED) + 2 (valproate female>=12 PPP)
+    expected_value = 10
+    assert return_value == expected_value, (
+        f"total_fields_expected(management) with no audit_period (cohort-6 fallback): "
+        f"expected {expected_value} but got {return_value}"
+    )
