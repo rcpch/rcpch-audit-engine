@@ -366,9 +366,14 @@ class KPI(models.Model, HelpTextMixin):
 
     def __str__(self):
         if hasattr(self, "registration"):
+            cohort = (
+                self.registration.audit_period.cohort_number
+                if self.registration.audit_period
+                else None
+            )
             if self.organisation.trust:
-                return f"KPI for {self.registration.case} in {self.organisation.name}({self.organisation.trust.name})[cohort {self.registration.audit_period.cohort_number}]"
+                return f"KPI for {self.registration.case} in {self.organisation.name}({self.organisation.trust.name})[cohort {cohort}]"
             else:
-                return f"KPI for {self.registration.case} in {self.organisation.name}({self.organisation.local_health_board.name})[cohort {self.registration.audit_period.cohort_number}]"
+                return f"KPI for {self.registration.case} in {self.organisation.name}({self.organisation.local_health_board.name})[cohort {cohort}]"
         else:
             return "There is no Registration associated with this KPI"

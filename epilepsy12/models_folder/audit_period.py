@@ -8,7 +8,6 @@ from django.utils.text import slugify
 
 from .help_text_mixin import HelpTextMixin
 from .time_and_user_abstract_base_classes import TimeStampAbstractBaseClass, UserStampAbstractBaseClass
-from .epilepsy12_site import Site
 from .entities.organisation import Organisation
 
 
@@ -26,7 +25,7 @@ class AuditPeriodManager(models.Manager):
         return self.filter(cohort_number=cohort_number).first()
 
     def currently_recruiting(self):
-        today = date.today()
+        today = timezone.now().date()
         return self.filter(
             recruitment_start_date__lte=today,
             recruitment_end_date__gte=today
@@ -34,7 +33,7 @@ class AuditPeriodManager(models.Manager):
 
     def currently_submitting(self):
         """The cohort closed to recruitment but still completing first-year data."""
-        today = date.today()
+        today = timezone.now().date()
         return self.filter(
             recruitment_end_date__lt=today,
             data_collection_end_date__gte=today
@@ -42,7 +41,7 @@ class AuditPeriodManager(models.Manager):
 
     def is_grace_period(self):
         """The cohort is in the grace period after data collection ends."""
-        today = date.today()
+        today = timezone.now().date()
         return self.filter(
             data_collection_end_date__lt=today,
             submission_deadline__gte=today
@@ -74,7 +73,7 @@ class AuditPeriodManager(models.Manager):
             within_grace_period                   -> bool
             today                                 -> date
         """
-        today = date.today()
+        today = timezone.now().date()
 
         recruiting = self.currently_recruiting()
         submitting = self.currently_submitting()
@@ -290,7 +289,7 @@ class AuditPeriod(
         compute ``days_remaining``.
         """
         if today is None:
-            today = date.today()
+            today = timezone.now().date()
         return {
             "cohort": self.cohort_number,
             "cohort_start_date": self.recruitment_start_date,

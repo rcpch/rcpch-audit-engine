@@ -7,7 +7,6 @@ from django.contrib.auth.admin import UserAdmin
 from django.http import HttpResponse
 from django.db.models import Count, Prefetch
 from django.forms import forms
-from typing_extensions import ReadOnly
 
 
 # Third-party
