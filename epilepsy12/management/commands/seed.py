@@ -74,7 +74,7 @@ class Command(BaseCommand):
             nargs="?",
             type=int,
             help="Indicates the cohort to create create registrations under. Note cannot be less than 4.",
-            default=7,
+            default=8,
         )
         parser.add_argument(
             "-fy",

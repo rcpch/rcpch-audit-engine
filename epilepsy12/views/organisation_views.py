@@ -6,7 +6,7 @@ from django.conf import settings
 from django.shortcuts import render
 from django.urls import reverse
 from django.contrib.auth.decorators import permission_required
-from django.http import HttpResponse
+from django.http import HttpResponse, HttpResponseForbidden
 from django.db.models import Q
 
 from django_htmx.http import HttpResponseClientRedirect
@@ -567,6 +567,8 @@ def selected_trust_open_select(request, organisation_id):
     return HttpResponseClientRedirect(url)
 
 
+@login_and_otp_required()
+@user_may_view_this_organisation()
 def selected_trust_select_kpi(request, organisation_id):
     """
     POST request from dropdown in selected_organisation_summary.html returning the individual kpis data and visualisations.
@@ -685,7 +687,12 @@ def view_preference(request, organisation_id, template_name):
     """
     organisation = Organisation.objects.get(pk=organisation_id)
 
-    request.user.view_preference = request.htmx.trigger_name
+    view_preference = int(request.htmx.trigger_name)
+
+    if view_preference == 2 and not request.user.is_rcpch_audit_team_member:
+        return HttpResponseForbidden("Only RCPCH staff can select National view preference.")
+
+    request.user.view_preference = view_preference
     request.user.save(update_fields=["view_preference"])
 
     return HttpResponseClientRedirect(

@@ -7,16 +7,30 @@ from django.contrib.auth.admin import UserAdmin
 from django.http import HttpResponse
 from django.db.models import Count, Prefetch
 from django.forms import forms
+from django.conf import settings
 
 
 # Third-party
 from epilepsy12.models_folder.audit_period import AuditPeriodExtension
 from simple_history.admin import SimpleHistoryAdmin
+from two_factor.admin import AdminSiteOTPRequiredMixin
 
 
 from .models import *
 from .organisational_audit import export_submission_period_as_csv
 from .filtersets import *
+
+
+class E12AdminSite(AdminSiteOTPRequiredMixin, admin.AdminSite):
+    def has_permission(self, request):
+        if settings.DEBUG and (request.user.is_superuser or request.user.is_staff):
+            return True
+        
+        return super().has_permission(request)
+
+admin.site.__class__ = E12AdminSite
+
+
 
 """
 Facets and filters for the Epilepsy12 admin site
