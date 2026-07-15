@@ -1,3 +1,5 @@
+from dataclasses import field
+
 from django.apps import apps
 from django.contrib.gis.db import models
 from .help_text_mixin import HelpTextMixin
@@ -430,7 +432,8 @@ class AuditProgress(models.Model, HelpTextMixin):
             "case",
         ]
 
-        cohort = self.registration.cohort
+        audit_period = self.registration.audit_period
+        cohort = audit_period.cohort_number if audit_period is not None else None
         if model_name == "registration":
             fields_to_exclude.append("cohort")
             model_instance = getattr(self, model_name)
@@ -440,9 +443,38 @@ class AuditProgress(models.Model, HelpTextMixin):
             fields_to_exclude.append("registration")
 
         if model_name == "investigations":
-            if self.registration.investigations.mri_indicated is False:
+            if not self.registration.investigations.mri_indicated:
                 fields_to_exclude.append("mri_brain_requested_date")
                 fields_to_exclude.append("mri_brain_reported_date")
+            if not self.registration.investigations.eeg_indicated:
+                fields_to_exclude.append("eeg_request_date")
+                fields_to_exclude.append("eeg_performed_date")
+
+            # genome fields are only for 8+
+            genome_fields = [
+                "r14_test_status", "r14_test_requested_date", "r14_test_achieved_date",
+                "r27_test_status", "r27_test_requested_date", "r27_test_achieved_date",
+                "r59_test_status", "r59_test_requested_date", "r59_test_achieved_date"
+            ]
+            if cohort is None or cohort < 8:
+                fields_to_exclude.append("genome_sequencing_requested")
+                fields_to_exclude.extend(genome_fields)
+            elif not self.registration.investigations.genome_sequencing_requested:
+                # Cohort >= 8 but genome sequencing not requested (False) or not yet
+                # answered (None): the gating question is still expected, but the
+                # R14/R27/R59 status and date fields are not.
+                fields_to_exclude.extend(genome_fields)
+            else:
+                # genome_sequencing_requested is True — apply per-test conditions
+                for test in ("r14", "r27", "r59"):
+                    status = getattr(self.registration.investigations, f"{test}_test_status")
+                    if status in (None, "N"):
+                        # Not requested / not yet answered: hide both dates
+                        fields_to_exclude.append(f"{test}_test_requested_date")
+                        fields_to_exclude.append(f"{test}_test_achieved_date")
+                    elif status == "R":
+                        # Requested but not achieved: hide achieved date only
+                        fields_to_exclude.append(f"{test}_test_achieved_date")
         # elif model_name == "epilepsycontext":
         #     fields_to_exclude.append("epilepsy_context")
         elif model_name == "assessment":
@@ -500,26 +532,8 @@ class AuditProgress(models.Model, HelpTextMixin):
                     "global_developmental_delay_or_learning_difficulties_severity"
                 )
         else:
-            model_instance = getattr(self.registration, model_name)
-            cohort = self.registration.cohort
-            if cohort < 8:
-                fields_to_exclude.extend(
-                    [
-                        "registration",
-                        "r14_test_status",
-                        "r14_test_requested_date",
-                        "r14_test_achieved_date",
-                        "r27_test_status",
-                        "r27_test_requested_date",
-                        "r27_test_achieved_date",
-                        "r59_test_status",
-                        "r59_test_requested_date",
-                        "r59_test_achieved_date",
-                        "genome_sequencing_requested",
-                        "global_developmental_delay_or_learning_difficulties_severity",
-                        "mental_health_issues",
-                    ]
-                )
+            fields_to_exclude.append("registration")
+
         return fields_to_exclude
 
     def audit_progress_related_instances_incomplete(self, related_model_name):

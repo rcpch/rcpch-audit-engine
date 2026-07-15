@@ -48,7 +48,9 @@ def _is_conditional_aem_field_expected(medicine_instance, field_name):
     if medicine_instance.medicine_entity is None:
         return False
 
-    cohort = medicine_instance.management.registration.audit_period.cohort_number
+    audit_period = medicine_instance.management.registration.audit_period
+    cohort = audit_period.cohort_number if audit_period is not None else None
+
     sex = medicine_instance.management.registration.case.sex
     concept_id = medicine_instance.medicine_entity.conceptId
 
@@ -60,7 +62,7 @@ def _is_conditional_aem_field_expected(medicine_instance, field_name):
     is_valproate_or_topiramate = concept_id in ["387481005", "777808008"]
 
     if field_name == "has_a_valproate_annual_risk_acknowledgement_form_been_completed":
-        if cohort > 6:
+        if cohort is not None and cohort > 6:
             return is_valproate_or_topiramate
 
         return (
@@ -71,7 +73,7 @@ def _is_conditional_aem_field_expected(medicine_instance, field_name):
         )
 
     # field_name == "is_a_pregnancy_prevention_programme_in_place"
-    if cohort > 6:
+    if cohort is not None and cohort > 6:
         if sex != 2:
             return False
         if concept_id == "387481005":
@@ -329,7 +331,8 @@ def total_fields_expected(model_instance):
             cumulative_score += 2
 
         # Genome sequencing fields (Cohort 8+)
-        if model_instance.registration.audit_period.cohort_number >= 8:
+        audit_period = model_instance.registration.audit_period
+        if audit_period and audit_period.cohort_number >= 8:
             # genome_sequencing_requested is always scorable for cohort 8+
             cumulative_score += 1
             if model_instance.genome_sequencing_requested:
@@ -376,7 +379,9 @@ def total_fields_expected(model_instance):
                     - the Annual Risk Acknowledgment Form question appear for males on topiramate (the pregnancy prevention programme doesn't apply to males)
                     """
                     # by this stage cumulative score must already be +3 for medicine name, start date,  risk discussed
-                    if model_instance.registration.audit_period.cohort_number > 6:
+                    audit_period = model_instance.registration.audit_period
+                    cohort = audit_period.cohort_number if audit_period is not None else None
+                    if cohort is not None and cohort > 6:
                         if medicine.medicine_entity is not None:
                             if (
                                 (
