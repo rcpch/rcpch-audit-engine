@@ -82,6 +82,7 @@ ENABLE_REQUEST_LOGGING="False"
 # FOR LOCAL DEVELOPMENT
 LOCAL_DEV_ADMIN_EMAIL="incubator@rcpch.ac.uk"
 LOCAL_DEV_ADMIN_PASSWORD="devp@ssword12345"
+LOCAL_DEV_BYPASS_2FA_AND_CAPTCHA="True"
 
 # Comma separated email addresses to receive notifications on changes like creating new users
 CHANGE_NOTIFICATION_EMAILS=[]

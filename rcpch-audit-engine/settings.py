@@ -42,6 +42,12 @@ SECRET_KEY = os.getenv("DJANGO_SECRET_KEY", get_random_secret_key())
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = os.getenv("DEBUG", "False") == "True"
 
+LOCAL_DEV_BYPASS_2FA_AND_CAPTCHA = os.getenv("LOCAL_DEV_BYPASS_2FA_AND_CAPTCHA", "False") == "True"
+if LOCAL_DEV_BYPASS_2FA_AND_CAPTCHA:
+    # Allows typing 'PASSED' to validate the captcha
+    # NB this is a django-simple-captcha setting so it is not unused!
+    CAPTCHA_TEST_MODE = True
+
 LOCAL_DEV_ADMIN_EMAIL = os.getenv("LOCAL_DEV_ADMIN_EMAIL")
 LOCAL_DEV_ADMIN_PASSWORD = os.getenv("LOCAL_DEV_ADMIN_PASSWORD")
 
@@ -363,7 +369,7 @@ SILKY_AUTHORISATION = True  # User must have permissions
 def silky_permissions(user):
     if user.is_superuser:
         # 2fa bypass for local dev
-        if DEBUG and user.is_authenticated:
+        if LOCAL_DEV_BYPASS_2FA_AND_CAPTCHA and user.is_authenticated:
             return True
 
         # 2fa enabled
