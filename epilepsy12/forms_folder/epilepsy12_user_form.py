@@ -319,13 +319,13 @@ class DebugCaptchaField(CaptchaField):
 
 
 class CaptchaAuthenticationForm(AuthenticationForm):
-    captcha = DebugCaptchaField() if settings.DEBUG else CaptchaField()
+    captcha = DebugCaptchaField() if settings.LOCAL_DEV_BYPASS_2FA_AND_CAPTCHA else CaptchaField()
 
     def __init__(self, request, *args, **kwargs) -> None:
         super().__init__(request, *args, **kwargs)
 
-        # If in DEBUG -> don't require captch, pre fill fields
-        if settings.DEBUG:
+        # If bypassing 2FA/captcha for local dev -> don't require captcha, pre fill fields
+        if settings.LOCAL_DEV_BYPASS_2FA_AND_CAPTCHA:
             logger.warning(
                 f"IN LOCAL DEVELOPMENT, BYPASSING LOGIN BY PREFILLING FIELDS"
             )
