@@ -40,16 +40,8 @@ BASE_DIR = Path(__file__).resolve().parent.parent
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = os.getenv("DEBUG", "False") == "True"
 
-# A random local-development key avoids committing a secret. Production must
-# fail fast: a per-process fallback silently invalidates sessions and tokens.
+# If no DJANGO_SECRET_KEY is found in ENV the app will crash (deliberately)
 SECRET_KEY = os.getenv("DJANGO_SECRET_KEY")
-if not SECRET_KEY:
-    if DEBUG:
-        SECRET_KEY = get_random_secret_key()
-    else:
-        raise ImproperlyConfigured(
-            "DJANGO_SECRET_KEY must be set when DEBUG is False."
-        )
 
 LOCAL_DEV_BYPASS_2FA_AND_CAPTCHA = os.getenv("LOCAL_DEV_BYPASS_2FA_AND_CAPTCHA", "False") == "True"
 if LOCAL_DEV_BYPASS_2FA_AND_CAPTCHA:
