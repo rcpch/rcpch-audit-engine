@@ -952,3 +952,67 @@ def test_completed_fields_multiaxial_diagnosis_random_fields(e12_case_factory, G
     assert (
         completed_fields(multiaxial_diagnosis) == EXPECTED_SCORE
     ), f"Randomly completed multiaxial_diagnosis, `completed_fields(multiaxial_diagnosis)` should return {EXPECTED_SCORE}. Instead returned {completed_fields(multiaxial_diagnosis)}. Answers: {factory_attributes}"
+
+
+# ---------------------------------------------------------------------------
+# Cohort gating of genome fields in completed_fields(investigations)
+# ---------------------------------------------------------------------------
+#
+# `avoid_fields` excludes the genome_sequencing_requested field and the
+# R14/R27/R59 status + date fields for cohorts below 8, so that
+# `completed_fields` stays symmetric with `total_fields_expected` (which does
+# not score them for cohort < 8). This test pins that behaviour for cohort 7:
+# even when every genome field is populated, none of them should be counted.
+# ---------------------------------------------------------------------------
+
+
+@pytest.mark.django_db
+def test_completed_fields_investigations_cohort7_ignores_genome_fields(
+    e12_case_factory, GOSH
+):
+    """
+    Cohort 7: even if genome_sequencing_requested is True and all R14/R27/R59
+    statuses and dates are populated, none of these 10 genome fields should be
+    counted by `completed_fields(investigations)`. Only the 4 baseline
+    investigations fields (eeg_indicated, twelve_lead_ecg_status,
+    ct_head_scan_status, mri_indicated) should be counted when set.
+    """
+    DATE_1 = date(2023, 1, 1)
+    DATE_2 = date(2023, 1, 2)
+
+    CASE = e12_case_factory(
+        first_name=f"temp_child_{GOSH.name}",
+        organisations__organisation=GOSH,
+        registration__investigations__eeg_indicated=True,
+        registration__investigations__twelve_lead_ecg_status=True,
+        registration__investigations__ct_head_scan_status=True,
+        registration__investigations__mri_indicated=True,
+        # Genome fields populated — these must NOT be counted for cohort 7.
+        registration__investigations__genome_sequencing_requested=True,
+        registration__investigations__r14_test_status="A",
+        registration__investigations__r14_test_requested_date=DATE_1,
+        registration__investigations__r14_test_achieved_date=DATE_2,
+        registration__investigations__r27_test_status="R",
+        registration__investigations__r27_test_requested_date=DATE_1,
+        registration__investigations__r27_test_achieved_date=DATE_2,
+        registration__investigations__r59_test_status="N",
+        registration__investigations__r59_test_requested_date=DATE_1,
+        registration__investigations__r59_test_achieved_date=DATE_2,
+    )
+
+    # Push the FPA date to cohort 7 (recruitment 2023-12-01..2024-11-30).
+    CASE.registration.first_paediatric_assessment_date = date(2024, 1, 1)
+    CASE.registration.save()
+    assert CASE.registration.audit_period.cohort_number == 7
+
+    investigations = Investigations.objects.get(registration=CASE.registration)
+
+    # Only the 4 baseline fields should be counted. The 10 genome fields
+    # (1 gate + 3 statuses + 6 dates) must be excluded by `avoid_fields`.
+    expected_value = 4
+    return_value = completed_fields(investigations)
+
+    assert return_value == expected_value, (
+        f"completed_fields(investigations) cohort 7 should ignore the 10 genome "
+        f"fields: expected {expected_value} but got {return_value}"
+    )

@@ -297,10 +297,15 @@ def total_fields_expected(model_instance):
             # mental_health_issues
             cumulative_score += 1
 
-        if model_instance.global_developmental_delay_or_learning_difficulties:
-            # essential fields increase to include
-            # global_developmental_delay_or_learning_difficulties_severity
-            cumulative_score += 1
+        audit_period = model_instance.registration.audit_period
+        cohort = audit_period.cohort_number if audit_period is not None else None
+        if cohort is not None and cohort >= 6:
+            cumulative_score += 1  # global_developmental_delay_or_learning_difficulties
+            cumulative_score += 1  # autistic_spectrum_disorder
+            if model_instance.global_developmental_delay_or_learning_difficulties:
+                # essential fields increase to include
+                # global_developmental_delay_or_learning_difficulties_severity
+                cumulative_score += 1
 
     elif model_class_name == "Assessment":
         if model_instance.consultant_paediatrician_referral_made:
@@ -488,7 +493,24 @@ def avoid_fields(model_instance):
         "EpilepsyContext",
         "Investigations",
     ]:
-        return META_VARIABLES + ["registration"]
+        avoid = META_VARIABLES + ["registration"]
+        if model_class_name == "Investigations":
+            audit_period = getattr(model_instance.registration, "audit_period", None)
+            cohort = audit_period.cohort_number if audit_period is not None else None
+            if cohort is None or cohort < 8:
+                avoid.extend([
+                    "genome_sequencing_requested",
+                    "r14_test_status",
+                    "r14_test_requested_date",
+                    "r14_test_achieved_date",
+                    "r27_test_status",
+                    "r27_test_requested_date",
+                    "r27_test_achieved_date",
+                    "r59_test_status",
+                    "r59_test_requested_date",
+                    "r59_test_achieved_date",
+                ])
+        return avoid
 
     elif model_class_name == "Assessment":
         return META_VARIABLES + [
@@ -500,7 +522,7 @@ def avoid_fields(model_instance):
         ]
 
     elif model_class_name == "MultiaxialDiagnosis":
-        return META_VARIABLES + [
+        avoid = META_VARIABLES + [
             "registration",
             "multiaxial_diagnosis",
             "episodes",
@@ -508,6 +530,16 @@ def avoid_fields(model_instance):
             "comorbidities",
             "epilepsy_cause",  # Nolonger scored - issue #1125
         ]
+        audit_period = getattr(model_instance.registration, "audit_period", None)
+        cohort = audit_period.cohort_number if audit_period is not None else None
+        if cohort is None or cohort < 6:
+            avoid.extend([
+                "global_developmental_delay_or_learning_difficulties",
+                "global_developmental_delay_or_learning_difficulties_severity",
+                "autistic_spectrum_disorder",
+            ])
+        return avoid
+
 
     elif model_class_name == "Management":
         return META_VARIABLES + ["registration", "antiepilepsymedicine"]

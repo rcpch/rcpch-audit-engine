@@ -513,21 +513,20 @@ class AuditProgress(models.Model, HelpTextMixin):
                     "childrens_epilepsy_surgical_service_input_date"
                 )
         elif model_name == "multiaxialdiagnosis":
-            if cohort < 8:
-                fields_to_exclude.append(
-                    "global_developmental_delay_or_learning_difficulties"
-                )
-                fields_to_exclude.append(
-                    "global_developmental_delay_or_learning_difficulties_severity"
-                )
-                fields_to_exclude.append("autistic_spectrum_disorder")
+            if cohort is None or cohort < 6:
+                    fields_to_exclude.append("global_developmental_delay_or_learning_difficulties")
+                    fields_to_exclude.append("global_developmental_delay_or_learning_difficulties_severity")
+                    fields_to_exclude.append("autistic_spectrum_disorder")
+            if cohort is None or cohort < 8:
                 fields_to_exclude.append("mental_health_screen")
                 fields_to_exclude.append("mental_health_issue_identified")
                 fields_to_exclude.append("mental_health_issues")
             if (
                 self.registration.multiaxialdiagnosis.global_developmental_delay_or_learning_difficulties
-                is False
+                is not True
             ):
+                # Severity is only expected when the gate is answered True.
+                # For None (unanswered) or False, severity is not expected.
                 fields_to_exclude.append(
                     "global_developmental_delay_or_learning_difficulties_severity"
                 )
