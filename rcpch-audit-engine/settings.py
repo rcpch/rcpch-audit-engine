@@ -42,8 +42,6 @@ SECRET_KEY = os.getenv("DJANGO_SECRET_KEY", get_random_secret_key())
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = os.getenv("DEBUG", "False") == "True"
 if DEBUG is True:
-    CAPTCHA_TEST_MODE = True  # if in debug mode, can just type 'PASSED' and captcha validates. Default value is False
-
     LOCAL_DEV_ADMIN_EMAIL = os.getenv("LOCAL_DEV_ADMIN_EMAIL")
     LOCAL_DEV_ADMIN_PASSWORD = os.getenv("LOCAL_DEV_ADMIN_PASSWORD")
 
