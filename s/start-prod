@@ -1,5 +1,10 @@
 #!/bin/bash -e
 
+if [ "$LOCAL_DEV_BYPASS_2FA_AND_CAPTCHA" = "True" ]; then
+    echo "FATAL: LOCAL_DEV_BYPASS_2FA_AND_CAPTCHA is set to True. Refusing to start in production mode with 2FA/captcha bypass enabled." >&2
+    exit 1
+fi
+
 python manage.py write_azure_pg_password_file
 python manage.py migrate
 python manage.py seed --mode=seed_groups_and_permissions
