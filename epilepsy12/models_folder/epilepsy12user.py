@@ -254,6 +254,14 @@ class Epilepsy12User(AbstractUser, PermissionsMixin):
         if self.has_usable_password():
             self.email_confirmed = True
 
+        # view_preference 2 (national) is only permitted for superusers or RCPCH audit
+        # team members. Any other user attempting to set it is silently downgraded to
+        # organisation level (0) to keep the invariant enforced at the model layer.
+        if self.view_preference == 2 and not (
+            self.is_superuser or self.is_rcpch_audit_team_member
+        ):
+            self.view_preference = 0
+
         return super().save(*args, **kwargs)
 
     class Meta:
