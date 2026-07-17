@@ -125,7 +125,6 @@ INSTALLED_APPS = [
     # third party
     "widget_tweaks",
     "django_htmx",
-    "rest_framework.authtoken",
     "simple_history",
     "django_filters",
     # 2fa
@@ -344,14 +343,14 @@ AUTHENTICATION_BACKENDS = (
     "django.contrib.auth.backends.ModelBackend",  # this is default
 )
 
-# rest framework settings
+# The DRF routes are disabled until the API has consumers and a 2FA-aware
+# authentication design. Keep only session authentication so a future route
+# cannot silently accept credentials or long-lived tokens without OTP.
 REST_FRAMEWORK = {
     "DEFAULT_PAGINATION_CLASS": "rest_framework.pagination.PageNumberPagination",
     "PAGE_SIZE": 10,
     "DEFAULT_AUTHENTICATION_CLASSES": (
         "rest_framework.authentication.SessionAuthentication",
-        "rest_framework.authentication.BasicAuthentication",
-        "rest_framework.authentication.TokenAuthentication",
     ),
     "DEFAULT_PERMISSION_CLASSES": [
         "rest_framework.permissions.IsAuthenticated",

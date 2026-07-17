@@ -2,66 +2,11 @@ from django.conf.urls import include
 from django.contrib.auth import urls as auth_urls
 from django.contrib.auth import views as auth_views
 from django.urls import path
-from rest_framework import routers, urls
-from rest_framework.authtoken.views import obtain_auth_token
 
 from .forms import Epilepsy12UserUpdatePasswordForm
 from .views import *
-from .views.api.assessment_viewset import AssessmentViewSet
-from .views.api.audit_progress_viewset import AuditProgressViewSet
-from .views.api.case_viewset import CaseViewSet
-from .views.api.comorbidity_viewset import ComorbidityEntityViewSet, ComorbidityViewSet
-from .views.api.entity_viewsets import (
-    AntiEpilepsyMedicineViewSet,
-    EpilepsyCauseEntityViewSet,
-    KeywordViewSet,
-    OrganisationViewSet,
-)
-from .views.api.epilepsy12user_viewset import Epilepsy12UserViewSet
-from .views.api.episode_viewset import EpisodeViewSet
-from .views.api.investigations_viewset import InvestigationsViewSet
-from .views.api.management_viewset import ManagementViewSet
-from .views.api.registration_viewset import RegistrationViewSet
-from .views.api.site_viewset import SiteViewSet
-from .views.api.syndrome_viewset import SyndromeViewSet
-
-# router = routers.DefaultRouter()
-
-"""
-These are all the endpoints for the API - currently commented out but can be brought in one by one as tests are added.
-router.register(r"epilepsy12users", viewset=Epilepsy12UserViewSet)
-router.register(r"cases", viewset=CaseViewSet)
-router.register(r"registration", viewset=RegistrationViewSet)
-
-router.register(
-    r"epilepsy_cause_entity",
-    viewset=EpilepsyCauseEntityViewSet,
-    basename="epilepsycauseentity",
-)
-router.register(r"episode", viewset=EpisodeViewSet)
-router.register(r"syndrome", viewset=SyndromeViewSet)
-router.register(r"comorbidity", viewset=ComorbidityViewSet)
-router.register(r"assessment", viewset=AssessmentViewSet)
-router.register(r"investigations", viewset=InvestigationsViewSet)
-router.register(r"management", viewset=ManagementViewSet)
-router.register(
-    r"antiepilepsy_medicine",
-    viewset=AntiEpilepsyMedicineViewSet,
-    basename="antiepilepsymedicine",
-)
-router.register(r"site", viewset=SiteViewSet)
-router.register(r"organisations", viewset=OrganisationViewSet)
-router.register(r"keyword", viewset=KeywordViewSet)
-router.register(
-    r"audit_progress", viewset=AuditProgressViewSet, basename="auditprogress"
-)
-router.register(r"syndrome_entities", viewset=SyndromeViewSet, basename="syndromelist")
-router.register(
-    r"comorbidity_entities",
-    viewset=ComorbidityEntityViewSet,
-    basename="comorbidityentity",
-)
-"""
+# The DRF API is intentionally disabled. Re-enable routes only with a
+# documented 2FA-aware authentication and authorisation design.
 
 
 # Auth, login, password reset
@@ -1147,17 +1092,6 @@ report_patterns = [
 
 urlpatterns = []
 
-# This is related to the DRF
-# drf_routes = [
-#     # rest framework paths
-#     path("api/v1/", include(router.urls)),
-#     # returns a Token (OAuth2 key: Token) against email and password of existing user
-#     path("api/v1/api-token-auth/", obtain_auth_token, name="api_token_auth"),
-#     # returns the standard Django for authentication of the DRF
-#     path("api/v1/api-auth/", include(urls, namespace="rest_framework")),
-# ]
-
-
 urlpatterns += user_patterns
 urlpatterns += redirect_patterns
 urlpatterns += home_page_patterns
@@ -1178,6 +1112,3 @@ urlpatterns += registration_patterns
 urlpatterns += antiepilepsy_medicine_patterns
 urlpatterns += organisational_audit_patterns
 urlpatterns += report_patterns
-
-# This is related to the DRF
-# urlpatterns += drf_routes
