@@ -137,6 +137,8 @@ class Epilepsy12UserManager(BaseUserManager):
         group = group_for_role(logged_in_user.role)
         logged_in_user.groups.add(group)
 
+        return logged_in_user
+
 
 class Epilepsy12User(AbstractUser, PermissionsMixin):
     username = None

@@ -104,6 +104,10 @@ def test_non_superuser_cannot_access_django_admin(
 def test_superuser_can_access_django_admin(e12_user_factory, client):
     """Control case for test_non_superuser_cannot_access_django_admin."""
     superuser = e12_user_factory(is_superuser=True, role=RCPCH_AUDIT_TEAM)
+    # E12UserFactory's groups post_generation hook sets a password in memory
+    # but only persists it when a `groups=` kwarg is passed; reload from the
+    # DB so force_login()'s session auth hash matches what's actually stored.
+    superuser.refresh_from_db()
 
     client.force_login(superuser)
     twofactor_signin(client, superuser)
