@@ -123,7 +123,6 @@ EMAIL_TRIGGER_FIELDS = [
     "is_rcpch_audit_team_member",
     "is_rcpch_staff",
     "is_superuser",
-    "is_staff",
     "email",
     "is_active",
 ]
@@ -134,7 +133,6 @@ LOGGED_FIELDS = [
     "is_active",
     "is_rcpch_audit_team_member",
     "is_rcpch_staff",
-    "is_staff",
     "email",
     "first_name",
     "surname",

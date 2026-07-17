@@ -22,9 +22,9 @@ from .filtersets import *
 
 class E12AdminSite(AdminSiteOTPRequiredMixin, admin.AdminSite):
     def has_permission(self, request):
-        if settings.LOCAL_DEV_BYPASS_2FA_AND_CAPTCHA and (request.user.is_superuser or request.user.is_staff):
+        if settings.LOCAL_DEV_BYPASS_2FA_AND_CAPTCHA and request.user.is_superuser:
             return True
-        
+
         return super().has_permission(request)
 
 admin.site.__class__ = E12AdminSite
@@ -382,7 +382,7 @@ class Epilepsy12UserAdmin(UserAdmin, SimpleHistoryAdmin):
         "first_name",
         "surname",
         "is_active",
-        "is_staff",
+        "is_superuser",
         "is_rcpch_staff",
         "is_rcpch_audit_team_member",
         "role",
@@ -415,7 +415,6 @@ class Epilepsy12UserAdmin(UserAdmin, SimpleHistoryAdmin):
             {
                 "fields": (
                     "is_active",
-                    "is_staff",
                     "is_rcpch_staff",
                     "is_rcpch_audit_team_member",
                     "is_superuser",
@@ -455,7 +454,6 @@ class Epilepsy12UserAdmin(UserAdmin, SimpleHistoryAdmin):
                     "title",
                     "first_name",
                     "surname",
-                    "is_staff",
                     "is_rcpch_staff",
                     "is_active",
                     "is_rcpch_audit_team_member",
@@ -466,23 +464,6 @@ class Epilepsy12UserAdmin(UserAdmin, SimpleHistoryAdmin):
             },
         ),
     )
-
-    def get_form(self, request, obj=None, **kwargs):
-        form = super().get_form(request, obj, **kwargs)
-        if not request.user.is_superuser:
-            self.exclude = ["is_superuser"]
-        else:
-            self.exclude = []
-        if request.user.groups.filter(name="trust_audit_team_edit_access"):
-            form.base_fields["groups"].disabled = True
-            form.base_fields["first_name"].disabled = True
-            form.base_fields["surname"].disabled = True
-            form.base_fields["title"].disabled = True
-            form.base_fields["email"].disabled = True
-            form.base_fields["is_staff"].disabled = True
-            form.base_fields["is_rcpch_staff"].disabled = True
-            form.base_fields["is_rcpch_audit_team_member"].disabled = True
-        return form
 
 
 class CaseAdmin(SimpleHistoryAdmin):

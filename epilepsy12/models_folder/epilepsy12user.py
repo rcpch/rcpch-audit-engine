@@ -110,7 +110,6 @@ class Epilepsy12UserManager(BaseUserManager):
 
         extra_fields.setdefault("is_superuser", True)
         extra_fields.setdefault("is_active", True)
-        extra_fields.setdefault("is_staff", True)
         extra_fields.setdefault("is_rcpch_audit_team_member", True)
         extra_fields.setdefault("is_rcpch_staff", False)
         extra_fields.setdefault("email_confirmed", True)
@@ -120,8 +119,6 @@ class Epilepsy12UserManager(BaseUserManager):
 
         if extra_fields.get("is_active") is not True:
             raise ValueError(_("Superuser must have is_active=True."))
-        if extra_fields.get("is_staff") is not True:
-            raise ValueError(_("Superuser must have is_staff=True."))
         if extra_fields.get("is_superuser") is not True:
             raise ValueError(_("Superuser must have is_superuser=True."))
         if not extra_fields.get("role") == RCPCH_AUDIT_TEAM:
@@ -253,6 +250,10 @@ class Epilepsy12User(AbstractUser, PermissionsMixin):
     def save(self, *args, **kwargs) -> None:
         if self.has_usable_password():
             self.email_confirmed = True
+
+        # is_staff (Django admin access) always mirrors is_superuser - only
+        # superusers can access the admin, so there is no separate flag to set.
+        self.is_staff = self.is_superuser
 
         return super().save(*args, **kwargs)
 
