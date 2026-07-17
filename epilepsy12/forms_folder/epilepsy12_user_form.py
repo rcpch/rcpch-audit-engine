@@ -193,12 +193,6 @@ class Epilepsy12UserAdminCreationForm(forms.ModelForm):
         required=False,
     )
 
-    is_staff = forms.BooleanField(
-        widget=forms.CheckboxInput(attrs={"class": "ui toggle checkbox"}),
-        initial=False,
-        required=False,
-    )
-
     email_confirmed = forms.BooleanField(
         widget=forms.CheckboxInput(attrs={"class": "ui toggle checkbox"}),
         initial=False,
@@ -213,7 +207,6 @@ class Epilepsy12UserAdminCreationForm(forms.ModelForm):
             "title",
             "first_name",
             "surname",
-            "is_staff",
             "is_rcpch_staff",
             "is_rcpch_audit_team_member",
             "is_superuser",
@@ -274,7 +267,6 @@ class Epilepsy12UserAdminCreationForm(forms.ModelForm):
                 self.requesting_user.is_rcpch_audit_team_member
                 or self.requesting_user.is_superuser
             ):
-                cleaned_data["is_staff"] = False
                 cleaned_data["is_rcpch_staff"] = True
                 cleaned_data["is_rcpch_audit_team_member"] = True
                 cleaned_data["view_preference"] = 0
