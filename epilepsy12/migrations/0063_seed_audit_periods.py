@@ -34,8 +34,11 @@ def backfill_registrations(apps, schema_editor):
         ).update(audit_period=period)
 
 def reverse(apps, schema_editor):
-    apps.get_model("epilepsy12", "Registration").objects.update(audit_period=None)
-    apps.get_model("epilepsy12", "AuditPeriod").objects.all().delete()
+    AuditPeriod = apps.get_model("epilepsy12", "AuditPeriod")
+    Registration = apps.get_model("epilepsy12", "Registration")
+    seeded = AuditPeriod.objects.filter(cohort_number__in=AUDIT_PERIODS.keys())
+    Registration.objects.filter(audit_period__in=seeded).update(audit_period=None)
+    seeded.delete()  # still cascades to extensions
 
 class Migration(migrations.Migration):
 
