@@ -110,7 +110,6 @@ class Epilepsy12UserManager(BaseUserManager):
 
         extra_fields.setdefault("is_superuser", True)
         extra_fields.setdefault("is_active", True)
-        extra_fields.setdefault("is_staff", True)
         extra_fields.setdefault("is_rcpch_audit_team_member", True)
         extra_fields.setdefault("is_rcpch_staff", False)
         extra_fields.setdefault("email_confirmed", True)
@@ -120,8 +119,6 @@ class Epilepsy12UserManager(BaseUserManager):
 
         if extra_fields.get("is_active") is not True:
             raise ValueError(_("Superuser must have is_active=True."))
-        if extra_fields.get("is_staff") is not True:
-            raise ValueError(_("Superuser must have is_staff=True."))
         if extra_fields.get("is_superuser") is not True:
             raise ValueError(_("Superuser must have is_superuser=True."))
         if not extra_fields.get("role") == RCPCH_AUDIT_TEAM:
@@ -139,6 +136,8 @@ class Epilepsy12UserManager(BaseUserManager):
 
         group = group_for_role(logged_in_user.role)
         logged_in_user.groups.add(group)
+
+        return logged_in_user
 
 
 class Epilepsy12User(AbstractUser, PermissionsMixin):
@@ -253,6 +252,18 @@ class Epilepsy12User(AbstractUser, PermissionsMixin):
     def save(self, *args, **kwargs) -> None:
         if self.has_usable_password():
             self.email_confirmed = True
+
+        # view_preference 2 (national) is only permitted for superusers or RCPCH audit
+        # team members. Any other user attempting to set it is silently downgraded to
+        # organisation level (0) to keep the invariant enforced at the model layer.
+        if self.view_preference == 2 and not (
+            self.is_superuser or self.is_rcpch_audit_team_member
+        ):
+            self.view_preference = 0
+
+        # is_staff (Django admin access) always mirrors is_superuser - only
+        # superusers can access the admin, so there is no separate flag to set.
+        self.is_staff = self.is_superuser
 
         return super().save(*args, **kwargs)
 

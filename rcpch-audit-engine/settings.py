@@ -19,6 +19,7 @@ from pathlib import Path
 from dotenv import load_dotenv
 
 # third party imports
+from django.core.exceptions import ImproperlyConfigured
 from django.core.management.utils import get_random_secret_key
 
 # Must be above importing logging settigns as we read environment variables there
@@ -36,16 +37,20 @@ load_dotenv("envs/.env")
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
 BASE_DIR = Path(__file__).resolve().parent.parent
 
-# SECURITY WARNING: keep the secret key used in production secret!
-SECRET_KEY = os.getenv("DJANGO_SECRET_KEY", get_random_secret_key())
-
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = os.getenv("DEBUG", "False") == "True"
-if DEBUG is True:
-    CAPTCHA_TEST_MODE = True  # if in debug mode, can just type 'PASSED' and captcha validates. Default value is False
 
-    LOCAL_DEV_ADMIN_EMAIL = os.getenv("LOCAL_DEV_ADMIN_EMAIL")
-    LOCAL_DEV_ADMIN_PASSWORD = os.getenv("LOCAL_DEV_ADMIN_PASSWORD")
+# If no DJANGO_SECRET_KEY is found in ENV the app will crash (deliberately)
+SECRET_KEY = os.getenv("DJANGO_SECRET_KEY")
+
+LOCAL_DEV_BYPASS_2FA_AND_CAPTCHA = os.getenv("LOCAL_DEV_BYPASS_2FA_AND_CAPTCHA", "False") == "True"
+if LOCAL_DEV_BYPASS_2FA_AND_CAPTCHA:
+    # Allows typing 'PASSED' to validate the captcha
+    # NB this is a django-simple-captcha setting so it is not unused!
+    CAPTCHA_TEST_MODE = True
+
+LOCAL_DEV_ADMIN_EMAIL = os.getenv("LOCAL_DEV_ADMIN_EMAIL")
+LOCAL_DEV_ADMIN_PASSWORD = os.getenv("LOCAL_DEV_ADMIN_PASSWORD")
 
 # GENERAL CAPTCHA SETTINGS
 CAPTCHA_IMAGE_SIZE = (200, 50)
@@ -120,7 +125,6 @@ INSTALLED_APPS = [
     # third party
     "widget_tweaks",
     "django_htmx",
-    "rest_framework.authtoken",
     "simple_history",
     "django_filters",
     # 2fa
@@ -339,14 +343,14 @@ AUTHENTICATION_BACKENDS = (
     "django.contrib.auth.backends.ModelBackend",  # this is default
 )
 
-# rest framework settings
+# The DRF routes are disabled until the API has consumers and a 2FA-aware
+# authentication design. Keep only session authentication so a future route
+# cannot silently accept credentials or long-lived tokens without OTP.
 REST_FRAMEWORK = {
     "DEFAULT_PAGINATION_CLASS": "rest_framework.pagination.PageNumberPagination",
     "PAGE_SIZE": 10,
     "DEFAULT_AUTHENTICATION_CLASSES": (
         "rest_framework.authentication.SessionAuthentication",
-        "rest_framework.authentication.BasicAuthentication",
-        "rest_framework.authentication.TokenAuthentication",
     ),
     "DEFAULT_PERMISSION_CLASSES": [
         "rest_framework.permissions.IsAuthenticated",
@@ -365,7 +369,7 @@ SILKY_AUTHORISATION = True  # User must have permissions
 def silky_permissions(user):
     if user.is_superuser:
         # 2fa bypass for local dev
-        if DEBUG and user.is_authenticated:
+        if LOCAL_DEV_BYPASS_2FA_AND_CAPTCHA and user.is_authenticated:
             return True
 
         # 2fa enabled

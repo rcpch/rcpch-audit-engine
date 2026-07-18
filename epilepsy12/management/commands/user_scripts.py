@@ -123,7 +123,6 @@ def insert_user_data(csv_path: str = "data.csv"):
             surname=record["surname"],
             role=record["role"],
             is_active=True, # So they can reset their password
-            is_staff=False, # django admin
             is_rcpch_audit_team_member=False,
             is_rcpch_staff=False,
             is_patient_or_carer=False,

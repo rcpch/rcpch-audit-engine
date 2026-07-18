@@ -689,8 +689,12 @@ def view_preference(request, organisation_id, template_name):
 
     view_preference = int(request.htmx.trigger_name)
 
-    if view_preference == 2 and not request.user.is_rcpch_audit_team_member:
-        return HttpResponseForbidden("Only RCPCH staff can select National view preference.")
+    if view_preference == 2 and not (
+        request.user.is_rcpch_audit_team_member or request.user.is_superuser
+    ):
+        return HttpResponseForbidden(
+            "Only RCPCH audit team members or superusers can select the National view preference."
+        )
 
     request.user.view_preference = view_preference
     request.user.save(update_fields=["view_preference"])

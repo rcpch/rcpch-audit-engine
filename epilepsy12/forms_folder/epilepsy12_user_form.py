@@ -193,12 +193,6 @@ class Epilepsy12UserAdminCreationForm(forms.ModelForm):
         required=False,
     )
 
-    is_staff = forms.BooleanField(
-        widget=forms.CheckboxInput(attrs={"class": "ui toggle checkbox"}),
-        initial=False,
-        required=False,
-    )
-
     email_confirmed = forms.BooleanField(
         widget=forms.CheckboxInput(attrs={"class": "ui toggle checkbox"}),
         initial=False,
@@ -213,7 +207,6 @@ class Epilepsy12UserAdminCreationForm(forms.ModelForm):
             "title",
             "first_name",
             "surname",
-            "is_staff",
             "is_rcpch_staff",
             "is_rcpch_audit_team_member",
             "is_superuser",
@@ -274,7 +267,6 @@ class Epilepsy12UserAdminCreationForm(forms.ModelForm):
                 self.requesting_user.is_rcpch_audit_team_member
                 or self.requesting_user.is_superuser
             ):
-                cleaned_data["is_staff"] = False
                 cleaned_data["is_rcpch_staff"] = True
                 cleaned_data["is_rcpch_audit_team_member"] = True
                 cleaned_data["view_preference"] = 0
@@ -319,13 +311,13 @@ class DebugCaptchaField(CaptchaField):
 
 
 class CaptchaAuthenticationForm(AuthenticationForm):
-    captcha = DebugCaptchaField() if settings.DEBUG else CaptchaField()
+    captcha = DebugCaptchaField() if settings.LOCAL_DEV_BYPASS_2FA_AND_CAPTCHA else CaptchaField()
 
     def __init__(self, request, *args, **kwargs) -> None:
         super().__init__(request, *args, **kwargs)
 
-        # If in DEBUG -> don't require captch, pre fill fields
-        if settings.DEBUG:
+        # If bypassing 2FA/captcha for local dev -> don't require captcha, pre fill fields
+        if settings.LOCAL_DEV_BYPASS_2FA_AND_CAPTCHA:
             logger.warning(
                 f"IN LOCAL DEVELOPMENT, BYPASSING LOGIN BY PREFILLING FIELDS"
             )
