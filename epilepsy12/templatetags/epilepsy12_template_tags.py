@@ -584,7 +584,7 @@ def show_topiramate_valproate_fields(
         return False
 
     # Get parameters from the antiepilepsy_medicine_instance
-    cohort = antiepilepsy_medicine_instance.management.registration.cohort
+    cohort = antiepilepsy_medicine_instance.management.registration.audit_period.cohort_number
     child_over_12 = (
         antiepilepsy_medicine_instance.management.registration.case.age_days()
         >= 365.25 * 12

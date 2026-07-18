@@ -4,7 +4,9 @@ from datetime import date
 from random import randint
 import logging
 from dateutil.relativedelta import relativedelta
-
+from epilepsy12.models import AuditPeriod
+from epilepsy12.general_functions.date_functions import nth_tuesday_of_year
+from epilepsy12.constants.audit_period_dates import AUDIT_PERIODS
 
 from django.core.management.base import BaseCommand
 
@@ -12,8 +14,6 @@ from django.core.management.base import BaseCommand
 logger = logging.getLogger(__name__)
 
 from ...general_functions import (
-    cohort_number_from_first_paediatric_assessment_date,
-    dates_for_cohort,
     return_random_postcode,
     random_date,
 )
@@ -90,6 +90,18 @@ class Command(BaseCommand):
             help="Optional List of Organisation ODS codes.",
             type=str,
         )
+        parser.add_argument(
+            "--up_to_cohort",
+            nargs="?",
+            help="To seed audit periods up to a given cohort.",
+            type=int
+        )
+        parser.add_argument(
+            "--force",
+            action="store_true",
+            help="Force update of existing audit periods.",
+        )
+
 
     def handle(self, *args, **options):
         if options["mode"] == "cases":
@@ -124,19 +136,16 @@ class Command(BaseCommand):
             groups_seeder(add_permissions_to_existing_groups=True)
             print(image())
         elif options["mode"] == "upload_old_patient_data":
-            print.write("Uploading old patient data.")
+            self.stdout.write("Uploading old patient data.")
             insert_old_pt_data()
         elif options["mode"] == "upload_user_data":
             self.stdout.write("Uploading user data.")
             insert_user_data()
-        elif options["mode"] == "add_new_epilepsy_causes":
-            extra_concept_ids = options["snomedctids"]
-            if not isinstance(extra_concept_ids, list):
-                self.stdout.write("Must provide a list of SNOMED CT ID integers.")
-                return
-            add_epilepsy_cause_list_by_sctid(extra_concept_ids=extra_concept_ids)
+        elif options["mode"] == "seed_audit_periods":
+            up_to_cohort = options["up_to_cohort"]
+            force = options["force"]
+            seed_audit_periods(up_to_cohort=up_to_cohort, force=force)
             print(image())
-
         else:
             self.stdout.write("No options supplied...")
 
@@ -224,16 +233,22 @@ def complete_registrations(verbose=True, cohort=None, full_year=False):
         )
 
     # Cohort number if today is date of FPA
-    current_cohort_number = cohort_number_from_first_paediatric_assessment_date(
-        date.today()
-    )
+    current_recruiting = AuditPeriod.objects.currently_recruiting()
+    current_cohort_number = current_recruiting.cohort_number if current_recruiting else None
 
     if cohort is None:
         # Generate cohort data for current cohort
-        current_cohort = current_cohort_number
-        cohort_data = dates_for_cohort(current_cohort)
+        target_cohort = current_cohort_number
     else:
-        cohort_data = dates_for_cohort(cohort=cohort)
+        target_cohort = cohort
+
+    audit_period = AuditPeriod.objects.by_cohort(target_cohort)
+    if audit_period is None:
+        logger.warning(
+            f"No AuditPeriod found for cohort {target_cohort}; skipping registrations."
+        )
+        return
+    cohort_data = audit_period.as_cohort_card_dict()
 
     for registration in Registration.objects.all():
 
@@ -268,6 +283,59 @@ def complete_registrations(verbose=True, cohort=None, full_year=False):
         registration.save()
 
         create_epilepsy12_record(registration_instance=registration, verbose=verbose)
+
+
+
+def seed_audit_periods(up_to_cohort: int=0, force: bool=False):
+    """Create any missing AuditPeriods up to the given cohort using the
+    E12 convention. NEVER updates existing rows: deadlines may have been
+    deliberately edited by the RCPCH audit team UNLESS the --force option is used."""
+    if not up_to_cohort:
+        # default: everything up to the currently recruiting cohort
+        today = date.today()
+        up_to_cohort = today.year - 2016
+
+    if up_to_cohort < 4:
+        print("No need to seed audit periods: cohort is before 4.")
+        return
+    for n in range(4, up_to_cohort + 1):
+        if n < 10: # for cohorts upto 9 we use the hard coded list
+            (rec_start, rec_end, dc_end, deadline) = AUDIT_PERIODS[n]
+        else:
+            rec_start = date(2016 + n + 1, 1, 1)
+            rec_end = date(2016 + n + 1, 12, 31)
+            dc_end = date(2016 + n + 2, 12, 31)
+            deadline = nth_tuesday_of_year(dc_end.year + 1, n=2)
+        if force:
+            audit_period, created = AuditPeriod.objects.update_or_create(
+                cohort_number=n,
+                defaults={
+                    "recruitment_start_date": rec_start,
+                    "recruitment_end_date": rec_end,
+                    "data_collection_end_date": dc_end,
+                    "submission_deadline": deadline,
+                    "slug": f"cohort-{n}",
+                    "is_visible": True,
+                },
+            )
+        else:
+            audit_period, created = AuditPeriod.objects.get_or_create(
+                cohort_number=n,
+                defaults={
+                    "recruitment_start_date": rec_start,
+                    "recruitment_end_date": rec_end,
+                    "data_collection_end_date": dc_end,
+                    "submission_deadline": deadline,
+                    "slug": f"cohort-{n}",
+                    "is_visible": True,
+                },
+            )
+        force_string = " (forced)" if force else ""
+        if created:
+            print(f"Created AuditPeriod for cohort {n} - {audit_period}{force_string}")
+        else:
+            print(f"Using existing AuditPeriod for cohort {n} - {audit_period}{force_string}")
+
 
 
 def image():

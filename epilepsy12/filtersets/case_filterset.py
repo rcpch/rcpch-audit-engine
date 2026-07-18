@@ -8,10 +8,10 @@ from silk.profiling.profiler import silk_profile
 
 from ..constants import KPI_MAP, ETHNICITIES, SEX_TYPE
 from epilepsy12.models import (
+    AuditPeriod,
     Organisation,
     Case,
 )
-from ..general_functions.cohort_number import get_all_cohort_list
 
 
 class CaseFilter(django_filters.FilterSet):
@@ -407,7 +407,7 @@ class CaseFilterMethods:
         Includes counts for: registration, audit progress, cohort
         """
 
-        cohort_list = get_all_cohort_list()
+        cohort_list = AuditPeriod.objects.all_cohorts_list()
         base_filter = Q(
             epilepsy12_sites__site_is_primary_centre_of_epilepsy_care=True,
             epilepsy12_sites__site_is_actively_involved_in_epilepsy_care=True,

@@ -48,7 +48,9 @@ def _is_conditional_aem_field_expected(medicine_instance, field_name):
     if medicine_instance.medicine_entity is None:
         return False
 
-    cohort = medicine_instance.management.registration.cohort
+    audit_period = medicine_instance.management.registration.audit_period
+    cohort = audit_period.cohort_number if audit_period is not None else None
+
     sex = medicine_instance.management.registration.case.sex
     concept_id = medicine_instance.medicine_entity.conceptId
 
@@ -60,7 +62,7 @@ def _is_conditional_aem_field_expected(medicine_instance, field_name):
     is_valproate_or_topiramate = concept_id in ["387481005", "777808008"]
 
     if field_name == "has_a_valproate_annual_risk_acknowledgement_form_been_completed":
-        if cohort > 6:
+        if cohort is not None and cohort > 6:
             return is_valproate_or_topiramate
 
         return (
@@ -71,7 +73,7 @@ def _is_conditional_aem_field_expected(medicine_instance, field_name):
         )
 
     # field_name == "is_a_pregnancy_prevention_programme_in_place"
-    if cohort > 6:
+    if cohort is not None and cohort > 6:
         if sex != 2:
             return False
         if concept_id == "387481005":
@@ -295,10 +297,15 @@ def total_fields_expected(model_instance):
             # mental_health_issues
             cumulative_score += 1
 
-        if model_instance.global_developmental_delay_or_learning_difficulties:
-            # essential fields increase to include
-            # global_developmental_delay_or_learning_difficulties_severity
-            cumulative_score += 1
+        audit_period = model_instance.registration.audit_period
+        cohort = audit_period.cohort_number if audit_period is not None else None
+        if cohort is not None and cohort >= 6:
+            cumulative_score += 1  # global_developmental_delay_or_learning_difficulties
+            cumulative_score += 1  # autistic_spectrum_disorder
+            if model_instance.global_developmental_delay_or_learning_difficulties:
+                # essential fields increase to include
+                # global_developmental_delay_or_learning_difficulties_severity
+                cumulative_score += 1
 
     elif model_class_name == "Assessment":
         if model_instance.consultant_paediatrician_referral_made:
@@ -329,7 +336,8 @@ def total_fields_expected(model_instance):
             cumulative_score += 2
 
         # Genome sequencing fields (Cohort 8+)
-        if model_instance.registration.cohort >= 8:
+        audit_period = model_instance.registration.audit_period
+        if audit_period and audit_period.cohort_number >= 8:
             # genome_sequencing_requested is always scorable for cohort 8+
             cumulative_score += 1
             if model_instance.genome_sequencing_requested:
@@ -376,7 +384,9 @@ def total_fields_expected(model_instance):
                     - the Annual Risk Acknowledgment Form question appear for males on topiramate (the pregnancy prevention programme doesn't apply to males)
                     """
                     # by this stage cumulative score must already be +3 for medicine name, start date,  risk discussed
-                    if model_instance.registration.cohort > 6:
+                    audit_period = model_instance.registration.audit_period
+                    cohort = audit_period.cohort_number if audit_period is not None else None
+                    if cohort is not None and cohort > 6:
                         if medicine.medicine_entity is not None:
                             if (
                                 (
@@ -483,7 +493,24 @@ def avoid_fields(model_instance):
         "EpilepsyContext",
         "Investigations",
     ]:
-        return META_VARIABLES + ["registration"]
+        avoid = META_VARIABLES + ["registration"]
+        if model_class_name == "Investigations":
+            audit_period = getattr(model_instance.registration, "audit_period", None)
+            cohort = audit_period.cohort_number if audit_period is not None else None
+            if cohort is None or cohort < 8:
+                avoid.extend([
+                    "genome_sequencing_requested",
+                    "r14_test_status",
+                    "r14_test_requested_date",
+                    "r14_test_achieved_date",
+                    "r27_test_status",
+                    "r27_test_requested_date",
+                    "r27_test_achieved_date",
+                    "r59_test_status",
+                    "r59_test_requested_date",
+                    "r59_test_achieved_date",
+                ])
+        return avoid
 
     elif model_class_name == "Assessment":
         return META_VARIABLES + [
@@ -495,7 +522,7 @@ def avoid_fields(model_instance):
         ]
 
     elif model_class_name == "MultiaxialDiagnosis":
-        return META_VARIABLES + [
+        avoid = META_VARIABLES + [
             "registration",
             "multiaxial_diagnosis",
             "episodes",
@@ -503,6 +530,16 @@ def avoid_fields(model_instance):
             "comorbidities",
             "epilepsy_cause",  # Nolonger scored - issue #1125
         ]
+        audit_period = getattr(model_instance.registration, "audit_period", None)
+        cohort = audit_period.cohort_number if audit_period is not None else None
+        if cohort is None or cohort < 6:
+            avoid.extend([
+                "global_developmental_delay_or_learning_difficulties",
+                "global_developmental_delay_or_learning_difficulties_severity",
+                "autistic_spectrum_disorder",
+            ])
+        return avoid
+
 
     elif model_class_name == "Management":
         return META_VARIABLES + ["registration", "antiepilepsymedicine"]
@@ -538,6 +575,7 @@ def avoid_fields(model_instance):
             "firstpaediatricassessment",
             "completed_first_year_of_care_date",
             "audit_submission_date",
+            "audit_period",
             "cohort",
             "case",
             "audit_progress",

@@ -52,7 +52,7 @@ def test_management_htmx_workflow_does_not_overcount_conditional_medicine_fields
 
     registration = case.registration
     registration.first_paediatric_assessment_date = date(2023, 5, 1)
-    registration.cohort = 6
+    registration.audit_period.cohort_number = 6
     registration.save()
 
     management = registration.management
@@ -199,7 +199,7 @@ def test_management_htmx_delete_and_readd_valproate_does_not_overcount(
 
     registration = case.registration
     registration.first_paediatric_assessment_date = date(2023, 5, 1)
-    registration.cohort = 6
+    registration.audit_period.cohort_number = 6
     registration.save()
 
     management = registration.management

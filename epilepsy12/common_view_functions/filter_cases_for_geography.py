@@ -22,7 +22,7 @@ def filter_all_registered_cases_by_active_lead_site_and_cohort_and_level_of_abst
             epilepsy12_sites__organisation__longitude__isnull=False,  # Ensure location is not null
             epilepsy12_sites__organisation__latitude__isnull=False,  # Ensure location is not null
             registration__isnull=False,
-            registration__cohort=cohort,
+            registration__audit_period__cohort_number=cohort,
             epilepsy12_sites__organisation=organisation,
             epilepsy12_sites__site_is_actively_involved_in_epilepsy_care=True,
             epilepsy12_sites__site_is_primary_centre_of_epilepsy_care=True,

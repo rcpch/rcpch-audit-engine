@@ -49,6 +49,7 @@ from epilepsy12.constants import (
     NON_EPILEPSY_SEIZURE_ONSET,
     NON_EPILEPSY_SEIZURE_TYPE,
 )
+from epilepsy12.models import Registration
 from epilepsy12.models_folder.management import Management
 from epilepsy12.tests.view_tests.form_calculations.test_number_of_completed_fields_in_related_models import (
     get_random_answers_update_counter,
@@ -457,7 +458,7 @@ def test_total_fields_expected_investigations_cohort8_no_genome_answer(
     CASE.registration.first_paediatric_assessment_date = date(2025, 1, 1)
     CASE.registration.save()
 
-    assert CASE.registration.cohort == 8
+    assert CASE.registration.audit_period.cohort_number == 8
 
     investigations = CASE.registration.investigations
 
@@ -488,7 +489,7 @@ def test_total_fields_expected_investigations_cohort8_genome_requested_true(
     CASE.registration.first_paediatric_assessment_date = date(2025, 1, 1)
     CASE.registration.save()
 
-    assert CASE.registration.cohort == 8
+    assert CASE.registration.audit_period.cohort_number == 8
 
     investigations = CASE.registration.investigations
 
@@ -549,7 +550,7 @@ def test_total_fields_expected_investigations_cohort8_genome_test_statuses(
     CASE.registration.first_paediatric_assessment_date = date(2025, 1, 1)
     CASE.registration.save()
 
-    assert CASE.registration.cohort == 8
+    assert CASE.registration.audit_period.cohort_number == 8
 
     investigations = CASE.registration.investigations
 
@@ -583,7 +584,7 @@ def test_total_fields_expected_investigations_pre_cohort8_ignores_genome(
     )
 
     # Default factory date gives cohort 6
-    assert CASE.registration.cohort < 8
+    assert CASE.registration.audit_period.cohort_number < 8
 
     investigations = CASE.registration.investigations
 
@@ -619,7 +620,7 @@ def test_total_fields_expected_investigations_cohort8_with_eeg_and_mri(
     CASE.registration.first_paediatric_assessment_date = date(2025, 1, 1)
     CASE.registration.save()
 
-    assert CASE.registration.cohort == 8
+    assert CASE.registration.audit_period.cohort_number == 8
 
     investigations = CASE.registration.investigations
 
@@ -752,7 +753,7 @@ def test_total_fields_expected_topiramate_or_valproate_for_sex_and_age_cohort_7(
     )
 
     CASE.registration.first_paediatric_assessment_date = date(2024, 5, 1)
-    CASE.registration.cohort = 7
+    CASE.registration.audit_period.cohort_number = 7
     CASE.registration.management.has_an_aed_been_given = True
     CASE.registration.save()
 
@@ -787,7 +788,7 @@ def test_total_fields_expected_topiramate_or_valproate_for_sex_and_age_cohort_7(
     return_value = total_fields_expected(CASE.registration.management)
 
     assert (
-        CASE.registration.cohort == 7
+        CASE.registration.audit_period.cohort_number == 7
     ), "Cohort should be 7 for first paediatric assessment date of 2024-05-01"
 
     # Calculate age at the assessment date, not at current time
@@ -853,7 +854,7 @@ def test_total_fields_expected_topiramate_or_valproate_for_sex_and_age_cohort_6(
     )
 
     CASE.registration.first_paediatric_assessment_date = date(2023, 5, 1)
-    CASE.registration.cohort = 6
+    CASE.registration.audit_period.cohort_number = 6
     CASE.registration.management.has_an_aed_been_given = True
     CASE.registration.save()
 
@@ -886,8 +887,8 @@ def test_total_fields_expected_topiramate_or_valproate_for_sex_and_age_cohort_6(
     return_value = total_fields_expected(CASE.registration.management)
 
     assert (
-        CASE.registration.cohort == 6
-    ), f"Cohort should be 6 for first paediatric assessment date of 2023-05-01, but got {CASE.registration.cohort}"
+        CASE.registration.audit_period.cohort_number == 6
+    ), f"Cohort should be 6 for first paediatric assessment date of 2023-05-01, but got {CASE.registration.audit_period.cohort_number}"
 
     # Calculate age at the assessment date, not at current time
     assessment_date = CASE.registration.first_paediatric_assessment_date
@@ -930,7 +931,7 @@ def test_management_valproate_fields_do_not_overcount_when_not_expected(
     )
 
     CASE.registration.first_paediatric_assessment_date = date(2023, 5, 1)
-    CASE.registration.cohort = 6
+    CASE.registration.audit_period.cohort_number = 6
     CASE.registration.management.has_an_aed_been_given = True
     CASE.registration.management.has_rescue_medication_been_prescribed = False
     CASE.registration.management.save()
@@ -981,3 +982,240 @@ def test_management_valproate_fields_do_not_overcount_when_not_expected(
     assert (
         all_completed_fields <= all_expected_fields
     ), f"Management overcount: completed={all_completed_fields}, expected={all_expected_fields}"
+
+
+# ---------------------------------------------------------------------------
+# None audit_period regression tests
+#
+# These pin the defensive guard added to total_fields_expected and
+# _is_conditional_aem_field_expected: a registration without an audit_period
+# (no first paediatric assessment date, or legacy/test data) must not raise
+# AttributeError/TypeError. None cohort is treated as "not cohort 8" for
+# Investigations and as "cohort <= 6" for Management, matching the fallback
+# semantics documented in exclude_fields_from_audit_progress.
+# ---------------------------------------------------------------------------
+
+
+@pytest.mark.django_db
+def test_total_fields_expected_investigations_no_audit_period(e12_case_factory, GOSH):
+    """
+    Regression: total_fields_expected(investigations) must not crash when the
+    registration has no audit_period. Genome fields are excluded (treated as
+    not cohort 8), so only the 4 base fields are expected.
+    """
+    CASE = e12_case_factory(
+        first_name=f"temp_child_{GOSH.name}",
+        organisations__organisation=GOSH,
+        registration__investigations__genome_sequencing_requested=True,
+        registration__investigations__r14_test_status="A",
+    )
+    Registration.objects.filter(pk=CASE.registration.pk).update(audit_period=None)
+    CASE.registration.refresh_from_db()
+    assert CASE.registration.audit_period is None
+
+    investigations = CASE.registration.investigations
+
+    # 4 base fields only; genome family excluded because cohort is None.
+    expected_value = 4
+    return_value = total_fields_expected(investigations)
+
+    assert return_value == expected_value, (
+        f"total_fields_expected(investigations) with no audit_period: "
+        f"expected {expected_value} but got {return_value}"
+    )
+
+
+@pytest.mark.django_db
+def test_total_fields_expected_management_no_audit_period(
+    e12_case_factory, e12_anti_epilepsy_medicine_factory, GOSH
+):
+    """
+    Regression: total_fields_expected(management) must not crash when the
+    registration has no audit_period. Cohort is treated as <= 6 (the
+    pre-cohort-7 fallback), so a 13yo female on valproate scores under the
+    cohort-6 rules: +3 base AED fields, +2 for valproate in a >=12yo female
+    with PPP needed (annual risk form is NOT scored in cohort 6).
+    """
+    CASE = e12_case_factory(
+        first_name=f"temp_child_{GOSH.name}",
+        date_of_birth=date.today() - relativedelta(years=13),
+        organisations__organisation=GOSH,
+        sex=SEX_TYPE[2][0],
+        registration__management__has_an_aed_been_given=True,
+        registration__management__has_rescue_medication_been_prescribed=False,
+    )
+    Registration.objects.filter(pk=CASE.registration.pk).update(audit_period=None)
+    CASE.registration.refresh_from_db()
+    assert CASE.registration.audit_period is None
+
+    management = CASE.registration.management
+    e12_anti_epilepsy_medicine_factory(
+        management=management,
+        is_rescue_medicine=False,
+        medicine_entity=Medicine.objects.get(conceptId="387481005"),
+        antiepilepsy_medicine_start_date=date(2023, 6, 1),
+        antiepilepsy_medicine_risk_discussed=True,
+        is_a_pregnancy_prevention_programme_needed=True,
+        is_a_pregnancy_prevention_programme_in_place=True,
+        has_a_valproate_annual_risk_acknowledgement_form_been_completed=True,
+    )
+
+    # Must not raise. Under cohort-6 rules: minimum 5 + 3 (AED base) + 2
+    # (valproate, >=12yo female, PPP needed -> PPP in place + annual risk form)
+    # = 10. (If the guard regresses and cohort is None hits `> 6`, this raises.)
+    return_value = total_fields_expected(management)
+
+    # Cohort-6 expected: 5 (management minimum) + 3 (AED) + 2 (valproate female>=12 PPP)
+    expected_value = 10
+    assert return_value == expected_value, (
+        f"total_fields_expected(management) with no audit_period (cohort-6 fallback): "
+        f"expected {expected_value} but got {return_value}"
+    )
+
+
+# ---------------------------------------------------------------------------
+# MultiaxialDiagnosis: cohort-6 gating of global_developmental_delay_or_
+# learning_difficulties, its _severity, and autistic_spectrum_disorder.
+#
+# These three fields should only be scored for cohort 6 and above. For
+# cohort < 6 (or a None audit_period) they must not contribute to the
+# expected total, even if they are populated on the instance.
+#
+# These tests are the scoring-path counterpart to the popup-side tests in
+# test_audit_progress_fields_incomplete.py and must stay in sync with them.
+# ---------------------------------------------------------------------------
+
+
+@pytest.mark.django_db
+def test_total_fields_expected_multiaxial_diagnosis_pre_cohort6_ignores_gated_fields(
+    e12_case_factory, GOSH
+):
+    """
+    Cohort < 6: even if global_developmental_delay_or_learning_difficulties is
+    True (with a severity set) and autistic_spectrum_disorder is True, none of
+    these three fields should be scored. The expected total should equal the
+    baseline MultiaxialDiagnosis minimum (5 once gated fields are removed from
+    the baseline) plus the episode fields.
+    """
+    CASE = e12_case_factory(
+        first_name=f"temp_child_{GOSH.name}",
+        organisations__organisation=GOSH,
+        registration__multiaxial_diagnosis__global_developmental_delay_or_learning_difficulties=True,
+        registration__multiaxial_diagnosis__global_developmental_delay_or_learning_difficulties_severity="mild",
+        registration__multiaxial_diagnosis__autistic_spectrum_disorder=True,
+    )
+
+    # Push the FPA date back to cohort 5 (recruitment 2021-12-01..2022-11-30).
+    CASE.registration.first_paediatric_assessment_date = date(2022, 1, 1)
+    CASE.registration.save()
+    assert CASE.registration.audit_period.cohort_number == 5
+
+    multiaxial_diagnosis = CASE.registration.multiaxialdiagnosis
+
+    # Baseline MultiaxialDiagnosis minimum (5 once gated fields are removed)
+    # + default episode (all None -> not epileptic -> 5 from
+    # expected_score_for_single_episode + 5 Episode minimum added back by
+    # count_episode_fields because no episode is epileptic = 10).
+    # The three gated fields must NOT be added for cohort 5.
+    expected_value = 5 + 10
+    return_value = total_fields_expected(multiaxial_diagnosis)
+
+    assert return_value == expected_value, (
+        f"total_fields_expected(multiaxial_diagnosis) cohort 5 should ignore "
+        f"the three cohort-6-gated fields: expected {expected_value} but got "
+        f"{return_value}"
+    )
+
+
+@pytest.mark.django_db
+def test_total_fields_expected_multiaxial_diagnosis_cohort6_no_gate_answer(
+    e12_case_factory, GOSH
+):
+    """
+    Cohort 6, gate questions unanswered (None): the two gate fields
+    (global_developmental_delay_or_learning_difficulties and
+    autistic_spectrum_disorder) are expected and so add 2 to the baseline.
+    The _severity field is NOT expected (the parent gate is not True).
+    """
+    CASE = e12_case_factory(
+        first_name=f"temp_child_{GOSH.name}",
+        organisations__organisation=GOSH,
+    )
+
+    # Default factory FPA date (2023-01-01) yields cohort 6.
+    assert CASE.registration.audit_period.cohort_number == 6
+
+    multiaxial_diagnosis = CASE.registration.multiaxialdiagnosis
+    assert multiaxial_diagnosis.global_developmental_delay_or_learning_difficulties is None
+    assert multiaxial_diagnosis.autistic_spectrum_disorder is None
+
+    # Baseline (5) + 2 gate fields + default episode (10) = 17.
+    expected_value = 5 + 2 + 10
+    return_value = total_fields_expected(multiaxial_diagnosis)
+
+    assert return_value == expected_value, (
+        f"total_fields_expected(multiaxial_diagnosis) cohort 6, gates "
+        f"unanswered: expected {expected_value} but got {return_value}"
+    )
+
+
+@pytest.mark.django_db
+def test_total_fields_expected_multiaxial_diagnosis_cohort6_gate_true_adds_severity(
+    e12_case_factory, GOSH
+):
+    """
+    Cohort 6, global_developmental_delay_or_learning_difficulties True: the
+    gate field, the severity field, and the autistic_spectrum_disorder field
+    are all expected -> +3 over the baseline.
+    """
+    CASE = e12_case_factory(
+        first_name=f"temp_child_{GOSH.name}",
+        organisations__organisation=GOSH,
+        registration__multiaxial_diagnosis__global_developmental_delay_or_learning_difficulties=True,
+    )
+
+    assert CASE.registration.audit_period.cohort_number == 6
+
+    multiaxial_diagnosis = CASE.registration.multiaxialdiagnosis
+
+    # Baseline (5) + 2 gate fields + 1 severity + default episode (10) = 18.
+    expected_value = 5 + 2 + 1 + 10
+    return_value = total_fields_expected(multiaxial_diagnosis)
+
+    assert return_value == expected_value, (
+        f"total_fields_expected(multiaxial_diagnosis) cohort 6, gate True: "
+        f"expected {expected_value} but got {return_value}"
+    )
+
+
+@pytest.mark.django_db
+def test_total_fields_expected_multiaxial_diagnosis_no_audit_period_ignores_gated_fields(
+    e12_case_factory, GOSH
+):
+    """
+    A registration without an audit_period must not raise, and the three
+    cohort-6-gated fields must not be scored (treated as not cohort 6), even
+    if they are populated on the instance.
+    """
+    CASE = e12_case_factory(
+        first_name=f"temp_child_{GOSH.name}",
+        organisations__organisation=GOSH,
+        registration__multiaxial_diagnosis__global_developmental_delay_or_learning_difficulties=True,
+        registration__multiaxial_diagnosis__global_developmental_delay_or_learning_difficulties_severity="mild",
+        registration__multiaxial_diagnosis__autistic_spectrum_disorder=True,
+    )
+    Registration.objects.filter(pk=CASE.registration.pk).update(audit_period=None)
+    CASE.registration.refresh_from_db()
+    assert CASE.registration.audit_period is None
+
+    multiaxial_diagnosis = CASE.registration.multiaxialdiagnosis
+
+    # Must not raise. Baseline (5) + default episode (10) = 15.
+    # The three gated fields must NOT be added.
+    expected_value = 5 + 10
+    return_value = total_fields_expected(multiaxial_diagnosis)
+
+    assert return_value == expected_value, (
+        f"total_fields_expected(multiaxial_diagnosis) with no audit_period: "
+        f"expected {expected_value} but got {return_value}"
+    )

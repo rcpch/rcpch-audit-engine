@@ -174,7 +174,7 @@ class AntiEpilepsyMedicine(
             hasattr(self, "management")
             and self.management
             and hasattr(self.management, "registration")
-            and self.management.registration.cohort > 6
+            and self.management.registration.audit_period and self.management.registration.audit_period.cohort_number > 6
         ):
             return {
                 "label": "Has the Annual Risk Acknowledgment Form been completed?",
@@ -199,7 +199,7 @@ class AntiEpilepsyMedicine(
             hasattr(self, "management")
             and self.management
             and hasattr(self.management, "registration")
-            and self.management.registration.cohort > 6
+            and self.management.registration.audit_period and self.management.registration.audit_period.cohort_number > 6
         ):
             return {
                 "label": "Is a Pregnancy Prevention Programme in place?",

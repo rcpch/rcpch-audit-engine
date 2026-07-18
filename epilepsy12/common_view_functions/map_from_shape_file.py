@@ -182,7 +182,7 @@ def generate_case_counts_for_each_region_in_each_abstraction_level(
             epilepsy12_sites__organisation__in=list_of_organisations_within_member,
             epilepsy12_sites__site_is_actively_involved_in_epilepsy_care=True,
             epilepsy12_sites__site_is_primary_centre_of_epilepsy_care=True,
-            registration__cohort=cohort,
+            registration__audit_period__cohort_number=cohort,
             registration__completed_first_year_of_care_date__lte=date.today(),
             registration__audit_progress__registration_complete=True,
             registration__audit_progress__first_paediatric_assessment_complete=True,

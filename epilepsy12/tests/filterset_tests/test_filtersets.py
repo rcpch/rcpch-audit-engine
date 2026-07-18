@@ -598,7 +598,7 @@ def test_apply_all_active_filters(e12_case_factory):
         sex=1,
         date_of_birth="2018-01-01",  # under 12
         index_of_multiple_deprivation_quintile=2,
-        registration__cohort="6",
+        registration__audit_period__cohort_number=6,
     )
     matching_case.registration.firstpaediatricassessment.developmental_learning_or_schooling_problems = (
         True
@@ -641,7 +641,7 @@ def test_apply_all_active_filters(e12_case_factory):
     non_matching_case = e12_case_factory(
         date_of_birth="2018-01-01",  # under 12
         index_of_multiple_deprivation_quintile=2,
-        registration__cohort="7",
+        registration__audit_period__cohort_number="7",
     )
 
     non_matching_case.registration.firstpaediatricassessment.developmental_learning_or_schooling_problems = (
@@ -700,7 +700,7 @@ def test_apply_all_active_filters(e12_case_factory):
         "has_been_referred_for_mental_health_support": "true",
         "has_support_for_mental_health_support": "true",
         "audit_progress_complete": "true",
-        "registration_cohort": "6",
+        "registration_audit_period__cohort_number": "6",
         "sex": "1",
         "age_range": "under_12",
         "registration_status": "registered",
@@ -727,7 +727,7 @@ def test_apply_all_active_filters(e12_case_factory):
         "has_support_for_mental_health_support",
         "audit_progress_complete",
         "audit_progress_incomplete",
-        "registration_cohort",
+        "registration_audit_period__cohort_number",
     ]
 
     qs = Case.objects.all()

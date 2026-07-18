@@ -128,11 +128,11 @@
           <td>{% none_masked case.get_sex_display %}</td>
           {% if organisation.country.boundary_identifier == 'JEY' %}<td>{{ case.unique_reference_number }}</td>{% else %}<td data-mask="000 000 0000">{% none_masked case.nhs_number %}</td>{% endif %}
           <td>{% none_masked case.registration.audit_submission_date|date:'D j M Y' %}</td>
-          <td>{% if case.registration.cohort is not None %}{{ case.registration.cohort }}{% endif %}</td>
+          <td>{% if case.registration.audit_period.cohort_number is not None %}{{ case.registration.audit_period.cohort_number }}{% endif %}</td>
           <td>{% if case.registration.days_remaining_before_submission is not None %}{{ case.registration.days_remaining_before_submission }}{% endif %}</td>
           <td class='two wide'>
             <div class='ui buttons'>
-              <button 
+              <button
                 {% if case.editable or request.user.is_superuser or request.user.is_rcpch_audit_team_member %}
                   data-tooltip='Edit or delete child.'
                 {% else %}
@@ -146,14 +146,14 @@
                   {% if case.editable or request.user.is_superuser or request.user.is_rcpch_audit_team_member %}Edit{% else %}View{% endif %}
                 </a>
               </button>
-              <button 
+              <button
                   {% if case.editable or request.user.is_superuser or request.user.is_rcpch_audit_team_member %}
                     data-tooltip='Complete audit details.'
                   {% else %}
                     data-tooltip='View audit details.'
                   {% endif %}
-                  class="ui rcpch_dark_purple button" 
-                  tabindexed="2" 
+                  class="ui rcpch_dark_purple button"
+                  tabindexed="2"
                   onclick="location.href='{% url 'register'  case.id %}'"
                 >Audit</button>
             </div>
@@ -175,10 +175,10 @@
             <td>
               <button
                 hx-headers='{"X-CSRFToken": "{{ csrf_token }}"}'
-                class="ui rcpch_primary icon button" 
-                tabindexed="1" 
+                class="ui rcpch_primary icon button"
+                tabindexed="1"
                 hx-post="{{hx_post}}"
-                hx_trigger='click' 
+                hx_trigger='click'
                 hx-target="#case_table"
                 {% if case.registration.days_remaining_before_submission == 0 or case.locked and not perms.epilepsy12.can_unlock_child_case_data_from_editing or not case.locked and not perms.epilepsy12.can_lock_child_case_data_from_editing  %}
                   disabled
@@ -204,17 +204,17 @@
               {% endif %}
             </td>
           {% endif %}
-            
+
             <td>
               {% if case in cases_in_transfer %}
                 <div class="ui buttons">
                   {% url 'transfer_response' organisation_id=organisation_id case_id=case.id organisation_response="accept" as hx_post_transfer_accept %}
                   <button
                     hx-headers='{"X-CSRFToken": "{{ csrf_token }}"}'
-                    class="ui rcpch_primary tiny icon button" 
-                    tabindexed="1" 
+                    class="ui rcpch_primary tiny icon button"
+                    tabindexed="1"
                     hx-post="{{hx_post_transfer_accept}}"
-                    hx_trigger='click' 
+                    hx_trigger='click'
                     hx-target="#case_table"
                     {% if not perms.epilepsy12.can_transfer_epilepsy12_lead_centre %}disabled{% endif %}
                       _="on htmx:confirm(issueRequest)
@@ -236,10 +236,10 @@
                   {% url 'transfer_response' organisation_id=organisation_id case_id=case.id organisation_response="reject" as hx_post_transfer_reject %}
                   <button
                     hx-headers='{"X-CSRFToken": "{{ csrf_token }}"}'
-                    class="ui rcpch_primary tiny icon button" 
-                    tabindexed="1" 
+                    class="ui rcpch_primary tiny icon button"
+                    tabindexed="1"
                     hx-post="{{hx_post_transfer_reject}}"
-                    hx_trigger='click' 
+                    hx_trigger='click'
                     hx-target="#case_table"
                     {% if not perms.epilepsy12.can_transfer_epilepsy12_lead_centre %}disabled{% endif %}
                       _="on htmx:confirm(issueRequest)
@@ -296,7 +296,7 @@
             {% endif %}
             hx-swap="innerHTML">Next 10</div>
           {% endif %}
-        </th> 
+        </th>
       </tr>
       <tr>
         <th colspan="12" class="right aligned">

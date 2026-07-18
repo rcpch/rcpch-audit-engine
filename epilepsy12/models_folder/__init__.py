@@ -33,7 +33,9 @@ from .organisation_employer import OrganisationEmployer
 # These are models which store progress, either of each child in the audit,
 # or each child's performance indicator score
 # or every E12 user's activity
+from .audit_period import AuditPeriod
 from .audit_progress import AuditProgress
+
 from .kpi import KPI
 from .visitactivity import VisitActivity
 

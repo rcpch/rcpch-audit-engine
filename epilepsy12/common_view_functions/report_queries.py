@@ -48,11 +48,11 @@ def all_registered_cases_for_cohort_and_abstraction_level(
             & Q(registration__audit_progress__multiaxial_diagnosis_complete=True)
             & Q(registration__audit_progress__investigations_complete=True)
             & Q(registration__audit_progress__management_complete=True)
-            & Q(registration__cohort=cohort)
+            & Q(registration__audit_period__cohort_number=cohort)
         ).all()
     else:
         all_cases_for_cohort = Case.objects.filter(
-            Q(registration__isnull=False) & Q(registration__cohort=cohort)
+            Q(registration__isnull=False) & Q(registration__audit_period__cohort_number=cohort)
         ).all()
 
     if abstraction_level == "organisation":

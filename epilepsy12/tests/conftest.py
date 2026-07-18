@@ -3,6 +3,7 @@ Configures pytest fixtures for epilepsy12 app tests.
 """
 
 # standard imports
+from datetime import date
 
 # third-party imports
 from pytest_factoryboy import register
@@ -15,6 +16,7 @@ from epilepsy12.tests.factories import (
     seed_users_fixture,
     E12AntiEpilepsyMedicineFactory,
     E12AssessmentFactory,
+    E12AuditPeriodFactory,
     E12CaseFactory,
     E12ComorbidityFactory,
     E12EpilepsyContextFactory,
@@ -27,7 +29,33 @@ from epilepsy12.tests.factories import (
     E12SyndromeFactory,
     E12UserFactory,
 )
-from epilepsy12.models import Organisation, Case
+from epilepsy12.models import AuditPeriod, Organisation, Case
+# Historical cohort definitions, kept in sync with migration
+# 0063_seed_audit_periods.py. Registration.save() looks up the AuditPeriod
+# for a given first_paediatric_assessment_date, so the test DB must contain
+# these rows or every Registration ends up with audit_period=None.
+from epilepsy12.constants.audit_period_dates import AUDIT_PERIODS
+
+
+
+@pytest.fixture(scope="session", autouse=True)
+def seed_audit_periods_fixture(django_db_setup,django_db_blocker):
+    """Ensure AuditPeriod rows exist in the test DB so Registration.save()
+    can resolve audit_period from first_paediatric_assessment_date.
+    Idempotent: safe with --reuse-db."""
+    with django_db_blocker.unblock():
+        for cohort_number, (rec_start, rec_end, dc_end, deadline) in AUDIT_PERIODS.items():
+            AuditPeriod.objects.get_or_create(
+                cohort_number=cohort_number,
+                defaults={
+                    "recruitment_start_date": rec_start,
+                    "recruitment_end_date": rec_end,
+                    "data_collection_end_date": dc_end,
+                    "submission_deadline": deadline,
+                    "slug": f"cohort-{cohort_number}",
+                    "is_visible": False,
+                },
+            )
 
 
 # register factories to be used across test directory
@@ -35,6 +63,7 @@ from epilepsy12.models import Organisation, Case
 # factory object becomes lowercase-underscore form of the class name
 register(E12AntiEpilepsyMedicineFactory)  # => e12_anti_epilepsy_medicine_factory
 register(E12AssessmentFactory)  # => e12_assessment_factory
+register(E12AuditPeriodFactory)  # => e12_audit_period_factory
 register(E12CaseFactory)  # => e12_case_factory
 register(E12ComorbidityFactory)  # => e12_comborbidity_factory
 register(E12EpilepsyContextFactory)  # => e12_epilepsy_context

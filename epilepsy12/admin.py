@@ -11,6 +11,7 @@ from django.conf import settings
 
 
 # Third-party
+from epilepsy12.models_folder.audit_period import AuditPeriodExtension
 from simple_history.admin import SimpleHistoryAdmin
 from two_factor.admin import AdminSiteOTPRequiredMixin
 
@@ -535,7 +536,7 @@ class CaseAdmin(SimpleHistoryAdmin):
 
     list_filter = [
         AgeRangeFilter,
-        "registration__cohort",
+        "registration__audit_period__cohort_number",
         OrganisationCaseFilter,
         TrustOrLocalHealthBoardFilter,
         IntegratedCareBoardFilter,
@@ -553,8 +554,9 @@ class CaseAdmin(SimpleHistoryAdmin):
         "get_registration",
         "get_lead_e12_site",
         "episode_count_display",
-        "registration__cohort",
     ]
+
+    list_select_related = ["registration__audit_period"]
 
 
 class OrganisationalAuditSubmissionAdmin(SimpleHistoryAdmin):
@@ -624,6 +626,17 @@ class TrustAdmin(SimpleHistoryAdmin):
     search_fields = ["name", "ods_code"]
 
 
+class AuditPeriodAdmin(SimpleHistoryAdmin):
+    list_display = ["cohort_number", "name", "slug", "recruitment_start_date", "recruitment_end_date", "data_collection_end_date", "submission_deadline"]
+    ordering = ["-recruitment_start_date"]
+    readonly_fields = ["slug"]
+
+class AuditPeriodExtensionAdmin(SimpleHistoryAdmin):
+    list_display = ["audit_period", "organisation", "extended_submission_date"]
+    list_filter = ["audit_period"]
+    autocomplete_fields = ["organisation"]
+    list_select_related = ["organisation", "audit_period"]
+
 # register all models
 admin.site.register(Epilepsy12User, Epilepsy12UserAdmin)
 admin.site.register(AntiEpilepsyMedicine, SimpleHistoryAdmin)
@@ -640,6 +653,8 @@ admin.site.register(FirstPaediatricAssessment, SimpleHistoryAdmin)
 admin.site.register(Management, SimpleHistoryAdmin)
 admin.site.register(Registration, SimpleHistoryAdmin)
 admin.site.register(Site, SimpleHistoryAdmin)
+admin.site.register(AuditPeriod, AuditPeriodAdmin)
+admin.site.register(AuditPeriodExtension, AuditPeriodExtensionAdmin)
 admin.site.register(AuditProgress, SimpleHistoryAdmin)
 admin.site.register(Episode, SimpleHistoryAdmin)
 

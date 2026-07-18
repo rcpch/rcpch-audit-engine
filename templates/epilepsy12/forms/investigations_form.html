@@ -6,16 +6,16 @@
     <div id="ecg_information" class="field" >
         {% include 'epilepsy12/partials/investigations/ecg_status.html' with investigations_id=investigations.pk %}
     </div>
-    
+
     <div id="ct_head_information" class="field" >
         {% include 'epilepsy12/partials/investigations/ct_head_status.html' with investigations_id=investigations.pk %}
     </div>
-    
+
     <div id="mri_brain_information" class="field" >
         {% include 'epilepsy12/partials/investigations/mri_brain_information.html' with investigations_id=investigations.pk mri_brain_declined=mri_brain_declined %}
     </div>
 
-    {% if registration.cohort >= 8 %}
+    {% if registration.audit_period.cohort_number >= 8 %}
         <div id="genetic_tests_information" class="field" >
             {% include 'epilepsy12/partials/investigations/genetic_tests_information.html' with investigations_id=investigations.pk %}
         </div>

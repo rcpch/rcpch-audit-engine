@@ -67,7 +67,7 @@ def test_imd_uses_2019_for_cohort_below_8(
     )
 
     case.refresh_from_db()
-    assert case.registration.cohort == 7
+    assert case.registration.audit_period.cohort_number == 7
     assert_imd_call(
         mock_imd, "WC1X8SH", year=2019, country_boundary_identifier="E92000001"
     )
@@ -91,7 +91,7 @@ def test_imd_uses_2025_for_cohort_8_and_above(
     )
 
     case.refresh_from_db()
-    assert case.registration.cohort == 8
+    assert case.registration.audit_period.cohort_number == 8
     assert_imd_call(
         mock_imd, "WC1X8SH", year=2025, country_boundary_identifier="E92000001"
     )
@@ -116,7 +116,7 @@ def test_imd_recalculated_when_assessment_date_changes_cohort(
     )
 
     registration = case.registration
-    assert registration.cohort == 7
+    assert registration.audit_period.cohort_number == 7
 
     # Advance into cohort 8
     mock_imd.return_value = 5
@@ -124,7 +124,7 @@ def test_imd_recalculated_when_assessment_date_changes_cohort(
     registration.save()
 
     case.refresh_from_db()
-    assert case.registration.cohort == 8
+    assert case.registration.audit_period.cohort_number == 8
     assert_imd_call(
         mock_imd, "WC1X8SH", year=2025, country_boundary_identifier="E92000001"
     )
@@ -148,7 +148,7 @@ def test_imd_uses_2019_for_cohort_8_when_country_not_england(
     )
 
     case.refresh_from_db()
-    assert case.registration.cohort == 8
+    assert case.registration.audit_period.cohort_number == 8
     assert_imd_call(
         mock_imd, "CF101AA", year=2019, country_boundary_identifier="W92000004"
     )
@@ -269,10 +269,10 @@ def test_imd_not_calculated_when_cohort_is_none(
         registration__first_paediatric_assessment_date=date(2024, 6, 1),
     )
 
-    # Force cohort to None without triggering signals
+    # Force audit_period to None without triggering signals
     from epilepsy12.models import Registration
 
-    Registration.objects.filter(pk=case.registration.pk).update(cohort=None)
+    Registration.objects.filter(pk=case.registration.pk).update(audit_period=None)
     case.registration.refresh_from_db()
     mock_imd.reset_mock()
 

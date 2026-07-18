@@ -2,7 +2,7 @@
 <div class="field" id="epilepsy_cause_categories">
   {% include 'epilepsy12/partials/multiaxial_diagnosis/epilepsy_causes/epilepsy_cause_categories.html' with choices=epilepsy_cause_selection multiaxial_diagnosis=multiaxial_diagnosis %}
 </div>
-{% if multiaxial_diagnosis.registration.cohort < 8 %}
+{% if multiaxial_diagnosis.registration.audit_period.cohort_number < 8 %}
     <div class='field' id='epilepsy_cause_selection'>
         {% include 'epilepsy12/partials/multiaxial_diagnosis/epilepsy_causes/epilepsy_cause_select.html' with choices=choices multiaxial_diagnosis=multiaxial_diagnosis %}
     </div>

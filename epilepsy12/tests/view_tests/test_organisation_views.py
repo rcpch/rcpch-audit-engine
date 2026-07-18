@@ -112,8 +112,8 @@ def test_case_appears_in_trust_kpis(
     failed_case.refresh_from_db()
     assert failed_case.registration.kpi.school_individual_healthcare_plan == KPI_SCORE["FAIL"]
 
-    cohort = passed_case.registration.cohort
-    assert failed_case.registration.cohort == cohort
+    cohort = passed_case.registration.audit_period.cohort_number
+    assert failed_case.registration.audit_period.cohort_number == cohort
 
     check_school_individual_healthcare_kpi_aggs(client, org, cohort,
         expected_passed=1,
@@ -157,7 +157,7 @@ def test_kpi_calculations_correct_for_case_with_referral_in_different_country(
 
     cases = e12_case_factory.create_batch(2, **args)
 
-    cohort = cases[0].registration.cohort
+    cohort = cases[0].registration.audit_period.cohort_number
 
     for case in cases:
         calculate_kpis(case.registration)
@@ -177,7 +177,7 @@ def test_kpi_calculations_correct_for_case_with_referral_in_different_country(
     })
 
     assert response.status_code == 200
-    
+
     welsh_case_with_referral.refresh_from_db()
     assert welsh_case_with_referral.epilepsy12_sites.count() == 2
 

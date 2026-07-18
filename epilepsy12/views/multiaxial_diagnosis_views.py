@@ -127,6 +127,8 @@ def multiaxial_diagnosis(request, can_edit, case_id):
     ).get()
     organisation_id = site.organisation.pk
 
+    audit_period = registration.audit_period if registration.audit_period else None
+
     context = {
         "case_id": registration.case_id,
         "registration": registration,
@@ -139,6 +141,7 @@ def multiaxial_diagnosis(request, can_edit, case_id):
         "epilepsy_cause_selection": EPILEPSY_CAUSES,
         "case_id": case_id,
         "audit_progress": registration.audit_progress,
+        "audit_period": audit_period,
         "active_template": "multiaxial_diagnosis",
         "there_are_epileptic_episodes": there_are_epileptic_episodes,
         "mental_health_issues_choices": NEUROPSYCHIATRIC,

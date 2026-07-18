@@ -2,6 +2,7 @@ from .seed_groups_permissions import seed_groups_fixture
 from .seed_users import seed_users_fixture
 from .E12AntiEpilepsyMedicineFactory import E12AntiEpilepsyMedicineFactory
 from .E12AssessmentFactory import E12AssessmentFactory
+from .E12AuditPeriodFactory import E12AuditPeriodFactory
 from .E12AuditProgressFactory import E12AuditProgressFactory
 from .E12CaseFactory import E12CaseFactory
 from .E12ComorbidityFactory import E12ComorbidityFactory

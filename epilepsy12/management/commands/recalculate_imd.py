@@ -54,7 +54,7 @@ class Command(BaseCommand):
         else:
             cohort = options["cohort"]
             cases = Case.objects.select_related("registration").filter(
-                registration__cohort=cohort
+                registration__audit_period__cohort_number=cohort
             )
             self.stdout.write(f"Recalculating IMD for cohort {cohort}…")
 

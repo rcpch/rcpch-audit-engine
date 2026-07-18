@@ -51,7 +51,7 @@ def test_cohort_filter_includes_unregistered_and_all_children(
         surname="A",
         organisations__organisation=gosh,
     )
-    reg.registration.cohort = 5
+    reg.registration.audit_period.cohort_number = 5
     reg.registration.first_paediatric_assessment_date = date(2023, 6, 1)
     reg.registration.save()
 
@@ -295,7 +295,7 @@ def test_individual_cohort_filtering(client, seed_groups_fixture, seed_users_fix
         surname="C",
         organisations__organisation=gosh,
     )
-    c7.registration.cohort = 7
+    c7.registration.audit_period.cohort_number = 7
     c7.registration.first_paediatric_assessment_date = date(2024, 1, 15)
     c7.registration.save()
 
