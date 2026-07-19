@@ -1,7 +1,5 @@
 import pytest
 
-from django.contrib.auth.models import Group
-
 from epilepsy12.management.commands.create_groups import groups_seeder
 
 
@@ -12,9 +10,9 @@ def seed_groups_fixture(django_db_setup, django_db_blocker):
     verbose=False
     """
     with django_db_blocker.unblock():
-
-        if not Group.objects.all().exists():
-            groups_seeder(verbose=False)
-        else:
-            print('Groups already seeded. Skipping')
+        # groups_seeder is idempotent: it creates missing groups and adds
+        # missing permissions to existing ones. Running it unconditionally
+        # keeps reused test databases (--reuse-db) in step with any newly
+        # added permissions.
+        groups_seeder(verbose=False)
 
