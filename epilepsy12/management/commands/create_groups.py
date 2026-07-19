@@ -391,7 +391,11 @@ def groups_seeder(verbose=True, **_deprecated_kwargs):
                 + FULL_ACCESS_PERMISSIONS
             )
         elif group == TRUST_AUDIT_TEAM_VIEW_ONLY:
-            return VIEW_PERMISSIONS
+            # View-only users (audit centre administrators) can still create and
+            # update cases - "view only" refers to clinical records, not case
+            # demographics. This matches the old create-path behaviour and the
+            # admin user guide.
+            return VIEW_PERMISSIONS + ADMIN_CASE_MANAGEMENT_PERMISSIONS
         elif group == TRUST_AUDIT_TEAM_EDIT_ACCESS:
             return (
                 VIEW_PERMISSIONS
