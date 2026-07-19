@@ -47,7 +47,7 @@ The audit-wide `submission_deadline` on `AuditPeriod` can be extended for a sing
   - Wire into `epilepsy12/management/commands/create_groups.py` (content type for `AuditPeriodExtension`, assign to `epilepsy12_audit_team_full_access`).
   - *Commit: "Grant extension permission to audit team group"*
 
-- [ ] **4. Model/manager support for the card**
+- [X] **4. Model/manager support for the card**
   - Add `audit_period_id` and (org-aware) extension info to `AuditPeriod.as_cohort_card_dict()`, or add a small helper returning the org's extension for the summary view to merge in.
   - Helper on `AuditPeriod` or manager to identify extension-eligible periods (submitting or grace, not complete).
   - Tests in `epilepsy12/tests/model_tests/test_audit_period.py`: card dict exposes extension when present for the org; eligibility helper excludes completed periods.

@@ -151,7 +151,7 @@ def selected_organisation_summary(request, organisation_id):
     template_name = "epilepsy12/organisation.html"
 
     # Dates for the closed, data collection ongoing and actively recruiting cohorts
-    cohort_data = AuditPeriod.objects.cohort_summary()
+    cohort_data = AuditPeriod.objects.cohort_summary(organisation=selected_organisation)
 
     # Where dashboard data is filtered by cohort, which cohort?
     # Users still want to see dashboard data even when data collection is complete.
@@ -407,11 +407,11 @@ def individual_metrics(request, organisation_id):
     """
     HTMX get request returning individual_metrics.html  real-time Key Performance Indicator (KPI) Metrics table.
     """
-
+    selected_organisation = Organisation.objects.get(pk=organisation_id)
     context = {
-        "selected_organisation": Organisation.objects.get(pk=organisation_id),
+        "selected_organisation": selected_organisation,
         "cohort_number": request.GET.get("cohort"),
-        "cohort_data": AuditPeriod.objects.cohort_summary(),
+        "cohort_data": AuditPeriod.objects.cohort_summary(organisation=selected_organisation),
         "individual_kpi_choices": INDIVIDUAL_KPI_MEASURES,
     }
     template = "epilepsy12/partials/organisation/individual_metrics.html"
@@ -429,7 +429,7 @@ def publish_kpis(request, organisation_id):
     """
 
     # get submitting_cohort number - in future will be selectable
-    cohort_data = AuditPeriod.objects.cohort_summary()
+    cohort_data = AuditPeriod.objects.cohort_summary(organisation=None) # audit-wide
 
     cohort_number = (
         cohort_data["grace_cohort"]["cohort"]
