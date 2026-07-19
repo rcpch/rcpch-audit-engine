@@ -465,7 +465,33 @@ def audit_period_extension(request, organisation_id, cohort):
         return render_cohort_card()
 
     if request.method == "POST":
-        # days is required; reason is optional
+        action = request.POST.get("action", "extend")
+
+        # close submission: set the organisation's effective deadline to today
+        if action == "close":
+            try:
+                audit_period.close_submission_for_organisation(
+                    organisation=selected_organisation,
+                    user=request.user,
+                )
+            except ValidationError as e:
+                return render_form(extension_error=e.messages[0])
+            # TODO: send "submission closed" email
+            return render_cohort_card()
+
+        # remove extension: revert the organisation to the audit-wide deadline
+        if action == "remove":
+            try:
+                audit_period.remove_submission_extension(
+                    organisation=selected_organisation,
+                    user=request.user,
+                )
+            except ValidationError as e:
+                return render_form(extension_error=e.messages[0])
+            # TODO: send "extension withdrawn" email
+            return render_cohort_card()
+
+        # extend (default action): days is required; reason is optional
         try:
             days = int(request.POST.get("days", ""))
         except (TypeError, ValueError):

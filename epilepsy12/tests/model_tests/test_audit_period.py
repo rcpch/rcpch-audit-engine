@@ -22,11 +22,12 @@ plain ``@pytest.mark.django_db`` test can query the mapping directly.
 from datetime import date, timedelta
 
 import pytest
+from django.core.exceptions import ValidationError
 
 from epilepsy12.constants.audit_period_extension_reasons import (
     AUDIT_PERIOD_EXTENSION_REASONS,
 )
-from epilepsy12.models import AuditPeriod, AuditPeriodExtension
+from epilepsy12.models import AuditPeriod, AuditPeriodExtension, Epilepsy12User
 
 # Cohort 6 seeded dates (see epilepsy12/constants/audit_period_dates.py):
 #   recruitment    2022-12-01 -> 2023-11-30
@@ -266,3 +267,117 @@ def test_cohort_summary_without_organisation_is_audit_wide():
 
     assert summary["submitting_cohort_dates"]["extended_submission_date"] is None
     assert summary["submitting_cohort_submission_date"] == submitting.submission_deadline
+
+
+# ---------------------------------------------------------------------------
+# deadline resolution with close-early extensions
+# ---------------------------------------------------------------------------
+
+
+@pytest.mark.django_db
+def test_extension_earlier_than_deadline_wins(GOSH):
+    """A close-early extension (date before the audit-wide deadline) is honoured."""
+    audit_period = AuditPeriod.objects.by_cohort(6)
+    early = COHORT_6_SUBMISSION_DEADLINE - timedelta(days=7)
+    AuditPeriodExtension.objects.create(
+        audit_period=audit_period,
+        organisation=GOSH,
+        extended_submission_date=early,
+        reason=None,
+    )
+
+    assert audit_period.submission_deadline_for_organisation(GOSH) == early
+
+
+@pytest.mark.django_db
+def test_extension_earlier_than_deadline_passes_clean(GOSH):
+    """clean() permits close-early dates (but not dates before data collection)."""
+    audit_period = AuditPeriod.objects.by_cohort(6)
+    extension = AuditPeriodExtension(
+        audit_period=audit_period,
+        organisation=GOSH,
+        extended_submission_date=COHORT_6_SUBMISSION_DEADLINE - timedelta(days=7),
+    )
+    extension.clean()  # should not raise
+
+    extension.extended_submission_date = (
+        audit_period.data_collection_start_date - timedelta(days=1)
+    )
+    with pytest.raises(ValidationError):
+        extension.clean()
+
+
+@pytest.mark.django_db
+def test_card_dict_flags_close_early_extension(GOSH):
+    """The card distinguishes close-early rows from true extensions."""
+    audit_period = AuditPeriod.objects.by_cohort(6)
+
+    AuditPeriodExtension.objects.create(
+        audit_period=audit_period,
+        organisation=GOSH,
+        extended_submission_date=COHORT_6_SUBMISSION_DEADLINE - timedelta(days=3),
+    )
+    card = audit_period.as_cohort_card_dict(
+        today=COHORT_6_DATA_COLLECTION, organisation=GOSH
+    )
+    assert card["is_closed_early"] is True
+
+    # a later extension is not closed early
+    extension = AuditPeriodExtension.objects.get(
+        audit_period=audit_period, organisation=GOSH
+    )
+    extension.extended_submission_date = COHORT_6_SUBMISSION_DEADLINE + timedelta(days=3)
+    extension.save()
+    card = audit_period.as_cohort_card_dict(
+        today=COHORT_6_DATA_COLLECTION, organisation=GOSH
+    )
+    assert card["is_closed_early"] is False
+
+
+# ---------------------------------------------------------------------------
+# close_submission_for_organisation / remove_submission_extension
+# ---------------------------------------------------------------------------
+
+
+@pytest.mark.django_db
+def test_close_submission_sets_extension_to_today(GOSH):
+    """Closing sets the extension date to today, with no reason required."""
+    audit_period = AuditPeriod.objects.currently_submitting()
+    assert audit_period is not None, "No seeded cohort is currently submitting."
+    admin = Epilepsy12User.objects.filter(is_rcpch_audit_team_member=True).first()
+
+    extension = audit_period.close_submission_for_organisation(GOSH, user=admin)
+
+    assert extension.extended_submission_date == date.today()
+    assert extension.reason is None
+    assert audit_period.submission_deadline_for_organisation(GOSH) == date.today()
+
+
+@pytest.mark.django_db
+def test_remove_submission_extension_reverts_to_audit_wide(GOSH):
+    """Removing the extension reverts the organisation to the audit-wide deadline."""
+    audit_period = AuditPeriod.objects.currently_submitting()
+    assert audit_period is not None, "No seeded cohort is currently submitting."
+    admin = Epilepsy12User.objects.filter(is_rcpch_audit_team_member=True).first()
+
+    _extension(audit_period, GOSH, days=28)
+    assert audit_period.extensions.filter(organisation=GOSH).exists()
+
+    audit_period.remove_submission_extension(GOSH, user=admin)
+
+    assert not audit_period.extensions.filter(organisation=GOSH).exists()
+    assert (
+        audit_period.submission_deadline_for_organisation(GOSH)
+        == audit_period.submission_deadline
+    )
+
+
+@pytest.mark.django_db
+def test_remove_submission_extension_without_extension_raises(GOSH):
+    """Removing an extension the organisation does not hold is an error."""
+    audit_period = AuditPeriod.objects.currently_submitting()
+    assert audit_period is not None, "No seeded cohort is currently submitting."
+    admin = Epilepsy12User.objects.filter(is_rcpch_audit_team_member=True).first()
+
+    with pytest.raises(ValidationError, match="no extension"):
+        audit_period.remove_submission_extension(GOSH, user=admin)

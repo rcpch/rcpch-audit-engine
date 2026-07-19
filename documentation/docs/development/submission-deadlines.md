@@ -28,6 +28,10 @@ The audit-wide `submission_deadline` on `AuditPeriod` can be extended for a sing
 - **One row per org/period**: enforced by the existing `one_extension_per_organisation_per_audit_period` unique constraint; the view uses `update_or_create`. Changes are captured by simple-history.
 - **Reason is coded, not free text**: `AuditPeriodExtension.reason` changes from `TextField` to `PositiveSmallIntegerField(choices=...)`. Reasons are defined as class-level constants + a tuple of tuples on the model (the `VisitActivity.ACTIVITY` pattern), so the list can be extended/edited later without a migration — only the initial field-type change needs one.
 - **URL design**: `organisation/<int:organisation_id>/audit_period/<int:cohort>/extension`, named `audit_period_extension`. Cohort number (not PK, not slug) is used in the URL — stable and human-meaningful. The `AuditPeriod.slug` field stays unexposed for now; it can be formalised later for reporting URLs if needed.
+- **Admin enters days, not a date**: the form takes an integer number of days, stacked on the organisation's current *effective* deadline (so a second extension extends the first). The model method `AuditPeriod.extend_submission_deadline(organisation, days, user, reason)` does the arithmetic.
+- **Close submission**: the audit team can close an organisation's submission immediately — the extension row's `extended_submission_date` is set to today (inclusive: submission still possible today). No reason required. This relaxes the original "extensions can only lengthen" rule: `submission_deadline_for_organisation()` now honours the extension whenever one exists, whether later or earlier than the audit-wide deadline. `effective_latest_submission_date`/`is_complete` are unaffected (a close-early date never exceeds the audit-wide deadline).
+- **Remove extension**: deletes the org's extension row, reverting to the audit-wide deadline — but refuses once the audit-wide deadline has passed (the row is then historical record). Deletion is captured by simple-history.
+- **Card badge wording**: "Extended to …" when the extension is later than the audit-wide deadline; "Closed early: …" when earlier/equal.
 
 ### Implementation checklist
 
@@ -63,9 +67,25 @@ The audit-wide `submission_deadline` on `AuditPeriod` can be extended for a sing
   - View tests (new file, e.g. `epilepsy12/tests/view_tests/test_audit_period_extension.py`): permission denied for non-audit-team users; audit team can GET the form; POST creates an extension; POST again updates the same row (no duplicate); invalid date rejected; completed cohort rejected.
   - *Commit: "Add extension view and URL"*
 
+- [ ] **7a. Model: close + remove, resolution-rule change**
+  - `submission_deadline_for_organisation()`: honour the extension whenever present (not only when later).
+  - `AuditPeriodExtension.clean()`: relax the must-be-later rule.
+  - New `AuditPeriod.close_submission_for_organisation(organisation, user)` — sets extension date to today, no reason.
+  - New `AuditPeriod.remove_submission_extension(organisation, user)` — refuses after the audit-wide deadline has passed; errors if no extension exists.
+  - Update existing card-dict/resolution tests; new tests: close sets today and resolves; extension earlier than deadline now wins; remove deletes + guard after deadline; remove with no extension raises.
+  - *Commit: "Allow close-early and removal of submission extensions"*
+
+- [ ] **7b. View + template: close & remove actions**
+  - View branches on POST `action` (`extend` default / `close` / `remove`) before days/reason parsing.
+  - Form partial gains "Close submission" and "Remove extension" buttons (only when an extension exists), with SweetAlert confirmations following the `publish_button.html` hyperscript pattern.
+  - Card badge wording switches on whether the extension is later or earlier than the audit-wide deadline.
+  - View tests: close posts create a today-dated extension without reason; remove deletes and card badge clears; remove after deadline fails.
+  - *Commit: "Close and remove actions on extension UI"*
+
 - [ ] **7. Email**
   - New `construct_extension_granted_email()` helper in `epilepsy12/general_functions/` (following `construct_transfer_email.py`) rendering a new template `templates/registration/extension_granted_email.html`; include the organisation, cohort, new deadline and the reason's display label.
   - Recipients: lead clinician(s) of the organisation (fallback to `SITE_CONTACT_EMAIL` if none) plus `SITE_CONTACT_EMAIL`.
+  - Wording variants per action: extension granted / submission closed / extension withdrawn.
   - Tests: email sent to expected recipients on POST (use Django's `mail.outbox`); fallback recipient when no lead clinician.
   - *Commit: "Send extension granted email"*
 

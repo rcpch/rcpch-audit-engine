@@ -1,13 +1,13 @@
 <div class="rcpch_summary_stats" id="cohort_card_{{ cohort }}">
   <div class="rcpch_summary_stats_row">
-    <h1>COHORT {{ cohort }} -</h1> EXTEND DEADLINE</h1>
+    <h1>COHORT {{ cohort }} - {% if existing_extension %}EXTEND FURTHER{% else %}EXTEND DEADLINE{% endif %}</h1>
   </div>
 
   <div class="rcpch_summary_stats_row">
     <div class="rcpch_summary_stats_description">
-      Current submission deadline: {{ audit_period.submission_deadline }}
+      Audit-wide submission deadline: {{ audit_period.submission_deadline }}
       {% if existing_extension %}
-        (already extended to {{ existing_extension.extended_submission_date }})
+        <br>Currently extended to: {{ existing_extension.extended_submission_date }}
       {% endif %}
     </div>
   </div>
@@ -21,7 +21,7 @@
   >
     <div class="rcpch_summary_stats_row">
       <div class="field">
-        <label for="extension_days_{{ cohort }}">Extend by (days)</label>
+        <label for="extension_days_{{ cohort }}">{% if existing_extension %}Extend by further (days){% else %}Extend by (days){% endif %}</label>
         <input
           class="ui input"
           type="number"
@@ -55,7 +55,9 @@
     {% endif %}
 
     <div class="rcpch_summary_stats_row">
-      <button type="submit" class="ui rcpch_positive button">Save extension</button>
+      <button type="submit" class="ui rcpch_positive button">
+        {% if existing_extension %}Update extension{% else %}Save extension{% endif %}
+      </button>
       <button
         style="margin-top: 5px;"
         type="button"

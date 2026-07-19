@@ -145,6 +145,17 @@ a label {
     font-size: 1em;
     margin: 0.4em 0;
   }
+
+  /* cohort card extension actions: equal-width buttons with a small gap */
+  .rcpch_summary_stats_row.extension_actions {
+    align-items: stretch;
+    gap: 5px;
+  }
+  
+  .rcpch_summary_stats_row.extension_actions .button {
+    margin: 0;
+    width: 100%;
+  }
   
   /* error label is case form and create user */
   .ui.pointing.red.basic.label {

@@ -313,6 +313,12 @@ class AuditPeriod(
             ),
             "audit_period_id": self.pk,
             "extended_submission_date": extension.extended_submission_date if extension else None,
+            # True when the extension closes submission early (date not after the
+            # audit-wide deadline) - the card shows "Closed early" not "Extended to".
+            "is_closed_early": (
+                extension is not None
+                and extension.extended_submission_date <= self.submission_deadline
+            ),
             # eligibility is evaluated against the passed-in ``today``, not the
             # is_collecting_data/is_in_grace_period properties, which are pinned
             # to timezone.now(). The window spans data collection start through
@@ -339,14 +345,15 @@ class AuditPeriod(
     def submission_deadline_for_organisation(self, organisation: Organisation) -> date:
         """
         The effective deadline for a given organisation: the audit-wide
-        submission_deadline unless this organisation holds a later extension.
-        Extensions can lengthen but never shorten the audit-wide deadline.
+        submission_deadline unless this organisation holds an extension row.
+        The extension always wins when present — it may be later (a granted
+        extension) or earlier (submission closed early by the audit team).
         Falls back to the audit-wide deadline if no organisation is supplied.
         """
         if organisation is None:
             return self.submission_deadline
         extension = self.extensions.filter(organisation=organisation).first()
-        if extension and extension.extended_submission_date > self.submission_deadline:
+        if extension:
             return extension.extended_submission_date
         return self.submission_deadline
 
@@ -402,6 +409,53 @@ class AuditPeriod(
             extension.save(update_fields=["created_by"])
         return extension
 
+    def close_submission_for_organisation(
+        self, organisation: Organisation, user
+    ) -> "AuditPeriodExtension":
+        """
+        Close this organisation's submission immediately: the extension row's
+        date is set to today (inclusive — submission is still possible today).
+        No reason is required. Same eligibility window as granting an extension.
+        """
+        today = timezone.now().date()
+        if not (self.data_collection_start_date <= today <= self.submission_deadline):
+            raise ValidationError(
+                "Submission can only be closed early for the submitting or grace cohort."
+            )
+
+        extension, created = self.extensions.update_or_create(
+            organisation=organisation,
+            defaults={
+                "extended_submission_date": today,
+                "reason": None,
+                "updated_by": user,
+            },
+        )
+        if created:
+            extension.created_by = user
+            extension.save(update_fields=["created_by"])
+        return extension
+
+    def remove_submission_extension(self, organisation: Organisation, user) -> None:
+        """
+        Remove this organisation's extension, reverting to the audit-wide
+        deadline. Refused once the audit-wide deadline has passed — the row is
+        then historical record of the deadline the organisation submitted against.
+        """
+        today = timezone.now().date()
+        if today > self.submission_deadline:
+            raise ValidationError(
+                "Extensions cannot be removed after the audit-wide submission deadline has passed."
+            )
+
+        extension = self.extensions.filter(organisation=organisation).first()
+        if extension is None:
+            raise ValidationError("This organisation has no extension to remove.")
+
+        # stamp who removed it before deleting so the history record keeps the actor
+        extension.updated_by = user
+        extension.save(update_fields=["updated_by"])
+        extension.delete()
 
     def clean(self):
         if self.recruitment_end_date <= self.recruitment_start_date:
@@ -467,9 +521,16 @@ class AuditPeriodExtension(
         ]
 
     def clean(self):
-        if self.audit_period_id and self.extended_submission_date <= self.audit_period.submission_deadline:
+        # Note: the date may legitimately be earlier than the audit-wide
+        # deadline - that is how the audit team closes an organisation's
+        # submission early. Sanity floor: never before data collection starts.
+        if (
+            self.audit_period_id
+            and self.extended_submission_date
+            and self.extended_submission_date < self.audit_period.data_collection_start_date
+        ):
             raise ValidationError(
-                "Extended submission date must be after the audit period submission deadline"
+                "Extended submission date cannot be before data collection starts."
             )
 
     def __str__(self):
