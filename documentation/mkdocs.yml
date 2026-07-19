@@ -148,6 +148,7 @@ nav:
     - 'admin-users/download.md'
     - 'admin-users/how-to-edit-docs.md'
     - 'admin-users/how-to-add-banners.md'
+    - 'admin-users/how-to-manage-submission-deadlines.md'
   - Developer Guide:
     - Getting Started: 'development/getting-started.md'
     - Architecture Overview: 'development/architecture-overview.md'
