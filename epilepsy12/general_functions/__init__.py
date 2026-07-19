@@ -4,6 +4,7 @@ Imports all the general functions
 
 from .calculate_kpi_average import *
 from .construct_confirm_email import *
+from .construct_extension_email import *
 from .construct_transfer_email import *
 from .date_functions import *
 from .email import *

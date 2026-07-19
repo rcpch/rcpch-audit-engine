@@ -22,6 +22,7 @@ from ..decorator import user_may_view_this_organisation, login_and_otp_required
 from epilepsy12.constants import INDIVIDUAL_KPI_MEASURES, AUDIT_PERIOD_EXTENSION_REASONS
 from epilepsy12.models import (
     AuditPeriod,
+    Epilepsy12User,
     Organisation,
     KPI,
     OrganisationKPIAggregation,
@@ -50,6 +51,8 @@ from epilepsy12.common_view_functions.sanction_user_access import (
 )
 from ..general_functions import (
     value_from_key,
+    construct_extension_granted_email,
+    send_email_to_recipients,
 )
 from ..kpi import download_kpi_summary_as_csv
 from epilepsy12.common_view_functions.aggregate_by import (
@@ -460,6 +463,40 @@ def audit_period_extension(request, organisation_id, cohort):
             },
         )
 
+    def send_extension_email(extension, action):
+        """
+        Email the organisation's lead clinician(s) and the generic audit team
+        address that the submission deadline has changed. ``action`` is one of
+        "granted" / "closed" / "withdrawn" and selects the email wording.
+        """
+        email = construct_extension_granted_email(
+            request=request,
+            organisation=selected_organisation,
+            audit_period=audit_period,
+            extension=extension,
+            action=action,
+        )
+
+        lead_clinicians = Epilepsy12User.objects.filter(
+            Q(employer_organisations__employer_organisation=selected_organisation)
+            & Q(is_active=True)
+            & Q(role=1)  # Audit Centre Lead Clinician
+        )
+        if lead_clinicians.exists():
+            recipients = list(lead_clinicians.values_list("email", flat=True))
+            recipients.append(settings.SITE_CONTACT_EMAIL)
+            subject = (
+                f"Epilepsy12 cohort {cohort} submission deadline - {action}"
+            )
+        else:
+            recipients = [settings.SITE_CONTACT_EMAIL]
+            subject = (
+                f"Epilepsy12 cohort {cohort} submission deadline - {action}"
+                " - NO LEAD CLINICIAN"
+            )
+
+        send_email_to_recipients(recipients=recipients, subject=subject, message=email)
+
     # cancel button: swap the card back
     if request.method == "GET" and request.GET.get("card"):
         return render_cohort_card()
@@ -470,13 +507,13 @@ def audit_period_extension(request, organisation_id, cohort):
         # close submission: set the organisation's effective deadline to today
         if action == "close":
             try:
-                audit_period.close_submission_for_organisation(
+                extension = audit_period.close_submission_for_organisation(
                     organisation=selected_organisation,
                     user=request.user,
                 )
             except ValidationError as e:
                 return render_form(extension_error=e.messages[0])
-            # TODO: send "submission closed" email
+            send_extension_email(extension=extension, action="closed")
             return render_cohort_card()
 
         # remove extension: revert the organisation to the audit-wide deadline
@@ -488,7 +525,7 @@ def audit_period_extension(request, organisation_id, cohort):
                 )
             except ValidationError as e:
                 return render_form(extension_error=e.messages[0])
-            # TODO: send "extension withdrawn" email
+            send_extension_email(extension=None, action="withdrawn")
             return render_cohort_card()
 
         # extend (default action): days is required; reason is optional
@@ -517,7 +554,7 @@ def audit_period_extension(request, organisation_id, cohort):
             )
 
         try:
-            audit_period.extend_submission_deadline(
+            extension = audit_period.extend_submission_deadline(
                 organisation=selected_organisation,
                 reason=reason,
                 days=days,
@@ -530,8 +567,7 @@ def audit_period_extension(request, organisation_id, cohort):
                 posted_reason=reason,
             )
 
-        # success: email the organisation lead clinician(s) and the audit team
-        # TODO: construct + send extension granted email
+        send_extension_email(extension=extension, action="granted")
 
         return render_cohort_card()
 

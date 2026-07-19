@@ -21,6 +21,7 @@ from datetime import date, timedelta
 from http import HTTPStatus
 
 import pytest
+from django.core import mail
 from django.urls import reverse
 
 from epilepsy12.models import (
@@ -277,6 +278,101 @@ def test_post_remove_without_extension_errors(
 
     assert response.status_code == HTTPStatus.OK
     assert b"no extension" in response.content
+
+
+# ---------------------------------------------------------------------------
+# emails
+# ---------------------------------------------------------------------------
+
+
+@pytest.mark.django_db
+def test_extend_sends_email_to_lead_clinician_and_audit_team(
+    client, seed_groups_fixture, seed_users_fixture, GOSH, settings
+):
+    """Granting an extension emails the org's lead clinician(s) and the audit team."""
+    settings.SITE_CONTACT_EMAIL = "epilepsy12@rcpch.ac.uk"
+    user = _audit_team_user()
+    _sign_in(client, user, GOSH)
+    period = _submitting_cohort()
+
+    client.post(_url(GOSH, period.cohort_number), data={"days": 14, "reason": "0"})
+
+    assert len(mail.outbox) == 1
+    email = mail.outbox[0]
+    assert "granted" in email.subject
+    # lead clinician of GOSH plus the generic audit team address
+    lead = Epilepsy12User.objects.get(
+        first_name=test_user_audit_centre_lead_clinician_data.role_str,
+        employer_organisations__employer_organisation=GOSH,
+    )
+    assert lead.email in email.to
+    assert "epilepsy12@rcpch.ac.uk" in email.to
+
+
+@pytest.mark.django_db
+def test_close_sends_email(
+    client, seed_groups_fixture, seed_users_fixture, GOSH, settings
+):
+    """Closing submission emails with the closed wording."""
+    settings.SITE_CONTACT_EMAIL = "epilepsy12@rcpch.ac.uk"
+    user = _audit_team_user()
+    _sign_in(client, user, GOSH)
+    period = _submitting_cohort()
+
+    client.post(_url(GOSH, period.cohort_number), data={"action": "close"})
+
+    assert len(mail.outbox) == 1
+    assert "closed" in mail.outbox[0].subject
+
+
+@pytest.mark.django_db
+def test_remove_sends_withdrawn_email(
+    client, seed_groups_fixture, seed_users_fixture, GOSH, settings
+):
+    """Removing an extension emails with the withdrawn wording."""
+    settings.SITE_CONTACT_EMAIL = "epilepsy12@rcpch.ac.uk"
+    user = _audit_team_user()
+    _sign_in(client, user, GOSH)
+    period = _submitting_cohort()
+    AuditPeriodExtension.objects.create(
+        audit_period=period,
+        organisation=GOSH,
+        extended_submission_date=period.submission_deadline + timedelta(days=14),
+        reason=0,
+    )
+
+    client.post(_url(GOSH, period.cohort_number), data={"action": "remove"})
+
+    assert len(mail.outbox) == 1
+    assert "withdrawn" in mail.outbox[0].subject
+
+
+@pytest.mark.django_db
+def test_email_falls_back_to_audit_team_when_no_lead_clinician(
+    client, seed_groups_fixture, seed_users_fixture, ADDENBROOKES, settings
+):
+    """Organisations with no lead clinician: email goes only to the audit team,
+    with the subject flagged."""
+    settings.SITE_CONTACT_EMAIL = "epilepsy12@rcpch.ac.uk"
+    user = _audit_team_user()
+    _sign_in(client, user, ADDENBROOKES)
+    period = _submitting_cohort()
+
+    # Addenbrookes has no seeded lead clinician
+    assert not Epilepsy12User.objects.filter(
+        employer_organisations__employer_organisation=ADDENBROOKES,
+        is_active=True,
+        role=1,
+    ).exists()
+
+    client.post(
+        _url(ADDENBROOKES, period.cohort_number), data={"days": 14, "reason": ""}
+    )
+
+    assert len(mail.outbox) == 1
+    email = mail.outbox[0]
+    assert email.to == ["epilepsy12@rcpch.ac.uk"]
+    assert "NO LEAD CLINICIAN" in email.subject
 
 
 @pytest.mark.django_db
