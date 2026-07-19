@@ -24,11 +24,13 @@ from epilepsy12.constants.user_types import (
     CAN_OPT_OUT_CHILD_FROM_INCLUSION_IN_AUDIT,
     CAN_PUBLISH_EPILEPSY12_DATA,
     CAN_ALLOCATE_USER_TO_ORGANISATION,
-    CAN_RESET_TWO_FACTOR_AUTHENTICATION
+    CAN_RESET_TWO_FACTOR_AUTHENTICATION,
+    CAN_EXTEND_SUBMISSION_DEADLINE
 )
 from epilepsy12.models import (
     AntiEpilepsyMedicine,
     Assessment,
+    AuditPeriodExtension,
     AuditProgress,
     Comorbidity,
     EpilepsyContext,
@@ -79,12 +81,13 @@ def groups_seeder(
         OrganisationKPIAggregation
     )
     visitactivityContentType = ContentType.objects.get_for_model(VisitActivity)
+    auditperiodextensionContentType = ContentType.objects.get_for_model(AuditPeriodExtension)
 
     """
     Note view permissions include viewing users, but not creating, updating or deleting them
     View permissions include viewing but NOT updating or deleting case audit records
 
-    NOTE Additional constraints are applied in view decorators to prevent users accessing 
+    NOTE Additional constraints are applied in view decorators to prevent users accessing
     records of users or children in organisations other than their own
     """
     VIEW_PERMISSIONS = [
@@ -149,11 +152,11 @@ def groups_seeder(
     Note editor access permissions do not include creating, updating or deleting Epilepsy12Users.
     Editor access include deleting patients
     Editor access permissions do include creating, updating or delete patient records
-    
-    Editors can create, update and delete neurology, general paediatric and surgical sites, but 
+
+    Editors can create, update and delete neurology, general paediatric and surgical sites, but
     cannot create, update or delete lead epilepsy12 centre allocation, or transfer
 
-    NOTE Additional constraints are applied in view decorators to prevent users accessing 
+    NOTE Additional constraints are applied in view decorators to prevent users accessing
     records of users or children in organisations other than their own
     """
     EDITOR_PERMISSIONS = [
@@ -282,7 +285,7 @@ def groups_seeder(
     - create, change and delete Epilepsy12Users
     - transfer to another the lead Epilepsy12 centre
 
-    NOTE Additional constraints are applied in view decorators to prevent users accessing 
+    NOTE Additional constraints are applied in view decorators to prevent users accessing
     records of users or children in organisations other than their own
     """
     FULL_ACCESS_PERMISSIONS = [
@@ -325,7 +328,7 @@ def groups_seeder(
     - allocate, update and delete Epilepsy12 lead site status
     - create, update and delete the look up lists for Keyword and Organisation
     - publish Epilepsy12 data to the public site
-    
+
     NOTE RCPCH team are able to access all users and all children nationally.
     """
     EPILEPSY12_AUDIT_TEAM_ACCESS_PERMISSIONS = [
@@ -346,7 +349,11 @@ def groups_seeder(
         {
             "codename": CAN_RESET_TWO_FACTOR_AUTHENTICATION[0],
             "content_type": epilepsy12userContentType,
-        }
+        },
+        {
+            "codename": CAN_EXTEND_SUBMISSION_DEADLINE[0],
+            "content_type": auditperiodextensionContentType,
+        },
     ]
 
     PATIENT_ACCESS_PERMISSIONS = [

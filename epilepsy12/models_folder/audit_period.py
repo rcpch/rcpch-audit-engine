@@ -9,6 +9,8 @@ from django.utils.text import slugify
 from .help_text_mixin import HelpTextMixin
 from .time_and_user_abstract_base_classes import TimeStampAbstractBaseClass, UserStampAbstractBaseClass
 from .entities.organisation import Organisation
+from epilepsy12.constants.user_types import CAN_EXTEND_SUBMISSION_DEADLINE
+from epilepsy12.constants.audit_period_extension_reasons import AUDIT_PERIOD_EXTENSION_REASONS
 
 
 from simple_history.models import HistoricalRecords
@@ -385,9 +387,10 @@ class AuditPeriodExtension(
     )
 
     extended_submission_date = models.DateField()
-    reason = models.TextField(
+    reason = models.PositiveSmallIntegerField(
         blank=True,
-        default=""
+        null=True,
+        choices=AUDIT_PERIOD_EXTENSION_REASONS
     )
 
     history = HistoricalRecords()
@@ -400,6 +403,9 @@ class AuditPeriodExtension(
                 fields=["audit_period", "organisation"],
                 name="one_extension_per_organisation_per_audit_period"
             )
+        ]
+        permissions = [
+            CAN_EXTEND_SUBMISSION_DEADLINE
         ]
 
     def clean(self):
