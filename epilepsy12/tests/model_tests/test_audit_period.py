@@ -406,3 +406,67 @@ def test_remove_submission_extension_without_extension_raises(GOSH):
 
     with pytest.raises(ValidationError, match="no extension"):
         audit_period.remove_submission_extension(GOSH, user=admin)
+
+
+# ---------------------------------------------------------------------------
+# AuditPeriodExtension.is_open_past_audit_wide_deadline
+# ---------------------------------------------------------------------------
+
+
+@pytest.mark.django_db
+def test_extension_open_past_deadline_true_when_still_open(GOSH):
+    """A true extension whose own date is still in the future, on a cohort
+    whose audit-wide deadline has passed, is open past the deadline."""
+    # cohort 6's audit-wide deadline (2025-01-14) is in the past
+    audit_period = AuditPeriod.objects.by_cohort(6)
+    extension = AuditPeriodExtension.objects.create(
+        audit_period=audit_period,
+        organisation=GOSH,
+        extended_submission_date=date.today() + timedelta(days=7),
+        reason=0,
+    )
+
+    assert extension.is_open_past_audit_wide_deadline is True
+
+
+@pytest.mark.django_db
+def test_extension_open_past_deadline_false_when_extension_expired(GOSH):
+    """An extension whose own date has also passed is not open."""
+    audit_period = AuditPeriod.objects.by_cohort(6)
+    extension = AuditPeriodExtension.objects.create(
+        audit_period=audit_period,
+        organisation=GOSH,
+        extended_submission_date=COHORT_6_SUBMISSION_DEADLINE + timedelta(days=7),
+        reason=0,
+    )
+
+    assert extension.is_open_past_audit_wide_deadline is False
+
+
+@pytest.mark.django_db
+def test_extension_open_past_deadline_false_for_close_early(GOSH):
+    """Close-early rows (date not after the audit-wide deadline) are not open."""
+    audit_period = AuditPeriod.objects.by_cohort(6)
+    extension = AuditPeriodExtension.objects.create(
+        audit_period=audit_period,
+        organisation=GOSH,
+        extended_submission_date=COHORT_6_SUBMISSION_DEADLINE - timedelta(days=3),
+    )
+
+    assert extension.is_open_past_audit_wide_deadline is False
+
+
+@pytest.mark.django_db
+def test_extension_open_past_deadline_false_before_audit_wide_deadline(GOSH):
+    """An extension on a cohort whose audit-wide deadline has not yet passed is
+    not 'open past the deadline' - everyone can still submit anyway."""
+    audit_period = AuditPeriod.objects.currently_submitting()
+    assert audit_period is not None, "No seeded cohort is currently submitting."
+    extension = AuditPeriodExtension.objects.create(
+        audit_period=audit_period,
+        organisation=GOSH,
+        extended_submission_date=audit_period.submission_deadline + timedelta(days=28),
+        reason=0,
+    )
+
+    assert extension.is_open_past_audit_wide_deadline is False

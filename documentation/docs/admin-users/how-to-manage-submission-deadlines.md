@@ -43,3 +43,13 @@ The organisation's deadline reverts to the audit-wide date and the lead clinicia
 ## What organisations see
 
 Organisation users see the same cohort cards (without the action buttons), including any **Extended to …** or **Closed early: …** badge and the countdown of days remaining, which always reflects their own effective deadline.
+
+## Chasing late submissions
+
+Once the audit-wide deadline has passed, any organisations still able to submit are doing so only because they hold an extension. To see them:
+
+1. Open the **Django admin** and go to **Audit Period site extensions**.
+2. Filter by cohort using the **Audit period** filter on the right.
+3. Use the **Open past audit-wide deadline** filter and choose **Yes**.
+
+The list shows each organisation still open past the audit-wide deadline, with the audit-wide date, their extended date, and the number of days remaining — the list of sites to chase before their extensions expire. Extensions whose own date has already passed drop off the list automatically.

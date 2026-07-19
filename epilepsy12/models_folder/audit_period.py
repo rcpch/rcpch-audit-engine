@@ -537,6 +537,22 @@ class AuditPeriodExtension(
             CAN_EXTEND_SUBMISSION_DEADLINE
         ]
 
+    @property
+    def is_open_past_audit_wide_deadline(self) -> bool:
+        """
+        True when the audit-wide deadline has passed but this organisation is
+        still able to submit by virtue of a later extension date - ie the
+        sites the audit team may still need to chase before the extended
+        deadline. Close-early rows (date not after the audit-wide deadline)
+        and extensions that have themselves expired return False.
+        """
+        today = timezone.now().date()
+        return (
+            self.extended_submission_date > self.audit_period.submission_deadline
+            and today > self.audit_period.submission_deadline
+            and today <= self.extended_submission_date
+        )
+
     def clean(self):
         # Note: the date may legitimately be earlier than the audit-wide
         # deadline - that is how the audit team closes an organisation's
