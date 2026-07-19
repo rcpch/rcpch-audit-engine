@@ -50,6 +50,18 @@ class AuditPeriodManager(models.Manager):
             submission_deadline__gte=today
         ).first()
 
+    def most_recently_closed(self):
+        """The most recent cohort whose submission deadline has fully passed.
+
+        Used so the dashboard's first cohort card always has a cohort to show
+        ("Data submission closed") even when no cohort is currently in grace -
+        ``is_grace_period()`` returns None once the deadline has passed.
+        """
+        today = timezone.now().date()
+        return self.filter(submission_deadline__lt=today).order_by(
+            "-submission_deadline"
+        ).first()
+
     def visible(self):
         return self.filter(is_visible=True)
 
@@ -84,6 +96,11 @@ class AuditPeriodManager(models.Manager):
         recruiting = self.currently_recruiting()
         submitting = self.currently_submitting()
         grace = self.is_grace_period()
+        # The first card shows the grace cohort while one is in grace, else the
+        # most recently closed cohort, so it is never blank. within_grace_period
+        # keeps its strict meaning for callers deciding which cohort is
+        # imminently submitting.
+        closed_card_period = grace or self.most_recently_closed()
 
         return {
             "currently_recruiting_cohort": recruiting.cohort_number if recruiting else None,
@@ -98,7 +115,7 @@ class AuditPeriodManager(models.Manager):
             "submitting_cohort_submission_date": submitting.submission_deadline if submitting else None,
             "submitting_cohort_days_remaining": submitting.days_until_submission_deadline_for_organisation(organisation=organisation, current_date=today) if submitting else None,
             "submitting_cohort_dates": submitting.as_cohort_card_dict(today=today, organisation=organisation) if submitting else {},
-            "grace_cohort": grace.as_cohort_card_dict(today=today, organisation=organisation) if grace else {},
+            "grace_cohort": closed_card_period.as_cohort_card_dict(today=today, organisation=organisation) if closed_card_period else {},
             "within_grace_period": grace is not None,
             "today": today,
         }

@@ -269,6 +269,31 @@ def test_cohort_summary_without_organisation_is_audit_wide():
     assert summary["submitting_cohort_submission_date"] == submitting.submission_deadline
 
 
+@pytest.mark.django_db
+def test_cohort_summary_grace_card_falls_back_to_most_recently_closed():
+    """The first card always has a cohort: when no cohort is in grace (the
+    common case - grace lasts only weeks), the card shows the most recently
+    closed cohort rather than an empty dict."""
+    summary = AuditPeriod.objects.cohort_summary()
+
+    grace_card = summary["grace_cohort"]
+    assert grace_card != {}, (
+        "grace_cohort card dict was empty - the dashboard's first card would "
+        "render with no cohort number or dates."
+    )
+
+    if summary["within_grace_period"]:
+        # during grace the card shows the grace cohort
+        grace_period = AuditPeriod.objects.is_grace_period()
+        assert grace_card["cohort"] == grace_period.cohort_number
+    else:
+        # otherwise the most recently closed cohort
+        closed = AuditPeriod.objects.most_recently_closed()
+        assert closed is not None
+        assert grace_card["cohort"] == closed.cohort_number
+        assert grace_card["is_extension_eligible"] is False
+
+
 # ---------------------------------------------------------------------------
 # deadline resolution with close-early extensions
 # ---------------------------------------------------------------------------
