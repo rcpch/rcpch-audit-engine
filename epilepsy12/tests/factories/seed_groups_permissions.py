@@ -14,10 +14,7 @@ def seed_groups_fixture(django_db_setup, django_db_blocker):
     with django_db_blocker.unblock():
 
         if not Group.objects.all().exists():
-            groups_seeder(
-                run_create_groups=True,
-                verbose=False,
-            )
+            groups_seeder(verbose=False)
         else:
             print('Groups already seeded. Skipping')
 
