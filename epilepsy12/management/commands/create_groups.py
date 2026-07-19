@@ -378,7 +378,7 @@ def groups_seeder(
             create_permissions(app_config, verbosity=0)
             app_config.models_module = None
 
-    if add_permissions_to_existing_groups:
+    def update_existing_groups_with_permissions(verbose=True):
         for group in GROUPS:
             if verbose:
                 print(f"...adding permissions to {group}...")
@@ -513,9 +513,11 @@ def groups_seeder(
                     if verbose:
                         print("Error: group does not exist!")
 
-                    else:
-                        if verbose:
-                            print("Error: group does not exist!")
+        if add_permissions_to_existing_groups:
+            update_existing_groups_with_permissions()
 
         if not verbose:
             print("groups_seeder(verbose=False), no output, groups seeded.")
+    else:
+        print("Updating existing groups with permissions...")
+        update_existing_groups_with_permissions(verbose=True)

@@ -133,7 +133,7 @@ class Command(BaseCommand):
             print(image())
         elif options["mode"] == "add_permissions_to_existing_groups":
             self.stdout.write("adding permissions to groups...")
-            groups_seeder(add_permissions_to_existing_groups=True)
+            groups_seeder(run_create_groups=False)
             print(image())
         elif options["mode"] == "upload_old_patient_data":
             self.stdout.write("Uploading old patient data.")
