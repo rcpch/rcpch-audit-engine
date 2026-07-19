@@ -19,11 +19,14 @@ The AuditPeriod rows for cohorts 4-9 are seeded into the test DB by the
 plain ``@pytest.mark.django_db`` test can query the mapping directly.
 """
 
-from datetime import date
+from datetime import date, timedelta
 
 import pytest
 
-from epilepsy12.models import AuditPeriod
+from epilepsy12.constants.audit_period_extension_reasons import (
+    AUDIT_PERIOD_EXTENSION_REASONS,
+)
+from epilepsy12.models import AuditPeriod, AuditPeriodExtension
 
 
 @pytest.mark.django_db
@@ -77,3 +80,36 @@ def test_for_fpa_date_returns_none_outside_seeded_periods(fpa_date):
     requirement to seed cohort 10 before FPA dates from 2027 can be registered.
     """
     assert AuditPeriod.objects.for_first_paediatric_assessment_date(fpa_date) is None
+
+
+@pytest.mark.django_db
+@pytest.mark.parametrize("reason_code, _", AUDIT_PERIOD_EXTENSION_REASONS)
+def test_extension_reason_stores_coded_value(GOSH, reason_code, _):
+    """Each coded reason can be stored on the extension and round-trips as an int."""
+    audit_period = AuditPeriod.objects.by_cohort(6)
+    extension = AuditPeriodExtension.objects.create(
+        audit_period=audit_period,
+        organisation=GOSH,
+        extended_submission_date=audit_period.submission_deadline + timedelta(days=28),
+        reason=reason_code,
+    )
+
+    extension.refresh_from_db()
+
+    assert extension.reason == reason_code
+    assert isinstance(extension.reason, int)
+
+
+@pytest.mark.django_db
+@pytest.mark.parametrize("reason_code, expected_label", AUDIT_PERIOD_EXTENSION_REASONS)
+def test_extension_reason_display_label(GOSH, reason_code, expected_label):
+    """get_reason_display() returns the human-readable label for each coded reason."""
+    audit_period = AuditPeriod.objects.by_cohort(6)
+    extension = AuditPeriodExtension.objects.create(
+        audit_period=audit_period,
+        organisation=GOSH,
+        extended_submission_date=audit_period.submission_deadline + timedelta(days=28),
+        reason=reason_code,
+    )
+
+    assert extension.get_reason_display() == expected_label
