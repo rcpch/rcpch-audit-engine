@@ -1,3 +1,4 @@
+from __future__ import annotations
 from datetime import date, timedelta
 from django.utils import timezone
 from django.apps import apps
@@ -362,6 +363,44 @@ class AuditPeriod(
             current_date = timezone.now().date()
         deadline = self.submission_deadline_for_organisation(organisation)
         return max(0, (deadline - current_date).days + 1)
+
+    def extend_submission_deadline(
+        self, organisation: Organisation, days: int, user, reason: int = None
+    ) -> AuditPeriodExtension:
+        """
+        Grant (or further extend) this organisation's submission deadline by
+        ``days`` beyond its current effective deadline. One row per organisation
+        per period; the existing row is edited in place on re-extension.
+        """
+        today = timezone.now().date()
+        if not (self.data_collection_start_date <= today <= self.submission_deadline):
+            raise ValidationError(
+                "Extensions can only be granted for the submitting or grace cohort."
+            )
+
+        extended_deadline = self.submission_deadline_for_organisation(organisation) + timedelta(days=days)
+        if extended_deadline <= self.submission_deadline:
+            raise ValidationError(
+                "Extended date must be after the audit-wide submission deadline."
+            )
+
+        valid_reasons = {code for code, _label in AUDIT_PERIOD_EXTENSION_REASONS}
+        if reason is not None and reason not in valid_reasons:
+            raise ValidationError("Invalid reason for extension.")
+
+
+        extension, created = self.extensions.update_or_create(
+            organisation=organisation,
+            defaults={
+                "extended_submission_date": extended_deadline,
+                "reason": reason,
+                "updated_by": user,
+            },
+        )
+        if created:
+            extension.created_by = user
+            extension.save(update_fields=["created_by"])
+        return extension
 
 
     def clean(self):

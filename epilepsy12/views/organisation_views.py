@@ -1,13 +1,16 @@
 # Python imports
 import math
+from sys import audit
 
 # third party libraries
 from django.conf import settings
 from django.shortcuts import render
 from django.urls import reverse
 from django.contrib.auth.decorators import permission_required
-from django.http import HttpResponse, HttpResponseForbidden
+from django.http import HttpResponse, HttpResponseForbidden, Http404
 from django.db.models import Q
+from django.core.exceptions import ValidationError
+from django.contrib import messages
 
 from django_htmx.http import HttpResponseClientRedirect
 import pandas as pd
@@ -16,7 +19,7 @@ from epilepsy12.models_folder.entities.local_health_board import LocalHealthBoar
 
 # E12 imports
 from ..decorator import user_may_view_this_organisation, login_and_otp_required
-from epilepsy12.constants import INDIVIDUAL_KPI_MEASURES
+from epilepsy12.constants import INDIVIDUAL_KPI_MEASURES, AUDIT_PERIOD_EXTENSION_REASONS
 from epilepsy12.models import (
     AuditPeriod,
     Organisation,
@@ -401,6 +404,48 @@ def selected_organisation_summary(request, organisation_id):
         template_name=template_name,
         context=context,
     )
+
+@login_and_otp_required()
+@user_may_view_this_organisation()
+@permission_required("epilepsy12.can_extend_submission_deadline", raise_exception=True)
+def audit_period_extension(request, organisation_id, cohort):
+    """
+    HTMX get request returning audit_period_extension.html.
+    """
+    template = "epilepsy12/partials/organisation/audit_period_extension.html"
+    selected_organisation = Organisation.objects.get(pk=organisation_id)
+    audit_period = AuditPeriod.objects.by_cohort(cohort_number=cohort)
+    if audit_period is None:
+        raise Http404("Audit period not found")
+
+    if request.method == "POST":
+        reason = int(request.POST.get("reason",""))
+        try:
+            extended_submission_deadline = int(request.POST.get("days", ""))
+        except ValueError:
+            messages.error(request, "Please enter a valid number of days")
+        try:
+            audit_period.extend_submission_deadline(
+                organisation=selected_organisation,
+                reason=reason,
+                days=extended_submission_deadline,
+                user=request.user
+            )
+        except ValidationError as e:
+            messages.error(request, e.messages[0])
+
+        # Now send the email to the organisation admin and the E12 admin
+
+
+    cohort_data = AuditPeriod.objects.cohort_summary(organisation=selected_organisation)
+
+    context = {
+        "cohort_data": cohort_data,
+        "selected_organisation": selected_organisation,
+        "cohort": cohort,
+        "extension_reasons": AUDIT_PERIOD_EXTENSION_REASONS
+    }
+    return render(request=request, template_name=template, context=context)
 
 
 def individual_metrics(request, organisation_id):

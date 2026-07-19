@@ -53,7 +53,7 @@ The audit-wide `submission_deadline` on `AuditPeriod` can be extended for a sing
   - Tests in `epilepsy12/tests/model_tests/test_audit_period.py`: card dict exposes extension when present for the org; eligibility helper excludes completed periods.
   - *Commit: "Expose extension state on cohort card data"*
 
-- [ ] **5. URL**
+- [X] **5. URL**
   - Add path to `organisation_patterns` in `epilepsy12/urls.py`: `organisation/<int:organisation_id>/audit_period/<int:cohort>/extension`, name `audit_period_extension`.
 
 - [ ] **6. View: GET form partial + POST grant**
