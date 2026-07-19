@@ -73,6 +73,11 @@ def _sign_in(client, user, organisation):
         organisation_employer=organisation, is_primary=True
     )
     twofactor_signin(client, user)
+    # set_organisation_employer fires an employer-assignment notification email
+    # when settings.CHANGE_NOTIFICATION_EMAILS is configured (it is in CI but
+    # not locally) - clear the outbox so email assertions only see emails sent
+    # by the extension endpoint itself.
+    mail.outbox = []
 
 
 @pytest.mark.django_db
