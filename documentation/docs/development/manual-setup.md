@@ -128,7 +128,7 @@ Both functions accept the `--verbose` flag also to have a more granular output t
 
 There are some other functions here also, but these are likely soon to be deprecated:
 
-- add_permissions_to_existing_groups
+- add_permissions_to_existing_groups (deprecated 19/7/2026)
 - upload_old_patient_data
 - async_upload_old_patient_data
 - upload_user_data

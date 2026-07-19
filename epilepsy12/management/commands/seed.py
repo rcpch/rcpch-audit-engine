@@ -51,7 +51,7 @@ class Command(BaseCommand):
             "-m",
             "--mode",
             type=str,
-            help="Mode - seed options to include: cases, seed_registrations, seed_groups_and_permissions, add_permissions_to_existing_groups, upload_old_patient_data, upload_user_data, add_new_epilepsy_causes",
+            help="Mode - seed options to include: cases, seed_registrations, seed_groups_and_permissions, upload_old_patient_data, upload_user_data, add_new_epilepsy_causes",
         )
         parser.add_argument(
             "-c",
