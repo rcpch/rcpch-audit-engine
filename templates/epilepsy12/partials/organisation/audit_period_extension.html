@@ -1,0 +1,72 @@
+<div class="rcpch_summary_stats" id="cohort_card_{{ cohort }}">
+  <div class="rcpch_summary_stats_row">
+    <h1>COHORT {{ cohort }} -</h1> EXTEND DEADLINE</h1>
+  </div>
+
+  <div class="rcpch_summary_stats_row">
+    <div class="rcpch_summary_stats_description">
+      Current submission deadline: {{ audit_period.submission_deadline }}
+      {% if existing_extension %}
+        (already extended to {{ existing_extension.extended_submission_date }})
+      {% endif %}
+    </div>
+  </div>
+
+  <form
+    class="ui rcpch form"
+    hx-post="{% url 'audit_period_extension' organisation_id=selected_organisation.pk cohort=cohort %}"
+    hx-target="#cohort_card_{{ cohort }}"
+    hx-swap="outerHTML"
+    hx-headers='{"X-CSRFToken": "{{ csrf_token }}"}'
+  >
+    <div class="rcpch_summary_stats_row">
+      <div class="field">
+        <label for="extension_days_{{ cohort }}">Extend by (days)</label>
+        <input
+          class="ui input"
+          type="number"
+          id="extension_days_{{ cohort }}"
+          name="days"
+          min="1"
+          required
+          value="{{ posted_days|default:'' }}"
+        >
+      </div>
+    </div>
+
+    <div class="rcpch_summary_stats_row">
+      <div class="field">
+        <label for="extension_reason_{{ cohort }}">Reason (optional)</label>
+        <select class="ui dropdown" id="extension_reason_{{ cohort }}" name="reason">
+          <option value="">-- Select a reason --</option>
+          {% for code, label in extension_reasons %}
+            <option value="{{ code }}" {% if posted_reason == code %}selected{% endif %}>{{ label }}</option>
+          {% endfor %}
+        </select>
+      </div>
+    </div>
+
+    {% if extension_error %}
+      <div class="rcpch_summary_stats_row">
+        <div class="rcpch_summary_stats_description" style="color: var(--rcpch_pink)">
+          {{ extension_error }}
+        </div>
+      </div>
+    {% endif %}
+
+    <div class="rcpch_summary_stats_row">
+      <button type="submit" class="ui rcpch_positive button">Save extension</button>
+      <button
+        style="margin-top: 5px;"
+        type="button"
+        class="ui rcpch_grey button"
+        hx-get="{% url 'audit_period_extension' organisation_id=selected_organisation.pk cohort=cohort %}?card=true"
+        hx-target="#cohort_card_{{ cohort }}"
+        hx-swap="outerHTML"
+        hx-headers='{"X-CSRFToken": "{{ csrf_token }}"}'
+      >
+        Cancel
+      </button>
+    </div>
+  </form>
+</div>

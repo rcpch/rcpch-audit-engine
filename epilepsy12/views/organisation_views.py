@@ -410,42 +410,107 @@ def selected_organisation_summary(request, organisation_id):
 @permission_required("epilepsy12.can_extend_submission_deadline", raise_exception=True)
 def audit_period_extension(request, organisation_id, cohort):
     """
-    HTMX get request returning audit_period_extension.html.
+    HTMX endpoint for granting/editing a per-organisation submission deadline extension.
+
+    GET:            returns the extension form partial (audit_period_extension.html),
+                    or the plain cohort card when ?card=true (used by the form's
+                    cancel button to swap the card back).
+    POST success:   grants/updates the extension and returns the re-rendered cohort
+                    card showing the new "Extended to" badge.
+    POST invalid:   re-renders the form partial with the error and posted values.
+
+    The form partial and cohort card share the same root element id
+    (cohort_card_<cohort>) so every response swaps the same target.
     """
-    template = "epilepsy12/partials/organisation/audit_period_extension.html"
     selected_organisation = Organisation.objects.get(pk=organisation_id)
     audit_period = AuditPeriod.objects.by_cohort(cohort_number=cohort)
     if audit_period is None:
         raise Http404("Audit period not found")
 
+    def render_cohort_card():
+        """Re-render just this period's card with org-aware extension state."""
+        return render(
+            request=request,
+            template_name="epilepsy12/partials/organisation/cohort_card.html",
+            context={
+                "cohort": audit_period.as_cohort_card_dict(
+                    organisation=selected_organisation
+                ),
+                "cohort_data": AuditPeriod.objects.cohort_summary(
+                    organisation=selected_organisation
+                ),
+                "selected_organisation": selected_organisation,
+                "cohort_number": cohort,
+            },
+        )
+
+    def render_form(**extra_context):
+        return render(
+            request=request,
+            template_name="epilepsy12/partials/organisation/audit_period_extension.html",
+            context={
+                "selected_organisation": selected_organisation,
+                "cohort": cohort,
+                "audit_period": audit_period,
+                "existing_extension": audit_period.extensions.filter(
+                    organisation=selected_organisation
+                ).first(),
+                "extension_reasons": AUDIT_PERIOD_EXTENSION_REASONS,
+                **extra_context,
+            },
+        )
+
+    # cancel button: swap the card back
+    if request.method == "GET" and request.GET.get("card"):
+        return render_cohort_card()
+
     if request.method == "POST":
-        reason = int(request.POST.get("reason",""))
+        # days is required; reason is optional
         try:
-            extended_submission_deadline = int(request.POST.get("days", ""))
-        except ValueError:
-            messages.error(request, "Please enter a valid number of days")
+            days = int(request.POST.get("days", ""))
+        except (TypeError, ValueError):
+            days = None
+
+        reason_raw = request.POST.get("reason", "")
+        try:
+            reason = int(reason_raw) if reason_raw != "" else None
+        except (TypeError, ValueError):
+            reason = None
+
+        if days is None or days < 1:
+            return render_form(
+                extension_error="Please enter a valid number of days.",
+                posted_days=request.POST.get("days", ""),
+                posted_reason=reason,
+            )
+        if reason_raw != "" and reason is None:
+            return render_form(
+                extension_error="Please choose a valid reason.",
+                posted_days=days,
+                posted_reason=None,
+            )
+
         try:
             audit_period.extend_submission_deadline(
                 organisation=selected_organisation,
                 reason=reason,
-                days=extended_submission_deadline,
-                user=request.user
+                days=days,
+                user=request.user,
             )
         except ValidationError as e:
-            messages.error(request, e.messages[0])
+            return render_form(
+                extension_error=e.messages[0],
+                posted_days=days,
+                posted_reason=reason,
+            )
 
-        # Now send the email to the organisation admin and the E12 admin
+        # success: email the organisation lead clinician(s) and the audit team
+        # TODO: construct + send extension granted email
 
+        return render_cohort_card()
 
-    cohort_data = AuditPeriod.objects.cohort_summary(organisation=selected_organisation)
-
-    context = {
-        "cohort_data": cohort_data,
-        "selected_organisation": selected_organisation,
-        "cohort": cohort,
-        "extension_reasons": AUDIT_PERIOD_EXTENSION_REASONS
-    }
-    return render(request=request, template_name=template, context=context)
+    # plain GET: show the form
+    return render_form()
 
 
 def individual_metrics(request, organisation_id):
