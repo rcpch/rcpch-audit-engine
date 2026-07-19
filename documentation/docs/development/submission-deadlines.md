@@ -31,19 +31,19 @@ The audit-wide `submission_deadline` on `AuditPeriod` can be extended for a sing
 
 ### Implementation checklist
 
-- [ ] **1. Permission: constant + migration**
+- [X] **1. Permission: constant + migration**
   - Add `CAN_EXTEND_SUBMISSION_DEADLINE` to `epilepsy12/constants/user_types.py` and include in `PERMISSIONS`.
   - Add to `AuditPeriodExtension.Meta.permissions` in `epilepsy12/models_folder/audit_period.py`.
   - *Commit: "Add can_extend_submission_deadline permission"*
 
-- [ ] **2. Change `reason` to coded choices + single migration for steps 1–2**
+- [X] **2. Change `reason` to coded choices + single migration for steps 1–2**
   - Define reason constants and `EXTENSION_REASONS` tuple on `AuditPeriodExtension` (e.g. staffing shortage, EPR/system issues, clinical capacity, data quality queries, other).
   - Replace `reason = models.TextField(...)` with `models.PositiveSmallIntegerField(choices=EXTENSION_REASONS, ...)`. Field was introduced in migration `0062`; existing rows (if any) need a data decision — default to "other".
   - Generate one migration covering the new permission and the field change.
   - Model test: reason stores a coded value; `get_reason_display()` returns the label.
   - *Commit: "Change extension reason to coded choices"*
 
-- [ ] **3. Grant permission to audit team group**
+- [X] **3. Grant permission to audit team group**
   - Wire into `epilepsy12/management/commands/create_groups.py` (content type for `AuditPeriodExtension`, assign to `epilepsy12_audit_team_full_access`).
   - *Commit: "Grant extension permission to audit team group"*
 

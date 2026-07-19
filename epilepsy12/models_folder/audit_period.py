@@ -52,11 +52,13 @@ class AuditPeriodManager(models.Manager):
     def visible(self):
         return self.filter(is_visible=True)
 
-    def cohort_summary(self):
+    def cohort_summary(self, organisation: Organisation | None = None):
         """
         Returns a dict describing the currently-recruiting, currently-submitting
         and grace-period cohorts, mirroring the shape historically produced by
         ``cohorts_and_dates`` so templates and views can be migrated piecemeal.
+        Optional `organisation` parameter to individualise the cohort summary for
+        a specific organisation, which may have an extended submission deadline.
 
         Keys:
             currently_recruiting_cohort          -> int | None
@@ -74,6 +76,7 @@ class AuditPeriodManager(models.Manager):
             grace_cohort                          -> dict (card shape) | {}
             within_grace_period                   -> bool
             today                                 -> date
+            organisation                          -> Organisation | None
         """
         today = timezone.now().date()
 
@@ -86,15 +89,15 @@ class AuditPeriodManager(models.Manager):
             "currently_recruiting_cohort_start_date": recruiting.recruitment_start_date if recruiting else None,
             "currently_recruiting_cohort_end_date": recruiting.recruitment_end_date if recruiting else None,
             "currently_recruiting_cohort_submission_date": recruiting.submission_deadline if recruiting else None,
-            "currently_recruiting_cohort_days_remaining": recruiting.days_until_submission_deadline_for_organisation(None, current_date=today) if recruiting else None,
-            "currently_recruiting_cohort_dates": recruiting.as_cohort_card_dict(today=today) if recruiting else {},
+            "currently_recruiting_cohort_days_remaining": recruiting.days_until_submission_deadline_for_organisation(organisation=organisation, current_date=today) if recruiting else None,
+            "currently_recruiting_cohort_dates": recruiting.as_cohort_card_dict(today=today, organisation=organisation) if recruiting else {},
             "submitting_cohort": submitting.cohort_number if submitting else None,
             "submitting_cohort_start_date": submitting.recruitment_start_date if submitting else None,
             "submitting_cohort_end_date": submitting.recruitment_end_date if submitting else None,
             "submitting_cohort_submission_date": submitting.submission_deadline if submitting else None,
-            "submitting_cohort_days_remaining": submitting.days_until_submission_deadline_for_organisation(None, current_date=today) if submitting else None,
-            "submitting_cohort_dates": submitting.as_cohort_card_dict(today=today) if submitting else {},
-            "grace_cohort": grace.as_cohort_card_dict(today=today) if grace else {},
+            "submitting_cohort_days_remaining": submitting.days_until_submission_deadline_for_organisation(organisation=organisation, current_date=today) if submitting else None,
+            "submitting_cohort_dates": submitting.as_cohort_card_dict(today=today, organisation=organisation) if submitting else {},
+            "grace_cohort": grace.as_cohort_card_dict(today=today, organisation=organisation) if grace else {},
             "within_grace_period": grace is not None,
             "today": today,
         }
@@ -283,7 +286,11 @@ class AuditPeriod(
         """No data entry possible anywhere, including any per-site extensions."""
         return timezone.now().date() > self.effective_latest_submission_date
 
-    def as_cohort_card_dict(self, today: date | None = None) -> dict:
+    def as_cohort_card_dict(
+        self,
+        today: date | None = None,
+        organisation: Organisation | None = None,
+    ) -> dict:
         """
         Returns this AuditPeriod as a dict in the shape consumed by the
         ``cohort_card.html`` template and historically produced by
@@ -292,13 +299,25 @@ class AuditPeriod(
         """
         if today is None:
             today = timezone.now().date()
+
+        extension = self.extensions.filter(organisation=organisation).first() if organisation else None
+
         return {
             "cohort": self.cohort_number,
             "cohort_start_date": self.recruitment_start_date,
             "cohort_end_date": self.recruitment_end_date,
             "submission_date": self.submission_deadline,
             "days_remaining": self.days_until_submission_deadline_for_organisation(
-                None, current_date=today
+                organisation=organisation, current_date=today
+            ),
+            "audit_period_id": self.pk,
+            "extended_submission_date": extension.extended_submission_date if extension else None,
+            # eligibility is evaluated against the passed-in ``today``, not the
+            # is_collecting_data/is_in_grace_period properties, which are pinned
+            # to timezone.now(). The window spans data collection start through
+            # the audit-wide deadline, covering both submitting and grace.
+            "is_extension_eligible": (
+                self.data_collection_start_date <= today <= self.submission_deadline
             ),
         }
 
