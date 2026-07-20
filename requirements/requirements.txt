@@ -27,6 +27,7 @@ whitenoise==6.9.0
 openpyxl==3.1.5
 python-dotenv==1.2.2
 azure-identity==1.22.0
+nh3==0.3.6
 
 ## graphing
 plotly==6.0.1
