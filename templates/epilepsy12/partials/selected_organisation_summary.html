@@ -12,7 +12,7 @@
             <div class='column'>
                 <div class="back link">
                     <button class="ui rcpch_positive button jump" _="on click go to top of #kpis">Jump to All KPI Metrics</button>
-                    
+
                     <a class="ui rcpch_positive button" href="{% url 'case_filter_list' organisation_id=selected_organisation.pk %}">
                         <i class="yellow wrench icon"></i>
                         Report Builder
@@ -44,11 +44,11 @@
                         View users of
                         {% if selected_organisation.trust %}
                             {% with organisation_name=selected_organisation.trust.name|title %}
-                            {{ organisation_name|capitalise_org_names }} 
+                            {{ organisation_name|capitalise_org_names }}
                             {% endwith %}
                         {% elif selected_organisation.local_health_board %}
                             {% with organisation_name=selected_organisation.local_health_board.name|title %}
-                            {{ organisation_name|capitalise_org_names }} 
+                            {{ organisation_name|capitalise_org_names }}
                             {% endwith %}
                         {% endif %}
                     </a>
@@ -58,11 +58,11 @@
                         View Clinical Audit entries for
                         {% if selected_organisation.trust %}
                             {% with organisation_name=selected_organisation.trust.name|title %}
-                            {{ organisation_name|capitalise_org_names }} 
+                            {{ organisation_name|capitalise_org_names }}
                             {% endwith %}
                         {% elif selected_organisation.local_health_board %}
                             {% with organisation_name=selected_organisation.local_health_board.name|title %}
-                            {{ organisation_name|capitalise_org_names }} 
+                            {{ organisation_name|capitalise_org_names }}
                             {% endwith %}
                         {% endif %}
                     </a>
@@ -73,11 +73,11 @@
                         View Organisational Audit for
                         {% if selected_organisation.trust %}
                             {% with organisation_name=selected_organisation.trust.name|title %}
-                            {{ organisation_name|capitalise_org_names }} 
+                            {{ organisation_name|capitalise_org_names }}
                             {% endwith %}
                         {% elif selected_organisation.local_health_board %}
                             {% with organisation_name=selected_organisation.local_health_board.name|title %}
-                            {{ organisation_name|capitalise_org_names }} 
+                            {{ organisation_name|capitalise_org_names }}
                             {% endwith %}
                         {% endif %}
                     </a>
@@ -221,10 +221,10 @@
 
         <div class="equal width row" style="height: 100%;">
 
-            
+
 
                 <div class="column" style="height: 100%;">
-    
+
                     <div class="ui rcpch_light_blue fluid card" style="height: 350px;;">
                         <div class="content">
                             <h3 >Distribution by Ethnicity
@@ -238,7 +238,7 @@
                                 ></i>
                             </h3>
                         </div>
-    
+
                         <div class="description">
                                 {% if cases_aggregated_by_ethnicity %}
                                     <div id="ethnicity_piechart" style="width:100%; height: 300px;"></div>
@@ -246,9 +246,9 @@
                                     <h5>No data yet!<h5>
                                 {% endif %}
                         </div>
-    
+
                     </div>
-    
+
                     <div class="ui rcpch_light_blue fluid card" style="height: 350px;">
                         <div class="content">
                                 <h3>
@@ -263,7 +263,7 @@
                                     ></i>
                                 </h3>
                         </div>
-    
+
                         <div class='description'>
                             {% if cases_aggregated_by_deprivation %}
                                 <div id="index_of_multiple_deprivation_score_piechart" style="width:100%; height: 300px;"></div>
@@ -271,13 +271,13 @@
                                 <h5>No data yet!<h5>
                             {% endif %}
                         </div>
-                        
+
                     </div>
-                
+
                 </div>
-                
+
                 <div class="column" style="height: 100%;">
-    
+
                     <div class="ui rcpch_light_blue fluid card" style="height: 350px;">
                         <div class="content">
                                 <h3>Distribution by Sex
@@ -291,7 +291,7 @@
                                     ></i>
                                 </h3>
                         </div>
-                    
+
                         <div class='description'>
                                 {% if cases_aggregated_by_sex %}
                                     <div id="sex_piechart" style="width:100%; height: 300px;"></div>
@@ -299,9 +299,9 @@
                                     <h5>No data yet!<h5>
                                 {% endif %}
                         </div>
-    
+
                     </div>
-                    
+
                     <div class="ui rcpch_light_blue fluid card" style="height: 350px;">
                         <div class="content">
                                 <h3>Distribution by Age Range
@@ -315,7 +315,7 @@
                                     ></i>
                                 </h3>
                         </div>
-                    
+
                         <div class='description'>
                                 {% if cases_aggregated_by_age_range %}
                                     <div id="age_range_piechart" style="width:100%; height: 300px;"></div>
@@ -323,12 +323,12 @@
                                     <h5>No data yet!<h5>
                                 {% endif %}
                         </div>
-    
+
                     </div>
-    
+
                 </div>
-                
-            
+
+
         </div>
 
         <div class="sixteen wide right fluid column">
@@ -351,19 +351,19 @@
                 {{ organisation_cases_imd_payload|json_script:"organisation-cases-map-payload" }}
                 <div class="extra content">
                     <p style="color: white; font-family: Montserrat-Regular;">
-                        Max: {{ aggregated_distances.max_distance_travelled_mi }} mi 
+                        Max: {{ aggregated_distances.max_distance_travelled_mi }} mi
                         ({{ aggregated_distances.max_distance_travelled_km }} km)
                     </p>
                     <p style="color: white; font-family: Montserrat-Regular;">
-                        Mean: {{ aggregated_distances.mean_distance_travelled_mi }} mi 
+                        Mean: {{ aggregated_distances.mean_distance_travelled_mi }} mi
                         ({{ aggregated_distances.mean_distance_travelled_km }} km)
                     </p>
                     <p style="color: white; font-family: Montserrat-Regular;">
-                        Median: {{ aggregated_distances.median_distance_travelled_mi }} mi 
+                        Median: {{ aggregated_distances.median_distance_travelled_mi }} mi
                         ({{ aggregated_distances.median_distance_travelled_km }} km)
                     </p>
                     <p style="color: white; font-family: Montserrat-Regular;">
-                        Std: {{ aggregated_distances.std_distance_travelled_mi }} mi 
+                        Std: {{ aggregated_distances.std_distance_travelled_mi }} mi
                         ({{ aggregated_distances.std_distance_travelled_km }} km)
                     </p>
                 </div>
@@ -375,7 +375,7 @@
             <div class="sixteen wide column">
                 <div
                     class="sixteen wide rcpch segment"
-                    hx-get="{% url 'selected_trust_kpis' organisation_id=selected_organisation.pk access='private' %}"
+                    hx-get="{% url 'selected_trust_kpis' organisation_id=selected_organisation.pk %}"
                     hx-vals='{"cohort":"{{cohort_number}}"}'
                     hx-trigger="load" hx-swap='innerHTML'
                     hx-indicator='#kpis'
@@ -392,7 +392,7 @@
             </div>
 
         {% else %}
-        
+
             <div class="ui rcpch_info icon message">
                 <i class='exclamation circle icon'></i>
                 <div class="content">

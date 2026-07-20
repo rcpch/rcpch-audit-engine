@@ -298,14 +298,9 @@ organisation_patterns = [
         name="selected_organisation_summary_select",
     ),
     path(
-        "selected_trust/<int:organisation_id>/kpis/<str:access>",
+        "selected_trust/<int:organisation_id>/kpis",
         view=selected_trust_kpis,
         name="selected_trust_kpis",
-    ),
-    path(
-        "selected_trust/<int:organisation_id>/open_select",
-        view=selected_trust_open_select,
-        name="selected_trust_open_select",
     ),
     path(
         "selected_trust_kpis/<int:organisation_id>/select_kpi",
@@ -317,11 +312,6 @@ organisation_patterns = [
         view=case_statistics,
         name="case_statistics",
     ),
-    # path(
-    #     "organisation/<int:organisation_id>/open_access",
-    #     view=open_access,
-    #     name="open_access",
-    # ),
     path(
         "organisation/<int:organisation_id>/kpi_download/<int:cohort>",
         view=kpi_download,

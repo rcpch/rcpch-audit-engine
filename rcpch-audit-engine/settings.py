@@ -58,16 +58,8 @@ CAPTCHA_FONT_SIZE = 40
 
 # Need to handle missing ENV var
 # Need to handle duplicates
-ALLOWED_HOSTS = os.getenv("DJANGO_ALLOWED_HOSTS", "").split(",") + [
-    "127.0.0.1",
-    "localhost",
-    "0.0.0.0",
-]
-CSRF_TRUSTED_ORIGINS = os.getenv("DJANGO_CSRF_TRUSTED_ORIGINS", "").split(",") + [
-    "https://127.0.0.1",
-    "https://localhost",
-    "https://0.0.0.0",
-]
+ALLOWED_HOSTS = os.getenv("DJANGO_ALLOWED_HOSTS", "").split(",")
+CSRF_TRUSTED_ORIGINS = os.getenv("DJANGO_CSRF_TRUSTED_ORIGINS", "").split(",")
 
 # Enables Django to use the X-Forwarded-Host header in preference to the Host header.
 # Fixes CSRF errors when using Caddy to forward requests to Django.
@@ -162,17 +154,18 @@ MIDDLEWARE = [
 ]
 
 # Django security middleware settings for HSTS support
-SECURE_BROWSER_XSS_FILTER = True
-SECURE_HSTS_SECONDS = 3600
-SECURE_HSTS_PRELOAD = True
+SECURE_HSTS_SECONDS = 31536000
+SECURE_HSTS_INCLUDE_SUBDOMAINS = True
 SECURE_CONTENT_TYPE_NOSNIFF = True
 X_FRAME_OPTIONS = "DENY"
 
 # Session cookies
 SESSION_COOKIE_SECURE = True  # enforces HTTPS
-CSRF_COOKIE_SECURE = True
+SESSION_COOKIE_SAMESITE = "Lax" # the default but set explicitly for the benefit of vulnerability scanners.
 SESSION_COOKIE_HTTPONLY = True  # cannot access session cookie on client-side using JS
 SESSION_EXPIRE_AT_BROWSER_CLOSE = True  # session expires on browser close
+CSRF_COOKIE_SECURE = True
+CSRF_COOKIE_SAMESITE = "Lax"
 
 ROOT_URLCONF = "rcpch-audit-engine.urls"
 

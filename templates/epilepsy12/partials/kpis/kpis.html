@@ -29,7 +29,7 @@ Currently the aggregation queries are run with every page load.
                         <!-- anyone can refresh and rerun aggregations that is not a member of the public  -->
                         <button
                             class='ui right floated rcpch_primary button'
-                            hx-get="{% url 'selected_trust_kpis' organisation_id=organisation.pk access='private' %}"
+                            hx-get="{% url 'selected_trust_kpis' organisation_id=organisation.pk %}"
                             name="refresh"
                             hx-trigger="click"
                             {% if cohort_number != submitting_cohort_number %}disabled{% endif %}
@@ -707,4 +707,3 @@ Currently the aggregation queries are run with every page load.
             </div>
 
     </div>
-
