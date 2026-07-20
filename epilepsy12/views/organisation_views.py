@@ -403,6 +403,8 @@ def selected_organisation_summary(request, organisation_id):
     )
 
 
+@login_and_otp_required()
+@user_may_view_this_organisation()
 def individual_metrics(request, organisation_id):
     """
     HTMX get request returning individual_metrics.html  real-time Key Performance Indicator (KPI) Metrics table.
