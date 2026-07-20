@@ -154,7 +154,6 @@ MIDDLEWARE = [
 ]
 
 # Django security middleware settings for HSTS support
-SECURE_BROWSER_XSS_FILTER = True
 SECURE_HSTS_SECONDS = 31536000
 SECURE_HSTS_INCLUDE_SUBDOMAINS = True
 SECURE_CONTENT_TYPE_NOSNIFF = True
@@ -162,9 +161,11 @@ X_FRAME_OPTIONS = "DENY"
 
 # Session cookies
 SESSION_COOKIE_SECURE = True  # enforces HTTPS
-CSRF_COOKIE_SECURE = True
+SESSION_COOKIE_SAMESITE = "Lax" # the default but set explicitly for the benefit of vulnerability scanners.
 SESSION_COOKIE_HTTPONLY = True  # cannot access session cookie on client-side using JS
 SESSION_EXPIRE_AT_BROWSER_CLOSE = True  # session expires on browser close
+CSRF_COOKIE_SECURE = True
+CSRF_COOKIE_SAMESITE = "Lax"
 
 ROOT_URLCONF = "rcpch-audit-engine.urls"
 
