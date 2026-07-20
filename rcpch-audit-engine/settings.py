@@ -58,16 +58,8 @@ CAPTCHA_FONT_SIZE = 40
 
 # Need to handle missing ENV var
 # Need to handle duplicates
-ALLOWED_HOSTS = os.getenv("DJANGO_ALLOWED_HOSTS", "").split(",") + [
-    "127.0.0.1",
-    "localhost",
-    "0.0.0.0",
-]
-CSRF_TRUSTED_ORIGINS = os.getenv("DJANGO_CSRF_TRUSTED_ORIGINS", "").split(",") + [
-    "https://127.0.0.1",
-    "https://localhost",
-    "https://0.0.0.0",
-]
+ALLOWED_HOSTS = os.getenv("DJANGO_ALLOWED_HOSTS", "").split(",")
+CSRF_TRUSTED_ORIGINS = os.getenv("DJANGO_CSRF_TRUSTED_ORIGINS", "").split(",")
 
 # Enables Django to use the X-Forwarded-Host header in preference to the Host header.
 # Fixes CSRF errors when using Caddy to forward requests to Django.
