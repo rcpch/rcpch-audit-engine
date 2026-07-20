@@ -25,7 +25,6 @@ def check_school_individual_healthcare_kpi_aggs(
 ):
     url = reverse("selected_trust_kpis", kwargs={
         "organisation_id": org.id,
-        "access": "private"
     })
 
     url = f"{url}?cohort={cohort}"
@@ -200,7 +199,6 @@ def test_kpi_calculations_correct_for_case_with_referral_in_different_country(
     # It could be any org but use the one we already have
     url = reverse("selected_trust_kpis", kwargs={
         "organisation_id": english_org.id,
-        "access": "private"
     })
 
     url = f"{url}?cohort={cohort}"

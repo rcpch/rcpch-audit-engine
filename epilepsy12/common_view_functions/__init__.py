@@ -31,9 +31,6 @@ from .report_queries import (
     get_all_nhs_regions,
     get_all_open_uk_regions,
 )
-from .sanction_user_access import (
-    logged_in_user_may_access_this_organisation,
-)
 from .group_for_group import group_for_role
 from .tiles_for_region import return_tile_for_region
 from .map_from_shape_file import *
