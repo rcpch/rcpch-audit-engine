@@ -6,6 +6,7 @@ from django.apps import apps
 from django.shortcuts import render
 
 # e12
+from epilepsy12.decorator import login_and_otp_required, user_may_view_this_child
 from epilepsy12.models import (
     Registration,
     Site,
@@ -13,7 +14,9 @@ from epilepsy12.models import (
 
 
 # HTMX generic partials
-def registration_active(request, case_id, active_template):
+@login_and_otp_required()
+@user_may_view_this_child()
+def registration_active(request, can_edit, case_id, active_template):
     """
     Call back from GET request in steps partial template
     Triggered also on registration in the audit
