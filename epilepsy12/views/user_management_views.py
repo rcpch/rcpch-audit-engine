@@ -28,6 +28,7 @@ from django_htmx.http import HttpResponseClientRedirect
 
 
 # Other dependencies
+from epilepsy12.constants.user_types import ROLES
 from two_factor.views import LoginView as TwoFactorLoginView
 from django_otp import devices_for_user, user_has_device
 
@@ -962,9 +963,41 @@ def all_epilepsy12_users_list(request, organisation_id):
     ):
         raise PermissionDenied()
 
-    all_users = Epilepsy12User.objects.all().values()
+    all_users = Epilepsy12User.objects.all()
+    
+    user_list = []
+    for user in all_users:
+        created_by = user.created_by.email if user.created_by else None
+        updated_by = user.updated_by.email if user.updated_by else None
 
-    df = pd.DataFrame(all_users)
+        role = dict(ROLES).get(user.role, "Unknown Role")
+
+        user_list.append(
+            {
+                "id": user.id,
+                "title": user.title,
+                "first_name": user.first_name,
+                "surname": user.surname,
+                "email": user.email,
+                "is_active": user.is_active,
+                "is_superuser": user.is_superuser,
+                "is_rcpch_audit_team_member": user.is_rcpch_audit_team_member,
+                "is_rcpch_staff": user.is_rcpch_staff,
+                "role": role,
+                "created_at": user.created_at,
+                "created_by": created_by,
+                "date_joined": user.date_joined,
+                "updated_at": user.updated_at,
+                "updated_by": updated_by,
+                "last_login": user.last_login,
+                "organisations": ", ".join(
+                    [org_employer.employer_organisation.name
+                    for org_employer in user.employer_organisations.filter(is_active=True)]
+                ),
+            }
+        )
+
+    df = pd.DataFrame(user_list)
 
     # Convert DataFrame to CSV format
     csv_data = df.to_csv(index=False)
