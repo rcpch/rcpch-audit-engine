@@ -688,6 +688,10 @@ def kpi_download(request, organisation_id, cohort):
     """
     GET: Loads the page necessary for downloading KPIs
     """
+    if not request.user.is_superuser and not request.user.is_rcpch_audit_team_member:
+        return HttpResponseForbidden(
+            "You do not have permission to download KPIs"
+        )
 
     context = {"organisation_id": organisation_id, "cohort": cohort}
 
@@ -699,6 +703,10 @@ def kpi_download(request, organisation_id, cohort):
 @login_and_otp_required()
 @permission_required("epilepsy12.can_publish_epilepsy12_data", raise_exception=True)
 def kpi_download_file(request, cohort):
+    if not request.user.is_superuser and not request.user.is_rcpch_audit_team_member:
+        return HttpResponseForbidden(
+            "You do not have permission to download KPIs"
+        )
 
     (
         country_df,
