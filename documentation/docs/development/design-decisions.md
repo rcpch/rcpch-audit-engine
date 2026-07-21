@@ -161,8 +161,9 @@ The second place that custom HTMX triggers are used is in the ```confirm_eligibl
 The ```registration_status``` trigger calls the function of the same name in ```registration_views.py``` which returns the ```registration_dates.html``` partial with an updated instance of registration allowing the date fields to be enabled.
 
 ```python
-@login_required
-@group_required('epilepsy12_audit_team_edit_access', 'epilepsy12_audit_team_full_access', 'trust_audit_team_edit_access', 'trust_audit_team_full_access')
+@login_and_otp_required()
+@user_may_view_this_child()
+@permission_required("epilepsy12.change_registration", raise_exception=True)
 def registration_status(request, registration_id):
 
     registration = Registration.objects.get(pk=registration_id)
