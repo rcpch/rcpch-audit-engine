@@ -629,6 +629,7 @@ def transfer_response(request, can_edit, organisation_id, case_id, organisation_
 @user_may_view_this_child()
 @permission_required(
     "epilepsy12.change_case",
+    raise_exception=True,
 )
 def case_submit(request, can_edit, organisation_id, case_id):
     """
@@ -656,7 +657,7 @@ def case_submit(request, can_edit, organisation_id, case_id):
 
 @login_and_otp_required()
 @user_may_view_this_child()
-@permission_required("epilepsy12.view_case")
+@permission_required("epilepsy12.view_case", raise_exception=True)
 def case_performance_summary(request, can_edit, case_id):
     case = Case.objects.get(pk=case_id)
     site = Site.objects.filter(
@@ -694,7 +695,7 @@ Case function based views - class based views not chosen as need to accept organ
 
 @login_and_otp_required()
 @user_may_view_this_organisation()
-@permission_required("epilepsy12.add_case")
+@permission_required("epilepsy12.add_case", raise_exception=True)
 def create_case(request, organisation_id):
     """
     Django function based - returns django form to create a new case, or saves a new case if a

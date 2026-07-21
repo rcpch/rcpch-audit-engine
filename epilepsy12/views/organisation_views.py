@@ -683,7 +683,7 @@ def view_preference(request, organisation_id, template_name):
 
 
 @login_and_otp_required()
-@permission_required("epilepsy12.can_publish_epilepsy12_data")
+@permission_required("epilepsy12.can_publish_epilepsy12_data", raise_exception=True)
 def kpi_download(request, organisation_id, cohort):
     """
     GET: Loads the page necessary for downloading KPIs
@@ -697,7 +697,7 @@ def kpi_download(request, organisation_id, cohort):
 
 
 @login_and_otp_required()
-@permission_required("epilepsy12.can_publish_epilepsy12_data")
+@permission_required("epilepsy12.can_publish_epilepsy12_data", raise_exception=True)
 def kpi_download_file(request, cohort):
 
     (
