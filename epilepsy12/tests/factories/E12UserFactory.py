@@ -31,7 +31,7 @@ class E12UserFactory(factory.django.DjangoModelFactory):
         model = Epilepsy12User  # returns the Epilepsy12User object
         skip_postgeneration_save = True
 
-    email = factory.Sequence(lambda n: f"e12_test_user_{n}@nhs.net")
+    email = factory.Faker("email")
     first_name = "Mandel"
     surname = "Brot"
     is_active = True
