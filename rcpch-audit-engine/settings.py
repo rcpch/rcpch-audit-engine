@@ -134,7 +134,6 @@ INSTALLED_APPS = [
 ]
 
 MIDDLEWARE = [
-    "silk.middleware.SilkyMiddleware",
     "django.middleware.security.SecurityMiddleware",
     "django.middleware.clickjacking.XFrameOptionsMiddleware",
     "whitenoise.middleware.WhiteNoiseMiddleware",
@@ -144,6 +143,7 @@ MIDDLEWARE = [
     "django.middleware.common.CommonMiddleware",
     "django.middleware.csrf.CsrfViewMiddleware",
     "django.contrib.auth.middleware.AuthenticationMiddleware",
+    "silk.middleware.SilkyMiddleware",
     "django.contrib.messages.middleware.MessageMiddleware",
     "django_htmx.middleware.HtmxMiddleware",
     "simple_history.middleware.HistoryRequestMiddleware",
@@ -382,7 +382,7 @@ SILKY_MAX_RECORDED_REQUESTS_CHECK_PERCENT = 1
 
 def silky_intercept_func(request):
     # Only profile NPDA routes (not login, captcha etc)
-    if request.path.startswith("/period"):
+    if not request.path.startswith("/account/") and not request.path.startswith("/captcha/"):
         return True
 
     return False
