@@ -32,13 +32,7 @@ class E12UserFactory(factory.django.DjangoModelFactory):
         model = Epilepsy12User  # returns the Epilepsy12User object
         skip_postgeneration_save = True
 
-    # The sequence restarts each pytest process, but session-scoped fixtures
-    # (seed_users_fixture) commit users into the reused test DB (--reuse-db),
-    # so plain sequenced emails collide across runs. Namespacing with a
-    # per-process UUID fragment keeps every generated email unique while the
-    # sequence keeps users distinct from each other within a run.
-    _run_id = uuid.uuid4().hex[:8]
-    email = factory.Sequence(lambda n: f"e12_test_user_{n}_{E12UserFactory._run_id}@nhs.net")
+    email = factory.Faker("email")
     first_name = "Mandel"
     surname = "Brot"
     is_active = True
