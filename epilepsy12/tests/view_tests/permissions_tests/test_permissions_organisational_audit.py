@@ -22,6 +22,7 @@ from epilepsy12.tests.view_tests.permissions_tests.perm_tests_utils import (
 
 
 @pytest.mark.parametrize("group", ["trust", "local_health_board"])
+@pytest.mark.django_db
 def test_anonymous_user_cannot_access_organisational_audit(client, group):
     response = client.get(reverse(f"organisational_audit_{group}", kwargs={f"id": 1}))
 
