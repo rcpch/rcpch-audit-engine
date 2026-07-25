@@ -77,6 +77,31 @@ register(E12SyndromeFactory) # => e12_syndrome_factory
 register(E12UserFactory)  # => e12_user_factory
 ```
 
+### Unique emails in `E12UserFactory`
+
+`E12UserFactory` generates emails with a `factory.Sequence`, which restarts at 0 in every pytest process. That is normally fine because each test runs inside a transaction that is rolled back. However, two things combine to break that assumption:
+
+1. The test suite runs with `--reuse-db` (see `pytest.ini`), so the test database and any *committed* data persist between runs.
+2. Session-scoped fixtures such as `seed_users_fixture` use `django_db_blocker.unblock()` and **commit** the users they create (~20 users with sequenced emails `e12_test_user_0@nhs.net` and up) into that reused database.
+
+In a later pytest process the sequence restarts, so the first factory-created user collides with the committed `e12_test_user_0@nhs.net` and fails with:
+
+```
+django.db.utils.IntegrityError: duplicate key value violates unique constraint "epilepsy12_epilepsy12user_email_key"
+```
+
+To make this collision impossible, the generated email includes a per-process UUID fragment alongside the sequence:
+
+```python
+_run_id = uuid.uuid4().hex[:8]
+email = factory.Sequence(lambda n: f"e12_test_user_{n}_{E12UserFactory._run_id}@nhs.net")
+```
+
+The sequence keeps users distinct from each other within a run; the UUID fragment keeps the run's emails distinct from any users committed by previous runs. Tests should never depend on the exact generated email format — look users up by a stable attribute (e.g. `first_name` for the seeded users) instead.
+
+!!! warning "Don't assert on generated emails"
+    If a test asserts a user's email address, pass `email="..."` explicitly to the factory rather than relying on the generated value.
+
 ### Usage
 
 For most test cases, which require multiple different linked models (e.g. a `Registration` attached to a `MultiaxialDiagnosis`), you should instantiate starting from the `e12_case_factory`:

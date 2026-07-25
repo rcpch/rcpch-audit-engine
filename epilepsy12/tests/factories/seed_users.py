@@ -37,8 +37,15 @@ def seed_users_fixture(django_db_setup, django_db_blocker):
     ]
 
     with django_db_blocker.unblock():
-        # Don't repeat seed
-        if not Epilepsy12User.objects.exists():
+        # Don't repeat seed. Check for one of the users this fixture creates
+        # rather than ``Epilepsy12User.objects.exists()``: on a fresh test DB
+        # (CI), other fixtures/migrations may already have created users, and
+        # the blanket exists() check would then skip seeding entirely, leaving
+        # every first_name lookup downstream empty.
+        sentinel_user_exists = Epilepsy12User.objects.filter(
+            first_name=test_user_audit_centre_administrator_data.role_str
+        ).exists()
+        if not sentinel_user_exists:
             GOSH = Organisation.objects.get(ods_code="RP401", trust__ods_code="RP4")
             KINGS = Organisation.objects.get(ods_code="RJZ01", trust__ods_code="RJZ")
             NOAHS_ARK = Organisation.objects.get(

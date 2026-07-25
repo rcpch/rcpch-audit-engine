@@ -278,9 +278,9 @@ organisation_patterns = [
         name="selected_organisation_summary",
     ),
     path(
-        "organisation/<int:organisation_id>/summary",
-        view=selected_organisation_summary,
-        name="selected_organisation_summary",
+        "organisation/<int:organisation_id>/audit_period/<int:cohort>/extension",
+        view=audit_period_extension,
+        name="audit_period_extension",
     ),
     path(
         "organisation/<int:organisation_id>/summary/individual_metrics",

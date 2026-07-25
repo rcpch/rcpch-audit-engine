@@ -1,3 +1,4 @@
+from __future__ import annotations
 from datetime import date, timedelta
 from django.utils import timezone
 from django.apps import apps
@@ -9,6 +10,8 @@ from django.utils.text import slugify
 from .help_text_mixin import HelpTextMixin
 from .time_and_user_abstract_base_classes import TimeStampAbstractBaseClass, UserStampAbstractBaseClass
 from .entities.organisation import Organisation
+from epilepsy12.constants.user_types import CAN_EXTEND_SUBMISSION_DEADLINE
+from epilepsy12.constants.audit_period_extension_reasons import AUDIT_PERIOD_EXTENSION_REASONS
 
 
 from simple_history.models import HistoricalRecords
@@ -47,14 +50,28 @@ class AuditPeriodManager(models.Manager):
             submission_deadline__gte=today
         ).first()
 
+    def most_recently_closed(self):
+        """The most recent cohort whose submission deadline has fully passed.
+
+        Used so the dashboard's first cohort card always has a cohort to show
+        ("Data submission closed") even when no cohort is currently in grace -
+        ``is_grace_period()`` returns None once the deadline has passed.
+        """
+        today = timezone.now().date()
+        return self.filter(submission_deadline__lt=today).order_by(
+            "-submission_deadline"
+        ).first()
+
     def visible(self):
         return self.filter(is_visible=True)
 
-    def cohort_summary(self):
+    def cohort_summary(self, organisation: Organisation | None = None):
         """
         Returns a dict describing the currently-recruiting, currently-submitting
         and grace-period cohorts, mirroring the shape historically produced by
         ``cohorts_and_dates`` so templates and views can be migrated piecemeal.
+        Optional `organisation` parameter to individualise the cohort summary for
+        a specific organisation, which may have an extended submission deadline.
 
         Keys:
             currently_recruiting_cohort          -> int | None
@@ -72,27 +89,33 @@ class AuditPeriodManager(models.Manager):
             grace_cohort                          -> dict (card shape) | {}
             within_grace_period                   -> bool
             today                                 -> date
+            organisation                          -> Organisation | None
         """
         today = timezone.now().date()
 
         recruiting = self.currently_recruiting()
         submitting = self.currently_submitting()
         grace = self.is_grace_period()
+        # The first card shows the grace cohort while one is in grace, else the
+        # most recently closed cohort, so it is never blank. within_grace_period
+        # keeps its strict meaning for callers deciding which cohort is
+        # imminently submitting.
+        closed_card_period = grace or self.most_recently_closed()
 
         return {
             "currently_recruiting_cohort": recruiting.cohort_number if recruiting else None,
             "currently_recruiting_cohort_start_date": recruiting.recruitment_start_date if recruiting else None,
             "currently_recruiting_cohort_end_date": recruiting.recruitment_end_date if recruiting else None,
             "currently_recruiting_cohort_submission_date": recruiting.submission_deadline if recruiting else None,
-            "currently_recruiting_cohort_days_remaining": recruiting.days_until_submission_deadline_for_organisation(None, current_date=today) if recruiting else None,
-            "currently_recruiting_cohort_dates": recruiting.as_cohort_card_dict(today=today) if recruiting else {},
+            "currently_recruiting_cohort_days_remaining": recruiting.days_until_submission_deadline_for_organisation(organisation=organisation, current_date=today) if recruiting else None,
+            "currently_recruiting_cohort_dates": recruiting.as_cohort_card_dict(today=today, organisation=organisation) if recruiting else {},
             "submitting_cohort": submitting.cohort_number if submitting else None,
             "submitting_cohort_start_date": submitting.recruitment_start_date if submitting else None,
             "submitting_cohort_end_date": submitting.recruitment_end_date if submitting else None,
             "submitting_cohort_submission_date": submitting.submission_deadline if submitting else None,
-            "submitting_cohort_days_remaining": submitting.days_until_submission_deadline_for_organisation(None, current_date=today) if submitting else None,
-            "submitting_cohort_dates": submitting.as_cohort_card_dict(today=today) if submitting else {},
-            "grace_cohort": grace.as_cohort_card_dict(today=today) if grace else {},
+            "submitting_cohort_days_remaining": submitting.days_until_submission_deadline_for_organisation(organisation=organisation, current_date=today) if submitting else None,
+            "submitting_cohort_dates": submitting.as_cohort_card_dict(today=today, organisation=organisation) if submitting else {},
+            "grace_cohort": closed_card_period.as_cohort_card_dict(today=today, organisation=organisation) if closed_card_period else {},
             "within_grace_period": grace is not None,
             "today": today,
         }
@@ -281,7 +304,11 @@ class AuditPeriod(
         """No data entry possible anywhere, including any per-site extensions."""
         return timezone.now().date() > self.effective_latest_submission_date
 
-    def as_cohort_card_dict(self, today: date | None = None) -> dict:
+    def as_cohort_card_dict(
+        self,
+        today: date | None = None,
+        organisation: Organisation | None = None,
+    ) -> dict:
         """
         Returns this AuditPeriod as a dict in the shape consumed by the
         ``cohort_card.html`` template and historically produced by
@@ -290,13 +317,31 @@ class AuditPeriod(
         """
         if today is None:
             today = timezone.now().date()
+
+        extension = self.extensions.filter(organisation=organisation).first() if organisation else None
+
         return {
             "cohort": self.cohort_number,
             "cohort_start_date": self.recruitment_start_date,
             "cohort_end_date": self.recruitment_end_date,
             "submission_date": self.submission_deadline,
             "days_remaining": self.days_until_submission_deadline_for_organisation(
-                None, current_date=today
+                organisation=organisation, current_date=today
+            ),
+            "audit_period_id": self.pk,
+            "extended_submission_date": extension.extended_submission_date if extension else None,
+            # True when the extension closes submission early (date not after the
+            # audit-wide deadline) - the card shows "Closed early" not "Extended to".
+            "is_closed_early": (
+                extension is not None
+                and extension.extended_submission_date <= self.submission_deadline
+            ),
+            # eligibility is evaluated against the passed-in ``today``, not the
+            # is_collecting_data/is_in_grace_period properties, which are pinned
+            # to timezone.now(). The window spans data collection start through
+            # the audit-wide deadline, covering both submitting and grace.
+            "is_extension_eligible": (
+                self.data_collection_start_date <= today <= self.submission_deadline
             ),
         }
 
@@ -317,14 +362,15 @@ class AuditPeriod(
     def submission_deadline_for_organisation(self, organisation: Organisation) -> date:
         """
         The effective deadline for a given organisation: the audit-wide
-        submission_deadline unless this organisation holds a later extension.
-        Extensions can lengthen but never shorten the audit-wide deadline.
+        submission_deadline unless this organisation holds an extension row.
+        The extension always wins when present — it may be later (a granted
+        extension) or earlier (submission closed early by the audit team).
         Falls back to the audit-wide deadline if no organisation is supplied.
         """
         if organisation is None:
             return self.submission_deadline
         extension = self.extensions.filter(organisation=organisation).first()
-        if extension and extension.extended_submission_date > self.submission_deadline:
+        if extension:
             return extension.extended_submission_date
         return self.submission_deadline
 
@@ -342,6 +388,91 @@ class AuditPeriod(
         deadline = self.submission_deadline_for_organisation(organisation)
         return max(0, (deadline - current_date).days + 1)
 
+    def extend_submission_deadline(
+        self, organisation: Organisation, days: int, user, reason: int = None
+    ) -> AuditPeriodExtension:
+        """
+        Grant (or further extend) this organisation's submission deadline by
+        ``days`` beyond its current effective deadline. One row per organisation
+        per period; the existing row is edited in place on re-extension.
+        """
+        today = timezone.now().date()
+        if not (self.data_collection_start_date <= today <= self.submission_deadline):
+            raise ValidationError(
+                "Extensions can only be granted for the submitting or grace cohort."
+            )
+
+        extended_deadline = self.submission_deadline_for_organisation(organisation) + timedelta(days=days)
+        if extended_deadline <= self.submission_deadline:
+            raise ValidationError(
+                "Extended date must be after the audit-wide submission deadline."
+            )
+
+        valid_reasons = {code for code, _label in AUDIT_PERIOD_EXTENSION_REASONS}
+        if reason is not None and reason not in valid_reasons:
+            raise ValidationError("Invalid reason for extension.")
+
+
+        extension, created = self.extensions.update_or_create(
+            organisation=organisation,
+            defaults={
+                "extended_submission_date": extended_deadline,
+                "reason": reason,
+                "updated_by": user,
+            },
+        )
+        if created:
+            extension.created_by = user
+            extension.save(update_fields=["created_by"])
+        return extension
+
+    def close_submission_for_organisation(
+        self, organisation: Organisation, user
+    ) -> "AuditPeriodExtension":
+        """
+        Close this organisation's submission immediately: the extension row's
+        date is set to today (inclusive — submission is still possible today).
+        No reason is required. Same eligibility window as granting an extension.
+        """
+        today = timezone.now().date()
+        if not (self.data_collection_start_date <= today <= self.submission_deadline):
+            raise ValidationError(
+                "Submission can only be closed early for the submitting or grace cohort."
+            )
+
+        extension, created = self.extensions.update_or_create(
+            organisation=organisation,
+            defaults={
+                "extended_submission_date": today,
+                "reason": None,
+                "updated_by": user,
+            },
+        )
+        if created:
+            extension.created_by = user
+            extension.save(update_fields=["created_by"])
+        return extension
+
+    def remove_submission_extension(self, organisation: Organisation, user) -> None:
+        """
+        Remove this organisation's extension, reverting to the audit-wide
+        deadline. Refused once the audit-wide deadline has passed — the row is
+        then historical record of the deadline the organisation submitted against.
+        """
+        today = timezone.now().date()
+        if today > self.submission_deadline:
+            raise ValidationError(
+                "Extensions cannot be removed after the audit-wide submission deadline has passed."
+            )
+
+        extension = self.extensions.filter(organisation=organisation).first()
+        if extension is None:
+            raise ValidationError("This organisation has no extension to remove.")
+
+        # stamp who removed it before deleting so the history record keeps the actor
+        extension.updated_by = user
+        extension.save(update_fields=["updated_by"])
+        extension.delete()
 
     def clean(self):
         if self.recruitment_end_date <= self.recruitment_start_date:
@@ -385,9 +516,10 @@ class AuditPeriodExtension(
     )
 
     extended_submission_date = models.DateField()
-    reason = models.TextField(
+    reason = models.PositiveSmallIntegerField(
         blank=True,
-        default=""
+        null=True,
+        choices=AUDIT_PERIOD_EXTENSION_REASONS
     )
 
     history = HistoricalRecords()
@@ -401,11 +533,37 @@ class AuditPeriodExtension(
                 name="one_extension_per_organisation_per_audit_period"
             )
         ]
+        permissions = [
+            CAN_EXTEND_SUBMISSION_DEADLINE
+        ]
+
+    @property
+    def is_open_past_audit_wide_deadline(self) -> bool:
+        """
+        True when the audit-wide deadline has passed but this organisation is
+        still able to submit by virtue of a later extension date - ie the
+        sites the audit team may still need to chase before the extended
+        deadline. Close-early rows (date not after the audit-wide deadline)
+        and extensions that have themselves expired return False.
+        """
+        today = timezone.now().date()
+        return (
+            self.extended_submission_date > self.audit_period.submission_deadline
+            and today > self.audit_period.submission_deadline
+            and today <= self.extended_submission_date
+        )
 
     def clean(self):
-        if self.audit_period_id and self.extended_submission_date <= self.audit_period.submission_deadline:
+        # Note: the date may legitimately be earlier than the audit-wide
+        # deadline - that is how the audit team closes an organisation's
+        # submission early. Sanity floor: never before data collection starts.
+        if (
+            self.audit_period_id
+            and self.extended_submission_date
+            and self.extended_submission_date < self.audit_period.data_collection_start_date
+        ):
             raise ValidationError(
-                "Extended submission date must be after the audit period submission deadline"
+                "Extended submission date cannot be before data collection starts."
             )
 
     def __str__(self):

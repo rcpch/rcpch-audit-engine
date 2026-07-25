@@ -13,6 +13,7 @@ The following parameters must be specified:
 """
 
 # standard imports
+import uuid
 
 from django.apps import apps
 

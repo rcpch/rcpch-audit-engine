@@ -1,3 +1,4 @@
+from django.apps import apps
 from django.contrib.auth.management import create_permissions
 from django.contrib.auth.models import Group, Permission
 from django.contrib.contenttypes.models import ContentType
@@ -24,11 +25,13 @@ from epilepsy12.constants.user_types import (
     CAN_OPT_OUT_CHILD_FROM_INCLUSION_IN_AUDIT,
     CAN_PUBLISH_EPILEPSY12_DATA,
     CAN_ALLOCATE_USER_TO_ORGANISATION,
-    CAN_RESET_TWO_FACTOR_AUTHENTICATION
+    CAN_RESET_TWO_FACTOR_AUTHENTICATION,
+    CAN_EXTEND_SUBMISSION_DEADLINE
 )
 from epilepsy12.models import (
     AntiEpilepsyMedicine,
     Assessment,
+    AuditPeriodExtension,
     AuditProgress,
     Comorbidity,
     EpilepsyContext,
@@ -49,9 +52,20 @@ from epilepsy12.models import (
 )
 
 
-def groups_seeder(
-    run_create_groups=False, add_permissions_to_existing_groups=False, verbose=True
-):
+def groups_seeder(verbose=True, **_deprecated_kwargs):
+    """
+    Idempotently seed the E12 groups and their permissions.
+
+    Creates any group in ``GROUPS`` that does not yet exist, then ensures every
+    expected permission is attached to it (skipping any already present). Safe
+    to run repeatedly - at project initialisation, in the test suite, or after
+    adding new permissions to the constants below.
+
+    The retired ``run_create_groups`` / ``add_permissions_to_existing_groups``
+    flags are accepted via ``_deprecated_kwargs`` for backwards compatibility;
+    both old call patterns now perform the same idempotent seed. Remove the
+    catch-all once all call sites are updated.
+    """
     caseContentType = ContentType.objects.get_for_model(Case)
     registrationContentType = ContentType.objects.get_for_model(Registration)
     first_paediatric_assessmentContentType = ContentType.objects.get_for_model(
@@ -79,12 +93,13 @@ def groups_seeder(
         OrganisationKPIAggregation
     )
     visitactivityContentType = ContentType.objects.get_for_model(VisitActivity)
+    auditperiodextensionContentType = ContentType.objects.get_for_model(AuditPeriodExtension)
 
     """
     Note view permissions include viewing users, but not creating, updating or deleting them
     View permissions include viewing but NOT updating or deleting case audit records
 
-    NOTE Additional constraints are applied in view decorators to prevent users accessing 
+    NOTE Additional constraints are applied in view decorators to prevent users accessing
     records of users or children in organisations other than their own
     """
     VIEW_PERMISSIONS = [
@@ -149,11 +164,11 @@ def groups_seeder(
     Note editor access permissions do not include creating, updating or deleting Epilepsy12Users.
     Editor access include deleting patients
     Editor access permissions do include creating, updating or delete patient records
-    
-    Editors can create, update and delete neurology, general paediatric and surgical sites, but 
+
+    Editors can create, update and delete neurology, general paediatric and surgical sites, but
     cannot create, update or delete lead epilepsy12 centre allocation, or transfer
 
-    NOTE Additional constraints are applied in view decorators to prevent users accessing 
+    NOTE Additional constraints are applied in view decorators to prevent users accessing
     records of users or children in organisations other than their own
     """
     EDITOR_PERMISSIONS = [
@@ -282,7 +297,7 @@ def groups_seeder(
     - create, change and delete Epilepsy12Users
     - transfer to another the lead Epilepsy12 centre
 
-    NOTE Additional constraints are applied in view decorators to prevent users accessing 
+    NOTE Additional constraints are applied in view decorators to prevent users accessing
     records of users or children in organisations other than their own
     """
     FULL_ACCESS_PERMISSIONS = [
@@ -325,7 +340,7 @@ def groups_seeder(
     - allocate, update and delete Epilepsy12 lead site status
     - create, update and delete the look up lists for Keyword and Organisation
     - publish Epilepsy12 data to the public site
-    
+
     NOTE RCPCH team are able to access all users and all children nationally.
     """
     EPILEPSY12_AUDIT_TEAM_ACCESS_PERMISSIONS = [
@@ -346,7 +361,11 @@ def groups_seeder(
         {
             "codename": CAN_RESET_TWO_FACTOR_AUTHENTICATION[0],
             "content_type": epilepsy12userContentType,
-        }
+        },
+        {
+            "codename": CAN_EXTEND_SUBMISSION_DEADLINE[0],
+            "content_type": auditperiodextensionContentType,
+        },
     ]
 
     PATIENT_ACCESS_PERMISSIONS = [
@@ -356,159 +375,70 @@ def groups_seeder(
         },
     ]
 
-    def initialize_permissions(apps, schema_editor):
-        """
-        This function is run in migrations/0002_create_groups.py as an initial
-        data migration at project initialization. it sets up some basic model-level
-        permissions for different groups when the project is initialised.
+    # Permissions have to exist before they can be attached to groups
+    for app_config in apps.get_app_configs():
+        app_config.models_module = True
+        create_permissions(app_config, verbosity=0)
+        app_config.models_module = None
 
-        6 groups. Loop through and add custom
-        """
-
-        # Permissions have to be created before applying them
-        for app_config in apps.get_app_configs(apps, schema_editor):
-            app_config.models_module = True
-            create_permissions(app_config, verbosity=0)
-            app_config.models_module = None
-
-    if add_permissions_to_existing_groups:
-        for group in GROUPS:
-            if verbose:
-                print(f"...adding permissions to {group}...")
-            # add permissions to group
-            newGroup = Group.objects.filter(name=group).get()
-
-            if group == EPILEPSY12_AUDIT_TEAM_FULL_ACCESS:
-                # custom permissions
-                add_permissions_to_group(
-                    EPILEPSY12_AUDIT_TEAM_ACCESS_PERMISSIONS, newGroup
-                )
-                # basic permissions
-                add_permissions_to_group(VIEW_PERMISSIONS, newGroup)
-                add_permissions_to_group(ADMIN_CASE_MANAGEMENT_PERMISSIONS, newGroup)
-                add_permissions_to_group(EDITOR_PERMISSIONS, newGroup)
-                add_permissions_to_group(FULL_ACCESS_PERMISSIONS, newGroup)
-
-            elif group == TRUST_AUDIT_TEAM_VIEW_ONLY:
-                # custom permissions
-
-                # basic permissions
-                add_permissions_to_group(VIEW_PERMISSIONS, newGroup)
-
-            elif group == TRUST_AUDIT_TEAM_EDIT_ACCESS:
-                # custom permissions
-
-                # basic permissions
-                add_permissions_to_group(VIEW_PERMISSIONS, newGroup)
-                add_permissions_to_group(ADMIN_CASE_MANAGEMENT_PERMISSIONS, newGroup)
-                add_permissions_to_group(EDITOR_PERMISSIONS, newGroup)
-
-            elif group == TRUST_AUDIT_TEAM_FULL_ACCESS:
-                # custom permissions
-
-                # basic permissions
-                add_permissions_to_group(VIEW_PERMISSIONS, newGroup)
-                add_permissions_to_group(ADMIN_CASE_MANAGEMENT_PERMISSIONS, newGroup)
-                add_permissions_to_group(EDITOR_PERMISSIONS, newGroup)
-                add_permissions_to_group(FULL_ACCESS_PERMISSIONS, newGroup)
-
-            elif group == PATIENT_ACCESS:
-                # custom permissions
-                add_permissions_to_group(PATIENT_ACCESS_PERMISSIONS, newGroup)
-                # basic permissions
-                add_permissions_to_group(VIEW_PERMISSIONS, newGroup)
-
-            else:
-                if verbose:
-                    print("Error: group does not exist!")
+    def permissions_for_group(group):
+        if group == EPILEPSY12_AUDIT_TEAM_FULL_ACCESS:
+            return (
+                EPILEPSY12_AUDIT_TEAM_ACCESS_PERMISSIONS
+                + VIEW_PERMISSIONS
+                + ADMIN_CASE_MANAGEMENT_PERMISSIONS
+                + EDITOR_PERMISSIONS
+                + FULL_ACCESS_PERMISSIONS
+            )
+        elif group == TRUST_AUDIT_TEAM_VIEW_ONLY:
+            # View-only users (audit centre administrators) can still create and
+            # update cases - "view only" refers to clinical records, not case
+            # demographics. This matches the old create-path behaviour and the
+            # admin user guide.
+            return VIEW_PERMISSIONS + ADMIN_CASE_MANAGEMENT_PERMISSIONS
+        elif group == TRUST_AUDIT_TEAM_EDIT_ACCESS:
+            return (
+                VIEW_PERMISSIONS
+                + ADMIN_CASE_MANAGEMENT_PERMISSIONS
+                + EDITOR_PERMISSIONS
+            )
+        elif group == TRUST_AUDIT_TEAM_FULL_ACCESS:
+            return (
+                VIEW_PERMISSIONS
+                + ADMIN_CASE_MANAGEMENT_PERMISSIONS
+                + EDITOR_PERMISSIONS
+                + FULL_ACCESS_PERMISSIONS
+            )
+        elif group == PATIENT_ACCESS:
+            return PATIENT_ACCESS_PERMISSIONS + VIEW_PERMISSIONS
+        return None
 
     def add_permissions_to_group(permissions_list, group_to_add):
         for permission in permissions_list:
             codename = permission.get("codename")
             content_type = permission.get("content_type")
+            if group_to_add.permissions.filter(codename=codename).exists():
+                if verbose:
+                    print(f"{codename} already exists for {group_to_add.name}. Skipping...")
+                continue
             newPermission = Permission.objects.get(
                 codename=codename, content_type=content_type
             )
-            if group_to_add.permissions.filter(codename=codename).exists():
-                if verbose:
-                    print(f"{codename} already exists for this group. Skipping...")
-            else:
-                if verbose:
-                    print(f"...Adding {codename}")
-                group_to_add.permissions.add(newPermission)
+            if verbose:
+                print(f"...adding {codename} to {group_to_add.name}")
+            group_to_add.permissions.add(newPermission)
 
-    if run_create_groups:
-        for group in GROUPS:
-            if not Group.objects.filter(name=group).exists():
-                if verbose:
-                    print(f"...creating group: {group}")
-                try:
-                    newGroup = Group.objects.create(name=group)
-                except Exception as error:
-                    if verbose:
-                        print(error)
-                    error = True
+    for group in GROUPS:
+        group_obj, created = Group.objects.get_or_create(name=group)
+        if created and verbose:
+            print(f"...created group: {group}")
 
-                if verbose:
-                    print(f"...adding permissions to {group}...")
-                # add permissions to group
+        permissions = permissions_for_group(group)
+        if permissions is None:
+            if verbose:
+                print(f"Error: no permissions defined for group '{group}'!")
+            continue
+        add_permissions_to_group(permissions, group_obj)
 
-                if group == EPILEPSY12_AUDIT_TEAM_FULL_ACCESS:
-                    # custom permissions
-                    add_permissions_to_group(
-                        EPILEPSY12_AUDIT_TEAM_ACCESS_PERMISSIONS, newGroup
-                    )
-                    # basic permissions
-                    add_permissions_to_group(VIEW_PERMISSIONS, newGroup)
-                    add_permissions_to_group(
-                        ADMIN_CASE_MANAGEMENT_PERMISSIONS, newGroup
-                    )
-                    add_permissions_to_group(EDITOR_PERMISSIONS, newGroup)
-                    add_permissions_to_group(FULL_ACCESS_PERMISSIONS, newGroup)
-
-                elif group == TRUST_AUDIT_TEAM_VIEW_ONLY:
-                    # custom permissions
-
-                    # basic permissions
-                    add_permissions_to_group(VIEW_PERMISSIONS, newGroup)
-                    add_permissions_to_group(
-                        ADMIN_CASE_MANAGEMENT_PERMISSIONS, newGroup
-                    )
-
-                elif group == TRUST_AUDIT_TEAM_EDIT_ACCESS:
-                    # custom permissions
-
-                    # basic permissions
-                    add_permissions_to_group(VIEW_PERMISSIONS, newGroup)
-                    add_permissions_to_group(
-                        ADMIN_CASE_MANAGEMENT_PERMISSIONS, newGroup
-                    )
-                    add_permissions_to_group(EDITOR_PERMISSIONS, newGroup)
-
-                elif group == TRUST_AUDIT_TEAM_FULL_ACCESS:
-                    # custom permissions
-
-                    # basic permissions
-                    add_permissions_to_group(VIEW_PERMISSIONS, newGroup)
-                    add_permissions_to_group(
-                        ADMIN_CASE_MANAGEMENT_PERMISSIONS, newGroup
-                    )
-                    add_permissions_to_group(EDITOR_PERMISSIONS, newGroup)
-                    add_permissions_to_group(FULL_ACCESS_PERMISSIONS, newGroup)
-
-                elif group == PATIENT_ACCESS:
-                    # custom permissions
-                    add_permissions_to_group(PATIENT_ACCESS_PERMISSIONS, newGroup)
-                    # basic permissions
-                    add_permissions_to_group(VIEW_PERMISSIONS, newGroup)
-
-                else:
-                    if verbose:
-                        print("Error: group does not exist!")
-
-                    else:
-                        if verbose:
-                            print("Error: group does not exist!")
-
-        if not verbose:
-            print("groups_seeder(verbose=False), no output, groups seeded.")
+    if not verbose:
+        print("groups_seeder(verbose=False), no output, groups seeded.")

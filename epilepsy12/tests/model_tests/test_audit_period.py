@@ -19,11 +19,33 @@ The AuditPeriod rows for cohorts 4-9 are seeded into the test DB by the
 plain ``@pytest.mark.django_db`` test can query the mapping directly.
 """
 
-from datetime import date
+from datetime import date, timedelta
 
 import pytest
+from django.core.exceptions import ValidationError
 
-from epilepsy12.models import AuditPeriod
+from epilepsy12.constants.audit_period_extension_reasons import (
+    AUDIT_PERIOD_EXTENSION_REASONS,
+)
+from epilepsy12.models import AuditPeriod, AuditPeriodExtension, Epilepsy12User
+
+# Cohort 6 seeded dates (see epilepsy12/constants/audit_period_dates.py):
+#   recruitment    2022-12-01 -> 2023-11-30
+#   data collect   2023-12-01 -> 2024-11-30
+#   grace          2024-12-01 -> 2025-01-14
+COHORT_6_SUBMISSION_DEADLINE = date(2025, 1, 14)
+COHORT_6_DATA_COLLECTION = date(2024, 6, 1)   # inside data collection window
+COHORT_6_GRACE = date(2025, 1, 6)             # inside grace window
+COHORT_6_RECRUITING = date(2023, 6, 1)        # inside recruitment window
+
+
+def _extension(audit_period, organisation, days=28, reason=0):
+    return AuditPeriodExtension.objects.create(
+        audit_period=audit_period,
+        organisation=organisation,
+        extended_submission_date=audit_period.submission_deadline + timedelta(days=days),
+        reason=reason,
+    )
 
 
 @pytest.mark.django_db
@@ -77,3 +99,374 @@ def test_for_fpa_date_returns_none_outside_seeded_periods(fpa_date):
     requirement to seed cohort 10 before FPA dates from 2027 can be registered.
     """
     assert AuditPeriod.objects.for_first_paediatric_assessment_date(fpa_date) is None
+
+
+@pytest.mark.django_db
+@pytest.mark.parametrize("reason_code, _", AUDIT_PERIOD_EXTENSION_REASONS)
+def test_extension_reason_stores_coded_value(GOSH, reason_code, _):
+    """Each coded reason can be stored on the extension and round-trips as an int."""
+    audit_period = AuditPeriod.objects.by_cohort(6)
+    extension = AuditPeriodExtension.objects.create(
+        audit_period=audit_period,
+        organisation=GOSH,
+        extended_submission_date=audit_period.submission_deadline + timedelta(days=28),
+        reason=reason_code,
+    )
+
+    extension.refresh_from_db()
+
+    assert extension.reason == reason_code
+    assert isinstance(extension.reason, int)
+
+
+@pytest.mark.django_db
+@pytest.mark.parametrize("reason_code, expected_label", AUDIT_PERIOD_EXTENSION_REASONS)
+def test_extension_reason_display_label(GOSH, reason_code, expected_label):
+    """get_reason_display() returns the human-readable label for each coded reason."""
+    audit_period = AuditPeriod.objects.by_cohort(6)
+    extension = AuditPeriodExtension.objects.create(
+        audit_period=audit_period,
+        organisation=GOSH,
+        extended_submission_date=audit_period.submission_deadline + timedelta(days=28),
+        reason=reason_code,
+    )
+
+    assert extension.get_reason_display() == expected_label
+
+
+# ---------------------------------------------------------------------------
+# as_cohort_card_dict
+# ---------------------------------------------------------------------------
+
+
+@pytest.mark.django_db
+def test_card_dict_without_organisation_shows_audit_wide_deadline():
+    """With no organisation the card shows the audit-wide deadline and no badge."""
+    audit_period = AuditPeriod.objects.by_cohort(6)
+
+    card = audit_period.as_cohort_card_dict(today=COHORT_6_DATA_COLLECTION)
+
+    assert card["cohort"] == 6
+    assert card["audit_period_id"] == audit_period.pk
+    assert card["submission_date"] == COHORT_6_SUBMISSION_DEADLINE
+    assert card["extended_submission_date"] is None
+
+
+@pytest.mark.django_db
+def test_card_dict_days_remaining_is_inclusive_and_audit_wide_without_organisation():
+    """days_remaining counts inclusively up to the audit-wide deadline."""
+    audit_period = AuditPeriod.objects.by_cohort(6)
+
+    card = audit_period.as_cohort_card_dict(today=COHORT_6_GRACE)
+
+    expected_days = (COHORT_6_SUBMISSION_DEADLINE - COHORT_6_GRACE).days + 1
+    assert card["days_remaining"] == expected_days
+
+
+@pytest.mark.django_db
+def test_card_dict_with_extension_shows_extended_badge_and_counts_to_extended_date(GOSH):
+    """An org with an extension gets the badge date and a countdown to the extension."""
+    audit_period = AuditPeriod.objects.by_cohort(6)
+    extension = _extension(audit_period, GOSH, days=28)
+
+    card = audit_period.as_cohort_card_dict(
+        today=COHORT_6_GRACE, organisation=GOSH
+    )
+
+    # original audit-wide deadline stays displayed
+    assert card["submission_date"] == COHORT_6_SUBMISSION_DEADLINE
+    # badge shows the extension
+    assert card["extended_submission_date"] == extension.extended_submission_date
+    # countdown honours the extension
+    expected_days = (extension.extended_submission_date - COHORT_6_GRACE).days + 1
+    assert card["days_remaining"] == expected_days
+
+
+@pytest.mark.django_db
+def test_card_dict_extension_is_organisation_specific(GOSH, ADDENBROOKES):
+    """An extension held by one organisation must not appear on another's card."""
+    audit_period = AuditPeriod.objects.by_cohort(6)
+    _extension(audit_period, GOSH, days=28)
+
+    gosh_card = audit_period.as_cohort_card_dict(
+        today=COHORT_6_GRACE, organisation=GOSH
+    )
+    addenbrookes_card = audit_period.as_cohort_card_dict(
+        today=COHORT_6_GRACE, organisation=ADDENBROOKES
+    )
+
+    assert gosh_card["extended_submission_date"] is not None
+    assert addenbrookes_card["extended_submission_date"] is None
+    assert addenbrookes_card["submission_date"] == COHORT_6_SUBMISSION_DEADLINE
+
+
+@pytest.mark.django_db
+@pytest.mark.parametrize(
+    "today, expected_eligible",
+    [
+        (COHORT_6_DATA_COLLECTION, True),   # submitting cohort
+        (COHORT_6_GRACE, True),             # grace cohort
+        (COHORT_6_RECRUITING, False),       # still recruiting
+        (date(2025, 1, 15), False),         # after audit-wide deadline
+    ],
+    ids=["submitting", "grace", "recruiting", "complete"],
+)
+def test_card_dict_extension_eligibility(today, expected_eligible):
+    """Extension button only offered for the submitting and grace cohorts."""
+    audit_period = AuditPeriod.objects.by_cohort(6)
+
+    card = audit_period.as_cohort_card_dict(today=today)
+
+    assert card["is_extension_eligible"] is expected_eligible
+
+
+# ---------------------------------------------------------------------------
+# cohort_summary
+# ---------------------------------------------------------------------------
+
+
+@pytest.mark.django_db
+def test_cohort_summary_threads_organisation_into_card_dicts(GOSH, ADDENBROOKES):
+    """The submitting cohort card is individualised for the given organisation."""
+    submitting = AuditPeriod.objects.currently_submitting()
+    assert submitting is not None, "No seeded cohort is currently submitting."
+
+    extension = _extension(submitting, GOSH, days=28)
+
+    summary = AuditPeriod.objects.cohort_summary(organisation=GOSH)
+    card = summary["submitting_cohort_dates"]
+
+    assert card["extended_submission_date"] == extension.extended_submission_date
+
+    # a different organisation sees no badge
+    summary_other = AuditPeriod.objects.cohort_summary(organisation=ADDENBROOKES)
+    assert summary_other["submitting_cohort_dates"]["extended_submission_date"] is None
+
+
+@pytest.mark.django_db
+def test_cohort_summary_days_remaining_honours_extension(GOSH):
+    """The standalone days_remaining key also counts to the extended deadline."""
+    submitting = AuditPeriod.objects.currently_submitting()
+    assert submitting is not None, "No seeded cohort is currently submitting."
+
+    extension = _extension(submitting, GOSH, days=28)
+
+    summary = AuditPeriod.objects.cohort_summary(organisation=GOSH)
+    expected_days = (extension.extended_submission_date - summary["today"]).days + 1
+
+    assert summary["submitting_cohort_days_remaining"] == expected_days
+
+
+@pytest.mark.django_db
+def test_cohort_summary_without_organisation_is_audit_wide():
+    """Default behaviour (no organisation) is unchanged: audit-wide dates."""
+    submitting = AuditPeriod.objects.currently_submitting()
+    assert submitting is not None, "No seeded cohort is currently submitting."
+
+    summary = AuditPeriod.objects.cohort_summary()
+
+    assert summary["submitting_cohort_dates"]["extended_submission_date"] is None
+    assert summary["submitting_cohort_submission_date"] == submitting.submission_deadline
+
+
+@pytest.mark.django_db
+def test_cohort_summary_grace_card_falls_back_to_most_recently_closed():
+    """The first card always has a cohort: when no cohort is in grace (the
+    common case - grace lasts only weeks), the card shows the most recently
+    closed cohort rather than an empty dict."""
+    summary = AuditPeriod.objects.cohort_summary()
+
+    grace_card = summary["grace_cohort"]
+    assert grace_card != {}, (
+        "grace_cohort card dict was empty - the dashboard's first card would "
+        "render with no cohort number or dates."
+    )
+
+    if summary["within_grace_period"]:
+        # during grace the card shows the grace cohort
+        grace_period = AuditPeriod.objects.is_grace_period()
+        assert grace_card["cohort"] == grace_period.cohort_number
+    else:
+        # otherwise the most recently closed cohort
+        closed = AuditPeriod.objects.most_recently_closed()
+        assert closed is not None
+        assert grace_card["cohort"] == closed.cohort_number
+        assert grace_card["is_extension_eligible"] is False
+
+
+# ---------------------------------------------------------------------------
+# deadline resolution with close-early extensions
+# ---------------------------------------------------------------------------
+
+
+@pytest.mark.django_db
+def test_extension_earlier_than_deadline_wins(GOSH):
+    """A close-early extension (date before the audit-wide deadline) is honoured."""
+    audit_period = AuditPeriod.objects.by_cohort(6)
+    early = COHORT_6_SUBMISSION_DEADLINE - timedelta(days=7)
+    AuditPeriodExtension.objects.create(
+        audit_period=audit_period,
+        organisation=GOSH,
+        extended_submission_date=early,
+        reason=None,
+    )
+
+    assert audit_period.submission_deadline_for_organisation(GOSH) == early
+
+
+@pytest.mark.django_db
+def test_extension_earlier_than_deadline_passes_clean(GOSH):
+    """clean() permits close-early dates (but not dates before data collection)."""
+    audit_period = AuditPeriod.objects.by_cohort(6)
+    extension = AuditPeriodExtension(
+        audit_period=audit_period,
+        organisation=GOSH,
+        extended_submission_date=COHORT_6_SUBMISSION_DEADLINE - timedelta(days=7),
+    )
+    extension.clean()  # should not raise
+
+    extension.extended_submission_date = (
+        audit_period.data_collection_start_date - timedelta(days=1)
+    )
+    with pytest.raises(ValidationError):
+        extension.clean()
+
+
+@pytest.mark.django_db
+def test_card_dict_flags_close_early_extension(GOSH):
+    """The card distinguishes close-early rows from true extensions."""
+    audit_period = AuditPeriod.objects.by_cohort(6)
+
+    AuditPeriodExtension.objects.create(
+        audit_period=audit_period,
+        organisation=GOSH,
+        extended_submission_date=COHORT_6_SUBMISSION_DEADLINE - timedelta(days=3),
+    )
+    card = audit_period.as_cohort_card_dict(
+        today=COHORT_6_DATA_COLLECTION, organisation=GOSH
+    )
+    assert card["is_closed_early"] is True
+
+    # a later extension is not closed early
+    extension = AuditPeriodExtension.objects.get(
+        audit_period=audit_period, organisation=GOSH
+    )
+    extension.extended_submission_date = COHORT_6_SUBMISSION_DEADLINE + timedelta(days=3)
+    extension.save()
+    card = audit_period.as_cohort_card_dict(
+        today=COHORT_6_DATA_COLLECTION, organisation=GOSH
+    )
+    assert card["is_closed_early"] is False
+
+
+# ---------------------------------------------------------------------------
+# close_submission_for_organisation / remove_submission_extension
+# ---------------------------------------------------------------------------
+
+
+@pytest.mark.django_db
+def test_close_submission_sets_extension_to_today(GOSH):
+    """Closing sets the extension date to today, with no reason required."""
+    audit_period = AuditPeriod.objects.currently_submitting()
+    assert audit_period is not None, "No seeded cohort is currently submitting."
+    admin = Epilepsy12User.objects.filter(is_rcpch_audit_team_member=True).first()
+
+    extension = audit_period.close_submission_for_organisation(GOSH, user=admin)
+
+    assert extension.extended_submission_date == date.today()
+    assert extension.reason is None
+    assert audit_period.submission_deadline_for_organisation(GOSH) == date.today()
+
+
+@pytest.mark.django_db
+def test_remove_submission_extension_reverts_to_audit_wide(GOSH):
+    """Removing the extension reverts the organisation to the audit-wide deadline."""
+    audit_period = AuditPeriod.objects.currently_submitting()
+    assert audit_period is not None, "No seeded cohort is currently submitting."
+    admin = Epilepsy12User.objects.filter(is_rcpch_audit_team_member=True).first()
+
+    _extension(audit_period, GOSH, days=28)
+    assert audit_period.extensions.filter(organisation=GOSH).exists()
+
+    audit_period.remove_submission_extension(GOSH, user=admin)
+
+    assert not audit_period.extensions.filter(organisation=GOSH).exists()
+    assert (
+        audit_period.submission_deadline_for_organisation(GOSH)
+        == audit_period.submission_deadline
+    )
+
+
+@pytest.mark.django_db
+def test_remove_submission_extension_without_extension_raises(GOSH):
+    """Removing an extension the organisation does not hold is an error."""
+    audit_period = AuditPeriod.objects.currently_submitting()
+    assert audit_period is not None, "No seeded cohort is currently submitting."
+    admin = Epilepsy12User.objects.filter(is_rcpch_audit_team_member=True).first()
+
+    with pytest.raises(ValidationError, match="no extension"):
+        audit_period.remove_submission_extension(GOSH, user=admin)
+
+
+# ---------------------------------------------------------------------------
+# AuditPeriodExtension.is_open_past_audit_wide_deadline
+# ---------------------------------------------------------------------------
+
+
+@pytest.mark.django_db
+def test_extension_open_past_deadline_true_when_still_open(GOSH):
+    """A true extension whose own date is still in the future, on a cohort
+    whose audit-wide deadline has passed, is open past the deadline."""
+    # cohort 6's audit-wide deadline (2025-01-14) is in the past
+    audit_period = AuditPeriod.objects.by_cohort(6)
+    extension = AuditPeriodExtension.objects.create(
+        audit_period=audit_period,
+        organisation=GOSH,
+        extended_submission_date=date.today() + timedelta(days=7),
+        reason=0,
+    )
+
+    assert extension.is_open_past_audit_wide_deadline is True
+
+
+@pytest.mark.django_db
+def test_extension_open_past_deadline_false_when_extension_expired(GOSH):
+    """An extension whose own date has also passed is not open."""
+    audit_period = AuditPeriod.objects.by_cohort(6)
+    extension = AuditPeriodExtension.objects.create(
+        audit_period=audit_period,
+        organisation=GOSH,
+        extended_submission_date=COHORT_6_SUBMISSION_DEADLINE + timedelta(days=7),
+        reason=0,
+    )
+
+    assert extension.is_open_past_audit_wide_deadline is False
+
+
+@pytest.mark.django_db
+def test_extension_open_past_deadline_false_for_close_early(GOSH):
+    """Close-early rows (date not after the audit-wide deadline) are not open."""
+    audit_period = AuditPeriod.objects.by_cohort(6)
+    extension = AuditPeriodExtension.objects.create(
+        audit_period=audit_period,
+        organisation=GOSH,
+        extended_submission_date=COHORT_6_SUBMISSION_DEADLINE - timedelta(days=3),
+    )
+
+    assert extension.is_open_past_audit_wide_deadline is False
+
+
+@pytest.mark.django_db
+def test_extension_open_past_deadline_false_before_audit_wide_deadline(GOSH):
+    """An extension on a cohort whose audit-wide deadline has not yet passed is
+    not 'open past the deadline' - everyone can still submit anyway."""
+    audit_period = AuditPeriod.objects.currently_submitting()
+    assert audit_period is not None, "No seeded cohort is currently submitting."
+    extension = AuditPeriodExtension.objects.create(
+        audit_period=audit_period,
+        organisation=GOSH,
+        extended_submission_date=audit_period.submission_deadline + timedelta(days=28),
+        reason=0,
+    )
+
+    assert extension.is_open_past_audit_wide_deadline is False

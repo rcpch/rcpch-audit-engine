@@ -1,5 +1,3 @@
-version: "3.10"
-
 x-global-environment: &global
   env_file:
     - envs/.env # env file - NOT committed to Git

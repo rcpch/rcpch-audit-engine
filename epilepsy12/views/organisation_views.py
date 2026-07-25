@@ -1,13 +1,16 @@
 # Python imports
 import math
+from sys import audit
 
 # third party libraries
 from django.conf import settings
 from django.shortcuts import render
 from django.urls import reverse
 from django.contrib.auth.decorators import permission_required
-from django.http import HttpResponse, HttpResponseForbidden
+from django.http import HttpResponse, HttpResponseForbidden, Http404
 from django.db.models import Q
+from django.core.exceptions import ValidationError
+from django.contrib import messages
 
 from django_htmx.http import HttpResponseClientRedirect
 import pandas as pd
@@ -16,9 +19,10 @@ from epilepsy12.models_folder.entities.local_health_board import LocalHealthBoar
 
 # E12 imports
 from ..decorator import user_may_view_this_organisation, login_and_otp_required
-from epilepsy12.constants import INDIVIDUAL_KPI_MEASURES
+from epilepsy12.constants import INDIVIDUAL_KPI_MEASURES, AUDIT_PERIOD_EXTENSION_REASONS
 from epilepsy12.models import (
     AuditPeriod,
+    Epilepsy12User,
     Organisation,
     KPI,
     OrganisationKPIAggregation,
@@ -46,6 +50,8 @@ from epilepsy12.common_view_functions.sanction_user_access import (
 )
 from ..general_functions import (
     value_from_key,
+    construct_extension_granted_email,
+    send_email_to_recipients,
 )
 from ..kpi import download_kpi_summary_as_csv
 from epilepsy12.common_view_functions.aggregate_by import (
@@ -151,7 +157,7 @@ def selected_organisation_summary(request, organisation_id):
     template_name = "epilepsy12/organisation.html"
 
     # Dates for the closed, data collection ongoing and actively recruiting cohorts
-    cohort_data = AuditPeriod.objects.cohort_summary()
+    cohort_data = AuditPeriod.objects.cohort_summary(organisation=selected_organisation)
 
     # Where dashboard data is filtered by cohort, which cohort?
     # Users still want to see dashboard data even when data collection is complete.
@@ -402,6 +408,172 @@ def selected_organisation_summary(request, organisation_id):
         context=context,
     )
 
+@login_and_otp_required()
+@user_may_view_this_organisation()
+@permission_required("epilepsy12.can_extend_submission_deadline", raise_exception=True)
+def audit_period_extension(request, organisation_id, cohort):
+    """
+    HTMX endpoint for granting/editing a per-organisation submission deadline extension.
+
+    GET:            returns the extension form partial (audit_period_extension.html),
+                    or the plain cohort card when ?card=true (used by the form's
+                    cancel button to swap the card back).
+    POST success:   grants/updates the extension and returns the re-rendered cohort
+                    card showing the new "Extended to" badge.
+    POST invalid:   re-renders the form partial with the error and posted values.
+
+    The form partial and cohort card share the same root element id
+    (cohort_card_<cohort>) so every response swaps the same target.
+    """
+    selected_organisation = Organisation.objects.get(pk=organisation_id)
+    audit_period = AuditPeriod.objects.by_cohort(cohort_number=cohort)
+    if audit_period is None:
+        raise Http404("Audit period not found")
+
+    def render_cohort_card():
+        """Re-render just this period's card with org-aware extension state."""
+        return render(
+            request=request,
+            template_name="epilepsy12/partials/organisation/cohort_card.html",
+            context={
+                "cohort": audit_period.as_cohort_card_dict(
+                    organisation=selected_organisation
+                ),
+                "cohort_data": AuditPeriod.objects.cohort_summary(
+                    organisation=selected_organisation
+                ),
+                "selected_organisation": selected_organisation,
+                "cohort_number": cohort,
+            },
+        )
+
+    def render_form(**extra_context):
+        return render(
+            request=request,
+            template_name="epilepsy12/partials/organisation/audit_period_extension.html",
+            context={
+                "selected_organisation": selected_organisation,
+                "cohort": cohort,
+                "audit_period": audit_period,
+                "existing_extension": audit_period.extensions.filter(
+                    organisation=selected_organisation
+                ).first(),
+                "extension_reasons": AUDIT_PERIOD_EXTENSION_REASONS,
+                **extra_context,
+            },
+        )
+
+    def send_extension_email(extension, action):
+        """
+        Email the organisation's lead clinician(s) and the generic audit team
+        address that the submission deadline has changed. ``action`` is one of
+        "granted" / "closed" / "withdrawn" and selects the email wording.
+        """
+        email = construct_extension_granted_email(
+            request=request,
+            organisation=selected_organisation,
+            audit_period=audit_period,
+            extension=extension,
+            action=action,
+        )
+
+        lead_clinicians = Epilepsy12User.objects.filter(
+            Q(employer_organisations__employer_organisation=selected_organisation)
+            & Q(is_active=True)
+            & Q(role=1)  # Audit Centre Lead Clinician
+        )
+        if lead_clinicians.exists():
+            recipients = list(lead_clinicians.values_list("email", flat=True))
+            recipients.append(settings.SITE_CONTACT_EMAIL)
+            subject = (
+                f"Epilepsy12 cohort {cohort} submission deadline - {action}"
+            )
+        else:
+            recipients = [settings.SITE_CONTACT_EMAIL]
+            subject = (
+                f"Epilepsy12 cohort {cohort} submission deadline - {action}"
+                " - NO LEAD CLINICIAN"
+            )
+
+        send_email_to_recipients(recipients=recipients, subject=subject, message=email)
+
+    # cancel button: swap the card back
+    if request.method == "GET" and request.GET.get("card"):
+        return render_cohort_card()
+
+    if request.method == "POST":
+        action = request.POST.get("action", "extend")
+
+        # close submission: set the organisation's effective deadline to today
+        if action == "close":
+            try:
+                extension = audit_period.close_submission_for_organisation(
+                    organisation=selected_organisation,
+                    user=request.user,
+                )
+            except ValidationError as e:
+                return render_form(extension_error=e.messages[0])
+            send_extension_email(extension=extension, action="closed")
+            return render_cohort_card()
+
+        # remove extension: revert the organisation to the audit-wide deadline
+        if action == "remove":
+            try:
+                audit_period.remove_submission_extension(
+                    organisation=selected_organisation,
+                    user=request.user,
+                )
+            except ValidationError as e:
+                return render_form(extension_error=e.messages[0])
+            send_extension_email(extension=None, action="withdrawn")
+            return render_cohort_card()
+
+        # extend (default action): days is required; reason is optional
+        try:
+            days = int(request.POST.get("days", ""))
+        except (TypeError, ValueError):
+            days = None
+
+        reason_raw = request.POST.get("reason", "")
+        try:
+            reason = int(reason_raw) if reason_raw != "" else None
+        except (TypeError, ValueError):
+            reason = None
+
+        if days is None or days < 1:
+            return render_form(
+                extension_error="Please enter a valid number of days.",
+                posted_days=request.POST.get("days", ""),
+                posted_reason=reason,
+            )
+        if reason_raw != "" and reason is None:
+            return render_form(
+                extension_error="Please choose a valid reason.",
+                posted_days=days,
+                posted_reason=None,
+            )
+
+        try:
+            extension = audit_period.extend_submission_deadline(
+                organisation=selected_organisation,
+                reason=reason,
+                days=days,
+                user=request.user,
+            )
+        except ValidationError as e:
+            return render_form(
+                extension_error=e.messages[0],
+                posted_days=days,
+                posted_reason=reason,
+            )
+
+        send_extension_email(extension=extension, action="granted")
+
+        return render_cohort_card()
+
+    # plain GET: show the form
+    return render_form()
+
 
 @login_and_otp_required()
 @user_may_view_this_organisation()
@@ -409,11 +581,11 @@ def individual_metrics(request, organisation_id):
     """
     HTMX get request returning individual_metrics.html  real-time Key Performance Indicator (KPI) Metrics table.
     """
-
+    selected_organisation = Organisation.objects.get(pk=organisation_id)
     context = {
-        "selected_organisation": Organisation.objects.get(pk=organisation_id),
+        "selected_organisation": selected_organisation,
         "cohort_number": request.GET.get("cohort"),
-        "cohort_data": AuditPeriod.objects.cohort_summary(),
+        "cohort_data": AuditPeriod.objects.cohort_summary(organisation=selected_organisation),
         "individual_kpi_choices": INDIVIDUAL_KPI_MEASURES,
     }
     template = "epilepsy12/partials/organisation/individual_metrics.html"
@@ -431,7 +603,7 @@ def publish_kpis(request, organisation_id):
     """
 
     # get submitting_cohort number - in future will be selectable
-    cohort_data = AuditPeriod.objects.cohort_summary()
+    cohort_data = AuditPeriod.objects.cohort_summary(organisation=None) # audit-wide
 
     cohort_number = (
         cohort_data["grace_cohort"]["cohort"]

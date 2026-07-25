@@ -51,7 +51,7 @@ class Command(BaseCommand):
             "-m",
             "--mode",
             type=str,
-            help="Mode - seed options to include: cases, seed_registrations, seed_groups_and_permissions, add_permissions_to_existing_groups, upload_old_patient_data, upload_user_data, add_new_epilepsy_causes",
+            help="Mode - seed options to include: cases, seed_registrations, seed_groups_and_permissions, upload_old_patient_data, upload_user_data, add_new_epilepsy_causes",
         )
         parser.add_argument(
             "-c",
@@ -129,11 +129,7 @@ class Command(BaseCommand):
             print(image())
         elif options["mode"] == "seed_groups_and_permissions":
             self.stdout.write("setting up groups and permissions...")
-            groups_seeder(run_create_groups=True)
-            print(image())
-        elif options["mode"] == "add_permissions_to_existing_groups":
-            self.stdout.write("adding permissions to groups...")
-            groups_seeder(add_permissions_to_existing_groups=True)
+            groups_seeder()
             print(image())
         elif options["mode"] == "upload_old_patient_data":
             self.stdout.write("Uploading old patient data.")

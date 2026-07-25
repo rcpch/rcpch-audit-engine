@@ -6,8 +6,10 @@ from django.contrib import messages
 from django.contrib.auth.admin import UserAdmin
 from django.http import HttpResponse
 from django.db.models import Count, Prefetch
+from django.db import models
 from django.forms import forms
 from django.conf import settings
+from django.utils import timezone
 
 
 # Third-party
@@ -631,11 +633,66 @@ class AuditPeriodAdmin(SimpleHistoryAdmin):
     ordering = ["-recruitment_start_date"]
     readonly_fields = ["slug"]
 
+class ExtensionOpenPastDeadlineFilter(admin.SimpleListFilter):
+    """
+    Filters extensions to those keeping submission open past the audit-wide
+    deadline - the sites the audit team may still need to chase once the
+    audit-wide date has passed.
+    """
+
+    title = "open past audit-wide deadline"
+    parameter_name = "open_past_deadline"
+
+    def lookups(self, request, model_admin):
+        return (
+            ("yes", "Yes"),
+            ("no", "No"),
+        )
+
+    def queryset(self, request, queryset):
+        today = timezone.now().date()
+        open_qs = queryset.filter(
+            extended_submission_date__gt=models.F(
+                "audit_period__submission_deadline"
+            ),
+            audit_period__submission_deadline__lt=today,
+            extended_submission_date__gte=today,
+        )
+        if self.value() == "yes":
+            return open_qs
+        if self.value() == "no":
+            return queryset.exclude(pk__in=open_qs.values("pk"))
+        return queryset
+
+
 class AuditPeriodExtensionAdmin(SimpleHistoryAdmin):
-    list_display = ["audit_period", "organisation", "extended_submission_date"]
-    list_filter = ["audit_period"]
+    list_display = [
+        "audit_period",
+        "organisation",
+        "audit_wide_deadline",
+        "extended_submission_date",
+        "is_open_past_audit_wide_deadline",
+        "days_left",
+    ]
+    list_filter = ["audit_period", ExtensionOpenPastDeadlineFilter]
     autocomplete_fields = ["organisation"]
     list_select_related = ["organisation", "audit_period"]
+
+    @admin.display(description="Audit-wide deadline")
+    def audit_wide_deadline(self, obj):
+        return obj.audit_period.submission_deadline
+
+    @admin.display(
+        description="Open past audit-wide deadline",
+        boolean=True,
+    )
+    def is_open_past_audit_wide_deadline(self, obj):
+        return obj.is_open_past_audit_wide_deadline
+
+    @admin.display(description="Days left")
+    def days_left(self, obj):
+        remaining = (obj.extended_submission_date - timezone.now().date()).days
+        return remaining if remaining >= 0 else 0
 
 # register all models
 admin.site.register(Epilepsy12User, Epilepsy12UserAdmin)

@@ -90,6 +90,12 @@ CAN_CONSENT_TO_AUDIT_PARTICIPATION = (
     "can_consent_to_audit_participation",
     "Can consent to participating in Epilepsy12.",
 )
+
+# AuditPeriodExtension
+CAN_EXTEND_SUBMISSION_DEADLINE = (
+    "can_extend_submission_deadline",
+    "Can extend the submission deadline for this audit period.",
+)
 ```
 
 These permissions can be access in the view or in the template to constrain access to particular fields, views or models.

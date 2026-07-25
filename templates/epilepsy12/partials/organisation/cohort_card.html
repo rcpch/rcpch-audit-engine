@@ -1,4 +1,4 @@
-<div class="rcpch_summary_stats">
+<div class="rcpch_summary_stats" id="cohort_card_{{ cohort.cohort }}">
   <div class="rcpch_summary_stats_row">
     <h1>COHORT {{cohort.cohort}}</h1>
   </div>
@@ -23,10 +23,28 @@
         <div class="rcpch_summary_stats_date">
           {{cohort.submission_date}}
         </div>
+        {% if cohort.extended_submission_date %}
+          <div class="rcpch_summary_stats_description" style="color: var(--rcpch_pink)">
+            {% if cohort.is_closed_early %}
+              Closed early: {{ cohort.extended_submission_date }}
+            {% else %}
+              Extended to {{ cohort.extended_submission_date }}
+            {% endif %}
+          </div>
+        {% endif %}
       {% else %}
         <div class="rcpch_summary_stats_description">
           Data submission closed
         </div>
+        {% if cohort.extended_submission_date and cohort.extended_submission_date >= cohort_data.today %}
+          <div class="rcpch_summary_stats_description" style="color: var(--rcpch_pink)">
+            {% if cohort.is_closed_early %}
+              Closed early: {{ cohort.extended_submission_date }}
+            {% else %}
+              Extended to {{ cohort.extended_submission_date }}
+            {% endif %}
+          </div>
+        {% endif %}
       {% endif %}
     </div>
   </div>
@@ -41,6 +59,72 @@
       <div class="rcpch_summary_stats_description">
         Across all organisations - audit team only.
       </div>
+    </div>
+  {% endif %}
+
+  {% if perms.epilepsy12.can_extend_submission_deadline and cohort.is_extension_eligible %}
+    <div class="rcpch_summary_stats_row extension_actions">
+      <button
+        class="ui rcpch_positive button"
+        hx-get="{% url 'audit_period_extension' organisation_id=selected_organisation.pk cohort=cohort.cohort %}"
+        hx-target="#cohort_card_{{ cohort.cohort }}"
+        hx-swap="outerHTML"
+        hx-trigger="click"
+      >
+        {% if cohort.extended_submission_date %}Extend further{% else %}Extend deadline{% endif %}
+      </button>
+      {% if cohort.extended_submission_date %}
+        <button
+          type="button"
+          class="ui rcpch_negative button"
+          hx-post="{% url 'audit_period_extension' organisation_id=selected_organisation.pk cohort=cohort.cohort %}"
+          hx-vals='{"action": "close"}'
+          hx-target="#cohort_card_{{ cohort.cohort }}"
+          hx-swap="outerHTML"
+          hx-headers='{"X-CSRFToken": "{{ csrf_token }}"}'
+          _="on htmx:confirm(issueRequest)
+              halt the event
+              call Swal.fire({
+                title: 'Confirmation Required',
+                text: 'This closes submission for this organisation today. They will no longer be able to submit data after today.',
+                icon: 'warning',
+                iconColor: '#e00087',
+                showCancelButton: true,
+                confirmButtonColor: '#11a7f2',
+                cancelButtonColor: '#e60700',
+                confirmButtonText: 'Close submission'
+              })
+              if result.isConfirmed issueRequest()
+              end"
+        >
+          Close submission
+        </button>
+        <button
+          type="button"
+          class="ui rcpch_danger button"
+          hx-post="{% url 'audit_period_extension' organisation_id=selected_organisation.pk cohort=cohort.cohort %}"
+          hx-vals='{"action": "remove"}'
+          hx-target="#cohort_card_{{ cohort.cohort }}"
+          hx-swap="outerHTML"
+          hx-headers='{"X-CSRFToken": "{{ csrf_token }}"}'
+          _="on htmx:confirm(issueRequest)
+              halt the event
+              call Swal.fire({
+                title: 'Confirmation Required',
+                text: 'This removes the extension. The deadline reverts to the audit-wide date of {{ cohort.submission_date }}.',
+                icon: 'warning',
+                iconColor: '#e00087',
+                showCancelButton: true,
+                confirmButtonColor: '#11a7f2',
+                cancelButtonColor: '#e60700',
+                confirmButtonText: 'Remove extension'
+              })
+              if result.isConfirmed issueRequest()
+              end"
+        >
+          Remove extension
+        </button>
+      {% endif %}
     </div>
   {% endif %}
 </div>

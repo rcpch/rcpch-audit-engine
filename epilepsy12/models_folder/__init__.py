@@ -34,6 +34,7 @@ from .organisation_employer import OrganisationEmployer
 # or each child's performance indicator score
 # or every E12 user's activity
 from .audit_period import AuditPeriod
+from .audit_period import AuditPeriodExtension
 from .audit_progress import AuditProgress
 
 from .kpi import KPI

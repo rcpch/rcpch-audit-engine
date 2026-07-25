@@ -148,6 +148,7 @@ nav:
     - 'admin-users/download.md'
     - 'admin-users/how-to-edit-docs.md'
     - 'admin-users/how-to-add-banners.md'
+    - 'admin-users/how-to-manage-submission-deadlines.md'
   - Developer Guide:
     - Getting Started: 'development/getting-started.md'
     - Architecture Overview: 'development/architecture-overview.md'
@@ -177,6 +178,7 @@ nav:
       - Date Validations: 'development/date-validations.md'
       - Indices of Multiple Deprivation: 'development/imd.md'
       - Cohort Number: 'development/cohort.md'
+      - Submission Deadlines: 'development/submission-deadlines.md'
       - KPIs: 'development/key-performance-indicators.md'
       - Organisations, Trusts and Regions: 'development/organisations.md'
       - Postcodes: 'development/postcodes.md'
