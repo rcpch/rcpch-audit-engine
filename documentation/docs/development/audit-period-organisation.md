@@ -168,6 +168,35 @@ During migration, the existing parent fields on `Organisation` can remain for co
 
 Cohort-aware reporting and permission checks must use `AuditPeriodOrganisation`. They must not silently fall back to the current `Organisation` relationships once the migration is complete.
 
+### Preventing accidental use of current relationships
+
+While both relationship paths exist, the database cannot prevent application code from traversing `Organisation.trust`, `Organisation.integrated_care_board` or the equivalent ORM paths. This requires an enforced application boundary rather than relying only on documentation.
+
+Direct current-relationship access should be classified explicitly:
+
+| Consumer | Current `Organisation` relationships allowed? |
+|---|---|
+| Organisation directory/admin and current contact details | Yes |
+| Candidate historical-membership backfill | Yes, as unapproved source data |
+| Legacy report builder until its second-stage refactor | Yes |
+| Organisational Audit, unless its separate policy changes | Yes |
+| Period-aware organisation dashboard | No |
+| Registered-case inherited permissions | No |
+| Period-aware KPI and demographic aggregation | No |
+| Publication generation | No |
+
+The boundary should be enforced in several complementary ways:
+
+1. **Mandatory service APIs** — period-aware code must call geography services that require both an `Organisation` and an `AuditPeriod`. A function that accepts only an organisation is not sufficient for period-aware hierarchy resolution.
+2. **No fallback** — `get_membership()` should raise a specific missing/ambiguous-membership error. It must not fall back to `Organisation.trust` or another current relationship.
+3. **Separated modules** — period-aware queries should live in clearly named geography/reporting services. Current-directory lookup code should remain separate so that imports and reviews make the chosen semantics visible.
+4. **Current-use inventory and allowlist** — before dashboard cutover, inventory direct uses of current parent fields and ORM paths. Each remaining use must be classified as intentionally current or scheduled for refactor.
+5. **CI guard** — add a targeted static check, preferably an AST-aware project check, that rejects direct current-parent traversal in period-aware dashboard, permission, aggregation and publication modules. A reviewed allowlist should contain the temporary legacy consumers. A simple repository-wide grep is useful for inventory but is too imprecise to be the sole guard.
+6. **Reorganisation canary tests** — use a standard fixture where Organisation A currently belongs to Trust B, belongs to Trust A in cohort 8, and belongs to Trust B in cohort 9. Every period-aware query and permission test should use this deliberately divergent data. Any accidental current relationship query will then fail visibly.
+7. **Code-review rule** — new reporting or inherited-permission code that traverses a parent relationship must show where its `AuditPeriod` came from.
+
+The strongest eventual safeguard would be to rename current fields to names such as `current_trust` and `current_integrated_care_board`, potentially retaining the existing database columns with `db_column`. That would make accidental use more obvious, but it would be a broad compatibility refactor and is not required for the initial foundation.
+
 ## Shared service layer
 
 Views, decorators and publication jobs should not each implement their own membership rules. A shared service layer should provide a small, tested API.
@@ -595,7 +624,8 @@ Scope:
 - copy current `Organisation` relationships only as candidate data, with provenance recorded;
 - provide a review/approval workflow for historical assignments;
 - report missing or ambiguous relationships rather than guessing them;
-- add the geography service functions such as `get_membership()`, `get_reporting_hierarchy()` and `get_organisations_for_parent()`; and
+- add the geography service functions such as `get_membership()`, `get_reporting_hierarchy()` and `get_organisations_for_parent()`;
+- make missing or ambiguous membership raise an explicit domain error with no fallback to current relationships; and
 - add readiness validation that can report whether an audit period has complete approved memberships.
 
 A normal data migration should not silently declare reconstructed historical relationships authoritative. Historical backfill needs an auditable, repeatable process and clinical/audit-team review.
@@ -661,8 +691,10 @@ Scope:
 - update selector permission checks to use the new service;
 - update the membership panel and parent labels to show the selected period's relationships;
 - scope KPI summaries, demographics, maps and travel calculations to the selected period;
-- resolve Trust/LHB, ICB, region and network comparison queries through period memberships; and
-- update links from the dashboard to retain the selected period where the destination is period-aware.
+- resolve Trust/LHB, ICB, region and network comparison queries through period memberships;
+- update links from the dashboard to retain the selected period where the destination is period-aware;
+- inventory every current-parent traversal used by the dashboard and its aggregation helpers; and
+- add the scoped static/CI guard that prevents those paths from being reintroduced into migrated modules.
 
 This pull request will require substantial test refactoring because the canonical route signature changes. Likely affected tests include:
 
@@ -682,7 +714,8 @@ New tests should cover:
 - historical membership labels;
 - period-specific KPI and demographic querysets;
 - period-specific map payloads;
-- Organisation A appearing under Trust A in cohort 8 and Trust B in cohort 9; and
+- the canary organisation currently belonging to Trust B while appearing under Trust A in cohort 8 and Trust B in cohort 9;
+- failure rather than current-geography fallback when the selected membership is missing; and
 - no mixing of records from another period.
 
 Exit condition: the organisation dashboard is fully period-aware and no longer relies on current parent relationships for historical summaries.
@@ -768,7 +801,8 @@ Exit condition: all critical submission workflows pass their focused regression 
 
 Scope:
 
-- remove temporary dashboard fallbacks to current parent geography;
+- verify that no dashboard, registered-case permission or live period-aggregation path falls back to current parent geography;
+- review and minimise the allowlist of intentional current-relationship consumers;
 - add diagnostics for missing memberships;
 - verify indexes and query counts with production-scale data;
 - document the staff process for applying a reorganisation from a chosen audit period;
