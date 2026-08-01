@@ -519,30 +519,302 @@ A backfill process should:
 
 `django-simple-history` records may help reconstruct changes but should not become the reporting policy or sole source of truth. They record database changes, not necessarily the audit period from which a reorganisation was intended to apply.
 
-## Suggested implementation sequence
+## Implementation plan — focused atomic pull requests
 
-### Foundation — takes precedence over publication
+The foundation should be delivered as a sequence of focused, deployable pull requests rather than one large feature branch. Each pull request should have one clear responsibility, include its own tests, and preserve the existing live application unless it explicitly performs a tested route cutover.
 
-1. Agree the period-level affiliation and direct/inherited access policies.
-2. Add `AuditPeriodOrganisation`, constraints, history, migration and administrative workflow.
-3. Backfill and approve historical memberships.
-4. Add shared geography-resolution services.
-5. Add period-aware permission services and tests without changing Organisational Audit semantics.
-6. Add canonical audit-period dashboard, case-list, selector and extension routes.
-7. Refactor `selected_organisation_summary`, its templates, KPI summaries, demographics and maps.
-8. Refactor direct case and related-model authorisation to derive `Registration.audit_period`.
-9. Preserve and regression-test clinical registration, editing, extensions, submission and locking.
-10. Preserve and regression-test the separate Organisational Audit workflow.
-11. Regression-test the unchanged report-builder route and representative facets against the new model and permission additions.
-12. Complete end-to-end migration and access-control testing.
+General rules for the sequence are:
 
-### Subsequent work
+- retain the current parent fields on `Organisation` throughout the foundation;
+- retain `Registration.cohort` for compatibility, while new code uses `Registration.audit_period`;
+- do not make publication code depend on incomplete or unreviewed membership data;
+- do not refactor the report builder during the foundation;
+- preserve clinical submission and Organisational Audit behaviour in every deployable state;
+- introduce new services alongside legacy call sites before switching consumers; and
+- run the full test suite before merging each pull request, in addition to the targeted tests listed below.
 
-13. Refactor the report builder to use audit-period-aware routing, permissions and geography facets before restoring broad access.
-14. Implement publication models and generation using approved memberships.
-15. Copy memberships into immutable publication geography snapshots.
+### Optional PR 0 — critical-workflow characterisation tests
 
-Publication schema exploration may proceed in parallel, but publication generation and public aggregation are blocked until the foundation is complete. The report-builder refactor is a separate downstream task and need not delay the foundation while the legacy feature continues behind its explicit compatibility boundary.
+This is a test-only pull request if the current coverage is not sufficient to protect the following work.
+
+Scope:
+
+- add end-to-end characterisation tests for registration, editing, extension, submission and locking;
+- add explicit regression coverage for Organisational Audit access, editing, submission and export;
+- add a smoke test for the current report-builder route and representative facets; and
+- record the current dashboard route and redirect behaviour.
+
+Likely test areas:
+
+- `epilepsy12/tests/model_tests/test_audit_period.py`;
+- `epilepsy12/tests/view_tests/test_audit_period_extension.py`;
+- `epilepsy12/tests/view_tests/permissions_tests/test_permissions_closed_cohort.py`;
+- `epilepsy12/tests/view_tests/permissions_tests/test_permissions_organisational_audit.py`;
+- `epilepsy12/tests/view_tests/test_organisation_views.py`; and
+- `epilepsy12/tests/view_tests/case_filters/`.
+
+Exit condition: the critical existing workflows have tests that will fail if later shared-service or permission changes cause a regression.
+
+### PR 1 — `AuditPeriodOrganisation` model and schema migration
+
+This pull request is additive and must not change any runtime query, route or permission behaviour.
+
+Scope:
+
+- add the `AuditPeriodOrganisation` model;
+- add the foreign keys, constraints, indexes, audit fields and `HistoricalRecords` agreed for the model;
+- expose the model through `epilepsy12.models`;
+- register a minimal Django admin representation;
+- add a schema migration;
+- add an explicit test factory or fixture for period memberships; and
+- retain every existing parent field on `Organisation`.
+
+Do not include publication models, dashboard query changes, permission changes or report-builder changes.
+
+New tests should cover:
+
+- one row per `(audit_period, organisation)`;
+- valid English Trust/ICB/region membership;
+- valid Welsh LHB membership;
+- invalid or incomplete parent combinations;
+- `PROTECT` behaviour for referenced audit periods, organisations and geographies;
+- history creation; and
+- coexistence of different parent assignments for the same organisation in concurrent periods.
+
+Expected existing-test refactoring should be minimal. Test factories that create an organisation and audit period should not silently create a membership unless the test explicitly asks for one; otherwise missing-membership cases become difficult to test.
+
+Exit condition: the migration can be deployed to the live database without changing current application behaviour.
+
+### PR 2 — population, approval and geography service layer
+
+This pull request populates and reads the new source of truth but still does not switch user-facing routes.
+
+Scope:
+
+- add an idempotent management command or controlled staff workflow to create candidate membership rows for existing audit periods;
+- copy current `Organisation` relationships only as candidate data, with provenance recorded;
+- provide a review/approval workflow for historical assignments;
+- report missing or ambiguous relationships rather than guessing them;
+- add the geography service functions such as `get_membership()`, `get_reporting_hierarchy()` and `get_organisations_for_parent()`; and
+- add readiness validation that can report whether an audit period has complete approved memberships.
+
+A normal data migration should not silently declare reconstructed historical relationships authoritative. Historical backfill needs an auditable, repeatable process and clinical/audit-team review.
+
+New tests should cover:
+
+- command/workflow idempotency;
+- candidate provenance;
+- preservation of an already-reviewed historical assignment;
+- missing-geography reporting;
+- approval and readiness checks;
+- service results for Organisation A moving from Trust A to Trust B between periods; and
+- queries accepting an `AuditPeriod` instance rather than a cohort integer.
+
+Existing fixtures and seeded data may need explicit membership rows where these new services are exercised. Existing application consumers remain on their old paths in this pull request.
+
+Exit condition: required historical membership rows can be generated, reviewed and queried without changing the live dashboard.
+
+### PR 3 — period-aware permission services
+
+This pull request adds the new permission vocabulary without yet replacing unrelated permission paths globally.
+
+Scope:
+
+- implement `can_view_organisation_for_period()`;
+- implement accessible-period, accessible-parent and accessible-organisation queries;
+- distinguish direct organisation access from inherited Trust/LHB access;
+- implement case/registration period resolution through `Registration.audit_period`;
+- define the pre-registration rule for cases without an audit period; and
+- leave the existing report-builder mixin and Organisational Audit permission path unchanged.
+
+New tests should use a reorganisation fixture and cover:
+
+- direct Organisation A access to the agreed older in-flight periods;
+- Trust A inherited access before the move;
+- Trust B inherited access from the effective period;
+- denial for the opposite period in each Trust;
+- RCPCH access;
+- inactive employment;
+- unregistered cases; and
+- absence or ambiguity of required membership rows.
+
+Likely existing-test refactoring includes permission factories and tests that currently infer access solely from `Organisation.trust` or `Organisation.local_health_board`.
+
+Exit condition: the new permission service is fully tested but only consumers explicitly migrated to it change behaviour.
+
+### PR 4 — audit-period-aware dashboard routes, views and templates
+
+This is the first user-facing cutover and should be limited to the organisation dashboard vertical slice.
+
+Scope:
+
+- add the canonical dashboard route:
+
+  ```text
+  /organisation/<organisation_id>/audit-periods/<audit_period_slug>/summary/
+  ```
+
+- make the legacy dashboard route redirect to the latest period that the user may access;
+- replace the `?cohort=<number>` dashboard state with `AuditPeriod.slug` routing;
+- update `selected_organisation_summary` to retain the resolved `AuditPeriod` and `AuditPeriodOrganisation` throughout the request;
+- update parent and organisation selector endpoints to carry the period slug;
+- update selector permission checks to use the new service;
+- update the membership panel and parent labels to show the selected period's relationships;
+- scope KPI summaries, demographics, maps and travel calculations to the selected period;
+- resolve Trust/LHB, ICB, region and network comparison queries through period memberships; and
+- update links from the dashboard to retain the selected period where the destination is period-aware.
+
+This pull request will require substantial test refactoring because the canonical route signature changes. Likely affected tests include:
+
+- `epilepsy12/tests/view_tests/test_organisation_views.py`;
+- `epilepsy12/tests/view_tests/authentication_and_authorization/test_login.py`;
+- aggregation and report-query tests under `common_view_functions_tests`;
+- tests that reverse `selected_organisation_summary`;
+- template assertions that use current `Organisation` parents; and
+- tests that pass `?cohort=` directly.
+
+New tests should cover:
+
+- canonical slug URLs;
+- legacy redirects;
+- inaccessible and invalid periods;
+- period-specific parent and organisation dropdowns;
+- historical membership labels;
+- period-specific KPI and demographic querysets;
+- period-specific map payloads;
+- Organisation A appearing under Trust A in cohort 8 and Trust B in cohort 9; and
+- no mixing of records from another period.
+
+Exit condition: the organisation dashboard is fully period-aware and no longer relies on current parent relationships for historical summaries.
+
+### PR 5 — period-aware case collections and clinical permissions
+
+This pull request applies the established period context to patient-facing collections and direct clinical access while keeping field-level URLs identifier-based.
+
+Scope:
+
+- add the canonical period case-list route:
+
+  ```text
+  /organisation/<organisation_id>/audit-periods/<audit_period_slug>/cases/
+  ```
+
+- define the compatibility behaviour of the existing all-children/all-cohort list;
+- update case-list queries and links to retain the selected period;
+- migrate child-record permission guards to derive `Registration.audit_period`;
+- apply the direct-versus-inherited access policy to registration and all related models;
+- retain identifier-based assessment, investigation, management and HTMX field routes;
+- validate any optional route period against `Registration.audit_period`; and
+- ensure unauthorised direct URLs fail server-side.
+
+Likely affected tests include:
+
+- `epilepsy12/tests/view_tests/permissions_tests/`;
+- `epilepsy12/tests/view_tests/case_filters/test_case_list_filters.py` for the ordinary case list, not the report builder;
+- tests that reverse the `cases` route;
+- clinical form view tests using `user_may_view_this_child()`; and
+- transfer, consent and performance-summary tests that redirect to an organisation case list.
+
+New tests should cover:
+
+- period-specific case collections;
+- direct organisation access to older in-flight registrations;
+- inherited parent access and denial across the reorganisation boundary;
+- unregistered-case access;
+- route/model period mismatch;
+- field-level GET and POST protection; and
+- redirects retaining the period slug.
+
+Exit condition: dashboard, case collections and direct clinical views enforce the same period-aware access policy.
+
+### PR 6 — submission, extension and Organisational Audit compatibility
+
+This pull request completes and proves the critical-workflow integration. It should avoid changing the underlying submission models unless a test exposes a genuine defect.
+
+Scope:
+
+- change the extension route from integer cohort to `AuditPeriod.slug`;
+- optionally validate that the organisation has a membership row for the selected period;
+- preserve `AuditPeriodExtension` identity and deadline calculations;
+- preserve `Registration.days_remaining_before_submission` and `Case.editable()` semantics;
+- update submission/locking redirects to preserve period context;
+- verify that direct organisation users can complete agreed older in-flight registrations;
+- keep `OrganisationalAuditSubmission` and `OrganisationalAuditSubmissionPeriod` unchanged; and
+- keep Organisational Audit permissions on their existing, separately tested semantics.
+
+Likely affected tests include:
+
+- `epilepsy12/tests/model_tests/test_audit_period.py`;
+- `epilepsy12/tests/model_tests/test_registration.py`;
+- `epilepsy12/tests/view_tests/test_audit_period_extension.py`;
+- `epilepsy12/tests/view_tests/permissions_tests/test_permissions_closed_cohort.py`;
+- submission and locking tests in `case_views`; and
+- `epilepsy12/tests/view_tests/permissions_tests/test_permissions_organisational_audit.py`.
+
+New or updated tests should prove:
+
+- extension GET and POST use the period slug;
+- extend, close and remove still update the same row;
+- deadline and editability calculations are unchanged;
+- closed-period editing is still denied;
+- direct users can finish permitted in-flight records after a move;
+- submission and locking use period-aware permission checks;
+- Organisational Audit access, editing, submission and export are unchanged; and
+- shared helper changes do not alter Organisational Audit behaviour.
+
+Exit condition: all critical submission workflows pass their focused regression suites under the new permission and routing foundation.
+
+### PR 7 — foundation hardening and publication readiness
+
+Scope:
+
+- remove temporary dashboard fallbacks to current parent geography;
+- add diagnostics for missing memberships;
+- verify indexes and query counts with production-scale data;
+- document the staff process for applying a reorganisation from a chosen audit period;
+- complete approved historical backfill;
+- run end-to-end access tests across concurrent periods;
+- run unchanged report-builder smoke/facet tests; and
+- expose a publication-readiness result for each audit period.
+
+Exit condition: the foundation is complete, historical memberships are approved, critical workflows are stable, and public publication implementation can safely begin.
+
+## Second-stage report-builder pull requests
+
+The report builder remains live with its existing current-geography, all-period semantics throughout the foundation. Its refactor begins only after PR 7.
+
+### Report-builder PR 1 — period-aware route, base queryset and permissions
+
+Scope:
+
+- add the canonical route:
+
+  ```text
+  /organisation/<organisation_id>/audit-periods/<audit_period_slug>/report-builder/
+  ```
+
+- resolve and authorise the `AuditPeriod` before constructing the queryset;
+- filter the base queryset through `Registration.audit_period`;
+- update the cohort facet or remove it when redundant;
+- preserve search and non-geographical clinical facets; and
+- redirect the legacy route according to an agreed compatibility policy.
+
+Tests should update `epilepsy12/tests/view_tests/case_filters/`, authentication tests and URL reversals, and prove that facet counts are calculated only from the authorised period queryset.
+
+### Report-builder PR 2 — period-aware geography facets
+
+Scope:
+
+- refactor Trust/LHB, ICB, NHS England region and country filters to use `AuditPeriodOrganisation`;
+- derive geography choices and counts from period memberships;
+- remove use of `Registration.cohort` from report-builder queries; and
+- add reorganisation tests proving that cohort 8 and cohort 9 produce their respective geography facets.
+
+Tests should update `epilepsy12/tests/filterset_tests/test_filtersets.py` and the report-builder view tests. Existing clinical facet tests should remain unchanged wherever their behaviour is independent of geography.
+
+## Publication work after the foundation
+
+Publication schema exploration may proceed independently, but publication generation and public aggregation are blocked until PR 7 is complete. Once the foundation is ready, publication implementation can use the approved membership and geography services and copy them into immutable publication snapshots.
 
 ## Testing requirements
 
