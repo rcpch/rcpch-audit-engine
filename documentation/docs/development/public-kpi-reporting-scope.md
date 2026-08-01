@@ -169,6 +169,8 @@ The current `Organisation.active` boolean represents current operational status;
 
 A period-aware source of truth is therefore required. The recommended approach is an explicit relationship such as an `AuditPeriodOrganisation` participation model, with one row per organisation and audit period. The exact model name is not prescribed by this scope.
 
+The proposed model, shared geography and permission services, audit-period-aware dashboard routes, and relationship with publication generation are described in [Audit-period organisation membership and access](audit-period-organisation.md).
+
 The relationship should be able to record at least:
 
 - the `AuditPeriod`;
