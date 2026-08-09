@@ -74,9 +74,6 @@ RCPCH_CENSUS_PLATFORM_TOKEN = os.getenv("RCPCH_CENSUS_PLATFORM_TOKEN")
 POSTCODES_IO_API_URL = os.getenv("POSTCODES_IO_API_URL")
 POSTCODES_IO_API_KEY = os.getenv("POSTCODES_IO_API_KEY")
 
-NHS_ODS_API_URL = os.getenv("NHS_ODS_API_URL")
-NHS_ODS_API_KEY = os.getenv("NHS_ODS_API_KEY")
-
 # RCPCH NHS Organisations API - source of truth for organisations, trusts, ICBs,
 # NHS England regions, OPEN UK networks, country and their history/mergers.
 # Replaces the direct NHS ODS sync. The local Organisation/Trust/etc. models

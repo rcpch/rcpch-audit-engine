@@ -25,7 +25,7 @@ class CountryBoundaries(models.Model):
     long = models.FloatField(null=True, blank=True)
     lat = models.FloatField(null=True, blank=True)
     globalid = models.CharField(max_length=38, null=True, blank=True)
-    geom = models.MultiPolygonField(srid=27700)
+    geom = models.MultiPolygonField(srid=27700, null=True, blank=True)
 
     class Meta:
         abstract = True

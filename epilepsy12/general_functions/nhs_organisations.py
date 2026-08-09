@@ -38,7 +38,7 @@ from requests.exceptions import HTTPError, Timeout
 
 logger = logging.getLogger(__name__)
 
-# Default request timeout in seconds. Matches the existing ods_update.py value.
+# Default request timeout in seconds.
 DEFAULT_TIMEOUT = 10
 
 

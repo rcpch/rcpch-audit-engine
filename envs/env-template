@@ -60,9 +60,6 @@ PASSWORD_RESET_TIMEOUT=259200
 # HERMES (SNOMED CT)
 RCPCH_HERMES_SERVER_URL=http://rcpch-hermes.uksouth.azurecontainer.io:8080/v1/snomed # SNOMED server API URL
 
-# NHS ODS API
-NHS_ODS_API_URL="https://directory.spineservices.nhs.uk/ORD/2-0-0"
-
 # MATERIAL FOR MKDOCS INSIDERS
 ENABLE_GIT_COMMITTERS="True" # Disables git committer extension
 ENABLE_PDF_EXPORT=1 # Disables automatic PDF generation

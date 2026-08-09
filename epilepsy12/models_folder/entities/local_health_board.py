@@ -21,12 +21,12 @@ class LocalHealthBoardBoundaries(TimeStampAbstractBaseClass):
     boundary_identifier = models.CharField(max_length=9)
     name = models.CharField(max_length=41)
     welsh_name = models.CharField(max_length=40)
-    bng_e = models.FloatField()
-    bng_n = models.FloatField()
-    long = models.FloatField()
-    lat = models.FloatField()
-    globalid = models.CharField(max_length=38)
-    geom = models.MultiPolygonField(srid=27700)
+    bng_e = models.FloatField(null=True, blank=True)
+    bng_n = models.FloatField(null=True, blank=True)
+    long = models.FloatField(null=True, blank=True)
+    lat = models.FloatField(null=True, blank=True)
+    globalid = models.CharField(max_length=38, null=True, blank=True)
+    geom = models.MultiPolygonField(srid=27700, null=True, blank=True)
 
     class Meta:
         abstract = True

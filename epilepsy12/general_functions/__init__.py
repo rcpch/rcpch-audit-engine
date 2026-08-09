@@ -13,7 +13,7 @@ from .has_all_attributes import *
 from .index_multiple_deprivation import *
 from .item_from_choice import *
 from .nhs_organisations import *
-from .ods_update import *
+from .nhs_organisations_sync import *
 from .postcode import *
 from .random_generator import *
 from .time_elapsed import stringify_time_elapsed

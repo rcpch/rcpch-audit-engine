@@ -18,12 +18,12 @@ from ..time_and_user_abstract_base_classes import TimeStampAbstractBaseClass
 class NHSEnglandRegionBoundaries(TimeStampAbstractBaseClass):
     boundary_identifier = models.CharField(max_length=9)
     name = models.CharField(max_length=24)
-    bng_e = models.BigIntegerField()
-    bng_n = models.BigIntegerField()
-    long = models.FloatField()
-    lat = models.FloatField()
-    globalid = models.CharField(max_length=38)
-    geom = models.MultiPolygonField(srid=27700)
+    bng_e = models.BigIntegerField(null=True, blank=True)
+    bng_n = models.BigIntegerField(null=True, blank=True)
+    long = models.FloatField(null=True, blank=True)
+    lat = models.FloatField(null=True, blank=True)
+    globalid = models.CharField(max_length=38, null=True, blank=True)
+    geom = models.MultiPolygonField(srid=27700, null=True, blank=True)
 
     class Meta:
         abstract = True
