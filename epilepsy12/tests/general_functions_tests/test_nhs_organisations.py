@@ -52,7 +52,7 @@ from epilepsy12.general_functions.nhs_organisations import (
 
 API_BASE = "https://test.rcpch.ac.uk/nhs-organisations/v1"
 TEST_API_KEY = "test-subscription-key"
-EXPECTED_HEADERS = {"Subscription-Key": TEST_API_KEY}
+EXPECTED_HEADERS = {"Ocp-Apim-Subscription-Key": TEST_API_KEY}
 
 
 @pytest.fixture(autouse=True)
@@ -624,7 +624,7 @@ def test_api_key_sent_as_subscription_key_header():
         list_organisations()
 
     _, kwargs = mock_get.call_args
-    assert kwargs["headers"] == {"Subscription-Key": TEST_API_KEY}
+    assert kwargs["headers"] == {"Ocp-Apim-Subscription-Key": TEST_API_KEY}
 
 
 def test_no_subscription_key_header_when_api_key_not_set(settings):

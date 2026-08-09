@@ -22,9 +22,10 @@ default via the API's ``fields`` parameter.
 
 The API is authenticated via an Azure API Management subscription key. The
 key is read from the ``RCPCH_NHS_ORGANISATIONS_API_KEY`` setting and sent as
-a ``Subscription-Key`` header on every request. The base URL defaults to the
-public ``https://api.rcpch.ac.uk/nhs-organisations/v1`` endpoint and can be
-overridden via the ``RCPCH_NHS_ORGANISATIONS_API_URL`` setting.
+an ``Ocp-Apim-Subscription-Key`` header on every request. The base URL
+defaults to the public ``https://api.rcpch.ac.uk/nhs-organisations/v1``
+endpoint and can be overridden via the
+``RCPCH_NHS_ORGANISATIONS_API_URL`` setting.
 
 Endpoint reference: https://rcpch-nhs-organisations.azurewebsites.net/schema/
 """
@@ -67,7 +68,7 @@ def _request(path: str, params: dict[str, Any] | None = None) -> Any:
     headers: dict[str, str] = {}
     api_key = getattr(settings, "RCPCH_NHS_ORGANISATIONS_API_KEY", None)
     if api_key:
-        headers["Subscription-Key"] = api_key
+        headers["Ocp-Apim-Subscription-Key"] = api_key
     try:
         response = requests.get(
             url=url,
