@@ -104,6 +104,33 @@ Trust.objects.filter(audit_period=cohort_7, ods_code="RJZ")
 No date arithmetic, no interval logic, no API calls at request time. The
 correct geography for each cohort is a simple FK filter.
 
+### Examples of organisational change
+
+The table below shows how the four main types of organisational change
+are represented in the per-cohort model. Each example uses real ODS
+codes and merger dates from the `rcpch-nhs-organisations` API's
+documentation.
+
+| Type | What happens | Example | Cohort before | Cohort after | OrganisationEntity | Cases |
+|---|---|---|---|---|---|---|
+| **Merger** (full) | Two trusts dissolve; a new trust is created with a new ODS code. Child organisations are reassigned to the new trust. | Ipswich Hospital (RGQ) + Colchester (RDE) → East Suffolk and North Essex (RJL), 2018 | Orgs under RGQ and RDE in cohort 5 | Same orgs under RJL in cohort 6 | One entity per hospital, unchanged. Org rows point to RJL trust in cohort 6. | Cases stay on the same Organisation rows; trust FK changes to RJL in the new cohort's row. |
+| **Acquisition** | One trust acquires another. The acquiring trust keeps its ODS code; the acquired trust is dissolved. Child organisations are reassigned. | Royal Free London (RAL) acquired Barnet & Chase Farm (RVL), 2014. Barnet Hospital kept its org code (RGT01-style) but parent changed from RVL to RAL. | Org under RVL in cohort 4 | Same org, same ODS code, under RAL in cohort 5 | One entity per hospital, unchanged. Org rows point to RAL trust in cohort 5. | Cases stay on the same Organisation rows; trust FK changes to RAL. |
+| **Split** (dissolution with split) | A trust is dissolved and its child organisations are split between different successor trusts. Child organisations get new ODS codes. | South London Healthcare (RYQ) dissolved 2013. PRUH (RYQ30) → King's (RJZ) as RJZ30. QEH Woolwich (RYQ01) → Lewisham & Greenwich (RJ2) as RJ201. | PRUH as RYQ30 under RYQ in cohort 4 | PRUH as RJZ30 under RJZ in cohort 5 | One entity per hospital. PRUH entity links RYQ30 (cohort 4) and RJZ30 (cohort 5) via `successor_of`. | Cases stay on the Organisation row they were created against (RYQ30/cohort 4 or RJZ30/cohort 5). |
+| **Rename** | A trust changes its name but keeps its ODS code. No child organisations move. | University Hospitals Bristol and Weston (RA7) renamed to Bristol NHS Foundation Trust (still RA7), 2024. | Trust RA7, name "UNIVERSITY HOSPITALS BRISTOL AND WESTON NHS FT" in cohort 7 | Trust RA7, name "BRISTOL NHS FOUNDATION TRUST" in cohort 8 | No entity change. Trust row for cohort 8 carries the new name. | Cases stay on the same Organisation rows; only the trust name changes in the new cohort's row. |
+
+In all four cases:
+
+- **No case migration is needed.** Cases stay on the `Organisation` row
+  they were created against. That row carries the correct geography
+  (trust, ICB, etc.) for its cohort.
+- **No user migration is needed.** User memberships point to
+  `OrganisationEntity`, which is stable. The user's sibling access
+  changes automatically because it's resolved against the current
+  cohort's trust.
+- **The entity model handles ODS code changes.** In the split case,
+  PRUH has two ODS codes (RYQ30, RJZ30) across cohorts, but one
+  `OrganisationEntity` row. The `successor_of` link connects them.
+
 ### How the PRUH edge case works
 
 Princess Royal University Hospital changed its ODS code from `RYQ30`
