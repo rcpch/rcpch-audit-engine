@@ -20,7 +20,9 @@ tiles from ``rcpch-census-platform`` and this project no longer needs to
 persist geometries locally, the country client functions omit ``geom`` by
 default via the API's ``fields`` parameter.
 
-The API is unauthenticated for read endpoints. The base URL defaults to the
+The API is authenticated via an Azure API Management subscription key. The
+key is read from the ``RCPCH_NHS_ORGANISATIONS_API_KEY`` setting and sent as
+a ``Subscription-Key`` header on every request. The base URL defaults to the
 public ``https://api.rcpch.ac.uk/nhs-organisations/v1`` endpoint and can be
 overridden via the ``RCPCH_NHS_ORGANISATIONS_API_URL`` setting.
 
@@ -54,14 +56,23 @@ def _base_url() -> str:
 def _request(path: str, params: dict[str, Any] | None = None) -> Any:
     """Perform a GET against the API and return parsed JSON.
 
+    Sends the ``RCPCH_NHS_ORGANISATIONS_API_KEY`` as a ``Subscription-Key``
+    header, which is the Azure API Management authentication pattern used by
+    the RCPCH API gateway.
+
     Raises :class:`NHSOrganisationsAPIError` on network or HTTP errors so
     callers do not have to catch ``requests`` exceptions directly.
     """
     url = f"{_base_url()}{path}"
+    headers: dict[str, str] = {}
+    api_key = getattr(settings, "RCPCH_NHS_ORGANISATIONS_API_KEY", None)
+    if api_key:
+        headers["Subscription-Key"] = api_key
     try:
         response = requests.get(
             url=url,
             params=params,
+            headers=headers,
             timeout=DEFAULT_TIMEOUT,
         )
         response.raise_for_status()

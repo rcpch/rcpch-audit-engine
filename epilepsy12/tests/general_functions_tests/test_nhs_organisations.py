@@ -51,11 +51,14 @@ from epilepsy12.general_functions.nhs_organisations import (
 
 
 API_BASE = "https://test.rcpch.ac.uk/nhs-organisations/v1"
+TEST_API_KEY = "test-subscription-key"
+EXPECTED_HEADERS = {"Subscription-Key": TEST_API_KEY}
 
 
 @pytest.fixture(autouse=True)
-def override_api_url(settings):
+def override_api_settings(settings):
     settings.RCPCH_NHS_ORGANISATIONS_API_URL = API_BASE
+    settings.RCPCH_NHS_ORGANISATIONS_API_KEY = TEST_API_KEY
 
 
 class _FakeResponse:
@@ -93,6 +96,7 @@ def test_list_organisations_calls_correct_url_with_no_filters():
         url=f"{API_BASE}/organisations/",
         params=None,
         timeout=DEFAULT_TIMEOUT,
+        headers=EXPECTED_HEADERS,
     )
 
 
@@ -108,6 +112,7 @@ def test_list_organisations_passes_filters_as_params():
         url=f"{API_BASE}/organisations/",
         params={"active": True, "ods_code": "RGT01"},
         timeout=DEFAULT_TIMEOUT,
+        headers=EXPECTED_HEADERS,
     )
 
 
@@ -124,6 +129,7 @@ def test_list_trusts_calls_correct_url():
         url=f"{API_BASE}/trusts/",
         params=None,
         timeout=DEFAULT_TIMEOUT,
+        headers=EXPECTED_HEADERS,
     )
 
 
@@ -140,6 +146,7 @@ def test_list_local_health_boards_calls_correct_url():
         url=f"{API_BASE}/local_health_boards/",
         params=None,
         timeout=DEFAULT_TIMEOUT,
+        headers=EXPECTED_HEADERS,
     )
 
 
@@ -156,6 +163,7 @@ def test_list_integrated_care_boards_calls_correct_url():
         url=f"{API_BASE}/integrated_care_boards/",
         params=None,
         timeout=DEFAULT_TIMEOUT,
+        headers=EXPECTED_HEADERS,
     )
 
 
@@ -172,6 +180,7 @@ def test_list_nhs_england_regions_calls_correct_url():
         url=f"{API_BASE}/nhs_england_regions/",
         params=None,
         timeout=DEFAULT_TIMEOUT,
+        headers=EXPECTED_HEADERS,
     )
 
 
@@ -203,6 +212,7 @@ def test_list_countries_omits_geom_by_default():
             )
         },
         timeout=DEFAULT_TIMEOUT,
+        headers=EXPECTED_HEADERS,
     )
 
 
@@ -227,6 +237,7 @@ def test_list_countries_includes_geom_when_requested():
         url=f"{API_BASE}/countries/",
         params=None,
         timeout=DEFAULT_TIMEOUT,
+        headers=EXPECTED_HEADERS,
     )
 
 
@@ -247,6 +258,7 @@ def test_list_countries_passes_filters_alongside_fields():
             ),
         },
         timeout=DEFAULT_TIMEOUT,
+        headers=EXPECTED_HEADERS,
     )
 
 
@@ -270,6 +282,7 @@ def test_list_openuk_networks_calls_correct_url_with_no_filters():
         url=f"{API_BASE}/openuk_networks/",
         params=None,
         timeout=DEFAULT_TIMEOUT,
+        headers=EXPECTED_HEADERS,
     )
 
 
@@ -292,6 +305,7 @@ def test_list_openuk_networks_passes_filters_as_params():
         url=f"{API_BASE}/openuk_networks/",
         params={"country": "England"},
         timeout=DEFAULT_TIMEOUT,
+        headers=EXPECTED_HEADERS,
     )
 
 
@@ -313,6 +327,7 @@ def test_get_organisation_calls_correct_url():
         url=f"{API_BASE}/organisations/RGT01/",
         params=None,
         timeout=DEFAULT_TIMEOUT,
+        headers=EXPECTED_HEADERS,
     )
 
 
@@ -329,6 +344,7 @@ def test_get_trust_calls_correct_url():
         url=f"{API_BASE}/trusts/RGT/",
         params=None,
         timeout=DEFAULT_TIMEOUT,
+        headers=EXPECTED_HEADERS,
     )
 
 
@@ -345,6 +361,7 @@ def test_get_local_health_board_calls_correct_url():
         url=f"{API_BASE}/local_health_boards/7A3/",
         params=None,
         timeout=DEFAULT_TIMEOUT,
+        headers=EXPECTED_HEADERS,
     )
 
 
@@ -361,6 +378,7 @@ def test_get_integrated_care_board_calls_correct_url():
         url=f"{API_BASE}/integrated_care_boards/QKK/",
         params=None,
         timeout=DEFAULT_TIMEOUT,
+        headers=EXPECTED_HEADERS,
     )
 
 
@@ -377,6 +395,7 @@ def test_get_nhs_england_region_calls_correct_url():
         url=f"{API_BASE}/nhs_england_regions/Y61/",
         params=None,
         timeout=DEFAULT_TIMEOUT,
+        headers=EXPECTED_HEADERS,
     )
 
 
@@ -406,6 +425,7 @@ def test_get_country_omits_geom_by_default():
             )
         },
         timeout=DEFAULT_TIMEOUT,
+        headers=EXPECTED_HEADERS,
     )
 
 
@@ -426,6 +446,7 @@ def test_get_country_includes_geom_when_requested():
         url=f"{API_BASE}/countries/E92000001/",
         params=None,
         timeout=DEFAULT_TIMEOUT,
+        headers=EXPECTED_HEADERS,
     )
 
 
@@ -447,6 +468,7 @@ def test_get_openuk_network_calls_correct_url():
         url=f"{API_BASE}/openuk_networks/EPEN/",
         params=None,
         timeout=DEFAULT_TIMEOUT,
+        headers=EXPECTED_HEADERS,
     )
 
 
@@ -472,6 +494,7 @@ def test_get_organisation_snapshot_with_date_serialises_as_iso():
         url=f"{API_BASE}/organisations/RGT01/snapshot/",
         params={"date": "2024-01-15"},
         timeout=DEFAULT_TIMEOUT,
+        headers=EXPECTED_HEADERS,
     )
 
 
@@ -488,6 +511,7 @@ def test_get_organisation_snapshot_without_date_omits_params():
         url=f"{API_BASE}/organisations/RGT01/snapshot/",
         params=None,
         timeout=DEFAULT_TIMEOUT,
+        headers=EXPECTED_HEADERS,
     )
 
 
@@ -525,6 +549,7 @@ def test_organisation_geography_as_of_delegates_to_snapshot():
         url=f"{API_BASE}/organisations/RGT01/snapshot/",
         params={"date": "2024-01-15"},
         timeout=DEFAULT_TIMEOUT,
+        headers=EXPECTED_HEADERS,
     )
 
 
@@ -585,4 +610,32 @@ def test_base_url_strips_trailing_slash(settings):
         url="https://test.rcpch.ac.uk/nhs-organisations/v1/organisations/",
         params=None,
         timeout=DEFAULT_TIMEOUT,
+        headers=EXPECTED_HEADERS,
     )
+
+
+def test_api_key_sent_as_subscription_key_header():
+    """The RCPCH_NHS_ORGANISATIONS_API_KEY is sent as a Subscription-Key
+    header on every request."""
+    with patch(
+        "epilepsy12.general_functions.nhs_organisations.requests.get"
+    ) as mock_get:
+        mock_get.return_value = _FakeResponse([])
+        list_organisations()
+
+    _, kwargs = mock_get.call_args
+    assert kwargs["headers"] == {"Subscription-Key": TEST_API_KEY}
+
+
+def test_no_subscription_key_header_when_api_key_not_set(settings):
+    """When RCPCH_NHS_ORGANISATIONS_API_KEY is not set, no Subscription-Key
+    header is sent (the headers dict is empty)."""
+    settings.RCPCH_NHS_ORGANISATIONS_API_KEY = None
+    with patch(
+        "epilepsy12.general_functions.nhs_organisations.requests.get"
+    ) as mock_get:
+        mock_get.return_value = _FakeResponse([])
+        list_organisations()
+
+    _, kwargs = mock_get.call_args
+    assert kwargs["headers"] == {}
