@@ -19,8 +19,8 @@ from ..time_and_user_abstract_base_classes import TimeStampAbstractBaseClass
 
 class LocalHealthBoardBoundaries(TimeStampAbstractBaseClass):
     boundary_identifier = models.CharField(max_length=9)
-    name = models.CharField(max_length=41)
-    welsh_name = models.CharField(max_length=40)
+    name = models.CharField(max_length=255)
+    welsh_name = models.CharField(max_length=255, null=True, blank=True)
     bng_e = models.FloatField(null=True, blank=True)
     bng_n = models.FloatField(null=True, blank=True)
     long = models.FloatField(null=True, blank=True)

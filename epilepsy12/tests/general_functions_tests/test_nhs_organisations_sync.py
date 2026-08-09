@@ -459,3 +459,34 @@ def test_sync_current_state_syncs_all_entities_in_transaction():
     assert org.nhs_england_region.region_code == "Y61"
     assert org.country.boundary_identifier == "E92000001"
     assert org.openuk_network.boundary_identifier == "EPEN"
+
+
+# ---------------------------------------------------------------------------
+# Truncation safeguard
+# ---------------------------------------------------------------------------
+
+
+@pytest.mark.django_db
+def test_sync_trusts_truncates_oversized_name():
+    """If the API returns a name longer than the field's max_length, the sync
+    truncates it and logs a warning rather than crashing with a DataError."""
+    # Trust.name has max_length=255 (widened in migration 0066).
+    # To test truncation, we patch the field's max_length down to 50.
+    from unittest.mock import PropertyMock
+
+    trust_field = Trust._meta.get_field("name")
+    original_max_length = trust_field.max_length
+    trust_field.max_length = 50
+
+    long_name = "A" * 200  # 200 chars, exceeds the patched max_length of 50
+    api_trust = {**API_BASE_TRUST, "ods_code": "RYY", "name": long_name}
+
+    try:
+        with patch.object(nhs_organisations_sync, "list_trusts", return_value=[api_trust]):
+            nhs_organisations_sync.sync_trusts()
+
+        trust = Trust.objects.get(ods_code="RYY")
+        assert len(trust.name) == 50
+        assert trust.name == "A" * 50
+    finally:
+        trust_field.max_length = original_max_length

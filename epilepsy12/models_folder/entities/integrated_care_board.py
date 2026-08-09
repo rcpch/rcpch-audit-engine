@@ -16,7 +16,7 @@ from django.contrib.gis.db import models
 
 class IntegratedCareBoardBoundaries(models.Model):
     boundary_identifier = models.CharField(max_length=9)
-    name = models.CharField(max_length=77)
+    name = models.CharField(max_length=255)
     bng_e = models.BigIntegerField(null=True, blank=True)
     bng_n = models.BigIntegerField(null=True, blank=True)
     long = models.FloatField(null=True, blank=True)

@@ -17,7 +17,7 @@ from ..time_and_user_abstract_base_classes import TimeStampAbstractBaseClass
 
 class NHSEnglandRegionBoundaries(TimeStampAbstractBaseClass):
     boundary_identifier = models.CharField(max_length=9)
-    name = models.CharField(max_length=24)
+    name = models.CharField(max_length=255)
     bng_e = models.BigIntegerField(null=True, blank=True)
     bng_n = models.BigIntegerField(null=True, blank=True)
     long = models.FloatField(null=True, blank=True)

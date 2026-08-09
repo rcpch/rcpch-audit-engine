@@ -14,16 +14,16 @@ class Trust(TimeStampAbstractBaseClass):
     objects = TrustManager()
     
     ods_code = models.CharField(max_length=10, unique=True)
-    name = models.CharField(max_length=100)
+    name = models.CharField(max_length=255)
     address_line_1 = models.CharField(
-        max_length=100, null=True, blank=True, default=None
+        max_length=255, null=True, blank=True, default=None
     )
-    address_line_2 = models.CharField(max_length=100, blank=True)
+    address_line_2 = models.CharField(max_length=255, blank=True)
     town = models.CharField(max_length=100, null=True, blank=True, default=None)
-    postcode = models.CharField(max_length=10, null=True, blank=True, default=None)
+    postcode = models.CharField(max_length=15, null=True, blank=True, default=None)
     country = models.CharField(max_length=50, null=True, blank=True, default=None)
     telephone = models.CharField(max_length=100, null=True, blank=True, default=None)
-    website = models.CharField(max_length=100, null=True, blank=True, default=None)
+    website = models.CharField(max_length=255, null=True, blank=True, default=None)
     active = models.BooleanField(
         default=True
     )  # a boolean representing if this Trust is still operational

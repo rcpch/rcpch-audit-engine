@@ -105,6 +105,38 @@ def _get_model(name: str):
     return apps.get_model("epilepsy12", name)
 
 
+def _truncate_to_field(value: Any, model_class, field_name: str) -> Any:
+    """Truncate a string value to the ``max_length`` of the named field.
+
+    The ODS occasionally publishes names or addresses that exceed the local
+    model's ``max_length`` constraint. Rather than letting the sync crash with
+    a ``DataError`` at the DB level, this function truncates the value to fit
+    and logs a warning so the issue is visible. The field widths have been
+    widened (migration 0066) to reduce the likelihood of truncation, but this
+    is a safety net for any field that still has a constraint.
+    """
+    if value is None:
+        return None
+    if not isinstance(value, str):
+        return value
+    try:
+        field = model_class._meta.get_field(field_name)
+    except Exception:
+        return value
+    max_length = getattr(field, "max_length", None)
+    if max_length and len(value) > max_length:
+        logger.warning(
+            "Truncating %s.%s value (%d chars) to max_length %d: %s...",
+            model_class.__name__,
+            field_name,
+            len(value),
+            max_length,
+            value[:50],
+        )
+        return value[:max_length]
+    return value
+
+
 # ---------------------------------------------------------------------------
 # Entity sync functions
 #
@@ -126,14 +158,14 @@ def sync_trusts() -> dict[str, Any]:
     for api_trust in api_trusts:
         ods_code = api_trust["ods_code"]
         defaults = {
-            "name": api_trust.get("name", ""),
-            "address_line_1": api_trust.get("address_line_1") or None,
-            "address_line_2": api_trust.get("address_line_2", ""),
+            "name": _truncate_to_field(api_trust.get("name", ""), Trust, "name"),
+            "address_line_1": _truncate_to_field(api_trust.get("address_line_1") or None, Trust, "address_line_1"),
+            "address_line_2": _truncate_to_field(api_trust.get("address_line_2", ""), Trust, "address_line_2"),
             "town": api_trust.get("town") or None,
             "postcode": api_trust.get("postcode") or None,
             "country": api_trust.get("country") or None,
             "telephone": api_trust.get("telephone") or None,
-            "website": api_trust.get("website") or None,
+            "website": _truncate_to_field(api_trust.get("website") or None, Trust, "website"),
             "active": api_trust.get("active", True),
             "published_at": _parse_date(api_trust.get("published_at")),
         }
@@ -160,8 +192,8 @@ def sync_local_health_boards() -> dict[str, Any]:
     for api_lhb in api_lhbs:
         ods_code = api_lhb["ods_code"]
         defaults = {
-            "name": api_lhb.get("name", ""),
-            "welsh_name": api_lhb.get("welsh_name", ""),
+            "name": _truncate_to_field(api_lhb.get("name", ""), LocalHealthBoard, "name"),
+            "welsh_name": _truncate_to_field(api_lhb.get("welsh_name", ""), LocalHealthBoard, "welsh_name"),
             "boundary_identifier": api_lhb.get("boundary_identifier", ""),
             "bng_e": _parse_float(api_lhb.get("bng_e")),
             "bng_n": _parse_float(api_lhb.get("bng_n")),
@@ -192,7 +224,7 @@ def sync_integrated_care_boards() -> dict[str, Any]:
     for api_icb in api_icbs:
         ods_code = api_icb["ods_code"]
         defaults = {
-            "name": api_icb.get("name", ""),
+            "name": _truncate_to_field(api_icb.get("name", ""), IntegratedCareBoard, "name"),
             "boundary_identifier": api_icb.get("boundary_identifier", ""),
             "bng_e": _parse_int(api_icb.get("bng_e")),
             "bng_n": _parse_int(api_icb.get("bng_n")),
@@ -223,7 +255,7 @@ def sync_nhs_england_regions() -> dict[str, Any]:
     for api_region in api_regions:
         region_code = api_region["region_code"]
         defaults = {
-            "name": api_region.get("name", ""),
+            "name": _truncate_to_field(api_region.get("name", ""), NHSEnglandRegion, "name"),
             "boundary_identifier": api_region.get("boundary_identifier", ""),
             "bng_e": _parse_int(api_region.get("bng_e")),
             "bng_n": _parse_int(api_region.get("bng_n")),
@@ -259,8 +291,8 @@ def sync_countries() -> dict[str, Any]:
     for api_country in api_countries:
         boundary_identifier = api_country["boundary_identifier"]
         defaults = {
-            "name": api_country.get("name", ""),
-            "welsh_name": api_country.get("welsh_name") or None,
+            "name": _truncate_to_field(api_country.get("name", ""), Country, "name"),
+            "welsh_name": _truncate_to_field(api_country.get("welsh_name") or None, Country, "welsh_name"),
             "bng_e": _parse_int(api_country.get("bng_e")),
             "bng_n": _parse_int(api_country.get("bng_n")),
             "long": _parse_float(api_country.get("long")),
@@ -292,7 +324,7 @@ def sync_openuk_networks() -> dict[str, Any]:
     for api_network in api_networks:
         boundary_identifier = api_network["boundary_identifier"]
         defaults = {
-            "name": api_network.get("name", ""),
+            "name": _truncate_to_field(api_network.get("name", ""), OPENUKNetwork, "name"),
             "country": api_network.get("country", ""),
             "publication_date": _parse_date(api_network.get("publication_date")),
         }
@@ -445,11 +477,11 @@ def sync_organisations(
             )
 
         defaults = {
-            "name": api_org.get("name") or None,
-            "website": api_org.get("website") or None,
-            "address1": api_org.get("address1") or None,
-            "address2": api_org.get("address2") or None,
-            "address3": api_org.get("address3") or None,
+            "name": _truncate_to_field(api_org.get("name") or None, Organisation, "name"),
+            "website": _truncate_to_field(api_org.get("website") or None, Organisation, "website"),
+            "address1": _truncate_to_field(api_org.get("address1") or None, Organisation, "address1"),
+            "address2": _truncate_to_field(api_org.get("address2") or None, Organisation, "address2"),
+            "address3": _truncate_to_field(api_org.get("address3") or None, Organisation, "address3"),
             "telephone": api_org.get("telephone") or None,
             "city": api_org.get("city") or None,
             "county": api_org.get("county") or None,
