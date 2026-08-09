@@ -173,6 +173,81 @@ def test_list_nhs_england_regions_calls_correct_url():
     )
 
 
+def test_list_countries_omits_geom_by_default():
+    payload = [
+        {
+            "boundary_identifier": "E92000001",
+            "name": "England",
+            "welsh_name": "Lloegr",
+            "bng_e": 394883,
+            "bng_n": 370883,
+            "long": -2.07811,
+            "lat": 53.235,
+            "globalid": "f6b76559-3626-49b8-b50b-bd15efcb0505",
+        }
+    ]
+    with patch(
+        "epilepsy12.general_functions.nhs_organisations.requests.get"
+    ) as mock_get:
+        mock_get.return_value = _FakeResponse(payload)
+        result = list_countries()
+
+    assert result == payload
+    mock_get.assert_called_once_with(
+        url=f"{API_BASE}/countries/",
+        params={
+            "fields": (
+                "boundary_identifier,name,welsh_name,bng_e,bng_n,long,lat,globalid"
+            )
+        },
+        timeout=DEFAULT_TIMEOUT,
+    )
+
+
+def test_list_countries_includes_geom_when_requested():
+    payload = [
+        {
+            "boundary_identifier": "E92000001",
+            "name": "England",
+            "geom": "SRID=27700;MULTIPOLYGON (((...)))",
+        }
+    ]
+    with patch(
+        "epilepsy12.general_functions.nhs_organisations.requests.get"
+    ) as mock_get:
+        mock_get.return_value = _FakeResponse(payload)
+        result = list_countries(include_geom=True)
+
+    assert result == payload
+    # When include_geom is True, no fields filter is sent — the API returns
+    # every field including geom.
+    mock_get.assert_called_once_with(
+        url=f"{API_BASE}/countries/",
+        params=None,
+        timeout=DEFAULT_TIMEOUT,
+    )
+
+
+def test_list_countries_passes_filters_alongside_fields():
+    payload = [{"boundary_identifier": "E92000001", "name": "England"}]
+    with patch(
+        "epilepsy12.general_functions.nhs_organisations.requests.get"
+    ) as mock_get:
+        mock_get.return_value = _FakeResponse(payload)
+        list_countries(name="England")
+
+    mock_get.assert_called_once_with(
+        url=f"{API_BASE}/countries/",
+        params={
+            "name": "England",
+            "fields": (
+                "boundary_identifier,name,welsh_name,bng_e,bng_n,long,lat,globalid"
+            ),
+        },
+        timeout=DEFAULT_TIMEOUT,
+    )
+
+
 # ---------------------------------------------------------------------------
 # Single-resource retrieve endpoints
 # ---------------------------------------------------------------------------
@@ -253,6 +328,55 @@ def test_get_nhs_england_region_calls_correct_url():
     assert result == payload
     mock_get.assert_called_once_with(
         url=f"{API_BASE}/nhs_england_regions/Y61/",
+        params=None,
+        timeout=DEFAULT_TIMEOUT,
+    )
+
+
+def test_get_country_omits_geom_by_default():
+    payload = {
+        "boundary_identifier": "E92000001",
+        "name": "England",
+        "welsh_name": "Lloegr",
+        "bng_e": 394883,
+        "bng_n": 370883,
+        "long": -2.07811,
+        "lat": 53.235,
+        "globalid": "f6b76559-3626-49b8-b50b-bd15efcb0505",
+    }
+    with patch(
+        "epilepsy12.general_functions.nhs_organisations.requests.get"
+    ) as mock_get:
+        mock_get.return_value = _FakeResponse(payload)
+        result = get_country("E92000001")
+
+    assert result == payload
+    mock_get.assert_called_once_with(
+        url=f"{API_BASE}/countries/E92000001/",
+        params={
+            "fields": (
+                "boundary_identifier,name,welsh_name,bng_e,bng_n,long,lat,globalid"
+            )
+        },
+        timeout=DEFAULT_TIMEOUT,
+    )
+
+
+def test_get_country_includes_geom_when_requested():
+    payload = {
+        "boundary_identifier": "E92000001",
+        "name": "England",
+        "geom": "SRID=27700;MULTIPOLYGON (((...)))",
+    }
+    with patch(
+        "epilepsy12.general_functions.nhs_organisations.requests.get"
+    ) as mock_get:
+        mock_get.return_value = _FakeResponse(payload)
+        result = get_country("E92000001", include_geom=True)
+
+    assert result == payload
+    mock_get.assert_called_once_with(
+        url=f"{API_BASE}/countries/E92000001/",
         params=None,
         timeout=DEFAULT_TIMEOUT,
     )
