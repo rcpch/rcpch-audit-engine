@@ -46,27 +46,25 @@ There are some many to many relationships. Django normally handles this for you,
 
 These classes are used as look up tables throughout the Epilepsy12 application. They are seeded in the first migrations, either pulling content from the the ```constants``` folder, or from SNOMED CT.
 
-- **Organisation**: This model stores information about each Organisation in England, Scotland and Wales. It is used as a lookup for clinicians as well as children in Epilepsy12. It has a many to many relationship with Case and a many to one relationship with Epilepsy12User. It is seeded from the ```constants``` folder with a ```JSON`` list of hospital trusts.
+- **Organisation**: This model stores information about each Organisation in England, Scotland and Wales. It is used as a lookup for clinicians as well as children in Epilepsy12. It has a many to many relationship with Case and a many to one relationship with Epilepsy12User. It is synced from the [`rcpch-nhs-organisations`](https://github.com/rcpch/rcpch-nhs-organisations) API by `epilepsy12/general_functions/nhs_organisations_sync.py`.
 - **Epilepsy12User**: The User base model in Django is too basic for the requirements of Epilepsy12 and therefore a custom class has been created to describe the different users who either administer or deliver the audit, either on behalf of RCPCH, or the hospital trusts.
 - **Keyword**: This model stores the keywords that are used to describe the semiology of each seizure event. The original list is taken from the International League against Epilepsy 2017, but is actually badly in need of enrichening. Even the word 'shaking' is missing. Part of the Epilepsy12 project is to validate the description of a seizure using keywords stored in this model. The original list of words is seeded on first run from the ```constants``` folder.
 - **Group**: Not strictly an Epilepsy12 model, but a Django model tied to the User class. There are 6 custom groups (3 RCPCH, 3 hospital trust) with differing levels of access depending on status. The permissions, which are granular and relate to the individual model fields, can then be allocated to groups, allowing admin staff to ensure that permissions are granted in a systematic way.
 - **EpilepsyCause**: Seeded from ```constants```, provides a look up for MultiaxialDiagnosis.
 - **MedicineList**: Seeded from SNOMED, provides lookup for the AntiepilepsyMedicine model.
 - **SyndromeList**: Seeded from SNOMED, provides lookup for the MultiaxialDiagnosis model.
-- **IntegratedCareBoard**: Seeded from ```constants``` provides a list of Integrated Care Boards and identifiers
-- **OpenUKNetwork**: Seeded from ```constants``` provides a list of OPENUK Networks and identifiers
-- **LocalHealthBoard**: Seeded from ```constants``` provides a list of Local Health Boards in Wales and identifiers
-- **NHSEnglandRegion**: Seeded from ```constants``` provides a list of NHS England regions and identifiers
-- **Country**: Seeded from ```constants``` provides a list of country identifiers
+- **IntegratedCareBoard**: Synced from the `rcpch-nhs-organisations` API.
+- **OpenUKNetwork**: Synced from the `rcpch-nhs-organisations` API.
+- **LocalHealthBoard**: Synced from the `rcpch-nhs-organisations` API.
+- **NHSEnglandRegion**: Synced from the `rcpch-nhs-organisations` API.
+- **Country**: Synced from the `rcpch-nhs-organisations` API.
+- **Trust**: Synced from the `rcpch-nhs-organisations` API.
 
 #### Boundary files and geography extension pack
 
-We have included the Django GIS extension allowing geographic data to be stored. This allowed for `.shp` files for the different regions to be stored and mapping therefore to be possible. The `.shp` files are stored in the following models:
+We have included the Django GIS extension allowing geographic data to be stored. Historically, `.shp` files for the different regions were stored in the boundary models (`IntegratedCareBoard`, `LocalHealthBoard`, `NHSEnglandRegion`, `Country`) and used for mapping.
 
-- **IntegratedCareBoard**
-- **LocalHealthBoard**
-- **NHSEnglandRegion**
-- **Country**
+Boundary geometries are no longer persisted locally from the `rcpch-nhs-organisations` API. The mapping component (`@rcpch/imd-map`) now pulls boundary tiles directly from the `rcpch-census-platform` vector tile service. The `geom`, `bng_e`, `bng_n`, `long`, `lat` and `globalid` fields on the boundary base classes are now nullable (migration `0065`) and are not populated by the sync. Existing geometry values from previous shapefile imports are left untouched.
 
 In future it is planned to use anonymised, aggregated patient postcodes to calculate distance to epilepsy treatment centres and correlate this against Key Performance Indicators.
 
