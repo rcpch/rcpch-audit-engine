@@ -2,9 +2,9 @@
 Tests for the ``sync_nhs_organisations`` management command.
 
 These tests mock the API client functions so no network access is required.
-The dry-run test verifies that the command calls the API list functions and
-reports counts without writing to the database. The live-sync test verifies
-that the command calls ``sync_current_state()`` and reports the result.
+The dry-run test verifies that the command produces a field-level diff
+report without writing to the database. The live-sync test verifies that
+the command calls ``sync_current_state()`` and reports the result.
 """
 
 from io import StringIO
@@ -13,53 +13,63 @@ from unittest.mock import patch
 import pytest
 from django.core.management import call_command
 
-from epilepsy12.general_functions import nhs_organisations
 from epilepsy12.management.commands import sync_nhs_organisations as cmd
 
 
 @pytest.mark.django_db
-def test_sync_nhs_organisations_dry_run_reports_counts_without_writing():
-    """--dry-run calls the API list functions and reports counts, but does
-    not call any sync (upsert) function."""
-    with patch.object(
-        nhs_organisations, "list_trusts", return_value=[{"ods_code": "RGT"}]
-    ), patch.object(
-        nhs_organisations,
-        "list_local_health_boards",
-        return_value=[{"ods_code": "7A3"}],
-    ), patch.object(
-        nhs_organisations,
-        "list_integrated_care_boards",
-        return_value=[{"ods_code": "QUE"}],
-    ), patch.object(
-        nhs_organisations,
-        "list_nhs_england_regions",
-        return_value=[{"region_code": "Y61"}],
-    ), patch.object(
-        nhs_organisations,
-        "list_countries",
-        return_value=[{"boundary_identifier": "E92000001"}],
-    ), patch.object(
-        nhs_organisations,
-        "list_openuk_networks",
-        return_value=[{"boundary_identifier": "EPEN"}],
-    ), patch.object(
-        nhs_organisations,
-        "list_organisations",
-        return_value=[{"ods_code": "RGT01"}],
-    ), patch.object(cmd, "sync_current_state") as mock_sync:
+def test_sync_nhs_organisations_dry_run_reports_diff_without_writing():
+    """--dry-run compares API state against the local DB and reports
+    new/changed/unchanged/local-only, but does not call any sync function."""
+    # The API returns one trust that doesn't exist locally (new) and one
+    # that does exist but with a different name (changed).
+    api_trusts = [
+        {"ods_code": "RXX", "name": "NEW TRUST", "active": True, "published_at": ""},
+        {"ods_code": "RGT", "name": "UPDATED NAME", "active": True, "published_at": ""},
+    ]
+
+    # Pre-create the RGT trust with a different name so it shows as "changed"
+    from epilepsy12.models import Trust
+
+    Trust.objects.get_or_create(
+        ods_code="RGT", defaults={"name": "OLD NAME", "active": True}
+    )
+
+    with patch.object(cmd, "sync_current_state") as mock_sync, patch(
+        "epilepsy12.general_functions.nhs_organisations_sync.list_trusts",
+        return_value=api_trusts,
+    ), patch(
+        "epilepsy12.general_functions.nhs_organisations_sync.list_local_health_boards",
+        return_value=[],
+    ), patch(
+        "epilepsy12.general_functions.nhs_organisations_sync.list_integrated_care_boards",
+        return_value=[],
+    ), patch(
+        "epilepsy12.general_functions.nhs_organisations_sync.list_nhs_england_regions",
+        return_value=[],
+    ), patch(
+        "epilepsy12.general_functions.nhs_organisations_sync.list_countries",
+        return_value=[],
+    ), patch(
+        "epilepsy12.general_functions.nhs_organisations_sync.list_openuk_networks",
+        return_value=[],
+    ), patch(
+        "epilepsy12.general_functions.nhs_organisations_sync.list_organisations",
+        return_value=[],
+    ):
         out = StringIO()
         call_command("sync_nhs_organisations", "--dry-run", stdout=out)
 
     output = out.getvalue()
     assert "Dry-run mode" in output
-    assert "Trusts: 1 from API" in output
-    assert "Local Health Boards: 1 from API" in output
-    assert "Integrated Care Boards: 1 from API" in output
-    assert "NHS England Regions: 1 from API" in output
-    assert "Countries: 1 from API" in output
-    assert "OPEN UK Networks: 1 from API" in output
-    assert "Organisations: 1 from API" in output
+    assert "Comparing API state" in output
+    # RXX is new
+    assert "RXX" in output
+    assert "NEW TRUST" in output
+    # RGT is changed (name differs)
+    assert "RGT" in output
+    assert "name:" in output
+    assert "UPDATED NAME" in output
+    # No changes written
     assert "No changes written" in output
     # sync_current_state must not be called in dry-run mode
     mock_sync.assert_not_called()

@@ -551,3 +551,224 @@ def sync_current_state() -> dict[str, int]:
         "openuk_networks": len(networks),
         "organisations": org_count,
     }
+
+
+# ---------------------------------------------------------------------------
+# Dry-run diff
+#
+# Compares the API's current state against the local DB and reports what
+# would change if the sync were run. Does not write to the database.
+# For each entity type, reports:
+#   - new: in the API but not in the local DB (would be created)
+#   - changed: in both, but with different field values (would be updated,
+#     with the specific fields that differ)
+#   - unchanged: in both, with identical field values (would be skipped)
+#   - local_only: in the local DB but not in the API (would not be touched —
+#     the sync never deletes)
+# ---------------------------------------------------------------------------
+
+
+# Field mappings: (api_field, model_field, parser)
+# The parser converts the API value to the same type the DB stores, so the
+# comparison is accurate. None means no conversion needed.
+_TRUST_FIELDS = [
+    ("name", "name", None),
+    ("address_line_1", "address_line_1", None),
+    ("address_line_2", "address_line_2", None),
+    ("town", "town", None),
+    ("postcode", "postcode", None),
+    ("country", "country", None),
+    ("telephone", "telephone", None),
+    ("website", "website", None),
+    ("active", "active", None),
+    ("published_at", "published_at", _parse_date),
+]
+
+_LHB_FIELDS = [
+    ("name", "name", None),
+    ("welsh_name", "welsh_name", None),
+    ("boundary_identifier", "boundary_identifier", None),
+    ("bng_e", "bng_e", _parse_float),
+    ("bng_n", "bng_n", _parse_float),
+    ("long", "long", _parse_float),
+    ("lat", "lat", _parse_float),
+    ("publication_date", "publication_date", _parse_date),
+]
+
+_ICB_FIELDS = [
+    ("name", "name", None),
+    ("boundary_identifier", "boundary_identifier", None),
+    ("bng_e", "bng_e", _parse_int),
+    ("bng_n", "bng_n", _parse_int),
+    ("long", "long", _parse_float),
+    ("lat", "lat", _parse_float),
+    ("publication_date", "publication_date", _parse_date),
+]
+
+_REGION_FIELDS = [
+    ("name", "name", None),
+    ("boundary_identifier", "boundary_identifier", None),
+    ("bng_e", "bng_e", _parse_int),
+    ("bng_n", "bng_n", _parse_int),
+    ("long", "long", _parse_float),
+    ("lat", "lat", _parse_float),
+    ("publication_date", "publication_date", _parse_date),
+]
+
+_COUNTRY_FIELDS = [
+    ("name", "name", None),
+    ("welsh_name", "welsh_name", None),
+    ("bng_e", "bng_e", _parse_int),
+    ("bng_n", "bng_n", _parse_int),
+    ("long", "long", _parse_float),
+    ("lat", "lat", _parse_float),
+    ("globalid", "globalid", None),
+]
+
+_NETWORK_FIELDS = [
+    ("name", "name", None),
+    ("country", "country", None),
+    ("publication_date", "publication_date", _parse_date),
+]
+
+_ORG_FIELDS = [
+    ("name", "name", None),
+    ("website", "website", None),
+    ("address1", "address1", None),
+    ("address2", "address2", None),
+    ("address3", "address3", None),
+    ("telephone", "telephone", None),
+    ("city", "city", None),
+    ("county", "county", None),
+    ("latitude", "latitude", _parse_float),
+    ("longitude", "longitude", _parse_float),
+    ("postcode", "postcode", None),
+    ("active", "active", None),
+    ("published_at", "published_at", _parse_date),
+]
+
+
+def _diff_entity(
+    api_rows: list[dict[str, Any]],
+    model_class,
+    lookup_field: str,
+    field_mappings: list[tuple],
+) -> dict[str, Any]:
+    """Compare API rows against local DB rows and report differences.
+
+    Returns a dict with keys:
+        new: list of (identifier, name) for rows in the API but not in the DB
+        changed: list of (identifier, name, {field: (old, new)}) for rows with differences
+        unchanged: count of rows with no differences
+        local_only: list of (identifier, name) for rows in the DB but not in the API
+    """
+    new = []
+    changed = []
+    unchanged = 0
+
+    api_identifiers = set()
+    for api_row in api_rows:
+        identifier = api_row.get(lookup_field)
+        if not identifier:
+            continue
+        api_identifiers.add(identifier)
+
+        # Get the local row (if it exists)
+        try:
+            local_obj = model_class.objects.get(**{lookup_field: identifier})
+        except model_class.DoesNotExist:
+            name = api_row.get("name", "")
+            new.append((identifier, name))
+            continue
+
+        # Compare fields
+        diffs = {}
+        for api_field, model_field, parser in field_mappings:
+            api_value = api_row.get(api_field)
+            if api_field in ("address_line_1", "address_line_2", "town", "postcode",
+                              "country", "telephone", "website", "name", "welsh_name",
+                              "boundary_identifier", "globalid", "address1", "address2",
+                              "address3", "city", "county"):
+                # String fields: empty string in API → None for comparison
+                api_value = api_value or None
+            if parser:
+                api_value = parser(api_value)
+
+            local_value = getattr(local_obj, model_field, None)
+
+            # Compare — handle float comparison tolerance
+            if isinstance(api_value, float) and isinstance(local_value, float):
+                if abs(api_value - local_value) > 0.0001:
+                    diffs[model_field] = (local_value, api_value)
+            elif api_value != local_value:
+                diffs[model_field] = (local_value, api_value)
+
+        if diffs:
+            name = api_row.get("name", "") or str(local_obj)
+            changed.append((identifier, name, diffs))
+        else:
+            unchanged += 1
+
+    # Find local-only rows
+    local_only = []
+    for local_obj in model_class.objects.all():
+        identifier = getattr(local_obj, lookup_field, None)
+        if identifier and identifier not in api_identifiers:
+            local_only.append((identifier, str(local_obj)))
+
+    return {
+        "new": new,
+        "changed": changed,
+        "unchanged": unchanged,
+        "local_only": local_only,
+    }
+
+
+def dry_run_diff(only: str | None = None) -> dict[str, dict[str, Any]]:
+    """Compare the API's current state against the local DB.
+
+    Fetches the API list endpoints and compares each entity field-by-field
+    against the local DB rows. Does not write to the database.
+
+    Returns a dict keyed by entity name, each containing the diff result
+    from :func:`_diff_entity`.
+    """
+    results = {}
+
+    if only is None or only == "trusts":
+        Trust = _get_model("Trust")
+        results["trusts"] = _diff_entity(
+            list_trusts(), Trust, "ods_code", _TRUST_FIELDS
+        )
+    if only is None or only == "local_health_boards":
+        LocalHealthBoard = _get_model("LocalHealthBoard")
+        results["local_health_boards"] = _diff_entity(
+            list_local_health_boards(), LocalHealthBoard, "ods_code", _LHB_FIELDS
+        )
+    if only is None or only == "integrated_care_boards":
+        IntegratedCareBoard = _get_model("IntegratedCareBoard")
+        results["integrated_care_boards"] = _diff_entity(
+            list_integrated_care_boards(), IntegratedCareBoard, "ods_code", _ICB_FIELDS
+        )
+    if only is None or only == "nhs_england_regions":
+        NHSEnglandRegion = _get_model("NHSEnglandRegion")
+        results["nhs_england_regions"] = _diff_entity(
+            list_nhs_england_regions(), NHSEnglandRegion, "region_code", _REGION_FIELDS
+        )
+    if only is None or only == "countries":
+        Country = _get_model("Country")
+        results["countries"] = _diff_entity(
+            list_countries(), Country, "boundary_identifier", _COUNTRY_FIELDS
+        )
+    if only is None or only == "openuk_networks":
+        OPENUKNetwork = _get_model("OPENUKNetwork")
+        results["openuk_networks"] = _diff_entity(
+            list_openuk_networks(), OPENUKNetwork, "boundary_identifier", _NETWORK_FIELDS
+        )
+    if only is None or only == "organisations":
+        Organisation = _get_model("Organisation")
+        results["organisations"] = _diff_entity(
+            list_organisations(), Organisation, "ods_code", _ORG_FIELDS
+        )
+
+    return results

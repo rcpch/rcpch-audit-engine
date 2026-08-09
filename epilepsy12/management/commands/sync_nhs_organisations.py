@@ -4,7 +4,7 @@ RCPCH NHS Organisations API.
 
 Usage:
     python manage.py sync_nhs_organisations           # sync all entities
-    python manage.py sync_nhs_organisations --dry-run  # report counts from the API, write nothing
+    python manage.py sync_nhs_organisations --dry-run  # report what would change, write nothing
     python manage.py sync_nhs_organisations --only trusts  # sync only the specified entity
 
 The command calls ``sync_current_state()`` which upserts Trust, LocalHealthBoard,
@@ -47,8 +47,9 @@ class Command(BaseCommand):
         parser.add_argument(
             "--dry-run",
             action="store_true",
-            help="Report counts from the API without writing to the database. "
-            "Useful for verifying API connectivity before a live sync.",
+            help="Compare the API's current state against the local DB and report "
+            "what would change (new, changed, unchanged, local-only) without "
+            "writing anything. Reports field-level differences for changed entities.",
         )
         parser.add_argument(
             "--only",
@@ -77,36 +78,71 @@ class Command(BaseCommand):
             self.stdout.write(
                 self.style.WARNING(
                     "Dry-run mode: no changes will be written to the database.\n"
-                    "Fetching counts from the API to verify connectivity..."
+                    "Comparing API state against local DB..."
                 )
             )
-            from epilepsy12.general_functions import nhs_organisations
+            from epilepsy12.general_functions.nhs_organisations_sync import dry_run_diff
 
             try:
-                if only is None or only == "trusts":
-                    trusts = nhs_organisations.list_trusts()
-                    self.stdout.write(f"  Trusts: {len(trusts)} from API")
-                if only is None or only == "local_health_boards":
-                    lhbs = nhs_organisations.list_local_health_boards()
-                    self.stdout.write(f"  Local Health Boards: {len(lhbs)} from API")
-                if only is None or only == "integrated_care_boards":
-                    icbs = nhs_organisations.list_integrated_care_boards()
-                    self.stdout.write(f"  Integrated Care Boards: {len(icbs)} from API")
-                if only is None or only == "nhs_england_regions":
-                    regions = nhs_organisations.list_nhs_england_regions()
-                    self.stdout.write(f"  NHS England Regions: {len(regions)} from API")
-                if only is None or only == "countries":
-                    countries = nhs_organisations.list_countries()
-                    self.stdout.write(f"  Countries: {len(countries)} from API")
-                if only is None or only == "openuk_networks":
-                    networks = nhs_organisations.list_openuk_networks()
-                    self.stdout.write(f"  OPEN UK Networks: {len(networks)} from API")
-                if only is None or only == "organisations":
-                    orgs = nhs_organisations.list_organisations()
-                    self.stdout.write(f"  Organisations: {len(orgs)} from API")
+                diffs = dry_run_diff(only=only)
             except Exception as e:
                 self.stdout.write(self.style.ERROR(f"API error during dry-run: {e}"))
                 raise
+
+            total_new = 0
+            total_changed = 0
+            total_unchanged = 0
+            total_local_only = 0
+
+            for entity_name, diff in diffs.items():
+                label = entity_name.replace("_", " ").title()
+                new = diff["new"]
+                changed = diff["changed"]
+                unchanged = diff["unchanged"]
+                local_only = diff["local_only"]
+
+                total_new += len(new)
+                total_changed += len(changed)
+                total_unchanged += unchanged
+                total_local_only += len(local_only)
+
+                self.stdout.write(f"\n  {label}:")
+                self.stdout.write(
+                    f"    {unchanged} unchanged, {len(new)} new, {len(changed)} changed, {len(local_only)} local-only"
+                )
+
+                if new:
+                    self.stdout.write(self.style.SUCCESS(f"    New (would be created):"))
+                    for identifier, name in new[:20]:
+                        self.stdout.write(f"      + {identifier}: {name}")
+                    if len(new) > 20:
+                        self.stdout.write(f"      ... and {len(new) - 20} more")
+
+                if changed:
+                    self.stdout.write(self.style.WARNING(f"    Changed (would be updated):"))
+                    for identifier, name, field_diffs in changed[:20]:
+                        self.stdout.write(f"      ~ {identifier}: {name}")
+                        for field, (old_val, new_val) in field_diffs.items():
+                            self.stdout.write(
+                                f"          {field}: {old_val!r} → {new_val!r}"
+                            )
+                    if len(changed) > 20:
+                        self.stdout.write(f"      ... and {len(changed) - 20} more")
+
+                if local_only:
+                    self.stdout.write(
+                        self.style.HTTP_INFO(f"    Local-only (not in API, would not be touched):")
+                    )
+                    for identifier, name in local_only[:10]:
+                        self.stdout.write(f"      - {identifier}: {name}")
+                    if len(local_only) > 10:
+                        self.stdout.write(f"      ... and {len(local_only) - 10} more")
+
+            self.stdout.write("")
+            self.stdout.write(
+                f"  Total: {total_unchanged} unchanged, {total_new} new, "
+                f"{total_changed} changed, {total_local_only} local-only"
+            )
             self.stdout.write(
                 self.style.SUCCESS("Dry-run complete. No changes written.")
             )
