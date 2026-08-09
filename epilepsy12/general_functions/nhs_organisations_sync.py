@@ -685,14 +685,23 @@ def _diff_entity(
         diffs = {}
         for api_field, model_field, parser in field_mappings:
             api_value = api_row.get(api_field)
-            if api_field in ("address_line_1", "address_line_2", "town", "postcode",
-                              "country", "telephone", "website", "name", "welsh_name",
-                              "boundary_identifier", "globalid", "address1", "address2",
-                              "address3", "city", "county"):
-                # String fields: empty string in API → None for comparison
-                api_value = api_value or None
             if parser:
                 api_value = parser(api_value)
+            else:
+                # For string fields, match the sync's conversion behaviour:
+                # if the model field allows null (null=True), the sync converts
+                # empty strings to None. If the field does not allow null, the
+                # sync keeps empty strings as-is. We check the model field's
+                # null attribute to determine which behaviour to mirror.
+                try:
+                    field = model_class._meta.get_field(model_field)
+                    field_allows_null = getattr(field, "null", False)
+                except Exception:
+                    field_allows_null = True  # safe default
+                if isinstance(api_value, str) and api_value == "":
+                    if field_allows_null:
+                        api_value = None
+                    # else: keep "" to match the sync's behaviour
 
             local_value = getattr(local_obj, model_field, None)
 
