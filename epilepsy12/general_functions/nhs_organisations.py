@@ -12,11 +12,7 @@ given date.
 
 Not every entity has its own list endpoint. The API exposes dedicated list
 endpoints for organisations, trusts, local health boards, integrated care
-boards, NHS England regions and countries. OPEN UK network data is only
-returned nested inside the ``/organisations/`` response (each organisation
-carries its own ``openuk_network`` object inline), so the sync path derives
-the local ``OPENUKNetwork`` table from that nested response rather than from
-a dedicated endpoint.
+boards, NHS England regions, countries and OPEN UK networks.
 
 The ``/countries/`` endpoint returns the full ``geom`` MultiPolygon by
 default, which is large. Since the mapping component now pulls boundary
@@ -107,12 +103,10 @@ def list_organisations(**filters: Any) -> list[dict[str, Any]]:
     ``integrated_care_board``, ``nhs_england_region``, ``openuk_network``,
     ``country``, ``paediatric_diabetes_unit``, ``local_authority_district``,
     ``lower_layer_super_output_area`` and ``london_borough`` inline. The sync
-    path uses this single endpoint to populate every local entity table and
-    every foreign key on ``Organisation`` in one pass — including
-    ``OPENUKNetwork``, which has no dedicated list endpoint. ``Country`` is
-    also present here, but the dedicated ``/countries/`` endpoint is preferred
-    for syncing the full ``Country`` rows (including boundary metadata) with
-    ``geom`` omitted.
+    path uses this single endpoint to populate every foreign key on
+    ``Organisation`` in one pass. The parent entity tables themselves
+    (``Trust``, ``OPENUKNetwork``, ``Country``, etc.) are synced from their
+    dedicated list endpoints.
     """
     return _request("/organisations/", params=filters or None)
 
@@ -166,6 +160,16 @@ def list_countries(
     return _request("/countries/", params=params or None)
 
 
+def list_openuk_networks(**filters: Any) -> list[dict[str, Any]]:
+    """Return a list of OPEN UK Networks (paediatric epilepsy networks).
+
+    Accepts the filter parameters documented by the API
+    (``boundary_identifier``, ``name``, ``country``, ``publication_date``).
+    With no filters, returns every network.
+    """
+    return _request("/openuk_networks/", params=filters or None)
+
+
 # ---------------------------------------------------------------------------
 # Single-resource retrieve endpoints
 # ---------------------------------------------------------------------------
@@ -217,6 +221,12 @@ def get_country(
     return _request(
         f"/countries/{boundary_identifier}/", params=params
     )
+
+
+def get_openuk_network(boundary_identifier: str) -> dict[str, Any]:
+    """Return a single OPEN UK Network by boundary identifier
+    (e.g. ``EPEN`` for the Eastern Paediatric Epilepsy Network)."""
+    return _request(f"/openuk_networks/{boundary_identifier}/")
 
 
 # ---------------------------------------------------------------------------

@@ -30,6 +30,7 @@ from epilepsy12.general_functions.nhs_organisations import (
     get_integrated_care_board,
     get_local_health_board,
     get_nhs_england_region,
+    get_openuk_network,
     get_organisation,
     get_organisation_snapshot,
     get_trust,
@@ -37,6 +38,7 @@ from epilepsy12.general_functions.nhs_organisations import (
     list_integrated_care_boards,
     list_local_health_boards,
     list_nhs_england_regions,
+    list_openuk_networks,
     list_organisations,
     list_trusts,
     organisation_geography_as_of,
@@ -248,6 +250,51 @@ def test_list_countries_passes_filters_alongside_fields():
     )
 
 
+def test_list_openuk_networks_calls_correct_url_with_no_filters():
+    payload = [
+        {
+            "name": "Eastern Paediatric Epilepsy Network",
+            "boundary_identifier": "EPEN",
+            "country": "England",
+            "publication_date": "2022-12-08",
+        }
+    ]
+    with patch(
+        "epilepsy12.general_functions.nhs_organisations.requests.get"
+    ) as mock_get:
+        mock_get.return_value = _FakeResponse(payload)
+        result = list_openuk_networks()
+
+    assert result == payload
+    mock_get.assert_called_once_with(
+        url=f"{API_BASE}/openuk_networks/",
+        params=None,
+        timeout=DEFAULT_TIMEOUT,
+    )
+
+
+def test_list_openuk_networks_passes_filters_as_params():
+    payload = [
+        {
+            "name": "Eastern Paediatric Epilepsy Network",
+            "boundary_identifier": "EPEN",
+            "country": "England",
+            "publication_date": "2022-12-08",
+        }
+    ]
+    with patch(
+        "epilepsy12.general_functions.nhs_organisations.requests.get"
+    ) as mock_get:
+        mock_get.return_value = _FakeResponse(payload)
+        list_openuk_networks(country="England")
+
+    mock_get.assert_called_once_with(
+        url=f"{API_BASE}/openuk_networks/",
+        params={"country": "England"},
+        timeout=DEFAULT_TIMEOUT,
+    )
+
+
 # ---------------------------------------------------------------------------
 # Single-resource retrieve endpoints
 # ---------------------------------------------------------------------------
@@ -377,6 +424,27 @@ def test_get_country_includes_geom_when_requested():
     assert result == payload
     mock_get.assert_called_once_with(
         url=f"{API_BASE}/countries/E92000001/",
+        params=None,
+        timeout=DEFAULT_TIMEOUT,
+    )
+
+
+def test_get_openuk_network_calls_correct_url():
+    payload = {
+        "name": "Eastern Paediatric Epilepsy Network",
+        "boundary_identifier": "EPEN",
+        "country": "England",
+        "publication_date": "2022-12-08",
+    }
+    with patch(
+        "epilepsy12.general_functions.nhs_organisations.requests.get"
+    ) as mock_get:
+        mock_get.return_value = _FakeResponse(payload)
+        result = get_openuk_network("EPEN")
+
+    assert result == payload
+    mock_get.assert_called_once_with(
+        url=f"{API_BASE}/openuk_networks/EPEN/",
         params=None,
         timeout=DEFAULT_TIMEOUT,
     )
