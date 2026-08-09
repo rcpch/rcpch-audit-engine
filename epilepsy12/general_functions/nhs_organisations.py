@@ -10,6 +10,20 @@ the only live API call used outside the sync path — it is called by the public
 KPI publication flow to resolve an organisation's geography as it was on a
 given date.
 
+Not every entity has its own list endpoint. The API exposes dedicated list
+endpoints for organisations, trusts, local health boards, integrated care
+boards, NHS England regions and countries. OPEN UK network data is only
+returned nested inside the ``/organisations/`` response (each organisation
+carries its own ``openuk_network`` object inline), so the sync path derives
+the local ``OPENUKNetwork`` table from that nested response rather than from
+a dedicated endpoint.
+
+The ``/countries/`` endpoint returns the full ``geom`` MultiPolygon by
+default, which is large. Since the mapping component now pulls boundary
+tiles from ``rcpch-census-platform`` and this project no longer needs to
+persist geometries locally, the country client functions omit ``geom`` by
+default via the API's ``fields`` parameter.
+
 The API is unauthenticated for read endpoints. The base URL defaults to the
 public ``https://api.rcpch.ac.uk/nhs-organisations/v1`` endpoint and can be
 overridden via the ``RCPCH_NHS_ORGANISATIONS_API_URL`` setting.
@@ -88,6 +102,17 @@ def list_organisations(**filters: Any) -> list[dict[str, Any]]:
     Accepts the filter parameters documented by the API (``ods_code``,
     ``active``, ``name``, ``postcode``, etc.). With no filters, returns every
     organisation.
+
+    Each organisation in the response nests its ``trust``, ``local_health_board``,
+    ``integrated_care_board``, ``nhs_england_region``, ``openuk_network``,
+    ``country``, ``paediatric_diabetes_unit``, ``local_authority_district``,
+    ``lower_layer_super_output_area`` and ``london_borough`` inline. The sync
+    path uses this single endpoint to populate every local entity table and
+    every foreign key on ``Organisation`` in one pass — including
+    ``OPENUKNetwork``, which has no dedicated list endpoint. ``Country`` is
+    also present here, but the dedicated ``/countries/`` endpoint is preferred
+    for syncing the full ``Country`` rows (including boundary metadata) with
+    ``geom`` omitted.
     """
     return _request("/organisations/", params=filters or None)
 
@@ -114,6 +139,31 @@ def list_nhs_england_regions(**filters: Any) -> list[dict[str, Any]]:
     """Return a list of NHS England regions. Accepts ``region_code``, ``name``,
     etc."""
     return _request("/nhs_england_regions/", params=filters or None)
+
+
+def list_countries(
+    *, include_geom: bool = False, **filters: Any
+) -> list[dict[str, Any]]:
+    """Return a list of countries.
+
+    The API returns the full ``geom`` MultiPolygon by default, which is large.
+    Since the mapping component now pulls boundary tiles from
+    ``rcpch-census-platform`` and this project no longer needs to persist
+    geometries locally, ``geom`` is omitted by default. Pass
+    ``include_geom=True`` to request it.
+
+    Accepts the filter parameters documented by the API
+    (``boundary_identifier``, ``name``, ``welsh_name``, etc.).
+    """
+    params: dict[str, Any] = dict(filters)
+    if not include_geom:
+        # Omit the heavy geometry column. The API supports a comma-separated
+        # ``fields`` parameter; listing every field except ``geom`` keeps the
+        # response shape stable if the API adds new non-geometry fields later.
+        params["fields"] = (
+            "boundary_identifier,name,welsh_name,bng_e,bng_n,long,lat,globalid"
+        )
+    return _request("/countries/", params=params or None)
 
 
 # ---------------------------------------------------------------------------
@@ -144,6 +194,29 @@ def get_integrated_care_board(ods_code: str) -> dict[str, Any]:
 def get_nhs_england_region(region_code: str) -> dict[str, Any]:
     """Return a single NHS England region by region code."""
     return _request(f"/nhs_england_regions/{region_code}/")
+
+
+def get_country(
+    boundary_identifier: str, *, include_geom: bool = False
+) -> dict[str, Any]:
+    """Return a single country by boundary identifier (e.g. ``E92000001``).
+
+    The API returns the full ``geom`` MultiPolygon by default, which is large.
+    Since the mapping component now pulls boundary tiles from
+    ``rcpch-census-platform`` and this project no longer needs to persist
+    geometries locally, ``geom`` is omitted by default. Pass
+    ``include_geom=True`` to request it.
+    """
+    params: dict[str, Any] | None = None
+    if not include_geom:
+        params = {
+            "fields": (
+                "boundary_identifier,name,welsh_name,bng_e,bng_n,long,lat,globalid"
+            )
+        }
+    return _request(
+        f"/countries/{boundary_identifier}/", params=params
+    )
 
 
 # ---------------------------------------------------------------------------
