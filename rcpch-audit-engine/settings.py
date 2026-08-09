@@ -77,6 +77,17 @@ POSTCODES_IO_API_KEY = os.getenv("POSTCODES_IO_API_KEY")
 NHS_ODS_API_URL = os.getenv("NHS_ODS_API_URL")
 NHS_ODS_API_KEY = os.getenv("NHS_ODS_API_KEY")
 
+# RCPCH NHS Organisations API - source of truth for organisations, trusts, ICBs,
+# NHS England regions, OPEN UK networks, country and their history/mergers.
+# Replaces the direct NHS ODS sync. The local Organisation/Trust/etc. models
+# are a synchronised mirror of this API; the snapshot endpoint is used for
+# as-of queries at publication time.
+RCPCH_NHS_ORGANISATIONS_API_URL = os.getenv(
+    "RCPCH_NHS_ORGANISATIONS_API_URL",
+    "https://api.rcpch.ac.uk/nhs-organisations/v1",
+)
+RCPCH_NHS_ORGANISATIONS_API_KEY = os.getenv("RCPCH_NHS_ORGANISATIONS_API_KEY")
+
 # SNOMED Terminology server
 RCPCH_HERMES_SERVER_URL = os.getenv("RCPCH_HERMES_SERVER_URL")
 
