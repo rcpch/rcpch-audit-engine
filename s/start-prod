@@ -5,7 +5,6 @@ if [ "$LOCAL_DEV_BYPASS_2FA_AND_CAPTCHA" = "True" ]; then
     exit 1
 fi
 
-python manage.py write_azure_pg_password_file
 python manage.py migrate
 python manage.py seed --mode=seed_groups_and_permissions
 
