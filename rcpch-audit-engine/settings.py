@@ -216,9 +216,6 @@ database_config = {
     "USER": os.environ.get("E12_POSTGRES_DB_USER"),
     "HOST": os.environ.get("E12_POSTGRES_DB_HOST"),
     "PORT": os.environ.get("E12_POSTGRES_DB_PORT"),
-    # Reuse connections between requests. Set (in seconds) via the env in prod;
-    # 0 keeps Django's default of a new connection per request.
-    "CONN_MAX_AGE": int(os.environ.get("E12_POSTGRES_DB_CONN_MAX_AGE", "0")),
 }
 
 if os.environ.get("E12_POSTGRES_DB_USE_AAD_TOKEN", "False") == "True":
