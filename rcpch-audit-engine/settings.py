@@ -209,17 +209,19 @@ WSGI_APPLICATION = "rcpch-audit-engine.wsgi.application"
 # https://docs.djangoproject.com/en/3.2/ref/settings/#databases
 
 database_config = {
-    "ENGINE": "django.contrib.gis.db.backends.postgis",
+    # Custom backend (subclasses the stock PostGIS backend) that can inject a
+    # fresh Azure Entra ID token as the password on each new connection.
+    "ENGINE": "epilepsy12.db_backend",
     "NAME": os.environ.get("E12_POSTGRES_DB_NAME"),
     "USER": os.environ.get("E12_POSTGRES_DB_USER"),
     "HOST": os.environ.get("E12_POSTGRES_DB_HOST"),
     "PORT": os.environ.get("E12_POSTGRES_DB_PORT"),
 }
 
-password_file = os.environ.get("E12_POSTGRES_DB_PASSWORD_FILE")
-
-if password_file:
-    database_config["OPTIONS"] = {"passfile": password_file}
+if os.environ.get("E12_POSTGRES_DB_USE_AAD_TOKEN", "False") == "True":
+    # Authenticate with a managed identity token acquired per connection by the
+    # custom backend; no static password is needed.
+    database_config["USE_AAD_TOKEN"] = True
 else:
     database_config["PASSWORD"] = os.environ.get("E12_POSTGRES_DB_PASSWORD")
 
