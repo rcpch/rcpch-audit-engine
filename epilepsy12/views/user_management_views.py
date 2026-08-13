@@ -4,7 +4,7 @@ import logging
 # Django
 from django.utils import timezone
 from django.contrib.auth.decorators import permission_required
-from django.contrib.auth import logout
+
 from django.shortcuts import render, redirect, get_object_or_404
 from django.urls import reverse
 from django.contrib.gis.db.models import Q, OuterRef, Exists, Subquery
@@ -872,26 +872,13 @@ class RCPCHLoginView(TwoFactorLoginView):
                     f"{transfer.transfer_origin_organisation} have requested transfer of {transfer.case} to {user.organisation_employer} for their Epilepsy12 care. Please find {transfer.case} in the case table to accept or decline this transfer request.",
                 )
 
-        # time since last set password
-        delta = timezone.now() - user.password_last_set
-        # if user has not renewed password in last 90 days, redirect to login page
-        password_reset_date = user.password_last_set + timezone.timedelta(days=90)
-        if user.is_active and (password_reset_date <= timezone.now()):
-            messages.error(
-                request=self.request,
-                message=f"Your password has expired. Please reset it.",
-            )
-            # log user out
-            logout(self.request)
-            return redirect(reverse("password_reset"))
-
         last_logged_in = VisitActivity.objects.filter(
             activity=1, epilepsy12user=user
         ).order_by("-activity_datetime")[:2]
         if last_logged_in.count() > 1:
             messages.info(
                 self.request,
-                f"You are now logged in as {user.email}. You last logged in at {timezone.localtime(last_logged_in[1].activity_datetime).strftime('%H:%M %p on %A, %d %B %Y')} from {last_logged_in[1].ip_address}.\nYou have {90-delta.days} days remaining until your password needs resetting.",
+                f"You are now logged in as {user.email}. You last logged in at {timezone.localtime(last_logged_in[1].activity_datetime).strftime('%H:%M %p on %A, %d %B %Y')} from {last_logged_in[1].ip_address}.",
             )
         else:
             messages.info(
