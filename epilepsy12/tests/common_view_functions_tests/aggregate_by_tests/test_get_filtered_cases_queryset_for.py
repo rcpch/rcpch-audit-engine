@@ -30,7 +30,7 @@ from epilepsy12.constants import (
     EnumAbstractionLevel,
 )
 
-from .helpers import _clean_cases_from_test_db, _register_cases_in_organisation
+from .helpers import _register_cases_in_organisation
 
 
 @pytest.mark.parametrize(
@@ -74,9 +74,6 @@ def test_get_filtered_cases_queryset_for_returns_correct_count(
     For each abstraction, 20 Cases are registered in the same abstraction level (all English organisations, split between 2 organisations), and 10 Cases in Wales - so should be excluded from agg counts.
     """
 
-    # Ensure Case db empty for this test
-    _clean_cases_from_test_db()
-
     # Generate test cases - 10 in each ods_code given
     ods_codes = ODSCodes
     _register_cases_in_organisation(
@@ -107,9 +104,6 @@ def test_get_filtered_cases_queryset_includes_only_specified_cohort(
 ):
     """Testing the `get_filtered_cases_queryset_for` function ignores kids who are from different cohort to specificed `cohort` arg. Here, all test kids are part of Cohort 4, but we request Cohort 6 Cases."""
 
-    # Ensure Case db empty for this test
-    _clean_cases_from_test_db()
-
     # Generate test cases
     org = Organisation.objects.get(ods_code="RGT01")
     e12_case_factory.create_batch(
@@ -133,9 +127,6 @@ def test_get_filtered_cases_queryset_includes_only_specified_cohort_that_have_co
     e12_case_factory,
 ):
     """Testing the `get_filtered_cases_queryset_for` function ignores kids who are from same `cohort` but did not complete 1y. Here, all test kids are part of Cohort 6, but none have completed 1 y."""
-
-    # Ensure Case db empty for this test
-    _clean_cases_from_test_db()
 
     # Cohort 6 includes patients who had a first assessment between 1 December 2022 and 30 November 2023. Patients will then complete their first year of care between 1 December 2023 to 30 November 2024.
 
@@ -166,9 +157,6 @@ def test_get_filtered_cases_queryset_for_orgs_with_null_ICB(
 
     TODO: healthboards model not yet implemented - add test once done.
     """
-    # Ensure Case db empty for this test
-    _clean_cases_from_test_db()
-
     ods_codes_where_icb_null = [
         code[0]
         for code in Organisation.objects.all()

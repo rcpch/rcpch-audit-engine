@@ -17,7 +17,7 @@ from epilepsy12.constants import (
     EnumAbstractionLevel,
 )
 
-from .helpers import _clean_cases_from_test_db, _register_kpi_scored_cases
+from .helpers import _register_kpi_scored_cases
 
 
 @pytest.mark.parametrize(
@@ -73,9 +73,6 @@ def test_calculate_kpi_value_counts_queryset_all_levels(
     abstraction_level, abstraction_codes, ods_codes, e12_case_factory
 ):
     """This registers kids in different organisations, with different abstraction keys, and ensures aggregation output is correct."""
-
-    # Clean
-    _clean_cases_from_test_db()
 
     kpi_scores_expected = {
         "ecg_passed": 10,

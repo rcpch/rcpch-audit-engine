@@ -7,7 +7,6 @@ from django.utils import timezone
 from epilepsy12.filtersets import CaseFilter, CaseFilterMethods
 from epilepsy12.tests.factories import E12CaseFactory
 from ..common_view_functions_tests.aggregate_by_tests.helpers import (
-    _clean_cases_from_test_db,
     _register_cases_in_organisation,
     _register_kpi_scored_cases,
 )
@@ -19,8 +18,6 @@ from epilepsy12.models import (
 
 @pytest.mark.django_db
 def test_get_ethnicity_counts(e12_case_factory):
-
-    _clean_cases_from_test_db()
     _register_cases_in_organisation(
         ["RGT01", "RGN90", "7A6AV"],
         e12_case_factory,
@@ -63,7 +60,6 @@ def test_get_ethnicity_counts(e12_case_factory):
 
 @pytest.mark.django_db
 def test_get_sex_counts(e12_case_factory):
-    _clean_cases_from_test_db()
     _register_cases_in_organisation(  # create 10 cases, 5 in each org
         ["RGT01", "RGN90"],
         e12_case_factory,
@@ -90,7 +86,6 @@ def test_get_sex_counts(e12_case_factory):
 
 @pytest.mark.django_db
 def test_get_age_counts(e12_case_factory):
-    _clean_cases_from_test_db()
     _register_cases_in_organisation(["RGT01"], e12_case_factory, n_cases=2)
     # Set one case under 12, one over 12
     cases = list(Case.objects.all())
@@ -106,7 +101,6 @@ def test_get_age_counts(e12_case_factory):
 
 @pytest.mark.django_db
 def test_get_index_of_multiple_deprivation_quintile_counts(e12_case_factory):
-    _clean_cases_from_test_db()
     _register_cases_in_organisation(["RGT01"], e12_case_factory, n_cases=3)
     Case.objects.all().update(index_of_multiple_deprivation_quintile=2)
     counts = CaseFilterMethods.get_all_simple_case_field_counts(
@@ -117,7 +111,6 @@ def test_get_index_of_multiple_deprivation_quintile_counts(e12_case_factory):
 
 @pytest.mark.django_db
 def test_get_registration_status_counts(e12_case_factory):
-    _clean_cases_from_test_db()
     _register_cases_in_organisation(["RGT01"], e12_case_factory, n_cases=2)
     # Assume all are registered by default
     registered_counts = CaseFilterMethods.get_all_registration_related_counts(
@@ -130,7 +123,6 @@ def test_get_registration_status_counts(e12_case_factory):
 
 @pytest.mark.django_db
 def test_get_developmental_learning_or_schooling_problems_counts(e12_case_factory):
-    _clean_cases_from_test_db()
     case_1 = e12_case_factory(
         registration__first_paediatric_assessment__developmental_learning_or_schooling_problems=True
     )
@@ -146,7 +138,6 @@ def test_get_developmental_learning_or_schooling_problems_counts(e12_case_factor
 
 @pytest.mark.django_db
 def test_get_behavioural_or_emotional_problems_counts(e12_case_factory):
-    _clean_cases_from_test_db()
     case_1 = e12_case_factory(
         registration__first_paediatric_assessment__behavioural_or_emotional_problems=True
     )
@@ -162,7 +153,6 @@ def test_get_behavioural_or_emotional_problems_counts(e12_case_factory):
 
 @pytest.mark.django_db
 def test_get_syndrome_present_counts(e12_case_factory):
-    _clean_cases_from_test_db()
     case_1 = e12_case_factory(registration__multiaxial_diagnosis__syndrome_present=True)
     case_2 = e12_case_factory(
         registration__multiaxial_diagnosis__syndrome_present=False
@@ -176,7 +166,6 @@ def test_get_syndrome_present_counts(e12_case_factory):
 
 @pytest.mark.django_db
 def test_get_epilepsy_cause_known_counts(e12_case_factory):
-    _clean_cases_from_test_db()
     case_1 = e12_case_factory(
         registration__multiaxial_diagnosis__epilepsy_cause_known=True
     )
@@ -194,7 +183,6 @@ def test_get_epilepsy_cause_known_counts(e12_case_factory):
 def test_get_global_developmental_delay_or_learning_difficulties_counts(
     e12_case_factory,
 ):
-    _clean_cases_from_test_db()
     case_1 = e12_case_factory(
         registration__multiaxial_diagnosis__global_developmental_delay_or_learning_difficulties=True
     )
@@ -213,7 +201,6 @@ def test_get_global_developmental_delay_or_learning_difficulties_counts(
 
 @pytest.mark.django_db
 def test_get_autistic_spectrum_disorder_counts(e12_case_factory):
-    _clean_cases_from_test_db()
     case_1 = e12_case_factory(
         registration__multiaxial_diagnosis__autistic_spectrum_disorder=True
     )
@@ -229,7 +216,6 @@ def test_get_autistic_spectrum_disorder_counts(e12_case_factory):
 
 @pytest.mark.django_db
 def test_get_mental_health_issue_identified_counts(e12_case_factory):
-    _clean_cases_from_test_db()
     case_1 = e12_case_factory(
         registration__multiaxial_diagnosis__mental_health_issue_identified=True
     )
@@ -245,7 +231,6 @@ def test_get_mental_health_issue_identified_counts(e12_case_factory):
 
 @pytest.mark.django_db
 def test_get_has_been_referred_for_mental_health_support_counts(e12_case_factory):
-    _clean_cases_from_test_db()
     case_1 = e12_case_factory(
         registration__management__has_been_referred_for_mental_health_support=True
     )
@@ -261,7 +246,6 @@ def test_get_has_been_referred_for_mental_health_support_counts(e12_case_factory
 
 @pytest.mark.django_db
 def test_get_has_support_for_mental_health_support_counts(e12_case_factory):
-    _clean_cases_from_test_db()
     case_1 = e12_case_factory(
         registration__management__has_support_for_mental_health_support=True
     )
@@ -277,7 +261,6 @@ def test_get_has_support_for_mental_health_support_counts(e12_case_factory):
 
 @pytest.mark.django_db
 def test_get_kpi_failed_counts(e12_case_factory):
-    _clean_cases_from_test_db()
     _register_kpi_scored_cases(
         e12_case_factory,
         ods_codes=["RJT01", "RGN90"],
@@ -386,7 +369,6 @@ Filter by tests
 
 @pytest.mark.django_db
 def test_filter_by_developmental_learning_or_schooling_problems(e12_case_factory):
-    _clean_cases_from_test_db()
     case_true = e12_case_factory(
         registration__first_paediatric_assessment__developmental_learning_or_schooling_problems=True
     )
@@ -403,7 +385,6 @@ def test_filter_by_developmental_learning_or_schooling_problems(e12_case_factory
 
 @pytest.mark.django_db
 def test_filter_by_behavioural_or_emotional_problems(e12_case_factory):
-    _clean_cases_from_test_db()
     case_true = e12_case_factory(
         registration__first_paediatric_assessment__behavioural_or_emotional_problems=True
     )
@@ -418,7 +399,6 @@ def test_filter_by_behavioural_or_emotional_problems(e12_case_factory):
 
 @pytest.mark.django_db
 def test_filter_by_syndrome_present(e12_case_factory):
-    _clean_cases_from_test_db()
     case_true = e12_case_factory(
         registration__multiaxial_diagnosis__syndrome_present=True
     )
@@ -433,7 +413,6 @@ def test_filter_by_syndrome_present(e12_case_factory):
 
 @pytest.mark.django_db
 def test_filter_by_epilepsy_cause_known(e12_case_factory):
-    _clean_cases_from_test_db()
     case_true = e12_case_factory(
         registration__multiaxial_diagnosis__epilepsy_cause_known=True
     )
@@ -450,7 +429,6 @@ def test_filter_by_epilepsy_cause_known(e12_case_factory):
 def test_filter_by_global_developmental_delay_or_learning_difficulties(
     e12_case_factory,
 ):
-    _clean_cases_from_test_db()
     case_true = e12_case_factory(
         registration__multiaxial_diagnosis__global_developmental_delay_or_learning_difficulties=True
     )
@@ -469,7 +447,6 @@ def test_filter_by_global_developmental_delay_or_learning_difficulties(
 
 @pytest.mark.django_db
 def test_filter_by_autistic_spectrum_disorder(e12_case_factory):
-    _clean_cases_from_test_db()
     case_true = e12_case_factory(
         registration__multiaxial_diagnosis__autistic_spectrum_disorder=True
     )
@@ -484,7 +461,6 @@ def test_filter_by_autistic_spectrum_disorder(e12_case_factory):
 
 @pytest.mark.django_db
 def test_filter_by_mental_health_issue_identified(e12_case_factory):
-    _clean_cases_from_test_db()
     case_true = e12_case_factory(
         registration__multiaxial_diagnosis__mental_health_issue_identified=True
     )
@@ -499,7 +475,6 @@ def test_filter_by_mental_health_issue_identified(e12_case_factory):
 
 @pytest.mark.django_db
 def test_filter_by_has_been_referred_for_mental_health_support(e12_case_factory):
-    _clean_cases_from_test_db()
     case_true = e12_case_factory(
         registration__management__has_been_referred_for_mental_health_support=True
     )
@@ -516,7 +491,6 @@ def test_filter_by_has_been_referred_for_mental_health_support(e12_case_factory)
 
 @pytest.mark.django_db
 def test_filter_by_has_support_for_mental_health_support(e12_case_factory):
-    _clean_cases_from_test_db()
     case_true = e12_case_factory(
         registration__management__has_support_for_mental_health_support=True
     )
@@ -535,7 +509,6 @@ def test_filter_by_has_support_for_mental_health_support(e12_case_factory):
 @pytest.mark.slow
 @pytest.mark.django_db
 def test_filter_by_kpi_failed(e12_case_factory):
-    _clean_cases_from_test_db()
     _register_kpi_scored_cases(
         e12_case_factory,
         ods_codes=["RJZ01", "RGN90"],
@@ -575,7 +548,6 @@ def test_filter_by_kpi_failed(e12_case_factory):
 
 @pytest.mark.django_db
 def test_filter_by_index_of_multiple_deprivation_quintile(e12_case_factory):
-    _clean_cases_from_test_db()
     case_1 = e12_case_factory(index_of_multiple_deprivation_quintile=1)
     case_2 = e12_case_factory(index_of_multiple_deprivation_quintile=2)
     qs = Case.objects.all()
@@ -592,8 +564,7 @@ from epilepsy12.models import Case
 
 @pytest.mark.django_db
 def test_apply_all_active_filters(e12_case_factory):
-    # Clean up and create a case that matches all filters
-    _clean_cases_from_test_db()
+    # Create a case that matches all filters
     matching_case = e12_case_factory(
         sex=1,
         date_of_birth="2018-01-01",  # under 12
