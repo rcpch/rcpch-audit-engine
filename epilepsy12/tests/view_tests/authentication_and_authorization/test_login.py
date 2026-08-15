@@ -1,8 +1,6 @@
 """
 - [ ] user can login with correct credentials
 - [ ] user cannot login with wrong credentials
-- [ ] user can login if password within 90 days of last update
-- [ ] user cannot login if password not within 90 days of last update
 
 - [ ] can create user with correct credentials
 - [ ] cannot create user with wrong credentials
