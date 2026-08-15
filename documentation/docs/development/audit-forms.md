@@ -16,6 +16,7 @@ In the main window, a square segment contains the audit form, and comprises a to
 
 The steps element described above is updated every time an item in the audit form is scored.
 
+{% raw %}
 ```python
 <div
       hx-get='{% url "registration_active" case_id active_template %}'
@@ -26,6 +27,7 @@ The steps element described above is updated every time an item in the audit for
       class="rcpch_steps_wrapper"
     >
 ```
+{% endraw %}
 
 The steps are wrapped in this div which defines a custom ```htmx-trigger```, named ```registration_active```, called from the ```body``` element. This HTMX action can be called from any other element and triggers a GET request to the ```registration_active``` endpoint, found in ```views.py```.
 

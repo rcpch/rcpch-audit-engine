@@ -37,18 +37,18 @@ class Organisation(TimeStampAbstractBaseClass):
     ods_code = CharField(
         max_length=100, null=True, blank=True, default=None, unique=True
     )
-    name = CharField(max_length=100, null=True, blank=True, default=None)
-    website = CharField(max_length=100, null=True, blank=True, default=None)
-    address1 = CharField(max_length=100, null=True, blank=True, default=None)
-    address2 = CharField(max_length=100, null=True, blank=True, default=None)
-    address3 = CharField(max_length=100, null=True, blank=True, default=None)
+    name = CharField(max_length=255, null=True, blank=True, default=None)
+    website = CharField(max_length=255, null=True, blank=True, default=None)
+    address1 = CharField(max_length=255, null=True, blank=True, default=None)
+    address2 = CharField(max_length=255, null=True, blank=True, default=None)
+    address3 = CharField(max_length=255, null=True, blank=True, default=None)
     telephone = CharField(max_length=100, null=True, blank=True, default=None)
     email = CharField(max_length=200, null=True, blank=True, default=None)
     city = CharField(max_length=100, null=True, blank=True, default=None)
     county = CharField(max_length=100, null=True, blank=True, default=None)
     latitude = FloatField(max_length=100, null=True, blank=True, default=None)
     longitude = FloatField(null=True, blank=True, default=None)
-    postcode = CharField(max_length=10, null=True, blank=True, default=None)
+    postcode = CharField(max_length=15, null=True, blank=True, default=None)
     geocode_coordinates = PointField(null=True, blank=True, default=None, srid=27700)
     active = BooleanField(
         default=True
