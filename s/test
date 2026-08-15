@@ -18,7 +18,12 @@ Runs pytest with -v.
 
 Modes (pick one):
 	--container, --in-container
-		Run in an already-running django container (default).
+		Run in an already-running django container (default). Errors if the
+		container is not running.
+	--auto
+		Run in the default project's django container, starting it (and its
+		dependencies) first if it is not already running. The container is
+		left running afterwards - useful for iterative development.
 	--local, --host, --outside-container
 		Run directly on the host machine.
 	--spin-up, --up, --with-up
@@ -26,11 +31,17 @@ Modes (pick one):
 		and tear it down automatically.
 
 Options:
+	-j, --parallel [N]
+		Run tests in parallel with pytest-xdist. N defaults to 'auto'
+		(one worker per CPU core). Pass an integer to use N workers.
 	-h, --help
 			Show this help message.
 
 Examples:
 	s/test
+	s/test -j
+	s/test -j 4
+	s/test --auto -j
 	s/test -k imd
 	s/test --local epilepsy12/tests/model_tests/test_imd.py
 	s/test --spin-up -m 'not slow'
@@ -38,6 +49,7 @@ EOF
 }
 
 MODE="container"
+PARALLEL=""
 PYTEST_ARGS=()
 SPIN_UP_PROJECT=""
 
@@ -58,6 +70,9 @@ cleanup_spin_up_project() {
 
 for arg in "$@"; do
 	case "$arg" in
+		--auto)
+			set_mode "auto"
+			;;
 		--local|--host|--outside-container)
 			set_mode "local"
 			;;
@@ -66,6 +81,12 @@ for arg in "$@"; do
 			;;
 		--spin-up|--up|--with-up)
 			set_mode "spin-up"
+			;;
+		-j|--parallel)
+			PARALLEL="auto"
+			;;
+		-j=*|--parallel=*)
+			PARALLEL="${arg#*=}"
 			;;
 		-h|--help)
 			usage
@@ -77,16 +98,31 @@ for arg in "$@"; do
 	esac
 done
 
+# Build the pytest invocation prefix (always -v; optionally -n for xdist)
+PYTEST_CMD=(pytest -v)
+if [ -n "$PARALLEL" ]; then
+	PYTEST_CMD+=(-n "$PARALLEL")
+fi
+PYTEST_CMD+=("${PYTEST_ARGS[@]}")
+
 if [ "$MODE" = "local" ]; then
-	pytest -v "${PYTEST_ARGS[@]}"
+	"${PYTEST_CMD[@]}"
 elif [ "$MODE" = "spin-up" ]; then
 	SPIN_UP_PROJECT="e12-test-$$"
 	trap cleanup_spin_up_project EXIT
 
 	# Start only what tests need in an isolated compose project.
 	DJANGO_START_COMMAND='s/start-test' docker compose -p "$SPIN_UP_PROJECT" up -d --wait django
-	docker compose -p "$SPIN_UP_PROJECT" exec django pytest -v "${PYTEST_ARGS[@]}"
+	docker compose -p "$SPIN_UP_PROJECT" exec django "${PYTEST_CMD[@]}"
+elif [ "$MODE" = "auto" ]; then
+	# Use the default project's containers if they are already running;
+	# otherwise start them (and leave them running).
+	if ! docker compose ps --services --filter "status=running" 2>/dev/null | grep -q "^django$"; then
+		echo "django container not running - starting default project..."
+		DJANGO_START_COMMAND='s/start-test' docker compose up -d --wait
+	fi
+	docker compose exec django "${PYTEST_CMD[@]}"
 else
 	# *** The project's containers MUST BE RUNNING to execute tests inside it! ***
-	docker compose exec django pytest -v "${PYTEST_ARGS[@]}"
+	docker compose exec django "${PYTEST_CMD[@]}"
 fi

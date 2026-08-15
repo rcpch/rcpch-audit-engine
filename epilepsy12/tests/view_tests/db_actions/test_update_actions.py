@@ -971,7 +971,7 @@ def test_user_updates_toggles_true_fail(client):
 
 
 @pytest.mark.django_db
-def test_user_updates_toggles_false_fail(client, seed_groups_fixture, seed_users_fixture):
+def test_user_updates_toggles_false_fail(client):
     """
     Assert for each toggle selection, value stored in model is correct selection value
     """
@@ -1113,8 +1113,6 @@ def test_user_updates_select_success(
 @pytest.mark.django_db
 def test_user_updates_select_fail(
     client,
-    seed_groups_fixture,
-    seed_users_fixture,
 ):
     """
     Assert for each single_choice_multiple_toggle choice selection, value stored in model is correct selection value
@@ -1206,7 +1204,7 @@ def test_user_updates_select_fail(
 
 
 @pytest.mark.django_db
-def test_age_at_registration_cannot_be_gt_24yo(client, GOSH, seed_groups_fixture, seed_users_fixture):
+def test_age_at_registration_cannot_be_gt_24yo(client, GOSH):
     """
     Assert date of first paediatric assessment cannot be after 24th birthday
     """
