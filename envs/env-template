@@ -17,6 +17,9 @@ RCPCH_CENSUS_PLATFORM_TOKEN= # API key for RCPCH Census Platform (Deprivation sc
 RCPCH_CENSUS_PLATFORM_URL="https://api.rcpch.ac.uk/deprivation/v1"
 RCPCH_DEPRIVATION_TILES_API_KEY= # Optional browser tile API key override; defaults to RCPCH_CENSUS_PLATFORM_TOKEN
 RCPCH_DEPRIVATION_TILES_API_KEY_PARAM="subscription-key" # Query parameter name used for RCPCH_DEPRIVATION_TILES_API_KEY
+RCPCH_NHS_ORGANISATIONS_API_URL = "https://api.rcpch.ac.uk/nhs-organisations/v1"
+RCPCH_NHS_ORGANISATIONS_API_KEY = "XXXXXXXXXX"
+
 
 # DJANGO
 AUTO_LOGOUT_DELAY_SECONDS=1800 # default 30 minutes
@@ -56,9 +59,6 @@ PASSWORD_RESET_TIMEOUT=259200
 
 # HERMES (SNOMED CT)
 RCPCH_HERMES_SERVER_URL=http://rcpch-hermes.uksouth.azurecontainer.io:8080/v1/snomed # SNOMED server API URL
-
-# NHS ODS API
-NHS_ODS_API_URL="https://directory.spineservices.nhs.uk/ORD/2-0-0"
 
 # MATERIAL FOR MKDOCS INSIDERS
 ENABLE_GIT_COMMITTERS="True" # Disables git committer extension
