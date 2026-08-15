@@ -280,6 +280,8 @@ def test_user_create_diff_org_success(
 @pytest.mark.django_db
 def test_user_creation_forbidden(
     client,
+    seed_groups_fixture,
+    seed_users_fixture,
 ):
     """Integration test checking functionality of view and form.
 

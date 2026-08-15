@@ -3,7 +3,7 @@ import pytest
 from epilepsy12.management.commands.create_groups import groups_seeder
 
 
-@pytest.fixture(scope="session")
+@pytest.fixture(scope="function")
 def seed_groups_fixture(django_db_setup, django_db_blocker):
     """
     Fixture which runs once per session to seed groups 

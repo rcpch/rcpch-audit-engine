@@ -57,7 +57,7 @@ def test_is_staff_flips_when_is_superuser_toggled(e12_user_factory):
 
 
 @pytest.mark.django_db
-def test_create_superuser_sets_is_staff_without_is_staff_kwarg(GOSH):
+def test_create_superuser_sets_is_staff_without_is_staff_kwarg(GOSH, seed_groups_fixture):
     user_model = get_user_model()
 
     superuser = user_model.objects.create_superuser(

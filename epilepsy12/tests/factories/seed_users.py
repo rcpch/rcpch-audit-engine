@@ -26,7 +26,7 @@ from epilepsy12.constants.user_types import (
 )
 
 
-@pytest.fixture(scope="session")
+@pytest.fixture(scope="function")
 def seed_users_fixture(django_db_setup, django_db_blocker):
     users = [
         test_user_audit_centre_administrator_data,
