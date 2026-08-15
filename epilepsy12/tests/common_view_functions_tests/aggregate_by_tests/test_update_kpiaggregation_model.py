@@ -18,7 +18,7 @@ from epilepsy12.models import (
 from epilepsy12.constants import (
     EnumAbstractionLevel,
 )
-from .helpers import _clean_cases_from_test_db, _register_kpi_scored_cases
+from .helpers import _register_kpi_scored_cases
 
 
 # Run last in CI to try and speed up runs (https://github.com/rcpch/rcpch-audit-engine/issues/1119)
@@ -82,9 +82,6 @@ def test_update_kpi_aggregation_model_all_levels(
         "ecg",
         "mental_health_support",
     ]
-
-    # Clean
-    _clean_cases_from_test_db()
 
     kpi_scores_expected = {
         "ecg_passed": 10,

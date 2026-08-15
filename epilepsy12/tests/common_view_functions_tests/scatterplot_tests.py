@@ -14,7 +14,6 @@ from epilepsy12.common_view_functions import (
     filter_all_registered_cases_by_active_lead_site_and_cohort_and_level_of_abstraction,
 )
 from epilepsy12.tests.common_view_functions_tests.aggregate_by_tests.helpers import (
-    _clean_cases_from_test_db,
     _register_cases_in_organisation,
 )
 from epilepsy12.models import (
@@ -27,14 +26,11 @@ from epilepsy12.models import (
 def test_generate_dataframe_and_aggregated_distance_data_from_cases(e12_case_factory):
     """Tests the generate_dataframe_and_aggregated_distance_data_from_cases fn returns correct count.
 
-    NOTE: There is already 1 seeded Case in the test db. In this test setup, we seed 10 cases with location_wgs84
+    In this test setup, we seed 10 cases with location_wgs84
     and distance_from_lead_organisation fields.
 
     Thus expected total count is 10.
     """
-
-    # removes some of the cases which are seeded earlier in the test db
-    _clean_cases_from_test_db()
 
     # define constants
     GOSH = Organisation.objects.get(

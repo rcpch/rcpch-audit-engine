@@ -11,12 +11,7 @@ from epilepsy12.common_view_functions import (
     cases_aggregated_by_ethnicity,
 )
 
-from epilepsy12.tests.common_view_functions_tests.aggregate_by_tests.helpers import (
-    _clean_cases_from_test_db,
-)
-
 from epilepsy12.models import (
-    Case,
     Organisation,
 )
 from epilepsy12.constants import (
@@ -28,15 +23,7 @@ from epilepsy12.constants import (
 
 @pytest.mark.django_db
 def test_cases_aggregated_by_sex(e12_case_factory):
-    """Tests the cases_aggregated_by_sex fn returns correct count.
-
-    NOTE: There is already 1 seeded Case in the test db. In this test setup, we seed 10 children per SEX_TYPE (n=4).
-
-    Thus expected total count is 10 for each sex, except Male, which is 11.
-    """
-
-    # removes some of the cases which are seeded earlier in the test db
-    _clean_cases_from_test_db()
+    """Tests the cases_aggregated_by_sex fn returns correct count."""
 
     # define constants
     GOSH = Organisation.objects.get(
@@ -135,9 +122,6 @@ def test_cases_aggregated_by_deprivation_score(e12_case_factory, e12_site_factor
 @pytest.mark.django_db
 def test_cases_aggregated_by_ethnicity(e12_case_factory):
     """Tests the cases_aggregated_by_ethnicity fn returns correct count."""
-
-    # removes some of the cases which are seeded earlier in the test db
-    _clean_cases_from_test_db()
 
     # define constants
     GOSH = Organisation.objects.get(

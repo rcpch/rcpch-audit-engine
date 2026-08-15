@@ -20,6 +20,7 @@ from epilepsy12.models import Epilepsy12User
 from epilepsy12.tests.UserDataClasses import (
     test_user_rcpch_audit_team_data,
 )
+from epilepsy12.tests.factories import E12UserFactory
 
 
 @pytest.mark.django_db
@@ -92,17 +93,30 @@ def test_pass_validation(
 
 
 @pytest.mark.django_db
-def test_unsuccessful_login_lockout(client):
-    """Testing auto-lockout after 5 unsuccessful login attempts."""
+def test_unsuccessful_login_lockout(client, seed_groups_fixture):
+    """Testing auto-lockout after 5 unsuccessful login attempts.
 
-    rcpch_user = Epilepsy12User.objects.get(
-        first_name=test_user_rcpch_audit_team_data.role_str
+    Uses a dedicated user created inside the test transaction so that
+    VisitActivity rows from other tests/workers (which share the seeded
+    RCPCH_AUDIT_TEAM user under --reuse-db) cannot contaminate the lockout
+    counter. Under pytest-xdist, multiple workers can fail logins against
+    the shared seeded user concurrently, pre-populating its VisitActivity
+    history and triggering lockout at the wrong attempt count.
+    """
+
+    # Create a fresh user with a unique email, isolated to this test's
+    # transaction. No other test/worker touches this user, so its
+    # VisitActivity history only contains rows this test creates.
+    rcpch_user = E12UserFactory(
+        first_name="LOCKOUT_TEST_USER",
+        email="lockout_test_user@nhs.net",
+        is_active=True,
     )
-    
+
     # 5 failed login attempts
-    
+
     for _ in range(5):
-    
+
         login_response = client.post(
             reverse('login'),
             data={
@@ -111,8 +125,8 @@ def test_unsuccessful_login_lockout(client):
                 'auth-password' : 'incorrect password',
                 'auth-captacha_1': 'PASSED',
             }
-        )     
-    
+        )
+
     # After 5 failed logins, attempt one more
     login_response = client.post(
             reverse('login'),

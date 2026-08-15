@@ -13,8 +13,6 @@ from epilepsy12.common_view_functions import (
 )
 from epilepsy12.models import (
     Organisation,
-    Registration,
-    Case,
 )
 from epilepsy12.tests.common_view_functions_tests.CreateKPIMetrics import KPIMetric
 

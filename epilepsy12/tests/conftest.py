@@ -29,7 +29,7 @@ from epilepsy12.tests.factories import (
     E12SyndromeFactory,
     E12UserFactory,
 )
-from epilepsy12.models import AuditPeriod, Organisation, Case
+from epilepsy12.models import AuditPeriod, Organisation
 # Historical cohort definitions, kept in sync with migration
 # 0063_seed_audit_periods.py. Registration.save() looks up the AuditPeriod
 # for a given first_paediatric_assessment_date, so the test DB must contain
@@ -88,18 +88,8 @@ def GOSH():
 
 
 @pytest.fixture
-def CASE_GOSH(GOSH):
-    return Case.objects.get(first_name=f"child_{GOSH.name}")
-
-
-@pytest.fixture
 def ADDENBROOKES():
     return Organisation.objects.get(
         ods_code="RGT01",
         trust__ods_code="RGT",
     )
-
-
-@pytest.fixture
-def CASE_ADDENBROOKES(ADDENBROOKES):
-    return Case.objects.get(first_name=f"child_{ADDENBROOKES.name}")
