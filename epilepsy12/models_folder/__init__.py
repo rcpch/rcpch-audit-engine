@@ -35,6 +35,7 @@ from .organisation_employer import OrganisationEmployer
 # or every E12 user's activity
 from .audit_period import AuditPeriod
 from .audit_period import AuditPeriodExtension
+from .audit_period_organisation import AuditPeriodOrganisation
 from .audit_progress import AuditProgress
 
 from .kpi import KPI
@@ -74,6 +75,7 @@ from .entities.nhs_england_region import NHSEnglandRegion
 from .entities.organisation import Organisation
 from .entities.trust import Trust
 from .entities.local_health_board import LocalHealthBoard
+from .organisation_identity import OrganisationIdentity
 
 from .organisational_audit import (
     OrganisationalAuditSubmissionPeriod,
