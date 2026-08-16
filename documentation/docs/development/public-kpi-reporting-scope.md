@@ -8,6 +8,14 @@ reviewers: Dr Simon Chapman
 !!! note "Document status"
     Draft for review. This document scopes a new public reporting feature that will replace the existing Power BI report. It describes the intended product, data, publication and technical boundaries; it is not an implementation specification.
 
+    !!! warning "Scope of the current branch"
+        The current branch is concerned only with the foundation described in [Audit-period organisation membership and access](audit-period-organisation.md): accepting historical organisation relationships and hierarchies into E12 and wiring them up with the existing `rcpch-nhs-organisations` sync. The publication workflow itself is a later phase and is documented here for context only. Decisions marked "publication" below are out of scope for the current branch except where they are prerequisites of the foundation.
+
+!!! note "Terminology: geography vs mapping"
+    Throughout this document, **geography** refers to organisational hierarchy — the parent-child relationships between an organisation and its Trust, Local Health Board, Integrated Care Board, NHS England region, OPEN UK network and country. These relationships change over time through mergers and reorganisations and must be versioned per audit period.
+
+    **Mapping** refers to patient-level geometry: postcode-based deprivation indices and map plots of patient locations. Mapping was previously handled within E12 but has been deprecated and handed off to a JavaScript library that pulls boundary tiles from `rcpch-census-platform`. Legacy mapping fields may remain in the database but the mapping code has been removed. References to "geography" in earlier design notes should be read as organisational hierarchy, not patient mapping.
+
 ## Executive summary
 
 Epilepsy12 will provide a public, longitudinal KPI reporting area within the Django application. It will replace the existing Power BI report as the public source of published KPI results.
@@ -96,8 +104,8 @@ The intended reporting dimensions are:
 
 | Level | Scope | Notes |
 |---|---|---|
-| National | All participating countries and islands | Must include England, Wales, Jersey and the Isle of Man where they participate in the audit. |
-| Country | One result per participating country or island | England, Wales, Jersey and the Isle of Man are separate country-level results. |
+| National | All participating countries and islands | Must include England, Wales and Jersey where they participate in the audit. The Isle of Man and any additional nations are a future phase (see *Change to current “National” semantics*). |
+| Country | One result per participating country or island | England, Wales and Jersey are separate country-level results. The Isle of Man and any additional nations are a future phase. |
 | NHS England Region | England | Applies only where a participating organisation has this relationship for the audit period. |
 | Integrated Care Board | England | Applies only where a participating organisation has this relationship for the audit period. |
 | OPEN UK network | Cross-cutting network geography | This is a comparison dimension rather than a strict parent in the administrative hierarchy. Inclusion of Channel Island organisations in network results must be explicitly agreed. |
@@ -108,11 +116,11 @@ The public reporting hierarchy should not assume that every level applies to eve
 
 ### Change to current “National” semantics
 
-The existing `NationalKPIAggregation` is described in code as England and Wales and the current aggregation filter explicitly excludes Jersey. The new public report's national result has different semantics: it includes all participating countries and islands, including Jersey and the Isle of Man.
+The existing `NationalKPIAggregation` is described in code as England and Wales and the current aggregation filter explicitly excludes Jersey. The new public report's national result has different semantics: it includes all participating countries and islands, including Jersey.
 
 This difference must be represented deliberately and covered by tests. Existing exports or internal reports that still require an England-and-Wales result must not silently change meaning as an accidental side effect.
 
-The repository currently contains explicit Jersey support, but equivalent Isle of Man data was not identified during this scoping review. Country, organisation and parent-geography reference data for the Isle of Man will need to be verified or added before the Isle of Man can contribute to a publication.
+Jersey already exists in the database and has live cases. The Isle of Man is a possible future addition but is **not** in scope for the first release: it has no reference data in the database or the API, and adding it would require amendments to the `Case` model (unique identifiers, postcodes, etc.) before it could contribute to the audit. The design should remain conceptually open to additional nations, but Isle of Man and any other new nation are deferred to a later phase.
 
 ## Audit periods and URLs
 
@@ -166,7 +174,7 @@ The audit period in the path is the report's anchor period. A longitudinal chart
 
 The interface should make the included periods explicit. It must not combine draft data with published data or infer a period from today's date.
 
-Where an organisation has changed ODS code between periods (for example following a trust dissolution and redistribution), the longitudinal series should follow the physical hospital across the code change. The `rcpch-nhs-organisations` API `snapshot` endpoint walks the `OrganisationSuccession` chain automatically and returns the predecessor's geography for dates before the organisation's current ODS code existed, so this project does not need to implement chain-walking itself. The interface should not silently drop earlier periods or treat the predecessor and successor as unrelated entities.
+Where an organisation has changed ODS code between periods (for example following a trust dissolution and redistribution), the longitudinal series should follow the physical hospital across the code change. The local `OrganisationIdentity` model (see [Audit-period organisation membership and access](audit-period-organisation.md), *Organisation identity and ODS code succession*) groups successive `Organisation` rows that represent the same physical hospital, including arbitrary-length succession chains. The longitudinal report groups by `OrganisationIdentity` rather than `Organisation.ods_code`, so it does not silently drop earlier periods or treat the predecessor and successor as unrelated entities. The `rcpch-nhs-organisations` API `snapshot` endpoint also walks the `OrganisationSuccession` chain and is used by the per-cohort sync to populate `OrganisationIdentity`; the local identity table is the authoritative grouping for longitudinal reporting within E12.
 
 ## Source of truth for organisations and geography
 
@@ -182,7 +190,7 @@ Organisational and geographical reference data is maintained outside this projec
 
 - **Geographical boundaries** (Trust, LHB, ICB, region, OPEN UK, London borough, LAD, LSOA geometries) are the responsibility of the `rcpch-census-platform` service.
 
-This project retains its existing `Organisation`, `Trust`, `LocalHealthBoard`, `IntegratedCareBoard`, `NHSEnglandRegion` and `OPENUKNetwork` models as a **synchronised mirror** of the API rather than the source of truth. The local models remain FK targets for clinical data (`Site`, `KPI`, etc.) and serve the live dashboard; the API is the source of truth for organisational state, history and mergers. The sync (`epilepsy12/general_functions/nhs_organisations_sync.py`) upserts the local tables from the API's list endpoints and wires up the foreign keys on `Organisation`. Mergers, reorganisations and ODS code changes are made in the API first and flow down into this project via sync; they are no longer authored here. The existing direct ODS sync in `epilepsy12/general_functions/ods_update.py` has been removed.
+This project retains its existing `Organisation`, `Trust`, `LocalHealthBoard`, `IntegratedCareBoard`, `NHSEnglandRegion` and `OPENUKNetwork` models as a **synchronised mirror** of the API rather than the source of truth. The local models remain FK targets for clinical data (`Site`, `KPI`, etc.) and serve the live dashboard; the API is the source of truth for organisational state, history and mergers. The sync (`epilepsy12/general_functions/nhs_organisations_sync.py`) upserts the local tables from the API's list endpoints and wires up the foreign keys on `Organisation`. Mergers, reorganisations and ODS code changes are made in the API first and flow down into this project via sync; they are no longer authored here. The previous direct ODS sync (`epilepsy12/general_functions/ods_update.py`) has been removed and replaced by the `rcpch-nhs-organisations` sync, which is now live but has not yet been run against production data — running it before the `AuditPeriodOrganisation` foundation is in place would orphan cases from their organisations, because the current local organisational state is behind the API's. This foundation is a prerequisite to running the sync in production.
 
 The public report must not depend on the API being available at request time. Geography is resolved against the API `snapshot` endpoint (or the local mirror) at **publication time** and frozen onto the publication snapshot; anonymous public views read only the frozen snapshot.
 
@@ -190,20 +198,16 @@ The public report must not depend on the API being available at request time. Ge
 
 The current `Organisation.active` boolean represents current operational status; it cannot reliably answer whether an organisation was participating and active in a historical audit period.
 
-A period-aware source of truth is therefore required. The recommended approach is an explicit relationship such as an `AuditPeriodOrganisation` participation model, with one row per organisation and audit period. The exact model name is not prescribed by this scope.
+A period-aware source of truth is therefore required: the `AuditPeriodOrganisation` participation model, with one row per organisation and audit period. The model, shared geography and permission services, audit-period-aware dashboard routes, and relationship with publication generation are described in [Audit-period organisation membership and access](audit-period-organisation.md).
 
-The proposed model, shared geography and permission services, audit-period-aware dashboard routes, and relationship with publication generation are described in [Audit-period organisation membership and access](audit-period-organisation.md).
+`AuditPeriodOrganisation` records both:
 
-The relationship should be able to record at least:
+- the RCPCH audit-team decision that the API cannot answer — whether the organisation was enrolled and in scope for the audit period (`included_in_reporting`); and
+- the organisational hierarchy (Trust / Local Health Board / ICB / NHS England region / OPEN UK network / country) that applied to that organisation in that audit period.
 
-- the `AuditPeriod`;
-- the `Organisation`;
-- whether the organisation is included in reporting for that period; and
-- audit fields explaining who changed the status and when.
+The hierarchy FKs are populated by the per-cohort sync from the `rcpch-nhs-organisations` API `snapshot` endpoint at the audit period's reference date (see [Source of truth for organisations and geography](#source-of-truth-for-organisations-and-geography)). The local `AuditPeriodOrganisation` rows are the period-aware source of truth for the live dashboard and permission services; the API remains the source of truth for organisational state and history, kept in sync with the local mirror.
 
-It does **not** need to record geography. Period geography is resolved from the `rcpch-nhs-organisations` API `snapshot` endpoint at the audit period's reference date (see [Source of truth for organisations and geography](#source-of-truth-for-organisations-and-geography)) and frozen onto the publication snapshot. The participation model is concerned only with the RCPCH audit-team decision that the API cannot answer: whether the organisation was enrolled and in scope for the audit period.
-
-At publication time, the release must snapshot the set of included organisations and their geographical memberships as resolved from the API `snapshot` endpoint at the period's reference date. This prevents later organisational changes from rewriting the meaning of an already published result.
+At publication time, the release copies the approved `AuditPeriodOrganisation` rows (participation and hierarchy) into an immutable publication snapshot. This prevents later organisational changes from rewriting the meaning of an already published result. Public views read only the snapshot.
 
 ### Proposed aggregation inclusion rule
 
@@ -479,7 +483,7 @@ They should share tested KPI inclusion and aggregation services where their meth
 - Eligibility, ineligibility and incomplete states match existing KPI definitions.
 - Results are filtered through `Registration.audit_period`.
 - Only period-active organisations contribute.
-- National results include England, Wales, Jersey and the Isle of Man when those countries participate.
+- National results include England, Wales and Jersey when those countries participate.
 - Country and lower-level results contain only their contributing cases.
 - Trust and LHB results are the lowest generated public levels.
 - Organisation result rows are not generated for public consumption.
@@ -528,25 +532,24 @@ They should share tested KPI inclusion and aggregation services where their meth
 
 - Inventory the KPI datasets and filters currently represented in Power BI.
 - Confirm active-organisation **participation** rules for each historical audit period (the RCPCH audit-team decision; geography is the API's responsibility).
-- Confirm OPEN UK inclusion rules for Jersey and the Isle of Man, and confirm the `rcpch-nhs-organisations` API holds the corresponding OPEN UK network memberships for the relevant organisations and audit periods (verifiable via the `snapshot` endpoint at each period's reference date).
+- Confirm OPEN UK inclusion rules for Jersey, and confirm the `rcpch-nhs-organisations` API holds the corresponding OPEN UK network memberships for the relevant organisations and audit periods (verifiable via the `snapshot` endpoint at each period's reference date).
 - Confirm the `rcpch-nhs-organisations` API has backfilled temporal geography for every E12-participating organisation across every audit period to be published. **This is a hard gate:** Phase 1 must not start until coverage is confirmed. Verification is by calling the `snapshot` endpoint at each period's reference date for every participating organisation and confirming a non-404 response with the expected geography.
-- Confirm Isle of Man reference data exists in the API (organisations, country, parent geography) and is returned by the `snapshot` endpoint for the relevant audit periods. The Isle of Man may not be in the ODS feed; verify how it is represented.
-- Choose and document the per-`AuditPeriod` geography reference date used for snapshot calls (likely `submission_deadline` or `data_collection_end_date`).
-- Confirm the small-number disclosure policy.
-- Identify KPI definition changes that affect longitudinal comparability.
-- Produce reconciliation fixtures for representative Power BI results.
+- Choose and document the per-`AuditPeriod` geography reference date used for snapshot calls. The foundation uses `data_collection_end_date` as the reference date for populating `AuditPeriodOrganisation` hierarchy (see [Audit-period organisation membership and access](audit-period-organisation.md)). A different reference date may be chosen for the publication snapshot if the audit team decides publication should reflect organisational structure as of a different point (for example the submission deadline). These two dates may legitimately differ.
+- Confirm the small-number disclosure policy. *(Publication phase — out of scope for the current branch.)*
+- Identify KPI definition changes that affect longitudinal comparability. *(Publication phase — out of scope for the current branch.)*
+- Produce reconciliation fixtures for representative Power BI results. *(Publication phase — out of scope for the current branch.)*
 
 ### Phase 1 — Publication foundation
 
-- Add period-aware organisation **participation** (participation only; no geography on this model).
-- Add explicit publication and published-result storage.
-- Add publication-time geography snapshot ingestion: for each included organisation, fetch its `snapshot` from the `rcpch-nhs-organisations` API `snapshot` endpoint at the period's reference date and freeze the result onto the publication.
-- Replace the local direct ODS sync (`epilepsy12/general_functions/ods_update.py`) with synchronisation from the `rcpch-nhs-organisations` API, so that mergers and reorganisations made in the API flow down into the local `Organisation` / `Trust` / `IntegratedCareBoard` / `NHSEnglandRegion` / `OPENUKNetwork` / `LocalHealthBoard` mirror tables. The local models remain for now as a mirror, not the source of truth.
-- Refactor shared KPI aggregation into a service callable outside an HTTP view.
-- Generate all public abstraction levels for one `AuditPeriod`.
-- Add validation, preview, activation and supersession.
-- Retire or redirect the organisation-dashboard publish action.
-- Keep the existing public version live if a new generation fails.
+- Add period-aware organisation **participation and hierarchy** via the `AuditPeriodOrganisation` model (see [Audit-period organisation membership and access](audit-period-organisation.md)). This is the work delivered by the current branch.
+- Add explicit publication and published-result storage. *(Publication phase — out of scope for the current branch.)*
+- Add publication-time hierarchy snapshot ingestion: copy the approved `AuditPeriodOrganisation` rows (participation and hierarchy) into an immutable publication snapshot. *(Publication phase — out of scope for the current branch.)*
+- Confirm synchronisation is sourced from the `rcpch-nhs-organisations` API (the `sync_current_state()` function in `epilepsy12/general_functions/nhs_organisations_sync.py` already upserts the local mirror from the API's list endpoints). The previous direct ODS sync (`epilepsy12/general_functions/ods_update.py`) has been removed.
+- Refactor shared KPI aggregation into a service callable outside an HTTP view. *(Publication phase — out of scope for the current branch.)*
+- Generate all public abstraction levels for one `AuditPeriod`. *(Publication phase — out of scope for the current branch.)*
+- Add validation, preview, activation and supersession. *(Publication phase — out of scope for the current branch.)*
+- Retire or redirect the organisation-dashboard publish action. *(Publication phase — out of scope for the current branch.)*
+- Keep the existing public version live if a new generation fails. *(Publication phase — out of scope for the current branch.)*
 
 ### Phase 2 — Public longitudinal KPI report
 
@@ -583,7 +586,7 @@ The first public release is complete when:
 4. anonymous users can view numerator, denominator and percentage for every published KPI;
 5. users can view longitudinal results across published audit periods;
 6. users can explore applicable levels from national and country down to Trust/LHB;
-7. national results include all participating England, Wales, Jersey and Isle of Man data;
+7. national results include all participating England, Wales and Jersey data;
 8. only organisations active for the relevant audit period contribute to calculations;
 9. no organisation-level public results, demographics, maps or patient-level data are exposed;
 10. a correction can replace the active publication at the same public URL;
@@ -592,17 +595,19 @@ The first public release is complete when:
 
 ## Decisions still required
 
-The following decisions remain before implementation can be considered fully specified:
+The following decisions remain before implementation can be considered fully specified. Decisions marked **publication** belong to the publication phase and are out of scope for the current branch, which delivers only the `AuditPeriodOrganisation` foundation.
 
-1. What system or staff workflow defines that an organisation is active and participating in a particular `AuditPeriod`? (Participation only — geography is resolved from the API.)
-2. Should Jersey and the Isle of Man contribute to their assigned OPEN UK network results, or only to country and national results?
-3. What small-number suppression or rounding rules apply at Trust/LHB level?
-4. Which Power BI KPI downloads and filter combinations are required for launch parity?
-5. Should `/reports/epilepsy12/` redirect to the latest publication or present an audit-period index?
-6. Which KPI definition changes should break a trend line rather than be shown with an annotation?
-7. Is initial publication generation fast enough to remain synchronous, or does it need a background worker?
-8. What is the per-`AuditPeriod` geography reference date used for API `snapshot` calls? (Candidate: `submission_deadline` or `data_collection_end_date`.)
-9. Does the local mirror sync from the API run on a schedule, on demand at publication time, or both? What is the target latency between a merger being recorded in the API and the local mirror reflecting it?
-10. Confirm the boundary geometries required for the public report are available from `rcpch-census-platform` for every geography level and audit period to be published.
+1. What system or staff workflow defines that an organisation is active and participating in a particular `AuditPeriod`? **Resolved for the foundation:** participation is recorded on `AuditPeriodOrganisation.included_in_reporting`, populated by the per-cohort sync and approved by the audit team as part of the backfill (see [Audit-period organisation membership and access](audit-period-organisation.md)).
+2. *(Publication)* Should Jersey contribute to its assigned OPEN UK network results, or only to country and national results?
+3. *(Publication)* What small-number suppression or rounding rules apply at Trust/LHB level?
+4. *(Publication)* Which Power BI KPI downloads and filter combinations are required for launch parity?
+5. *(Publication)* Should `/reports/epilepsy12/` redirect to the latest publication or present an audit-period index?
+6. *(Publication)* Which KPI definition changes should break a trend line rather than be shown with an annotation?
+7. *(Publication)* Is initial publication generation fast enough to remain synchronous, or does it need a background worker?
+8. **Resolved for the foundation:** the per-`AuditPeriod` hierarchy reference date used to populate `AuditPeriodOrganisation` is `data_collection_end_date`. A different reference date may be chosen later for the publication snapshot if the audit team decides publication should reflect organisational structure as of a different point.
+9. Does the local mirror sync from the API run on a schedule, on demand at publication time, or both? What is the target latency between a merger being recorded in the API and the local mirror reflecting it? *(Operational — to be confirmed, but not blocking the foundation.)*
+10. *(Publication)* Confirm the boundary geometries required for the public report are available from `rcpch-census-platform` for every geography level and audit period to be published.
+11. **Resolved:** `OrganisationIdentity` is the approach for ODS code succession, not a self-FK on `Organisation`. It handles arbitrary-length succession chains and is the authoritative grouping for longitudinal reporting within E12, populated by the per-cohort sync from the API's succession data.
+12. **Resolved:** `AuditPeriodOrganisation` carries the hierarchy FKs (trust, LHB, ICB, region, network, country), populated by the per-cohort sync from the API `snapshot` endpoint at the period's reference date. The local rows serve the dashboard and permission services. Publication may still freeze its own copy for immutability.
 
-These decisions do not alter the central architecture: public results are versioned snapshots tied to an `AuditPeriod`, generated across the whole audit and activated atomically. Organisational and geographical reference data is sourced from the `rcpch-nhs-organisations` and `rcpch-census-platform` services; this project mirrors it, kept in sync with the API.
+These decisions do not alter the central architecture: public results are versioned snapshots tied to an `AuditPeriod`, generated across the whole audit and activated atomically. Organisational and geographical reference data is sourced from the `rcpch-nhs-organisations` and `rcpch-census-platform` services; this project mirrors it, kept in sync with the API. The current branch delivers only the period-aware organisation foundation; the publication workflow is a later phase.
