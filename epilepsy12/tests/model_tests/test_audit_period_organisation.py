@@ -304,7 +304,7 @@ def test_history_records_changes(cohort_4, england_hierarchy):
 
 @pytest.mark.django_db
 def test_default_source_and_unapproved_state(cohort_4, england_hierarchy):
-    """A newly created membership defaults to ``source='api_snapshot'`` and
+    """A newly created membership defaults to ``source='snapshot'`` and
     ``approved_at=None`` (a candidate row awaiting audit-team approval)."""
     GOSH = Organisation.objects.get(ods_code="RP401", trust__ods_code="RP4")
 
@@ -315,7 +315,7 @@ def test_default_source_and_unapproved_state(cohort_4, england_hierarchy):
         trust=england_hierarchy["trust"],
     )
 
-    assert membership.source == "api_snapshot"
+    assert membership.source == "snapshot"
     assert membership.approved_at is None
     assert membership.approved_by is None
 

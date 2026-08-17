@@ -181,10 +181,12 @@ class AuditPeriodOrganisation(
     )
     source = models.CharField(
         max_length=32,
-        default="api_snapshot",
-        help_text="Provenance of this row. 'api_snapshot' for rows "
-        "populated by the per-cohort sync; 'manual' for rows created or "
-        "corrected by the audit team.",
+        default="snapshot",
+        help_text="Provenance of this row. 'snapshot' for rows "
+        "populated by the per-cohort sync from the API snapshot endpoint; "
+        "'detail_fallback' for rows populated from the detail endpoint "
+        "(current state) when the snapshot had no temporal history for the "
+        "date; 'manual' for rows created or corrected by the audit team.",
     )
     notes = models.TextField(
         blank=True,

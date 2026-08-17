@@ -32,7 +32,11 @@ from typing import Any
 from django.apps import apps
 from django.db import transaction
 
-from .nhs_organisations import get_organisation_snapshot, NHSOrganisationsAPIError
+from .nhs_organisations import (
+    get_organisation,
+    get_organisation_snapshot,
+    NHSOrganisationsAPIError,
+)
 from .nhs_organisations_sync import _truncate_to_field, _parse_date
 
 logger = logging.getLogger(__name__)
@@ -287,6 +291,9 @@ def _sync_organisation_for_period(
     - ``status``: "created", "updated", "skipped_approved", or "error"
     - ``error``: error message (if status == "error")
     - ``predecessor_ods_code``: if the snapshot walked the succession chain
+    - ``source``: "snapshot" or "detail_fallback" — indicates whether the
+      hierarchy came from the snapshot endpoint or the detail endpoint
+      (fallback when the snapshot has no temporal history for the date)
     """
     AuditPeriodOrganisation = _get_model("AuditPeriodOrganisation")
 
@@ -295,13 +302,38 @@ def _sync_organisation_for_period(
         "status": "error",
         "error": None,
         "predecessor_ods_code": None,
+        "source": "snapshot",
     }
 
+    # Try the snapshot endpoint first. If it returns 404 (no temporal history
+    # for the date) or a response with no country (reduced shape for future
+    # dates), fall back to the detail endpoint, which returns the current
+    # state with the full hierarchy. This is the best available
+    # approximation for historical periods until the API backfills temporal
+    # history. The source field records which endpoint was used so the
+    # audit team can re-sync once the API has historical data.
+    snapshot = None
     try:
         snapshot = get_organisation_snapshot(ods_code, on_date=reference_date)
+        # Check if the snapshot has a usable country. The snapshot endpoint
+        # returns a reduced shape for future dates where country is absent.
+        if not snapshot.get("country"):
+            snapshot = None
+            result["source"] = "detail_fallback"
     except NHSOrganisationsAPIError as exc:
-        result["error"] = str(exc)
-        return result
+        if "404" not in str(exc):
+            result["error"] = str(exc)
+            return result
+        # 404 — no temporal history for this date. Fall back to detail.
+        result["source"] = "detail_fallback"
+
+    if snapshot is None:
+        # Fall back to the detail endpoint (current state).
+        try:
+            snapshot = get_organisation(ods_code)
+        except NHSOrganisationsAPIError as exc:
+            result["error"] = str(exc)
+            return result
 
     predecessor_ods_code = snapshot.get("predecessor_ods_code")
     result["predecessor_ods_code"] = predecessor_ods_code
@@ -331,8 +363,11 @@ def _sync_organisation_for_period(
     )
 
     if country is None:
+        # This should not happen with the detail-endpoint fallback, but if
+        # it does, record the error rather than creating a row without a
+        # country (country is a required, non-nullable FK).
         result["error"] = (
-            f"Snapshot for {ods_code} at {reference_date} returned no country."
+            f"No country found for {ods_code} in snapshot or detail endpoint."
         )
         return result
 
@@ -369,7 +404,7 @@ def _sync_organisation_for_period(
         "nhs_england_region_name_snapshot": region_name,
         "openuk_network_name_snapshot": network_name,
         "country_name_snapshot": country_name,
-        "source": "api_snapshot",
+        "source": result["source"],
     }
 
     # Don't overwrite approved rows. If a row exists and is approved,
@@ -431,6 +466,8 @@ def sync_audit_period(audit_period) -> dict[str, Any]:
     created = 0
     updated = 0
     skipped_approved = 0
+    snapshot_count = 0
+    detail_fallback_count = 0
     errors: list[tuple[str, str]] = []
     predecessors: list[tuple[str, str]] = []
 
@@ -448,8 +485,16 @@ def sync_audit_period(audit_period) -> dict[str, Any]:
             status = result["status"]
             if status == "created":
                 created += 1
+                if result["source"] == "detail_fallback":
+                    detail_fallback_count += 1
+                else:
+                    snapshot_count += 1
             elif status == "updated":
                 updated += 1
+                if result["source"] == "detail_fallback":
+                    detail_fallback_count += 1
+                else:
+                    snapshot_count += 1
             elif status == "skipped_approved":
                 skipped_approved += 1
             else:
@@ -461,6 +506,8 @@ def sync_audit_period(audit_period) -> dict[str, Any]:
         "created": created,
         "updated": updated,
         "skipped_approved": skipped_approved,
+        "snapshot": snapshot_count,
+        "detail_fallback": detail_fallback_count,
         "errors": errors,
         "predecessors": predecessors,
     }

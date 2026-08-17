@@ -346,13 +346,14 @@ def test_sync_organisation_for_period_upserts_membership(
         result = _sync_organisation_for_period(GOSH, cohort_4, cohort_4.data_collection_end_date)
 
     assert result["status"] == "created"
+    assert result["source"] == "snapshot"
 
     membership = AuditPeriodOrganisation.objects.get(
         organisation=GOSH, audit_period=cohort_4
     )
     assert membership.trust == england_hierarchy["trust"]
     assert membership.country == england_hierarchy["country"]
-    assert membership.source == "api_snapshot"
+    assert membership.source == "snapshot"
     assert membership.approved_at is None  # candidate, not yet approved
     assert membership.trust_name_snapshot == "GREAT ORMOND STREET HOSPITAL NHS FOUNDATION TRUST"
 
@@ -421,7 +422,59 @@ def test_sync_is_idempotent(cohort_4, england_hierarchy):
 # ---------------------------------------------------------------------------
 
 @pytest.mark.django_db
-def test_sync_reports_api_error(cohort_4):
+def test_sync_reports_api_error_non_404(cohort_4):
+    """A non-404 API error from the snapshot endpoint is reported, not
+    swallowed. The detail-endpoint fallback is only triggered for 404s
+    (no temporal history)."""
+    GOSH = Organisation.objects.get(ods_code="RP401", trust__ods_code="RP4")
+
+    from epilepsy12.general_functions.nhs_organisations import NHSOrganisationsAPIError
+
+    with patch(
+        "epilepsy12.general_functions.audit_period_sync.get_organisation_snapshot",
+        side_effect=NHSOrganisationsAPIError("500: Internal server error"),
+    ):
+        result = _sync_organisation_for_period(GOSH, cohort_4, cohort_4.data_collection_end_date)
+
+    assert result["status"] == "error"
+    assert "500" in result["error"]
+    assert not AuditPeriodOrganisation.objects.filter(
+        organisation=GOSH, audit_period=cohort_4
+    ).exists()
+
+
+@pytest.mark.django_db
+def test_sync_falls_back_to_detail_on_404(cohort_4, england_hierarchy):
+    """When the snapshot returns 404 (no temporal history for the date),
+    the sync falls back to the detail endpoint (current state)."""
+    GOSH = Organisation.objects.get(ods_code="RP401", trust__ods_code="RP4")
+
+    from epilepsy12.general_functions.nhs_organisations import NHSOrganisationsAPIError
+
+    detail_response = _make_snapshot_response()
+
+    with patch(
+        "epilepsy12.general_functions.audit_period_sync.get_organisation_snapshot",
+        side_effect=NHSOrganisationsAPIError("404: No snapshot exists"),
+    ), patch(
+        "epilepsy12.general_functions.audit_period_sync.get_organisation",
+        return_value=detail_response,
+    ):
+        result = _sync_organisation_for_period(GOSH, cohort_4, cohort_4.data_collection_end_date)
+
+    assert result["status"] == "created"
+    assert result["source"] == "detail_fallback"
+
+    membership = AuditPeriodOrganisation.objects.get(
+        organisation=GOSH, audit_period=cohort_4
+    )
+    assert membership.source == "detail_fallback"
+
+
+@pytest.mark.django_db
+def test_sync_reports_error_when_both_endpoints_fail(cohort_4):
+    """If both the snapshot and the detail endpoint fail, the sync reports
+    the error from the detail endpoint."""
     GOSH = Organisation.objects.get(ods_code="RP401", trust__ods_code="RP4")
 
     from epilepsy12.general_functions.nhs_organisations import NHSOrganisationsAPIError
@@ -429,11 +482,14 @@ def test_sync_reports_api_error(cohort_4):
     with patch(
         "epilepsy12.general_functions.audit_period_sync.get_organisation_snapshot",
         side_effect=NHSOrganisationsAPIError("404: No snapshot exists"),
+    ), patch(
+        "epilepsy12.general_functions.audit_period_sync.get_organisation",
+        side_effect=NHSOrganisationsAPIError("500: Detail endpoint failed"),
     ):
         result = _sync_organisation_for_period(GOSH, cohort_4, cohort_4.data_collection_end_date)
 
     assert result["status"] == "error"
-    assert "404" in result["error"]
+    assert "500" in result["error"]
     assert not AuditPeriodOrganisation.objects.filter(
         organisation=GOSH, audit_period=cohort_4
     ).exists()

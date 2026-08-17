@@ -173,6 +173,12 @@ class Command(BaseCommand):
             f"{result['created']} created, {result['updated']} updated, "
             f"{result['skipped_approved']} skipped (approved)"
         )
+        if result.get("snapshot") or result.get("detail_fallback"):
+            self.stdout.write(
+                f"    Source: {result.get('snapshot', 0)} from snapshot, "
+                f"{result.get('detail_fallback', 0)} from detail fallback "
+                f"(current state — re-sync once API has temporal history)"
+            )
         if result["errors"]:
             self.stdout.write(
                 self.style.ERROR(f"    {len(result['errors'])} errors:")
