@@ -31,46 +31,6 @@ from epilepsy12.models import (
 
 
 # ---------------------------------------------------------------------------
-# Fixtures
-# ---------------------------------------------------------------------------
-
-@pytest.fixture
-def england_hierarchy():
-    """Return a dict of English hierarchy entities from the seeded GOSH org."""
-    org = Organisation.objects.get(ods_code="RP401", trust__ods_code="RP4")
-    return {
-        "country": org.country,
-        "trust": org.trust,
-        "icb": org.integrated_care_board,
-        "region": org.nhs_england_region,
-        "network": org.openuk_network,
-    }
-
-
-@pytest.fixture
-def wales_hierarchy():
-    """Return a dict of Welsh hierarchy entities from the seeded Noah's Ark org."""
-    org = Organisation.objects.get(
-        ods_code="7A4H1", local_health_board__ods_code="7A4"
-    )
-    return {
-        "country": org.country,
-        "lhb": org.local_health_board,
-        "network": org.openuk_network,
-    }
-
-
-@pytest.fixture
-def cohort_4():
-    return AuditPeriod.objects.get(cohort_number=4)
-
-
-@pytest.fixture
-def cohort_5():
-    return AuditPeriod.objects.get(cohort_number=5)
-
-
-# ---------------------------------------------------------------------------
 # AuditPeriodOrganisation — uniqueness
 # ---------------------------------------------------------------------------
 
