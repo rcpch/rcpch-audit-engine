@@ -49,7 +49,7 @@ class Organisation(TimeStampAbstractBaseClass):
     latitude = FloatField(max_length=100, null=True, blank=True, default=None)
     longitude = FloatField(null=True, blank=True, default=None)
     postcode = CharField(max_length=15, null=True, blank=True, default=None)
-    geocode_coordinates = PointField(null=True, blank=True, default=None, srid=27700)
+    geocode_coordinates = PointField(null=True, blank=True, default=None, srid=4326)
     active = BooleanField(
         default=True
     )  # a boolean representing if this Organisation is still operational

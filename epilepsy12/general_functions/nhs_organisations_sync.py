@@ -85,12 +85,9 @@ def _parse_int(value: Any) -> int | None:
 def _parse_point(geocode_coordinates: Any) -> Point | None:
     """Parse the API's ``geocode_coordinates`` GeoJSON Point into a GEOS Point.
 
-    The API returns ``{"type": "Point", "coordinates": [lon, lat]}``. The
-    local ``Organisation.geocode_coordinates`` field uses SRID 27700 (BNG),
-    but the API returns WGS84 coordinates. We store the point in SRID 4326
-    and let the ``Organisation.save()`` signal handle any reprojection if
-    needed — matching the existing behaviour where ``latitude``/``longitude``
-    are stored alongside the point.
+    The API returns ``{"type": "Point", "coordinates": [lon, lat]}`` in
+    WGS84 (SRID 4326). The ``Organisation.geocode_coordinates`` field is
+    now SRID 4326, so no reprojection is needed.
     """
     if not geocode_coordinates:
         return None
