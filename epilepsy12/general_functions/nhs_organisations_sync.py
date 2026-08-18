@@ -159,13 +159,13 @@ def sync_trusts() -> dict[str, Any]:
         ods_code = api_trust["ods_code"]
         defaults = {
             "name": _truncate_to_field(api_trust.get("name", ""), Trust, "name"),
-            "address_line_1": _truncate_to_field(api_trust.get("address_line_1") or None, Trust, "address_line_1"),
-            "address_line_2": _truncate_to_field(api_trust.get("address_line_2", ""), Trust, "address_line_2"),
-            "town": api_trust.get("town") or None,
-            "postcode": api_trust.get("postcode") or None,
-            "country": api_trust.get("country") or None,
-            "telephone": api_trust.get("telephone") or None,
-            "website": _truncate_to_field(api_trust.get("website") or None, Trust, "website"),
+            "address_line_1": _truncate_to_field(api_trust.get("address_line_1") or "", Trust, "address_line_1"),
+            "address_line_2": _truncate_to_field(api_trust.get("address_line_2") or "", Trust, "address_line_2"),
+            "town": api_trust.get("town") or "",
+            "postcode": api_trust.get("postcode") or "",
+            "country": api_trust.get("country") or "",
+            "telephone": api_trust.get("telephone") or "",
+            "website": _truncate_to_field(api_trust.get("website") or "", Trust, "website"),
             "active": api_trust.get("active", True),
             "published_at": _parse_date(api_trust.get("published_at")),
         }
@@ -292,12 +292,12 @@ def sync_countries() -> dict[str, Any]:
         boundary_identifier = api_country["boundary_identifier"]
         defaults = {
             "name": _truncate_to_field(api_country.get("name", ""), Country, "name"),
-            "welsh_name": _truncate_to_field(api_country.get("welsh_name") or None, Country, "welsh_name"),
+            "welsh_name": _truncate_to_field(api_country.get("welsh_name") or "", Country, "welsh_name"),
             "bng_e": _parse_int(api_country.get("bng_e")),
             "bng_n": _parse_int(api_country.get("bng_n")),
             "long": _parse_float(api_country.get("long")),
             "lat": _parse_float(api_country.get("lat")),
-            "globalid": api_country.get("globalid") or None,
+            "globalid": api_country.get("globalid") or "",
         }
         country, created = Country.objects.update_or_create(
             boundary_identifier=boundary_identifier, defaults=defaults
@@ -477,17 +477,17 @@ def sync_organisations(
             )
 
         defaults = {
-            "name": _truncate_to_field(api_org.get("name") or None, Organisation, "name"),
-            "website": _truncate_to_field(api_org.get("website") or None, Organisation, "website"),
-            "address1": _truncate_to_field(api_org.get("address1") or None, Organisation, "address1"),
-            "address2": _truncate_to_field(api_org.get("address2") or None, Organisation, "address2"),
-            "address3": _truncate_to_field(api_org.get("address3") or None, Organisation, "address3"),
-            "telephone": api_org.get("telephone") or None,
-            "city": api_org.get("city") or None,
-            "county": api_org.get("county") or None,
+            "name": _truncate_to_field(api_org.get("name") or "", Organisation, "name"),
+            "website": _truncate_to_field(api_org.get("website") or "", Organisation, "website"),
+            "address1": _truncate_to_field(api_org.get("address1") or "", Organisation, "address1"),
+            "address2": _truncate_to_field(api_org.get("address2") or "", Organisation, "address2"),
+            "address3": _truncate_to_field(api_org.get("address3") or "", Organisation, "address3"),
+            "telephone": api_org.get("telephone") or "",
+            "city": api_org.get("city") or "",
+            "county": api_org.get("county") or "",
             "latitude": _parse_float(api_org.get("latitude")),
             "longitude": _parse_float(api_org.get("longitude")),
-            "postcode": api_org.get("postcode") or None,
+            "postcode": api_org.get("postcode") or "",
             "geocode_coordinates": _parse_point(api_org.get("geocode_coordinates")),
             "active": api_org.get("active", True),
             "published_at": _parse_date(api_org.get("published_at")),
@@ -688,22 +688,18 @@ def _diff_entity(
             if parser:
                 api_value = parser(api_value)
             else:
-                # For string fields, match the sync's conversion behaviour:
-                # if the model field allows null (null=True), the sync converts
-                # empty strings to None. If the field does not allow null, the
-                # sync keeps empty strings as-is. We check the model field's
-                # null attribute to determine which behaviour to mirror.
-                try:
-                    field = model_class._meta.get_field(model_field)
-                    field_allows_null = getattr(field, "null", False)
-                except Exception:
-                    field_allows_null = True  # safe default
-                if isinstance(api_value, str) and api_value == "":
-                    if field_allows_null:
-                        api_value = None
-                    # else: keep "" to match the sync's behaviour
+                # The sync normalises None to "" for string fields (the API
+                # returns null for unset string fields, but the local DB stores
+                # ""). Mirror this so the diff doesn't report spurious
+                # '' → None changes.
+                if api_value is None:
+                    api_value = ""
 
             local_value = getattr(local_obj, model_field, None)
+            # Also normalise None to "" for the local value, so a local None
+            # compares equal to an API "".
+            if local_value is None and isinstance(api_value, str):
+                local_value = ""
 
             # Compare — handle float comparison tolerance
             if isinstance(api_value, float) and isinstance(local_value, float):
