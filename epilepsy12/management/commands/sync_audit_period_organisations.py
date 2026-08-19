@@ -44,6 +44,14 @@ class Command(BaseCommand):
             "audit periods are synced.",
         )
         parser.add_argument(
+            "--ods-code",
+            type=str,
+            action="append",
+            help="Sync only the specified ODS code(s). Can be passed multiple "
+            "times (e.g. --ods-code RGT01 --ods-code RP401). If omitted, all "
+            "organisations with registrations in the period are synced.",
+        )
+        parser.add_argument(
             "--dry-run",
             action="store_true",
             help="Report what the sync would do without writing anything. "
@@ -70,6 +78,7 @@ class Command(BaseCommand):
 
     def handle(self, *args, **options):
         cohort = options.get("cohort")
+        ods_codes = options.get("ods_code")
         dry_run = options["dry_run"]
         reconcile = options["reconcile"]
 
@@ -97,6 +106,12 @@ class Command(BaseCommand):
                     .distinct()
                 )
                 org_count = len(set(participating_org_ids))
+                if ods_codes:
+                    from epilepsy12.models import Organisation
+                    org_count = Organisation.objects.filter(
+                        id__in=participating_org_ids,
+                        ods_code__in=ods_codes,
+                    ).count()
                 self.stdout.write(
                     f"  Cohort {period.cohort_number}: would sync {org_count} "
                     f"organisations at reference date "
@@ -124,11 +139,11 @@ class Command(BaseCommand):
                 f"Syncing cohort {cohort} at reference date "
                 f"{period.data_collection_end_date.isoformat()}..."
             )
-            result = sync_audit_period(period)
+            result = sync_audit_period(period, ods_codes=ods_codes)
             self._report_result(result)
         else:
             self.stdout.write("Syncing all audit periods...")
-            results = sync_all_audit_periods()
+            results = sync_all_audit_periods(ods_codes=ods_codes)
             for result in results:
                 self._report_result(result)
 

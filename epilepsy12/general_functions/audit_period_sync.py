@@ -438,12 +438,17 @@ def _sync_organisation_for_period(
 # ---------------------------------------------------------------------------
 
 
-def sync_audit_period(audit_period) -> dict[str, Any]:
+def sync_audit_period(audit_period, ods_codes=None) -> dict[str, Any]:
     """Populate ``AuditPeriodOrganisation`` rows for one audit period.
 
     For each organisation that has at least one registration in the audit
     period, calls the API snapshot endpoint at the period's
     ``data_collection_end_date`` and upserts a membership row.
+
+    Args:
+        ods_codes: an optional list of ODS codes to filter by. If provided,
+            only organisations with these ODS codes are synced. If None,
+            all organisations with registrations in the period are synced.
 
     Returns a dict with:
     - ``period``: the audit period's cohort number
@@ -467,6 +472,10 @@ def sync_audit_period(audit_period) -> dict[str, Any]:
         .distinct()
     )
     organisations = Organisation.objects.filter(id__in=participating_org_ids)
+
+    # If ods_codes is provided, filter to only those organisations.
+    if ods_codes:
+        organisations = organisations.filter(ods_code__in=ods_codes)
 
     created = 0
     updated = 0
@@ -518,15 +527,19 @@ def sync_audit_period(audit_period) -> dict[str, Any]:
     }
 
 
-def sync_all_audit_periods() -> list[dict[str, Any]]:
+def sync_all_audit_periods(ods_codes=None) -> list[dict[str, Any]]:
     """Run the per-cohort sync for every audit period.
+
+    Args:
+        ods_codes: an optional list of ODS codes to filter by. If provided,
+            only organisations with these ODS codes are synced in each period.
 
     Returns a list of per-period result dicts (see ``sync_audit_period``).
     """
     AuditPeriod = _get_model("AuditPeriod")
     results = []
     for period in AuditPeriod.objects.all().order_by("cohort_number"):
-        results.append(sync_audit_period(period))
+        results.append(sync_audit_period(period, ods_codes=ods_codes))
     return results
 
 
