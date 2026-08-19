@@ -4,33 +4,85 @@ import django.contrib.gis.db.models.fields
 from django.db import migrations
 
 
-def clear_geocode_coordinates(apps, schema_editor):
-    """Set all geocode_coordinates to NULL before changing the column SRID.
+def transform_geocode_coordinates_to_4326(apps, schema_editor):
+    """Transform existing geocode_coordinates from SRID 27700 (BNG) to
+    SRID 4326 (WGS84) using PostGIS ALTER TABLE ... TYPE ... USING.
 
-    The column is currently SRID 27700 (BNG). We need to change it to 4326
-    (WGS84), but PostGIS enforces that stored geometries must match the
-    column SRID — so we can't transform in place. Setting to NULL and
-    repopulating from latitude/longitude after the SRID change is the
-    cleanest approach. The sync_nhs_organisations command repopulates
-    geocode_coordinates from the API's latitude/longitude fields.
+    This transforms the data and changes the column type in one atomic
+    statement, avoiding the "Geometry SRID does not match column SRID"
+    error that occurs when trying to store a 4326 geometry in a 27700
+    column.
+
+    Points that fail the transform (out of the valid range for the BNG
+    transform, e.g. Jersey) are set to NULL via a CASE expression —
+    they will be repopulated from latitude/longitude by the sync.
     """
     if schema_editor.connection.vendor != "postgresql":
         return
 
     with schema_editor.connection.cursor() as cursor:
-        cursor.execute(
-            "UPDATE epilepsy12_organisation SET geocode_coordinates = NULL "
-            "WHERE geocode_coordinates IS NOT NULL"
-        )
-        cursor.execute(
-            "UPDATE epilepsy12_historicalorganisation SET geocode_coordinates = NULL "
-            "WHERE geocode_coordinates IS NOT NULL"
-        )
+        # Transform the organisation table: change column type to 4326
+        # and transform existing data in one statement. Points that fail
+        # ST_Transform (out of range) become NULL.
+        cursor.execute("""
+            ALTER TABLE epilepsy12_organisation
+            ALTER COLUMN geocode_coordinates TYPE geometry(Point, 4326)
+            USING CASE
+                WHEN geocode_coordinates IS NULL THEN NULL
+                WHEN ST_SRID(geocode_coordinates) = 27700 THEN
+                    ST_Transform(geocode_coordinates, 4326)
+                WHEN ST_SRID(geocode_coordinates) = 4326 THEN
+                    geocode_coordinates
+                ELSE NULL
+            END
+        """)
+
+        # Transform the historical organisation table the same way.
+        cursor.execute("""
+            ALTER TABLE epilepsy12_historicalorganisation
+            ALTER COLUMN geocode_coordinates TYPE geometry(Point, 4326)
+            USING CASE
+                WHEN geocode_coordinates IS NULL THEN NULL
+                WHEN ST_SRID(geocode_coordinates) = 27700 THEN
+                    ST_Transform(geocode_coordinates, 4326)
+                WHEN ST_SRID(geocode_coordinates) = 4326 THEN
+                    geocode_coordinates
+                ELSE NULL
+            END
+        """)
 
 
-def noop_reverse(apps, schema_editor):
-    """No-op reverse — the data is repopulated by the sync."""
-    pass
+def transform_geocode_coordinates_to_27700(apps, schema_editor):
+    """Reverse: transform from 4326 back to 27700."""
+    if schema_editor.connection.vendor != "postgresql":
+        return
+
+    with schema_editor.connection.cursor() as cursor:
+        cursor.execute("""
+            ALTER TABLE epilepsy12_organisation
+            ALTER COLUMN geocode_coordinates TYPE geometry(Point, 27700)
+            USING CASE
+                WHEN geocode_coordinates IS NULL THEN NULL
+                WHEN ST_SRID(geocode_coordinates) = 4326 THEN
+                    ST_Transform(geocode_coordinates, 27700)
+                WHEN ST_SRID(geocode_coordinates) = 27700 THEN
+                    geocode_coordinates
+                ELSE NULL
+            END
+        """)
+
+        cursor.execute("""
+            ALTER TABLE epilepsy12_historicalorganisation
+            ALTER COLUMN geocode_coordinates TYPE geometry(Point, 27700)
+            USING CASE
+                WHEN geocode_coordinates IS NULL THEN NULL
+                WHEN ST_SRID(geocode_coordinates) = 4326 THEN
+                    ST_Transform(geocode_coordinates, 27700)
+                WHEN ST_SRID(geocode_coordinates) = 27700 THEN
+                    geocode_coordinates
+                ELSE NULL
+            END
+        """)
 
 
 class Migration(migrations.Migration):
@@ -40,13 +92,17 @@ class Migration(migrations.Migration):
     ]
 
     operations = [
-        # Step 1: clear existing geocode_coordinates (can't transform in
-        # place because PostGIS enforces column SRID on stored geometries)
+        # Transform existing data from 27700 to 4326 and change the column
+        # type in one atomic PostGIS operation. This avoids the "Geometry
+        # SRID does not match column SRID" error.
         migrations.RunPython(
-            clear_geocode_coordinates,
-            reverse_code=noop_reverse,
+            transform_geocode_coordinates_to_4326,
+            reverse_code=transform_geocode_coordinates_to_27700,
         ),
-        # Step 2: change the column SRID to 4326
+        # Tell Django the field has changed (so the migration state matches
+        # the database state). The actual column change was done by the
+        # RunPython above; these AlterField operations update Django's
+        # migration state without re-issuing the ALTER TABLE.
         migrations.AlterField(
             model_name="historicalorganisation",
             name="geocode_coordinates",

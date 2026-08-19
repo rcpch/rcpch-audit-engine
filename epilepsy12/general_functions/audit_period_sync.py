@@ -321,8 +321,13 @@ def _sync_organisation_for_period(
             snapshot = None
             result["source"] = "detail_fallback"
     except NHSOrganisationsAPIError as exc:
-        if "404" not in str(exc):
-            result["error"] = str(exc)
+        # The snapshot endpoint raises NHSOrganisationsAPIError for both 404s
+        # (no temporal history) and other errors. The 404 case is re-raised
+        # with a "No snapshot exists" message by get_organisation_snapshot.
+        # Fall back to the detail endpoint for 404s; report other errors.
+        error_msg = str(exc)
+        if "404" not in error_msg and "No snapshot exists" not in error_msg:
+            result["error"] = error_msg
             return result
         # 404 — no temporal history for this date. Fall back to detail.
         result["source"] = "detail_fallback"

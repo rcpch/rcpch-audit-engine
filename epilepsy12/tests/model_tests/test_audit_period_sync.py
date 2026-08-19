@@ -469,6 +469,38 @@ def test_sync_falls_back_to_detail_on_404(cohort_4, england_hierarchy):
         organisation=GOSH, audit_period=cohort_4
     )
     assert membership.source == "detail_fallback"
+@pytest.mark.django_db
+def test_sync_falls_back_to_detail_on_re_raised_404(cohort_4, england_hierarchy):
+    """When the snapshot endpoint re-raises a 404 with a 'No snapshot exists'
+    message (which does not contain '404'), the sync still falls back to the
+    detail endpoint.
+    """
+    GOSH = Organisation.objects.get(ods_code="RP401", trust__ods_code="RP4")
+
+    from epilepsy12.general_functions.nhs_organisations import NHSOrganisationsAPIError
+
+    detail_response = _make_snapshot_response()
+
+    with patch(
+        "epilepsy12.general_functions.audit_period_sync.get_organisation_snapshot",
+        side_effect=NHSOrganisationsAPIError(
+            "No snapshot exists for organisation RP401 on 2022-11-30. "
+            "The organisation may not have existed on that date, or the "
+            "date is before the API's temporal history installation day."
+        ),
+    ), patch(
+        "epilepsy12.general_functions.audit_period_sync.get_organisation",
+        return_value=detail_response,
+    ):
+        result = _sync_organisation_for_period(GOSH, cohort_4, cohort_4.data_collection_end_date)
+
+    assert result["status"] == "created"
+    assert result["source"] == "detail_fallback"
+
+    membership = AuditPeriodOrganisation.objects.get(
+        organisation=GOSH, audit_period=cohort_4
+    )
+    assert membership.source == "detail_fallback"
 
 
 @pytest.mark.django_db
