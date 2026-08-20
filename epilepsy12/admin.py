@@ -628,6 +628,37 @@ class TrustAdmin(SimpleHistoryAdmin):
     search_fields = ["name", "ods_code"]
 
 
+class OrganisationIdentityAdmin(SimpleHistoryAdmin):
+    search_fields = ["name"]
+    list_display = ["name"]
+
+
+class AuditPeriodOrganisationAdmin(SimpleHistoryAdmin):
+    list_display = [
+        "audit_period",
+        "organisation",
+        "included_in_reporting",
+        "trust",
+        "local_health_board",
+        "approved_at",
+        "source",
+    ]
+    list_filter = [
+        "audit_period",
+        "included_in_reporting",
+        "source",
+        "country",
+    ]
+    search_fields = [
+        "organisation__name",
+        "organisation__ods_code",
+        "trust__name",
+        "trust__ods_code",
+        "local_health_board__name",
+        "local_health_board__ods_code",
+    ]
+
+
 class AuditPeriodAdmin(SimpleHistoryAdmin):
     list_display = ["cohort_number", "name", "slug", "recruitment_start_date", "recruitment_end_date", "data_collection_end_date", "submission_deadline"]
     ordering = ["-recruitment_start_date"]
@@ -712,6 +743,7 @@ admin.site.register(Registration, SimpleHistoryAdmin)
 admin.site.register(Site, SimpleHistoryAdmin)
 admin.site.register(AuditPeriod, AuditPeriodAdmin)
 admin.site.register(AuditPeriodExtension, AuditPeriodExtensionAdmin)
+admin.site.register(AuditPeriodOrganisation, AuditPeriodOrganisationAdmin)
 admin.site.register(AuditProgress, SimpleHistoryAdmin)
 admin.site.register(Episode, SimpleHistoryAdmin)
 
@@ -741,6 +773,7 @@ admin.site.register(IntegratedCareBoard)
 admin.site.register(NHSEnglandRegion)
 
 admin.site.register(Trust, TrustAdmin)
+admin.site.register(OrganisationIdentity, OrganisationIdentityAdmin)
 admin.site.register(LocalHealthBoard)
 admin.site.register(OPENUKNetwork)
 

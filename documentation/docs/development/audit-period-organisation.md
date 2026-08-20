@@ -71,6 +71,12 @@ Data entered after the reorganisation for a cohort 7 or cohort 8 registration wo
 
 If policy later requires a relationship to change within one audit period, this design would need an effective-dated membership model and an agreed attribution event. That is outside the initial proposal.
 
+### Within-period ODS code changes
+
+ODS code succession (a hospital changing its ODS code following a trust dissolution and redistribution) is handled by `OrganisationIdentity` (see below). The initial design assumes that an ODS code change takes effect between audit periods, not within one. If a hospital were to change ODS code part-way through an audit period's data-collection window, the `AuditPeriodOrganisation.organisation` FK would have to point at a single `Organisation` row while `Site.organisation` for cases registered before the change points at the predecessor and cases after point at the successor.
+
+The per-cohort sync should validate this assumption against the API's succession data and report any within-period ODS code changes to the audit team for an explicit attribution decision. The default attribution rule, if a within-period change is encountered, is the ODS code in use at the case's `first_paediatric_assessment_date` — consistent with how `Registration.audit_period` itself is derived (`AuditPeriodManager.for_first_paediatric_assessment_date`).
+
 ## Proposed `AuditPeriodOrganisation` model
 
 A provisional model shape is:
@@ -164,7 +170,7 @@ Validation should include:
 - approval before the row can be used for publication; and
 - protection against deleting referenced organisations and geographies.
 
-Trusts, LHBs and other hierarchy entities referenced historically should be retired or marked inactive rather than deleted.
+Trusts, LHBs and other hierarchy entities referenced historically should be retired or marked inactive rather than deleted. To enforce this, the existing parent FKs on `Organisation` (`trust`, `local_health_board`, `integrated_care_board`, `nhs_england_region`, `openuk_network`) should be changed from `on_delete=models.CASCADE` to `on_delete=models.PROTECT` as part of the foundation migration. The `Organisation.country` FK is already `PROTECT`. This prevents a hierarchy entity deletion from cascading to delete `Organisation` rows and orphaning `Site`, `KPI` and `Registration` data. Existing relationships must not be broken by the migration; only the deletion behaviour changes.
 
 ### Relationship with current `Organisation` fields
 
@@ -239,7 +245,7 @@ This matters for:
 
 #### What does NOT change
 
-- `Site.organisation` — stays pointing at the `Organisation` row the case was created against. Cases do not migrate.
+- `Site.organisation` — stays pointing at the `Organisation` row the case was created against. Cases do not migrate. `Site` does **not** need to reference `AuditPeriodOrganisation` directly. The period-aware path is `Site.organisation` → `Registration.audit_period` → `AuditPeriodOrganisation`, resolved at query time by the permission and hierarchy services. `Site` continues to point at a single `Organisation` row; period-awareness is added at the service layer, not by changing the `Site` schema.
 - `OrganisationEmployer.employer_organisation` — stays pointing at the current `Organisation` row. User memberships do not migrate.
 - `Organisation.ods_code` — remains `unique=True`. Each ODS code is still one row.
 
@@ -332,22 +338,24 @@ Once historical affiliation affects access, an organisation ID alone is not a co
 
 The recommended starting policy distinguishes:
 
-1. **Direct organisation access** — a user with active employment at Organisation A may access Organisation A's applicable historical or in-flight cohorts so that a reorganisation does not prevent completion of existing records.
-2. **Inherited Trust/LHB access** — a user elsewhere in a Trust or LHB may access Organisation A only for audit periods in which `AuditPeriodOrganisation` assigns Organisation A to that parent.
+1. **Direct organisation access** — a user with active employment at an organisation may access **all of that organisation's historical cases, irrespective of historical affiliation**. This is the purpose of `OrganisationIdentity`: a user employed at the current ODS code (e.g. `RJZ30`) can access cases stored against a predecessor ODS code (e.g. `RYQ30`) for any historical cohort, because both `Organisation` rows share the same `OrganisationIdentity`. A reorganisation must not prevent an organisation from completing or reviewing its own historical records.
+2. **Inherited Trust/LHB access** — a user elsewhere in a Trust or LHB may access Organisation A only for audit periods in which `AuditPeriodOrganisation` assigns Organisation A to that parent, **and only for the parent the user is currently affiliated with**. Inherited access is therefore current-affiliation-and-period-aware: a user at Trust B (Organisation A's current parent) can see Organisation A's cohort-9 cases (Trust B period) but not Organisation A's cohort-8 cases (Trust A period), even though Organisation A itself can see both. Inherited access never crosses the succession chain to a historical parent — that is direct access only.
 3. **RCPCH access** — authorised RCPCH audit team and administrative users retain their broader access.
 
-For Organisation A moving from Trust A to Trust B from cohort 9, a possible policy is:
+For Organisation A moving from Trust A to Trust B from cohort 9, with an ODS code change at the same boundary (`RYQ30` → `RJZ30`, same `OrganisationIdentity`):
 
-| User | Cohort 8 | Cohort 9 |
+| User | Cohort 8 (Trust A, `RYQ30`) | Cohort 9 (Trust B, `RJZ30`) |
 |---|---:|---:|
-| Direct Organisation A user | Yes | Yes |
-| User elsewhere in Trust A | Yes | No |
-| User elsewhere in Trust B | No | Yes |
+| Direct user employed at `RJZ30` (current) | Yes (via `OrganisationIdentity`) | Yes |
+| User elsewhere in Trust A (current affiliation Trust A) | Yes | No |
+| User elsewhere in Trust B (current affiliation Trust B) | No | Yes |
 | Authorised RCPCH user | Yes | Yes |
 
-Whether direct Organisation A access includes all historical periods or only periods still open for data collection/submission is a governance decision. Editing remains separately constrained by the audit period and organisation-specific submission deadlines.
+The key asymmetry: **direct access follows the organisation across all periods and ODS code changes; inherited access follows the user's current parent and is scoped to the periods in which that parent was the organisation's reporting parent.** This means that when a merger happens mid-audit-year, the audit team flips the affiliation switch on the affected `AuditPeriodOrganisation` rows from the effective period; at that point, users at the new trust gain inherited access to sibling organisations' cases for the new period, while users at the organisation itself retain access to their historical cases under the old affiliation.
 
-A direct Organisation A exception must not grant that user access to every historical organisation in Trust A. Direct access applies to Organisation A itself; inherited sibling access remains parent-and-period-aware.
+Whether direct organisation access includes editing as well as viewing historical periods remains a governance decision. Editing remains separately constrained by the audit period and organisation-specific submission deadlines.
+
+A direct organisation exception must not grant that user access to every historical organisation in the parent trust. Direct access applies to the user's own organisation (resolved through `OrganisationIdentity`); inherited sibling access remains parent-and-period-aware.
 
 ### Access must be enforced server-side
 
@@ -536,6 +544,8 @@ Current address, contact details and lead-centre coordinates may continue to com
 
 The report builder is not required to implement the initial `AuditPeriodOrganisation` foundation and should be refactored as a separate step after the new model, services, permissions and audit-period-aware routes are in place.
 
+The eventual refactor should make the report builder filter cases using all the filters in the filterset, scoped to the user's permissions and the selected audit period — consistent with the period-aware dashboard and case collections. This is a substantial refactor because the report builder currently uses an all-period, current-hierarchy interpretation, so it is deferred to a separate PR. The foundation must not break the existing report builder; if the refactor proves too large to land alongside the foundation, the existing behaviour is retained so long as nothing breaks.
+
 ### Compatibility during the foundation
 
 Adding `AuditPeriodOrganisation` is additive and does not by itself affect the report builder. The existing report builder can continue to use:
@@ -624,7 +634,7 @@ If a historical `AuditPeriodOrganisation` assignment is corrected after publicat
 
 The `rcpch-nhs-organisations` API is the source of truth for organisational state, history and mergers. The local models (`Organisation`, `Trust`, `IntegratedCareBoard`, `LocalHealthBoard`, `NHSEnglandRegion`, `OPENUKNetwork`, `Country`) are a synchronised mirror. The sync upserts local tables from the API; mergers and reorganisations are made in the API first and flow down via sync.
 
-The sync has three layers:
+The sync has four layers:
 
 ### 1. Current-state sync (existing)
 
@@ -632,7 +642,7 @@ The existing `sync_current_state()` function in `epilepsy12/general_functions/nh
 
 ### 2. Per-cohort hierarchy sync (new)
 
-A new management command populates `AuditPeriodOrganisation` rows for each audit period. For each `AuditPeriod` and each participating organisation, it calls the API's snapshot endpoint:
+A new management command (`sync_audit_period_organisations`) populates `AuditPeriodOrganisation` rows for each audit period. For each `AuditPeriod` and each participating organisation, it calls the API's snapshot endpoint:
 
 ```text
 GET /organisations/{ods_code}/snapshot/?date={reference_date}
@@ -645,12 +655,19 @@ The sync upserts an `AuditPeriodOrganisation` row with:
 - the `organisation` FK pointing at the local `Organisation` row whose ODS code was in use during that period (which may be a predecessor ODS code);
 - the `audit_period` FK;
 - the hierarchy FKs (`trust`, `local_health_board`, `integrated_care_board`, `nhs_england_region`, `openuk_network`, `country`) resolved from the snapshot response;
+- snapshot name fields (`trust_name_snapshot`, etc.) for historical display labels;
 - `included_in_reporting` set to `True` by default (subject to audit-team approval);
 - provenance metadata recording that the row was sourced from the API snapshot.
 
 The sync also upserts any historical `Trust` / `ICB` / `LHB` rows that the snapshot returns but do not yet exist locally (e.g. a dissolved trust that is no longer in the API's list endpoint but appears in a historical snapshot). These rows carry `active=False` and are retained as FK targets for historical memberships.
 
 This is a batch operation run via a management command, not at request time. It is idempotent: re-running it for the same period upserts the same rows.
+
+#### Detail-endpoint fallback
+
+The API's temporal history layer only started recording on ~2026-08-08. For dates before that (which includes all historical audit period reference dates), the snapshot endpoint returns 404. For future dates, it returns a reduced shape with `country`/`ICB`/`region`/`network` all `null`.
+
+The sync handles this by falling back to the detail endpoint (`/organisations/{ods_code}/`), which returns the current state with the full hierarchy. The `source` field on `AuditPeriodOrganisation` records whether the row came from `"snapshot"` or `"detail_fallback"`. Rows with `source="detail_fallback"` should be re-synced once the API backfills temporal history.
 
 ### 3. Succession sync (new)
 
@@ -662,17 +679,48 @@ The API's succession data records when two ODS codes represent the same physical
 
 This handles arbitrary-length succession chains: if a hospital later changes its ODS code again (`RJZ30` → `RXZ40`), the sync links `RXZ40` to the same `OrganisationIdentity`.
 
+#### Identity linking step (post current-state sync)
+
+The per-cohort sync (layer 2) links `OrganisationIdentity` when the snapshot returns `predecessor_ods_code`. But the snapshot for an old ODS code at a historical date doesn't return a predecessor (the old code was the one in use at that time). The identity linking happens in a separate step after the current-state sync creates new ODS code rows.
+
+`link_organisation_identities()` (triggered by `--link-identities`) processes each active `Organisation` without an `identity` FK. It calls the snapshot at a historical date; if the API walks the succession chain and returns `predecessor_ods_code`, it links both rows to the same `OrganisationIdentity`. This bridges the gap when an organisation changes its ODS code following a trust merger or dissolution.
+
+### 4. Reconciliation (new)
+
+After the sync, `reconcile_period()` produces a verification report confirming:
+
+- **hierarchy changes** — Trust/LHB changes between consecutive periods, confirming mergers/acquisitions flowed through correctly;
+- **registration attribution** — registration counts per organisation per period, confirming the attribution chain is intact and no registrations are orphaned;
+- **sibling organisations** — sibling sets per organisation per period, confirming that after a merger/affiliation/split an organisation correctly has the right siblings.
+
+This is the counterpart to the sync command's `--dry-run` flag: the dry-run signposts the changes expected, and the reconciliation confirms that the sync was successful.
+
 ### Reference date
 
 The per-cohort sync needs a reference date for the snapshot call. This determines which trust/ICB is used for the whole cohort if a merger happens mid-cohort.
 
 The `AuditPeriod` model currently has `submission_deadline` and `data_collection_end_date` fields. The recommended reference date is `data_collection_end_date`, because this represents the end of the audit period's data collection window and is the most accurate reflection of the organisational hierarchy during the period in which cases were being managed. The `submission_deadline` includes a grace period that extends beyond the period's actual data collection.
 
+Note: `data_collection_end_date` is an audit-wide field on `AuditPeriod` and is not per-organisation. The per-organisation extendable date is `AuditPeriodExtension.extended_submission_date`, which extends the *submission deadline*, not the data-collection end date. There is therefore no per-organisation `data_collection_end_date` to use as a reference; the audit-wide value is the reference date for the per-cohort sync.
+
+A different reference date may be chosen later for the *publication* snapshot if the audit team decides publication should reflect organisational structure as of a different point (for example the submission deadline). The foundation reference date and the publication reference date may legitimately differ.
+
 This decision should be confirmed by the audit team before the sync runs. If a different reference date is needed per period, an explicit `hierarchy_reference_date` field can be added to `AuditPeriod`.
 
 ### Ordering constraint
 
-The per-cohort sync (layer 2) must run **before** the current-state sync (layer 1) for the first time, to avoid the window where `Organisation.trust` has been updated to current state but `AuditPeriodOrganisation` is not yet populated for historical periods. Once both have run, the order does not matter: historical reporting reads `AuditPeriodOrganisation`, current-state operations read `Organisation` directly.
+The per-cohort sync (layer 2) must run **before** the current-state sync (layer 1) for the first time, to avoid the window where `Organisation.trust` has been updated to current state but `AuditPeriodOrganisation` is not yet populated for historical periods. Once both have run, the order does not matter for subsequent runs: historical reporting reads `AuditPeriodOrganisation`, current-state operations read `Organisation` directly.
+
+The identity linking step (layer 3) must run **after** the current-state sync, because it processes new `Organisation` rows created by the current-state sync.
+
+The recommended production workflow for the first run is:
+
+1. `python manage.py sync_audit_period_organisations` — per-cohort sync (freezes historical state);
+2. `python manage.py sync_nhs_organisations` — current-state sync (creates new ODS code rows);
+3. `python manage.py sync_audit_period_organisations --link-identities` — links successors to predecessors;
+4. `python manage.py sync_audit_period_organisations --reconcile` — confirms the changes.
+
+Individual organisations can be tested with `--ods-code` before running the full sync.
 
 ## Migration and backfill
 
@@ -705,7 +753,7 @@ General rules for the sequence are:
 - introduce new services alongside legacy call sites before switching consumers; and
 - run the full test suite before merging each pull request, in addition to the targeted tests listed below.
 
-### Optional PR 0 — critical-workflow characterisation tests
+### Optional PR 0 — critical-workflow characterisation tests ✅ COMPLETE
 
 This is a test-only pull request if the current coverage is not sufficient to protect the following work.
 
@@ -716,18 +764,18 @@ Scope:
 - add a smoke test for the current report-builder route and representative facets; and
 - record the current dashboard route and redirect behaviour.
 
-Likely test areas:
+Delivered in `epilepsy12/tests/view_tests/test_critical_workflow_characterisation.py`:
 
-- `epilepsy12/tests/model_tests/test_audit_period.py`;
-- `epilepsy12/tests/view_tests/test_audit_period_extension.py`;
-- `epilepsy12/tests/view_tests/permissions_tests/test_permissions_closed_cohort.py`;
-- `epilepsy12/tests/view_tests/permissions_tests/test_permissions_organisational_audit.py`;
-- `epilepsy12/tests/view_tests/test_organisation_views.py`; and
-- `epilepsy12/tests/view_tests/case_filters/`.
+- 4 submission/locking tests (lead clinician locks, RCPCH audit team unlocks, clinician locks, closed-cohort POST forbidden);
+- 2 report-builder smoke tests (loads for lead clinician, redirects to login for anonymous);
+- 3 dashboard route/redirect tests (redirects to login for anonymous, loads with `?cohort=`, defaults to grace/submitting);
+- 2 Organisational Audit export tests (CSV with submission, CSV with empty period).
 
-Exit condition: the critical existing workflows have tests that will fail if later shared-service or permission changes cause a regression.
+All tests use `date.today() - timedelta(days=30)` for open-cohort cases so they are date-independent. The closed-cohort test uses cohort 4 (permanently closed).
 
-### PR 1 — `AuditPeriodOrganisation` and `OrganisationIdentity` models, schema migration
+Exit condition: the critical existing workflows have tests that will fail if later shared-service or permission changes cause a regression. ✅
+
+### PR 1 — `AuditPeriodOrganisation` and `OrganisationIdentity` models, schema migration ✅ COMPLETE
 
 This pull request is additive and must not change any runtime query, route or permission behaviour.
 
@@ -745,23 +793,22 @@ Scope:
 
 Do not include publication models, dashboard query changes, permission changes or report-builder changes.
 
-New tests should cover:
+Delivered:
 
-- one row per `(audit_period, organisation)`;
-- valid English Trust/ICB/region membership;
-- valid Welsh LHB membership;
-- invalid or incomplete parent combinations;
-- `PROTECT` behaviour for referenced audit periods, organisations and hierarchy entities;
-- history creation;
-- coexistence of different parent assignments for the same organisation in concurrent periods;
-- `OrganisationIdentity` linking multiple `Organisation` rows (ODS code succession); and
-- `OrganisationIdentity` `PROTECT` behaviour when an `Organisation` row is referenced.
+- `epilepsy12/models_folder/audit_period_organisation.py` — `AuditPeriodOrganisation` model with hierarchy FKs, snapshot name fields (interim display labels), approval/provenance fields, `HistoricalRecords`;
+- `epilepsy12/models_folder/organisation_identity.py` — `OrganisationIdentity` model;
+- `epilepsy12/models_folder/entities/organisation.py` — added nullable `identity` FK;
+- `epilepsy12/admin.py` — admin registration for both models;
+- Migration `0067` creates the new tables and the `Organisation.identity` column;
+- `epilepsy12/tests/model_tests/test_audit_period_organisation.py` — 18 model tests covering uniqueness, valid English/Welsh membership, country required, concurrent periods, PROTECT behaviour, history, approval defaults, identity linking, and identity PROTECT.
 
-Expected existing-test refactoring should be minimal. Test factories that create an organisation and audit period should not silently create a membership unless the test explicitly asks for one; otherwise missing-membership cases become difficult to test.
+The `source` field default was later changed from `"api_snapshot"` to `"snapshot"` (migration `0068`) to reflect the three possible values: `snapshot`, `detail_fallback`, `manual`.
 
-Exit condition: the migration can be deployed to the live database without changing current application behaviour.
+The `geocode_coordinates` field SRID was changed from 27700 to 4326 (migration `0069`) to fix PostGIS transform errors for Jersey and other out-of-range coordinates. The migration transforms existing data in place using `ALTER TABLE ... TYPE ... USING ST_Transform`.
 
-### PR 2 — per-cohort sync, population, approval and hierarchy service layer
+Exit condition: the migration can be deployed to the live database without changing current application behaviour. ✅
+
+### PR 2 — per-cohort sync, population, approval and hierarchy service layer ✅ COMPLETE
 
 This pull request populates and reads the new source of truth but still does not switch user-facing routes.
 
@@ -777,26 +824,39 @@ Scope:
 - make missing or ambiguous membership raise an explicit domain error with no fallback to current relationships; and
 - add readiness validation that can report whether an audit period has complete approved memberships.
 
-The sync must run before the current-state sync for the first time, to avoid the window where `Organisation.trust` has been updated to current state but `AuditPeriodOrganisation` is not yet populated for historical periods.
+Delivered:
 
-A normal data migration should not silently declare reconstructed historical relationships authoritative. Historical backfill needs an auditable, repeatable process and clinical/audit-team review.
+- `epilepsy12/general_functions/audit_period_hierarchy.py` — hierarchy service layer: `get_membership()`, `get_reporting_hierarchy()`, `get_organisations_for_parent()`, `get_sibling_organisations()`, `is_period_ready()`, `period_readiness_report()`. `MembershipMissing` and `MembershipUnapproved` domain errors with no fallback to current relationships.
+- `epilepsy12/general_functions/audit_period_sync.py` — per-cohort sync: `sync_audit_period()`, `sync_all_audit_periods()`, `_sync_organisation_for_period()`. Upserts `AuditPeriodOrganisation` rows with hierarchy FKs and snapshot name fields. Upserts dissolved hierarchy entities from snapshot responses. Links `OrganisationIdentity` from succession data. Idempotent; does not overwrite approved rows.
+- `epilepsy12/general_functions/audit_period_reconciliation.py` — post-sync verification: `reconcile_hierarchy_changes()` (reports Trust/LHB changes between periods), `reconcile_registration_attribution()` (counts registrations per org, detects orphaned registrations/memberships), `reconcile_sibling_organisations()` (lists siblings per org per period), `reconcile_period()` (combines all three).
+- `epilepsy12/management/commands/sync_audit_period_organisations.py` — management command with flags:
+  - `--cohort N` — sync a single period;
+  - `--ods-code CODE` — sync only the specified ODS code(s); can be passed multiple times (e.g. `--ods-code RGT01 --ods-code RP401`);
+  - `--dry-run` — report what would be synced without writing;
+  - `--reconcile` — run reconciliation after sync;
+  - `--link-identities` — link `OrganisationIdentity` rows after current-state sync.
+- `epilepsy12/tests/model_tests/test_audit_period_sync.py` — 29 tests covering hierarchy services, sync, reconciliation, and identity linking.
 
-New tests should cover:
+#### Detail-endpoint fallback
 
-- command idempotency (re-running for the same period upserts the same rows);
-- snapshot response parsing and `AuditPeriodOrganisation` upsert with correct hierarchy FKs;
-- upsert of dissolved `Trust` / `ICB` / `LHB` rows from historical snapshots;
-- `OrganisationIdentity` linking for ODS code succession (single and multi-step chains);
-- candidate provenance;
-- preservation of an already-reviewed historical assignment (sync does not overwrite approved rows);
-- missing-hierarchy reporting (API 404 for a snapshot);
-- approval and readiness checks;
-- service results for Organisation A moving from Trust A to Trust B between periods; and
-- queries accepting an `AuditPeriod` instance rather than a cohort integer.
+The API's temporal history layer only started recording on ~2026-08-08. The snapshot endpoint returns 404 for all historical audit period reference dates (2022–2027), and for future dates it returns a reduced shape with `country`/`ICB`/`region`/`network` all `null`.
 
-Existing fixtures and seeded data may need explicit membership rows where these new services are exercised. Existing application consumers remain on their old paths in this pull request.
+The sync tries the snapshot endpoint first. If it returns 404 (no temporal history) or a response with no `country` (reduced shape), it falls back to the detail endpoint (`/organisations/{ods_code}/`), which returns the current state with the full hierarchy. The `source` field on `AuditPeriodOrganisation` records whether the row came from `"snapshot"` or `"detail_fallback"`, so the audit team can re-sync once the API backfills temporal history.
 
-Exit condition: required historical membership rows can be generated, reviewed and queried without changing the live dashboard.
+#### Identity linking step
+
+After the current-state sync (`sync_nhs_organisations`) creates new `Organisation` rows for successor ODS codes, `link_organisation_identities()` links them to their predecessors via `OrganisationIdentity`. For each active `Organisation` without an `identity` FK, it calls the API snapshot at a historical date; if the API walks the succession chain and returns `predecessor_ods_code`, it links both rows to the same `OrganisationIdentity`. Handles multi-step succession chains across multiple runs. Triggered by the `--link-identities` flag.
+
+#### Production workflow
+
+1. `python manage.py sync_audit_period_organisations` — per-cohort sync (freezes historical state);
+2. `python manage.py sync_nhs_organisations` — current-state sync (creates new ODS code rows);
+3. `python manage.py sync_audit_period_organisations --link-identities` — links successors to predecessors;
+4. `python manage.py sync_audit_period_organisations --reconcile` — confirms the changes.
+
+Individual organisations can be tested with `--ods-code` before running the full sync.
+
+Exit condition: required historical membership rows can be generated, reviewed and queried without changing the live dashboard. ✅
 
 ### PR 3 — period-aware permission services
 
@@ -1088,16 +1148,18 @@ When it is refactored:
 
 ## Decisions still required
 
-1. Do direct organisation users retain access to all historical periods or only open/in-flight periods?
-2. Does period-aware parent access permit viewing only, or also editing while the registration remains editable?
-3. Should a direct organisation user see historical parent aggregates even when they cannot open sibling organisations' patient records?
-4. What is the authoritative source and approval workflow for historical membership backfill?
+1. **Resolved:** direct organisation users retain access to **all** of their organisation's historical cases, irrespective of historical affiliation. Direct access follows the organisation across all periods and ODS code changes via `OrganisationIdentity`.
+2. Does period-aware parent access permit viewing only, or also editing while the registration remains editable? (Editing remains separately constrained by submission deadlines; the viewing/editing boundary for inherited access is still to be confirmed.)
+3. **Resolved:** a direct organisation user can see their own organisation's historical cases (including across ODS code changes via `OrganisationIdentity`), but can only see sibling organisations' cases through their **current** affiliation — current Trust/LHB and other hierarchies, scoped to the periods in which that parent was the organisation's reporting parent. Inherited access never crosses the succession chain to a historical parent.
+4. **Resolved:** the authoritative source for historical membership backfill is the `rcpch-nhs-organisations` API `snapshot` endpoint at the period's reference date, populated by the per-cohort sync. Approval occurs as part of the backfill: sync-sourced rows are candidates until approved by the audit team, and approved rows are not overwritten by re-running the sync.
 5. Should inactive organisations remain selectable for periods in which they participated?
 6. Is an explicit "all authorised periods" dashboard view required?
 7. Which current organisation fields remain operational sources after the migration, and which should eventually be derived from the latest membership?
 8. Does the Organisational Audit permission model require any separately approved change following a Trust/LHB reorganisation, or should it continue to use current parent relationships?
-9. **Confirmed: the per-cohort hierarchy reference date is `data_collection_end_date`.** This should be validated by the audit team before the sync runs.
-10. **Confirmed: `OrganisationIdentity` is the approach for ODS code succession**, not a self-FK on `Organisation`. This handles arbitrary-length succession chains and supports longitudinal reporting across code changes.
+9. **Confirmed: the per-cohort hierarchy reference date is `data_collection_end_date`** (audit-wide on `AuditPeriod`; not per-organisation). A different reference date may be chosen later for the publication snapshot. This should be validated by the audit team before the sync runs.
+10. **Confirmed: `OrganisationIdentity` is the approach for ODS code succession**, not a self-FK on `Organisation`. This handles arbitrary-length succession chains and is the authoritative grouping for longitudinal reporting within E12, populated by the per-cohort sync from the API's succession data.
 11. **Confirmed: `AuditPeriodOrganisation` carries hierarchy FKs** (trust, LHB, ICB, region, network, country), populated by the per-cohort sync from the API snapshot endpoint. Hierarchy is not deferred to publication time; the local rows serve the dashboard and permission services. Publication may still freeze its own copy for immutability.
+12. **Resolved:** `Site` does not need to reference `AuditPeriodOrganisation` directly. `Site.organisation` continues to point at a single `Organisation` row; period-awareness is resolved at the service layer via `Site.organisation` → `Registration.audit_period` → `AuditPeriodOrganisation`.
+13. **Resolved:** the `Organisation` / `Trust` / `ICB` / etc. models become the source of truth synced from the API, and their FKs from `Organisation` should be changed to `on_delete=models.PROTECT` so that referenced hierarchy entities cannot be deleted (only retired/marked inactive). `AuditPeriodOrganisation` FKs are also `PROTECT`. Existing relationships must not be broken by the migration.
 
 These decisions affect access and presentation but do not change the central design: historical reporting affiliation is determined by `AuditPeriodOrganisation`, selected through `Registration.audit_period`, while publications retain their own immutable copy.

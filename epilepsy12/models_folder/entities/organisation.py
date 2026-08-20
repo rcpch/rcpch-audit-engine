@@ -49,7 +49,7 @@ class Organisation(TimeStampAbstractBaseClass):
     latitude = FloatField(max_length=100, null=True, blank=True, default=None)
     longitude = FloatField(null=True, blank=True, default=None)
     postcode = CharField(max_length=15, null=True, blank=True, default=None)
-    geocode_coordinates = PointField(null=True, blank=True, default=None, srid=27700)
+    geocode_coordinates = PointField(null=True, blank=True, default=None, srid=4326)
     active = BooleanField(
         default=True
     )  # a boolean representing if this Organisation is still operational
@@ -103,6 +103,21 @@ class Organisation(TimeStampAbstractBaseClass):
 
     country = models.ForeignKey(
         to="epilepsy12.Country", on_delete=models.PROTECT, null=True, blank=True
+    )
+
+    # Stable identity of the physical hospital, independent of ODS code.
+    # Nullable during migration and backfilled by the per-cohort sync from
+    # the API's succession data. Multiple Organisation rows (one per ODS
+    # code) can point at the same OrganisationIdentity.
+    identity = models.ForeignKey(
+        to="epilepsy12.OrganisationIdentity",
+        on_delete=models.PROTECT,
+        null=True,
+        blank=True,
+        related_name="ods_codes",
+        help_text="The stable identity of the physical hospital, "
+        "independent of ODS code. Links successive Organisation rows "
+        "that represent the same hospital across ODS code changes.",
     )
 
     history = HistoricalRecords(cascade_delete_history=True)
