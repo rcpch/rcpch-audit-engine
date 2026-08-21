@@ -973,3 +973,133 @@ def dry_run_diff(only: str | None = None) -> dict[str, dict[str, Any]]:
         results["organisations"]["changed"] = augmented_changed
 
     return results
+
+
+# ---------------------------------------------------------------------------
+# Pre-sync safety check
+# ---------------------------------------------------------------------------
+
+# Hierarchy FK fields on Organisation whose change is high-impact (moves
+# cases between reporting parents). A change to any of these triggers the
+# safety check.
+_HIGH_IMPACT_ORG_FK_FIELDS = {
+    "trust",
+    "local_health_board",
+    "integrated_care_board",
+    "nhs_england_region",
+    "openuk_network",
+    "country",
+}
+
+
+def pre_sync_safety_check(only: str | None = None) -> dict[str, Any]:
+    """Run the dry-run diff and decide whether the live sync is safe.
+
+    This is the guard that runs before the live ``sync_current_state``
+    commits. It enforces two rules:
+
+    1. **Ordering constraint** — if the sync would move any organisation's
+       trust/LHB (or flip any trust/LHB ``active``), and any in-flight audit
+       period (recruiting / data collection / grace) has no approved
+       ``AuditPeriodOrganisation`` rows, the sync is blocked. Historical
+       memberships must be frozen *before* the live rows are mutated,
+       otherwise the live dashboard has no period-aware source of truth to
+       fall back to and cases would be silently reattributed.
+
+    2. **Impact confirmation** — if the sync would affect any registrations
+       or cases (an organisation moving trust/LHB, or a trust/LHB going
+       inactive), the caller must confirm explicitly. The exposure counts are
+       returned so the command can print them and require ``--confirm``.
+
+    Returns a dict with:
+    - ``blocked``: bool — True if the ordering constraint blocks the sync.
+    - ``block_reason``: str — human-readable explanation if blocked.
+    - ``requires_confirm``: bool — True if the sync would affect
+      registrations/cases and the caller must confirm.
+    - ``total_registrations``: int — registrations across all changed entities.
+    - ``total_registrations_in_flight``: int — in-flight registrations affected.
+    - ``total_cases``: int — distinct cases affected.
+    - ``high_impact_changes``: list of (entity, identifier, description) for
+      the changes that triggered the impact confirmation.
+    """
+    diffs = dry_run_diff(only=only)
+
+    total_registrations = 0
+    total_registrations_in_flight = 0
+    total_cases = 0
+    high_impact_changes: list[tuple[str, str, str]] = []
+    has_org_fk_move = False
+    has_parent_active_flip = False
+
+    for entity_name, diff in diffs.items():
+        for entry in diff.get("changed", []):
+            identifier = entry[0]
+            field_diffs = entry[2]
+            exposure = entry[3] if len(entry) > 3 else None
+
+            # Detect organisation FK moves.
+            if entity_name == "organisations":
+                moved_fks = _HIGH_IMPACT_ORG_FK_FIELDS & set(field_diffs.keys())
+                if moved_fks:
+                    has_org_fk_move = True
+                    for fk in sorted(moved_fks):
+                        old_label, new_label = field_diffs[fk]
+                        high_impact_changes.append(
+                            (entity_name, identifier, f"{fk}: {old_label} -> {new_label}")
+                        )
+
+            # Detect trust/LHB active flips.
+            if entity_name in ("trusts", "local_health_boards") and "active" in field_diffs:
+                has_parent_active_flip = True
+                old_active, new_active = field_diffs["active"]
+                high_impact_changes.append(
+                    (entity_name, identifier, f"active: {old_active} -> {new_active}")
+                )
+
+            if exposure:
+                total_registrations += exposure.get("registrations_all_periods", 0)
+                total_registrations_in_flight += exposure.get("registrations_in_flight", 0)
+                total_cases += exposure.get("cases_all_periods", 0)
+
+    requires_confirm = bool(total_registrations or total_cases)
+
+    # Ordering constraint: if the sync would move orgs or flip parent active,
+    # and any in-flight period lacks approved memberships, block.
+    blocked = False
+    block_reason = ""
+    if (has_org_fk_move or has_parent_active_flip) and only in (None, "organisations", "trusts", "local_health_boards"):
+        AuditPeriod = _get_model("AuditPeriod")
+        AuditPeriodOrganisation = _get_model("AuditPeriodOrganisation")
+        today = date_class.today()
+        in_flight_periods = AuditPeriod.objects.filter(
+            recruitment_start_date__lte=today,
+            submission_deadline__gte=today,
+        )
+        unapproved_in_flight = []
+        for period in in_flight_periods:
+            approved_count = AuditPeriodOrganisation.objects.filter(
+                audit_period=period,
+                approved_at__isnull=False,
+            ).count()
+            if approved_count == 0:
+                unapproved_in_flight.append(period.cohort_number)
+        if unapproved_in_flight:
+            blocked = True
+            block_reason = (
+                "This sync would move organisations between trusts/LHBs or flip "
+                "a trust/LHB active flag, but the following in-flight audit "
+                f"periods have no approved AuditPeriodOrganisation rows: "
+                f"{', '.join(str(c) for c in unapproved_in_flight)}. Run "
+                "`sync_audit_period_organisations` first to freeze historical "
+                "memberships before mutating live organisation rows."
+            )
+
+    return {
+        "blocked": blocked,
+        "block_reason": block_reason,
+        "requires_confirm": requires_confirm,
+        "total_registrations": total_registrations,
+        "total_registrations_in_flight": total_registrations_in_flight,
+        "total_cases": total_cases,
+        "high_impact_changes": high_impact_changes,
+    }

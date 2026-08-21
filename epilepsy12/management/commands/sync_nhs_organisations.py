@@ -6,10 +6,23 @@ Usage:
     python manage.py sync_nhs_organisations           # sync all entities
     python manage.py sync_nhs_organisations --dry-run  # report what would change, write nothing
     python manage.py sync_nhs_organisations --only trusts  # sync only the specified entity
+    python manage.py sync_nhs_organisations --confirm  # proceed despite registration/case impact
 
 The command calls ``sync_current_state()`` which upserts Trust, LocalHealthBoard,
 IntegratedCareBoard, NHSEnglandRegion, Country, OPENUKNetwork and Organisation
 rows from the API's list endpoints, wiring up the foreign keys on Organisation.
+
+Before the live sync commits, a pre-sync safety check runs the dry-run diff
+internally and enforces two rules:
+
+1. **Ordering constraint** — if the sync would move any organisation's
+   trust/LHB or flip any trust/LHB ``active`` flag, and any in-flight audit
+   period (recruiting / data collection / grace) has no approved
+   ``AuditPeriodOrganisation`` rows, the sync is blocked. Historical
+   memberships must be frozen before live rows are mutated.
+2. **Impact confirmation** — if the sync would affect any registrations or
+   cases, ``--confirm`` is required. Without it, the sync aborts and prints
+   the exposure summary.
 
 This replaces the old direct NHS ODS (Spine) sync that was in
 ``epilepsy12/general_functions/ods_update.py`` (now removed).
@@ -68,6 +81,16 @@ class Command(BaseCommand):
             "Note: when syncing only 'organisations', parent entities must already "
             "exist in the local DB — they will be resolved by ODS code / boundary "
             "identifier on demand.",
+        )
+        parser.add_argument(
+            "--confirm",
+            action="store_true",
+            help="Confirm that you have reviewed the exposure report and accept "
+            "the impact on registrations and cases. Required when the sync would "
+            "move an organisation between trusts/LHBs or flip a trust/LHB active "
+            "flag and any registrations or cases are attached to the affected "
+            "organisations. Without --confirm, the sync aborts and prints the "
+            "exposure summary. Run --dry-run first to see the exposure.",
         )
 
     def handle(self, *args, **options):
@@ -182,6 +205,65 @@ class Command(BaseCommand):
                 self.style.SUCCESS("Dry-run complete. No changes written.")
             )
             return
+
+        # Live sync
+        # Run the pre-sync safety check before mutating anything. This
+        # enforces the ordering constraint (historical memberships must be
+        # frozen before live rows are moved) and requires --confirm when the
+        # sync would affect registrations or cases.
+        from epilepsy12.general_functions.nhs_organisations_sync import pre_sync_safety_check
+
+        try:
+            safety = pre_sync_safety_check(only=only)
+        except Exception as e:
+            self.stdout.write(self.style.ERROR(f"API error during pre-sync safety check: {e}"))
+            raise
+
+        if safety["blocked"]:
+            self.stdout.write(
+                self.style.ERROR("Sync blocked by the ordering constraint:")
+            )
+            self.stdout.write(self.style.ERROR(f"  {safety['block_reason']}"))
+            self.stdout.write(
+                "  Run `python manage.py sync_audit_period_organisations` first, "
+                "then re-run this command."
+            )
+            return
+
+        if safety["requires_confirm"] and not options["confirm"]:
+            self.stdout.write(
+                self.style.WARNING(
+                    "This sync would affect registrations or cases. "
+                    "Run with --dry-run to see the full exposure report, "
+                    "or pass --confirm to proceed."
+                )
+            )
+            self.stdout.write("")
+            self.stdout.write(
+                f"  Affected registrations: {safety['total_registrations']} "
+                f"({safety['total_registrations_in_flight']} in-flight)"
+            )
+            self.stdout.write(f"  Affected cases: {safety['total_cases']}")
+            if safety["high_impact_changes"]:
+                self.stdout.write("")
+                self.stdout.write("  High-impact changes:")
+                for entity, identifier, description in safety["high_impact_changes"][:20]:
+                    self.stdout.write(f"    {entity}: {identifier} — {description}")
+                if len(safety["high_impact_changes"]) > 20:
+                    self.stdout.write(
+                        f"    ... and {len(safety['high_impact_changes']) - 20} more"
+                    )
+            return
+
+        if safety["requires_confirm"] and options["confirm"]:
+            self.stdout.write(
+                self.style.WARNING(
+                    f"Proceeding with confirmed impact: "
+                    f"{safety['total_registrations']} registrations "
+                    f"({safety['total_registrations_in_flight']} in-flight), "
+                    f"{safety['total_cases']} cases."
+                )
+            )
 
         # Live sync
         if only:

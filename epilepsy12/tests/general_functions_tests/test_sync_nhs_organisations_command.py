@@ -88,7 +88,19 @@ def test_sync_nhs_organisations_live_sync_calls_sync_current_state():
         "openuk_networks": 12,
         "organisations": 200,
     }
-    with patch.object(cmd, "sync_current_state", return_value=fake_result):
+    fake_safety = {
+        "blocked": False,
+        "block_reason": "",
+        "requires_confirm": False,
+        "total_registrations": 0,
+        "total_registrations_in_flight": 0,
+        "total_cases": 0,
+        "high_impact_changes": [],
+    }
+    with patch.object(cmd, "sync_current_state", return_value=fake_result), patch(
+        "epilepsy12.general_functions.nhs_organisations_sync.pre_sync_safety_check",
+        return_value=fake_safety,
+    ):
         out = StringIO()
         call_command("sync_nhs_organisations", stdout=out)
 
@@ -108,9 +120,21 @@ def test_sync_nhs_organisations_live_sync_calls_sync_current_state():
 def test_sync_nhs_organisations_only_trusts():
     """--only trusts syncs only trusts, not all entities."""
     fake_trusts = {"RGT": "trust_obj"}
+    fake_safety = {
+        "blocked": False,
+        "block_reason": "",
+        "requires_confirm": False,
+        "total_registrations": 0,
+        "total_registrations_in_flight": 0,
+        "total_cases": 0,
+        "high_impact_changes": [],
+    }
     with patch.object(cmd, "sync_trusts", return_value=fake_trusts) as mock_sync_trusts, patch.object(
         cmd, "sync_current_state"
-    ) as mock_sync_all:
+    ) as mock_sync_all, patch(
+        "epilepsy12.general_functions.nhs_organisations_sync.pre_sync_safety_check",
+        return_value=fake_safety,
+    ):
         out = StringIO()
         call_command("sync_nhs_organisations", "--only", "trusts", stdout=out)
 

@@ -747,6 +747,46 @@ For trust/LHB `active` flips, the exposure is aggregated across all organisation
 
 The command prints a per-entity exposure line for each changed entity and a total exposure summary at the end. This lets the audit team see, before running the live current-state sync, exactly how many registrations and cases a reorganisation would touch — and specifically how many are in in-flight cohorts where the live dashboard has not yet been cut over to period-aware queries.
 
+### Current-state sync safety guards
+
+The live `sync_nhs_organisations` command (without `--dry-run`) runs a pre-sync safety check before committing. This enforces two rules that protect cases and registrations when organisations move between trusts/LHBs or trusts go inactive:
+
+#### Ordering constraint
+
+If the sync would move any organisation's `trust` / `local_health_board` (or flip any trust/LHB `active` flag), and any **in-flight audit period** (recruiting, in data collection, or in grace) has no approved `AuditPeriodOrganisation` rows, the sync is **blocked**.
+
+The rationale: the live dashboard has not yet been cut over to period-aware queries (that is PR 4). While it still reads `Organisation.trust` directly, moving that FK reattributes cases silently. The `AuditPeriodOrganisation` rows are the period-aware source of truth that publication will read instead — but they must exist and be approved before the live rows are mutated, otherwise there is no fallback. The block message tells the user to run `sync_audit_period_organisations` first.
+
+Once the in-flight period has approved memberships, the block is lifted. The live sync can then move `Organisation.trust` knowing that publication will read the frozen membership, not the live FK.
+
+#### Impact confirmation (`--confirm`)
+
+If the sync would affect any registrations or cases (an organisation moving trust/LHB, or a trust/LHB going inactive), the command requires `--confirm`. Without it, the sync aborts and prints the exposure summary: total registrations affected (all periods and in-flight), total distinct cases affected, and the list of high-impact changes (which organisation moved which FK, which trust flipped `active`).
+
+This makes the exposure report actionable rather than advisory: you cannot accidentally run the live sync and move 500 cases without explicitly confirming you have seen the number. The recommended workflow is:
+
+1. `python manage.py sync_nhs_organisations --dry-run` — review the exposure report;
+2. `python manage.py sync_audit_period_organisations` — freeze historical memberships (if the ordering constraint blocks);
+3. `python manage.py sync_nhs_organisations --confirm` — proceed with the live sync.
+
+A sync that changes only low-impact fields (e.g. a trust rename with no organisation move and no `active` flip) does not require `--confirm` and is not blocked by the ordering constraint.
+
+### Reorganisation integration tests
+
+The sync workflow is tested against the three canonical reorganisation shapes to verify that cases and registrations follow their organisation/trust/LHB correctly across the per-cohort and current-state syncs:
+
+- **Merger** — two trusts combine into one; their organisations move to the surviving trust. Cohort 4 (historical) memberships are frozen with GOSH under RP4 and KINGS under RJZ. After the current-state sync moves both orgs to the merged trust, the frozen cohort 4 memberships still point at RP4 and RJZ respectively — historical reporting is preserved.
+- **Acquisition** — one trust absorbs another; the acquired trust's organisations move to the acquirer. GOSH (under RP4) moves to RJZ. The frozen cohort 4 membership stays at RP4.
+- **Split** — one trust divides into two; its organisations split between the two new trusts. GOSH (under RP4) moves to SPL1. The frozen cohort 4 membership stays at RP4.
+
+For each, the test verifies that:
+
+1. the live `Organisation.trust` FK moves to the new trust (the current-state sync owns this);
+2. the frozen `AuditPeriodOrganisation` membership for the historical cohort stays pointing at the old trust (the per-cohort sync owns this, and is not overwritten by the current-state sync);
+3. registrations in the historical cohort remain attributed to the old trust via the frozen membership, while the live FK follows the reorganisation.
+
+A fourth test covers the in-flight cohort: when the current-state sync moves an organisation's trust, the frozen in-flight membership is not overwritten — the per-cohort sync must be re-run to pick up the new trust. This is the expected behaviour: the in-flight cohort's membership is a candidate (unapproved) until the audit team reviews and approves it, and re-running the per-cohort sync updates it.
+
 ### Re-running the per-cohort sync for the in-flight cohort
 
 Although the per-cohort sync freezes state at a period's reference date, the **currently in-flight cohort** (recruiting, in data collection, or in grace) is not yet historical. Its organisational hierarchy can still change while the cohort is open — a trust merger announced mid-cohort changes the hierarchy that will apply to cases registered before and after the merger.
