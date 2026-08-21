@@ -35,6 +35,7 @@ import logging
 from typing import Any
 
 from django.apps import apps
+from django.db.models import Count
 
 logger = logging.getLogger(__name__)
 
@@ -151,8 +152,6 @@ def reconcile_registration_attribution(audit_period) -> dict[str, Any]:
     Organisation = _get_model("Organisation")
 
     # Count registrations per organisation for this period.
-    from django.db.models import Count
-
     reg_counts = dict(
         Registration.objects.filter(audit_period=audit_period)
         .values("case__epilepsy12_sites__organisation")
