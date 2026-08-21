@@ -89,34 +89,121 @@ class Command(BaseCommand):
                     "Reporting what the sync would do..."
                 )
             )
-            # The dry-run reports what would change by inspecting the current
-            # state of the API against the local DB. For now, we report the
-            # periods that would be synced and the organisations that would
-            # be processed.
-            from epilepsy12.models import AuditPeriod, Registration
+            # The dry-run inspects the current state of the API against the
+            # local DB and reports, per organisation, what the sync would do:
+            # create a new membership row, update an existing unapproved row,
+            # skip an already-approved row, or report an error. It calls the
+            # same API endpoints as the live sync but writes nothing.
+            from epilepsy12.models import AuditPeriod, Organisation, Registration
+            from epilepsy12.general_functions.audit_period_sync import (
+                _sync_organisation_for_period_dry_run,
+            )
 
             periods = AuditPeriod.objects.all().order_by("cohort_number")
             if cohort:
                 periods = periods.filter(cohort_number=cohort)
 
             for period in periods:
-                participating_org_ids = (
+                reference_date = period.data_collection_end_date
+                participating_org_ids = set(
                     Registration.objects.filter(audit_period=period)
                     .values_list("case__epilepsy12_sites__organisation", flat=True)
                     .distinct()
                 )
-                org_count = len(set(participating_org_ids))
-                if ods_codes:
-                    from epilepsy12.models import Organisation
-                    org_count = Organisation.objects.filter(
-                        id__in=participating_org_ids,
-                        ods_code__in=ods_codes,
-                    ).count()
-                self.stdout.write(
-                    f"  Cohort {period.cohort_number}: would sync {org_count} "
-                    f"organisations at reference date "
-                    f"{period.data_collection_end_date.isoformat()}"
+                organisations = Organisation.objects.filter(
+                    id__in=participating_org_ids
                 )
+                if ods_codes:
+                    organisations = organisations.filter(ods_code__in=ods_codes)
+
+                self.stdout.write(
+                    f"  Cohort {period.cohort_number} "
+                    f"(reference date {reference_date.isoformat()}, "
+                    f"{organisations.count()} organisations):"
+                )
+
+                would_create = 0
+                would_update = 0
+                would_in_sync = 0
+                would_skip_approved = 0
+                would_error = 0
+                total_registrations_in_period = 0
+                total_registrations_all_periods = 0
+                total_cases_all_periods = 0
+                error_registrations_in_period = 0
+                error_registrations_all_periods = 0
+                error_cases_all_periods = 0
+                for organisation in organisations:
+                    result = _sync_organisation_for_period_dry_run(
+                        organisation, period, reference_date
+                    )
+                    status = result["status"]
+                    reg_in_period = result["registration_count_in_period"]
+                    reg_all = result["registration_count_all_periods"]
+                    cases_all = result["case_count_all_periods"]
+                    total_registrations_in_period += reg_in_period
+                    total_registrations_all_periods += reg_all
+                    total_cases_all_periods += cases_all
+                    exposure_str = (
+                        f"{reg_in_period} reg in period, "
+                        f"{reg_all} reg all periods, "
+                        f"{cases_all} cases all periods"
+                    )
+                    if status == "create":
+                        would_create += 1
+                        self.stdout.write(
+                            f"    + {organisation.ods_code} ({organisation.name}): "
+                            f"would create membership ({exposure_str})"
+                        )
+                    elif status == "update":
+                        would_update += 1
+                        changes = result.get("changes") or []
+                        change_str = ", ".join(changes) if changes else "(no diff reported)"
+                        self.stdout.write(
+                            f"    ~ {organisation.ods_code} ({organisation.name}): "
+                            f"would update unapproved membership ({change_str}) "
+                            f"[{exposure_str}]"
+                        )
+                    elif status == "in_sync":
+                        would_in_sync += 1
+                    elif status == "skip_approved":
+                        would_skip_approved += 1
+                    elif status == "error":
+                        would_error += 1
+                        error_registrations_in_period += reg_in_period
+                        error_registrations_all_periods += reg_all
+                        error_cases_all_periods += cases_all
+                        self.stdout.write(
+                            self.style.ERROR(
+                                f"    ! {organisation.ods_code} ({organisation.name}): "
+                                f"{result.get('error') or 'unknown error'} "
+                                f"[{exposure_str}]"
+                            )
+                        )
+
+                self.stdout.write(
+                    f"    Summary: {would_create} to create, "
+                    f"{would_update} to update, "
+                    f"{would_in_sync} already in sync, "
+                    f"{would_skip_approved} approved (skipped), "
+                    f"{would_error} errors"
+                )
+                self.stdout.write(
+                    f"    Exposure: {total_registrations_in_period} registrations "
+                    f"in this period, {total_registrations_all_periods} across "
+                    f"all periods, {total_cases_all_periods} distinct cases "
+                    f"across all periods"
+                )
+                if would_error:
+                    self.stdout.write(
+                        self.style.ERROR(
+                            f"    Behind errors: {error_registrations_in_period} "
+                            f"registrations in this period, "
+                            f"{error_registrations_all_periods} across all "
+                            f"periods, {error_cases_all_periods} cases across "
+                            f"all periods would be affected by these errors"
+                        )
+                    )
 
             self.stdout.write(
                 self.style.SUCCESS("Dry-run complete. No changes written.")

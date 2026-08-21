@@ -33,6 +33,8 @@ from epilepsy12.general_functions.audit_period_hierarchy import (
     get_membership,
     get_reporting_hierarchy,
     get_organisations_for_parent,
+    get_participating_organisations,
+    get_expected_reporting_hierarchies,
     get_sibling_organisations,
     is_period_ready,
     period_readiness_report,
@@ -42,6 +44,7 @@ from epilepsy12.general_functions.audit_period_hierarchy import (
 from epilepsy12.general_functions.audit_period_sync import (
     sync_audit_period,
     _sync_organisation_for_period,
+    _sync_organisation_for_period_dry_run,
     _upsert_organisation_identity,
     link_organisation_identities,
 )
@@ -244,6 +247,117 @@ def test_get_organisations_for_parent_excludes_unapproved(cohort_4, england_hier
 
 
 # ---------------------------------------------------------------------------
+# Hierarchy service layer — get_participating_organisations
+# ---------------------------------------------------------------------------
+
+@pytest.mark.django_db
+def test_get_participating_organisations_returns_approved_included(
+    cohort_4, england_hierarchy
+):
+    GOSH = Organisation.objects.get(ods_code="RP401", trust__ods_code="RP4")
+    KINGS = Organisation.objects.get(ods_code="RJZ01", trust__ods_code="RJZ")
+
+    AuditPeriodOrganisation.objects.create(
+        audit_period=cohort_4, organisation=GOSH,
+        country=england_hierarchy["country"], trust=england_hierarchy["trust"],
+        approved_at=date(2024, 1, 1),
+    )
+    AuditPeriodOrganisation.objects.create(
+        audit_period=cohort_4, organisation=KINGS,
+        country=england_hierarchy["country"], trust=england_hierarchy["trust"],
+        approved_at=date(2024, 1, 1),
+    )
+
+    org_ids = list(get_participating_organisations(cohort_4))
+    assert GOSH.id in org_ids
+    assert KINGS.id in org_ids
+
+
+@pytest.mark.django_db
+def test_get_participating_organisations_excludes_unapproved_and_excluded(
+    cohort_4, england_hierarchy
+):
+    GOSH = Organisation.objects.get(ods_code="RP401", trust__ods_code="RP4")
+    KINGS = Organisation.objects.get(ods_code="RJZ01", trust__ods_code="RJZ")
+
+    # GOSH: approved but excluded from reporting
+    AuditPeriodOrganisation.objects.create(
+        audit_period=cohort_4, organisation=GOSH,
+        country=england_hierarchy["country"], trust=england_hierarchy["trust"],
+        approved_at=date(2024, 1, 1),
+        included_in_reporting=False,
+    )
+    # KINGS: included but unapproved
+    AuditPeriodOrganisation.objects.create(
+        audit_period=cohort_4, organisation=KINGS,
+        country=england_hierarchy["country"], trust=england_hierarchy["trust"],
+        # unapproved
+    )
+
+    org_ids = list(get_participating_organisations(cohort_4))
+    assert org_ids == []
+
+
+# ---------------------------------------------------------------------------
+# Hierarchy service layer — get_expected_reporting_hierarchies
+# ---------------------------------------------------------------------------
+
+@pytest.mark.django_db
+def test_get_expected_reporting_hierarchies_returns_distinct_parents(
+    cohort_4, england_hierarchy
+):
+    GOSH = Organisation.objects.get(ods_code="RP401", trust__ods_code="RP4")
+    KINGS = Organisation.objects.get(ods_code="RJZ01", trust__ods_code="RJZ")
+
+    AuditPeriodOrganisation.objects.create(
+        audit_period=cohort_4, organisation=GOSH,
+        country=england_hierarchy["country"], trust=england_hierarchy["trust"],
+        integrated_care_board=england_hierarchy["icb"],
+        nhs_england_region=england_hierarchy["region"],
+        openuk_network=england_hierarchy["network"],
+        approved_at=date(2024, 1, 1),
+    )
+    AuditPeriodOrganisation.objects.create(
+        audit_period=cohort_4, organisation=KINGS,
+        country=england_hierarchy["country"], trust=england_hierarchy["trust"],
+        integrated_care_board=england_hierarchy["icb"],
+        nhs_england_region=england_hierarchy["region"],
+        openuk_network=england_hierarchy["network"],
+        approved_at=date(2024, 1, 1),
+    )
+
+    hierarchies = get_expected_reporting_hierarchies(cohort_4)
+    assert set(hierarchies.keys()) == {
+        "country", "trust", "local_health_board",
+        "integrated_care_board", "nhs_england_region", "openuk_network",
+    }
+    # Two orgs under the same trust/ICB/region/network/country — distinct = 1 each.
+    assert len(hierarchies["trust"]) == 1
+    assert hierarchies["trust"][0] == england_hierarchy["trust"]
+    assert len(hierarchies["country"]) == 1
+    assert len(hierarchies["integrated_care_board"]) == 1
+    assert len(hierarchies["nhs_england_region"]) == 1
+    assert len(hierarchies["openuk_network"]) == 1
+    # No Welsh orgs in this period — LHB list is empty.
+    assert hierarchies["local_health_board"] == []
+
+
+@pytest.mark.django_db
+def test_get_expected_reporting_hierarchies_excludes_unapproved(cohort_4, england_hierarchy):
+    GOSH = Organisation.objects.get(ods_code="RP401", trust__ods_code="RP4")
+
+    AuditPeriodOrganisation.objects.create(
+        audit_period=cohort_4, organisation=GOSH,
+        country=england_hierarchy["country"], trust=england_hierarchy["trust"],
+        # unapproved
+    )
+
+    hierarchies = get_expected_reporting_hierarchies(cohort_4)
+    assert hierarchies["trust"] == []
+    assert hierarchies["country"] == []
+
+
+# ---------------------------------------------------------------------------
 # Hierarchy service layer — get_sibling_organisations
 # ---------------------------------------------------------------------------
 
@@ -325,6 +439,50 @@ def test_is_period_ready_false_when_missing(cohort_4, e12_case_factory):
 
     # No membership row created
     assert is_period_ready(cohort_4) is False
+
+
+@pytest.mark.django_db
+def test_is_period_ready_false_when_unapproved_row_without_registrations(
+    cohort_4, england_hierarchy
+):
+    """An unapproved membership row blocks readiness even when the
+    organisation has no registrations in the period. The previous definition
+    only checked organisations with registrations, which let unapproved
+    rows for zero-registration organisations slip through. Publication and
+    dashboard selectors iterate over membership rows, not registrations, so
+    an unapproved row must block readiness regardless of registrations.
+    """
+    GOSH = Organisation.objects.get(ods_code="RP401", trust__ods_code="RP4")
+
+    # Unapproved membership, no registrations in the period.
+    AuditPeriodOrganisation.objects.create(
+        audit_period=cohort_4, organisation=GOSH,
+        country=england_hierarchy["country"], trust=england_hierarchy["trust"],
+        # unapproved
+    )
+
+    assert is_period_ready(cohort_4) is False
+
+
+@pytest.mark.django_db
+def test_period_readiness_report_lists_unapproved_without_registrations(
+    cohort_4, england_hierarchy
+):
+    """The readiness report should list an unapproved membership row even
+    when the organisation has no registrations in the period.
+    """
+    GOSH = Organisation.objects.get(ods_code="RP401", trust__ods_code="RP4")
+
+    AuditPeriodOrganisation.objects.create(
+        audit_period=cohort_4, organisation=GOSH,
+        country=england_hierarchy["country"], trust=england_hierarchy["trust"],
+        # unapproved
+    )
+
+    report = period_readiness_report(cohort_4)
+    assert report["ready"] is False
+    assert GOSH.id in report["unapproved_memberships"]
+    assert report["missing_memberships"] == []
 
 
 # ---------------------------------------------------------------------------
@@ -469,6 +627,8 @@ def test_sync_falls_back_to_detail_on_404(cohort_4, england_hierarchy):
         organisation=GOSH, audit_period=cohort_4
     )
     assert membership.source == "detail_fallback"
+
+
 @pytest.mark.django_db
 def test_sync_falls_back_to_detail_on_re_raised_404(cohort_4, england_hierarchy):
     """When the snapshot endpoint re-raises a 404 with a 'No snapshot exists'
@@ -528,11 +688,351 @@ def test_sync_reports_error_when_both_endpoints_fail(cohort_4):
 
 
 # ---------------------------------------------------------------------------
-# Per-cohort sync — dissolved trust upsert
+# Per-cohort sync — dry-run
 # ---------------------------------------------------------------------------
 
 @pytest.mark.django_db
-def test_sync_upserts_dissolved_trust(cohort_4):
+def test_dry_run_reports_create_when_no_existing_membership(
+    cohort_4, england_hierarchy
+):
+    """The dry-run reports 'create' when no membership row exists, and writes
+    nothing to the database."""
+    GOSH = Organisation.objects.get(ods_code="RP401", trust__ods_code="RP4")
+
+    snapshot = _make_snapshot_response()
+
+    with patch(
+        "epilepsy12.general_functions.audit_period_sync.get_organisation_snapshot",
+        return_value=snapshot,
+    ):
+        result = _sync_organisation_for_period_dry_run(
+            GOSH, cohort_4, cohort_4.data_collection_end_date
+        )
+
+    assert result["status"] == "create"
+    assert result["source"] == "snapshot"
+    # Nothing written.
+    assert not AuditPeriodOrganisation.objects.filter(
+        organisation=GOSH, audit_period=cohort_4
+    ).exists()
+
+
+@pytest.mark.django_db
+def test_dry_run_reports_skip_approved_when_existing_approved(
+    cohort_4, england_hierarchy
+):
+    """The dry-run reports 'skip_approved' when an approved membership row
+    already exists, and writes nothing."""
+    GOSH = Organisation.objects.get(ods_code="RP401", trust__ods_code="RP4")
+
+    AuditPeriodOrganisation.objects.create(
+        audit_period=cohort_4, organisation=GOSH,
+        country=england_hierarchy["country"], trust=england_hierarchy["trust"],
+        approved_at=date(2024, 1, 1),
+    )
+
+    snapshot = _make_snapshot_response(
+        trust_ods_code="RJZ",
+        trust_name="KING'S COLLEGE HOSPITAL NHS FOUNDATION TRUST",
+    )
+
+    with patch(
+        "epilepsy12.general_functions.audit_period_sync.get_organisation_snapshot",
+        return_value=snapshot,
+    ):
+        result = _sync_organisation_for_period_dry_run(
+            GOSH, cohort_4, cohort_4.data_collection_end_date
+        )
+
+    assert result["status"] == "skip_approved"
+    # The approved row is untouched.
+    membership = AuditPeriodOrganisation.objects.get(
+        organisation=GOSH, audit_period=cohort_4
+    )
+    assert membership.trust == england_hierarchy["trust"]
+
+
+@pytest.mark.django_db
+def test_dry_run_reports_update_with_diff_for_unapproved_row(
+    cohort_4, england_hierarchy
+):
+    """The dry-run reports 'update' with a hierarchy diff when an unapproved
+    membership row exists and the snapshot would change its trust."""
+    GOSH = Organisation.objects.get(ods_code="RP401", trust__ods_code="RP4")
+    KINGS_TRUST = Trust.objects.get(ods_code="RJZ")
+
+    # Existing unapproved row under King's trust.
+    AuditPeriodOrganisation.objects.create(
+        audit_period=cohort_4, organisation=GOSH,
+        country=england_hierarchy["country"], trust=KINGS_TRUST,
+        trust_name_snapshot="KING'S COLLEGE HOSPITAL NHS FOUNDATION TRUST",
+        # unapproved
+    )
+
+    # Snapshot would assign GOSH trust (the seeded GOSH trust).
+    snapshot = _make_snapshot_response()
+
+    with patch(
+        "epilepsy12.general_functions.audit_period_sync.get_organisation_snapshot",
+        return_value=snapshot,
+    ):
+        result = _sync_organisation_for_period_dry_run(
+            GOSH, cohort_4, cohort_4.data_collection_end_date
+        )
+
+    assert result["status"] == "update"
+    # The diff should mention the trust change.
+    trust_changes = [c for c in result["changes"] if c.startswith("trust:")]
+    assert len(trust_changes) == 1
+    # Nothing written — the unapproved row still has King's trust.
+    membership = AuditPeriodOrganisation.objects.get(
+        organisation=GOSH, audit_period=cohort_4
+    )
+    assert membership.trust == KINGS_TRUST
+
+
+@pytest.mark.django_db
+def test_dry_run_reports_in_sync_when_nothing_would_change(
+    cohort_4, england_hierarchy
+):
+    """The dry-run reports 'in_sync' when an unapproved membership row exists
+    and the snapshot would write the same hierarchy FKs, snapshot names,
+    source and included_in_reporting. The live sync would still fire
+    update_or_create, but there is no meaningful change to report.
+    """
+    GOSH = Organisation.objects.get(ods_code="RP401", trust__ods_code="RP4")
+
+    # Build a snapshot whose nested hierarchy entities match the real
+    # seeded GOSH hierarchy exactly, so the dry-run resolves the same FKs
+    # the existing row already points at. The previous version used the
+    # _make_snapshot_response defaults (hardcoded ODS codes), which did not
+    # match the seeded ICB/region/network/country and so always reported
+    # "update".
+    trust = england_hierarchy["trust"]
+    icb = england_hierarchy["icb"]
+    region = england_hierarchy["region"]
+    network = england_hierarchy["network"]
+    country = england_hierarchy["country"]
+
+    snapshot = _make_snapshot_response(
+        trust_ods_code=trust.ods_code,
+        trust_name=trust.name,
+        icb_ods_code=icb.ods_code,
+        icb_name=icb.name,
+        region_code=region.region_code,
+        region_name=region.name,
+        network_boundary_id=network.boundary_identifier,
+        network_name=network.name,
+        country_boundary_id=country.boundary_identifier,
+        country_name=country.name,
+    )
+
+    # Create an unapproved row that exactly matches what the snapshot would
+    # write, including the snapshot name fields and source.
+    AuditPeriodOrganisation.objects.create(
+        audit_period=cohort_4, organisation=GOSH,
+        country=country,
+        trust=trust,
+        integrated_care_board=icb,
+        nhs_england_region=region,
+        openuk_network=network,
+        country_name_snapshot=country.name,
+        trust_name_snapshot=trust.name,
+        local_health_board_name_snapshot="",
+        integrated_care_board_name_snapshot=icb.name,
+        nhs_england_region_name_snapshot=region.name,
+        openuk_network_name_snapshot=network.name,
+        source="snapshot",
+        included_in_reporting=True,
+        # unapproved
+    )
+
+    with patch(
+        "epilepsy12.general_functions.audit_period_sync.get_organisation_snapshot",
+        return_value=snapshot,
+    ):
+        result = _sync_organisation_for_period_dry_run(
+            GOSH, cohort_4, cohort_4.data_collection_end_date
+        )
+
+    assert result["status"] == "in_sync"
+    assert result["changes"] == []
+
+
+@pytest.mark.django_db
+def test_dry_run_reports_snapshot_name_diff_when_fk_unchanged(
+    cohort_4, england_hierarchy
+):
+    """The dry-run reports a snapshot-name change even when the FK is the
+    same — the live sync rewrites the snapshot name from the API response,
+    so a renamed trust (same ODS code, different name) is a real change.
+    """
+    GOSH = Organisation.objects.get(ods_code="RP401", trust__ods_code="RP4")
+
+    # Existing unapproved row under the seeded GOSH trust, but with a stale
+    # snapshot name.
+    AuditPeriodOrganisation.objects.create(
+        audit_period=cohort_4, organisation=GOSH,
+        country=england_hierarchy["country"], trust=england_hierarchy["trust"],
+        trust_name_snapshot="OLD TRUST NAME",
+        # unapproved
+    )
+
+    # Snapshot returns the same trust ODS code but the current name.
+    snapshot = _make_snapshot_response()
+
+    with patch(
+        "epilepsy12.general_functions.audit_period_sync.get_organisation_snapshot",
+        return_value=snapshot,
+    ):
+        result = _sync_organisation_for_period_dry_run(
+            GOSH, cohort_4, cohort_4.data_collection_end_date
+        )
+
+    assert result["status"] == "update"
+    name_changes = [
+        c for c in result["changes"] if c.startswith("trust_name_snapshot:")
+    ]
+    assert len(name_changes) == 1
+    assert "OLD TRUST NAME" in name_changes[0]
+    # No FK change reported.
+    fk_changes = [c for c in result["changes"] if c.startswith("trust:")]
+    assert fk_changes == []
+
+
+@pytest.mark.django_db
+def test_dry_run_reports_error_on_api_failure(cohort_4):
+    """The dry-run reports 'error' when the API call fails, and writes nothing."""
+    GOSH = Organisation.objects.get(ods_code="RP401", trust__ods_code="RP4")
+
+    from epilepsy12.general_functions.nhs_organisations import NHSOrganisationsAPIError
+
+    with patch(
+        "epilepsy12.general_functions.audit_period_sync.get_organisation_snapshot",
+        side_effect=NHSOrganisationsAPIError("500: server error"),
+    ):
+        result = _sync_organisation_for_period_dry_run(
+            GOSH, cohort_4, cohort_4.data_collection_end_date
+        )
+
+    assert result["status"] == "error"
+    assert "500" in result["error"]
+    assert not AuditPeriodOrganisation.objects.filter(
+        organisation=GOSH, audit_period=cohort_4
+    ).exists()
+
+
+@pytest.mark.django_db
+def test_dry_run_reports_registration_and_case_impact_counts(
+    cohort_4, england_hierarchy, e12_case_factory
+):
+    """The dry-run reports registration counts (in period and all periods) and
+    case counts (all periods, including cases without a registration) for each
+    organisation, so the audit team can see how many cases a membership change
+    would touch — including cases that are attached to the organisation via
+    ``Site`` but have no ``Registration`` yet.
+    """
+    GOSH = Organisation.objects.get(ods_code="RP401", trust__ods_code="RP4")
+
+    # Two registered cases in cohort 4 (the period being synced).
+    e12_case_factory(
+        first_name="impact_1",
+        organisations__organisation=GOSH,
+        registration__first_paediatric_assessment_date=date(2021, 6, 1),
+        registration__audit_period__cohort_number=4,
+    )
+    e12_case_factory(
+        first_name="impact_2",
+        organisations__organisation=GOSH,
+        registration__first_paediatric_assessment_date=date(2021, 7, 1),
+        registration__audit_period__cohort_number=4,
+    )
+    # One registered case in a different cohort — should appear in the
+    # all-periods registration count but not the in-period count.
+    e12_case_factory(
+        first_name="impact_other",
+        organisations__organisation=GOSH,
+        registration__first_paediatric_assessment_date=date(2020, 6, 1),
+        registration__audit_period__cohort_number=3,
+    )
+
+    snapshot = _make_snapshot_response()
+
+    with patch(
+        "epilepsy12.general_functions.audit_period_sync.get_organisation_snapshot",
+        return_value=snapshot,
+    ):
+        result = _sync_organisation_for_period_dry_run(
+            GOSH, cohort_4, cohort_4.data_collection_end_date
+        )
+
+    # 2 registrations in the synced period, 3 across all periods, 3 distinct
+    # cases across all periods.
+    assert result["registration_count_in_period"] == 2
+    assert result["registration_count_all_periods"] == 3
+    assert result["case_count_all_periods"] == 3
+
+
+@pytest.mark.django_db
+def test_dry_run_counts_cases_without_registrations(
+    cohort_4, england_hierarchy, e12_case_factory
+):
+    """The case count includes cases attached to the organisation via ``Site``
+    that have no ``Registration``. A hierarchy change still affects which
+    parent those cases group under, so they must be counted even though they
+    are not yet registered for the audit.
+    """
+    GOSH = Organisation.objects.get(ods_code="RP401", trust__ods_code="RP4")
+
+    # One registered case in cohort 4.
+    e12_case_factory(
+        first_name="registered",
+        organisations__organisation=GOSH,
+        registration__first_paediatric_assessment_date=date(2021, 6, 1),
+        registration__audit_period__cohort_number=4,
+    )
+    # One case attached to GOSH via Site but with no registration.
+    from epilepsy12.models import Case, Site
+    unregistered = Case.objects.create(
+        first_name="unregistered",
+        surname="test",
+        date_of_birth=date(2020, 1, 1),
+        nhs_number="9999999999",
+        sex=1,
+    )
+    Site.objects.create(
+        case=unregistered,
+        organisation=GOSH,
+        site_is_primary_centre_of_epilepsy_care=True,
+        site_is_actively_involved_in_epilepsy_care=True,
+    )
+
+    snapshot = _make_snapshot_response()
+
+    with patch(
+        "epilepsy12.general_functions.audit_period_sync.get_organisation_snapshot",
+        return_value=snapshot,
+    ):
+        result = _sync_organisation_for_period_dry_run(
+            GOSH, cohort_4, cohort_4.data_collection_end_date
+        )
+
+    assert result["registration_count_in_period"] == 1
+    assert result["registration_count_all_periods"] == 1
+    # Both cases counted, including the unregistered one.
+    assert result["case_count_all_periods"] == 2
+
+
+# ---------------------------------------------------------------------------
+# Per-cohort sync — dissolved trust creation
+# ---------------------------------------------------------------------------
+
+@pytest.mark.django_db
+def test_sync_creates_dissolved_trust_from_snapshot(cohort_4):
+    """A trust that only appears in a historical snapshot (not the current
+    list endpoint) is created locally with active=False so it can serve as
+    an FK target for historical memberships.
+    """
     GOSH = Organisation.objects.get(ods_code="RP401", trust__ods_code="RP4")
 
     snapshot = _make_snapshot_response(
@@ -555,6 +1055,50 @@ def test_sync_upserts_dissolved_trust(cohort_4):
         organisation=GOSH, audit_period=cohort_4
     )
     assert membership.trust == dissolved_trust
+
+
+@pytest.mark.django_db
+def test_sync_does_not_overwrite_existing_trust_current_state(cohort_4, england_hierarchy):
+    """The per-cohort sync must not mutate the live ``Trust`` row's
+    current-state fields (name, address, active, etc.). Those are owned by
+    the current-state sync (``sync_nhs_organisations``). Historical names
+    live in ``trust_name_snapshot`` on ``AuditPeriodOrganisation``.
+
+    This guards against a regression where the snapshot upsert used
+    ``update_or_create`` and would revert a renamed trust's live name to
+    its historical name when syncing an old cohort.
+    """
+    GOSH = Organisation.objects.get(ods_code="RP401", trust__ods_code="RP4")
+    live_trust = england_hierarchy["trust"]
+    live_name_before = live_trust.name
+    live_address_before = live_trust.address_line_1
+    live_active_before = live_trust.active
+
+    # Snapshot returns the same trust ODS code but a stale (historical)
+    # name and address, and active=False (as for a dissolved trust).
+    snapshot = _make_snapshot_response(
+        trust_ods_code=live_trust.ods_code,
+        trust_name="OLD HISTORICAL TRUST NAME",
+    )
+    snapshot["trust"]["active"] = False
+    snapshot["trust"]["address_line_1"] = "OLD ADDRESS LINE 1"
+
+    with patch(
+        "epilepsy12.general_functions.audit_period_sync.get_organisation_snapshot",
+        return_value=snapshot,
+    ):
+        _sync_organisation_for_period(GOSH, cohort_4, cohort_4.data_collection_end_date)
+
+    live_trust.refresh_from_db()
+    # Live row untouched.
+    assert live_trust.name == live_name_before
+    assert live_trust.address_line_1 == live_address_before
+    assert live_trust.active == live_active_before
+    # Historical name captured on the membership row instead.
+    membership = AuditPeriodOrganisation.objects.get(
+        organisation=GOSH, audit_period=cohort_4
+    )
+    assert membership.trust_name_snapshot == "OLD HISTORICAL TRUST NAME"
 
 
 # ---------------------------------------------------------------------------

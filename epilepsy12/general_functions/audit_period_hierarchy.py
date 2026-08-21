@@ -124,6 +124,82 @@ def get_organisations_for_parent(parent, audit_period, parent_field: str):
     ).select_related("organisation")
 
 
+def get_participating_organisations(audit_period):
+    """Return the organisations that participate in reporting for the given
+    audit period.
+
+    An organisation participates if it has an approved, included
+    ``AuditPeriodOrganisation`` row for the period. Organisations with
+    unapproved or excluded memberships are not returned.
+
+    Returns a queryset of ``Organisation`` instances.
+    """
+    AuditPeriodOrganisation = _get_model("AuditPeriodOrganisation")
+    return (
+        AuditPeriodOrganisation.objects.filter(
+            audit_period=audit_period,
+            approved_at__isnull=False,
+            included_in_reporting=True,
+        )
+        .select_related("organisation")
+        .values_list("organisation", flat=True)
+    )
+
+
+def get_expected_reporting_hierarchies(audit_period) -> dict[str, Any]:
+    """Return the distinct reporting hierarchies that apply across all
+    participating organisations for the given audit period.
+
+    Useful for populating parent-level selectors and for verifying that the
+    period's memberships cover the expected set of trusts, ICBs, regions,
+    networks and countries.
+
+    Returns a dict keyed by hierarchy field name (``"trust"``,
+    ``"local_health_board"``, ``"integrated_care_board"``,
+    ``"nhs_england_region"``, ``"openuk_network"``, ``"country"``). Each value
+    is a list of the distinct model instances of that hierarchy type used by
+    approved, included memberships for the period. Hierarchy fields that no
+    participating organisation uses (e.g. ``local_health_board`` for an
+    all-English period) return an empty list.
+    """
+    AuditPeriodOrganisation = _get_model("AuditPeriodOrganisation")
+
+    memberships = AuditPeriodOrganisation.objects.filter(
+        audit_period=audit_period,
+        approved_at__isnull=False,
+        included_in_reporting=True,
+    )
+
+    hierarchies: dict[str, list[Any]] = {}
+    for field in (
+        "country",
+        "trust",
+        "local_health_board",
+        "integrated_care_board",
+        "nhs_england_region",
+        "openuk_network",
+    ):
+        # values_list with flat=True on a nullable FK returns [None, ...] for
+        # organisations without that hierarchy; filter those out.
+        ids = [
+            pk
+            for pk in memberships.values_list(field, flat=True).distinct()
+            if pk is not None
+        ]
+        model_name = {
+            "country": "Country",
+            "trust": "Trust",
+            "local_health_board": "LocalHealthBoard",
+            "integrated_care_board": "IntegratedCareBoard",
+            "nhs_england_region": "NHSEnglandRegion",
+            "openuk_network": "OPENUKNetwork",
+        }[field]
+        model = _get_model(model_name)
+        hierarchies[field] = list(model.objects.filter(pk__in=ids))
+
+    return hierarchies
+
+
 def get_sibling_organisations(organisation, audit_period):
     """Return the sibling organisations for the given organisation and
     audit period — other organisations that share the same Trust or Local
@@ -153,18 +229,41 @@ def get_sibling_organisations(organisation, audit_period):
 
 
 def is_period_ready(audit_period) -> bool:
-    """Return True if every participating organisation for the given
-    audit period has an approved membership row.
+    """Return True if the audit period is ready for period-aware reporting.
 
-    An organisation is "participating" if it has at least one registration
-    in the audit period. This is a pragmatic definition: the sync may not
-    create rows for organisations that never participated in a historical
-    period, and we don't want to block readiness on those.
+    A period is ready when **both** of the following hold:
+
+    1. Every ``AuditPeriodOrganisation`` row for the period is approved —
+       there are no unapproved candidate rows.
+    2. Every organisation that has at least one registration in the period
+       has a membership row (no orphaned registrations).
+
+    The first condition catches sync-sourced candidate rows that the audit
+    team have not yet reviewed, even for organisations that have no
+    registrations in the period (e.g. an organisation that participated in
+    the audit but has no recruited cases in this period). The previous
+    definition only checked organisations with registrations, which meant
+    an unapproved membership row for a zero-registration organisation would
+    not block readiness — that is not fit for purpose, because publication
+    and dashboard selectors iterate over membership rows, not registrations.
+
+    A period with no membership rows at all is considered not ready unless
+    it also has no registrations, in which case there is nothing to report
+    and the period is trivially ready.
     """
     AuditPeriodOrganisation = _get_model("AuditPeriodOrganisation")
     Registration = _get_model("Registration")
 
-    # Organisations that have at least one registration in this period.
+    # Condition 1: no unapproved membership rows for the period.
+    has_unapproved = AuditPeriodOrganisation.objects.filter(
+        audit_period=audit_period,
+        approved_at__isnull=True,
+    ).exists()
+    if has_unapproved:
+        return False
+
+    # Condition 2: every organisation with a registration has a membership
+    # row (approved, since condition 1 already passed).
     participating_org_ids = set(
         Registration.objects.filter(
             audit_period=audit_period
@@ -175,7 +274,6 @@ def is_period_ready(audit_period) -> bool:
         # No registrations in this period — nothing to block readiness.
         return True
 
-    # Approved memberships for this period, for participating organisations.
     approved_org_ids = set(
         AuditPeriodOrganisation.objects.filter(
             audit_period=audit_period,
@@ -184,7 +282,6 @@ def is_period_ready(audit_period) -> bool:
         ).values_list("organisation_id", flat=True)
     )
 
-    # Every participating organisation must have an approved membership.
     return participating_org_ids.issubset(approved_org_ids)
 
 
@@ -192,16 +289,17 @@ def period_readiness_report(audit_period) -> dict[str, Any]:
     """Return a detailed readiness report for the given audit period.
 
     The report includes:
-    - ``ready``: bool — True if every participating organisation has an
-      approved membership.
+    - ``ready``: bool — True if the period is ready (see ``is_period_ready``):
+      no unapproved membership rows, and every organisation with a
+      registration has an approved membership row.
     - ``participating_organisations``: list of organisation IDs that have
       at least one registration in the period.
     - ``approved_memberships``: list of organisation IDs with approved
       membership rows.
-    - ``missing_memberships``: list of organisation IDs with no membership
-      row.
     - ``unapproved_memberships``: list of organisation IDs with a membership
       row that has not been approved.
+    - ``missing_memberships``: list of organisation IDs with a registration
+      in the period but no membership row.
     """
     AuditPeriodOrganisation = _get_model("AuditPeriodOrganisation")
     Registration = _get_model("Registration")
@@ -214,7 +312,6 @@ def period_readiness_report(audit_period) -> dict[str, Any]:
 
     memberships = AuditPeriodOrganisation.objects.filter(
         audit_period=audit_period,
-        organisation_id__in=participating_org_ids,
     )
 
     approved_org_ids = set()
@@ -228,7 +325,7 @@ def period_readiness_report(audit_period) -> dict[str, Any]:
     missing_org_ids = participating_org_ids - approved_org_ids - unapproved_org_ids
 
     return {
-        "ready": not missing_org_ids and not unapproved_org_ids,
+        "ready": not unapproved_org_ids and not missing_org_ids,
         "participating_organisations": sorted(participating_org_ids),
         "approved_memberships": sorted(approved_org_ids),
         "missing_memberships": sorted(missing_org_ids),

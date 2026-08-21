@@ -659,7 +659,7 @@ The sync upserts an `AuditPeriodOrganisation` row with:
 - `included_in_reporting` set to `True` by default (subject to audit-team approval);
 - provenance metadata recording that the row was sourced from the API snapshot.
 
-The sync also upserts any historical `Trust` / `ICB` / `LHB` rows that the snapshot returns but do not yet exist locally (e.g. a dissolved trust that is no longer in the API's list endpoint but appears in a historical snapshot). These rows carry `active=False` and are retained as FK targets for historical memberships.
+The sync also creates any historical `Trust` / `ICB` / `LHB` rows that the snapshot returns but do not yet exist locally (e.g. a dissolved trust that is no longer in the API's list endpoint but appears in a historical snapshot). These rows carry `active=False` and are retained as FK targets for historical memberships. **Existing hierarchy entity rows are never updated by the per-cohort sync** — the current-state sync (`sync_nhs_organisations`) owns the live name/address/etc. on `Trust`, `IntegratedCareBoard`, etc. Historical names are captured in the `*_name_snapshot` fields on `AuditPeriodOrganisation`, not by mutating the live hierarchy rows. This prevents syncing an old cohort from reverting a renamed trust's live name to its historical name.
 
 This is a batch operation run via a management command, not at request time. It is idempotent: re-running it for the same period upserts the same rows.
 
@@ -721,6 +721,33 @@ The recommended production workflow for the first run is:
 4. `python manage.py sync_audit_period_organisations --reconcile` — confirms the changes.
 
 Individual organisations can be tested with `--ods-code` before running the full sync.
+
+### The two sync commands are complementary
+
+The two management commands have distinct, non-overlapping responsibilities and must not be folded into one operation:
+
+- **`sync_nhs_organisations` (current-state sync)** owns the **live** `Organisation`, `Trust`, `LocalHealthBoard`, `IntegratedCareBoard`, `NHSEnglandRegion`, `OPENUKNetwork` and `Country` rows. It mutates them in place to match the API's current state — renames, coordinate corrections, `active` flips, and repointing `Organisation.trust` / `Organisation.local_health_board` / etc. to the current parent. This is the operational/directory source of truth: the live dashboard and admin read it to answer "where is this organisation now?".
+- **`sync_audit_period_organisations` (per-cohort sync)** owns the **period-aware** `AuditPeriodOrganisation` rows. It freezes the hierarchy as it was at each audit period's reference date. It **never** mutates live `Organisation` / `Trust` / etc. rows — it only creates dissolved hierarchy entities returned by a historical snapshot if they do not yet exist locally (with `active=False`). Historical names are captured in the `*_name_snapshot` fields on `AuditPeriodOrganisation`, not by rewriting the live hierarchy rows. This is the period-aware source of truth: KPI publication and period-aware permissions read it to answer "where was this organisation in cohort 7?".
+
+The separation is what makes the design safe: once the per-cohort sync has frozen cohort 7's trust assignment into `AuditPeriodOrganisation`, a later current-state sync can move `Organisation.trust` to the new trust without affecting cohort 7's KPIs — because publication reads the frozen membership, not the live FK. If the per-cohort sync mutated live rows in place, a reorganisation would silently rewrite history.
+
+### Re-running the per-cohort sync for the in-flight cohort
+
+Although the per-cohort sync freezes state at a period's reference date, the **currently in-flight cohort** (recruiting, in data collection, or in grace) is not yet historical. Its organisational hierarchy can still change while the cohort is open — a trust merger announced mid-cohort changes the hierarchy that will apply to cases registered before and after the merger.
+
+The per-cohort sync should therefore be **re-run periodically for the in-flight cohort** as well as for historical cohorts. It is idempotent and safe to re-run:
+
+- approved rows are never overwritten, so an approved historical membership is stable;
+- unapproved rows for the in-flight cohort are updated to the latest snapshot, which is the desired behaviour while the cohort is still open and the audit team have not yet approved the membership;
+- once the cohort closes and the audit team approve the membership, the row is frozen.
+
+The recommended cadence is to re-run `sync_audit_period_organisations` for the in-flight cohort whenever the current-state sync (`sync_nhs_organisations`) is run, or whenever the audit team are informed of a reorganisation affecting an in-flight cohort. The `--cohort` flag targets a single period if a full re-run is not needed.
+
+### Country invariant: England uses `Trust`, Wales uses `LocalHealthBoard`
+
+The hierarchy is country-specific. An English organisation's reporting parent is its **`Trust`** (`Organisation.trust` / `AuditPeriodOrganisation.trust`); a Welsh organisation's reporting parent is its **`Local Health Board`** (`Organisation.local_health_board` / `AuditPeriodOrganisation.local_health_board`). The two are mutually exclusive for a given organisation: an English organisation has `trust` set and `local_health_board` null; a Welsh organisation has `local_health_board` set and `trust` null.
+
+The per-cohort sync must not break this invariant. The snapshot response for an English organisation returns a `trust` and no `local_health_board`; for a Welsh organisation it returns a `local_health_board` and no `trust`. The sync upserts whichever nested entity the snapshot returns and leaves the other FK null, so the country-specific parent is preserved per period. The current-state sync (`sync_nhs_organisations`) must preserve the same invariant on the live `Organisation` row — an English organisation's `local_health_board` must not be populated, and a Welsh organisation's `trust` must not be populated. Reconciliation (`reconcile_hierarchy_changes`) reports Trust/LHB changes between periods but does not conflate the two: a change is reported against whichever of `trust` or `local_health_board` the membership row uses.
 
 ## Migration and backfill
 
@@ -826,16 +853,16 @@ Scope:
 
 Delivered:
 
-- `epilepsy12/general_functions/audit_period_hierarchy.py` — hierarchy service layer: `get_membership()`, `get_reporting_hierarchy()`, `get_organisations_for_parent()`, `get_sibling_organisations()`, `is_period_ready()`, `period_readiness_report()`. `MembershipMissing` and `MembershipUnapproved` domain errors with no fallback to current relationships.
-- `epilepsy12/general_functions/audit_period_sync.py` — per-cohort sync: `sync_audit_period()`, `sync_all_audit_periods()`, `_sync_organisation_for_period()`. Upserts `AuditPeriodOrganisation` rows with hierarchy FKs and snapshot name fields. Upserts dissolved hierarchy entities from snapshot responses. Links `OrganisationIdentity` from succession data. Idempotent; does not overwrite approved rows.
+- `epilepsy12/general_functions/audit_period_hierarchy.py` — hierarchy service layer: `get_membership()`, `get_reporting_hierarchy()`, `get_organisations_for_parent()`, `get_participating_organisations()`, `get_expected_reporting_hierarchies()`, `get_sibling_organisations()`, `is_period_ready()`, `period_readiness_report()`. `MembershipMissing` and `MembershipUnapproved` domain errors with no fallback to current relationships.
+- `epilepsy12/general_functions/audit_period_sync.py` — per-cohort sync: `sync_audit_period()`, `sync_all_audit_periods()`, `_sync_organisation_for_period()`. Upserts `AuditPeriodOrganisation` rows with hierarchy FKs and snapshot name fields. Creates dissolved hierarchy entities (`Trust` / `ICB` / `LHB` / region / network / country) from snapshot responses if they do not yet exist locally; **does not overwrite** existing hierarchy entity rows — the current-state sync owns the live name/address/etc., and historical names live in the `*_name_snapshot` fields on `AuditPeriodOrganisation`. Links `OrganisationIdentity` from succession data. Idempotent; does not overwrite approved rows.
 - `epilepsy12/general_functions/audit_period_reconciliation.py` — post-sync verification: `reconcile_hierarchy_changes()` (reports Trust/LHB changes between periods), `reconcile_registration_attribution()` (counts registrations per org, detects orphaned registrations/memberships), `reconcile_sibling_organisations()` (lists siblings per org per period), `reconcile_period()` (combines all three).
 - `epilepsy12/management/commands/sync_audit_period_organisations.py` — management command with flags:
   - `--cohort N` — sync a single period;
   - `--ods-code CODE` — sync only the specified ODS code(s); can be passed multiple times (e.g. `--ods-code RGT01 --ods-code RP401`);
-  - `--dry-run` — report what would be synced without writing;
+  - `--dry-run` — report what would be synced without writing; calls the API and reports, per organisation, whether the sync would create, update (with a per-field diff covering hierarchy FKs, snapshot name fields, `source` and `included_in_reporting`), leave the row in sync (unapproved row already matches the snapshot), skip an approved row, or error; **for each organisation also reports the number of registrations in the synced period, registrations across all periods, and distinct cases across all periods attached to that organisation** (including cases without a registration — they are still attached via `Site`, so a hierarchy change still affects which parent they group under); the per-period total and the count behind errors are summarised so the audit team can see how many registrations/cases a failed sync would leave without a membership; writes nothing to `AuditPeriodOrganisation` (but does create dissolved hierarchy entities returned by the snapshot that do not yet exist locally, matching the live sync's behaviour);
   - `--reconcile` — run reconciliation after sync;
   - `--link-identities` — link `OrganisationIdentity` rows after current-state sync.
-- `epilepsy12/tests/model_tests/test_audit_period_sync.py` — 29 tests covering hierarchy services, sync, reconciliation, and identity linking.
+- `epilepsy12/tests/model_tests/test_audit_period_sync.py` — 47 tests covering hierarchy services (including `get_participating_organisations` and `get_expected_reporting_hierarchies`), sync (including the no-overwrite guard for live hierarchy rows), reconciliation, identity linking, the dry-run (including `in_sync`, snapshot-name diffs, and registration/case impact counts including cases without registrations), and readiness (including unapproved rows without registrations).
 
 #### Detail-endpoint fallback
 
