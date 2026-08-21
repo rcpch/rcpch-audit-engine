@@ -731,6 +731,22 @@ The two management commands have distinct, non-overlapping responsibilities and 
 
 The separation is what makes the design safe: once the per-cohort sync has frozen cohort 7's trust assignment into `AuditPeriodOrganisation`, a later current-state sync can move `Organisation.trust` to the new trust without affecting cohort 7's KPIs — because publication reads the frozen membership, not the live FK. If the per-cohort sync mutated live rows in place, a reorganisation would silently rewrite history.
 
+### Current-state sync dry-run with exposure report
+
+`sync_nhs_organisations --dry-run` compares the API's current state against the local DB and reports, per entity type, what would change: new, changed (with field-level diffs), unchanged, and local-only. It writes nothing.
+
+For **organisations**, the dry-run also compares the nested relationship objects (`trust`, `local_health_board`, `integrated_care_board`, `nhs_england_region`, `openuk_network`, `country`) against the live FKs on `Organisation` — the flat-field comparison alone misses these, because the API returns nested dicts rather than flat fields. An organisation moving from one trust to another, or from one LHB to another, is reported as a FK change with the old and new parent labels.
+
+For each changed organisation and for each trust/LHB whose `active` flag would flip, the dry-run attaches an **exposure** dict counting:
+
+- `registrations_all_periods` — registrations under the organisation (or under all organisations in the trust/LHB) across every cohort;
+- `registrations_in_flight` — registrations whose `audit_period` is currently recruiting, in data collection, or in grace — the cohorts a current-state change could disrupt on the live dashboard before it is cut over to period-aware queries;
+- `cases_all_periods` — distinct cases under the organisation across all cohorts, **including cases without a registration** (they are still attached via `Site`, so a trust move or a trust going inactive still affects which parent they group under).
+
+For trust/LHB `active` flips, the exposure is aggregated across all organisations under that parent, and the count includes an `organisations` field showing how many organisations are affected.
+
+The command prints a per-entity exposure line for each changed entity and a total exposure summary at the end. This lets the audit team see, before running the live current-state sync, exactly how many registrations and cases a reorganisation would touch — and specifically how many are in in-flight cohorts where the live dashboard has not yet been cut over to period-aware queries.
+
 ### Re-running the per-cohort sync for the in-flight cohort
 
 Although the per-cohort sync freezes state at a period's reference date, the **currently in-flight cohort** (recruiting, in data collection, or in grace) is not yet historical. Its organisational hierarchy can still change while the cohort is open — a trust merger announced mid-cohort changes the hierarchy that will apply to cases registered before and after the merger.

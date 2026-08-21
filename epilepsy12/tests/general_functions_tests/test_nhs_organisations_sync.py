@@ -490,3 +490,173 @@ def test_sync_trusts_truncates_oversized_name():
         assert trust.name == "A" * 50
     finally:
         trust_field.max_length = original_max_length
+
+
+# ---------------------------------------------------------------------------
+# Dry-run: FK-move detection and exposure report
+# ---------------------------------------------------------------------------
+
+
+@pytest.mark.django_db
+def test_dry_run_detects_organisation_trust_move():
+    """The dry-run detects when an organisation's trust FK would change —
+    the flat-field comparison misses this because the API returns a nested
+    dict, not a flat field.
+    """
+    GOSH = Organisation.objects.get(ods_code="RP401", trust__ods_code="RP4")
+    KINGS_TRUST = Trust.objects.get(ods_code="RJZ")
+
+    # API returns GOSH under King's trust (a move from RP4 to RJZ).
+    api_org = {
+        **API_BASE_ORG,
+        "ods_code": "RP401",
+        "name": GOSH.name,
+        "trust": {"ods_code": "RJZ", "name": KINGS_TRUST.name},
+    }
+
+    with patch.object(nhs_organisations_sync, "list_organisations", return_value=[api_org]):
+        diffs = nhs_organisations_sync.dry_run_diff(only="organisations")
+
+    changed = diffs["organisations"]["changed"]
+    assert len(changed) == 1
+    identifier, name, field_diffs, exposure = changed[0]
+    assert identifier == "RP401"
+    assert "trust" in field_diffs
+    old_label, new_label = field_diffs["trust"]
+    assert "RP4" in old_label
+    assert "RJZ" in new_label
+
+
+@pytest.mark.django_db
+def test_dry_run_detects_organisation_lhb_move_for_welsh_org():
+    """The dry-run detects a LocalHealthBoard move on a Welsh organisation.
+    The country invariant (England=Trust, Wales=LHB) must not be broken —
+    the FK diff checks both fields independently.
+    """
+    welsh_org = Organisation.objects.get(ods_code="7A4H1", local_health_board__ods_code="7A4")
+    other_lhb = LocalHealthBoard.objects.exclude(ods_code="7A4").first()
+
+    api_org = {
+        **API_BASE_ORG,
+        "ods_code": "7A4H1",
+        "name": welsh_org.name,
+        "trust": "",
+        "local_health_board": {"ods_code": other_lhb.ods_code, "name": other_lhb.name},
+    }
+
+    with patch.object(nhs_organisations_sync, "list_organisations", return_value=[api_org]):
+        diffs = nhs_organisations_sync.dry_run_diff(only="organisations")
+
+    changed = diffs["organisations"]["changed"]
+    assert len(changed) >= 1
+    gosh_entry = [c for c in changed if c[0] == "7A4H1"]
+    assert len(gosh_entry) == 1
+    _, _, field_diffs, _ = gosh_entry[0]
+    assert "local_health_board" in field_diffs
+    assert "trust" not in field_diffs  # trust was already None
+
+
+@pytest.mark.django_db
+def test_dry_run_reports_organisation_exposure_counts(
+    cohort_4, e12_case_factory
+):
+    """The dry-run attaches an exposure dict to each changed organisation,
+    counting registrations (all periods + in-flight) and cases (all periods,
+    including cases without a registration).
+    """
+    GOSH = Organisation.objects.get(ods_code="RP401", trust__ods_code="RP4")
+
+    # Two registered cases in cohort 4.
+    e12_case_factory(
+        first_name="exposure_1",
+        organisations__organisation=GOSH,
+        registration__first_paediatric_assessment_date=date(2021, 6, 1),
+        registration__audit_period__cohort_number=4,
+    )
+    e12_case_factory(
+        first_name="exposure_2",
+        organisations__organisation=GOSH,
+        registration__first_paediatric_assessment_date=date(2021, 7, 1),
+        registration__audit_period__cohort_number=4,
+    )
+
+    # API returns a renamed GOSH (a field-level change, not an FK move).
+    api_org = {**API_BASE_ORG, "ods_code": "RP401", "name": "RENAMED HOSPITAL"}
+
+    with patch.object(nhs_organisations_sync, "list_organisations", return_value=[api_org]):
+        diffs = nhs_organisations_sync.dry_run_diff(only="organisations")
+
+    changed = diffs["organisations"]["changed"]
+    gosh_entry = [c for c in changed if c[0] == "RP401"]
+    assert len(gosh_entry) == 1
+    _, _, _, exposure = gosh_entry[0]
+    assert exposure["registrations_all_periods"] == 2
+    assert exposure["cases_all_periods"] == 2
+
+
+@pytest.mark.django_db
+def test_dry_run_counts_cases_without_registrations(e12_case_factory):
+    """The case count includes cases attached via Site with no Registration."""
+    from epilepsy12.models import Case, Site
+    GOSH = Organisation.objects.get(ods_code="RP401", trust__ods_code="RP4")
+
+    e12_case_factory(
+        first_name="registered",
+        organisations__organisation=GOSH,
+        registration__first_paediatric_assessment_date=date(2021, 6, 1),
+        registration__audit_period__cohort_number=4,
+    )
+    unregistered = Case.objects.create(
+        first_name="unregistered",
+        surname="test",
+        date_of_birth=date(2020, 1, 1),
+        nhs_number="8888888888",
+        sex=1,
+    )
+    Site.objects.create(
+        case=unregistered,
+        organisation=GOSH,
+        site_is_primary_centre_of_epilepsy_care=True,
+        site_is_actively_involved_in_epilepsy_care=True,
+    )
+
+    api_org = {**API_BASE_ORG, "ods_code": "RP401", "name": "RENAMED HOSPITAL"}
+
+    with patch.object(nhs_organisations_sync, "list_organisations", return_value=[api_org]):
+        diffs = nhs_organisations_sync.dry_run_diff(only="organisations")
+
+    changed = diffs["organisations"]["changed"]
+    gosh_entry = [c for c in changed if c[0] == "RP401"]
+    _, _, _, exposure = gosh_entry[0]
+    assert exposure["registrations_all_periods"] == 1
+    assert exposure["cases_all_periods"] == 2  # registered + unregistered
+
+
+@pytest.mark.django_db
+def test_dry_run_reports_trust_active_flip_exposure(e12_case_factory):
+    """When a trust's active flag would flip, the dry-run attaches an exposure
+    dict counting registrations and cases under all organisations in that trust.
+    """
+    GOSH = Organisation.objects.get(ods_code="RP401", trust__ods_code="RP4")
+
+    e12_case_factory(
+        first_name="trust_flip_1",
+        organisations__organisation=GOSH,
+        registration__first_paediatric_assessment_date=date(2021, 6, 1),
+        registration__audit_period__cohort_number=4,
+    )
+
+    # API returns GOSH trust as inactive.
+    api_trust = {**API_BASE_TRUST, "ods_code": "RP4", "active": False}
+
+    with patch.object(nhs_organisations_sync, "list_trusts", return_value=[api_trust]):
+        diffs = nhs_organisations_sync.dry_run_diff(only="trusts")
+
+    changed = diffs["trusts"]["changed"]
+    rp4_entry = [c for c in changed if c[0] == "RP4"]
+    assert len(rp4_entry) == 1
+    _, _, field_diffs, exposure = rp4_entry[0]
+    assert "active" in field_diffs
+    assert exposure["organisations"] >= 1
+    assert exposure["registrations_all_periods"] >= 1
+    assert exposure["cases_all_periods"] >= 1

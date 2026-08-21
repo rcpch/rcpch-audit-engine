@@ -120,11 +120,24 @@ class Command(BaseCommand):
 
                 if changed:
                     self.stdout.write(self.style.WARNING(f"    Changed (would be updated):"))
-                    for identifier, name, field_diffs in changed[:20]:
+                    for entry in changed[:20]:
+                        identifier, name, field_diffs = entry[0], entry[1], entry[2]
+                        exposure = entry[3] if len(entry) > 3 else None
                         self.stdout.write(f"      ~ {identifier}: {name}")
                         for field, (old_val, new_val) in field_diffs.items():
                             self.stdout.write(
                                 f"          {field}: {old_val!r} → {new_val!r}"
+                            )
+                        if exposure:
+                            self.stdout.write(
+                                f"          Exposure: {exposure['registrations_all_periods']} reg "
+                                f"({exposure['registrations_in_flight']} in-flight), "
+                                f"{exposure['cases_all_periods']} cases"
+                                + (
+                                    f" across {exposure['organisations']} organisations"
+                                    if "organisations" in exposure
+                                    else ""
+                                )
                             )
                     if len(changed) > 20:
                         self.stdout.write(f"      ... and {len(changed) - 20} more")
@@ -143,6 +156,28 @@ class Command(BaseCommand):
                 f"  Total: {total_unchanged} unchanged, {total_new} new, "
                 f"{total_changed} changed, {total_local_only} local-only"
             )
+
+            # Aggregate exposure across all changed entities that carry it.
+            total_registrations = 0
+            total_registrations_in_flight = 0
+            total_cases = 0
+            for entity_name, diff in diffs.items():
+                for entry in diff.get("changed", []):
+                    if len(entry) > 3 and entry[3]:
+                        exposure = entry[3]
+                        total_registrations += exposure.get("registrations_all_periods", 0)
+                        total_registrations_in_flight += exposure.get("registrations_in_flight", 0)
+                        total_cases += exposure.get("cases_all_periods", 0)
+            if total_registrations or total_cases:
+                self.stdout.write(
+                    self.style.WARNING(
+                        f"  Exposure across all changed entities: "
+                        f"{total_registrations} registrations "
+                        f"({total_registrations_in_flight} in-flight), "
+                        f"{total_cases} distinct cases would be affected"
+                    )
+                )
+
             self.stdout.write(
                 self.style.SUCCESS("Dry-run complete. No changes written.")
             )

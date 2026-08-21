@@ -726,6 +726,155 @@ def _diff_entity(
     }
 
 
+# ---------------------------------------------------------------------------
+# Organisation FK diff and exposure report
+# ---------------------------------------------------------------------------
+
+# Nested API relationship field → (model_field on Organisation, lookup field
+# on the related model, related model name). Used to detect trust/LHB/ICB/
+# region/network/country moves that the flat _ORG_FIELDS comparison misses.
+_ORG_FK_FIELDS = [
+    ("trust", "trust", "ods_code", "Trust"),
+    ("local_health_board", "local_health_board", "ods_code", "LocalHealthBoard"),
+    ("integrated_care_board", "integrated_care_board", "ods_code", "IntegratedCareBoard"),
+    ("nhs_england_region", "nhs_england_region", "region_code", "NHSEnglandRegion"),
+    ("openuk_network", "openuk_network", "boundary_identifier", "OPENUKNetwork"),
+    ("country", "country", "boundary_identifier", "Country"),
+]
+
+
+def _diff_organisation_fks(
+    api_org: dict[str, Any],
+    local_org,
+) -> dict[str, tuple]:
+    """Compare the nested relationship objects in an API organisation row
+    against the FKs on the local ``Organisation`` row.
+
+    Returns a dict of ``{model_field: (old_label, new_label)}`` for FKs that
+    would change. Labels are human-readable (ODS code or boundary identifier,
+    plus the name where available) so the dry-run output is useful without a
+    further lookup. An FK moving from a value to ``None`` (or vice versa) is
+    reported, as is a move from one instance to another.
+
+    This is separate from the flat-field ``_diff_entity`` comparison because
+    the API returns nested dicts (e.g. ``{"ods_code": "RGT", ...}``) or empty
+    strings for relationships that don't apply (e.g. a Welsh organisation has
+    ``trust: ""``), which the flat comparison cannot handle.
+    """
+    diffs: dict[str, tuple] = {}
+    for api_field, model_field, lookup_field, model_name in _ORG_FK_FIELDS:
+        nested = api_org.get(api_field)
+        # Resolve the API value to a local instance (or None).
+        if not nested or not isinstance(nested, dict):
+            new_instance = None
+            new_label = "None"
+        else:
+            identifier = nested.get(lookup_field)
+            if not identifier:
+                new_instance = None
+                new_label = "None"
+            else:
+                new_instance = _lookup_by_code(model_name, lookup_field, identifier)
+                new_label = identifier
+                name = nested.get("name")
+                if name:
+                    new_label = f"{identifier} ({name})"
+                elif new_instance is None:
+                    new_label = f"{identifier} (not in local DB)"
+
+        existing_instance = getattr(local_org, model_field, None)
+        existing_pk = existing_instance.pk if existing_instance is not None else None
+        new_pk = new_instance.pk if new_instance is not None else None
+
+        if existing_pk != new_pk:
+            if existing_instance is not None:
+                old_label = getattr(existing_instance, lookup_field, None) or str(existing_instance)
+                old_name = getattr(existing_instance, "name", None)
+                if old_name:
+                    old_label = f"{old_label} ({old_name})"
+            else:
+                old_label = "None"
+            diffs[model_field] = (old_label, new_label)
+
+    return diffs
+
+
+def _count_organisation_exposure(organisation) -> dict[str, int]:
+    """Count registrations and cases attached to ``organisation`` across all
+    periods, for the current-state sync's exposure report.
+
+    Returns a dict with:
+    - ``registrations_all_periods``: registrations under the organisation
+      across every cohort.
+    - ``registrations_in_flight``: registrations under the organisation whose
+      ``audit_period`` is currently recruiting, in data collection, or in
+      grace — the cohorts a current-state change could disrupt on the live
+      dashboard before it is cut over to period-aware queries.
+    - ``cases_all_periods``: distinct cases under the organisation across
+      all cohorts, including cases without a registration (they are still
+      attached via ``Site``, so a trust move or trust going inactive still
+      affects which parent they group under).
+    """
+    Registration = _get_model("Registration")
+    Case = _get_model("Case")
+    AuditPeriod = _get_model("AuditPeriod")
+
+    registrations_all_periods = Registration.objects.filter(
+        case__epilepsy12_sites__organisation=organisation,
+    ).count()
+
+    # In-flight audit periods: recruiting, data collection, or grace.
+    today = date_class.today()
+    in_flight_period_ids = list(
+        AuditPeriod.objects.filter(
+            recruitment_start_date__lte=today,
+            submission_deadline__gte=today,
+        ).values_list("pk", flat=True)
+    )
+    if in_flight_period_ids:
+        registrations_in_flight = Registration.objects.filter(
+            case__epilepsy12_sites__organisation=organisation,
+            audit_period_id__in=in_flight_period_ids,
+        ).count()
+    else:
+        registrations_in_flight = 0
+
+    cases_all_periods = Case.objects.filter(
+        epilepsy12_sites__organisation=organisation,
+    ).distinct().count()
+
+    return {
+        "registrations_all_periods": registrations_all_periods,
+        "registrations_in_flight": registrations_in_flight,
+        "cases_all_periods": cases_all_periods,
+    }
+
+
+def _count_parent_exposure(parent, parent_field: str) -> dict[str, int]:
+    """Count registrations and cases under all organisations whose live
+    ``Organisation.<parent_field>`` points at ``parent``.
+
+    Used when a trust or LHB would flip ``active`` — every organisation under
+    that parent is affected, so the exposure is the sum across them.
+    """
+    Organisation = _get_model("Organisation")
+    orgs = Organisation.objects.filter(**{parent_field: parent})
+    total_registrations = 0
+    total_registrations_in_flight = 0
+    total_cases = 0
+    for org in orgs:
+        exposure = _count_organisation_exposure(org)
+        total_registrations += exposure["registrations_all_periods"]
+        total_registrations_in_flight += exposure["registrations_in_flight"]
+        total_cases += exposure["cases_all_periods"]
+    return {
+        "organisations": orgs.count(),
+        "registrations_all_periods": total_registrations,
+        "registrations_in_flight": total_registrations_in_flight,
+        "cases_all_periods": total_cases,
+    }
+
+
 def dry_run_diff(only: str | None = None) -> dict[str, dict[str, Any]]:
     """Compare the API's current state against the local DB.
 
@@ -733,7 +882,13 @@ def dry_run_diff(only: str | None = None) -> dict[str, dict[str, Any]]:
     against the local DB rows. Does not write to the database.
 
     Returns a dict keyed by entity name, each containing the diff result
-    from :func:`_diff_entity`.
+    from :func:`_diff_entity`. For organisations, the ``changed`` entries
+    are augmented with FK-move diffs (trust/LHB/ICB/region/network/country)
+    that the flat-field comparison misses, and each changed organisation
+    carries an ``exposure`` dict counting registrations and cases that the
+    change would affect. For trusts and LHBs, entries whose ``active`` flag
+    would flip carry an ``exposure`` dict counting registrations and cases
+    under all organisations in that parent.
     """
     results = {}
 
@@ -742,11 +897,33 @@ def dry_run_diff(only: str | None = None) -> dict[str, dict[str, Any]]:
         results["trusts"] = _diff_entity(
             list_trusts(), Trust, "ods_code", _TRUST_FIELDS
         )
+        # Attach exposure to trusts whose active flag would flip.
+        for i, (identifier, name, field_diffs) in enumerate(
+            results["trusts"]["changed"]
+        ):
+            if "active" in field_diffs:
+                trust = Trust.objects.filter(ods_code=identifier).first()
+                if trust is not None:
+                    exposure = _count_parent_exposure(trust, "trust")
+                    results["trusts"]["changed"][i] = (
+                        identifier, name, field_diffs, exposure,
+                    )
     if only is None or only == "local_health_boards":
         LocalHealthBoard = _get_model("LocalHealthBoard")
         results["local_health_boards"] = _diff_entity(
             list_local_health_boards(), LocalHealthBoard, "ods_code", _LHB_FIELDS
         )
+        # Attach exposure to LHBs whose active flag would flip.
+        for i, (identifier, name, field_diffs) in enumerate(
+            results["local_health_boards"]["changed"]
+        ):
+            if "active" in field_diffs:
+                lhb = LocalHealthBoard.objects.filter(ods_code=identifier).first()
+                if lhb is not None:
+                    exposure = _count_parent_exposure(lhb, "local_health_board")
+                    results["local_health_boards"]["changed"][i] = (
+                        identifier, name, field_diffs, exposure,
+                    )
     if only is None or only == "integrated_care_boards":
         IntegratedCareBoard = _get_model("IntegratedCareBoard")
         results["integrated_care_boards"] = _diff_entity(
@@ -772,5 +949,27 @@ def dry_run_diff(only: str | None = None) -> dict[str, dict[str, Any]]:
         results["organisations"] = _diff_entity(
             list_organisations(), Organisation, "ods_code", _ORG_FIELDS
         )
+        # Augment changed organisations with FK-move diffs and exposure.
+        api_orgs = list_organisations()
+        api_orgs_by_ods = {o.get("ods_code"): o for o in api_orgs if o.get("ods_code")}
+        augmented_changed = []
+        for identifier, name, field_diffs in results["organisations"]["changed"]:
+            local_org = Organisation.objects.filter(ods_code=identifier).first()
+            api_org = api_orgs_by_ods.get(identifier, {})
+            fk_diffs = (
+                _diff_organisation_fks(api_org, local_org)
+                if local_org is not None
+                else {}
+            )
+            all_diffs = {**field_diffs, **fk_diffs}
+            exposure = (
+                _count_organisation_exposure(local_org)
+                if local_org is not None
+                else {"registrations_all_periods": 0, "registrations_in_flight": 0, "cases_all_periods": 0}
+            )
+            augmented_changed.append(
+                (identifier, name, all_diffs, exposure)
+            )
+        results["organisations"]["changed"] = augmented_changed
 
     return results
