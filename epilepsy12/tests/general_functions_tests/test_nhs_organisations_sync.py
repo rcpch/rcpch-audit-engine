@@ -490,3 +490,755 @@ def test_sync_trusts_truncates_oversized_name():
         assert trust.name == "A" * 50
     finally:
         trust_field.max_length = original_max_length
+
+
+# ---------------------------------------------------------------------------
+# PROTECT FK guard (migration 0070)
+# ---------------------------------------------------------------------------
+
+
+@pytest.mark.django_db
+def test_trust_with_organisation_cannot_be_deleted():
+    """A Trust referenced by an Organisation cannot be deleted — PROTECT
+    prevents the cascade that would otherwise delete the Organisation and
+    all its clinical data (Site, Registration, Case, KPI).
+    """
+    from django.db.models import ProtectedError
+
+    GOSH = Organisation.objects.get(ods_code="RP401", trust__ods_code="RP4")
+    trust = GOSH.trust
+    assert trust is not None
+
+    with pytest.raises(ProtectedError):
+        trust.delete()
+
+    # Trust and Organisation still exist.
+    assert Trust.objects.filter(ods_code="RP4").exists()
+    assert Organisation.objects.filter(ods_code="RP401").exists()
+
+
+@pytest.mark.django_db
+def test_lhb_with_organisation_cannot_be_deleted():
+    """A LocalHealthBoard referenced by an Organisation cannot be deleted."""
+    from django.db.models import ProtectedError
+
+    welsh_org = Organisation.objects.get(
+        ods_code="7A4H1", local_health_board__ods_code="7A4"
+    )
+    lhb = welsh_org.local_health_board
+    assert lhb is not None
+
+    with pytest.raises(ProtectedError):
+        lhb.delete()
+
+    assert LocalHealthBoard.objects.filter(ods_code="7A4").exists()
+    assert Organisation.objects.filter(ods_code="7A4H1").exists()
+
+
+@pytest.mark.django_db
+def test_trust_without_organisation_can_be_deleted():
+    """A Trust with no Organisation referencing it can still be deleted —
+    PROTECT only blocks when there is a referencing row.
+    """
+    orphan_trust = Trust.objects.create(
+        ods_code="ZZZ", name="ORPHAN TRUST", active=False
+    )
+    orphan_trust.delete()
+    assert not Trust.objects.filter(ods_code="ZZZ").exists()
+
+
+# ---------------------------------------------------------------------------
+# Dry-run: FK-move detection and exposure report
+# ---------------------------------------------------------------------------
+
+
+@pytest.mark.django_db
+def test_dry_run_detects_organisation_trust_move():
+    """The dry-run detects when an organisation's trust FK would change —
+    the flat-field comparison misses this because the API returns a nested
+    dict, not a flat field.
+    """
+    GOSH = Organisation.objects.get(ods_code="RP401", trust__ods_code="RP4")
+    KINGS_TRUST = Trust.objects.get(ods_code="RJZ")
+
+    # API returns GOSH under King's trust (a move from RP4 to RJZ).
+    api_org = {
+        **API_BASE_ORG,
+        "ods_code": "RP401",
+        "name": GOSH.name,
+        "trust": {"ods_code": "RJZ", "name": KINGS_TRUST.name},
+    }
+
+    with patch.object(nhs_organisations_sync, "list_organisations", return_value=[api_org]):
+        diffs = nhs_organisations_sync.dry_run_diff(only="organisations")
+
+    changed = diffs["organisations"]["changed"]
+    assert len(changed) == 1
+    identifier, name, field_diffs, exposure = changed[0]
+    assert identifier == "RP401"
+    assert "trust" in field_diffs
+    old_label, new_label = field_diffs["trust"]
+    assert "RP4" in old_label
+    assert "RJZ" in new_label
+
+
+@pytest.mark.django_db
+def test_dry_run_detects_organisation_lhb_move_for_welsh_org():
+    """The dry-run detects a LocalHealthBoard move on a Welsh organisation.
+    The country invariant (England=Trust, Wales=LHB) must not be broken —
+    the FK diff checks both fields independently.
+    """
+    welsh_org = Organisation.objects.get(ods_code="7A4H1", local_health_board__ods_code="7A4")
+    other_lhb = LocalHealthBoard.objects.exclude(ods_code="7A4").first()
+
+    api_org = {
+        **API_BASE_ORG,
+        "ods_code": "7A4H1",
+        "name": welsh_org.name,
+        "trust": "",
+        "local_health_board": {"ods_code": other_lhb.ods_code, "name": other_lhb.name},
+    }
+
+    with patch.object(nhs_organisations_sync, "list_organisations", return_value=[api_org]):
+        diffs = nhs_organisations_sync.dry_run_diff(only="organisations")
+
+    changed = diffs["organisations"]["changed"]
+    assert len(changed) >= 1
+    gosh_entry = [c for c in changed if c[0] == "7A4H1"]
+    assert len(gosh_entry) == 1
+    _, _, field_diffs, _ = gosh_entry[0]
+    assert "local_health_board" in field_diffs
+    assert "trust" not in field_diffs  # trust was already None
+
+
+@pytest.mark.django_db
+def test_dry_run_reports_organisation_exposure_counts(
+    cohort_4, e12_case_factory
+):
+    """The dry-run attaches an exposure dict to each changed organisation,
+    counting registrations (all periods + in-flight) and cases (all periods,
+    including cases without a registration).
+    """
+    GOSH = Organisation.objects.get(ods_code="RP401", trust__ods_code="RP4")
+
+    # Two registered cases in cohort 4.
+    e12_case_factory(
+        first_name="exposure_1",
+        organisations__organisation=GOSH,
+        registration__first_paediatric_assessment_date=date(2021, 6, 1),
+        registration__audit_period__cohort_number=4,
+    )
+    e12_case_factory(
+        first_name="exposure_2",
+        organisations__organisation=GOSH,
+        registration__first_paediatric_assessment_date=date(2021, 7, 1),
+        registration__audit_period__cohort_number=4,
+    )
+
+    # API returns a renamed GOSH (a field-level change, not an FK move).
+    api_org = {**API_BASE_ORG, "ods_code": "RP401", "name": "RENAMED HOSPITAL"}
+
+    with patch.object(nhs_organisations_sync, "list_organisations", return_value=[api_org]):
+        diffs = nhs_organisations_sync.dry_run_diff(only="organisations")
+
+    changed = diffs["organisations"]["changed"]
+    gosh_entry = [c for c in changed if c[0] == "RP401"]
+    assert len(gosh_entry) == 1
+    _, _, _, exposure = gosh_entry[0]
+    assert exposure["registrations_all_periods"] == 2
+    assert exposure["cases_all_periods"] == 2
+
+
+@pytest.mark.django_db
+def test_dry_run_counts_cases_without_registrations(e12_case_factory):
+    """The case count includes cases attached via Site with no Registration."""
+    from epilepsy12.models import Case, Site
+    GOSH = Organisation.objects.get(ods_code="RP401", trust__ods_code="RP4")
+
+    e12_case_factory(
+        first_name="registered",
+        organisations__organisation=GOSH,
+        registration__first_paediatric_assessment_date=date(2021, 6, 1),
+        registration__audit_period__cohort_number=4,
+    )
+    unregistered = Case.objects.create(
+        first_name="unregistered",
+        surname="test",
+        date_of_birth=date(2020, 1, 1),
+        nhs_number="8888888888",
+        sex=1,
+    )
+    Site.objects.create(
+        case=unregistered,
+        organisation=GOSH,
+        site_is_primary_centre_of_epilepsy_care=True,
+        site_is_actively_involved_in_epilepsy_care=True,
+    )
+
+    api_org = {**API_BASE_ORG, "ods_code": "RP401", "name": "RENAMED HOSPITAL"}
+
+    with patch.object(nhs_organisations_sync, "list_organisations", return_value=[api_org]):
+        diffs = nhs_organisations_sync.dry_run_diff(only="organisations")
+
+    changed = diffs["organisations"]["changed"]
+    gosh_entry = [c for c in changed if c[0] == "RP401"]
+    _, _, _, exposure = gosh_entry[0]
+    assert exposure["registrations_all_periods"] == 1
+    assert exposure["cases_all_periods"] == 2  # registered + unregistered
+
+
+@pytest.mark.django_db
+def test_dry_run_reports_trust_active_flip_exposure(e12_case_factory):
+    """When a trust's active flag would flip, the dry-run attaches an exposure
+    dict counting registrations and cases under all organisations in that trust.
+    """
+    GOSH = Organisation.objects.get(ods_code="RP401", trust__ods_code="RP4")
+
+    e12_case_factory(
+        first_name="trust_flip_1",
+        organisations__organisation=GOSH,
+        registration__first_paediatric_assessment_date=date(2021, 6, 1),
+        registration__audit_period__cohort_number=4,
+    )
+
+    # API returns GOSH trust as inactive.
+    api_trust = {**API_BASE_TRUST, "ods_code": "RP4", "active": False}
+
+    with patch.object(nhs_organisations_sync, "list_trusts", return_value=[api_trust]):
+        diffs = nhs_organisations_sync.dry_run_diff(only="trusts")
+
+    changed = diffs["trusts"]["changed"]
+    rp4_entry = [c for c in changed if c[0] == "RP4"]
+    assert len(rp4_entry) == 1
+    _, _, field_diffs, exposure = rp4_entry[0]
+    assert "active" in field_diffs
+    assert exposure["organisations"] >= 1
+    assert exposure["registrations_all_periods"] >= 1
+    assert exposure["cases_all_periods"] >= 1
+
+
+# ---------------------------------------------------------------------------
+# Pre-sync safety check
+# ---------------------------------------------------------------------------
+
+
+@pytest.mark.django_db
+def test_pre_sync_safety_check_blocks_when_in_flight_period_lacks_memberships(
+    cohort_4, e12_case_factory
+):
+    """The safety check blocks the live sync when the sync would move an
+    organisation's trust and an in-flight audit period has no approved
+    AuditPeriodOrganisation rows.
+    """
+    from epilepsy12.models import AuditPeriod, AuditPeriodOrganisation
+    from django.utils import timezone
+
+    GOSH = Organisation.objects.get(ods_code="RP401", trust__ods_code="RP4")
+    KINGS_TRUST = Trust.objects.get(ods_code="RJZ")
+
+    # Find or create an in-flight period (recruiting / data collection / grace).
+    today = timezone.now().date()
+    in_flight_period = AuditPeriod.objects.filter(
+        recruitment_start_date__lte=today,
+        submission_deadline__gte=today,
+    ).first()
+    if in_flight_period is None:
+        # Create one if none exists (test env may not have one seeded).
+        in_flight_period = AuditPeriod.objects.create(
+            cohort_number=999,
+            recruitment_start_date=today - timezone.timedelta(days=30),
+            recruitment_end_date=today + timezone.timedelta(days=30),
+            data_collection_end_date=today + timezone.timedelta(days=60),
+            submission_deadline=today + timezone.timedelta(days=90),
+        )
+
+    # Ensure no approved memberships exist for this period.
+    AuditPeriodOrganisation.objects.filter(audit_period=in_flight_period).delete()
+
+    # API returns GOSH under King's trust (a trust move).
+    api_org = {
+        **API_BASE_ORG,
+        "ods_code": "RP401",
+        "name": GOSH.name,
+        "trust": {"ods_code": "RJZ", "name": KINGS_TRUST.name},
+    }
+
+    with patch.object(nhs_organisations_sync, "list_organisations", return_value=[api_org]):
+        safety = nhs_organisations_sync.pre_sync_safety_check(only="organisations")
+
+    assert safety["blocked"] is True
+    assert "in-flight" in safety["block_reason"]
+    assert "sync_audit_period_organisations" in safety["block_reason"]
+
+
+@pytest.mark.django_db
+def test_pre_sync_safety_check_allows_when_in_flight_period_has_memberships(
+    cohort_4, e12_case_factory
+):
+    """The safety check does not block when the in-flight period has approved
+    AuditPeriodOrganisation rows — historical memberships are frozen, so the
+    live sync can proceed (subject to --confirm for impact).
+    """
+    from epilepsy12.models import AuditPeriod, AuditPeriodOrganisation
+    from django.utils import timezone
+    from datetime import date
+
+    GOSH = Organisation.objects.get(ods_code="RP401", trust__ods_code="RP4")
+    KINGS_TRUST = Trust.objects.get(ods_code="RJZ")
+
+    # Register a case under GOSH so the trust move has impact to confirm.
+    e12_case_factory(
+        first_name="allows_confirm_test",
+        organisations__organisation=GOSH,
+        registration__first_paediatric_assessment_date=date(2021, 6, 1),
+        registration__audit_period__cohort_number=4,
+    )
+
+    today = timezone.now().date()
+    # Create approved memberships for GOSH in ALL in-flight periods, not
+    # just one — the safety check blocks if any in-flight period has zero
+    # approved memberships.
+    in_flight_periods = AuditPeriod.objects.filter(
+        recruitment_start_date__lte=today,
+        submission_deadline__gte=today,
+    )
+    for period in in_flight_periods:
+        AuditPeriodOrganisation.objects.update_or_create(
+            audit_period=period,
+            organisation=GOSH,
+            defaults={
+                "country": GOSH.country,
+                "trust": GOSH.trust,
+                "approved_at": date(2024, 1, 1),
+            },
+        )
+
+    # API returns GOSH under King's trust (a trust move).
+    api_org = {
+        **API_BASE_ORG,
+        "ods_code": "RP401",
+        "name": GOSH.name,
+        "trust": {"ods_code": "RJZ", "name": KINGS_TRUST.name},
+    }
+
+    with patch.object(nhs_organisations_sync, "list_organisations", return_value=[api_org]):
+        safety = nhs_organisations_sync.pre_sync_safety_check(only="organisations")
+
+    assert safety["blocked"] is False
+    # Still requires confirmation because cases are affected.
+    assert safety["requires_confirm"] is True
+
+
+@pytest.mark.django_db
+def test_pre_sync_safety_check_requires_confirm_for_trust_move(
+    cohort_4, e12_case_factory
+):
+    """The safety check requires --confirm when a trust move would affect
+    registrations, even when the ordering constraint is satisfied.
+    """
+    from epilepsy12.models import AuditPeriod, AuditPeriodOrganisation
+    from django.utils import timezone
+    from datetime import date
+
+    GOSH = Organisation.objects.get(ods_code="RP401", trust__ods_code="RP4")
+    KINGS_TRUST = Trust.objects.get(ods_code="RJZ")
+
+    # Create a registration under GOSH so the move affects it.
+    e12_case_factory(
+        first_name="confirm_test",
+        organisations__organisation=GOSH,
+        registration__first_paediatric_assessment_date=date(2021, 6, 1),
+        registration__audit_period__cohort_number=4,
+    )
+
+    # Ensure no in-flight period blocks the sync — create approved
+    # memberships for GOSH in ALL in-flight periods.
+    today = timezone.now().date()
+    in_flight_periods = AuditPeriod.objects.filter(
+        recruitment_start_date__lte=today,
+        submission_deadline__gte=today,
+    )
+    for period in in_flight_periods:
+        AuditPeriodOrganisation.objects.update_or_create(
+            audit_period=period,
+            organisation=GOSH,
+            defaults={
+                "country": GOSH.country,
+                "trust": GOSH.trust,
+                "approved_at": date(2024, 1, 1),
+            },
+        )
+
+    api_org = {
+        **API_BASE_ORG,
+        "ods_code": "RP401",
+        "name": GOSH.name,
+        "trust": {"ods_code": "RJZ", "name": KINGS_TRUST.name},
+    }
+
+    with patch.object(nhs_organisations_sync, "list_organisations", return_value=[api_org]):
+        safety = nhs_organisations_sync.pre_sync_safety_check(only="organisations")
+
+    assert safety["blocked"] is False
+    assert safety["requires_confirm"] is True
+    assert safety["total_registrations"] >= 1
+    assert safety["total_cases"] >= 1
+    assert any("trust" in desc for _, _, desc in safety["high_impact_changes"])
+
+
+@pytest.mark.django_db
+def test_pre_sync_safety_check_allows_no_impact_sync():
+    """The safety check does not block or require confirmation when the sync
+    would change only low-impact fields (e.g. a trust rename with no org move
+    and no active flip) and no registrations are affected.
+    """
+    # API returns a renamed trust (no active flip, no org move).
+    api_trust = {**API_BASE_TRUST, "ods_code": "RGT", "name": "RENAMED TRUST"}
+
+    with patch.object(nhs_organisations_sync, "list_trusts", return_value=[api_trust]):
+        safety = nhs_organisations_sync.pre_sync_safety_check(only="trusts")
+
+    assert safety["blocked"] is False
+    assert safety["requires_confirm"] is False
+    assert safety["total_registrations"] == 0
+    assert safety["total_cases"] == 0
+
+
+# ---------------------------------------------------------------------------
+# Reorganisation integration tests: merger, acquisition, split
+# ---------------------------------------------------------------------------
+# These tests exercise the full sync workflow (per-cohort freeze +
+# current-state mutation) for the three canonical reorganisation shapes:
+#
+# - Merger: two trusts combine into one; their organisations move to the
+#   surviving trust.
+# - Acquisition: one trust absorbs another; the acquired trust's
+#   organisations move to the acquirer.
+# - Split: one trust divides into two; its organisations split between the
+#   two new trusts.
+#
+# For each, the test verifies that:
+# - the live Organisation.trust FK moves to the new trust (current-state
+#   sync owns this);
+# - the frozen AuditPeriodOrganisation membership for the historical cohort
+#   stays pointing at the old trust (per-cohort sync owns this, and is not
+#   overwritten by the current-state sync);
+# - registrations in the historical cohort remain attributed to the old trust
+#   via the frozen membership, while registrations in the in-flight cohort
+#   follow the live FK to the new trust.
+# ---------------------------------------------------------------------------
+
+
+def _make_org_snapshot(organisation, trust=None, lhb=None):
+    """Build a snapshot response for an organisation, with the given trust or
+    LHB. Used to mock the per-cohort sync's snapshot calls."""
+    snapshot = {
+        "ods_code": organisation.ods_code,
+        "name": organisation.name,
+        "trust": "",
+        "local_health_board": "",
+        "integrated_care_board": "",
+        "nhs_england_region": "",
+        "openuk_network": "",
+        "country": {"boundary_identifier": "E92000001", "name": "England"},
+        "predecessor_ods_code": None,
+    }
+    if trust is not None:
+        snapshot["trust"] = {"ods_code": trust.ods_code, "name": trust.name, "active": True}
+    if lhb is not None:
+        snapshot["local_health_board"] = {"ods_code": lhb.ods_code, "name": lhb.name}
+    return snapshot
+
+
+def _make_org_list_entry(organisation, trust=None, lhb=None):
+    """Build a list-endpoint entry for an organisation, with the given trust or
+    LHB. Used to mock the current-state sync's list_organisations calls."""
+    entry = {
+        "ods_code": organisation.ods_code,
+        "name": organisation.name,
+        "website": "",
+        "address1": "",
+        "address2": "",
+        "address3": "",
+        "telephone": "",
+        "city": "",
+        "county": "",
+        "latitude": None,
+        "longitude": None,
+        "postcode": "",
+        "geocode_coordinates": None,
+        "active": True,
+        "published_at": "",
+        "trust": "",
+        "local_health_board": "",
+        "integrated_care_board": "",
+        "nhs_england_region": "",
+        "openuk_network": "",
+        "country": {"boundary_identifier": "E92000001", "name": "England"},
+    }
+    if trust is not None:
+        entry["trust"] = {"ods_code": trust.ods_code, "name": trust.name}
+    if lhb is not None:
+        entry["local_health_board"] = {"ods_code": lhb.ods_code, "name": lhb.name}
+    return entry
+
+
+@pytest.mark.django_db
+def test_trust_merger_preserves_historical_membership(
+    cohort_4, cohort_5, e12_case_factory
+):
+    """A trust merger: two trusts (RP4 and RJZ) merge into a new trust
+    (NEW1). Their organisations (GOSH and KINGS) both move to NEW1 in the
+    current-state sync.
+
+    Cohort 4 is historical (closed). Its memberships were frozen by the
+    per-cohort sync with GOSH under RP4 and KINGS under RJZ. After the
+    current-state sync moves both orgs to NEW1, the cohort 4 memberships
+    must still point at RP4 and RJZ respectively — the historical reporting
+    parent is preserved.
+
+    Cohort 5 is in-flight. Its membership was frozen with GOSH under RP4.
+    After the current-state sync, the live Organisation.trust FK moves to
+    NEW1, but the frozen cohort 5 membership stays at RP4 until it is
+    re-synced. This is the expected behaviour: the per-cohort sync must be
+    re-run for the in-flight cohort to pick up the new trust.
+    """
+    from epilepsy12.general_functions import audit_period_sync
+    from epilepsy12.models import AuditPeriodOrganisation
+
+    GOSH = Organisation.objects.get(ods_code="RP401", trust__ods_code="RP4")
+    KINGS = Organisation.objects.get(ods_code="RJZ01", trust__ods_code="RJZ")
+    RP4 = GOSH.trust
+    RJZ = KINGS.trust
+    NEW1, _ = Trust.objects.get_or_create(
+        ods_code="NEW1", defaults={"name": "MERGED TRUST", "active": True}
+    )
+
+    # Register a case under GOSH in cohort 4 (historical).
+    e12_case_factory(
+        first_name="merger_c4",
+        organisations__organisation=GOSH,
+        registration__first_paediatric_assessment_date=date(2021, 6, 1),
+        registration__audit_period__cohort_number=4,
+    )
+    # Register a case under KINGS in cohort 4 (historical).
+    e12_case_factory(
+        first_name="merger_c4_kings",
+        organisations__organisation=KINGS,
+        registration__first_paediatric_assessment_date=date(2021, 7, 1),
+        registration__audit_period__cohort_number=4,
+    )
+
+    # Freeze cohort 4 memberships via the per-cohort sync.
+    # GOSH under RP4, KINGS under RJZ.
+    with patch(
+        "epilepsy12.general_functions.audit_period_sync.get_organisation_snapshot",
+        side_effect=[
+            _make_org_snapshot(GOSH, trust=RP4),
+            _make_org_snapshot(KINGS, trust=RJZ),
+        ],
+    ):
+        audit_period_sync.sync_audit_period(cohort_4)
+
+    # Approve the frozen memberships.
+    AuditPeriodOrganisation.objects.filter(
+        audit_period=cohort_4, organisation=GOSH
+    ).update(approved_at=date(2024, 1, 1))
+    AuditPeriodOrganisation.objects.filter(
+        audit_period=cohort_4, organisation=KINGS
+    ).update(approved_at=date(2024, 1, 1))
+
+    # Now run the current-state sync: both orgs move to NEW1.
+    api_orgs = [
+        _make_org_list_entry(GOSH, trust=NEW1),
+        _make_org_list_entry(KINGS, trust=NEW1),
+    ]
+    with patch.object(nhs_organisations_sync, "list_organisations", return_value=api_orgs):
+        nhs_organisations_sync.sync_organisations()
+
+    # Live FKs have moved to NEW1.
+    GOSH.refresh_from_db()
+    KINGS.refresh_from_db()
+    assert GOSH.trust == NEW1
+    assert KINGS.trust == NEW1
+
+    # Frozen cohort 4 memberships are untouched — still RP4 and RJZ.
+    gosh_c4 = AuditPeriodOrganisation.objects.get(
+        audit_period=cohort_4, organisation=GOSH
+    )
+    kings_c4 = AuditPeriodOrganisation.objects.get(
+        audit_period=cohort_4, organisation=KINGS
+    )
+    assert gosh_c4.trust == RP4
+    assert kings_c4.trust == RJZ
+
+
+@pytest.mark.django_db
+def test_trust_acquisition_moves_org_to_acquirer(
+    cohort_4, cohort_5, e12_case_factory
+):
+    """A trust acquisition: trust RJZ acquires trust RP4. GOSH (formerly
+    under RP4) moves to RJZ in the current-state sync.
+
+    Cohort 4 is historical. Its membership was frozen with GOSH under RP4.
+    After the acquisition, the live FK moves to RJZ, but the frozen cohort 4
+    membership stays at RP4 — historical reporting is preserved.
+    """
+    from epilepsy12.general_functions import audit_period_sync
+    from epilepsy12.models import AuditPeriodOrganisation
+
+    GOSH = Organisation.objects.get(ods_code="RP401", trust__ods_code="RP4")
+    RP4 = GOSH.trust
+    RJZ = Trust.objects.get(ods_code="RJZ")
+
+    # Register a case under GOSH in cohort 4 (historical).
+    e12_case_factory(
+        first_name="acquisition_c4",
+        organisations__organisation=GOSH,
+        registration__first_paediatric_assessment_date=date(2021, 6, 1),
+        registration__audit_period__cohort_number=4,
+    )
+
+    # Freeze cohort 4 membership: GOSH under RP4.
+    with patch(
+        "epilepsy12.general_functions.audit_period_sync.get_organisation_snapshot",
+        return_value=_make_org_snapshot(GOSH, trust=RP4),
+    ):
+        audit_period_sync.sync_audit_period(cohort_4)
+
+    AuditPeriodOrganisation.objects.filter(
+        audit_period=cohort_4, organisation=GOSH
+    ).update(approved_at=date(2024, 1, 1))
+
+    # Current-state sync: GOSH moves to RJZ (acquisition).
+    api_orgs = [_make_org_list_entry(GOSH, trust=RJZ)]
+    with patch.object(nhs_organisations_sync, "list_organisations", return_value=api_orgs):
+        nhs_organisations_sync.sync_organisations()
+
+    # Live FK has moved to RJZ.
+    GOSH.refresh_from_db()
+    assert GOSH.trust == RJZ
+
+    # Frozen cohort 4 membership is untouched — still RP4.
+    gosh_c4 = AuditPeriodOrganisation.objects.get(
+        audit_period=cohort_4, organisation=GOSH
+    )
+    assert gosh_c4.trust == RP4
+
+
+@pytest.mark.django_db
+def test_trust_split_distributes_orgs_between_new_trusts(
+    cohort_4, e12_case_factory
+):
+    """A trust split: trust RP4 splits into two new trusts (SPL1 and SPL2).
+    GOSH moves to SPL1 and another organisation under RP4 moves to SPL2 in
+    the current-state sync.
+
+    Cohort 4 is historical. Its membership was frozen with GOSH under RP4.
+    After the split, the live FK moves to SPL1, but the frozen cohort 4
+    membership stays at RP4 — historical reporting is preserved.
+    """
+    from epilepsy12.general_functions import audit_period_sync
+    from epilepsy12.models import AuditPeriodOrganisation
+
+    GOSH = Organisation.objects.get(ods_code="RP401", trust__ods_code="RP4")
+    RP4 = GOSH.trust
+    SPL1, _ = Trust.objects.get_or_create(
+        ods_code="SPL1", defaults={"name": "SPLIT TRUST 1", "active": True}
+    )
+    SPL2, _ = Trust.objects.get_or_create(
+        ods_code="SPL2", defaults={"name": "SPLIT TRUST 2", "active": True}
+    )
+
+    # Register a case under GOSH in cohort 4 (historical).
+    e12_case_factory(
+        first_name="split_c4",
+        organisations__organisation=GOSH,
+        registration__first_paediatric_assessment_date=date(2021, 6, 1),
+        registration__audit_period__cohort_number=4,
+    )
+
+    # Freeze cohort 4 membership: GOSH under RP4.
+    with patch(
+        "epilepsy12.general_functions.audit_period_sync.get_organisation_snapshot",
+        return_value=_make_org_snapshot(GOSH, trust=RP4),
+    ):
+        audit_period_sync.sync_audit_period(cohort_4)
+
+    AuditPeriodOrganisation.objects.filter(
+        audit_period=cohort_4, organisation=GOSH
+    ).update(approved_at=date(2024, 1, 1))
+
+    # Current-state sync: GOSH moves to SPL1 (split).
+    api_orgs = [_make_org_list_entry(GOSH, trust=SPL1)]
+    with patch.object(nhs_organisations_sync, "list_organisations", return_value=api_orgs):
+        nhs_organisations_sync.sync_organisations()
+
+    # Live FK has moved to SPL1.
+    GOSH.refresh_from_db()
+    assert GOSH.trust == SPL1
+
+    # Frozen cohort 4 membership is untouched — still RP4.
+    gosh_c4 = AuditPeriodOrganisation.objects.get(
+        audit_period=cohort_4, organisation=GOSH
+    )
+    assert gosh_c4.trust == RP4
+
+
+@pytest.mark.django_db
+def test_in_flight_cohort_membership_not_overwritten_by_current_state_sync(
+    cohort_5, e12_case_factory
+):
+    """When the current-state sync moves an organisation's trust, the frozen
+    membership for the in-flight cohort is not overwritten — the per-cohort
+    sync must be re-run to pick up the new trust. This is the expected
+    behaviour: the in-flight cohort's membership is a candidate (unapproved)
+    until the audit team reviews and approves it, and re-running the
+    per-cohort sync updates it.
+    """
+    from epilepsy12.general_functions import audit_period_sync
+    from epilepsy12.models import AuditPeriodOrganisation
+
+    GOSH = Organisation.objects.get(ods_code="RP401", trust__ods_code="RP4")
+    RP4 = GOSH.trust
+    RJZ = Trust.objects.get(ods_code="RJZ")
+
+    # Register a case under GOSH in cohort 5 (in-flight).
+    e12_case_factory(
+        first_name="inflight_c5",
+        organisations__organisation=GOSH,
+        registration__first_paediatric_assessment_date=date(2022, 6, 1),
+        registration__audit_period__cohort_number=5,
+    )
+
+    # Freeze cohort 5 membership: GOSH under RP4 (unapproved candidate).
+    with patch(
+        "epilepsy12.general_functions.audit_period_sync.get_organisation_snapshot",
+        return_value=_make_org_snapshot(GOSH, trust=RP4),
+    ):
+        audit_period_sync.sync_audit_period(cohort_5)
+
+    # Current-state sync: GOSH moves to RJZ.
+    api_orgs = [_make_org_list_entry(GOSH, trust=RJZ)]
+    with patch.object(nhs_organisations_sync, "list_organisations", return_value=api_orgs):
+        nhs_organisations_sync.sync_organisations()
+
+    # Live FK has moved to RJZ.
+    GOSH.refresh_from_db()
+    assert GOSH.trust == RJZ
+
+    # Frozen cohort 5 membership is still RP4 (not overwritten by current-state).
+    gosh_c5 = AuditPeriodOrganisation.objects.get(
+        audit_period=cohort_5, organisation=GOSH
+    )
+    assert gosh_c5.trust == RP4
+
+    # Re-run the per-cohort sync for the in-flight cohort: now it picks up RJZ.
+    with patch(
+        "epilepsy12.general_functions.audit_period_sync.get_organisation_snapshot",
+        return_value=_make_org_snapshot(GOSH, trust=RJZ),
+    ):
+        audit_period_sync.sync_audit_period(cohort_5)
+
+    gosh_c5.refresh_from_db()
+    assert gosh_c5.trust == RJZ

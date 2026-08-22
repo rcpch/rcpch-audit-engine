@@ -170,7 +170,7 @@ Validation should include:
 - approval before the row can be used for publication; and
 - protection against deleting referenced organisations and geographies.
 
-Trusts, LHBs and other hierarchy entities referenced historically should be retired or marked inactive rather than deleted. To enforce this, the existing parent FKs on `Organisation` (`trust`, `local_health_board`, `integrated_care_board`, `nhs_england_region`, `openuk_network`) should be changed from `on_delete=models.CASCADE` to `on_delete=models.PROTECT` as part of the foundation migration. The `Organisation.country` FK is already `PROTECT`. This prevents a hierarchy entity deletion from cascading to delete `Organisation` rows and orphaning `Site`, `KPI` and `Registration` data. Existing relationships must not be broken by the migration; only the deletion behaviour changes.
+Trusts, LHBs and other hierarchy entities referenced historically should be retired or marked inactive rather than deleted. To enforce this, the existing parent FKs on `Organisation` (`trust`, `local_health_board`, `integrated_care_board`, `nhs_england_region`, `openuk_network`, `london_borough`) are changed from `on_delete=models.CASCADE` to `on_delete=models.PROTECT` in migration `0070`. The `Organisation.country` FK was already `PROTECT`. This prevents a hierarchy entity deletion from cascading to delete `Organisation` rows and orphaning `Site`, `KPI` and `Registration` data. Existing relationships are not broken by the migration; only the deletion behaviour changes.
 
 ### Relationship with current `Organisation` fields
 
@@ -730,6 +730,66 @@ The two management commands have distinct, non-overlapping responsibilities and 
 - **`sync_audit_period_organisations` (per-cohort sync)** owns the **period-aware** `AuditPeriodOrganisation` rows. It freezes the hierarchy as it was at each audit period's reference date. It **never** mutates live `Organisation` / `Trust` / etc. rows — it only creates dissolved hierarchy entities returned by a historical snapshot if they do not yet exist locally (with `active=False`). Historical names are captured in the `*_name_snapshot` fields on `AuditPeriodOrganisation`, not by rewriting the live hierarchy rows. This is the period-aware source of truth: KPI publication and period-aware permissions read it to answer "where was this organisation in cohort 7?".
 
 The separation is what makes the design safe: once the per-cohort sync has frozen cohort 7's trust assignment into `AuditPeriodOrganisation`, a later current-state sync can move `Organisation.trust` to the new trust without affecting cohort 7's KPIs — because publication reads the frozen membership, not the live FK. If the per-cohort sync mutated live rows in place, a reorganisation would silently rewrite history.
+
+### Current-state sync dry-run with exposure report
+
+`sync_nhs_organisations --dry-run` compares the API's current state against the local DB and reports, per entity type, what would change: new, changed (with field-level diffs), unchanged, and local-only. It writes nothing.
+
+For **organisations**, the dry-run also compares the nested relationship objects (`trust`, `local_health_board`, `integrated_care_board`, `nhs_england_region`, `openuk_network`, `country`) against the live FKs on `Organisation` — the flat-field comparison alone misses these, because the API returns nested dicts rather than flat fields. An organisation moving from one trust to another, or from one LHB to another, is reported as a FK change with the old and new parent labels.
+
+For each changed organisation and for each trust/LHB whose `active` flag would flip, the dry-run attaches an **exposure** dict counting:
+
+- `registrations_all_periods` — registrations under the organisation (or under all organisations in the trust/LHB) across every cohort;
+- `registrations_in_flight` — registrations whose `audit_period` is currently recruiting, in data collection, or in grace — the cohorts a current-state change could disrupt on the live dashboard before it is cut over to period-aware queries;
+- `cases_all_periods` — distinct cases under the organisation across all cohorts, **including cases without a registration** (they are still attached via `Site`, so a trust move or a trust going inactive still affects which parent they group under).
+
+For trust/LHB `active` flips, the exposure is aggregated across all organisations under that parent, and the count includes an `organisations` field showing how many organisations are affected.
+
+The command prints a per-entity exposure line for each changed entity and a total exposure summary at the end. This lets the audit team see, before running the live current-state sync, exactly how many registrations and cases a reorganisation would touch — and specifically how many are in in-flight cohorts where the live dashboard has not yet been cut over to period-aware queries.
+
+### Current-state sync safety guards
+
+The live `sync_nhs_organisations` command (without `--dry-run`) runs a pre-sync safety check before committing. This enforces two rules that protect cases and registrations when organisations move between trusts/LHBs or trusts go inactive:
+
+#### Ordering constraint
+
+If the sync would move any organisation's `trust` / `local_health_board` (or flip any trust/LHB `active` flag), and any **in-flight audit period** (recruiting, in data collection, or in grace) has no approved `AuditPeriodOrganisation` rows, the sync is **blocked**.
+
+The rationale: the live dashboard has not yet been cut over to period-aware queries (that is PR 4). While it still reads `Organisation.trust` directly, moving that FK reattributes cases silently. The `AuditPeriodOrganisation` rows are the period-aware source of truth that publication will read instead — but they must exist and be approved before the live rows are mutated, otherwise there is no fallback. The block message tells the user to run `sync_audit_period_organisations` first.
+
+Once the in-flight period has approved memberships, the block is lifted. The live sync can then move `Organisation.trust` knowing that publication will read the frozen membership, not the live FK.
+
+#### Impact confirmation (`--confirm`)
+
+If the sync would affect any registrations or cases (an organisation moving trust/LHB, or a trust/LHB going inactive), the command requires `--confirm`. Without it, the sync aborts and prints the exposure summary: total registrations affected (all periods and in-flight), total distinct cases affected, and the list of high-impact changes (which organisation moved which FK, which trust flipped `active`).
+
+This makes the exposure report actionable rather than advisory: you cannot accidentally run the live sync and move 500 cases without explicitly confirming you have seen the number. The recommended workflow is:
+
+1. `python manage.py sync_nhs_organisations --dry-run` — review the exposure report;
+2. `python manage.py sync_audit_period_organisations` — freeze historical memberships (if the ordering constraint blocks);
+3. `python manage.py sync_nhs_organisations --confirm` — proceed with the live sync.
+
+A sync that changes only low-impact fields (e.g. a trust rename with no organisation move and no `active` flip) does not require `--confirm` and is not blocked by the ordering constraint.
+
+#### Deletion protection (migration 0070)
+
+In addition to the pre-sync safety check, the `Organisation` hierarchy FKs (`trust`, `local_health_board`, `integrated_care_board`, `nhs_england_region`, `openuk_network`, `london_borough`) are `on_delete=models.PROTECT` as of migration `0070`. This prevents a hierarchy entity deletion from cascading to delete `Organisation` rows and all their clinical data (`Site`, `Registration`, `Case`, `KPI`). A hierarchy entity that is referenced by an organisation cannot be deleted; it must be retired (marked `active=False`) instead. This is the structural counterpart to the safety check: the check prevents accidental *moves*, and `PROTECT` prevents accidental *deletions*.
+
+### Reorganisation integration tests
+
+The sync workflow is tested against the three canonical reorganisation shapes to verify that cases and registrations follow their organisation/trust/LHB correctly across the per-cohort and current-state syncs:
+
+- **Merger** — two trusts combine into one; their organisations move to the surviving trust. Cohort 4 (historical) memberships are frozen with GOSH under RP4 and KINGS under RJZ. After the current-state sync moves both orgs to the merged trust, the frozen cohort 4 memberships still point at RP4 and RJZ respectively — historical reporting is preserved.
+- **Acquisition** — one trust absorbs another; the acquired trust's organisations move to the acquirer. GOSH (under RP4) moves to RJZ. The frozen cohort 4 membership stays at RP4.
+- **Split** — one trust divides into two; its organisations split between the two new trusts. GOSH (under RP4) moves to SPL1. The frozen cohort 4 membership stays at RP4.
+
+For each, the test verifies that:
+
+1. the live `Organisation.trust` FK moves to the new trust (the current-state sync owns this);
+2. the frozen `AuditPeriodOrganisation` membership for the historical cohort stays pointing at the old trust (the per-cohort sync owns this, and is not overwritten by the current-state sync);
+3. registrations in the historical cohort remain attributed to the old trust via the frozen membership, while the live FK follows the reorganisation.
+
+A fourth test covers the in-flight cohort: when the current-state sync moves an organisation's trust, the frozen in-flight membership is not overwritten — the per-cohort sync must be re-run to pick up the new trust. This is the expected behaviour: the in-flight cohort's membership is a candidate (unapproved) until the audit team reviews and approves it, and re-running the per-cohort sync updates it.
 
 ### Re-running the per-cohort sync for the in-flight cohort
 
