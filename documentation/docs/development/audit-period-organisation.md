@@ -945,7 +945,7 @@ Individual organisations can be tested with `--ods-code` before running the full
 
 Exit condition: required historical membership rows can be generated, reviewed and queried without changing the live dashboard. ✅
 
-### PR 3 — period-aware permission services
+### PR 3 — period-aware permission services ✅ COMPLETE
 
 This pull request adds the new permission vocabulary without yet replacing unrelated permission paths globally.
 
@@ -980,7 +980,9 @@ New tests should use a reorganisation fixture and cover:
 
 Likely existing-test refactoring includes permission factories and tests that currently infer access solely from `Organisation.trust` or `Organisation.local_health_board`.
 
-Exit condition: the new permission service is fully tested but only consumers explicitly migrated to it change behaviour.
+Exit condition: the new permission service is fully tested but only consumers explicitly migrated to it change behaviour. ✅
+
+No existing consumers import the new module — only the test file does. The existing report-builder mixin, Organisational Audit permission path, and `decorator.py` / `sanction_user_access.py` permission helpers are unchanged. PR 4 is the first user-facing cutover and will migrate the organisation dashboard to the new service.
 
 ### PR 4 — audit-period-aware dashboard routes, views and templates
 
