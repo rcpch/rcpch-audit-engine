@@ -555,6 +555,39 @@ def test_get_accessible_periods_inherited_trust_b_user_sees_only_cohort_9(
 
 
 @pytest.mark.django_db
+def test_get_accessible_periods_inherited_resolves_identity_chain(
+    reorganisation,
+):
+    """An inherited Trust A user passing the current ODS code (RJZ30) still
+    sees cohort 8, because the membership for cohort 8 is held against the
+    predecessor RYQ30 which shares the same ``OrganisationIdentity``.
+
+    This mirrors how the dashboard will call the function: it always passes
+    the current organisation, and the service resolves the identity chain
+    to find historical memberships.
+    """
+    org_a_current = reorganisation["org_a_current"]  # RJZ30 (current)
+    trust_a = reorganisation["trust_a"]
+
+    sibling_under_trust_a = Organisation.objects.create(
+        ods_code="RYQ98",
+        name="Sibling Hospital under Trust A (chain)",
+        trust=trust_a,
+        country=reorganisation["country"],
+        active=True,
+    )
+
+    user = _make_user(
+        email="periods-inherited-a-chain@trust-a.nhs.uk",
+        employers=[sibling_under_trust_a],
+    )
+
+    periods = list(get_accessible_periods(user, org_a_current))
+    cohort_numbers = {p.cohort_number for p in periods}
+    assert cohort_numbers == {8}
+
+
+@pytest.mark.django_db
 def test_get_accessible_periods_rcpch_user_sees_all_participating_periods(
     reorganisation,
 ):

@@ -304,6 +304,26 @@ def _user_direct_organisation_ids(user) -> "set[int]":
     return direct_ids
 
 
+def _organisation_identity_chain_ids(organisation) -> "set[int]":
+    """Return the set of ``Organisation`` IDs that share the same
+    ``OrganisationIdentity`` as ``organisation``, including ``organisation``
+    itself.
+
+    This is the ODS code succession chain: for PRUH, it returns both RYQ30
+    and RJZ30 (and any further predecessors/successors) because they share
+    the same identity. If ``organisation`` has no ``identity`` FK, only the
+    literal organisation is returned.
+    """
+    Organisation = _get_model("Organisation")
+    if organisation.identity_id is None:
+        return {organisation.pk}
+    return set(
+        Organisation.objects.filter(
+            identity_id=organisation.identity_id
+        ).values_list("pk", flat=True)
+    )
+
+
 def get_accessible_periods(user, organisation):
     """Return the ``AuditPeriod`` instances the user may view for the given
     organisation.
@@ -335,9 +355,12 @@ def get_accessible_periods(user, organisation):
         return AuditPeriod.objects.none()
 
     if _is_rcpch_user(user):
-        # RCPCH users see every period the organisation participated in.
+        # RCPCH users see every period the organisation participated in,
+        # resolved across the identity chain (RYQ30's cohort 8 membership
+        # counts for PRUH even when the caller passed RJZ30).
+        chain_ids = _organisation_identity_chain_ids(organisation)
         period_ids = AuditPeriodOrganisation.objects.filter(
-            organisation=organisation,
+            organisation_id__in=chain_ids,
             approved_at__isnull=False,
             included_in_reporting=True,
         ).values_list("audit_period", flat=True)
@@ -347,9 +370,12 @@ def get_accessible_periods(user, organisation):
 
     direct_ids = _user_direct_organisation_ids(user)
     if organisation.pk in direct_ids:
-        # Direct access — see every period the organisation participated in.
+        # Direct access — see every period the organisation participated in,
+        # resolved across the identity chain (a direct user at RJZ30 sees
+        # RYQ30's cohort 8 membership because both share the same identity).
+        chain_ids = _organisation_identity_chain_ids(organisation)
         period_ids = AuditPeriodOrganisation.objects.filter(
-            organisation=organisation,
+            organisation_id__in=chain_ids,
             approved_at__isnull=False,
             included_in_reporting=True,
         ).values_list("audit_period", flat=True)
@@ -358,17 +384,25 @@ def get_accessible_periods(user, organisation):
         )
 
     # Inherited access — only periods whose membership parent matches the
-    # user's current affiliation.
+    # user's current affiliation. Resolve across the identity chain so a
+    # dashboard passing the current ODS code (RJZ30) still finds the
+    # predecessor's cohort 8 membership (RYQ30) if the user's current parent
+    # is Trust A.
     user_parents = _user_current_parents(user)
     parent_q = _build_parent_q(user_parents)
     if parent_q is None:
         return AuditPeriod.objects.none()
 
-    period_ids = AuditPeriodOrganisation.objects.filter(
-        organisation=organisation,
-        approved_at__isnull=False,
-        included_in_reporting=True,
-    ).filter(parent_q).values_list("audit_period", flat=True)
+    chain_ids = _organisation_identity_chain_ids(organisation)
+    period_ids = (
+        AuditPeriodOrganisation.objects.filter(
+            organisation_id__in=chain_ids,
+            approved_at__isnull=False,
+            included_in_reporting=True,
+        )
+        .filter(parent_q)
+        .values_list("audit_period", flat=True)
+    )
     return AuditPeriod.objects.filter(pk__in=period_ids).order_by("-cohort_number")
 
 
