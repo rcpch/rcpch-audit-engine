@@ -3,6 +3,15 @@
 # Avoid the start-dev script seeding and pytest seeding fighting
 # each other and causing OOM errors
 DJANGO_START_COMMAND='s/start-test' docker compose up -d --wait
-s/test -j -m 'not slow'
-s/test -j -m 'slow'
+
+# CI runs serially (no -j). Measured on GitHub's ubuntu-latest (2 vCPU):
+# serial  660 tests in 312s  (pre-xdist baseline, run #1446)
+# 4-worker 755 tests in 694s  (this branch)
+# xdist against a single shared Postgres on a 2-vCPU runner is slower
+# than serial: the DB is the bottleneck, and 4 concurrent workers cause
+# connection/lock contention that dwarfs the parallelism gain. xdist
+# still wins locally where Postgres has access to all 12 cores.
+s/test -m 'not slow'
+s/test -m 'slow'
+
 docker compose down
