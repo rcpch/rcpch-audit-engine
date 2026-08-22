@@ -946,11 +946,11 @@ def dry_run_diff(only: str | None = None) -> dict[str, dict[str, Any]]:
         )
     if only is None or only == "organisations":
         Organisation = _get_model("Organisation")
+        api_orgs = list_organisations()
         results["organisations"] = _diff_entity(
-            list_organisations(), Organisation, "ods_code", _ORG_FIELDS
+            api_orgs, Organisation, "ods_code", _ORG_FIELDS
         )
         # Augment changed organisations with FK-move diffs and exposure.
-        api_orgs = list_organisations()
         api_orgs_by_ods = {o.get("ods_code"): o for o in api_orgs if o.get("ods_code")}
         augmented_changed = []
         for identifier, name, field_diffs in results["organisations"]["changed"]:

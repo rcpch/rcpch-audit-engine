@@ -59,35 +59,35 @@ class Organisation(TimeStampAbstractBaseClass):
 
     trust = models.ForeignKey(
         to="epilepsy12.Trust",
-        on_delete=models.CASCADE,
+        on_delete=models.PROTECT,
         null=True,
         blank=True,
         default=None,
     )
     local_health_board = models.ForeignKey(
         to="epilepsy12.LocalHealthBoard",
-        on_delete=models.CASCADE,
+        on_delete=models.PROTECT,
         null=True,
         blank=True,
         default=None,
     )
     integrated_care_board = models.ForeignKey(
         to="epilepsy12.IntegratedCareBoard",
-        on_delete=models.CASCADE,
+        on_delete=models.PROTECT,
         null=True,
         blank=True,
         default=None,
     )
     nhs_england_region = models.ForeignKey(
         to="epilepsy12.NHSEnglandRegion",
-        on_delete=models.CASCADE,
+        on_delete=models.PROTECT,
         null=True,
         blank=True,
         default=None,
     )
     openuk_network = models.ForeignKey(
         to="epilepsy12.OPENUKNetwork",
-        on_delete=models.CASCADE,
+        on_delete=models.PROTECT,
         null=True,
         blank=True,
         default=None,
@@ -95,7 +95,7 @@ class Organisation(TimeStampAbstractBaseClass):
     # administrative regions
     london_borough = models.ForeignKey(
         to="epilepsy12.LondonBorough",
-        on_delete=models.CASCADE,
+        on_delete=models.PROTECT,
         null=True,
         blank=True,
         default=None,

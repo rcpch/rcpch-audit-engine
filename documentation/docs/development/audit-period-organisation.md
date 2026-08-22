@@ -170,7 +170,7 @@ Validation should include:
 - approval before the row can be used for publication; and
 - protection against deleting referenced organisations and geographies.
 
-Trusts, LHBs and other hierarchy entities referenced historically should be retired or marked inactive rather than deleted. To enforce this, the existing parent FKs on `Organisation` (`trust`, `local_health_board`, `integrated_care_board`, `nhs_england_region`, `openuk_network`) should be changed from `on_delete=models.CASCADE` to `on_delete=models.PROTECT` as part of the foundation migration. The `Organisation.country` FK is already `PROTECT`. This prevents a hierarchy entity deletion from cascading to delete `Organisation` rows and orphaning `Site`, `KPI` and `Registration` data. Existing relationships must not be broken by the migration; only the deletion behaviour changes.
+Trusts, LHBs and other hierarchy entities referenced historically should be retired or marked inactive rather than deleted. To enforce this, the existing parent FKs on `Organisation` (`trust`, `local_health_board`, `integrated_care_board`, `nhs_england_region`, `openuk_network`, `london_borough`) are changed from `on_delete=models.CASCADE` to `on_delete=models.PROTECT` in migration `0070`. The `Organisation.country` FK was already `PROTECT`. This prevents a hierarchy entity deletion from cascading to delete `Organisation` rows and orphaning `Site`, `KPI` and `Registration` data. Existing relationships are not broken by the migration; only the deletion behaviour changes.
 
 ### Relationship with current `Organisation` fields
 
@@ -770,6 +770,10 @@ This makes the exposure report actionable rather than advisory: you cannot accid
 3. `python manage.py sync_nhs_organisations --confirm` — proceed with the live sync.
 
 A sync that changes only low-impact fields (e.g. a trust rename with no organisation move and no `active` flip) does not require `--confirm` and is not blocked by the ordering constraint.
+
+#### Deletion protection (migration 0070)
+
+In addition to the pre-sync safety check, the `Organisation` hierarchy FKs (`trust`, `local_health_board`, `integrated_care_board`, `nhs_england_region`, `openuk_network`, `london_borough`) are `on_delete=models.PROTECT` as of migration `0070`. This prevents a hierarchy entity deletion from cascading to delete `Organisation` rows and all their clinical data (`Site`, `Registration`, `Case`, `KPI`). A hierarchy entity that is referenced by an organisation cannot be deleted; it must be retired (marked `active=False`) instead. This is the structural counterpart to the safety check: the check prevents accidental *moves*, and `PROTECT` prevents accidental *deletions*.
 
 ### Reorganisation integration tests
 

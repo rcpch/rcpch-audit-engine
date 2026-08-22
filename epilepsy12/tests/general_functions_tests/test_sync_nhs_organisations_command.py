@@ -143,3 +143,95 @@ def test_sync_nhs_organisations_only_trusts():
     assert "Synced 1 trusts" in output
     mock_sync_trusts.assert_called_once_with()
     mock_sync_all.assert_not_called()
+
+
+@pytest.mark.django_db
+def test_sync_nhs_organisations_blocks_when_safety_check_blocks():
+    """When the safety check returns blocked=True, the command prints the
+    block reason and does not call sync_current_state."""
+    fake_safety = {
+        "blocked": True,
+        "block_reason": "in-flight periods have no approved memberships",
+        "requires_confirm": False,
+        "total_registrations": 0,
+        "total_registrations_in_flight": 0,
+        "total_cases": 0,
+        "high_impact_changes": [],
+    }
+    with patch.object(cmd, "sync_current_state") as mock_sync, patch(
+        "epilepsy12.general_functions.nhs_organisations_sync.pre_sync_safety_check",
+        return_value=fake_safety,
+    ):
+        out = StringIO()
+        call_command("sync_nhs_organisations", stdout=out)
+
+    output = out.getvalue()
+    assert "Sync blocked" in output
+    assert "in-flight periods" in output
+    assert "sync_audit_period_organisations" in output
+    mock_sync.assert_not_called()
+
+
+@pytest.mark.django_db
+def test_sync_nhs_organisations_requires_confirm_without_flag():
+    """When requires_confirm=True and --confirm is not passed, the command
+    prints the exposure summary and does not call sync_current_state."""
+    fake_safety = {
+        "blocked": False,
+        "block_reason": "",
+        "requires_confirm": True,
+        "total_registrations": 42,
+        "total_registrations_in_flight": 10,
+        "total_cases": 50,
+        "high_impact_changes": [
+            ("organisations", "RP401", "trust: RP4 -> RJZ"),
+        ],
+    }
+    with patch.object(cmd, "sync_current_state") as mock_sync, patch(
+        "epilepsy12.general_functions.nhs_organisations_sync.pre_sync_safety_check",
+        return_value=fake_safety,
+    ):
+        out = StringIO()
+        call_command("sync_nhs_organisations", stdout=out)
+
+    output = out.getvalue()
+    assert "would affect registrations or cases" in output
+    assert "42" in output
+    assert "10" in output
+    assert "50" in output
+    assert "RP401" in output
+    assert "trust: RP4 -> RJZ" in output
+    assert "Sync complete" not in output
+    mock_sync.assert_not_called()
+
+
+@pytest.mark.django_db
+def test_sync_nhs_organisations_proceeds_with_confirm():
+    """When requires_confirm=True and --confirm is passed, the command
+    prints the confirmed impact and proceeds to call sync_current_state."""
+    fake_result = {"trusts": 1, "local_health_boards": 0, "integrated_care_boards": 0,
+                   "nhs_england_regions": 0, "countries": 0, "openuk_networks": 0,
+                   "organisations": 1}
+    fake_safety = {
+        "blocked": False,
+        "block_reason": "",
+        "requires_confirm": True,
+        "total_registrations": 42,
+        "total_registrations_in_flight": 10,
+        "total_cases": 50,
+        "high_impact_changes": [
+            ("organisations", "RP401", "trust: RP4 -> RJZ"),
+        ],
+    }
+    with patch.object(cmd, "sync_current_state", return_value=fake_result) as mock_sync, patch(
+        "epilepsy12.general_functions.nhs_organisations_sync.pre_sync_safety_check",
+        return_value=fake_safety,
+    ):
+        out = StringIO()
+        call_command("sync_nhs_organisations", "--confirm", stdout=out)
+
+    output = out.getvalue()
+    assert "Proceeding with confirmed impact" in output
+    assert "42" in output
+    assert "Sync complete" in output
+    mock_sync.assert_called_once_with()

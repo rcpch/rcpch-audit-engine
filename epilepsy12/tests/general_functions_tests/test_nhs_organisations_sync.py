@@ -493,6 +493,61 @@ def test_sync_trusts_truncates_oversized_name():
 
 
 # ---------------------------------------------------------------------------
+# PROTECT FK guard (migration 0070)
+# ---------------------------------------------------------------------------
+
+
+@pytest.mark.django_db
+def test_trust_with_organisation_cannot_be_deleted():
+    """A Trust referenced by an Organisation cannot be deleted — PROTECT
+    prevents the cascade that would otherwise delete the Organisation and
+    all its clinical data (Site, Registration, Case, KPI).
+    """
+    from django.db.models import ProtectedError
+
+    GOSH = Organisation.objects.get(ods_code="RP401", trust__ods_code="RP4")
+    trust = GOSH.trust
+    assert trust is not None
+
+    with pytest.raises(ProtectedError):
+        trust.delete()
+
+    # Trust and Organisation still exist.
+    assert Trust.objects.filter(ods_code="RP4").exists()
+    assert Organisation.objects.filter(ods_code="RP401").exists()
+
+
+@pytest.mark.django_db
+def test_lhb_with_organisation_cannot_be_deleted():
+    """A LocalHealthBoard referenced by an Organisation cannot be deleted."""
+    from django.db.models import ProtectedError
+
+    welsh_org = Organisation.objects.get(
+        ods_code="7A4H1", local_health_board__ods_code="7A4"
+    )
+    lhb = welsh_org.local_health_board
+    assert lhb is not None
+
+    with pytest.raises(ProtectedError):
+        lhb.delete()
+
+    assert LocalHealthBoard.objects.filter(ods_code="7A4").exists()
+    assert Organisation.objects.filter(ods_code="7A4H1").exists()
+
+
+@pytest.mark.django_db
+def test_trust_without_organisation_can_be_deleted():
+    """A Trust with no Organisation referencing it can still be deleted —
+    PROTECT only blocks when there is a referencing row.
+    """
+    orphan_trust = Trust.objects.create(
+        ods_code="ZZZ", name="ORPHAN TRUST", active=False
+    )
+    orphan_trust.delete()
+    assert not Trust.objects.filter(ods_code="ZZZ").exists()
+
+
+# ---------------------------------------------------------------------------
 # Dry-run: FK-move detection and exposure report
 # ---------------------------------------------------------------------------
 
