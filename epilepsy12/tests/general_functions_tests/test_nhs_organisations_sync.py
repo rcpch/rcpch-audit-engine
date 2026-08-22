@@ -786,6 +786,14 @@ def test_pre_sync_safety_check_allows_when_in_flight_period_has_memberships(
     GOSH = Organisation.objects.get(ods_code="RP401", trust__ods_code="RP4")
     KINGS_TRUST = Trust.objects.get(ods_code="RJZ")
 
+    # Register a case under GOSH so the trust move has impact to confirm.
+    e12_case_factory(
+        first_name="allows_confirm_test",
+        organisations__organisation=GOSH,
+        registration__first_paediatric_assessment_date=date(2021, 6, 1),
+        registration__audit_period__cohort_number=4,
+    )
+
     today = timezone.now().date()
     # Create approved memberships for GOSH in ALL in-flight periods, not
     # just one — the safety check blocks if any in-flight period has zero
