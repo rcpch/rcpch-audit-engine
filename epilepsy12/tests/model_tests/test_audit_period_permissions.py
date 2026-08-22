@@ -879,3 +879,248 @@ def test_get_accessible_organisations_direct_user_sees_own_org_across_identity_c
     orgs = list(get_accessible_organisations(user, cohort_8))
     ods_codes = {o.ods_code for o in orgs}
     assert "RYQ30" in ods_codes  # predecessor via identity chain
+
+
+# ---------------------------------------------------------------------------
+# Direct access across a multi-step ODS code chain (RYQ30 -> RJZ30 -> RXZ40)
+# ---------------------------------------------------------------------------
+#
+# The PR 3 scope calls out the multi-step succession chain explicitly. The
+# scenario: PRUH changes its ODS code a second time (RJZ30 -> RXZ40) at the
+# cohort 9 -> 10 boundary, joining a new dissolved Trust C (RXZ). All three
+# Organisation rows (RYQ30, RJZ30, RXZ40) share the same OrganisationIdentity.
+#
+# A user employed at the latest ODS code (RXZ40) must be able to view PRUH's
+# data for all three periods: cohort 8 (RYQ30, Trust A), cohort 9 (RJZ30,
+# Trust B) and cohort 10 (RXZ40, Trust C). Direct access follows the
+# organisation across all periods and ODS code changes via the identity chain.
+
+
+@pytest.fixture
+def multi_step_chain(reorganisation):
+    """Extend the ``reorganisation`` fixture with a third ODS code (RXZ40)
+    and a cohort 10 membership, forming the three-step chain
+    RYQ30 -> RJZ30 -> RXZ40.
+
+    Returns a dict with the new keys added to the ``reorganisation`` dict:
+        trust_c:              dissolved Trust (RXZ), ``active=False``
+        org_a_successor:      successor Organisation (RXZ40), ``active=True``
+        cohort_10:            the cohort 10 AuditPeriod
+        cohort_10_membership: approved AuditPeriodOrganisation for cohort 10
+    """
+    england = reorganisation["country"]
+    org_a_identity = reorganisation["org_a_identity"]
+
+    # Trust C — a hypothetical future successor trust (RXZ), dissolved.
+    trust_c, _ = Trust.objects.get_or_create(
+        ods_code="RXZ",
+        defaults={
+            "name": "FUTURE SUCCESSOR TRUST (RXZ)",
+            "town": "ORPINGTON",
+            "postcode": "BR6 8ND",
+            "country": "ENGLAND",
+            "active": False,
+        },
+    )
+
+    # The third ODS code (RXZ40) — the latest successor, active.
+    org_a_successor, _ = Organisation.objects.get_or_create(
+        ods_code="RXZ40",
+        defaults={
+            "name": "PRINCESS ROYAL UNIVERSITY HOSPITAL (RXZ40)",
+            "trust": trust_c,
+            "country": england,
+            "identity": org_a_identity,
+            "active": True,
+        },
+    )
+    if org_a_successor.identity_id != org_a_identity.id:
+        org_a_successor.identity = org_a_identity
+        org_a_successor.save(update_fields=["identity"])
+
+    # Cohort 10 is not seeded (only 4-9 are). Create it with derived dates.
+    cohort_10, _ = AuditPeriod.objects.get_or_create(
+        cohort_number=10,
+        defaults={
+            "name": "Cohort 10",
+            "recruitment_start_date": date(2027, 1, 1),
+            "recruitment_end_date": date(2027, 12, 31),
+            "data_collection_end_date": date(2028, 12, 31),
+            "submission_deadline": date(2029, 1, 9),
+            "slug": "cohort-10",
+            "is_visible": False,
+        },
+    )
+
+    cohort_10_membership, _ = AuditPeriodOrganisation.objects.update_or_create(
+        audit_period=cohort_10,
+        organisation=org_a_successor,
+        defaults={
+            "country": england,
+            "trust": trust_c,
+            "local_health_board": None,
+            "integrated_care_board": None,
+            "nhs_england_region": None,
+            "openuk_network": None,
+            "included_in_reporting": True,
+            "approved_at": date(2029, 1, 1),
+            "source": "manual",
+            "notes": "Multi-step chain canary: PRUH under Trust C (RXZ) for cohort 10.",
+        },
+    )
+
+    return {
+        **reorganisation,
+        "trust_c": trust_c,
+        "org_a_successor": org_a_successor,
+        "cohort_10": cohort_10,
+        "cohort_10_membership": cohort_10_membership,
+    }
+
+
+@pytest.mark.django_db
+def test_multi_step_chain_can_view_all_three_periods(multi_step_chain):
+    """A user employed at the latest ODS code (RXZ40) can view PRUH's data
+    for all three periods: cohort 8 (RYQ30, Trust A), cohort 9 (RJZ30,
+    Trust B) and cohort 10 (RXZ40, Trust C).
+
+    Direct access follows the organisation across all periods and ODS code
+    changes via the shared ``OrganisationIdentity``.
+    """
+    org_a_predecessor = multi_step_chain["org_a_predecessor"]  # RYQ30
+    org_a_current = multi_step_chain["org_a_current"]  # RJZ30
+    org_a_successor = multi_step_chain["org_a_successor"]  # RXZ40
+    cohort_8 = multi_step_chain["cohort_8"]
+    cohort_9 = multi_step_chain["cohort_9"]
+    cohort_10 = multi_step_chain["cohort_10"]
+
+    user = _make_user(
+        email="chain-latest@pruh.nhs.uk",
+        employers=[org_a_successor],
+    )
+
+    assert (
+        can_view_organisation_for_period(user, org_a_predecessor, cohort_8)
+        is True
+    )
+    assert can_view_organisation_for_period(user, org_a_current, cohort_9) is True
+    assert can_view_organisation_for_period(user, org_a_successor, cohort_10) is True
+
+
+@pytest.mark.django_db
+def test_multi_step_chain_user_at_middle_code_can_view_all_three_periods(
+    multi_step_chain,
+):
+    """A user employed at the middle ODS code (RJZ30) can also view all three
+    periods, because RJZ30 shares the same ``OrganisationIdentity`` as both
+    RYQ30 and RXZ40.
+
+    This is the symmetric case: direct access is resolved through identity,
+    not through which ODS code is "current" or "latest".
+    """
+    org_a_predecessor = multi_step_chain["org_a_predecessor"]  # RYQ30
+    org_a_current = multi_step_chain["org_a_current"]  # RJZ30
+    org_a_successor = multi_step_chain["org_a_successor"]  # RXZ40
+    cohort_8 = multi_step_chain["cohort_8"]
+    cohort_9 = multi_step_chain["cohort_9"]
+    cohort_10 = multi_step_chain["cohort_10"]
+
+    user = _make_user(
+        email="chain-middle@kch.nhs.uk",
+        employers=[org_a_current],
+    )
+
+    assert (
+        can_view_organisation_for_period(user, org_a_predecessor, cohort_8)
+        is True
+    )
+    assert can_view_organisation_for_period(user, org_a_current, cohort_9) is True
+    assert can_view_organisation_for_period(user, org_a_successor, cohort_10) is True
+
+
+@pytest.mark.django_db
+def test_multi_step_chain_get_accessible_periods_sees_all_three(multi_step_chain):
+    """``get_accessible_periods`` for a direct user at RXZ40 returns all three
+    periods (8, 9, 10), resolved across the full identity chain.
+    """
+    org_a_successor = multi_step_chain["org_a_successor"]  # RXZ40
+
+    user = _make_user(
+        email="chain-periods@pruh.nhs.uk",
+        employers=[org_a_successor],
+    )
+
+    periods = list(get_accessible_periods(user, org_a_successor))
+    cohort_numbers = {p.cohort_number for p in periods}
+    assert cohort_numbers == {8, 9, 10}
+
+
+@pytest.mark.django_db
+def test_multi_step_chain_get_accessible_organisations_sees_all_three(
+    multi_step_chain,
+):
+    """``get_accessible_organisations`` for a direct user at RXZ40 returns the
+    PRUH organisation for each period — RYQ30 for cohort 8, RJZ30 for cohort
+    9, RXZ40 for cohort 10 — resolved across the full identity chain.
+    """
+    cohort_8 = multi_step_chain["cohort_8"]
+    cohort_9 = multi_step_chain["cohort_9"]
+    cohort_10 = multi_step_chain["cohort_10"]
+    org_a_successor = multi_step_chain["org_a_successor"]  # RXZ40
+
+    user = _make_user(
+        email="chain-orgs@pruh.nhs.uk",
+        employers=[org_a_successor],
+    )
+
+    orgs_8 = {o.ods_code for o in get_accessible_organisations(user, cohort_8)}
+    orgs_9 = {o.ods_code for o in get_accessible_organisations(user, cohort_9)}
+    orgs_10 = {o.ods_code for o in get_accessible_organisations(user, cohort_10)}
+
+    assert "RYQ30" in orgs_8
+    assert "RJZ30" in orgs_9
+    assert "RXZ40" in orgs_10
+
+
+@pytest.mark.django_db
+def test_multi_step_chain_inherited_does_not_cross_chain(multi_step_chain):
+    """Inherited access never crosses the succession chain to a historical
+    parent — that is direct access only.
+
+    A user elsewhere in Trust C (the cohort 10 parent) can view PRUH for
+    cohort 10 (RXZ40, Trust C) but NOT for cohort 8 (RYQ30, Trust A) or
+    cohort 9 (RJZ30, Trust B), even though all three share the same
+    ``OrganisationIdentity``.
+    """
+    org_a_predecessor = multi_step_chain["org_a_predecessor"]  # RYQ30
+    org_a_current = multi_step_chain["org_a_current"]  # RJZ30
+    org_a_successor = multi_step_chain["org_a_successor"]  # RXZ40
+    cohort_8 = multi_step_chain["cohort_8"]
+    cohort_9 = multi_step_chain["cohort_9"]
+    cohort_10 = multi_step_chain["cohort_10"]
+    trust_c = multi_step_chain["trust_c"]
+
+    # A sibling organisation under Trust C — the user's current affiliation
+    # is Trust C.
+    sibling_under_trust_c = Organisation.objects.create(
+        ods_code="RXZ99",
+        name="Sibling Hospital under Trust C",
+        trust=trust_c,
+        country=multi_step_chain["country"],
+        active=True,
+    )
+
+    user = _make_user(
+        email="chain-inherited-c@trust-c.nhs.uk",
+        employers=[sibling_under_trust_c],
+    )
+
+    # Cohort 10 (Trust C) — inherited access granted.
+    assert can_view_organisation_for_period(user, org_a_successor, cohort_10) is True
+    # Cohort 8 (Trust A) and cohort 9 (Trust B) — inherited access denied.
+    # The membership parent does not match the user's current parent (Trust C).
+    assert (
+        can_view_organisation_for_period(user, org_a_predecessor, cohort_8)
+        is False
+    )
+    assert can_view_organisation_for_period(user, org_a_current, cohort_9) is False
