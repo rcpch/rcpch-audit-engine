@@ -352,7 +352,15 @@ def test_inactive_user_account_denies_access(reorganisation):
 @pytest.mark.django_db
 def test_unconfirmed_email_denies_access(reorganisation):
     """A user who has not confirmed their email is denied access (unless a
-    superuser, which is tested separately)."""
+    superuser, which is tested separately).
+
+    ``Epilepsy12User.save()`` forces ``email_confirmed=True`` whenever the
+    user has a usable password, so to test the unconfirmed state we create
+    the user with an unusable password (``set_unusable_password``) and then
+    persist ``email_confirmed=False`` via a queryset update (bypassing
+    ``save()``). This mirrors the real state of a newly-created user who
+    has not yet clicked the confirmation link.
+    """
     org_a_current = reorganisation["org_a_current"]
     cohort_9 = reorganisation["cohort_9"]
 
@@ -361,7 +369,13 @@ def test_unconfirmed_email_denies_access(reorganisation):
         email_confirmed=False,
         employers=[org_a_current],
     )
+    # The helper sets a usable password, which save() would have used to
+    # force email_confirmed=True. Bypass save() to persist the unconfirmed
+    # state directly, matching a real pre-confirmation user row.
+    Epilepsy12User.objects.filter(pk=user.pk).update(email_confirmed=False)
+    user.refresh_from_db()
 
+    assert user.email_confirmed is False
     assert can_view_organisation_for_period(user, org_a_current, cohort_9) is False
 
 
