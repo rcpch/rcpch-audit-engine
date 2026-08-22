@@ -1,29 +1,12 @@
 """
 conftest for view_tests.
 
-Every test in this subtree relies on the seeded E12 groups and users
-(`seed_groups_fixture`, `seed_users_fixture`) being present, but most tests
-do not declare them as explicit fixture dependencies - they look users up
-by first_name (e.g. ``Epilepsy12User.objects.get(first_name=...)``) and
-assume the rows already exist.
+The seed fixtures (`seed_groups_fixture`, `seed_users_fixture`) are
+session-scoped and commit their rows via `django_db_blocker.unblock()`.
+Committed session data is visible to every test in this subtree (and every
+xdist worker's own connection), so tests that look users up by `first_name`
+and `force_login` them work without an autouse wrapper.
 
-Under a single-process run with session-scoped seed fixtures this worked
-because the committed seed data was visible to every subsequent test. Under
-pytest-xdist with function-scoped seed fixtures (required for cross-worker
-transaction isolation), only tests that explicitly request the fixtures get
-seeded data - the rest see an empty user table and fail with DoesNotExist.
-
-This autouse fixture makes the seed fixtures run for every test in this
-directory without having to add them to every test signature. It is
-function-scoped (matching the seed fixtures themselves) so each test gets
-its own seeded data inside its own transaction.
+Tests that need the seed data should request the fixtures explicitly in their
+signature; tests that only read the committed rows do not need to.
 """
-
-import pytest
-
-
-@pytest.fixture(scope="function", autouse=True)
-def _seed_view_tests_data(seed_groups_fixture, seed_users_fixture):
-    # The seed fixtures do all the work; this wrapper just ensures they are
-    # requested for every test in this subtree.
-    yield
