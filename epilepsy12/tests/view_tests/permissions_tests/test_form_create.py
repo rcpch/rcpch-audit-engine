@@ -40,7 +40,7 @@ from epilepsy12.forms_folder import Epilepsy12UserAdminCreationForm
 
 
 @pytest.mark.django_db
-def test_lead_clinician_cannot_create_a_user_in_another_trust(client):
+def test_lead_clinician_cannot_create_a_user_in_another_trust(client, seed_groups_fixture, seed_users_fixture):
     """ """
 
     TEMP_CREATED_USER_FIRST_NAME = "TEMP_CREATED_USER_FIRST_NAME"
@@ -98,7 +98,7 @@ def test_lead_clinician_cannot_create_a_user_in_another_trust(client):
 
 
 @pytest.mark.django_db
-def test_lead_clinician_can_create_a_user_in_the_same_trust(client):
+def test_lead_clinician_can_create_a_user_in_the_same_trust(client, seed_groups_fixture, seed_users_fixture):
     """ """
 
     TEMP_CREATED_USER_FIRST_NAME = "TEMP_CREATED_USER_FIRST_NAME"
@@ -245,7 +245,7 @@ def test_lead_clinician_cannot_create_a_user_in_another_local_health_board(clien
 
 
 @pytest.mark.django_db
-def test_lead_clinician_can_create_a_user_in_the_same_local_health_board(client):
+def test_lead_clinician_can_create_a_user_in_the_same_local_health_board(client, seed_groups_fixture, seed_users_fixture):
     """
     A group of tests which have the unusual assumption that a user logged in as a lead clinician
     (probably a paediatric neurologist or paediatrician with expertise in epilepsy) is using his/her credentials
@@ -316,7 +316,7 @@ def test_lead_clinician_can_create_a_user_in_the_same_local_health_board(client)
 
 
 @pytest.mark.django_db
-def test_lead_clinician_cannot_create_an_RCPCH_audit_team_member(client):
+def test_lead_clinician_cannot_create_an_RCPCH_audit_team_member(client, seed_groups_fixture, seed_users_fixture):
     # is rcpch audit team member
 
     # GOSH
@@ -365,7 +365,7 @@ def test_lead_clinician_cannot_create_an_RCPCH_audit_team_member(client):
 
 
 @pytest.mark.django_db
-def test_lead_clinician_cannot_create_an_RCPCH_staff_member(client):
+def test_lead_clinician_cannot_create_an_RCPCH_staff_member(client, seed_groups_fixture, seed_users_fixture):
     # is rcpch audit team member
 
     # GOSH
@@ -415,7 +415,7 @@ def test_lead_clinician_cannot_create_an_RCPCH_staff_member(client):
 
 
 @pytest.mark.django_db
-def test_lead_clinician_cannot_create_a_superuser(client):
+def test_lead_clinician_cannot_create_a_superuser(client, seed_groups_fixture, seed_users_fixture):
     # is rcpch audit team member
 
     # GOSH
