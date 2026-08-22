@@ -30,6 +30,9 @@ import pytest
 
 from epilepsy12.general_functions.audit_period_permissions import (
     can_view_organisation_for_period,
+    get_accessible_periods,
+    get_accessible_memberships,
+    get_accessible_organisations,
 )
 from epilepsy12.models import (
     AuditPeriod,
@@ -472,3 +475,374 @@ def test_user_with_no_employer_denied(reorganisation):
     )
 
     assert can_view_organisation_for_period(user, org_a_current, cohort_9) is False
+
+
+# ---------------------------------------------------------------------------
+# get_accessible_periods
+# ---------------------------------------------------------------------------
+
+
+@pytest.mark.django_db
+def test_get_accessible_periods_direct_user_sees_all_participating_periods(
+    reorganisation,
+):
+    """A direct user (employed at RJZ30) sees every period PRUH participated
+    in — both cohort 8 (RYQ30, Trust A) and cohort 9 (RJZ30, Trust B).
+
+    Direct access is period-independent in principle, but the
+    accessible-periods query returns only periods with an approved,
+    included membership row (a period with no membership has no dashboard
+    summary to show).
+    """
+    org_a_current = reorganisation["org_a_current"]
+    cohort_8 = reorganisation["cohort_8"]
+    cohort_9 = reorganisation["cohort_9"]
+
+    user = _make_user(
+        email="periods-direct@kch.nhs.uk",
+        employers=[org_a_current],
+    )
+
+    periods = list(get_accessible_periods(user, org_a_current))
+    cohort_numbers = {p.cohort_number for p in periods}
+    assert cohort_numbers == {8, 9}
+
+
+@pytest.mark.django_db
+def test_get_accessible_periods_inherited_trust_a_user_sees_only_cohort_8(
+    reorganisation,
+):
+    """An inherited Trust A user sees only cohort 8 (the period in which PRUH
+    was assigned to Trust A). Cohort 9 (Trust B) is excluded."""
+    org_a_predecessor = reorganisation["org_a_predecessor"]
+    trust_a = reorganisation["trust_a"]
+
+    sibling_under_trust_a = Organisation.objects.create(
+        ods_code="RYQ99",
+        name="Sibling Hospital under Trust A",
+        trust=trust_a,
+        country=reorganisation["country"],
+        active=True,
+    )
+
+    user = _make_user(
+        email="periods-inherited-a@trust-a.nhs.uk",
+        employers=[sibling_under_trust_a],
+    )
+
+    periods = list(get_accessible_periods(user, org_a_predecessor))
+    cohort_numbers = {p.cohort_number for p in periods}
+    assert cohort_numbers == {8}
+
+
+@pytest.mark.django_db
+def test_get_accessible_periods_inherited_trust_b_user_sees_only_cohort_9(
+    reorganisation,
+):
+    """An inherited Trust B user sees only cohort 9 (the period in which PRUH
+    was assigned to Trust B). Cohort 8 (Trust A) is excluded."""
+    org_a_current = reorganisation["org_a_current"]
+    sibling_under_trust_b = Organisation.objects.get(ods_code="RJZ01")
+
+    user = _make_user(
+        email="periods-inherited-b@trust-b.nhs.uk",
+        employers=[sibling_under_trust_b],
+    )
+
+    periods = list(get_accessible_periods(user, org_a_current))
+    cohort_numbers = {p.cohort_number for p in periods}
+    assert cohort_numbers == {9}
+
+
+@pytest.mark.django_db
+def test_get_accessible_periods_rcpch_user_sees_all_participating_periods(
+    reorganisation,
+):
+    """An RCPCH user sees every period PRUH participated in."""
+    org_a_current = reorganisation["org_a_current"]
+
+    user = _make_user(
+        email="periods-rcpch@rcpch.ac.uk",
+        role=RCPCH_AUDIT_TEAM,
+        is_rcpch_audit_team_member=True,
+        is_rcpch_staff=True,
+        employers=[],
+    )
+
+    periods = list(get_accessible_periods(user, org_a_current))
+    cohort_numbers = {p.cohort_number for p in periods}
+    assert cohort_numbers == {8, 9}
+
+
+@pytest.mark.django_db
+def test_get_accessible_periods_unrelated_user_sees_none(reorganisation):
+    """An unrelated user sees no periods for PRUH."""
+    org_a_current = reorganisation["org_a_current"]
+    unrelated_org = Organisation.objects.get(ods_code="RGT01")
+
+    user = _make_user(
+        email="periods-unrelated@addenbrookes.nhs.uk",
+        employers=[unrelated_org],
+    )
+
+    periods = list(get_accessible_periods(user, org_a_current))
+    assert periods == []
+
+
+# ---------------------------------------------------------------------------
+# get_accessible_memberships
+# ---------------------------------------------------------------------------
+
+
+@pytest.mark.django_db
+def test_get_accessible_memberships_rcpch_user_sees_all_for_period(
+    reorganisation, england_hierarchy
+):
+    """An RCPCH user sees every approved, included membership for the period."""
+    cohort_9 = reorganisation["cohort_9"]
+    org_a_current = reorganisation["org_a_current"]
+
+    # Add a sibling organisation under Trust B for cohort 9 so the RCPCH
+    # user sees more than one membership.
+    kings = Organisation.objects.get(ods_code="RJZ01")
+    AuditPeriodOrganisation.objects.update_or_create(
+        audit_period=cohort_9,
+        organisation=kings,
+        defaults={
+            "country": england_hierarchy["country"],
+            "trust": reorganisation["trust_b"],
+            "integrated_care_board": kings.integrated_care_board,
+            "nhs_england_region": kings.nhs_england_region,
+            "openuk_network": kings.openuk_network,
+            "included_in_reporting": True,
+            "approved_at": date(2028, 1, 1),
+            "source": "snapshot",
+        },
+    )
+
+    user = _make_user(
+        email="memberships-rcpch@rcpch.ac.uk",
+        role=RCPCH_AUDIT_TEAM,
+        is_rcpch_audit_team_member=True,
+        is_rcpch_staff=True,
+        employers=[],
+    )
+
+    memberships = list(get_accessible_memberships(user, cohort_9))
+    org_ids = {m.organisation_id for m in memberships}
+    assert org_a_current.id in org_ids
+    assert kings.id in org_ids
+
+
+@pytest.mark.django_db
+def test_get_accessible_memberships_inherited_trust_b_user_sees_trust_b_orgs(
+    reorganisation, england_hierarchy
+):
+    """An inherited Trust B user sees only cohort-9 memberships whose Trust
+    is Trust B. PRUH (RJZ30, Trust B) is included; a Trust A organisation
+    is not.
+    """
+    cohort_9 = reorganisation["cohort_9"]
+    org_a_current = reorganisation["org_a_current"]
+    trust_a = reorganisation["trust_a"]
+
+    # A Trust A organisation with a cohort 9 membership — must NOT appear.
+    trust_a_org = Organisation.objects.create(
+        ods_code="RYQ98",
+        name="Trust A Hospital (cohort 9)",
+        trust=trust_a,
+        country=england_hierarchy["country"],
+        active=True,
+    )
+    AuditPeriodOrganisation.objects.create(
+        audit_period=cohort_9,
+        organisation=trust_a_org,
+        country=england_hierarchy["country"],
+        trust=trust_a,
+        approved_at=date(2028, 1, 1),
+    )
+
+    sibling_under_trust_b = Organisation.objects.get(ods_code="RJZ01")
+    user = _make_user(
+        email="memberships-inherited-b@trust-b.nhs.uk",
+        employers=[sibling_under_trust_b],
+    )
+
+    memberships = list(get_accessible_memberships(user, cohort_9))
+    org_ids = {m.organisation_id for m in memberships}
+    assert org_a_current.id in org_ids  # PRUH under Trust B
+    assert trust_a_org.id not in org_ids  # Trust A org excluded
+
+
+@pytest.mark.django_db
+def test_get_accessible_memberships_direct_user_sees_own_org_across_identity_chain(
+    reorganisation,
+):
+    """A direct user employed at RJZ30 sees their own organisation's
+    memberships across the identity chain — both cohort 8 (RYQ30) and
+    cohort 9 (RJZ30) — because both share the same OrganisationIdentity.
+
+    This is the bulk-query equivalent of direct access across an ODS code
+    change: the user's direct organisation set includes RYQ30 via the shared
+    identity, so the cohort 8 membership for RYQ30 is returned.
+    """
+    cohort_8 = reorganisation["cohort_8"]
+    org_a_predecessor = reorganisation["org_a_predecessor"]
+    org_a_current = reorganisation["org_a_current"]
+
+    user = _make_user(
+        email="memberships-direct@kch.nhs.uk",
+        employers=[org_a_current],
+    )
+
+    # Cohort 8 membership is for RYQ30 (the predecessor), not RJZ30. A
+    # direct user at RJZ30 should still see it via the shared identity.
+    memberships = list(get_accessible_memberships(user, cohort_8))
+    org_ids = {m.organisation_id for m in memberships}
+    assert org_a_predecessor.id in org_ids
+
+
+# ---------------------------------------------------------------------------
+# get_accessible_organisations
+# ---------------------------------------------------------------------------
+
+
+@pytest.mark.django_db
+def test_get_accessible_organisations_rcpch_user_sees_all_for_period(
+    reorganisation, england_hierarchy
+):
+    """An RCPCH user sees every organisation with an approved, included
+    membership for the period."""
+    cohort_9 = reorganisation["cohort_9"]
+    org_a_current = reorganisation["org_a_current"]
+
+    kings = Organisation.objects.get(ods_code="RJZ01")
+    AuditPeriodOrganisation.objects.update_or_create(
+        audit_period=cohort_9,
+        organisation=kings,
+        defaults={
+            "country": england_hierarchy["country"],
+            "trust": reorganisation["trust_b"],
+            "integrated_care_board": kings.integrated_care_board,
+            "nhs_england_region": kings.nhs_england_region,
+            "openuk_network": kings.openuk_network,
+            "included_in_reporting": True,
+            "approved_at": date(2028, 1, 1),
+            "source": "snapshot",
+        },
+    )
+
+    user = _make_user(
+        email="orgs-rcpch@rcpch.ac.uk",
+        role=RCPCH_AUDIT_TEAM,
+        is_rcpch_audit_team_member=True,
+        is_rcpch_staff=True,
+        employers=[],
+    )
+
+    orgs = list(get_accessible_organisations(user, cohort_9))
+    ods_codes = {o.ods_code for o in orgs}
+    assert "RJZ30" in ods_codes  # PRUH
+    assert "RJZ01" in ods_codes  # King's
+
+
+@pytest.mark.django_db
+def test_get_accessible_organisations_inherited_trust_b_user_sees_trust_b_orgs(
+    reorganisation, england_hierarchy
+):
+    """An inherited Trust B user sees only cohort-9 organisations under
+    Trust B. A Trust A organisation with a cohort 9 membership is excluded."""
+    cohort_9 = reorganisation["cohort_9"]
+    org_a_current = reorganisation["org_a_current"]
+    trust_a = reorganisation["trust_a"]
+
+    trust_a_org = Organisation.objects.create(
+        ods_code="RYQ97",
+        name="Trust A Hospital (cohort 9 orgs)",
+        trust=trust_a,
+        country=england_hierarchy["country"],
+        active=True,
+    )
+    AuditPeriodOrganisation.objects.create(
+        audit_period=cohort_9,
+        organisation=trust_a_org,
+        country=england_hierarchy["country"],
+        trust=trust_a,
+        approved_at=date(2028, 1, 1),
+    )
+
+    sibling_under_trust_b = Organisation.objects.get(ods_code="RJZ01")
+    user = _make_user(
+        email="orgs-inherited-b@trust-b.nhs.uk",
+        employers=[sibling_under_trust_b],
+    )
+
+    orgs = list(get_accessible_organisations(user, cohort_9))
+    ods_codes = {o.ods_code for o in orgs}
+    assert "RJZ30" in ods_codes  # PRUH under Trust B
+    assert "RYQ97" not in ods_codes  # Trust A org excluded
+
+
+@pytest.mark.django_db
+def test_get_accessible_organisations_with_parent_filter(
+    reorganisation, england_hierarchy
+):
+    """The ``parent`` filter narrows the result to organisations whose
+    membership for the period assigns them to that parent.
+
+    Here an RCPCH user requests cohort 9 organisations under Trust B. PRUH
+    (RJZ30, Trust B) is included; a Trust A organisation is not.
+    """
+    cohort_9 = reorganisation["cohort_9"]
+    trust_a = reorganisation["trust_a"]
+    trust_b = reorganisation["trust_b"]
+
+    trust_a_org = Organisation.objects.create(
+        ods_code="RYQ96",
+        name="Trust A Hospital (parent filter)",
+        trust=trust_a,
+        country=england_hierarchy["country"],
+        active=True,
+    )
+    AuditPeriodOrganisation.objects.create(
+        audit_period=cohort_9,
+        organisation=trust_a_org,
+        country=england_hierarchy["country"],
+        trust=trust_a,
+        approved_at=date(2028, 1, 1),
+    )
+
+    user = _make_user(
+        email="orgs-parent-filter@rcpch.ac.uk",
+        role=RCPCH_AUDIT_TEAM,
+        is_rcpch_audit_team_member=True,
+        is_rcpch_staff=True,
+        employers=[],
+    )
+
+    orgs = list(get_accessible_organisations(user, cohort_9, parent=trust_b))
+    ods_codes = {o.ods_code for o in orgs}
+    assert "RJZ30" in ods_codes  # PRUH under Trust B
+    assert "RYQ96" not in ods_codes  # Trust A org excluded by parent filter
+
+
+@pytest.mark.django_db
+def test_get_accessible_organisations_direct_user_sees_own_org_across_identity_chain(
+    reorganisation,
+):
+    """A direct user employed at RJZ30 sees their own organisation for cohort
+    8 (RYQ30, the predecessor) via the shared identity chain, even though
+    they have no inherited access to Trust A.
+    """
+    cohort_8 = reorganisation["cohort_8"]
+    org_a_predecessor = reorganisation["org_a_predecessor"]
+    org_a_current = reorganisation["org_a_current"]
+
+    user = _make_user(
+        email="orgs-direct-chain@kch.nhs.uk",
+        employers=[org_a_current],
+    )
+
+    orgs = list(get_accessible_organisations(user, cohort_8))
+    ods_codes = {o.ods_code for o in orgs}
+    assert "RYQ30" in ods_codes  # predecessor via identity chain
