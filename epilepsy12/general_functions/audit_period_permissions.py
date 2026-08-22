@@ -268,6 +268,198 @@ def can_view_organisation_for_period(user, organisation, audit_period) -> bool:
 
 
 # ---------------------------------------------------------------------------
+# Case / registration period resolution
+# ---------------------------------------------------------------------------
+
+
+class CasePeriodMismatch(Exception):
+    """Raised when a route-supplied audit period does not match the case's
+    ``Registration.audit_period``.
+
+    A route period, when supplied, cannot disagree with the registration
+    period. This protects against URL tampering (e.g. constructing a
+    ``/audit-periods/<slug>/cases/<id>/`` URL with a period that does not
+    match the case's actual registration period).
+    """
+
+
+def _resolve_case_period(case, audit_period=None):
+    """Return the ``AuditPeriod`` for ``case``, validating it against an
+    optional route-supplied period.
+
+    - If ``audit_period`` is ``None``, the period is resolved from
+      ``case.registration.audit_period`` (the authoritative source — the
+      period is assigned from the first paediatric assessment date during
+      registration).
+    - If ``audit_period`` is supplied, it must match
+      ``case.registration.audit_period``. A mismatch raises
+      ``CasePeriodMismatch`` — a route period cannot disagree with the
+      registration period.
+    - If the case has no ``Registration`` (pre-registration), ``None`` is
+      returned. The pre-registration rule is handled separately by
+      ``can_view_case_pre_registration`` / ``can_edit_case_pre_registration``.
+
+    Returns a tuple ``(period, lead_organisation)`` where ``period`` may be
+    ``None`` (pre-registration) and ``lead_organisation`` may be ``None`` (no
+    lead site yet).
+    """
+    Registration = _get_model("Registration")
+
+    try:
+        registration = case.registration
+    except Registration.DoesNotExist:
+        # Pre-registration — no period yet. The caller must use the
+        # pre-registration rule, not the period-aware rule.
+        return None, None
+
+    registration_period = registration.audit_period
+
+    if audit_period is not None and registration_period is not None:
+        if audit_period.pk != registration_period.pk:
+            raise CasePeriodMismatch(
+                f"Route period {audit_period} does not match "
+                f"Registration.audit_period {registration_period} for case {case}."
+            )
+
+    lead_organisation = registration.lead_organisation()
+    return registration_period, lead_organisation
+
+
+def can_view_case_for_period(user, case, audit_period=None) -> bool:
+    """Return True if ``user`` may view ``case`` for the given audit period.
+
+    The audit period is resolved from ``case.registration.audit_period``
+    (the authoritative source). If ``audit_period`` is supplied, it must
+    match the registration period — a route period cannot disagree with the
+    registration period (raises ``CasePeriodMismatch`` if they differ).
+
+    The view decision delegates to ``can_view_organisation_for_period``
+    with the case's lead organisation (resolved from the primary ``Site``)
+    and the registration period.
+
+    Pre-registration cases (no ``Registration``) are denied here — they are
+    handled by ``can_view_case_pre_registration``, which uses the
+    separately defined direct/current organisation rule.
+    """
+    if not _user_is_active_and_confirmed(user):
+        return False
+
+    period, lead_organisation = _resolve_case_period(case, audit_period)
+
+    if period is None or lead_organisation is None:
+        # Pre-registration or no lead site — the period-aware rule does not
+        # apply. Use the pre-registration rule instead.
+        return can_view_case_pre_registration(user, case)
+
+    return can_view_organisation_for_period(user, lead_organisation, period)
+
+
+def can_edit_case_for_period(user, case, audit_period=None) -> bool:
+    """Return True if ``user`` may edit ``case`` for the given audit period.
+
+    Combines the period-aware view permission with the case's own
+    ``editable()`` check. Editing remains separately constrained by
+    submission deadlines (via ``Case.editable()`` and
+    ``Registration.days_remaining_before_submission``), which honour
+    per-organisation extensions.
+
+    The audit period is resolved from ``case.registration.audit_period``.
+    If ``audit_period`` is supplied, it must match the registration period
+    (raises ``CasePeriodMismatch`` if they differ).
+
+    Pre-registration cases (no ``Registration``) are handled by the
+    pre-registration rule, which allows editing by direct/current
+    organisation users (the case has not yet been assigned to a period).
+    """
+    if not _user_is_active_and_confirmed(user):
+        return False
+
+    period, lead_organisation = _resolve_case_period(case, audit_period)
+
+    if period is None or lead_organisation is None:
+        # Pre-registration — use the pre-registration rule. Editing is
+        # allowed for direct/current organisation users; the case has not
+        # yet been assigned to a period so deadline constraints do not
+        # apply.
+        return can_edit_case_pre_registration(user, case)
+
+    if not can_view_organisation_for_period(user, lead_organisation, period):
+        return False
+
+    return case.editable()
+
+
+# ---------------------------------------------------------------------------
+# Pre-registration rule
+# ---------------------------------------------------------------------------
+#
+# A case may not yet have ``Registration.audit_period``, because the period
+# is assigned from the first paediatric assessment date during registration.
+# Access before that assignment cannot be period-based. The pre-registration
+# rule uses direct/current organisation access: a user with active employment
+# at the case's lead organisation (or an organisation sharing its identity)
+# may view and edit the case. RCPCH users retain their broader access.
+
+
+def _case_lead_organisation(case):
+    """Return the lead ``Organisation`` for a case, resolved from the primary
+    ``Site`` (``site_is_primary_centre_of_epilepsy_care=True`` and
+    ``site_is_actively_involved_in_epilepsy_care=True``).
+
+    Returns ``None`` if the case has no sites or no primary lead site.
+    """
+    Site = _get_model("Site")
+    site = Site.objects.filter(
+        case=case,
+        site_is_primary_centre_of_epilepsy_care=True,
+        site_is_actively_involved_in_epilepsy_care=True,
+    ).first()
+    return site.organisation if site else None
+
+
+def can_view_case_pre_registration(user, case) -> bool:
+    """Return True if ``user`` may view ``case`` before it has been registered
+    (i.e. before ``Registration.audit_period`` has been assigned).
+
+    Uses the direct/current organisation rule: a user with active employment
+    at the case's lead organisation (or an organisation sharing its identity)
+    may view the case. RCPCH users retain their broader access. Inherited
+    Trust/LHB access does **not** apply pre-registration, because there is no
+    period membership to resolve the parent from.
+    """
+    if not _user_is_active_and_confirmed(user):
+        return False
+
+    if _is_rcpch_user(user):
+        return True
+
+    lead_organisation = _case_lead_organisation(case)
+    if lead_organisation is None:
+        return False
+
+    employer_ids = set(_active_employer_organisations(user))
+    if lead_organisation.pk in employer_ids:
+        return True
+    if _organisation_shares_identity_with_user(lead_organisation, user):
+        return True
+
+    return False
+
+
+def can_edit_case_pre_registration(user, case) -> bool:
+    """Return True if ``user`` may edit ``case`` before it has been registered.
+
+    Combines the pre-registration view rule with the case's ``editable()``
+    check. Pre-registration cases have no deadline constraint yet (the
+    submission deadline is assigned from the audit period, which has not been
+    set), so ``editable()`` returns True unless the case is locked.
+    """
+    if not can_view_case_pre_registration(user, case):
+        return False
+    return case.editable()
+
+
+# ---------------------------------------------------------------------------
 # Bulk access queries
 # ---------------------------------------------------------------------------
 #

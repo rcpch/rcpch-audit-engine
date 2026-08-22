@@ -33,6 +33,11 @@ from epilepsy12.general_functions.audit_period_permissions import (
     get_accessible_periods,
     get_accessible_memberships,
     get_accessible_organisations,
+    can_view_case_for_period,
+    can_edit_case_for_period,
+    can_view_case_pre_registration,
+    can_edit_case_pre_registration,
+    CasePeriodMismatch,
 )
 from epilepsy12.models import (
     AuditPeriod,
@@ -1124,3 +1129,361 @@ def test_multi_step_chain_inherited_does_not_cross_chain(multi_step_chain):
         is False
     )
     assert can_view_organisation_for_period(user, org_a_current, cohort_9) is False
+
+
+# ---------------------------------------------------------------------------
+# Case / registration period resolution
+# ---------------------------------------------------------------------------
+#
+# These tests verify that case and field routes derive the period from
+# ``Registration.audit_period``, that a route period cannot disagree with the
+# registration period, and that the view/edit decision delegates to
+# ``can_view_organisation_for_period`` with the case's lead organisation.
+#
+# The case factory creates a Case with a Registration, a Site (lead
+# organisation) and all the related audit sub-models. Passing
+# ``registration__first_paediatric_assessment_date`` and
+# ``registration__audit_period__cohort_number`` pins the case to a specific
+# cohort; passing ``organisations__organisation`` pins the lead site.
+
+
+@pytest.mark.django_db
+def test_can_view_case_resolves_period_from_registration(
+    reorganisation, e12_case_factory
+):
+    """``can_view_case_for_period`` derives the audit period from
+    ``Registration.audit_period`` when no explicit period is supplied.
+
+    A direct user at RJZ30 can view a cohort 9 case whose lead organisation
+    is RJZ30, with no ``audit_period`` argument — the period is resolved
+    from the registration.
+    """
+    org_a_current = reorganisation["org_a_current"]  # RJZ30
+    cohort_9 = reorganisation["cohort_9"]
+
+    case = e12_case_factory(
+        first_name="case_period_resolve",
+        organisations__organisation=org_a_current,
+        registration__first_paediatric_assessment_date=date(2026, 6, 1),
+        registration__audit_period__cohort_number=9,
+    )
+
+    user = _make_user(
+        email="case-direct@kch.nhs.uk",
+        employers=[org_a_current],
+    )
+
+    assert can_view_case_for_period(user, case) is True
+
+
+@pytest.mark.django_db
+def test_can_view_case_accepts_matching_route_period(reorganisation, e12_case_factory):
+    """A route period matching ``Registration.audit_period`` is accepted."""
+    org_a_current = reorganisation["org_a_current"]  # RJZ30
+    cohort_9 = reorganisation["cohort_9"]
+
+    case = e12_case_factory(
+        first_name="case_matching_period",
+        organisations__organisation=org_a_current,
+        registration__first_paediatric_assessment_date=date(2026, 6, 1),
+        registration__audit_period__cohort_number=9,
+    )
+
+    user = _make_user(
+        email="case-matching@kch.nhs.uk",
+        employers=[org_a_current],
+    )
+
+    assert can_view_case_for_period(user, case, audit_period=cohort_9) is True
+
+
+@pytest.mark.django_db
+def test_can_view_case_rejects_mismatched_route_period(reorganisation, e12_case_factory):
+    """A route period that does not match ``Registration.audit_period`` raises
+    ``CasePeriodMismatch``.
+
+    This protects against URL tampering — constructing a period-aware case
+    URL with a period that does not match the case's actual registration
+    period.
+    """
+    org_a_current = reorganisation["org_a_current"]  # RJZ30
+    cohort_8 = reorganisation["cohort_8"]
+
+    # Cohort 9 case.
+    case = e12_case_factory(
+        first_name="case_mismatch",
+        organisations__organisation=org_a_current,
+        registration__first_paediatric_assessment_date=date(2026, 6, 1),
+        registration__audit_period__cohort_number=9,
+    )
+
+    user = _make_user(
+        email="case-mismatch@kch.nhs.uk",
+        employers=[org_a_current],
+    )
+
+    # Passing cohort 8 as the route period for a cohort 9 case must raise.
+    with pytest.raises(CasePeriodMismatch):
+        can_view_case_for_period(user, case, audit_period=cohort_8)
+
+
+@pytest.mark.django_db
+def test_can_view_case_direct_user_across_ods_code_change(
+    reorganisation, e12_case_factory
+):
+    """A direct user at RJZ30 can view a cohort 8 case whose lead organisation
+    is RYQ30 (the predecessor ODS code), via the shared identity chain.
+
+    This is the case-level equivalent of direct organisation access across
+    an ODS code change.
+    """
+    org_a_current = reorganisation["org_a_current"]  # RJZ30
+    org_a_predecessor = reorganisation["org_a_predecessor"]  # RYQ30
+    cohort_8 = reorganisation["cohort_8"]
+
+    case = e12_case_factory(
+        first_name="case_cross_ods",
+        organisations__organisation=org_a_predecessor,
+        registration__first_paediatric_assessment_date=date(2025, 6, 1),
+        registration__audit_period__cohort_number=8,
+    )
+
+    user = _make_user(
+        email="case-cross-ods@kch.nhs.uk",
+        employers=[org_a_current],
+    )
+
+    assert can_view_case_for_period(user, case) is True
+
+
+@pytest.mark.django_db
+def test_can_view_case_inherited_trust_b_denied_for_cohort_8(
+    reorganisation, e12_case_factory
+):
+    """An inherited Trust B user cannot view a cohort 8 case whose lead
+    organisation is RYQ30 (Trust A period), even though the same user can
+    view cohort 9 cases under Trust B.
+    """
+    org_a_predecessor = reorganisation["org_a_predecessor"]  # RYQ30
+    org_a_current = reorganisation["org_a_current"]  # RJZ30
+    cohort_8 = reorganisation["cohort_8"]
+    cohort_9 = reorganisation["cohort_9"]
+    sibling_under_trust_b = Organisation.objects.get(ods_code="RJZ01")
+
+    user = _make_user(
+        email="case-inherited-b@trust-b.nhs.uk",
+        employers=[sibling_under_trust_b],
+    )
+
+    # Cohort 8 case under Trust A — denied.
+    case_8 = e12_case_factory(
+        first_name="case_cohort_8",
+        organisations__organisation=org_a_predecessor,
+        registration__first_paediatric_assessment_date=date(2025, 6, 1),
+        registration__audit_period__cohort_number=8,
+    )
+    assert can_view_case_for_period(user, case_8) is False
+
+    # Cohort 9 case under Trust B — allowed.
+    case_9 = e12_case_factory(
+        first_name="case_cohort_9",
+        organisations__organisation=org_a_current,
+        registration__first_paediatric_assessment_date=date(2026, 6, 1),
+        registration__audit_period__cohort_number=9,
+    )
+    assert can_view_case_for_period(user, case_9) is True
+
+
+@pytest.mark.django_db
+def test_can_view_case_rcpch_user(reorganisation, e12_case_factory):
+    """An RCPCH user can view any case."""
+    org_a_predecessor = reorganisation["org_a_predecessor"]  # RYQ30
+
+    case = e12_case_factory(
+        first_name="case_rcpch",
+        organisations__organisation=org_a_predecessor,
+        registration__first_paediatric_assessment_date=date(2025, 6, 1),
+        registration__audit_period__cohort_number=8,
+    )
+
+    user = _make_user(
+        email="case-rcpch@rcpch.ac.uk",
+        role=RCPCH_AUDIT_TEAM,
+        is_rcpch_audit_team_member=True,
+        is_rcpch_staff=True,
+        employers=[],
+    )
+
+    assert can_view_case_for_period(user, case) is True
+
+
+@pytest.mark.django_db
+def test_can_edit_case_combines_view_permission_with_editable(
+    reorganisation, e12_case_factory
+):
+    """``can_edit_case_for_period`` combines the period-aware view permission
+    with the case's ``editable()`` check.
+
+    A direct user at RJZ30 can edit a cohort 9 case (editable, view
+    allowed). The same case locked is not editable.
+    """
+    org_a_current = reorganisation["org_a_current"]  # RJZ30
+    cohort_9 = reorganisation["cohort_9"]
+
+    case = e12_case_factory(
+        first_name="case_editable",
+        organisations__organisation=org_a_current,
+        registration__first_paediatric_assessment_date=date(2026, 6, 1),
+        registration__audit_period__cohort_number=9,
+    )
+
+    user = _make_user(
+        email="case-edit@kch.nhs.uk",
+        employers=[org_a_current],
+    )
+
+    # Cohort 9 is in the future relative to today, so the case is editable
+    # (days_remaining is not yet 0). The direct user has view access, so
+    # edit is allowed.
+    assert can_edit_case_for_period(user, case) is True
+
+    # Lock the case — edit is now denied even though view is allowed.
+    case.locked = True
+    case.save(update_fields=["locked"])
+    assert can_edit_case_for_period(user, case) is False
+
+
+@pytest.mark.django_db
+def test_can_edit_case_denied_for_inherited_user_outside_period(
+    reorganisation, e12_case_factory
+):
+    """An inherited Trust B user cannot edit a cohort 8 case (Trust A period),
+    even if the case is editable — the view permission is denied first."""
+    org_a_predecessor = reorganisation["org_a_predecessor"]  # RYQ30
+    sibling_under_trust_b = Organisation.objects.get(ods_code="RJZ01")
+
+    case = e12_case_factory(
+        first_name="case_edit_denied",
+        organisations__organisation=org_a_predecessor,
+        registration__first_paediatric_assessment_date=date(2025, 6, 1),
+        registration__audit_period__cohort_number=8,
+    )
+
+    user = _make_user(
+        email="case-edit-denied@trust-b.nhs.uk",
+        employers=[sibling_under_trust_b],
+    )
+
+    assert can_edit_case_for_period(user, case) is False
+
+
+# ---------------------------------------------------------------------------
+# Pre-registration rule
+# ---------------------------------------------------------------------------
+
+
+@pytest.mark.django_db
+def test_can_view_case_pre_registration_direct_user(reorganisation, e12_case_factory):
+    """A direct user at the case's lead organisation can view a case that has
+    no ``Registration`` yet (pre-registration).
+
+    The period-aware rule does not apply pre-registration; the direct/current
+    organisation rule is used instead.
+    """
+    org_a_current = reorganisation["org_a_current"]  # RJZ30
+
+    # Create a case with no registration. The factory creates a registration
+    # by default, so we pass registration=None to suppress it.
+    case = e12_case_factory(
+        first_name="pre_reg_direct",
+        organisations__organisation=org_a_current,
+        registration=None,
+    )
+
+    user = _make_user(
+        email="pre-reg-direct@kch.nhs.uk",
+        employers=[org_a_current],
+    )
+
+    assert can_view_case_pre_registration(user, case) is True
+    # can_view_case_for_period should also delegate to the pre-registration
+    # rule when the case has no registration.
+    assert can_view_case_for_period(user, case) is True
+
+
+@pytest.mark.django_db
+def test_can_view_case_pre_registration_rcpch_user(reorganisation, e12_case_factory):
+    """An RCPCH user can view a pre-registration case."""
+    org_a_current = reorganisation["org_a_current"]  # RJZ30
+
+    case = e12_case_factory(
+        first_name="pre_reg_rcpch",
+        organisations__organisation=org_a_current,
+        registration=None,
+    )
+
+    user = _make_user(
+        email="pre-reg-rcpch@rcpch.ac.uk",
+        role=RCPCH_AUDIT_TEAM,
+        is_rcpch_audit_team_member=True,
+        is_rcpch_staff=True,
+        employers=[],
+    )
+
+    assert can_view_case_pre_registration(user, case) is True
+
+
+@pytest.mark.django_db
+def test_can_view_case_pre_registration_inherited_user_denied(
+    reorganisation, e12_case_factory
+):
+    """An inherited Trust B user (not employed at the case's lead organisation)
+    cannot view a pre-registration case.
+
+    Inherited Trust/LHB access does not apply pre-registration, because
+    there is no period membership to resolve the parent from.
+    """
+    org_a_current = reorganisation["org_a_current"]  # RJZ30
+    sibling_under_trust_b = Organisation.objects.get(ods_code="RJZ01")
+
+    case = e12_case_factory(
+        first_name="pre_reg_inherited",
+        organisations__organisation=org_a_current,
+        registration=None,
+    )
+
+    user = _make_user(
+        email="pre-reg-inherited@trust-b.nhs.uk",
+        employers=[sibling_under_trust_b],
+    )
+
+    assert can_view_case_pre_registration(user, case) is False
+    assert can_view_case_for_period(user, case) is False
+
+
+@pytest.mark.django_db
+def test_can_edit_case_pre_registration_direct_user(reorganisation, e12_case_factory):
+    """A direct user can edit a pre-registration case (no deadline constraint
+    yet — the submission deadline is assigned from the audit period, which
+    has not been set)."""
+    org_a_current = reorganisation["org_a_current"]  # RJZ30
+
+    case = e12_case_factory(
+        first_name="pre_reg_edit",
+        organisations__organisation=org_a_current,
+        registration=None,
+    )
+
+    user = _make_user(
+        email="pre-reg-edit@kch.nhs.uk",
+        employers=[org_a_current],
+    )
+
+    assert can_edit_case_pre_registration(user, case) is True
+    # can_edit_case_for_period delegates to the pre-registration rule.
+    assert can_edit_case_for_period(user, case) is True
+
+    # Lock the case — edit is now denied.
+    case.locked = True
+    case.save(update_fields=["locked"])
+    assert can_edit_case_pre_registration(user, case) is False
