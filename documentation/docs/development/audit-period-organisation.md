@@ -962,6 +962,8 @@ Scope:
 Delivered (in progress):
 
 - `epilepsy12/tests/conftest.py` — `reorganisation` fixture (the canonical canary: PRUH moved from Trust A `RYQ`, dissolved, to Trust B `RJZ`, live, at the cohort 8 -> 9 boundary, with an ODS code change `RYQ30` -> `RJZ30` sharing one `OrganisationIdentity`); `cohort_8` and `cohort_9` AuditPeriod fixtures. The fixture is idempotent within a test run.
+- `epilepsy12/general_functions/audit_period_permissions.py` — `can_view_organisation_for_period(user, organisation, audit_period)` implementing the three-tier access model: RCPCH access (superusers, audit team, staff), direct organisation access (active employment at the organisation, resolved through `OrganisationIdentity` across ODS code changes, does not require an approved membership row), and inherited Trust/LHB access (current-affiliation-and-period-aware, requires an approved membership row, never crosses the succession chain). Inactive employment, unconfirmed email, absent membership and unapproved membership all deny access (except for RCPCH users).
+- `epilepsy12/tests/model_tests/test_audit_period_permissions.py` — tests for direct access (current and predecessor ODS code, both periods, no-membership case), inherited Trust A / Trust B access with denial for the opposite period, RCPCH access (audit team member and superuser), inactive employment / inactive account / unconfirmed email, absent and unapproved membership, and unrelated / no-employer users.
 
 New tests should use a reorganisation fixture and cover:
 
