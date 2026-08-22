@@ -959,6 +959,10 @@ Scope:
 - define the pre-registration rule for cases without an audit period; and
 - leave the existing report-builder mixin and Organisational Audit permission path unchanged.
 
+Delivered (in progress):
+
+- `epilepsy12/tests/conftest.py` — `reorganisation` fixture (the canonical canary: PRUH moved from Trust A `RYQ`, dissolved, to Trust B `RJZ`, live, at the cohort 8 -> 9 boundary, with an ODS code change `RYQ30` -> `RJZ30` sharing one `OrganisationIdentity`); `cohort_8` and `cohort_9` AuditPeriod fixtures. The fixture is idempotent within a test run.
+
 New tests should use a reorganisation fixture and cover:
 
 - direct Organisation A access to the agreed older in-flight periods;
