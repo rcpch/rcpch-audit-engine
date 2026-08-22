@@ -22,5 +22,11 @@ jobs:
           cp envs/env-template envs/.env
 
       - name: Run PR check script
+        env:
+          # GitHub's ubuntu-latest runner exposes 2 vCPUs, so xdist 'auto'
+          # only spawns 2 workers. Oversubscribe to 4: Django tests are
+          # mostly DB I/O, not CPU, so extra workers help despite the
+          # limited core count.
+          E12_TEST_WORKERS: "4"
         run: |
           s/pr-check
