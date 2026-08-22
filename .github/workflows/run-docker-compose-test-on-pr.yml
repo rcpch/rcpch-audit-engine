@@ -22,5 +22,10 @@ jobs:
           cp envs/env-template envs/.env
 
       - name: Run PR check script
+        env:
+          # Oversubscribe the 2-vCPU runner. Django tests are mostly DB I/O,
+          # and the seed fixtures are session-scoped so per-worker DB setup
+          # is a one-off cost, not a per-test cost.
+          E12_TEST_WORKERS: "4"
         run: |
           s/pr-check

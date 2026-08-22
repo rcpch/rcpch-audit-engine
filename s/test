@@ -32,8 +32,11 @@ Modes (pick one):
 
 Options:
 	-j, --parallel [N]
-		Run tests in parallel with pytest-xdist. N defaults to 'auto'
-		(one worker per CPU core). Pass an integer to use N workers.
+		Run tests in parallel with pytest-xdist. N defaults to the value of
+		the E12_TEST_WORKERS env var if set, otherwise 'auto' (one worker
+		per CPU core). Pass an integer to use N workers.
+		In CI, set E12_TEST_WORKERS to oversubscribe the runner (e.g. 4 on
+		a 2-vCPU runner) since Django tests are mostly DB I/O, not CPU.
 	-h, --help
 			Show this help message.
 
@@ -83,7 +86,9 @@ for arg in "$@"; do
 			set_mode "spin-up"
 			;;
 		-j|--parallel)
-			PARALLEL="auto"
+			# 'auto' = one worker per CPU core locally; in CI set
+			# E12_TEST_WORKERS to oversubscribe (Django tests are I/O bound).
+			PARALLEL="${E12_TEST_WORKERS:-auto}"
 			;;
 		-j=*|--parallel=*)
 			PARALLEL="${arg#*=}"

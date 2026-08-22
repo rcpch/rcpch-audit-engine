@@ -1,21 +1,18 @@
 """
 Seeds E12 Users in the test db.
 
-Idempotent: each user is fetched-or-created by its deterministic ``first_name``
-(a stable natural key per role + organisation), so the fixture is safe to run
-repeatedly - including concurrently across pytest-xdist workers against a
-fresh test database, where the previous sentinel-then-create pattern could
-race and produce duplicate users with the same first_name (causing
-``MultipleObjectsReturned`` in tests that look users up by first_name).
+Session-scoped: runs once per pytest session (not per test) and commits via
+``django_db_blocker.unblock()``. Committed session rows are visible to every
+test and every xdist worker's own connection - the per-worker isolation
+concern that drove the original function-scope change did not apply to
+committed seed data, only to in-flight test-transaction writes.
 
-Note on scope: this fixture is ``scope="function"`` (not session) because
-tests mutate seeded users (``set_organisation_employer``, ``is_staff`` flips,
-``force_login`` session state, etc.). Function scope runs the seed inside
-each test's own ``@pytest.mark.django_db`` transaction, so those mutations
-are rolled back and the committed seed data stays clean for the next test.
-Under xdist, session-scoped committed rows are not reliably visible to a
-worker's in-flight test transaction, so function scope is also required for
-correctness across workers.
+Idempotent: each user is fetched-or-created by its deterministic ``first_name``
+(a stable natural key per role + organisation), with a deterministic email,
+so the fixture is safe under ``--reuse-db`` and across repeated runs.
+
+View tests only read these users (``force_login`` by ``first_name``); they do
+not mutate the seeded rows, so session scope is correct for that subtree.
 """
 
 # Standard imports
@@ -42,7 +39,7 @@ from epilepsy12.constants.user_types import (
 )
 
 
-@pytest.fixture(scope="function")
+@pytest.fixture(scope="session")
 def seed_users_fixture(django_db_setup, django_db_blocker):
     users = [
         test_user_audit_centre_administrator_data,
@@ -90,9 +87,10 @@ def seed_users_fixture(django_db_setup, django_db_blocker):
 
                 # Idempotent create: first_name is a stable natural key per
                 # (role, organisation). Deterministic email avoids Faker
-                # generating different values across racing workers, which
-                # would otherwise let two workers each create a row with the
-                # same first_name but different emails.
+                # generating different values across runs, which would otherwise
+                # let a later run create a row with the same first_name but a
+                # different email (IntegrityError on the email unique constraint
+                # under --reuse-db).
                 e12_user, created = Epilepsy12User.objects.get_or_create(
                     first_name=first_name,
                     defaults={
@@ -114,7 +112,7 @@ def seed_users_fixture(django_db_setup, django_db_blocker):
                     e12_user.save()
 
                     # Attach employer via get_or_create on the natural key
-                    # (user, organisation) so concurrent workers don't create
+                    # (user, organisation) so repeated runs don't create
                     # duplicate OrganisationEmployer rows.
                     OrganisationEmployer.objects.get_or_create(
                         epilepsy12_user=e12_user,

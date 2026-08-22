@@ -3,6 +3,12 @@
 # Avoid the start-dev script seeding and pytest seeding fighting
 # each other and causing OOM errors
 DJANGO_START_COMMAND='s/start-test' docker compose up -d --wait
+
+# Parallelise with xdist (-j). E12_TEST_WORKERS is set in the workflow
+# (4) to oversubscribe the 2-vCPU runner. This is safe now that the seed
+# fixtures are session-scoped: the previous per-test autouse re-seeding
+# in view_tests/conftest.py was the real regression, not xdist itself.
 s/test -j -m 'not slow'
-s/test -m 'slow'
+s/test -j -m 'slow'
+
 docker compose down
