@@ -764,9 +764,10 @@ The identity linking step (layer 3) must run **after** the current-state sync, b
 The recommended production workflow for the first run is:
 
 1. `python manage.py sync_audit_period_organisations` — per-cohort sync (freezes historical state);
-2. `python manage.py sync_nhs_organisations` — current-state sync (creates new ODS code rows);
-3. `python manage.py sync_audit_period_organisations --link-identities` — links successors to predecessors;
-4. `python manage.py sync_audit_period_organisations --reconcile` — confirms the changes.
+2. `python manage.py approve_audit_period_organisations` — review and approve the frozen memberships for the in-flight periods;
+3. `python manage.py sync_nhs_organisations` — current-state sync (creates new ODS code rows);
+4. `python manage.py sync_audit_period_organisations --link-identities` — links successors to predecessors;
+5. `python manage.py sync_audit_period_organisations --reconcile` — confirms the changes.
 
 Individual organisations can be tested with `--ods-code` before running the full sync.
 
@@ -815,9 +816,30 @@ This makes the exposure report actionable rather than advisory: you cannot accid
 
 1. `python manage.py sync_nhs_organisations --dry-run` — review the exposure report;
 2. `python manage.py sync_audit_period_organisations` — freeze historical memberships (if the ordering constraint blocks);
-3. `python manage.py sync_nhs_organisations --confirm` — proceed with the live sync.
+3. `python manage.py approve_audit_period_organisations` — approve the frozen memberships for the in-flight periods (see below);
+4. `python manage.py sync_nhs_organisations --confirm` — proceed with the live sync.
 
 A sync that changes only low-impact fields (e.g. a trust rename with no organisation move and no `active` flip) does not require `--confirm` and is not blocked by the ordering constraint.
+
+#### Approval workflow (`approve_audit_period_organisations`)
+
+The ordering constraint blocks on **approved** memberships, not merely populated ones. The per-cohort sync (`sync_audit_period_organisations`) creates rows with `approved_at` null — they are candidates until the audit team reviews them. The `approve_audit_period_organisations` management command performs that review:
+
+- it lists every unapproved `AuditPeriodOrganisation` row for the selected period(s);
+- for each row it reports the **exposure** — the number of registrations and distinct cases attached to that organisation (across all periods) that would be grouped under the period hierarchy once approved;
+- it shows the period hierarchy (Trust/LHB, ICB, NHS England region, OPEN UK network, country), preferring the snapshot name and falling back to the live FK;
+- it prompts the audit team to **approve**, **decline** (recording a reason in `notes`), show **details** (current vs period hierarchy, in-cohort registrations, sibling organisations under the same period parent), **skip**, or **quit**;
+- approving sets `approved_at` and `approved_by` (the audit-team user, validated as RCPCH audit team / staff / superuser); declined rows stay unapproved with a note so the assignment can be corrected separately.
+
+Flags:
+
+- `--cohort N` — review only one period;
+- `--ods-code CODE` — review only specific organisation(s); can be passed multiple times;
+- `--user EMAIL` — the audit-team user to record as approver (otherwise prompted);
+- `--dry-run` — report the exposure for every unapproved row without prompting or writing;
+- `--auto-approve` — approve every unapproved row without prompting (review with `--dry-run` first).
+
+Approval is a one-way freeze: once `approved_at` is set, re-running the per-cohort sync leaves the row untouched (`skip_approved`). This is exactly what the ordering constraint relies on — the in-flight period's hierarchy is frozen before the live rows are mutated.
 
 #### Deletion protection (migration 0070)
 
@@ -850,6 +872,8 @@ The per-cohort sync should therefore be **re-run periodically for the in-flight 
 - once the cohort closes and the audit team approve the membership, the row is frozen.
 
 The recommended cadence is to re-run `sync_audit_period_organisations` for the in-flight cohort whenever the current-state sync (`sync_nhs_organisations`) is run, or whenever the audit team are informed of a reorganisation affecting an in-flight cohort. The `--cohort` flag targets a single period if a full re-run is not needed.
+
+A corollary for the in-flight cohort: because the sync never overwrites approved rows, **approving an in-flight membership freezes it against later re-organisations** for the remainder of the open cohort. The audit team should therefore keep an in-flight cohort's memberships unapproved until they are confident the hierarchy is final, run the re-sync to pick up the latest snapshot, and only then approve with `approve_audit_period_organisations --cohort <N>`. Approving too early means a mid-cohort reorganisation will not be reflected in the frozen membership; to correct that, the row's `approved_at` would need to be cleared before re-syncing.
 
 ### Country invariant: England uses `Trust`, Wales uses `LocalHealthBoard`
 
@@ -970,6 +994,7 @@ Delivered:
   - `--dry-run` — report what would be synced without writing; calls the API and reports, per organisation, whether the sync would create, update (with a per-field diff covering hierarchy FKs, snapshot name fields, `source` and `included_in_reporting`), leave the row in sync (unapproved row already matches the snapshot), skip an approved row, or error; **for each organisation also reports the number of registrations in the synced period, registrations across all periods, and distinct cases across all periods attached to that organisation** (including cases without a registration — they are still attached via `Site`, so a hierarchy change still affects which parent they group under); the per-period total and the count behind errors are summarised so the audit team can see how many registrations/cases a failed sync would leave without a membership; writes nothing to `AuditPeriodOrganisation` (but does create dissolved hierarchy entities returned by the snapshot that do not yet exist locally, matching the live sync's behaviour);
   - `--reconcile` — run reconciliation after sync;
   - `--link-identities` — link `OrganisationIdentity` rows after current-state sync.
+- `epilepsy12/management/commands/approve_audit_period_organisations.py` — review/approval workflow for the sync-sourced candidate rows. Reports exposure (registrations and distinct cases attached to each organisation) and lets the audit team approve, decline (with a note), show details (hierarchy, in-cohort registrations, sibling organisations), skip, or quit, per row. Flags: `--cohort N`, `--ods-code CODE`, `--user EMAIL` (approver), `--dry-run` (exposure only), `--auto-approve`. See the [approval workflow](#approval-workflow-approve_audit_period_organisations) section.
 - `epilepsy12/tests/model_tests/test_audit_period_sync.py` — 47 tests covering hierarchy services (including `get_participating_organisations` and `get_expected_reporting_hierarchies`), sync (including the no-overwrite guard for live hierarchy rows), reconciliation, identity linking, the dry-run (including `in_sync`, snapshot-name diffs, and registration/case impact counts including cases without registrations), and readiness (including unapproved rows without registrations).
 
 #### Detail-endpoint fallback
@@ -985,9 +1010,10 @@ After the current-state sync (`sync_nhs_organisations`) creates new `Organisatio
 #### Production workflow
 
 1. `python manage.py sync_audit_period_organisations` — per-cohort sync (freezes historical state);
-2. `python manage.py sync_nhs_organisations` — current-state sync (creates new ODS code rows);
-3. `python manage.py sync_audit_period_organisations --link-identities` — links successors to predecessors;
-4. `python manage.py sync_audit_period_organisations --reconcile` — confirms the changes.
+2. `python manage.py approve_audit_period_organisations` — review and approve the frozen memberships (see the approval workflow under [Current-state sync safety guards](#current-state-sync-safety-guards));
+3. `python manage.py sync_nhs_organisations` — current-state sync (creates new ODS code rows);
+4. `python manage.py sync_audit_period_organisations --link-identities` — links successors to predecessors;
+5. `python manage.py sync_audit_period_organisations --reconcile` — confirms the changes.
 
 Individual organisations can be tested with `--ods-code` before running the full sync.
 
