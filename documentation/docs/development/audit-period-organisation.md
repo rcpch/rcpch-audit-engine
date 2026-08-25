@@ -507,7 +507,48 @@ Unless a separate requirement is agreed, Organisational Audit should continue to
 
 ## Live organisation dashboard
 
-The authenticated dashboard remains a live reporting product; it does not read publication snapshots.
+The authenticated dashboard is split into two products with different
+parent semantics:
+
+### Operational dashboard
+
+The operational dashboard (the current
+`/organisation/<id>/summary` route) is for live data entry — the three
+active cohorts (recruiting, submitting, grace) where data is still
+potentially editable. It remains a live reporting product; it does not
+read publication snapshots and it does not use the period-aware
+permission service or the `AuditPeriodOrganisation` membership.
+
+For a selected organisation it should:
+
+- display the three active cohort tiles (recruiting, submitting,
+  grace), with the cohort toggle via `?cohort=<number>` HTMX as today;
+- for the recruiting cohort, show only recruitment numbers (case
+  counts) — most cases are not scored yet, so the full KPI table and
+  aggregations are not relevant at this stage;
+- for the submitting and grace cohorts, show the full aggregations
+  (IMD, sex, ethnicity, age, totals, KPIs) as today;
+- use the organisation's *current* parent (Trust / LHB) for the parent
+  label, the organisation dropdown, and the trust-level aggregation —
+  the operational dashboard is not a historical reporting product;
+- tether the parent and organisation dropdowns to the user's current
+  parent membership; and
+- use the existing `user_may_view_this_organisation` decorator (current
+  parent check) for access control.
+
+The operational dashboard does not need `AuditPeriodOrganisation`
+membership rows to exist, because it does not resolve historical
+parents. A new organisation on day one of a new cohort can access its
+dashboard and start registering cases.
+
+### Reporting workflow (future phase)
+
+The reporting workflow (the public KPI reporting feature) is the
+period-aware product. It gets the canonical route
+`/organisation/<id>/audit-periods/<slug>/summary/`, the period-aware
+permission service, the membership-based parent resolution, and the
+historical aggregations. This is where closed-cohort data and
+historical parents live.
 
 For a selected organisation and audit period it should:
 
@@ -525,20 +566,27 @@ A historical membership panel could say:
 
 ### Demographics and patient mapping
 
-Demographic charts on a period-aware dashboard should use the selected `AuditPeriod` consistently.
+Demographic charts on the operational dashboard reflect the selected
+active cohort (recruiting, submitting, or grace). For the recruiting
+cohort, only recruitment numbers are shown. For the submitting and
+grace cohorts, the full demographic summaries (IMD, sex, ethnicity,
+age) are shown as today, scoped to the selected cohort.
 
-Patient mapping (postcode-based deprivation indices and map plots) has been deprecated within E12 and handed off to a JavaScript library that pulls from a hosted tile server. Legacy mapping fields may remain in the database but the mapping code has been removed. Any remaining demographic summaries that use patient postcodes should be scoped to the selected period.
+The reporting workflow will scope demographic summaries to the selected
+`AuditPeriod` consistently.
 
-Several existing demographic summaries are described as covering all cohorts. Once access varies by audit period, an unqualified all-cohort result could include records the user is not authorised to see. The safest initial design is therefore:
+Patient mapping (postcode-based deprivation indices and map plots) has
+been deprecated within E12 and handed off to a JavaScript library that
+pulls from a hosted tile server. Legacy mapping fields may remain in
+the database but the mapping code has been removed. Any remaining
+demographic summaries that use patient postcodes should be scoped to
+the selected period.
 
-- KPI summaries: selected period;
-- demographic summaries: selected period;
-- patient mapping (if any remains): selected period; and
-- parent/hierarchy comparators: selected period.
-
-A later "all authorised periods" view could be provided if needed, but it must list the periods included and filter them through the permission service.
-
-Current address, contact details and lead-centre coordinates may continue to come from `Organisation` if they are clearly presented as current information. Historical address or coordinate accuracy would require separate period-specific data and is not part of this proposal.
+Current address, contact details and lead-centre coordinates may
+continue to come from `Organisation` if they are clearly presented as
+current information. Historical address or coordinate accuracy would
+require separate period-specific data and is not part of this
+proposal.
 
 ## Deferred report-builder refactor
 
@@ -716,9 +764,10 @@ The identity linking step (layer 3) must run **after** the current-state sync, b
 The recommended production workflow for the first run is:
 
 1. `python manage.py sync_audit_period_organisations` — per-cohort sync (freezes historical state);
-2. `python manage.py sync_nhs_organisations` — current-state sync (creates new ODS code rows);
-3. `python manage.py sync_audit_period_organisations --link-identities` — links successors to predecessors;
-4. `python manage.py sync_audit_period_organisations --reconcile` — confirms the changes.
+2. `python manage.py approve_audit_period_organisations` — review and approve the frozen memberships for the in-flight periods;
+3. `python manage.py sync_nhs_organisations` — current-state sync (creates new ODS code rows);
+4. `python manage.py sync_audit_period_organisations --link-identities` — links successors to predecessors;
+5. `python manage.py sync_audit_period_organisations --reconcile` — confirms the changes.
 
 Individual organisations can be tested with `--ods-code` before running the full sync.
 
@@ -767,9 +816,30 @@ This makes the exposure report actionable rather than advisory: you cannot accid
 
 1. `python manage.py sync_nhs_organisations --dry-run` — review the exposure report;
 2. `python manage.py sync_audit_period_organisations` — freeze historical memberships (if the ordering constraint blocks);
-3. `python manage.py sync_nhs_organisations --confirm` — proceed with the live sync.
+3. `python manage.py approve_audit_period_organisations` — approve the frozen memberships for the in-flight periods (see below);
+4. `python manage.py sync_nhs_organisations --confirm` — proceed with the live sync.
 
 A sync that changes only low-impact fields (e.g. a trust rename with no organisation move and no `active` flip) does not require `--confirm` and is not blocked by the ordering constraint.
+
+#### Approval workflow (`approve_audit_period_organisations`)
+
+The ordering constraint blocks on **approved** memberships, not merely populated ones. The per-cohort sync (`sync_audit_period_organisations`) creates rows with `approved_at` null — they are candidates until the audit team reviews them. The `approve_audit_period_organisations` management command performs that review:
+
+- it lists every unapproved `AuditPeriodOrganisation` row for the selected period(s);
+- for each row it reports the **exposure** — the number of registrations and distinct cases attached to that organisation (across all periods) that would be grouped under the period hierarchy once approved;
+- it shows the period hierarchy (Trust/LHB, ICB, NHS England region, OPEN UK network, country), preferring the snapshot name and falling back to the live FK;
+- it prompts the audit team to **approve**, **decline** (recording a reason in `notes`), show **details** (current vs period hierarchy, in-cohort registrations, sibling organisations under the same period parent), **skip**, or **quit**;
+- approving sets `approved_at` and `approved_by` (the audit-team user, validated as RCPCH audit team / staff / superuser); declined rows stay unapproved with a note so the assignment can be corrected separately.
+
+Flags:
+
+- `--cohort N` — review only one period;
+- `--ods-code CODE` — review only specific organisation(s); can be passed multiple times;
+- `--user EMAIL` — the audit-team user to record as approver (otherwise prompted);
+- `--dry-run` — report the exposure for every unapproved row without prompting or writing;
+- `--auto-approve` — approve every unapproved row without prompting (review with `--dry-run` first).
+
+Approval is a one-way freeze: once `approved_at` is set, re-running the per-cohort sync leaves the row untouched (`skip_approved`). This is exactly what the ordering constraint relies on — the in-flight period's hierarchy is frozen before the live rows are mutated.
 
 #### Deletion protection (migration 0070)
 
@@ -802,6 +872,8 @@ The per-cohort sync should therefore be **re-run periodically for the in-flight 
 - once the cohort closes and the audit team approve the membership, the row is frozen.
 
 The recommended cadence is to re-run `sync_audit_period_organisations` for the in-flight cohort whenever the current-state sync (`sync_nhs_organisations`) is run, or whenever the audit team are informed of a reorganisation affecting an in-flight cohort. The `--cohort` flag targets a single period if a full re-run is not needed.
+
+A corollary for the in-flight cohort: because the sync never overwrites approved rows, **approving an in-flight membership freezes it against later re-organisations** for the remainder of the open cohort. The audit team should therefore keep an in-flight cohort's memberships unapproved until they are confident the hierarchy is final, run the re-sync to pick up the latest snapshot, and only then approve with `approve_audit_period_organisations --cohort <N>`. Approving too early means a mid-cohort reorganisation will not be reflected in the frozen membership; to correct that, the row's `approved_at` would need to be cleared before re-syncing.
 
 ### Country invariant: England uses `Trust`, Wales uses `LocalHealthBoard`
 
@@ -922,6 +994,7 @@ Delivered:
   - `--dry-run` — report what would be synced without writing; calls the API and reports, per organisation, whether the sync would create, update (with a per-field diff covering hierarchy FKs, snapshot name fields, `source` and `included_in_reporting`), leave the row in sync (unapproved row already matches the snapshot), skip an approved row, or error; **for each organisation also reports the number of registrations in the synced period, registrations across all periods, and distinct cases across all periods attached to that organisation** (including cases without a registration — they are still attached via `Site`, so a hierarchy change still affects which parent they group under); the per-period total and the count behind errors are summarised so the audit team can see how many registrations/cases a failed sync would leave without a membership; writes nothing to `AuditPeriodOrganisation` (but does create dissolved hierarchy entities returned by the snapshot that do not yet exist locally, matching the live sync's behaviour);
   - `--reconcile` — run reconciliation after sync;
   - `--link-identities` — link `OrganisationIdentity` rows after current-state sync.
+- `epilepsy12/management/commands/approve_audit_period_organisations.py` — review/approval workflow for the sync-sourced candidate rows. Reports exposure (registrations and distinct cases attached to each organisation) and lets the audit team approve, decline (with a note), show details (hierarchy, in-cohort registrations, sibling organisations), skip, or quit, per row. Flags: `--cohort N`, `--ods-code CODE`, `--user EMAIL` (approver), `--dry-run` (exposure only), `--auto-approve`. See the [approval workflow](#approval-workflow-approve_audit_period_organisations) section.
 - `epilepsy12/tests/model_tests/test_audit_period_sync.py` — 47 tests covering hierarchy services (including `get_participating_organisations` and `get_expected_reporting_hierarchies`), sync (including the no-overwrite guard for live hierarchy rows), reconciliation, identity linking, the dry-run (including `in_sync`, snapshot-name diffs, and registration/case impact counts including cases without registrations), and readiness (including unapproved rows without registrations).
 
 #### Detail-endpoint fallback
@@ -937,9 +1010,10 @@ After the current-state sync (`sync_nhs_organisations`) creates new `Organisatio
 #### Production workflow
 
 1. `python manage.py sync_audit_period_organisations` — per-cohort sync (freezes historical state);
-2. `python manage.py sync_nhs_organisations` — current-state sync (creates new ODS code rows);
-3. `python manage.py sync_audit_period_organisations --link-identities` — links successors to predecessors;
-4. `python manage.py sync_audit_period_organisations --reconcile` — confirms the changes.
+2. `python manage.py approve_audit_period_organisations` — review and approve the frozen memberships (see the approval workflow under [Current-state sync safety guards](#current-state-sync-safety-guards));
+3. `python manage.py sync_nhs_organisations` — current-state sync (creates new ODS code rows);
+4. `python manage.py sync_audit_period_organisations --link-identities` — links successors to predecessors;
+5. `python manage.py sync_audit_period_organisations --reconcile` — confirms the changes.
 
 Individual organisations can be tested with `--ods-code` before running the full sync.
 
@@ -982,55 +1056,151 @@ Likely existing-test refactoring includes permission factories and tests that cu
 
 Exit condition: the new permission service is fully tested but only consumers explicitly migrated to it change behaviour. ✅
 
-No existing consumers import the new module — only the test file does. The existing report-builder mixin, Organisational Audit permission path, and `decorator.py` / `sanction_user_access.py` permission helpers are unchanged. PR 4 is the first user-facing cutover and will migrate the organisation dashboard to the new service.
+No existing consumers import the new module — only the test file does. The existing report-builder mixin, Organisational Audit permission path, and `decorator.py` / `sanction_user_access.py` permission helpers are unchanged. The period-aware permission service will be consumed by the reporting workflow (future phase), not by the operational dashboard — see the revised PR 4 scope below.
 
-### PR 4 — audit-period-aware dashboard routes, views and templates
+### PR 4 — operational dashboard simplification and reporting-workflow split
 
-This is the first user-facing cutover and should be limited to the organisation dashboard vertical slice.
+This PR revises the original PR 4 scope. The original plan was to make the
+live organisation dashboard fully period-aware — putting the
+`AuditPeriod.slug` in the URL, resolving the parent from the
+`AuditPeriodOrganisation` membership, and enforcing the period-aware
+permission service. Exploration of that design revealed two problems:
 
-Scope:
+1. **New organisations on day one of a new cohort have no membership
+   row.** The per-cohort sync runs at the period's reference date
+   (`data_collection_end_date`), which is in the future for the
+   recruiting cohort. A brand-new organisation (or an existing one with
+   no historical memberships) would be locked out of its own dashboard
+   on the first day of data collection, because the period-aware
+   permission service requires an approved membership row for inherited
+   access, and the legacy redirect returns no accessible periods.
 
-- add the canonical dashboard route:
+2. **The operational dashboard and the historical reporting workflow
+   have different parent semantics.** The operational dashboard is for
+   live data entry — recruiting, submitting, and grace cohorts where
+   data is still potentially editable. Its parent is the organisation's
+   *current* parent, because the organisation is operating under that
+   parent now. The historical reporting workflow is for closed cohorts
+   where the organisation may have been under a different parent. Its
+   parent is the *period membership* parent. Mixing these on one route
+   creates the tension where a PRUH user (moved from Trust A to Trust
+   B) viewing the cohort 7 submitting tile would see Trust B's
+   aggregation for cohort 7 cases that were registered under Trust A —
+   historically inaccurate.
 
-  ```text
-  /organisation/<organisation_id>/audit-periods/<audit_period_slug>/summary/
-  ```
+The revised design splits the two concerns:
 
-- make the legacy dashboard route redirect to the latest period that the user may access;
-- replace the `?cohort=<number>` dashboard state with `AuditPeriod.slug` routing;
-- update `selected_organisation_summary` to retain the resolved `AuditPeriod` and `AuditPeriodOrganisation` throughout the request;
-- update parent and organisation selector endpoints to carry the period slug;
-- update selector permission checks to use the new service;
-- update the membership panel and parent labels to show the selected period's relationships;
-- scope KPI summaries, demographics, maps and travel calculations to the selected period;
-- resolve Trust/LHB, ICB, region and network comparison queries through period memberships;
-- update links from the dashboard to retain the selected period where the destination is period-aware;
-- inventory every current-parent traversal used by the dashboard and its aggregation helpers; and
-- add the scoped static/CI guard that prevents those paths from being reintroduced into migrated modules.
+- **The operational dashboard** stays at `/organisation/<id>/summary`
+  with no audit-period slug in the URL. It covers the three active
+  cohorts (recruiting, submitting, grace) via HTMX, exactly as it does
+  today. The parent and organisation dropdowns are tethered to the
+  user's *current* parent membership. The aggregations reflect the
+  current parent. No `AuditPeriodOrganisation` membership is needed,
+  because the operational dashboard is not a historical reporting
+  product.
 
-This pull request will require substantial test refactoring because the canonical route signature changes. Likely affected tests include:
+- **The reporting workflow** (future phase, the public KPI reporting
+  feature) gets the audit-period slug route
+  `/organisation/<id>/audit-periods/<slug>/summary/`, the period-aware
+  permission service, the membership-based parent resolution, and the
+  historical aggregations. This is where closed-cohort data and
+  historical parents live.
 
-- `epilepsy12/tests/view_tests/test_organisation_views.py`;
-- `epilepsy12/tests/view_tests/authentication_and_authorization/test_login.py`;
-- aggregation and report-query tests under `common_view_functions_tests`;
-- tests that reverse `selected_organisation_summary`;
-- template assertions that use current `Organisation` parents; and
-- tests that pass `?cohort=` directly.
+Scope for this PR:
+
+- keep the operational dashboard route at `/organisation/<id>/summary`
+  (no change to the URL);
+- keep the parent and organisation dropdowns tethered to the current
+  parent (no period-aware selectors);
+- keep the existing `?cohort=<number>` HTMX toggle for the three active
+  cohorts (no slug routing on the operational dashboard);
+- for the recruiting cohort, show only recruitment numbers (case
+  counts) — most cases are not scored yet, so the full KPI table and
+  aggregations are not relevant at this stage;
+- for the submitting and grace cohorts, show the full aggregations
+  (IMD, sex, ethnicity, age, totals, KPIs) as today, reflecting the
+  current parent;
+- make the three cohort tiles clickable to toggle between the active
+  cohorts (this may already be the case via `?cohort=`);
+- confirm that the user management workflow permissions are unchanged
+  (they default to the latest employer affiliation, not period-aware);
+- do not introduce the canonical period-aware route, the period-aware
+  permission check, the period-aware selectors, or the membership-based
+  parent resolution on the operational dashboard — these are deferred
+  to the reporting workflow phase; and
+- update the characterisation tests in
+  `epilepsy12/tests/view_tests/test_critical_workflow_characterisation.py`
+  to pin the operational dashboard's three-active-cohort behaviour,
+  including the recruiting-cohort simplification.
+
+Likely affected tests:
+
+- `epilepsy12/tests/view_tests/test_critical_workflow_characterisation.py`
+  (the dashboard route and redirect behaviour tests);
+- `epilepsy12/tests/view_tests/test_organisation_views.py` (the KPI
+  aggregation tests, if the recruiting-cohort simplification changes
+  what the KPI table renders);
+- aggregation and report-query tests under `common_view_functions_tests`
+  (if the recruiting-cohort simplification changes the aggregation
+  calls).
 
 New tests should cover:
 
-- canonical slug URLs;
-- legacy redirects;
-- inaccessible and invalid periods;
-- period-specific parent and organisation dropdowns;
-- historical membership labels;
-- period-specific KPI and demographic querysets;
-- period-specific map payloads;
-- the canary organisation currently belonging to Trust B while appearing under Trust A in cohort 8 and Trust B in cohort 9;
-- failure rather than current-hierarchy fallback when the selected membership is missing; and
-- no mixing of records from another period.
+- the recruiting cohort showing only recruitment numbers (not the full
+  KPI table / aggregations);
+- the submitting and grace cohorts showing the full aggregations as
+  today;
+- the three cohort tiles toggling between the active cohorts; and
+- the parent and organisation dropdowns remaining tethered to the
+  current parent (not period-filtered).
 
-Exit condition: the organisation dashboard is fully period-aware and no longer relies on current parent relationships for historical summaries.
+Exit condition: the operational dashboard covers the three active
+cohorts using the current parent, with the recruiting cohort simplified
+to recruitment numbers. The period-aware route, permission, and
+membership-based parent resolution are deferred to the reporting
+workflow phase.
+
+#### Deferred to the reporting workflow phase
+
+The following work was explored during PR 4 and is deferred to the
+reporting workflow phase (the public KPI reporting feature). The
+exploration produced reusable patterns that will inform that phase:
+
+- the canonical period-aware route
+  `/organisation/<id>/audit-periods/<slug>/summary/`;
+- the legacy redirect to the latest accessible period (resolving
+  `get_accessible_periods` for the user and organisation);
+- `can_view_organisation_for_period` enforcement on the canonical
+  route;
+- `get_membership_for_identity_chain(organisation, audit_period)` —
+  resolving the `AuditPeriodOrganisation` membership across the
+  `OrganisationIdentity` chain, so a direct user at the current ODS
+  code (RJZ30) can read the predecessor's (RYQ30) historical
+  membership;
+- the `get_accessible_periods` RCPCH relaxation — RCPCH users see
+  periods with unapproved memberships (they are the users who approve
+  them), aligning `get_accessible_periods` with
+  `can_view_organisation_for_period` which returns `True`
+  unconditionally for RCPCH users;
+- the membership panel and parent labels reading from the period
+  membership;
+- the visibility check — hiding abstraction levels (Trust/LHB, ICB,
+  NHSE region, OPEN UK network, country) whose period-specific parent
+  differs from the current parent, with a message explaining why;
+- period-aware aggregation queries — resolving the organisation IDs
+  for a parent via `get_organisations_for_parent(parent, audit_period,
+  parent_field)` instead of traversing `Organisation.trust`;
+- the PRUH canary contract tests (Trust B sibling denied cohort 8,
+  allowed cohort 9; direct user across the ODS code change; parent
+  label reading Trust A from the membership); and
+- the scoped static/CI guard preventing current-parent traversals in
+  migrated modules.
+
+The reporting workflow phase will also need to address the KPI
+aggregation tables (`TrustKPIAggregation`, `ICBKPIAggregation`, etc.),
+which are keyed by the current trust/ICB. Period-aware KPIs require
+either keying by the period-specific trust (schema changes) or
+on-the-fly recomputation from case-level KPIs.
 
 ### PR 5 — period-aware case collections and clinical permissions
 
