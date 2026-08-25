@@ -138,11 +138,25 @@ class Command(BaseCommand):
         )
         return registrations, cases
 
+    # The identifier attribute differs per hierarchy entity type.
+    _IDENTIFIER_FIELDS = {
+        "country": "boundary_identifier",
+        "trust": "ods_code",
+        "local_health_board": "ods_code",
+        "integrated_care_board": "ods_code",
+        "nhs_england_region": "region_code",
+        "openuk_network": "boundary_identifier",
+    }
+
     def _format_hierarchy(self, membership):
         def label(name_field, fk_field):
             snapshot = getattr(membership, name_field, "") or ""
             fk = getattr(membership, fk_field, None)
-            fk_label = f"{fk.ods_code} ({fk.name})" if fk is not None else "None"
+            identifier_field = self._IDENTIFIER_FIELDS[fk_field]
+            fk_identifier = getattr(fk, identifier_field, None) if fk is not None else None
+            fk_label = (
+                f"{fk_identifier} ({fk.name})" if fk is not None else "None"
+            )
             return snapshot or fk_label
 
         country = label("country_name_snapshot", "country")
