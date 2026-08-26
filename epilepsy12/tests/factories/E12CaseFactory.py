@@ -14,6 +14,22 @@ from epilepsy12.constants import SEX_TYPE, DEPRIVATION_QUINTILES
 import nhs_number as nhs_number_package
 
 
+def nhs_number_not_yet_in_db():
+    not_found_unique_nhs_num = True
+
+    while not_found_unique_nhs_num:
+        candidate_num = nhs_number_package.generate()[0]
+
+        if not Case.objects.filter(nhs_number=candidate_num).exists():
+            not_found_unique_nhs_num = False
+
+    return candidate_num
+
+def unique_urn_not_yet_in_db():
+    num = Case.objects.count() + 1
+    return f"JERSEY-{num:06d}"  # Format the number with leading zeros to ensure a fixed length
+
+
 class E12CaseFactory(factory.django.DjangoModelFactory):
     """Factory for making E12 Cases, with all associated models (with answers as model-defined defaults, usually None). As default values should be none, KPIs should be 'NOT_SCORED' if no specific flags are passed.
 
@@ -70,20 +86,12 @@ class E12CaseFactory(factory.django.DjangoModelFactory):
 
         is_jersey = factory.Trait(
             nhs_number=None,
-            unique_reference_number=factory.Sequence(lambda n: f"JERSEY-{n}"),
+            unique_reference_number=factory.LazyFunction(unique_urn_not_yet_in_db),
         )
 
     @factory.lazy_attribute
     def nhs_number(self):
-        """Returns a unique NHS number which has not been used in the db yet."""
-        not_found_unique_nhs_num = True
-
-        while not_found_unique_nhs_num:
-            candidate_num = nhs_number_package.generate()[0]
-
-            if not Case.objects.filter(nhs_number=candidate_num).exists():
-                not_found_unique_nhs_num = False
-        return candidate_num
+        return nhs_number_not_yet_in_db()
 
     first_name = "Thomas"
     surname = "Anderson"
