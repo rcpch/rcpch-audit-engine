@@ -27,7 +27,7 @@ def nhs_number_not_yet_in_db():
 
 def unique_urn_not_yet_in_db():
     num = Case.objects.count() + 1
-    return f"JERSEY-{num:06d}"  # Format the number with leading zeros to ensure a fixed length
+    return f"JERSEY-{num}"
 
 
 class E12CaseFactory(factory.django.DjangoModelFactory):
