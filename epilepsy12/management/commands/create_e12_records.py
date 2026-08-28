@@ -59,9 +59,8 @@ from ...common_view_functions import update_audit_progress, calculate_kpis
 
 
 def create_registrations(verbose=True):
-    """
-    run through all newly created cases and create registrations
-    """
+    registrations = []
+
     for case in Case.objects.all():
         if not hasattr(case, "registration"):
             # create  a registration
@@ -117,13 +116,16 @@ def create_registrations(verbose=True):
                 sudep=0,
                 school_individual_healthcare_plan=0,
             )
-            Registration.objects.create(
+            registration = Registration.objects.create(
                 case=case, audit_progress=audit_progress, kpi=kpi
             )
+
+            registrations.append(registration)
         else:
             if verbose:
                 print(f"{case} is registered already. Skipping")
-            return case.registration
+
+    return registrations
 
 
 def create_epilepsy12_record(registration_instance, verbose=True):
