@@ -290,6 +290,14 @@ def test_accept_registration_transfer_response_not_previously_involved(
         registration__first_paediatric_assessment_date=first_paediatric_assessment_date,
     )
 
+    # E12CaseFactory auto-creates a stray Site with a non-deterministic
+    # organisation (factory.Iterator over all organisations). Delete it
+    # (scoped to this case) so the explicit KCH/GOSH sites below are the
+    # only ones for this case; otherwise a stray site landing on GOSH/KCH
+    # causes a duplicate and the later Site.objects.get(...) raises
+    # MultipleObjectsReturned.
+    Site.objects.filter(case=case).delete()
+
     # Create the Site instance and set the field - KCH is the primary site of care, but a transfer to GOSH is requested
     # This means in a prior step,  KCH site_is_primary_centre_of_epilepsy_care has already been set to False and GOSH site_is_primary_centre_of_epilepsy_care has been set to True
     kch_site = e12_site_factory(
@@ -429,7 +437,7 @@ def test_accept_registration_transfer_response_previously_involved(
         registration__first_paediatric_assessment_date=first_paediatric_assessment_date,
     )
 
-    Site.objects.all().delete()
+    Site.objects.filter(case=case).delete()
 
     # Create the Site instance and set the field - KCH is the primary site of care, but a transfer to GOSH is requested
     # This means in a prior step,  KCH site_is_primary_centre_of_epilepsy_care has already been set to False and GOSH site_is_primary_centre_of_epilepsy_care has been set to True
@@ -613,7 +621,7 @@ def test_accept_registration_transfer_response_transfer_centre_still_involved(
         registration__first_paediatric_assessment_date=first_paediatric_assessment_date,
     )
 
-    Site.objects.all().delete()
+    Site.objects.filter(case=case).delete()
 
     # Create the Site instance and set the field - KCH is the primary site of care, but a transfer to GOSH is requested
     # This means in a prior step,  KCH site_is_primary_centre_of_epilepsy_care has already been set to False and GOSH site_is_primary_centre_of_epilepsy_care has been set to True
@@ -799,13 +807,15 @@ def test_reject_registration_transfer_response_not_previously_involved(
         trust__ods_code="RJZ",
     )
 
-    Site.objects.all().delete()
-
     # Create the Case instance and associate it with the Site
     case = e12_case_factory(
         date_of_birth=date_of_birth,
         registration__first_paediatric_assessment_date=first_paediatric_assessment_date,
     )
+    # E12CaseFactory auto-creates a stray Site with a non-deterministic
+    # organisation; remove it (scoped to this case) so the explicit
+    # KCH/GOSH sites below are the only ones for this case.
+    Site.objects.filter(case=case).delete()
     # Create the Site instance and set the field - KCH is the primary site of care, but a transfer to GOSH is requested
     gos_site = e12_site_factory(
         organisation=GOSH,
@@ -913,8 +923,6 @@ def test_reject_registration_transfer_response_previously_involved(
     date_of_birth = date(2023, 1, 1)
     first_paediatric_assessment_date = date_of_birth + relativedelta(days=10)
 
-    Site.objects.all().delete()
-
     GOSH = Organisation.objects.get(
         ods_code="RP401",
         trust__ods_code="RP4",
@@ -930,6 +938,10 @@ def test_reject_registration_transfer_response_previously_involved(
         date_of_birth=date_of_birth,
         registration__first_paediatric_assessment_date=first_paediatric_assessment_date,
     )
+    # E12CaseFactory auto-creates a stray Site with a non-deterministic
+    # organisation; remove it (scoped to this case) so the explicit
+    # KCH/GOSH sites below are the only ones for this case.
+    Site.objects.filter(case=case).delete()
     # Create the Site instance and set the field - KCH is the primary site of care, but a transfer to GOSH is requested
     # This means in a prior step,  KCH site_is_primary_centre_of_epilepsy_care has already been set to False and GOSH site_is_primary_centre_of_epilepsy_care has been set to True
     gos_site = e12_site_factory(
@@ -1064,8 +1076,6 @@ def test_reject_registration_transfer_response_transfer_centre_still_involved(
     date_of_birth = date(2023, 1, 1)
     first_paediatric_assessment_date = date_of_birth + relativedelta(days=10)
 
-    Site.objects.all().delete()
-
     GOSH = Organisation.objects.get(
         ods_code="RP401",
         trust__ods_code="RP4",
@@ -1081,6 +1091,10 @@ def test_reject_registration_transfer_response_transfer_centre_still_involved(
         date_of_birth=date_of_birth,
         registration__first_paediatric_assessment_date=first_paediatric_assessment_date,
     )
+    # E12CaseFactory auto-creates a stray Site with a non-deterministic
+    # organisation; remove it (scoped to this case) so the explicit
+    # KCH/GOSH sites below are the only ones for this case.
+    Site.objects.filter(case=case).delete()
     # Create the Site instance and set the field - KCH is the primary site of care, but a transfer to GOSH is requested
     # This means in a prior step,  KCH site_is_primary_centre_of_epilepsy_care has already been set to False and GOSH site_is_primary_centre_of_epilepsy_care has been set to True
     gos_site = e12_site_factory(
