@@ -12,6 +12,7 @@ from django.conf import settings
 from django.contrib.auth.mixins import LoginRequiredMixin, PermissionRequiredMixin
 from django.contrib.auth.decorators import permission_required
 from django.contrib.gis.db.models import Q
+from django.db.models import Prefetch
 from django.contrib import messages
 from django.core.paginator import Paginator
 from django.views.generic import ListView
@@ -340,12 +341,30 @@ def case_list(request, organisation_id):
         else:
             all_cases = filtered_cases.order_by("surname").all()
 
-    # Eagerly load the relations dereferenced per row in case_table.html
-    # (case.registration / .audit_period / .audit_progress) to avoid N+1s.
+    # Eagerly load the relations dereferenced per row in case_table.html to
+    # avoid N+1s. select_related covers the single-valued FK chain
+    # (registration/audit_period/audit_progress); prefetch_related covers the
+    # per-case lead Site (with its Organisation + Trust/HealthBoard) consumed by
+    # lead_site_for_case and Registration.lead_organisation, and the
+    # AuditPeriodExtension rows consumed by submission_deadline_for_organisation.
     all_cases = all_cases.select_related(
         "registration",
         "registration__audit_period",
         "registration__audit_progress",
+    ).prefetch_related(
+        Prefetch(
+            "epilepsy12_sites",
+            queryset=Site.objects.select_related(
+                "organisation",
+                "organisation__trust",
+                "organisation__local_health_board",
+            ).filter(
+                site_is_actively_involved_in_epilepsy_care=True,
+                site_is_primary_centre_of_epilepsy_care=True,
+            ),
+            to_attr="_lead_sites_prefetched",
+        ),
+        "registration__audit_period__extensions",
     )
 
     registered_cases = all_cases.filter(

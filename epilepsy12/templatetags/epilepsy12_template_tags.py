@@ -501,6 +501,12 @@ def lead_site_for_case(case):
     """
     Returns all active sites for a given case
     """
+    # Use prefetched lead sites if present (set by case_list via
+    # Prefetch("epilepsy12_sites", ..., to_attr="_lead_sites_prefetched"))
+    # to avoid a per-row Site query.
+    if hasattr(case, "_lead_sites_prefetched"):
+        sites = case._lead_sites_prefetched
+        return sites[0] if sites else None
     site = Site.objects.filter(
         case=case,
         site_is_actively_involved_in_epilepsy_care=True,
