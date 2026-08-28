@@ -115,7 +115,7 @@
           {% endif %}
           <td>
             {% if request.user.is_rcpch_audit_team_member %}
-              {% with case|lead_site_for_case as lead_site  %}
+              {% with case.lead_site as lead_site  %}
                 <span {% if lead_site %} data-tooltip="Lead site: {{lead_site.organisation}} ({{lead_site.organisation.trust}})" {% else %}  data-tooltip="There is no allocated lead site" {% endif %}data-position="top left">
                   <i class="rcpch question circle icon"></i>
                 </span>

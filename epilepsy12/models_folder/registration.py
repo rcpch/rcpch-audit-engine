@@ -1,7 +1,6 @@
 # python
 from datetime import datetime, date
 from django.utils import timezone
-from .epilepsy12_site import Site
 from .audit_period import AuditPeriod
 
 from dateutil.relativedelta import relativedelta
@@ -141,17 +140,12 @@ class Registration(
             return f"Epilepsy12 registration for {self.case} incomplete."
 
     def lead_organisation(self):
-        # Use prefetched lead sites if present (set by case_list via
+        # Delegates to Case.lead_site, which reads the prefetched
+        # _lead_sites_prefetched list when present (set by case_list via
         # Prefetch("epilepsy12_sites", ..., to_attr="_lead_sites_prefetched"))
-        # to avoid a per-row Site query. self.case is reached via
-        # case.registration (select_related) so the reverse is cached.
+        # and falls back to a query for other callers.
         case = self.case
-        if case is not None and hasattr(case, "_lead_sites_prefetched"):
-            sites = case._lead_sites_prefetched
-            return sites[0].organisation if sites else None
-        site = Site.objects.filter(
-            case=self.case,
-            site_is_primary_centre_of_epilepsy_care=True,
-            site_is_actively_involved_in_epilepsy_care=True,
-        ).first()
+        if case is None:
+            return None
+        site = case.lead_site()
         return site.organisation if site else None
