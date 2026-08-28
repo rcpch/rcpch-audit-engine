@@ -340,6 +340,14 @@ def case_list(request, organisation_id):
         else:
             all_cases = filtered_cases.order_by("surname").all()
 
+    # Eagerly load the relations dereferenced per row in case_table.html
+    # (case.registration / .audit_period / .audit_progress) to avoid N+1s.
+    all_cases = all_cases.select_related(
+        "registration",
+        "registration__audit_period",
+        "registration__audit_progress",
+    )
+
     registered_cases = all_cases.filter(
         ~Q(registration__isnull=True)
         & Q(epilepsy12_sites__site_is_primary_centre_of_epilepsy_care=True)
