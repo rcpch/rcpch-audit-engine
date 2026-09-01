@@ -16,7 +16,7 @@ django-simple-history==3.8.0
 django-two-factor-auth==1.17.0
 django-widget-tweaks==1.5.0
 django-multiselectfield==0.1.13
-djangorestframework==3.16.0
+djangorestframework==3.17.2
 docutils==0.21.2
 pandas==2.2.3
 # We don't use this but django-two-factor-auth requires it
