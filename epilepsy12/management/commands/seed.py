@@ -3,6 +3,7 @@ from random import randint, choice
 from datetime import date
 from random import randint
 import logging
+import re
 from dateutil.relativedelta import relativedelta
 from epilepsy12.models import AuditPeriod
 from epilepsy12.general_functions.date_functions import nth_tuesday_of_year
@@ -202,14 +203,14 @@ def run_dummy_cases_seed(cases, organisations, noskip, verbose=True):
 
 def run_registrations(verbose=True, cohort=7, full_year=False):
     """
-    Calling function to register all cases in Epilepsy12 and complete all fields with random answers
+    Calling function to register all unregistered cases in Epilepsy12 and complete all fields with random answers
     """
     if verbose:
         print("\033[33m", "Registering fictional cases in Epilepsy12...", "\033[33m")
 
-    create_registrations(verbose=verbose)
+    registrations = create_registrations(verbose=verbose)
 
-    complete_registrations(verbose=verbose, cohort=cohort, full_year=full_year)
+    complete_registrations(registrations, verbose, cohort, full_year)
 
     if not verbose:
         print(
@@ -217,7 +218,7 @@ def run_registrations(verbose=True, cohort=7, full_year=False):
         )
 
 
-def complete_registrations(verbose=True, cohort=None, full_year=False):
+def complete_registrations(registrations, verbose=True, cohort=None, full_year=False):
     """
     Loop through the registrations and score all fields
     """
@@ -232,21 +233,15 @@ def complete_registrations(verbose=True, cohort=None, full_year=False):
     current_recruiting = AuditPeriod.objects.currently_recruiting()
     current_cohort_number = current_recruiting.cohort_number if current_recruiting else None
 
-    if cohort is None:
-        # Generate cohort data for current cohort
-        target_cohort = current_cohort_number
-    else:
-        target_cohort = cohort
-
-    audit_period = AuditPeriod.objects.by_cohort(target_cohort)
+    audit_period = AuditPeriod.objects.by_cohort(cohort)
     if audit_period is None:
         logger.warning(
-            f"No AuditPeriod found for cohort {target_cohort}; skipping registrations."
+            f"No AuditPeriod found for cohort {cohort}; skipping registrations."
         )
         return
     cohort_data = audit_period.as_cohort_card_dict()
 
-    for registration in Registration.objects.all():
+    for registration in registrations:
 
         if cohort is not None and cohort != current_cohort_number:
             fpa_date = random_date(

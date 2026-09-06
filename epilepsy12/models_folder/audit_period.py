@@ -369,6 +369,14 @@ class AuditPeriod(
         """
         if organisation is None:
             return self.submission_deadline
+        # Use prefetched extensions if present (set by case_list via
+        # prefetch_related("registration__audit_period__extensions")) to avoid
+        # a per-row AuditPeriodExtension query.
+        if hasattr(self, "_prefetched_objects_cache") and "extensions" in self._prefetched_objects_cache:
+            for ext in self._prefetched_objects_cache["extensions"]:
+                if ext.organisation_id == organisation.pk:
+                    return ext.extended_submission_date
+            return self.submission_deadline
         extension = self.extensions.filter(organisation=organisation).first()
         if extension:
             return extension.extended_submission_date

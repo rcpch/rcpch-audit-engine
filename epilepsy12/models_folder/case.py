@@ -14,6 +14,7 @@ from simple_history.models import HistoricalRecords
 
 # epilepsy12
 from .help_text_mixin import HelpTextMixin
+from .epilepsy12_site import Site
 from ..constants import (
     SEX_TYPE,
     ETHNICITIES,
@@ -191,6 +192,23 @@ class Case(TimeStampAbstractBaseClass, UserStampAbstractBaseClass, HelpTextMixin
             return True
 
         return days_remaining > 0
+
+    def lead_site(self):
+        """The primary, active lead Site for this case, or None.
+
+        Single read-point for the prefetched lead-site list used by the case
+        list view: when ``_lead_sites_prefetched`` is present (set by case_list
+        via ``Prefetch("epilepsy12_sites", ..., to_attr="_lead_sites_prefetched")``)
+        it is returned directly; other callers fall back to a query.
+        """
+        if hasattr(self, "_lead_sites_prefetched"):
+            sites = self._lead_sites_prefetched
+            return sites[0] if sites else None
+        return Site.objects.filter(
+            case=self,
+            site_is_primary_centre_of_epilepsy_care=True,
+            site_is_actively_involved_in_epilepsy_care=True,
+        ).first()
 
     def save(self, *args, **kwargs) -> None:
         # Normalise postcode and update geolocation coordinates.
