@@ -135,7 +135,7 @@ def lookup_child_if_user_has_permission(request_kwargs, user):
     # Guard against users with no active primary employer
     if not user.organisation_employer:
         return None
-    
+
     via_registration = lambda obj: obj.registration.case
     via_multiaxial_dagnosis = lambda obj: obj.multiaxial_diagnosis.registration.case
     via_management = lambda obj: obj.management.registration.case
@@ -161,7 +161,7 @@ def lookup_child_if_user_has_permission(request_kwargs, user):
         if pk is not None:
             obj = model.objects.get(pk=pk)
             child = via_fn(obj)
-            
+
             org_filters = {
                 "cases": child,
                 "patient_sites__site_is_actively_involved_in_epilepsy_care": True,
@@ -182,14 +182,14 @@ def lookup_user_permissions_on_child(request, request_kwargs):
     # 3. Active trust level users with confirmed email where their trust is the same as the child
     # Editing is allowed if the cohort is still open or if you are an RCPCH audit member
     user = request.user
-    
+
     # Check user is active and has confirmed their email (unless superuser)
     if not user.is_superuser and not (user.is_active and user.email_confirmed):
         return {
             "can_view": False,
             "can_edit": False,
         }
-    
+
     is_admin = user.is_rcpch_audit_team_member or user.is_rcpch_staff or user.is_superuser
 
     if is_admin:
@@ -199,7 +199,7 @@ def lookup_user_permissions_on_child(request, request_kwargs):
         }
 
     child = lookup_child_if_user_has_permission(request_kwargs, request.user)
-    
+
     if child:
         return {
             "can_view": True,
@@ -222,7 +222,7 @@ def user_may_view_this_child():
 
             if permissions["can_view"]:
                 return view(request, permissions["can_edit"], *args, **kwargs)
-            
+
             raise PermissionDenied()
 
         return wrapper
@@ -288,7 +288,6 @@ def login_and_otp_required():
         def wrapper(request, *args, **kwargs):
             # Then, ensure 2fa verified
             user = request.user
-
             # Bypass 2fa if local dev, with warning message
             if settings.LOCAL_DEV_BYPASS_2FA_AND_CAPTCHA and user.is_authenticated:
                 logger.warning(

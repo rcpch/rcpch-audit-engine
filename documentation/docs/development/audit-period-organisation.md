@@ -771,6 +771,109 @@ The recommended production workflow for the first run is:
 
 Individual organisations can be tested with `--ods-code` before running the full sync.
 
+### Cutover walkthrough (first run)
+
+This is the explicit, step-by-step sequence the audit team follows the **first time** they stand up the period-aware organisation membership layer against a new (staging or live) environment. It orders all five commands with what each does, why the order matters, and what to check before moving on. The worked example traces one organisation — Newark Hospital (ODS `RK5HP`) moving from Nottinghamshire Healthcare (RHA) to Sherwood Forest (RK5) — through the whole cutover.
+
+**A crucial distinction to keep in mind throughout:** there are *two* separate "trust" fields with the same name.
+
+- `AuditPeriodOrganisation.trust` — the **period membership** parent, frozen by the per-cohort sync and confirmed by approval. This is what historical reporting will read.
+- `Organisation.trust` — the **live** parent on the `Organisation` row, moved only by the current-state sync. This is what the operational dashboard reads today.
+
+Approving a membership does **not** move the live `Organisation.trust`. Only the current-state sync does that. The two are reconciled separately on purpose (see [The two sync commands are complementary](#the-two-sync-commands-are-complementary)).
+
+#### Step 0 — Baseline review (`sync_nhs_organisations --dry-run`)
+
+Before changing anything, preview what the current-state sync will do. It contacts the API, compares it against the local DB, and reports every change it *would* make — new entities, changed entities with field-level diffs, exposures (registrations/in-flight registrations/cases across all periods), and local-only rows. It writes nothing.
+
+```bash
+python manage.py sync_nhs_organisations --dry-run
+```
+
+Review the output for:
+
+- **Organisation trust/LHB moves** (e.g. `RK5HP`: `RHA → RK5`) and whether they carry registrations/cases exposure — these are the high-impact changes;
+- **Trust/LHB `active` flips** (mostly dissolved/merged trusts going `active=False`);
+- anything you do **not** expect that you should investigate before proceeding.
+
+The dry-run output is the confirmation you (and reviewers) should check against reality. Keep it for the record.
+
+#### Step 1 — Freeze historical memberships (`sync_audit_period_organisations`)
+
+Populate `AuditPeriodOrganisation` rows for every audit period by calling the API's snapshot endpoint at each period's reference date. This freezes, per period, which Trust/LHB/ICB/region/network/country each participating organisation belonged to. Rows are created **unapproved** (`approved_at` null). This command never touches live `Organisation.*` fields.
+
+```bash
+python manage.py sync_audit_period_organisations
+```
+
+For Newark this writes a **cohort 6 membership row** with `trust = Sherwood Forest (RK5)` — the period-correct parent — while Newark's live `Organisation.trust` is still `RHA`. That is correct and expected.
+
+Confirm it created memberships (the command prints per-cohort counts; a dry-run summary of what it *would* do is available via `--dry-run`).
+
+#### Step 2 — Review and approve the memberships (`approve_audit_period_organisations`)
+
+Walk each unapproved row and decide whether the frozen period hierarchy is correct. The command shows the period hierarchy and the exposure (registrations and distinct cases attached to the organisation) so you can judge impact before committing. Approving sets `approved_at`/`approved_by` and **freezes** the row — the per-cohort sync will never overwrite it again.
+
+At minimum you must approve memberships in the **in-flight cohorts** (currently recruiting / in data collection / in grace) to unblock the next step — the current-state sync's ordering constraint blocks on any in-flight period having zero approved memberships. Historically it is good practice to approve closed-cohort memberships too once reviewed.
+
+```bash
+python manage.py approve_audit_period_organisations
+```
+
+Use `--cohort N` to scope to a single cohort, `--ods-code CODE` to scope to specific organisations, `--dry-run` to review without prompting, or `--auto-approve` to approve every row (after a dry-run review). Newark appears in the list under cohort 6 showing `Trust: SHERWOOD FOREST` — you are approving that *period* assignment, not moving the live row.
+
+See [Approval workflow (`approve_audit_period_organisations`)](#approval-workflow-approve_audit_period_organisations) for the full command reference — every prompt option, every flag, and the freeze semantics. This section covers the command in the context of the cutover flow; that section is the tool manual.
+
+> **Why this is required**: without an approved membership in every in-flight cohort, `sync_nhs_organisations` is blocked by the [ordering constraint](#ordering-constraint). Approving the in-flight memberships is the step that lifts that block.
+
+#### Step 3 — Apply the live current state (`sync_nhs_organisations --confirm`)
+
+This is the command that actually mutates the **live** `Organisation.trust` / `Organisation.local_health_board` / etc. and flips `active` flags to match the API's current state. It is the current-state sync. It runs a pre-sync safety check, then requires `--confirm` when the sync would affect registrations or cases.
+
+```bash
+python manage.py sync_nhs_organisations --confirm
+```
+
+For Newark this repoints the live `Organisation.trust` from `RHA` to `RK5`, and the two registrations attached to Newark now aggregate under Sherwood Forest on the operational dashboard. The cases themselves never move — they stay attached to the organisation via `Site`; only the trust grouping changes.
+
+If the command instead prints `Sync blocked by the ordering constraint: ... in-flight audit periods have no approved ... rows`, return to Step 2 and approve the in-flight cohorts before re-running.
+
+#### Step 4 — Link OrganisationalIdentities (`sync_audit_period_organisations --link-identities`)
+
+Bridge ODS code changes from mergers/dissolutions by linking successor `Organisation` rows to their predecessor via `OrganisationIdentity`. This must run **after** Step 3 because the current-state sync creates the new ODS code rows that this step links.
+
+```bash
+python manage.py sync_audit_period_organisations --link-identities
+```
+
+#### Step 5 — Confirm the changes (`sync_audit_period_organisations --reconcile`)
+
+Produce a read-only verification report covering hierarchy changes between periods, registration attribution, and sibling organisations. This is the counterpart to the step-3 change — it confirms the sync was applied as expected.
+
+```bash
+python manage.py sync_audit_period_organisations --reconcile
+```
+
+You should see Newark (`RK5HP`) reported as a hierarchy change `RHA → RK5`. If you do, the cutover for Newark is complete: the frozen cohort 6 membership (period reporting) and the live `Organisation.trust` (operational dashboard) both point at Sherwood Forest.
+
+#### Summary of the set of commands
+
+| # | Command | Writes to | Trust it changes | Net effect |
+|---|---------|-----------|------------------|-----------|
+| 0 | `sync_nhs_organisations --dry-run` | nothing | — | Preview the current-state sync |
+| 1 | `sync_audit_period_organisations` | `AuditPeriodOrganisation` | period memberships (`AuditPeriodOrganisation.trust`) | Freeze historical/period hierarchy, all unapproved |
+| 2 | `approve_audit_period_organisations` | `AuditPeriodOrganisation.approved_at/by` | period memberships (locks them) | Approve & freeze; unblocks the current-state sync |
+| 3 | `sync_nhs_organisations --confirm` | live `Organisation`, `Trust`, `ICB`, etc. | **live `Organisation.trust`** | Move/reparent live organisations to current state |
+| 4 | `sync_audit_period_organisations --link-identities` | `Organisation.identity` / `OrganisationIdentity` | — | Link ODS code successors to predecessors |
+| 5 | `sync_audit_period_organisations --reconcile` | nothing | — | Verify the whole cutover |
+
+#### Idempotency and rollback notes
+
+- Steps 1–5 are safe to re-run. Step 2 only ever touches unapproved rows, so a re-run re-presents only what is still unapproved.
+- Once Step 3 has run, re-running it is idempotent — it detects that live rows already match the API and reports no further high-impact changes (the same trust move is not applied twice).
+- Rolling back a live trust move is not automatic. To undo a specific move you would need to re-run a later current-state sync with the API reflecting the previous state, or correct the `Organisation.trust` manually — there is no built-in undo in these commands.
+- **Scenario after cutover**: if a reorganisation occurs in an in-flight cohort *after* Step 2 approved it, that approval freezes the membership and the per-cohort sync will not pick up the change. To reflect it, run the per-cohort sync for that cohort, clear `approved_at` on the affected row(s), and re-approve. This is why the design recommends keeping in-flight memberships unapproved until the hierarchy is final (see [Re-running the per-cohort sync for the in-flight cohort](#re-running-the-per-cohort-sync-for-the-in-flight-cohort)).
+
 ### The two sync commands are complementary
 
 The two management commands have distinct, non-overlapping responsibilities and must not be folded into one operation:
@@ -840,6 +943,8 @@ Flags:
 - `--auto-approve` — approve every unapproved row without prompting (review with `--dry-run` first).
 
 Approval is a one-way freeze: once `approved_at` is set, re-running the per-cohort sync leaves the row untouched (`skip_approved`). This is exactly what the ordering constraint relies on — the in-flight period's hierarchy is frozen before the live rows are mutated.
+
+This command is **Step 2 of the cutover walkthrough** — see [Cutover walkthrough (first run)](#cutover-walkthrough-first-run) for where it fits in the command sequence, why it must precede the current-state sync, and the worked example. This section is the command reference; the walkthrough is the procedure it serves.
 
 #### Deletion protection (migration 0070)
 
