@@ -18,55 +18,55 @@
 
         </th>
         {% if all_data.TRUST_KPIS.aggregation_model %}
-        <th class='right aligned'>
-            <p>Trust</p>
-            <p><i
-                class="info circle icon"
-                id='totals_trust_{{kpi_head_id}}'
-                data-title='Epilepsy12 totals'
-                data-content="Number of children registered in this Trust ({{all_data.TRUST_KPIS.aggregation_model.abstraction_relation.name}})"
-                data-position='top right'
-                _="init js $('#totals_trust_{{kpi_head_id}}').popup(); end"
-            ></i>({{all_data.TRUST_KPIS.total_cases_registered}})</p>
-        </th>
-        {% if country.boundary_identifier != 'JEY' %}
-        <th class='right aligned'>
-            <p>Integrated Care Board</p>
-            <p><i
-                class="info circle icon"
-                id='totals_icb_{{kpi_head_id}}'
-                data-title='Epilepsy12 totals'
-                data-content="Number of children registered in this Integrated Care Board ({% formatlabel all_data.ICB_KPIS.aggregation_model.abstraction_relation.name %})"
-                data-position='top right'
-                _="init js $('#totals_icb_{{kpi_head_id}}').popup(); end"
-            ></i>({{all_data.ICB_KPIS.total_cases_registered}})</p>
-        </th>
-        <th class='right aligned'>
-            <p>NHS Region</p>
-            <p><i
-                class="info circle icon"
-                id='totals_nhs_{{kpi_head_id}}'
-                data-title='Epilepsy12 totals'
-                data-content="Number of children registered in this NHS Region ({{all_data.NHS_ENGLAND_REGION_KPIS.aggregation_model.abstraction_relation.name}})"
-                data-position='top right'
-                _="init js $('#totals_nhs_{{kpi_head_id}}').popup(); end"
-            ></i>({{all_data.NHS_ENGLAND_REGION_KPIS.total_cases_registered}})</p>
-        </th>
-        {% endif %}
+            <th class='right aligned'>
+                <p>Trust</p>
+                <p><i
+                    class="info circle icon"
+                    id='totals_trust_{{kpi_head_id}}'
+                    data-title='Epilepsy12 totals'
+                    data-content="Number of children registered in this Trust ({{all_data.TRUST_KPIS.aggregation_model.abstraction_relation.name}})"
+                    data-position='top right'
+                    _="init js $('#totals_trust_{{kpi_head_id}}').popup(); end"
+                ></i>({{all_data.TRUST_KPIS.total_cases_registered}})</p>
+            </th>
+            {% if country.boundary_identifier != 'JEY' %}
+            <th class='right aligned'>
+                <p>Integrated Care Board</p>
+                <p><i
+                    class="info circle icon"
+                    id='totals_icb_{{kpi_head_id}}'
+                    data-title='Epilepsy12 totals'
+                    data-content="Number of children registered in this Integrated Care Board ({% formatlabel all_data.ICB_KPIS.aggregation_model.abstraction_relation.name %})"
+                    data-position='top right'
+                    _="init js $('#totals_icb_{{kpi_head_id}}').popup(); end"
+                ></i>({{all_data.ICB_KPIS.total_cases_registered}})</p>
+            </th>
+            <th class='right aligned'>
+                <p>NHS Region</p>
+                <p><i
+                    class="info circle icon"
+                    id='totals_nhs_{{kpi_head_id}}'
+                    data-title='Epilepsy12 totals'
+                    data-content="Number of children registered in this NHS Region ({{all_data.NHS_ENGLAND_REGION_KPIS.aggregation_model.abstraction_relation.name}})"
+                    data-position='top right'
+                    _="init js $('#totals_nhs_{{kpi_head_id}}').popup(); end"
+                ></i>({{all_data.NHS_ENGLAND_REGION_KPIS.total_cases_registered}})</p>
+            </th>
+            {% endif %}
         {% else %}
-        <th class='right aligned'>
-            <p>Local Health Board</p>
-            <p><i
-                class="info circle icon"
-                id='totals_trust_{{kpi_head_id}}'
-                data-title='Epilepsy12 totals'
-                data-content="Number of children registered in this Local Health Board ({{all_data.LOCAL_HEALTH_BOARD_KPIS.aggregation_model.abstraction_relation.name}})"
-                data-position='top right'
-                _="init js $('#totals_trust_{{kpi_head_id}}').popup(); end"
-            ></i>({{all_data.LOCAL_HEALTH_BOARD_KPIS.total_cases_registered}})</p>
-        </th>
+            <th class='right aligned'>
+                <p>Local Health Board</p>
+                <p><i
+                    class="info circle icon"
+                    id='totals_trust_{{kpi_head_id}}'
+                    data-title='Epilepsy12 totals'
+                    data-content="Number of children registered in this Local Health Board ({{all_data.LOCAL_HEALTH_BOARD_KPIS.aggregation_model.abstraction_relation.name}})"
+                    data-position='top right'
+                    _="init js $('#totals_trust_{{kpi_head_id}}').popup(); end"
+                ></i>({{all_data.LOCAL_HEALTH_BOARD_KPIS.total_cases_registered}})</p>
+            </th>
         {% endif %}
-        {% if country.boundary_identifier != 'JEY' %}
+
         <th class='right aligned'>
             <p>OPEN UK Region</p>
             <p><i
@@ -78,7 +78,7 @@
                 _="init js $('#totals_open_uk_{{kpi_head_id}}').popup(); end"
             ></i>({{all_data.OPEN_UK_KPIS.total_cases_registered}})</p>
         </th>
-        {% endif %}
+
         <th class='right aligned'>
             <p>{{all_data.COUNTRY_KPIS.aggregation_model.abstraction_relation.name}}</p>
             <p><i
@@ -90,7 +90,7 @@
                 _="init js $('#totals_country_{{kpi_head_id}}').popup(); end"
             ></i>({{all_data.COUNTRY_KPIS.total_cases_registered}})</p>
         </th>
-
+        {% if country.boundary_identifier != 'JEY' %}
         <th class='right aligned'>
             <p>National</p>
             <p><i
@@ -102,6 +102,6 @@
                 _="init js $('#totals_national_{{kpi_head_id}}').popup(); end"
             ></i>({{all_data.NATIONAL_KPIS.total_cases_registered}})</p>
         </th>
-
+        {% endif %}
     </tr>
 </thead>

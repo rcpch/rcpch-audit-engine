@@ -839,20 +839,21 @@ class RCPCHLoginView(TwoFactorLoginView):
     # Override successful login redirect to org summary page
     def get_success_url(self):
         url = self.get_redirect_url()
-        
+
         if url:
             return url
-        
-        org_employer = self.request.user.organisation_employer 
+
+        org_employer = self.request.user.organisation_employer
         org_id = org_employer.id if org_employer else None
 
         if org_id:
             return reverse("selected_organisation_summary", kwargs={"organisation_id": org_id})
-        
+
         return reverse(settings.LOGIN_REDIRECT_URL)
 
     def done(self, form_list, **kwargs):
-        response = super().done(form_list)
+
+        response = super().done(form_list, **kwargs)
 
         user = self.get_user()
 
@@ -914,12 +915,12 @@ def logs(request, organisation_id, epilepsy12_user_id):
         for device in devices:
             if device.name == request.htmx.trigger_name:
                 device.delete()
-        
+
         devices = devices_for_user(user=epilepsy12_user, confirmed=True)
         template_name = "epilepsy12/logs_user_summary.html"
     else:
         template_name = "epilepsy12/logs.html"
-    
+
     device_data = [
         {
             "name": device.name,
@@ -951,7 +952,7 @@ def all_epilepsy12_users_list(request, organisation_id):
         raise PermissionDenied()
 
     all_users = Epilepsy12User.objects.all()
-    
+
     user_list = []
     for user in all_users:
         created_by = user.created_by.email if user.created_by else None
