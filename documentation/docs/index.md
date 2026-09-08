@@ -23,4 +23,3 @@ Epilepsy affects around one in 200 children and young people in the UK (aged 18 
 * Use a pragmatic and concise dataset.
 * Incorporate NICE Quality Standards alongside metrics about mental health, education and transition to adult services.
 * Provide services with local real-time patient- and service-level reporting.
-

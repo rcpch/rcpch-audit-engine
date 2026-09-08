@@ -19,4 +19,4 @@ All documentation and textual work (such as this documentation site) is licensed
 
 ### Upstream components
 
-Our licensing arrangements do not affect the licenses of any upstream technologies which we have used to build pur platforms, such as Django ([3-clause BSD](https://docs.djangoproject.com/en/4.1/faq/general/)) MkDocs ([BSD](https://www.mkdocs.org/about/license/#mkdocs-license-bsd)) or Python ([PSF](https://docs.python.org/3/license.html#psf-license)). However our license choice is compatible with these upstream licensing arrangements.
+Our licensing arrangements do not affect the licenses of any upstream technologies which we have used to build our platforms, such as Django ([3-clause BSD](https://docs.djangoproject.com/en/4.1/faq/general/)) MkDocs ([MIT](https://github.com/zensical/zensical/blob/master/LICENSE.md)) or Python ([PSF](https://docs.python.org/3/license.html#psf-license)). However our license choice is compatible with these upstream licensing arrangements.

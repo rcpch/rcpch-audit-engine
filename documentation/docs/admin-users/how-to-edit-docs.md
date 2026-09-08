@@ -5,7 +5,7 @@ author: Dr Anchit Chandran
 
 ## Markdown Files
 
-This site is created using the Zensical documentation framework (built on MkDocs). All text content comes from *markdown* files.
+This site is created using the Zensical documentation framework (previously MkDocs). All text content comes from *markdown* files.
 
 Markdown is a simple, lightweight markup language that allows you to format text using a few simple symbols. It was designed to be easy to read and write, even for people unfamiliar with coding.
 
@@ -51,7 +51,7 @@ Markdown is widely used on the web, especially in blogs, documentation, and foru
 
 ## Zensical
 
-On top of MkDocs, this site uses [Zensical](https://zensical.org/), a static site generator built by the same team as *Material for MkDocs*, which adds several extra features and a more modern appearance.
+This site uses [Zensical](https://zensical.org/), a static site generator built by the same team as *Material for MkDocs*, which adds several extra features and a more modern appearance.
 
 As you'd expect, there is delightful documentation for [Zensical](https://zensical.org/docs/) and for the underlying [MkDocs](https://www.mkdocs.org/), on which it's built. At times, you may need to refer to both for different features.
 

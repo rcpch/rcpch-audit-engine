@@ -54,7 +54,7 @@ Which should result in something like:
 NAME                                IMAGE                             COMMAND                  SERVICE             CREATED             STATUS              PORTS
 rcpch-audit-engine-caddy-1          caddy                             "caddy run --config …"   caddy               27 minutes ago      Up 19 minutes       0.0.0.0:80->80/tcp, 0.0.0.0:443->443/tcp, 443/udp, 2019/tcp
 rcpch-audit-engine-django-1         rcpch-audit-engine-django         "sh -c 'python manag…"   django              27 minutes ago      Up 19 minutes
-rcpch-audit-engine-mkdocs-1         rcpch-audit-engine-mkdocs         "sh -c 'mkdocs build…"   mkdocs              27 minutes ago      Up 19 minutes       0.0.0.0:8001->8001/tcp
+rcpch-audit-engine-zensical-1       rcpch-audit-engine-zensical       "sh -c 'zensical build…"   zensical            27 minutes ago      Up 19 minutes       0.0.0.0:8001->8001/tcp
 rcpch-audit-engine-postgis-1        postgis/postgis:15-3.3            "docker-entrypoint.s…"   postgis             27 minutes ago      Up 19 minutes       5432/tcp
 ```
 

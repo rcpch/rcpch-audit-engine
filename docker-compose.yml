@@ -40,7 +40,7 @@ services:
       - postgis-data:/var/lib/postgresql/data
     restart: always
 
-  mkdocs:
+  zensical:
     <<: *global # this will inherit config from x-global-environment
     image: e12-django:built
     ports:

@@ -15,7 +15,7 @@
 - **Reverse proxy**: Caddy (handles HTTPS)
 - **Task queue**: Celery (celerybeat for scheduled tasks)
 - **Primary app**: `epilepsy12/` — all audit domain logic lives here
-- **Documentation**: Zensical site (built on MkDocs), served via a separate Docker Compose service and built into the image at deploy time
+- **Documentation**: Zensical site (previously MkDocs), served via a separate Docker Compose service and built into the image at deploy time
 - **Full docs**: https://e12.rcpch.ac.uk/docs
 
 The main Django project config is in `rcpch-audit-engine/` (the inner directory), including `settings.py`, `urls.py`, `logging_settings.py`, and `build_info.py`.
@@ -28,7 +28,7 @@ All developer and CI operations are driven by short shell scripts in `s/`. These
 
 | Script | Purpose |
 |---|---|
-| `s/up` | `docker compose up` — starts all services (caddy, django, postgis, mkdocs) |
+| `s/up` | `docker compose up` — starts all services (caddy, django, postgis, zensical) |
 | `s/down` | `docker compose down` — stops services, does **not** destroy volumes or images |
 | `s/rebuild` | Destroys containers and images then calls `s/up` (runs `s/remove-containers-and-images` then `s/up`) |
 | `s/remove-containers-and-images` | Removes local containers and images without touching volumes |
@@ -94,7 +94,7 @@ The GitHub Actions workflow uses OIDC (`id-token: write` permission) with Azure 
 | `caddy` | `caddy` (official) | Reverse proxy, TLS termination, serves static docs |
 | `django` | `e12-django:built` (local build) | Main Django application |
 | `postgis` | `postgis/postgis:15-3.3` | PostgreSQL + PostGIS |
-| `mkdocs` | `e12-django:built` | Builds and optionally serves the Zensical documentation |
+| `zensical` | `e12-django:built` | Builds and optionally serves the Zensical documentation |
 
 All services share environment from `envs/.env` (not committed to git). Two named volumes are used: `caddy-data` and `postgis-data`.
 

@@ -11,14 +11,7 @@ The RCPCH Audit Engine / Epilepsy12 documentation site is made with [Zensical](h
 
 As part of our standard Docker and Docker Compose development setup, we have a `docker-compose.yml` file in the root of the repo which will build a `zensical` Docker image with all the dependencies needed to run the documentation site locally.
 
-By default this image is running in a container at `localhost:8001` when you run the Docker dev setup using `s/up` and it will auto-reload when you make changes to the source files in `documentation/docs`.
-
-!!! warning "IMPORTANT"
-    There are two ways to view the documentation site:
-
-    <https://localhost:8001> is served from the `zensical serve` command and **has auto-reload**, so is much more convenient for local development, you can instantly see changes made to the Markdown files in `documentation/docs`.
-
-    <https://e12.localhost/docs> is the built static HTML files, served through Caddy. This reflects how the documentation site works in the VPS environments. **There is no auto-reload**, so you have to manually run `docker compose restart mkdocs` to rebuild the static HTML files after making changes to the Markdown files in `documentation/docs`.
+You can view the documentation at `https://e12.localhost/docs`. Changes appear when the page is reloaded.
 
 ## How to edit content
 
@@ -30,7 +23,7 @@ By default this image is running in a container at `localhost:8001` when you run
 
 ## Reference guides
 
-*Zensical* (the static site generator we are using, built by the Material for MkDocs team) has a host of features for making beautiful, practical, functional and easily navigable documentation.
+[Zensical](https://zensical.org/docs/) (the static site generator we are using, built by the Material for MkDocs team) has a host of features for making beautiful, practical, functional and easily navigable documentation.
 
 ### Markdown
 
@@ -43,16 +36,6 @@ Markdown uses characters like asterisks (`*`), hashes (`#`) and others, to effec
 If you are new to Markdown editing, you can use GitHub's interface itself to edit in-browser, by clicking the 'pencil' edit icon in the top right corner of any source code page. There are also external tools like [Prose.io](http://prose.io/) and [StackEdit](https://stackedit.io/) which give you a nice interface for editing Markdown in a browser, and will sync the changes with GitHub for you.
 
 If Markdown seems daunting then another option is simply to edit the content in the word processor of your choice and then ask one of the RCPCH Developer team to convert it to Markdown and add it to the documentation.
-
-### Zensical
-
-On top of the basic features of Markdown and MkDocs (the underlying framework), *Zensical* adds all the nice website appearance and many additional features for making beautiful documentation sites.
-
-A good overview can be had from looking at the [Zensical documentation](https://zensical.org/docs/) and from copying existing code in our documentation that does what you need.
-
-### MkDocs
-
-Zensical is built on top of MkDocs, and uses the same `mkdocs.yml` configuration file. Some functionality comes from MkDocs itself rather than Zensical. See the [MkDocs](https://www.mkdocs.org/user-guide/writing-your-docs/#writing-with-markdown) site for these features.
 
 ### Pymdownx extensions
 
@@ -80,16 +63,16 @@ Create a virtualenv for the Python modules:
 
 * Install `pyenv` using the instructions at <https://github.com/pyenv/pyenv-installer>
 * Any recent Python version works, we tend to use 3.11
-* Calling it `mkdocs` will enable Pyenv to automatically select it when you navigate to the directory, because this will match the contents of the `.python-version` file in the root of the project.
+* Calling it `zensical` will enable Pyenv to automatically select it when you navigate to the directory, because this will match the contents of the `.python-version` file in the root of the project.
 
 ```console
-pyenv virtualenv 3.11 mkdocs
+pyenv virtualenv 3.11 zensical
 ```
 
-The first time you want to use the `mkdocs` pyenv, you will need to activate it. Subsequent times it should automatically be activated if you have named it the same as the entry in the `.python-version` file in the root of the project.
+The first time you want to use the `zensical` pyenv, you will need to activate it. Subsequent times it should automatically be activated if you have named it the same as the entry in the `.python-version` file in the root of the project.
 
 ```console
-pyenv activate mkdocs
+pyenv activate zensical
 ```
 
 ### Install Zensical
