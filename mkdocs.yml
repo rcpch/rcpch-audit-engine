@@ -38,12 +38,7 @@ theme:
     - content.tabs.link # enables the content tabs to all change in a linked way, on selection
     - navigation.expand
     - navigation.footer # explicitly adds footer prev/next (Material4MkDocs9.0)
-    # navigation.instant is disabled: the docs are served from a /docs subpath
-    # (see rcpch-audit-engine/wsgi.py and Caddyfile), and Zensical does not yet
-    # derive __config.base from site_url's path component. With instant nav on,
-    # partial page swaps resolve assets against '/' instead of '/docs/' and the
-    # page renders unstyled (looks like a theme switch) until a hard reload.
-    # - navigation.instant
+    - navigation.instant
     - navigation.tabs
     - navigation.tabs.sticky
     - navigation.top
