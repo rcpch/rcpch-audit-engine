@@ -5,7 +5,7 @@ FROM python:3.11
 ENV PYTHONDONTWRITEBYTECODE 1
 ENV PYTHONUNBUFFERED 1
 
-# Required for CAPTCHA, Material for MkDocs plugins (dependency for git and pdf plugins)
+# Required for CAPTCHA, Zensical (successor to Material for MkDocs) plugins
 # --no-install-recommends reduces size of image by avoiding unnecessary packages
 RUN apt-get update && \
     apt-get install -y binutils libproj-dev gdal-bin \

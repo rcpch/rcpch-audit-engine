@@ -50,11 +50,18 @@ pytest-factoryboy==2.8.1
 pytest-xdist==3.8.0
 rapidfuzz==3.14.5
 
-mkdocs-material==9.6.12
-mkdocs-git-committers-plugin-2==2.5.0 # displays authors at the bottom of the page
-mkdocs-git-revision-date-localized-plugin==1.4.5 # displays last edit date at the bottom of the page
-mkdocs-macros-plugin==1.3.7 # enables 'foldable' admonition text (used for large code blocks)
-mkdocs-with-pdf==0.9.3 # PDF export feature
+# Documentation site theme
+# Ported from Material for MkDocs to Zensical (the successor, built by the same
+# team). See https://zensical.org/docs/get-started/
+zensical==0.0.59
+
+# The following MkDocs plugins are NOT yet compatible with Zensical and are
+# suspended pending Zensical's module system. Re-enable each when the
+# corresponding Zensical backlog issue is resolved.
+# mkdocs-git-committers-plugin-2==2.5.0           # https://github.com/zensical/backlog/issues/17
+# mkdocs-git-revision-date-localized-plugin==1.4.5 # https://github.com/zensical/backlog/issues/18
+# mkdocs-macros-plugin==1.3.7                     # replaced by zensical.extensions.macros (built into Zensical >=0.0.40)
+# mkdocs-with-pdf==0.9.3                         # https://github.com/zensical/backlog/issues/25
 
 # for colored logs
 colorlog==6.9.0
