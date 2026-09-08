@@ -17,8 +17,8 @@ s/get-build-info > build_info.json
 # Build the app
 docker compose build
 
-# Build the docs
-docker compose run mkdocs /bin/bash -c 'mkdocs build --config-file documentation/mkdocs.yml'
+# Build the docs (zensical auto-discovers ./mkdocs.yml at the repo root)
+docker compose run mkdocs /bin/bash -c 'zensical build'
 
 # HOTFIX: Build again to embed the docs
 docker compose build

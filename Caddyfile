@@ -11,7 +11,7 @@
     # DJANGO
     reverse_proxy http://django:8000
 
-    # MKDOCS static files are served from a /docs path
+    # Zensical static files are served from a /docs path
     handle_path /docs/* {
         root * /srv/staticdocs
         file_server {

@@ -15,7 +15,7 @@
 - **Reverse proxy**: Caddy (handles HTTPS)
 - **Task queue**: Celery (celerybeat for scheduled tasks)
 - **Primary app**: `epilepsy12/` — all audit domain logic lives here
-- **Documentation**: MkDocs site, served via a separate Docker Compose service and built into the image at deploy time
+- **Documentation**: Zensical site (built on MkDocs), served via a separate Docker Compose service and built into the image at deploy time
 - **Full docs**: https://e12.rcpch.ac.uk/docs
 
 The main Django project config is in `rcpch-audit-engine/` (the inner directory), including `settings.py`, `urls.py`, `logging_settings.py`, and `build_info.py`.
@@ -72,7 +72,7 @@ This is the authoritative deploy sequence executed on every push to `live`:
 2. **Download `.env` from Azure File Share** — production secrets are stored in Azure Storage, not in the repo
 3. **Burn in build info** — `s/get-build-info` writes git metadata to `build_info.json`
 4. **Build the Docker image** — `docker compose build`
-5. **Build the MkDocs documentation** — runs inside the image; docs are embedded into the static files
+5. **Build the Zensical documentation** — runs inside the image; docs are embedded into the static files
 6. **Rebuild the image** — a second build to embed the freshly built docs
 7. **Tag and push to ACR** — tagged with the Git SHA: `<registry>.azurecr.io/e12-django:<SHA>`
 8. **Run tests** — `s/test -m 'not slow'` then `s/test -m 'slow'` against a local Postgres container
@@ -94,7 +94,7 @@ The GitHub Actions workflow uses OIDC (`id-token: write` permission) with Azure 
 | `caddy` | `caddy` (official) | Reverse proxy, TLS termination, serves static docs |
 | `django` | `e12-django:built` (local build) | Main Django application |
 | `postgis` | `postgis/postgis:15-3.3` | PostgreSQL + PostGIS |
-| `mkdocs` | `e12-django:built` | Builds and optionally serves the MkDocs documentation |
+| `mkdocs` | `e12-django:built` | Builds and optionally serves the Zensical documentation |
 
 All services share environment from `envs/.env` (not committed to git). Two named volumes are used: `caddy-data` and `postgis-data`.
 

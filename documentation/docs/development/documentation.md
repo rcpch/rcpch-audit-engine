@@ -5,18 +5,18 @@ reviewers: Dr Marcus Baw
 
 ## Introduction
 
-The RCPCH Audit Engine / Epilepsy12 documentation site is made with [Material for MkDocs](https://squidfunk.github.io/mkdocs-material/), which is a framework, separate from Django, which takes Markdown source files from `documentation/docs` within the project and compiles them into a static HTML site. These static files are then served from our hosting resources.
+The RCPCH Audit Engine / Epilepsy12 documentation site is made with [Zensical](https://zensical.org/), a static site generator (built by the same team as Material for MkDocs) which takes Markdown source files from `documentation/docs` within the project and compiles them into a static HTML site. These static files are then served from our hosting resources.
 
 ## Docker development setup
 
-As part of our standard Docker and Docker Compose development setup, we have a `docker-compose.yml` file in the root of the repo which will build a `mkdocs` Docker image with all the dependencies needed to run the documentation site locally.
+As part of our standard Docker and Docker Compose development setup, we have a `docker-compose.yml` file in the root of the repo which will build a `zensical` Docker image with all the dependencies needed to run the documentation site locally.
 
 By default this image is running in a container at `localhost:8001` when you run the Docker dev setup using `s/up` and it will auto-reload when you make changes to the source files in `documentation/docs`.
 
 !!! warning "IMPORTANT"
     There are two ways to view the documentation site:
 
-    <https://localhost:8001> is served from the `mkdocs serve` command and **has auto-reload**, so is much more convenient for local development, you can instantly see changes made to the Markdown files in `documentation/docs`.
+    <https://localhost:8001> is served from the `zensical serve` command and **has auto-reload**, so is much more convenient for local development, you can instantly see changes made to the Markdown files in `documentation/docs`.
 
     <https://e12.localhost/docs> is the built static HTML files, served through Caddy. This reflects how the documentation site works in the VPS environments. **There is no auto-reload**, so you have to manually run `docker compose restart mkdocs` to rebuild the static HTML files after making changes to the Markdown files in `documentation/docs`.
 
@@ -30,7 +30,7 @@ By default this image is running in a container at `localhost:8001` when you run
 
 ## Reference guides
 
-*MkDocs* and *Material for MkDocs* (the MkDocs theme we are using) have a host of features for making beautiful, practical, functional and easily navigable documentation.
+*Zensical* (the static site generator we are using, built by the Material for MkDocs team) has a host of features for making beautiful, practical, functional and easily navigable documentation.
 
 ### Markdown
 
@@ -44,15 +44,15 @@ If you are new to Markdown editing, you can use GitHub's interface itself to edi
 
 If Markdown seems daunting then another option is simply to edit the content in the word processor of your choice and then ask one of the RCPCH Developer team to convert it to Markdown and add it to the documentation.
 
-### Material for MkDocs
+### Zensical
 
-On top of the basic features of Markdown, MkDocs and the *Material for MkDocs* theme together add all the nice website appearance and many additional features for making beautiful documentation sites.
+On top of the basic features of Markdown and MkDocs (the underlying framework), *Zensical* adds all the nice website appearance and many additional features for making beautiful documentation sites.
 
-A good overview can be had from looking at the [Material for MkDocs Reference section](https://squidfunk.github.io/mkdocs-material/reference/) and from copying existing code in our documentation that does what you need.
+A good overview can be had from looking at the [Zensical documentation](https://zensical.org/docs/) and from copying existing code in our documentation that does what you need.
 
 ### MkDocs
 
-If you can't find functionality documented in the Material for MkDocs theme website, this is usually because it is functionality which comes from MkDocs, the underlying framework, itself. See the [MkDocs](https://www.mkdocs.org/user-guide/writing-your-docs/#writing-with-markdown) site for these features.
+Zensical is built on top of MkDocs, and uses the same `mkdocs.yml` configuration file. Some functionality comes from MkDocs itself rather than Zensical. See the [MkDocs](https://www.mkdocs.org/user-guide/writing-your-docs/#writing-with-markdown) site for these features.
 
 ### Pymdownx extensions
 
@@ -92,7 +92,7 @@ The first time you want to use the `mkdocs` pyenv, you will need to activate it.
 pyenv activate mkdocs
 ```
 
-### Install Material for Mkdocs
+### Install Zensical
 
 Install all the Python requirements
 
@@ -100,24 +100,14 @@ Install all the Python requirements
 pip install -r requirements.txt
 ```
 
-### Running the development MkDocs server
+### Running the development Zensical server
 
-`mkdocs serve` starts up a development server which will auto-reload after changes to the source files, and will serve the documentation on [`localhost:8001`](http://localhost:8001).
+`zensical serve` starts up a development server which will auto-reload after changes to the source files, and will serve the documentation on [`localhost:8001`](http://localhost:8001).
 
-To run `mkdocs serve` the fastest way, use
-
-```console
-export ENABLE_PDF_EXPORT=0;mkdocs serve  --config-file documentation/mkdocs.yml
-```
-
-`ENABLE_PDF_EXPORT=0 disables the generation of the PDF version of the documentation, which is slow and not needed in development.
-
-`--config-file documentation/mkdocs.yml` tells MkDocs to use the `mkdocs.yml` file in the `documentation` folder. This assumes that you are running the command from the root of the project.
-
-If you want the automatic PDF generation to happen in development locally, then run
+To run `zensical serve` the fastest way, use
 
 ```console
-export ENABLE_PDF_EXPORT=1;mkdocs serve  --config-file documentation/mkdocs.yml
+zensical serve
 ```
 
-The PDF generation slows down the hot reloading by about 10-15 seconds so it can get tiresome in development. PDF generation will automatically happen in production when the site is built and deployed, even if you didn't generate PDFs in local development.
+`mkdocs.yml` lives at the root of the project, so Zensical auto-discovers it. Run the command from the root of the project.
