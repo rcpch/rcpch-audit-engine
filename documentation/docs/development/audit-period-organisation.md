@@ -36,6 +36,93 @@ This foundation includes a new model and migration, historical data backfill, se
 
 The report builder is a separate downstream refactor. Its existing route and facet implementation can continue unchanged while this foundation is added. This requires an explicit compatibility boundary: retain the current `Organisation` relationships and legacy report-builder permission path, and introduce the new period-aware dashboard services alongside them rather than replacing every shared helper globally. The report builder will continue to have its existing current-hierarchy, all-period semantics until it is deliberately refactored.
 
+## Historical period-aware ER diagram
+
+The diagram below is a compact ER-style view of the period-aware organisation model. It keeps the core relationships only and omits generated `simple_history` tables from the drawing.
+
+```mermaid
+erDiagram
+    ORGANISATION {
+      string ods_code PK
+      string name
+      int identity_id FK
+    }
+
+    ORGANISATION_IDENTITY {
+      string name
+    }
+
+    AUDIT_PERIOD {
+      int cohort_number PK
+      date recruitment_start_date
+      date recruitment_end_date
+      date data_collection_end_date
+      date submission_deadline
+    }
+
+    AUDIT_PERIOD_ORGANISATION {
+      int audit_period_id FK
+      int organisation_id FK
+      boolean included_in_reporting
+      int hierarchy_source_id FK
+    }
+
+    HIERARCHY_SOURCE {
+      string trust
+      string local_health_board
+      string integrated_care_board
+      string nhs_england_region
+      string openuk_network
+      string country
+    }
+
+    SITE {
+      int organisation_id FK
+      int case_id FK
+    }
+
+    REGISTRATION {
+      int audit_period_id FK
+      int case_id FK
+      date first_paediatric_assessment_date
+      int cohort
+    }
+
+    ORGANISATION_EMPLOYER {
+      int epilepsy12_user_id FK
+      int employer_organisation_id FK
+      boolean is_active
+    }
+
+    EPILEPSY12_USER
+    CASE
+
+    ORGANISATION_IDENTITY ||--o{ ORGANISATION : groups
+    AUDIT_PERIOD ||--o{ AUDIT_PERIOD_ORGANISATION : has_memberships
+    ORGANISATION ||--o{ AUDIT_PERIOD_ORGANISATION : period_membership
+    HIERARCHY_SOURCE ||--o{ AUDIT_PERIOD_ORGANISATION : hierarchy_fk_inputs
+
+    ORGANISATION ||--o{ SITE : site_org
+    CASE ||--o{ SITE : has_sites
+
+    AUDIT_PERIOD ||--o{ REGISTRATION : contains
+    CASE ||--o{ REGISTRATION : registered_case
+
+    EPILEPSY12_USER ||--o{ ORGANISATION_EMPLOYER : employs
+    ORGANISATION ||--o{ ORGANISATION_EMPLOYER : employer_org
+```
+
+### Interpretation
+
+- `Organisation` is the live/current organisational record.
+- `OrganisationIdentity` groups successive `Organisation` rows for the same physical hospital across ODS code changes.
+- `AuditPeriodOrganisation` is the period-aware membership row used for reporting and permissions.
+- `HIERARCHY_SOURCE` represents the set of period-specific hierarchy lookups that feed into `AuditPeriodOrganisation`: `Trust`, `LocalHealthBoard`, `IntegratedCareBoard`, `NHSEnglandRegion`, `OPENUKNetwork`, and `Country`.
+- `Registration.audit_period` determines which period applies to a case, and therefore which `AuditPeriodOrganisation` row is relevant.
+- `Site.organisation` keeps the organisation the case was created against; it does not move when hierarchy changes.
+
+
+
 ## Problem
 
 `Organisation` currently holds mutable relationships to its present-day:
