@@ -7,6 +7,7 @@ Usage:
     python manage.py sync_nhs_organisations --dry-run  # report what would change, write nothing
     python manage.py sync_nhs_organisations --only trusts  # sync only the specified entity
     python manage.py sync_nhs_organisations --confirm  # proceed despite registration/case impact
+    python manage.py sync_nhs_organisations --dry-run --full  # show every item, no truncation
 
 The command calls ``sync_current_state()`` which upserts Trust, LocalHealthBoard,
 IntegratedCareBoard, NHSEnglandRegion, Country, OPENUKNetwork and Organisation
@@ -92,10 +93,23 @@ class Command(BaseCommand):
             "organisations. Without --confirm, the sync aborts and prints the "
             "exposure summary. Run --dry-run first to see the exposure.",
         )
+        parser.add_argument(
+            "--full",
+            action="store_true",
+            help="Do not truncate the new/changed/local-only and high-impact-changes "
+            "listings. By default only the first 20 (or 10) entries per section are "
+            "shown with a '... and N more' summary; pass this flag to print every "
+            "entry, which is useful when reviewing the full impact of a --dry-run.",
+        )
 
     def handle(self, *args, **options):
         dry_run = options["dry_run"]
         only = options.get("only")
+        full = options.get("full")
+        new_limit = None if full else 20
+        changed_limit = None if full else 20
+        local_only_limit = None if full else 10
+        high_impact_limit = None if full else 20
 
         if dry_run:
             self.stdout.write(
@@ -136,14 +150,14 @@ class Command(BaseCommand):
 
                 if new:
                     self.stdout.write(self.style.SUCCESS(f"    New (would be created):"))
-                    for identifier, name in new[:20]:
+                    for identifier, name in (new if new_limit is None else new[:new_limit]):
                         self.stdout.write(f"      + {identifier}: {name}")
-                    if len(new) > 20:
-                        self.stdout.write(f"      ... and {len(new) - 20} more")
+                    if new_limit is not None and len(new) > new_limit:
+                        self.stdout.write(f"      ... and {len(new) - new_limit} more")
 
                 if changed:
                     self.stdout.write(self.style.WARNING(f"    Changed (would be updated):"))
-                    for entry in changed[:20]:
+                    for entry in (changed if changed_limit is None else changed[:changed_limit]):
                         identifier, name, field_diffs = entry[0], entry[1], entry[2]
                         exposure = entry[3] if len(entry) > 3 else None
                         self.stdout.write(f"      ~ {identifier}: {name}")
@@ -162,17 +176,17 @@ class Command(BaseCommand):
                                     else ""
                                 )
                             )
-                    if len(changed) > 20:
-                        self.stdout.write(f"      ... and {len(changed) - 20} more")
+                    if changed_limit is not None and len(changed) > changed_limit:
+                        self.stdout.write(f"      ... and {len(changed) - changed_limit} more")
 
                 if local_only:
                     self.stdout.write(
                         self.style.HTTP_INFO(f"    Local-only (not in API, would not be touched):")
                     )
-                    for identifier, name in local_only[:10]:
+                    for identifier, name in (local_only if local_only_limit is None else local_only[:local_only_limit]):
                         self.stdout.write(f"      - {identifier}: {name}")
-                    if len(local_only) > 10:
-                        self.stdout.write(f"      ... and {len(local_only) - 10} more")
+                    if local_only_limit is not None and len(local_only) > local_only_limit:
+                        self.stdout.write(f"      ... and {len(local_only) - local_only_limit} more")
 
             self.stdout.write("")
             self.stdout.write(
@@ -247,11 +261,14 @@ class Command(BaseCommand):
             if safety["high_impact_changes"]:
                 self.stdout.write("")
                 self.stdout.write("  High-impact changes:")
-                for entity, identifier, description in safety["high_impact_changes"][:20]:
+                changes = safety["high_impact_changes"]
+                for entity, identifier, description in (
+                    changes if high_impact_limit is None else changes[:high_impact_limit]
+                ):
                     self.stdout.write(f"    {entity}: {identifier} — {description}")
-                if len(safety["high_impact_changes"]) > 20:
+                if high_impact_limit is not None and len(changes) > high_impact_limit:
                     self.stdout.write(
-                        f"    ... and {len(safety['high_impact_changes']) - 20} more"
+                        f"    ... and {len(changes) - high_impact_limit} more"
                     )
             return
 
