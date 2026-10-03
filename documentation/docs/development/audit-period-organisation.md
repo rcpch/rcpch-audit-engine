@@ -798,6 +798,12 @@ Review the output for:
 
 The dry-run output is the confirmation you (and reviewers) should check against reality. Keep it for the record.
 
+By default each section (new, changed, local-only, high-impact changes) is truncated to the first 20 (or 10, for local-only) entries with a `... and N more` summary line, to keep the console output manageable for large diffs. The totals printed above and below each section are never truncated. Pass `--full` to print every entry in full — useful when you need to review the complete impact of a reorganisation before committing to it:
+
+```bash
+python manage.py sync_nhs_organisations --dry-run --full
+```
+
 #### Step 1 — Freeze historical memberships (`sync_audit_period_organisations`)
 
 Populate `AuditPeriodOrganisation` rows for every audit period by calling the API's snapshot endpoint at each period's reference date. This freezes, per period, which Trust/LHB/ICB/region/network/country each participating organisation belonged to. Rows are created **unapproved** (`approved_at` null). This command never touches live `Organisation.*` fields.
@@ -898,6 +904,8 @@ For each changed organisation and for each trust/LHB whose `active` flag would f
 For trust/LHB `active` flips, the exposure is aggregated across all organisations under that parent, and the count includes an `organisations` field showing how many organisations are affected.
 
 The command prints a per-entity exposure line for each changed entity and a total exposure summary at the end. This lets the audit team see, before running the live current-state sync, exactly how many registrations and cases a reorganisation would touch — and specifically how many are in in-flight cohorts where the live dashboard has not yet been cut over to period-aware queries.
+
+As with the new/changed/local-only listings, the `--confirm`-gated high-impact-changes list (shown when a live run is attempted without `--confirm`) is truncated to 20 entries by default; pass `--full` alongside `--dry-run` (or when re-running without `--confirm`) to see every high-impact change without truncation.
 
 ### Current-state sync safety guards
 
