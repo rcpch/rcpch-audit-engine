@@ -25,16 +25,17 @@ The proposed solution is an explicit `AuditPeriodOrganisation` model with one ap
 A shared service layer would use this model for:
 
 1. period-aware hierarchy resolution;
-2. period-aware permissions;
-3. the live organisation dashboard;
-4. protection of clinical audit and submission workflows; and
-5. public publication generation.
+2. period-aware permissions where the selected period is not already implied by a registered case;
+3. historical reporting and future publication generation; and
+4. the future period-aware report-builder refactor.
 
-The live dashboard would continue to query live clinical records. The publication workflow would use the same approved membership rows as an input, then copy them into an immutable publication snapshot. Anonymous public views would query only that snapshot.
+Audit-period context and audit-period URL slugs are deliberately separate concerns. `AuditPeriod.slug` should appear only in canonical routes for the future historical reporting/publication workflow and the future period-aware report builder. Operational dashboard, ordinary case-list, clinical form, submission, locking, field-level HTMX and extension workflows should not require a period slug. Where those workflows need period-aware rules, they derive the period from the relevant model relationship — usually `Registration.audit_period` — or from the existing cohort toggle/admin selection.
 
-This foundation includes a new model and migration, historical data backfill, service-layer work, permission changes, route changes, and substantial changes to `selected_organisation_summary` and its templates. It is not a small preliminary part of publication implementation. Publication generation should not begin until this foundation is complete and its historical memberships have been approved.
+The operational dashboard continues to query live clinical records and keeps its existing non-slugged route. However, the selected cohort still identifies an `AuditPeriod`, so cohort-specific KPI tables, trust totals and comparator aggregations should use that selected period's approved `AuditPeriodOrganisation` parentage once the membership backfill has been run. This separates route design from aggregation semantics: the period does not need to appear in the URL, but the selected cohort should still determine the parent hierarchy used for cohort results. The publication workflow will use the same approved membership rows as an input, then copy them into an immutable publication snapshot. Anonymous public views will query only that snapshot.
 
-The report builder is a separate downstream refactor. Its existing route and facet implementation can continue unchanged while this foundation is added. This requires an explicit compatibility boundary: retain the current `Organisation` relationships and legacy report-builder permission path, and introduce the new period-aware dashboard services alongside them rather than replacing every shared helper globally. The report builder will continue to have its existing current-hierarchy, all-period semantics until it is deliberately refactored.
+This foundation includes a new model and migration, historical data backfill tooling, service-layer work and permission vocabulary. It must preserve the operational dashboard, current case-list toggle behaviour, submission workflow, extensions, Organisational Audit and the existing report builder. Publication generation should not begin until this foundation is complete, the management commands have been run in the target environment, and historical memberships have been approved.
+
+The report builder is a separate downstream refactor. Its existing route and facet implementation can continue unchanged while this foundation is added. This requires an explicit compatibility boundary: retain the current `Organisation` relationships and legacy report-builder permission path, and introduce the new period-aware services alongside them rather than replacing every shared helper globally. The report builder will continue to have its existing current-hierarchy, all-period semantics until it is deliberately refactored.
 
 ## Historical period-aware ER diagram
 
@@ -463,66 +464,63 @@ A case may not yet have `Registration.audit_period`, because the period is assig
 
 The registration-start workflow should therefore use a separately defined rule, most likely direct/current organisation access. Once `Registration.audit_period` exists, all subsequent reporting and inherited access should use the period-aware policy.
 
-## Audit-period-aware routes
+## Audit-period routing policy
 
-### Organisation dashboard
+`AuditPeriod.slug` is a routing concern, not the source of truth. The source of truth is always the resolved `AuditPeriod` model. Some workflows need an audit-period context without needing the slug in the URL.
 
-The dashboard route should contain the authoritative `AuditPeriod.slug` because an organisation has many period-specific summaries and the period affects authorisation.
+| Area | Needs `AuditPeriod` context? | URL uses `AuditPeriod.slug`? | Source of period |
+|---|---:|---:|---|
+| Operational dashboard | Yes, for selected-cohort KPI/comparator semantics | No | Existing `/organisation/<id>/summary?cohort=<number>` toggle resolves the selected `AuditPeriod` |
+| Current case list | Yes, for the selected cohort list | No | Existing cohort toggle/buttons and current case-list filtering |
+| Reporting workflow summary | Yes | Yes | Future route `/organisation/<id>/audit-periods/<slug>/summary/` |
+| Public reports/publication views | Yes | Yes | Public report URL slug |
+| Report builder, legacy | Legacy all-period/current-hierarchy semantics | No | Existing filters, including legacy cohort filter |
+| Report builder, future | Yes | Yes | Future route `/organisation/<id>/audit-periods/<audit_period_slug>/report-builder/` |
+| Individual clinical forms | Yes | No | `Registration.audit_period` |
+| Field-level HTMX | Yes | No | Related model → case → registration |
+| Submission and locking | Yes | No | `Registration.audit_period` |
+| Audit-period extensions | Yes | No new slug route in this foundation | Existing extension workflow/model selection keyed to `(AuditPeriod, Organisation)` |
+| Organisational Audit | No Epilepsy12 `AuditPeriod` semantics | No | Existing `OrganisationalAuditSubmissionPeriod` |
 
-Current shape:
+### Operational dashboard and current case list
+
+The operational dashboard remains at:
 
 ```text
 /organisation/<organisation_id>/summary
 ```
 
-Proposed canonical shape:
+It uses the existing `?cohort=<number>` HTMX/toggle behaviour for the three active cohorts. The toggle resolves the selected `AuditPeriod`; it must not redirect to a slugged audit-period route as part of this foundation. Where the dashboard renders cohort KPI tables, trust totals or hierarchy comparators, those aggregations should use the selected period's `AuditPeriodOrganisation` parentage once memberships have been generated and approved.
+
+The ordinary case list also keeps its current route and toggle-button behaviour. Toggle buttons switch between cohorts and return the corresponding list. A slugged period-specific case-list route could be added later if a reporting or navigation requirement emerges, but it is not part of this foundation.
+
+### Future reporting and report-builder routes
+
+The future historical reporting workflow will use the period slug because it addresses a historical summary whose parent hierarchy and permissions depend on the selected period:
 
 ```text
 /organisation/<organisation_id>/audit-periods/<audit_period_slug>/summary/
 ```
 
-The view should resolve the slug to an `AuditPeriod`, check period-aware permission, and retain that object throughout dashboard queries.
-
-The legacy route can redirect to the latest audit period that the requesting user may access for the selected organisation. It must not select a period merely because that period is globally latest.
-
-A legacy `?cohort=<number>` URL can similarly redirect to the canonical slug URL during migration.
-
-### Case collections
-
-Case-list routes that represent one period should also be audit-period-aware:
+The future report-builder refactor will also use the period slug:
 
 ```text
-/organisation/<organisation_id>/audit-periods/<audit_period_slug>/cases/
+/organisation/<organisation_id>/audit-periods/<audit_period_slug>/report-builder/
 ```
 
-An explicitly named all-periods collection may remain where there is a valid use case, but it must include only periods and records the user is authorised to see. The report builder is treated separately below because its refactor is deferred until after this foundation.
+Those future views should resolve the slug to an `AuditPeriod`, check period-aware permission, and retain that object throughout reporting queries. Legacy non-reporting routes should not be changed to slug routes merely because the period-aware membership model exists.
 
-### Parent and organisation selectors
+### Selectors
 
-The selector order should conceptually become:
+Operational dashboard selectors may keep their existing route and HTMX shape, but the choices and labels that depend on the selected cohort should be derived from the selected `AuditPeriod` where period membership is available. This does not require adding the period slug to selector URLs; the selected cohort can be carried in the existing request state. Future public reporting and report-builder selectors will make this period context canonical in their own slugged routes.
 
-```text
-Audit period
-    -> permitted Trust/LHB
-        -> permitted organisation
-```
-
-Period-aware HTMX endpoints might follow this shape:
-
-```text
-/audit-periods/<audit_period_slug>/parents/<parent_type>/<parent_code>/organisations/
-/audit-periods/<audit_period_slug>/organisations/select/
-```
-
-The exact endpoint names can be agreed during implementation. Every selector request must carry the period slug and apply the same server-side access service as the destination dashboard.
-
-Stable parent codes are preferable to database primary keys where practical, although these authenticated internal routes do not have the same public stability requirement as publication URLs.
+Stable parent codes are preferable to database primary keys for future public/reporting routes where practical, although authenticated internal routes do not have the same public stability requirement as publication URLs.
 
 ## Do audit-form routes also need the audit-period slug?
 
-Not generally.
+No.
 
-The dashboard and case-list routes need a period because they address a collection or summary that is otherwise ambiguous. A registered case and its related clinical models already have an authoritative period path:
+A registered case and its related clinical models already have an authoritative period path:
 
 ```text
 related model -> Registration -> audit_period
@@ -549,7 +547,7 @@ For example, an existing route such as:
 
 can remain identifier-based if its view derives and validates the period from the case's registration.
 
-A period slug may be included in a higher-level audit route for navigation or readability, but if present it must be checked against `Registration.audit_period` and rejected on mismatch. It must never override the model relationship.
+A period slug may be included later in a higher-level reporting route for navigation or readability, but if present it must be checked against `Registration.audit_period` before linking to or acting on a registered case. It must never override the model relationship.
 
 The registration-creation route is a further reason not to require a slug everywhere: before the first paediatric assessment date is known, the registration may not yet belong to an audit period.
 
@@ -570,11 +568,7 @@ The following behaviour should remain unchanged:
 
 It may be useful to validate that a corresponding `AuditPeriodOrganisation` exists before creating an extension, and the extension administration interface should offer organisations participating in the selected period. This is validation and user-interface integration, not a change to deadline semantics.
 
-The existing extension route uses an integer cohort. It should move to the authoritative slug shape while preserving the same model operation:
-
-```text
-/organisation/<organisation_id>/audit-periods/<audit_period_slug>/extension/
-```
+The existing extension workflow can continue to identify the period through its current route/form/admin context. It should not move to a new slug route as part of this foundation. The important invariant is the model operation: extensions remain keyed to `(AuditPeriod, Organisation)`.
 
 ### Submission, locking and clinical forms
 
@@ -582,7 +576,7 @@ Case submission/locking does not need a new state model. Its permission guard do
 
 Direct organisation users must retain the agreed ability to complete in-flight registrations from an older affiliation after their organisation moves. Parent-inherited access must follow the registration's period membership. The same rule applies to all assessment, investigation, management and field-level HTMX writes.
 
-Redirects after registration, submission, locking or related actions should return to the correct audit-period-aware case list or dashboard. They must not drop the period and silently select a different cohort.
+Redirects after registration, submission, locking or related actions should return to the correct existing case list or operational dashboard state. They must preserve the selected cohort/list context and must not silently select a different cohort.
 
 ### Organisational Audit
 
@@ -602,9 +596,8 @@ parent semantics:
 The operational dashboard (the current
 `/organisation/<id>/summary` route) is for live data entry — the three
 active cohorts (recruiting, submitting, grace) where data is still
-potentially editable. It remains a live reporting product; it does not
-read publication snapshots and it does not use the period-aware
-permission service or the `AuditPeriodOrganisation` membership.
+potentially editable. It remains an operational product; it does not
+read publication snapshots and does not use an audit-period slug route. The selected cohort nevertheless resolves to an `AuditPeriod`, and cohort KPI/comparator sections should use that period's approved `AuditPeriodOrganisation` membership once the backfill has been run.
 
 For a selected organisation it should:
 
@@ -615,18 +608,22 @@ For a selected organisation it should:
   aggregations are not relevant at this stage;
 - for the submitting and grace cohorts, show the full aggregations
   (IMD, sex, ethnicity, age, totals, KPIs) as today;
-- use the organisation's *current* parent (Trust / LHB) for the parent
-  label, the organisation dropdown, and the trust-level aggregation —
-  the operational dashboard is not a historical reporting product;
+- for the recruiting cohort, use the current parent for operational selection and recruitment counts unless an approved period membership exists for that new period;
+- for submitting and grace cohorts, use the selected period's `AuditPeriodOrganisation` parent for KPI tables, trust/LHB totals and hierarchy comparators, so an older active cohort remains attributed to the parent that applied for that cohort even if the organisation has already moved for the new recruiting cohort;
 - tether the parent and organisation dropdowns to the user's current
   parent membership; and
 - use the existing `user_may_view_this_organisation` decorator (current
   parent check) for access control.
 
-The operational dashboard does not need `AuditPeriodOrganisation`
-membership rows to exist, because it does not resolve historical
-parents. A new organisation on day one of a new cohort can access its
-dashboard and start registering cases.
+The operational dashboard must remain usable when `AuditPeriodOrganisation`
+membership rows do not yet exist for a brand-new recruiting cohort. A new
+organisation on day one of a new cohort can access its dashboard and start
+registering cases. For KPI/comparator sections in submitting and grace
+cohorts, though, the recommended target behaviour is period-aware
+aggregation from the selected cohort's approved membership row. Until the
+management commands have been run and memberships approved in an environment,
+the current implementation may still follow current `Organisation` parent
+fields; that is compatibility behaviour, not the desired attribution model.
 
 ### Reporting workflow (future phase)
 
@@ -736,7 +733,9 @@ flowchart TD
     APO[AuditPeriodOrganisation]
     GEO[Hierarchy and participation services]
     AUTH[Period-aware permission services]
-    DASH[Live organisation dashboard]
+    OPDASH[Operational dashboard]
+    REPORTING[Future reporting workflow]
+    REPORTBUILDER[Future report builder]
     CLINICAL[Clinical audit views]
     GENERATOR[Publication generator]
     SNAPSHOT[Immutable publication snapshot]
@@ -744,9 +743,12 @@ flowchart TD
 
     APO --> GEO
     GEO --> AUTH
-    GEO --> DASH
-    AUTH --> DASH
+    GEO --> REPORTING
+    AUTH --> REPORTING
+    GEO --> REPORTBUILDER
+    AUTH --> REPORTBUILDER
     AUTH --> CLINICAL
+    OPDASH -. current hierarchy .-> CLINICAL
     GEO --> GENERATOR
     GENERATOR --> SNAPSHOT
     SNAPSHOT --> PUBLIC
@@ -777,7 +779,7 @@ The existing `sync_current_state()` function in `epilepsy12/general_functions/nh
 
 ### 2. Per-cohort hierarchy sync (new)
 
-A new management command (`sync_audit_period_organisations`) populates `AuditPeriodOrganisation` rows for each audit period. For each `AuditPeriod` and each participating organisation, it calls the API's snapshot endpoint:
+A new management command (`sync_audit_period_organisations`) populates `AuditPeriodOrganisation` rows for each audit period. At the time of writing this workflow is implemented/documented but has not yet been run in the target environment; the operational dashboard, case list and extension workflows must therefore continue to work without depending on approved membership rows. For each `AuditPeriod` and each participating organisation, it calls the API's snapshot endpoint:
 
 ```text
 GET /organisations/{ods_code}/snapshot/?date={reference_date}
@@ -1217,7 +1219,7 @@ After the current-state sync (`sync_nhs_organisations`) creates new `Organisatio
 
 Individual organisations can be tested with `--ods-code` before running the full sync.
 
-Exit condition: required historical membership rows can be generated, reviewed and queried without changing the live dashboard. ✅
+Exit condition: required historical membership rows can be generated, reviewed and queried without changing the live dashboard. This validates command/test behaviour only; the management commands still need to be run and approved in the target environment before reporting/publication consumes the memberships. ✅
 
 ### PR 3 — period-aware permission services ✅ COMPLETE
 
@@ -1402,20 +1404,15 @@ which are keyed by the current trust/ICB. Period-aware KPIs require
 either keying by the period-specific trust (schema changes) or
 on-the-fly recomputation from case-level KPIs.
 
-### PR 5 — period-aware case collections and clinical permissions
+### PR 5 — case-list compatibility and clinical permissions
 
-This pull request applies the established period context to patient-facing collections and direct clinical access while keeping field-level URLs identifier-based.
+This pull request preserves the current patient-facing collection routes and toggle behaviour while applying the established period context to direct clinical access. Field-level URLs remain identifier-based.
 
 Scope:
 
-- add the canonical period case-list route:
-
-  ```text
-  /organisation/<organisation_id>/audit-periods/<audit_period_slug>/cases/
-  ```
-
+- keep the current case-list route without an audit-period slug;
+- keep the existing cohort toggle/button behaviour that returns the correct cohort-specific list;
 - define the compatibility behaviour of the existing all-children/all-cohort list;
-- update case-list queries and links to retain the selected period;
 - migrate child-record permission guards to derive `Registration.audit_period`;
 - apply the direct-versus-inherited access policy to registration and all related models;
 - retain identifier-based assessment, investigation, management and HTMX field routes;
@@ -1438,9 +1435,9 @@ New tests should cover:
 - unregistered-case access;
 - route/model period mismatch;
 - field-level GET and POST protection; and
-- redirects retaining the period slug.
+- redirects preserving the existing selected cohort/list context without introducing a slug route.
 
-Exit condition: dashboard, case collections and direct clinical views enforce the same period-aware access policy.
+Exit condition: current case collections keep their existing route/toggle behaviour, and direct clinical views derive period-aware access from `Registration.audit_period`.
 
 ### PR 6 — submission, extension and Organisational Audit compatibility
 
@@ -1448,8 +1445,8 @@ This pull request completes and proves the critical-workflow integration. It sho
 
 Scope:
 
-- change the extension route from integer cohort to `AuditPeriod.slug`;
-- optionally validate that the organisation has a membership row for the selected period;
+- keep the extension route/workflow non-slugged for this foundation;
+- optionally validate that the organisation has a membership row for the selected period once memberships have been generated and approved;
 - preserve `AuditPeriodExtension` identity and deadline calculations;
 - preserve `Registration.days_remaining_before_submission` and `Case.editable()` semantics;
 - update submission/locking redirects to preserve period context;
@@ -1468,7 +1465,7 @@ Likely affected tests include:
 
 New or updated tests should prove:
 
-- extension GET and POST use the period slug;
+- extension GET and POST continue to resolve the intended `AuditPeriod` without a new slug route;
 - extend, close and remove still update the same row;
 - deadline and editability calculations are unchanged;
 - closed-period editing is still denied;
@@ -1564,15 +1561,18 @@ Using an organisation that moves from Trust A to Trust B from cohort 9:
 - a route period, when supplied, cannot disagree with the registration period;
 - pre-registration access follows the separately approved rule.
 
-### Dashboard tests
+### Operational dashboard and case-list tests
 
-- canonical dashboard URLs contain `AuditPeriod.slug`;
-- legacy routes redirect to an accessible canonical period;
-- period, parent and organisation selectors contain only permitted choices;
-- membership labels reflect the selected period;
-- parent KPI summaries use the selected period's hierarchy;
-- demographics and patient mapping contain only selected-period cases;
-- pages do not mix data from unauthorised periods.
+- the operational dashboard route remains `/organisation/<id>/summary` without an audit-period slug;
+- the existing `?cohort=<number>` HTMX/toggle behaviour selects between the three active cohorts;
+- the ordinary case list keeps its current non-slugged route;
+- case-list toggle buttons return the correct cohort-specific list;
+- parent and organisation selectors keep their existing non-slugged route/HTMX shape;
+- a brand-new recruiting cohort can still load before approved `AuditPeriodOrganisation` rows exist;
+- the recruiting cohort shows recruitment numbers only;
+- submitting and grace cohorts show the existing full aggregations;
+- when approved memberships exist, submitting/grace KPI tables, trust totals and hierarchy comparators use the selected cohort's `AuditPeriodOrganisation` parentage rather than the organisation's current parent; and
+- pages do not mix data from the wrong selected cohort.
 
 ### Critical workflow regression tests
 
@@ -1581,9 +1581,9 @@ Using an organisation that moves from Trust A to Trust B from cohort 9:
 - direct organisation users can complete the agreed older in-flight registrations after a reorganisation;
 - inherited users cannot view or edit a registration outside the target organisation's period membership;
 - audit-wide and organisation-specific submission deadlines are unchanged;
-- extensions remain keyed to `(AuditPeriod, Organisation)` and use the slug-aware route;
+- extensions remain keyed to `(AuditPeriod, Organisation)` and do not require a new slug route;
 - `Case.editable()`, submission and locking retain their existing deadline and state behaviour;
-- redirects preserve the selected audit period;
+- redirects preserve the selected cohort/list context;
 - Organisational Audit routes, permissions, editing, submission and exports continue to work under their existing submission-period semantics.
 
 ### Deferred report-builder tests

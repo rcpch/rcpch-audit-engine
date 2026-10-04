@@ -9,6 +9,26 @@ The Report Builder leverages facets to allow users to construct their own comple
 
 It is written with the 'django-filter` package though the facets are calculated within the filterset class.
 
+### Current audit-period compatibility
+
+The report builder currently keeps its existing route and all-period/current-hierarchy semantics. It does **not** use `AuditPeriod.slug` in the URL as part of the `AuditPeriodOrganisation` foundation work.
+
+The foundation described in [Audit-period organisation membership and access](audit-period-organisation.md) should preserve the existing report-builder behaviour while the historical membership model, sync commands and permission vocabulary are added. In particular:
+
+- the existing report-builder route remains unchanged;
+- the legacy cohort filter remains available;
+- hierarchy facets continue to use the current `Organisation` relationships until the report builder is deliberately refactored;
+- tests should prove the existing route and representative facets still load after the foundation migrations; and
+- links from report-builder results should continue to reach clinical views that derive their period from `Registration.audit_period`, not from a report-builder URL slug.
+
+A future period-aware report-builder refactor may introduce a canonical route such as:
+
+```text
+/organisation/<organisation_id>/audit-periods/<audit_period_slug>/report-builder/
+```
+
+That future refactor should resolve the `AuditPeriod` from the slug before constructing the base queryset, filter cases through `Registration.audit_period`, and derive hierarchy facets from `AuditPeriodOrganisation`. It is intentionally separate from the foundation work.
+
 ### Structure
 
 There is a `CaseFilter` filterset and a helper class, `CaseFilterMethods` for running all the queries. This is because some of the queries can then be used in the admin.
