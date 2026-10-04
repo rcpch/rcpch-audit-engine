@@ -10,7 +10,7 @@ Scope (per ``audit-period-organisation.md`` PR 0):
 
 - submission (lock/unlock) via ``case_submit``;
 - report-builder smoke test (route loads, representative facets render);
-- dashboard route and redirect behaviour (``?cohort=`` semantics); and
+- operational dashboard route behaviour (non-slugged ``?cohort=`` semantics); and
 - Organisational Audit export (CSV generation from a submission period).
 
 If a later PR changes one of these behaviours deliberately, the test should be
@@ -285,8 +285,8 @@ def test_report_builder_forbidden_for_unauthenticated(client):
 def test_dashboard_redirects_to_login_when_unauthenticated(client):
     """The organisation dashboard must redirect to login for anonymous users.
 
-    This pins the current behaviour so that the period-aware dashboard
-    cutover (PR 4) does not accidentally expose the dashboard publicly.
+    This pins the current behaviour so that operational dashboard routing
+    changes do not accidentally expose the dashboard publicly.
     """
     GOSH = Organisation.objects.get(ods_code="RP401", trust__ods_code="RP4")
 
@@ -308,8 +308,9 @@ def test_dashboard_loads_with_cohort_query_param(
 ):
     """The dashboard currently selects the cohort via ``?cohort=<number>``.
 
-    This pins the current ``?cohort=`` semantics so that the PR 4 cutover to
-    ``AuditPeriod.slug`` routing can be verified as a deliberate change.
+    This pins the non-slugged operational dashboard route: the selected
+    audit period is resolved from the existing ``?cohort=`` toggle, not from
+    an ``AuditPeriod.slug`` URL.
     """
     GOSH = Organisation.objects.get(ods_code="RP401", trust__ods_code="RP4")
 
@@ -348,8 +349,8 @@ def test_dashboard_defaults_to_grace_or_submitting_cohort(
     to the grace cohort (or the submitting cohort if no grace cohort is
     active).
 
-    This pins the default-selection behaviour so that the PR 4 cutover to
-    slug-based routing can be verified as a deliberate change.
+    This pins the default-selection behaviour for the non-slugged
+    operational dashboard route.
     """
     GOSH = Organisation.objects.get(ods_code="RP401", trust__ods_code="RP4")
 

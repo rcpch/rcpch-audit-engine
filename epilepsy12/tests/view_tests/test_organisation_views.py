@@ -6,6 +6,7 @@ from dateutil.relativedelta import relativedelta
 from django.urls import reverse
 
 from ...constants import AUDIT_CENTRE_CLINICIAN, RCPCH_AUDIT_TEAM, KPI_SCORE
+from ...common_view_functions.aggregate_by import get_all_kpi_aggregation_data_for_view
 from ...common_view_functions.calculate_kpis import calculate_kpis
 from ...tests.view_tests.permissions_tests.perm_tests_utils import twofactor_signin
 from ...models import (
@@ -13,6 +14,7 @@ from ...models import (
     KPI,
     Organisation,
     CountryKPIAggregation,
+    TrustKPIAggregation,
 )
 
 
@@ -64,6 +66,88 @@ def check_school_individual_healthcare_kpi_aggs(
     country_agg_kpis = aggregate_kpis["COUNTRY_KPIS"]["aggregation_model"]
     assert country_agg_kpis.school_individual_healthcare_plan_passed == expected_passed
     assert country_agg_kpis.school_individual_healthcare_plan_total_eligible == expected_total_eligible
+
+
+@pytest.mark.django_db
+def test_operational_dashboard_kpi_context_keeps_non_slugged_cohort_route(
+    client,
+    seed_groups_fixture,
+    seed_users_fixture,
+):
+    """The operational dashboard resolves the selected audit period from
+    ``?cohort=`` rather than from an ``AuditPeriod.slug`` URL.
+    """
+    user = Epilepsy12User.objects.filter(
+        employer_organisations__employer_organisation__ods_code="RP401",
+        role=AUDIT_CENTRE_CLINICIAN,
+    ).first()
+    org = user.employer_organisations.first().employer_organisation
+
+    client.force_login(user)
+    twofactor_signin(client, test_user=user)
+
+    url = reverse("selected_trust_kpis", kwargs={
+        "organisation_id": org.id,
+    })
+    response = client.get(url, data={"cohort": 6})
+
+    assert response.status_code == 200
+    assert "audit-periods" not in response.request["PATH_INFO"]
+    assert response.context["cohort_number"] == 6
+
+
+@pytest.mark.django_db
+@pytest.mark.xfail(
+    strict=False,
+    reason=(
+        "Operational dashboard KPI context should use the selected cohort's "
+        "AuditPeriodOrganisation parentage once period-aware aggregation is implemented."
+    ),
+)
+def test_operational_dashboard_trust_kpis_use_selected_period_parentage(
+    reorganisation,
+):
+    """A non-slugged cohort selection should still use period-aware parentage
+    for KPI/trust totals.
+
+    PRUH is currently under Trust B, but its cohort 8 membership is under
+    Trust A. The cohort 8 trust KPI context should therefore select Trust A,
+    not the organisation's current Trust B.
+    """
+    org = reorganisation["org_a_current"]
+    trust_a = reorganisation["trust_a"]
+    trust_b = reorganisation["trust_b"]
+    cohort_8 = reorganisation["cohort_8"]
+
+    TrustKPIAggregation.objects.update_or_create(
+        abstraction_relation=trust_a,
+        cohort=cohort_8.cohort_number,
+        open_access=False,
+        defaults={
+            "school_individual_healthcare_plan_passed": 1,
+            "school_individual_healthcare_plan_total_eligible": 1,
+        },
+    )
+    TrustKPIAggregation.objects.update_or_create(
+        abstraction_relation=trust_b,
+        cohort=cohort_8.cohort_number,
+        open_access=False,
+        defaults={
+            "school_individual_healthcare_plan_passed": 99,
+            "school_individual_healthcare_plan_total_eligible": 99,
+        },
+    )
+
+    all_data = get_all_kpi_aggregation_data_for_view(
+        organisation=org,
+        cohort=cohort_8.cohort_number,
+    )
+
+    trust_agg = all_data["TRUST_KPIS"]["aggregation_model"]
+
+    assert trust_agg.abstraction_relation == trust_a
+    assert trust_agg.school_individual_healthcare_plan_passed == 1
+    assert trust_agg.school_individual_healthcare_plan_total_eligible == 1
 
 
 @pytest.mark.django_db
