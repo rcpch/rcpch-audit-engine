@@ -910,8 +910,9 @@ def test_pre_sync_safety_check_allows_no_impact_sync():
 # These tests exercise the full sync workflow (per-cohort freeze +
 # current-state mutation) for the three canonical reorganisation shapes:
 #
-# - Merger: two trusts combine into one; their organisations move to the
-#   surviving trust.
+# - Merger: both predecessor trusts are dissolved and a new trust with a
+#   new ODS code is created; their organisations move to the new successor
+#   trust.
 # - Acquisition: one trust absorbs another; the acquired trust's
 #   organisations move to the acquirer.
 # - Split: one trust divides into two; its organisations split between the

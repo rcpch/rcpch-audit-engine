@@ -1051,9 +1051,9 @@ In addition to the pre-sync safety check, the `Organisation` hierarchy FKs (`tru
 
 The sync workflow is tested against the three canonical reorganisation shapes to verify that cases and registrations follow their organisation/trust/LHB correctly across the per-cohort and current-state syncs:
 
-- **Merger** — two trusts combine into one; their organisations move to the surviving trust. Cohort 4 (historical) memberships are frozen with GOSH under RP4 and KINGS under RJZ. After the current-state sync moves both orgs to the merged trust, the frozen cohort 4 memberships still point at RP4 and RJZ respectively — historical reporting is preserved.
+- **Merger** — both predecessor trusts are dissolved and a new trust with a new ODS code is created; their organisations move to the new successor trust. Cohort 4 (historical) memberships are frozen with GOSH under RP4 and KINGS under RJZ. After the current-state sync moves both orgs to the merged trust, the frozen cohort 4 memberships still point at RP4 and RJZ respectively — historical reporting is preserved.
 - **Acquisition** — one trust absorbs another; the acquired trust's organisations move to the acquirer. GOSH (under RP4) moves to RJZ. The frozen cohort 4 membership stays at RP4.
-- **Split** — one trust divides into two; its organisations split between the two new trusts. GOSH (under RP4) moves to SPL1. The frozen cohort 4 membership stays at RP4.
+- **Split** — one trust is dissolved and its organisations split between two (or more) new successor trusts. GOSH (under RP4) moves to SPL1. The frozen cohort 4 membership stays at RP4. (In a canonical split the child organisations typically also receive new ODS codes reflecting the new parent stem; the integration test simplifies this by retaining GOSH's ODS code, since the `OrganisationSuccession` / `OrganisationIdentity` chain-walking is exercised by the dedicated reorganisation canary fixture.)
 
 For each, the test verifies that:
 
