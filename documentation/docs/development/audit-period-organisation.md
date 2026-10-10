@@ -1025,6 +1025,26 @@ General rules for the sequence are:
 - introduce new services alongside legacy call sites before switching consumers; and
 - run the full test suite before merging each pull request, in addition to the targeted tests listed below.
 
+### Implementation status (summary)
+
+This table is the single source of truth for what has shipped. Per-PR ✅ markers below elaborate; where they disagree, this table wins.
+
+| PR | Title | Status |
+|---|---|---|
+| PR 0 | Critical-workflow characterisation tests | ✅ Complete |
+| PR 1 | `AuditPeriodOrganisation` / `OrganisationIdentity` models + migration | ✅ Complete |
+| PR 2 | Per-cohort sync, population, approval, hierarchy service layer | ✅ Complete |
+| PR 3 | Period-aware permission services | ✅ Complete (built and tested) — **not yet consumed by any production view** |
+| PR 4 | Operational dashboard simplification + reporting-workflow split | ⬜ Not complete — design revised in docs only; recruiting-cohort template tweak aside, the scoped deliverables and characterisation tests are outstanding |
+| PR 5 | Period-aware case collections and clinical permissions | ⬜ Not started — no `audit-periods/<slug>/cases/` route exists; `case_list` still uses the legacy integer route and legacy permission path |
+| PR 6 | Submission, extension and Organisational Audit compatibility | ⬜ Not started |
+| PR 7 | Foundation hardening and publication readiness | ⬜ Not started |
+
+!!! warning "PR 3 is built but not wired in"
+    `epilepsy12/general_functions/audit_period_permissions.py` (`can_view_organisation_for_period`, `can_view_case_for_period`, `get_accessible_periods`, the `OrganisationIdentity`-chain resolution, etc.) is complete and fully unit-tested, but it is imported **only by its test module**. No view, decorator or selector in the running application consumes it yet. Consequently the **live operational dashboard and case list are not period-aware or identity-aware**: selecting a successor organisation (after an ODS code change) will not surface the predecessor organisation's cases in the current UI, and historical cohorts are still grouped by the current `Organisation` parent. Identity-based cross-visibility and period-aware aggregation only take effect once PR 4 and PR 5 migrate those consumers.
+
+    The branch merged as PR #1453 was named `audit-period-aware-routes`, but it delivered the `approve_audit_period_organisations` command and the PR 4 *design rewrite* — **not** the period-aware routes themselves. The routes, period-aware permission enforcement and period-aware selectors remain outstanding.
+
 ### Optional PR 0 — critical-workflow characterisation tests ✅ COMPLETE
 
 This is a test-only pull request if the current coverage is not sufficient to protect the following work.
