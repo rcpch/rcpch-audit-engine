@@ -47,6 +47,9 @@ from ..general_functions import (
     construct_transfer_epilepsy12_site_outcome_email,
     send_email_to_recipients,
 )
+from epilepsy12.general_functions.audit_period_hierarchy import (
+    expand_organisation_ids_via_identity,
+)
 
 # Logging setup
 logger = logging.getLogger(__name__)
@@ -101,6 +104,23 @@ def case_list(request, organisation_id):
             trust=parent_trust, active=True
         ).all()
 
+    # --- Identity-chain expansion (PR 4) ----------------------------------
+    # Expand the organisation sets through the OrganisationIdentity chain
+    # so that cases/registrations attached to inactive predecessor
+    # organisations remain visible.  Before the cutover commands have run,
+    # no identity links exist, so the expansion is a no-op and the IDs are
+    # identical to the pre-foundation sets.
+    #
+    # organisation_org_ids — for the organisation-level view, includes
+    #   the selected organisation plus its identity-linked predecessors.
+    # trust_org_ids — for the trust/LHB-level view, includes all active
+    #   organisations in the current trust/LHB plus their identity-linked
+    #   predecessors.
+    organisation_org_ids = expand_organisation_ids_via_identity({organisation.pk})
+    trust_org_ids = expand_organisation_ids_via_identity(
+        set(organisation_children.values_list("pk", flat=True))
+    )
+
     if filter_term:
         # filter_term is called if filtering by search box
         if request.user.view_preference == 0:
@@ -109,7 +129,7 @@ def case_list(request, organisation_id):
                 Case.objects.filter(
                     cohort_filter  # filter by cohort if selected
                     & Q(
-                        epilepsy12_sites__organisation=organisation,
+                        epilepsy12_sites__organisation__pk__in=organisation_org_ids,
                         epilepsy12_sites__site_is_primary_centre_of_epilepsy_care=True,
                         epilepsy12_sites__site_is_actively_involved_in_epilepsy_care=True
                     )
@@ -126,20 +146,13 @@ def case_list(request, organisation_id):
             )
         elif request.user.view_preference == 1:
             # user has requested trust level view
-            if organisation.country.boundary_identifier == "W92000004":
-                # in Wales filter by health board
-                trust_filter = Q(
-                    epilepsy12_sites__organisation__local_health_board=organisation.local_health_board,
-                    epilepsy12_sites__site_is_primary_centre_of_epilepsy_care=True,
-                    epilepsy12_sites__site_is_actively_involved_in_epilepsy_care=True
-                )
-            else:
-                # England filter by Trust
-                trust_filter = Q(
-                    epilepsy12_sites__organisation__trust=organisation.trust,
-                    epilepsy12_sites__site_is_primary_centre_of_epilepsy_care=True,
-                    epilepsy12_sites__site_is_actively_involved_in_epilepsy_care=True
-                )
+            # Expand through the identity chain so that cases from inactive
+            # predecessor organisations remain visible.
+            trust_filter = Q(
+                epilepsy12_sites__organisation__pk__in=trust_org_ids,
+                epilepsy12_sites__site_is_primary_centre_of_epilepsy_care=True,
+                epilepsy12_sites__site_is_actively_involved_in_epilepsy_care=True
+            )
 
             all_cases = (
                 Case.objects.filter(
@@ -197,32 +210,24 @@ def case_list(request, organisation_id):
             )
         elif request.user.view_preference == 1:
             # filters all primary Trust level centres where site is active and primary
-            if organisation.country.boundary_identifier == "W92000004":
-                # welsh - select health boards
-                filtered_cases = Case.objects.filter(
-                    Q(
-                        epilepsy12_sites__organisation__local_health_board=parent_trust,
-                        epilepsy12_sites__site_is_primary_centre_of_epilepsy_care=True,
-                        epilepsy12_sites__site_is_actively_involved_in_epilepsy_care=True
-                    )
-                    & cohort_filter  # filter by cohort if selected
+            # Expand through the identity chain so that cases from inactive
+            # predecessor organisations remain visible.
+            filtered_cases = Case.objects.filter(
+                Q(
+                    epilepsy12_sites__organisation__pk__in=trust_org_ids,
+                    epilepsy12_sites__site_is_primary_centre_of_epilepsy_care=True,
+                    epilepsy12_sites__site_is_actively_involved_in_epilepsy_care=True
                 )
-            else:
-                # England - select trusts
-                filtered_cases = Case.objects.filter(
-                    Q(
-                        epilepsy12_sites__organisation__trust=parent_trust,
-                        epilepsy12_sites__site_is_primary_centre_of_epilepsy_care=True,
-                        epilepsy12_sites__site_is_actively_involved_in_epilepsy_care=True
-                    )
-                    & cohort_filter  # filter by cohort if selected
-                )
+                & cohort_filter  # filter by cohort if selected
+            )
 
         else:
             # filters all primary centres at organisation level where site is active and primary
+            # Expand through the identity chain so that cases from inactive
+            # predecessor organisations remain visible.
             filtered_cases = Case.objects.filter(
                 Q(
-                    epilepsy12_sites__organisation=organisation,
+                    epilepsy12_sites__organisation__pk__in=organisation_org_ids,
                     epilepsy12_sites__site_is_primary_centre_of_epilepsy_care=True,
                     epilepsy12_sites__site_is_actively_involved_in_epilepsy_care=True
                 )

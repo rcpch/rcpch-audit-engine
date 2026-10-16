@@ -1330,26 +1330,81 @@ The revised design splits the two concerns:
 
 Scope for this PR:
 
+- **pre-cutover compatibility.** The changes in this PR and PR 5
+  must work identically before and after the cutover commands have been
+  run. Before cutover, no `AuditPeriodOrganisation` rows exist and no
+  `OrganisationIdentity` links are set. The identity-chain expansion is
+  a no-op (it returns only the literal organisation when no `identity`
+  FK is set), so case visibility is unchanged. The period-correct
+  parent resolution must fall back to the current
+  `Organisation.trust` / `Organisation.local_health_board` when no
+  approved membership is found, so aggregations and dropdowns behave
+  exactly as they do today. This fallback is the same safety valve
+  that covers new organisations on day one of a recruiting cohort; it
+  also covers the entire pre-cutover state;
+
 - keep the operational dashboard route at `/organisation/<id>/summary`
   (no change to the URL);
-- keep the parent and organisation dropdowns tethered to the current
-  parent (no period-aware selectors);
 - keep the existing `?cohort=<number>` HTMX toggle for the three active
-  cohorts (no slug routing on the operational dashboard);
+  cohorts. The cohort is carried in the query string, not in the URL
+  path — no `AuditPeriod.slug` is added to the operational dashboard or
+  case-list routes. The query parameter is the consistent period-context
+  mechanism across the operational workflow: the dashboard uses it, the
+  case list uses it, and downstream clinical views derive the period from
+  `Registration.audit_period`. A slugged route would be a one-off on the
+  case list that the clinical form does not share, so it is not added;
+- resolve the parent and organisation dropdowns per-cohort from the
+  approved `AuditPeriodOrganisation` membership when a specific cohort
+  is selected (Option A). The trust/LHB label and the organisation
+  sidebar reflect the hierarchy at the time of the selected cohort, not
+  the current hierarchy. When no cohort is selected ("all children" /
+  "all cohorts"), fall back to the current parent — cross-period views
+  use current hierarchy;
 - for the recruiting cohort, show only recruitment numbers (case
   counts) — most cases are not scored yet, so the full KPI table and
   aggregations are not relevant at this stage;
 - for the submitting and grace cohorts, show the full aggregations
-  (IMD, sex, ethnicity, age, totals, KPIs) as today, reflecting the
-  current parent;
+  (IMD, sex, ethnicity, age, totals, KPIs), with the trust/LHB parent
+  resolved per-cohort from the approved `AuditPeriodOrganisation`
+  membership (the organisation/trust/LHB active at the time of the
+  cohort in question), not the live `Organisation.trust` /
+  `Organisation.local_health_board`. This is what keeps the active-cohort
+  aggregations historically correct after a reorganisation: a case
+  registered under Trust A in cohort 7 continues to aggregate under
+  Trust A for cohort 7 even after the organisation has moved to Trust B;
+- **period-context alert.** When a specific cohort is selected and the
+  resolved period-correct parent (from `AuditPeriodOrganisation`, or the
+  fallback current parent) differs from the organisation's current
+  parent, show a dismissible banner explaining that the
+  organisation/trust list for this cohort reflects the hierarchy at the
+  time of the cohort and may differ from the current organisation/trust.
+  The alert is contextual — it appears only when the period-correct
+  parent and the current parent diverge — and it does not block or hide
+  anything. It is the UX guard that makes period-correct dropdowns safe
+  to ship;
 - make the three cohort tiles clickable to toggle between the active
   cohorts (this may already be the case via `?cohort=`);
-- confirm that the user management workflow permissions are unchanged
-  (they default to the latest employer affiliation, not period-aware);
-- do not introduce the canonical period-aware route, the period-aware
-  permission check, the period-aware selectors, or the membership-based
-  parent resolution on the operational dashboard — these are deferred
-  to the reporting workflow phase; and
+- accept organisations with linked `OrganisationIdentity` chains
+  through the case list, user management and organisation dashboard
+  views: cases and registrations attached to an inactive predecessor
+  organisation must remain visible through its active successor. The
+  inactive organisation itself need not appear in dropdowns or
+  selectors — only its cases/registrations must be reachable from the
+  successor's view. For example, after `RAPNM` (Trust `RAP`) goes
+  inactive and `RAL27` (Trust `RAL`) becomes its successor, the 40
+  registrations on `RAPNM` must be visible when viewing `RAL27`'s
+  case list, user list and dashboard;
+- amend the user management workflow (`epilepsy12_user_list`) and the
+  organisation whitelist (`organisation_white_list_for_user`) so that
+  users employed at an active successor organisation can see users and
+  cases attached to the inactive predecessor through the shared
+  `OrganisationIdentity`. The trust-level filters must expand through
+  the identity chain so that inactive predecessors' users and cases
+  remain visible after cutover;
+- do not introduce the canonical period-aware slugged route or the
+  period-aware permission check on the operational dashboard — these are
+  deferred to the reporting workflow phase. The membership-based parent
+  resolution for dropdowns and aggregation IS in scope (see above); and
 - update the characterisation tests in
   `epilepsy12/tests/view_tests/test_critical_workflow_characterisation.py`
   to pin the operational dashboard's three-active-cohort behaviour,
@@ -1360,27 +1415,46 @@ Likely affected tests:
 - `epilepsy12/tests/view_tests/test_critical_workflow_characterisation.py`
   (the dashboard route and redirect behaviour tests);
 - `epilepsy12/tests/view_tests/test_organisation_views.py` (the KPI
-  aggregation tests, if the recruiting-cohort simplification changes
-  what the KPI table renders);
+  aggregation tests, including the period-correct parent resolution);
+- `epilepsy12/tests/view_tests/test_user_management_views.py` (the
+  user list and trust-level filter tests, for identity-chain
+  visibility);
+- `epilepsy12/common_view_functions_tests` (the organisation whitelist
+  and merged-parent-list tests, for identity-chain expansion);
 - aggregation and report-query tests under `common_view_functions_tests`
-  (if the recruiting-cohort simplification changes the aggregation
-  calls).
+  (the period-aware aggregation calls).
 
 New tests should cover:
 
 - the recruiting cohort showing only recruitment numbers (not the full
   KPI table / aggregations);
-- the submitting and grace cohorts showing the full aggregations as
-  today;
-- the three cohort tiles toggling between the active cohorts; and
-- the parent and organisation dropdowns remaining tethered to the
-  current parent (not period-filtered).
+- the submitting and grace cohorts showing the full aggregations,
+  with the trust/LHB parent resolved per-cohort from
+  `AuditPeriodOrganisation` (not the live `Organisation.trust`);
+- the three cohort tiles toggling between the active cohorts;
+- the parent and organisation dropdowns showing the period-correct
+  parent when a specific cohort is selected, and the current parent
+  when no cohort is selected;
+- the period-context alert appearing when the period-correct parent
+  differs from the current parent, and not appearing when they match;
+- the fallback to current parent when no approved
+  `AuditPeriodOrganisation` membership exists (pre-cutover behaviour);
+- cases and registrations from an inactive predecessor organisation
+  (e.g. `RAPNM`) remaining visible through its active successor
+  (`RAL27`) in the case list, user list and dashboard after cutover; and
+- the `?cohort=` query parameter (not a URL slug) carrying the period
+  context on both the dashboard and the case list.
 
 Exit condition: the operational dashboard covers the three active
-cohorts using the current parent, with the recruiting cohort simplified
-to recruitment numbers. The period-aware route, permission, and
-membership-based parent resolution are deferred to the reporting
-workflow phase.
+cohorts using the period-correct parent resolved from
+`AuditPeriodOrganisation` (with fallback to current parent when no
+approved membership exists), with the recruiting cohort simplified to
+recruitment numbers. Dropdowns show the period-correct parent when a
+cohort is selected, with a contextual alert when it differs from the
+current parent. Cases and registrations from inactive predecessor
+organisations are visible through their active successors via
+`OrganisationIdentity`. The period-aware slugged route, permission
+check, and selectors are deferred to the reporting workflow phase.
 
 #### Deferred to the reporting workflow phase
 
@@ -1411,7 +1485,10 @@ exploration produced reusable patterns that will inform that phase:
   differs from the current parent, with a message explaining why;
 - period-aware aggregation queries — resolving the organisation IDs
   for a parent via `get_organisations_for_parent(parent, audit_period,
-  parent_field)` instead of traversing `Organisation.trust`;
+  parent_field)` instead of traversing `Organisation.trust`. (The
+  operational dashboard's active-cohort aggregations are now in PR 4
+  scope; the full reporting-workflow aggregation with slugged routes
+  remains deferred here);
 - the PRUH canary contract tests (Trust B sibling denied cohort 8,
   allowed cohort 9; direct user across the ODS code change; parent
   label reading Trust A from the membership); and
@@ -1422,7 +1499,11 @@ The reporting workflow phase will also need to address the KPI
 aggregation tables (`TrustKPIAggregation`, `ICBKPIAggregation`, etc.),
 which are keyed by the current trust/ICB. Period-aware KPIs require
 either keying by the period-specific trust (schema changes) or
-on-the-fly recomputation from case-level KPIs.
+on-the-fly recomputation from case-level KPIs. PR 4 addresses the
+operational dashboard's active-cohort aggregations by resolving the
+period-correct parent from `AuditPeriodOrganisation`; the reporting
+workflow phase must still handle the pre-aggregated KPI tables for
+historical publication.
 
 ### PR 5 — case-list compatibility and clinical permissions
 
@@ -1430,11 +1511,31 @@ This pull request preserves the current patient-facing collection routes and tog
 
 Scope:
 
-- keep the current case-list route without an audit-period slug;
-- keep the existing cohort toggle/button behaviour that returns the correct cohort-specific list;
-- define the compatibility behaviour of the existing all-children/all-cohort list;
+- keep the current case-list route without an audit-period slug —
+  the `?cohort=<number>` query parameter carries the period context
+  (consistent with the operational dashboard, see PR 4);
+- keep the existing cohort toggle/button behaviour that returns the
+  correct cohort-specific list;
+- define the compatibility behaviour of the existing all-children/all-cohort
+  list (no specific cohort → current parent, as in PR 4);
+- resolve the trust/LHB parent and organisation sidebar per-cohort
+  from the approved `AuditPeriodOrganisation` membership when a
+  specific cohort is selected, with the same fallback to current
+  parent and the same period-context alert as PR 4;
+- expand the case-list and trust-level filters through the
+  `OrganisationIdentity` chain so that cases whose lead
+  `Site.organisation` is an inactive predecessor remain visible under
+  the active successor. The organisation-level filter
+  (`epilepsy12_sites__organisation=<org>`) and the trust-level filter
+  (`epilepsy12_sites__organisation__trust=<trust>`) must both include
+  identity-linked predecessor organisations in their resolved
+  organisation set;
 - migrate child-record permission guards to derive `Registration.audit_period`;
-- apply the direct-versus-inherited access policy to registration and all related models;
+- apply the direct-versus-inherited access policy to registration and
+  all related models, including direct access across the
+  `OrganisationIdentity` succession chain (a user employed at the
+  current ODS code may view cases registered against a predecessor
+  ODS code);
 - retain identifier-based assessment, investigation, management and HTMX field routes;
 - validate any optional route period against `Registration.audit_period`; and
 - ensure unauthorised direct URLs fail server-side.
@@ -1452,12 +1553,18 @@ New tests should cover:
 - period-specific case collections;
 - direct organisation access to older in-flight registrations;
 - inherited parent access and denial across the reorganisation boundary;
+- identity-chain case visibility: cases on an inactive predecessor
+  visible under the active successor at both organisation and trust
+  level;
+- the fallback to current parent when no approved
+  `AuditPeriodOrganisation` membership exists (pre-cutover behaviour);
 - unregistered-case access;
 - route/model period mismatch;
 - field-level GET and POST protection; and
-- redirects preserving the existing selected cohort/list context without introducing a slug route.
+- redirects preserving the existing selected cohort/list context
+  without introducing a slug route.
 
-Exit condition: current case collections keep their existing route/toggle behaviour, and direct clinical views derive period-aware access from `Registration.audit_period`.
+Exit condition: current case collections keep their existing route/toggle behaviour, cases from inactive predecessor organisations are visible through their active successors via `OrganisationIdentity`, the period-correct parent is resolved per-cohort with fallback to current parent when no approved membership exists, and direct clinical views derive period-aware access from `Registration.audit_period`.
 
 ### PR 6 — submission, extension and Organisational Audit compatibility
 

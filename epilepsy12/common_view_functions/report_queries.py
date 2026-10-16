@@ -5,6 +5,23 @@ from typing import Literal
 from django.contrib.gis.db.models import Q
 from django.apps import apps
 
+from epilepsy12.general_functions.audit_period_hierarchy import (
+    resolve_period_parent_for_field,
+    get_period_organisation_ids,
+    expand_organisation_ids_via_identity,
+)
+
+# Maps abstraction_level strings used by the view layer to the FK field
+# names on Organisation / AuditPeriodOrganisation.
+_PARENT_FIELD = {
+    "trust": "trust",
+    "local_health_board": "local_health_board",
+    "icb": "integrated_care_board",
+    "nhs_england_region": "nhs_england_region",
+    "open_uk": "openuk_network",
+    "country": "country",
+}
+
 
 def all_registered_cases_for_cohort_and_abstraction_level(
     organisation_instance,
@@ -20,6 +37,7 @@ def all_registered_cases_for_cohort_and_abstraction_level(
         "country",
         "national",
     ] = "organisation",
+    audit_period=None,
 ):
     """
     Returns all Cases that have been registered for a given cohort at a given abstration level.
@@ -30,6 +48,11 @@ def all_registered_cases_for_cohort_and_abstraction_level(
     Cohort - this is an integer
     case_complete: a boolean flag denoting that the case is registered in Epilepsy12 and a fully completed audit return is available
     abstraction level: string, one of ['organisation', 'trust', 'icb', 'nhs_region', 'open_uk', 'country', 'national']
+    audit_period: optional AuditPeriod instance. When provided, the trust/LHB/ICB/region/network/country parent is
+    resolved per-cohort from the approved AuditPeriodOrganisation membership (with fallback to the current parent
+    when no approved membership exists). The organisation set is also expanded through the OrganisationIdentity chain
+    so that cases from inactive predecessor organisations remain visible. When None (the default), the function
+    behaves exactly as before — using the live Organisation.trust / .local_health_board / etc.
 
     Note that all these children will by definition have epilepsy, since a cohort cannot be allocated without the clinician confirming
     1. the child has epilepsy
@@ -55,91 +78,144 @@ def all_registered_cases_for_cohort_and_abstraction_level(
             Q(registration__isnull=False) & Q(registration__audit_period__cohort_number=cohort)
         ).all()
 
+    # --- Period-aware organisation-set resolution -------------------------
+    #
+    # When audit_period is provided, the parent for each abstraction level
+    # is resolved per-cohort from the approved AuditPeriodOrganisation
+    # membership (with fallback to the current parent when no approved
+    # membership exists).  The organisation set is expanded through the
+    # OrganisationIdentity chain so that cases from inactive predecessor
+    # organisations remain visible.
+    #
+    # When audit_period is None, the original live-parent behaviour is used
+    # — the function behaves exactly as before.
+
+    site_active_q = (
+        Q(epilepsy12_sites__site_is_actively_involved_in_epilepsy_care=True)
+        & Q(epilepsy12_sites__site_is_primary_centre_of_epilepsy_care=True)
+    )
+
     if abstraction_level == "organisation":
-        q_filter = (
-            Q(epilepsy12_sites__organisation__pk=organisation_instance.pk)
-            & Q(epilepsy12_sites__site_is_actively_involved_in_epilepsy_care=True)
-            & Q(epilepsy12_sites__site_is_primary_centre_of_epilepsy_care=True)
-        )
-    elif abstraction_level == "trust":
-        if organisation_instance.trust is not None:
-            q_filter = (
-                Q(
-                    epilepsy12_sites__organisation__trust__ods_code=organisation_instance.trust.ods_code
-                )
-                & Q(epilepsy12_sites__site_is_actively_involved_in_epilepsy_care=True)
-                & Q(epilepsy12_sites__site_is_primary_centre_of_epilepsy_care=True)
+        if audit_period is not None:
+            org_ids = expand_organisation_ids_via_identity(
+                {organisation_instance.pk}
             )
+            q_filter = Q(epilepsy12_sites__organisation__pk__in=org_ids) & site_active_q
         else:
-            return all_cases_for_cohort
-    elif abstraction_level == "local_health_board":
-        if organisation_instance.local_health_board is not None:
             q_filter = (
-                Q(
-                    epilepsy12_sites__organisation__local_health_board__ods_code=organisation_instance.local_health_board.ods_code
-                )
-                & Q(epilepsy12_sites__site_is_actively_involved_in_epilepsy_care=True)
-                & Q(epilepsy12_sites__site_is_primary_centre_of_epilepsy_care=True)
+                Q(epilepsy12_sites__organisation__pk=organisation_instance.pk)
+                & site_active_q
             )
-        else:
+
+    elif abstraction_level in _PARENT_FIELD:
+        parent_field = _PARENT_FIELD[abstraction_level]
+        current_parent = getattr(organisation_instance, parent_field, None)
+
+        if current_parent is None and abstraction_level in ("trust", "local_health_board"):
             return all_cases_for_cohort
-    elif abstraction_level == "icb":
-        if organisation_instance.integrated_care_board is not None:
-            """
-            Wales has no ICBs
-            """
-            q_filter = (
-                Q(
-                    epilepsy12_sites__organisation__integrated_care_board__ods_code=organisation_instance.integrated_care_board.ods_code
-                )
-                & Q(epilepsy12_sites__site_is_actively_involved_in_epilepsy_care=True)
-                & Q(epilepsy12_sites__site_is_primary_centre_of_epilepsy_care=True)
+
+        if audit_period is not None:
+            period_parent, is_period_correct = resolve_period_parent_for_field(
+                organisation_instance, audit_period, parent_field
             )
+            if is_period_correct and period_parent is not None:
+                org_ids = get_period_organisation_ids(
+                    period_parent, audit_period, parent_field
+                )
+                if org_ids:
+                    q_filter = (
+                        Q(epilepsy12_sites__organisation__pk__in=org_ids)
+                        & site_active_q
+                    )
+                else:
+                    # No approved memberships for this parent/period — fall
+                    # back to current parent.
+                    q_filter = _current_parent_filter(
+                        abstraction_level, organisation_instance, site_active_q
+                    )
+            else:
+                # Fallback: no approved membership — use current parent.
+                q_filter = _current_parent_filter(
+                    abstraction_level, organisation_instance, site_active_q
+                )
         else:
-            return all_cases_for_cohort
-    elif abstraction_level == "nhs_england_region":
-        """
-        Wales has no NHS regions
-        """
-        if organisation_instance.nhs_england_region is not None:
-            q_filter = (
-                Q(
-                    epilepsy12_sites__organisation__nhs_england_region__region_code=organisation_instance.nhs_england_region.region_code
-                )
-                & Q(
-                    epilepsy12_sites__organisation__country__boundary_identifier=organisation_instance.country.boundary_identifier
-                )
-                & Q(epilepsy12_sites__site_is_actively_involved_in_epilepsy_care=True)
-                & Q(epilepsy12_sites__site_is_primary_centre_of_epilepsy_care=True)
+            q_filter = _current_parent_filter(
+                abstraction_level, organisation_instance, site_active_q
             )
-        else:
-            return all_cases_for_cohort
-    elif abstraction_level == "open_uk":
-        q_filter = (
-            Q(
-                epilepsy12_sites__organisation__openuk_network__boundary_identifier=organisation_instance.openuk_network.boundary_identifier
-            )
-            & Q(epilepsy12_sites__site_is_actively_involved_in_epilepsy_care=True)
-            & Q(epilepsy12_sites__site_is_primary_centre_of_epilepsy_care=True)
-        )
-    elif abstraction_level == "country":
-        q_filter = (
-            Q(
-                epilepsy12_sites__organisation__country__boundary_identifier=organisation_instance.country.boundary_identifier
-            )
-            & Q(epilepsy12_sites__site_is_actively_involved_in_epilepsy_care=True)
-            & Q(epilepsy12_sites__site_is_primary_centre_of_epilepsy_care=True)
-        )
+
     elif abstraction_level == "national":
-        q_filter = Q(
-            epilepsy12_sites__site_is_actively_involved_in_epilepsy_care=True
-        ) & Q(epilepsy12_sites__site_is_primary_centre_of_epilepsy_care=True)
+        q_filter = site_active_q
+
     else:
         raise ValueError(
             f"Incorrect or invalid abstraction error {abstraction_level} supplied."
         )
 
     return all_cases_for_cohort.filter(q_filter)
+
+
+def _current_parent_filter(abstraction_level, organisation_instance, site_active_q):
+    """Build the Q filter for a given abstraction level using the current
+    (live) parent.  This is the pre-foundation behaviour, used both when
+    audit_period is None and as the fallback when no approved
+    AuditPeriodOrganisation membership exists.
+    """
+    parent_field = _PARENT_FIELD[abstraction_level]
+    current_parent = getattr(organisation_instance, parent_field, None)
+
+    if current_parent is None:
+        # No parent for this abstraction level (e.g. Wales has no ICB).
+        # Return a Q that matches nothing — the caller already handles
+        # the trust/LHB case by returning early; this covers ICB/region/etc.
+        return Q(pk__in=[])
+
+    if abstraction_level == "trust":
+        return (
+            Q(epilepsy12_sites__organisation__trust__ods_code=current_parent.ods_code)
+            & site_active_q
+        )
+    elif abstraction_level == "local_health_board":
+        return (
+            Q(
+                epilepsy12_sites__organisation__local_health_board__ods_code=current_parent.ods_code
+            )
+            & site_active_q
+        )
+    elif abstraction_level == "icb":
+        return (
+            Q(
+                epilepsy12_sites__organisation__integrated_care_board__ods_code=current_parent.ods_code
+            )
+            & site_active_q
+        )
+    elif abstraction_level == "nhs_england_region":
+        return (
+            Q(
+                epilepsy12_sites__organisation__nhs_england_region__region_code=current_parent.region_code
+            )
+            & Q(
+                epilepsy12_sites__organisation__country__boundary_identifier=organisation_instance.country.boundary_identifier
+            )
+            & site_active_q
+        )
+    elif abstraction_level == "open_uk":
+        return (
+            Q(
+                epilepsy12_sites__organisation__openuk_network__boundary_identifier=current_parent.boundary_identifier
+            )
+            & site_active_q
+        )
+    elif abstraction_level == "country":
+        return (
+            Q(
+                epilepsy12_sites__organisation__country__boundary_identifier=current_parent.boundary_identifier
+            )
+            & site_active_q
+        )
+    else:
+        raise ValueError(
+            f"Incorrect or invalid abstraction error {abstraction_level} supplied."
+        )
 
 
 def get_all_countries():

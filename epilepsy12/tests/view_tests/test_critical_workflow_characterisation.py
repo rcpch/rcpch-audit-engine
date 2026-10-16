@@ -29,6 +29,14 @@ from epilepsy12.models import (
     Organisation,
     OrganisationalAuditSubmission,
     OrganisationalAuditSubmissionPeriod,
+    Site,
+)
+from epilepsy12.common_view_functions.sanction_user_access import (
+    organisation_white_list_for_user,
+)
+from epilepsy12.general_functions.audit_period_hierarchy import (
+    resolve_period_parent,
+    expand_organisation_ids_via_identity,
 )
 from epilepsy12.organisational_audit import export_submission_period_as_csv
 from epilepsy12.tests.UserDataClasses import (
@@ -428,3 +436,247 @@ def test_organisational_audit_export_empty_period(
     csv_data = export_submission_period_as_csv(submission_period)
 
     assert isinstance(csv_data, str)
+
+
+# ---------------------------------------------------------------------------
+# PR 4 — period-correct dropdowns, identity-chain visibility, recruiting cohort
+# ---------------------------------------------------------------------------
+
+
+@pytest.mark.django_db
+def test_resolve_period_parent_falls_back_to_current_when_no_membership(
+    reorganisation,
+):
+    """resolve_period_parent must fall back to the current parent when no
+    approved AuditPeriodOrganisation membership exists for the selected
+    period.
+
+    This is the pre-cutover safety valve: before the cutover commands have
+    run, no membership rows exist, so every call falls back to the current
+    parent and behaviour is identical to the pre-foundation code.
+    """
+    org = reorganisation["org_a_current"]
+    cohort_9 = reorganisation["cohort_9"]
+
+    # Temporarily delete the cohort 9 membership to simulate pre-cutover.
+    from epilepsy12.models import AuditPeriodOrganisation
+
+    AuditPeriodOrganisation.objects.filter(
+        audit_period=cohort_9, organisation=org
+    ).delete()
+
+    parent, is_period_correct = resolve_period_parent(org, cohort_9)
+
+    assert is_period_correct is False
+    assert parent == org.trust  # the current parent
+
+
+@pytest.mark.django_db
+def test_resolve_period_parent_uses_membership_when_approved(
+    reorganisation,
+):
+    """resolve_period_parent must return the period-correct parent from
+    the approved AuditPeriodOrganisation membership when it exists.
+    """
+    org = reorganisation["org_a_predecessor"]
+    cohort_8 = reorganisation["cohort_8"]
+    trust_a = reorganisation["trust_a"]
+
+    parent, is_period_correct = resolve_period_parent(org, cohort_8)
+
+    assert is_period_correct is True
+    assert parent == trust_a  # the period-correct parent (Trust A)
+
+
+@pytest.mark.django_db
+def test_expand_organisation_ids_via_identity_includes_predecessor(
+    reorganisation,
+):
+    """expand_organisation_ids_via_identity must include inactive
+    predecessor organisations that share the same OrganisationIdentity.
+    """
+    org_current = reorganisation["org_a_current"]
+    org_predecessor = reorganisation["org_a_predecessor"]
+
+    expanded = expand_organisation_ids_via_identity({org_current.pk})
+
+    assert org_predecessor.pk in expanded
+    assert org_current.pk in expanded
+
+
+@pytest.mark.django_db
+def test_expand_organisation_ids_noop_without_identity():
+    """expand_organisation_ids_via_identity must be a no-op when no
+    identity links exist (the pre-cutover state).
+    """
+    # RP401 (GOSH) is seeded without an identity FK.
+    gosh = Organisation.objects.get(ods_code="RP401")
+    assert gosh.identity_id is None
+
+    expanded = expand_organisation_ids_via_identity({gosh.pk})
+
+    assert expanded == {gosh.pk}
+
+
+@pytest.mark.django_db
+def test_organisation_white_list_includes_identity_predecessor(
+    reorganisation,
+):
+    """organisation_white_list_for_user must include inactive predecessor
+    organisations that share an OrganisationIdentity with the user's
+    active employer, so that cases and users attached to the predecessor
+    remain visible after cutover.
+    """
+    org_current = reorganisation["org_a_current"]
+    org_predecessor = reorganisation["org_a_predecessor"]
+
+    # Find or create a user employed at the current organisation.
+    user = Epilepsy12User.objects.filter(
+        employer_organisations__employer_organisation=org_current,
+        employer_organisations__is_active=True,
+    ).first()
+    if user is None:
+        # Use the seeded lead clinician and add an employer at org_current.
+        user = Epilepsy12User.objects.filter(
+            first_name=test_user_audit_centre_lead_clinician_data.role_str,
+            is_active=True,
+        ).first()
+        from epilepsy12.models import OrganisationEmployer
+
+        OrganisationEmployer.objects.get_or_create(
+            epilepsy12_user=user,
+            employer_organisation=org_current,
+            defaults={"is_active": True},
+        )
+
+    whitelist = organisation_white_list_for_user(user)
+    whitelist_ids = set(whitelist.values_list("pk", flat=True))
+
+    assert org_current.pk in whitelist_ids
+    assert org_predecessor.pk in whitelist_ids
+
+
+@pytest.mark.django_db
+def test_dashboard_period_alert_appears_when_parent_differs(
+    client,
+    reorganisation,
+    seed_groups_fixture,
+    seed_users_fixture,
+):
+    """When a specific cohort is selected and the period-correct parent
+    differs from the current parent, the dashboard context must set
+    show_period_alert=True.
+    """
+    org = reorganisation["org_a_current"]
+    cohort_8 = reorganisation["cohort_8"]
+
+    user = Epilepsy12User.objects.filter(
+        first_name=test_user_rcpch_audit_team_data.role_str,
+        is_active=True,
+    ).first()
+    client.force_login(user)
+    twofactor_signin(client, user)
+
+    url = reverse("selected_organisation_summary", kwargs={"organisation_id": org.pk})
+    response = client.get(url, data={"cohort": cohort_8.cohort_number})
+
+    assert response.status_code == HTTPStatus.OK
+    assert response.context["show_period_alert"] is True
+
+
+@pytest.mark.django_db
+def test_dashboard_period_alert_absent_when_parent_matches(
+    client,
+    reorganisation,
+    seed_groups_fixture,
+    seed_users_fixture,
+):
+    """When the period-correct parent matches the current parent (cohort 9
+    for the current organisation), the alert must not appear.
+    """
+    org = reorganisation["org_a_current"]
+    cohort_9 = reorganisation["cohort_9"]
+
+    user = Epilepsy12User.objects.filter(
+        first_name=test_user_rcpch_audit_team_data.role_str,
+        is_active=True,
+    ).first()
+    client.force_login(user)
+    twofactor_signin(client, user)
+
+    url = reverse("selected_organisation_summary", kwargs={"organisation_id": org.pk})
+    response = client.get(url, data={"cohort": cohort_9.cohort_number})
+
+    assert response.status_code == HTTPStatus.OK
+    assert response.context["show_period_alert"] is False
+
+
+@pytest.mark.django_db
+def test_dashboard_falls_back_to_current_parent_without_membership(
+    client,
+    reorganisation,
+    seed_groups_fixture,
+    seed_users_fixture,
+):
+    """When no approved membership exists for the selected cohort (the
+    pre-cutover state), the dashboard must fall back to the current parent
+    and not show the period alert.
+    """
+    org = reorganisation["org_a_current"]
+    cohort_9 = reorganisation["cohort_9"]
+
+    # Delete the cohort 9 membership to simulate pre-cutover.
+    from epilepsy12.models import AuditPeriodOrganisation
+
+    AuditPeriodOrganisation.objects.filter(
+        audit_period=cohort_9, organisation=org
+    ).delete()
+
+    user = Epilepsy12User.objects.filter(
+        first_name=test_user_rcpch_audit_team_data.role_str,
+        is_active=True,
+    ).first()
+    client.force_login(user)
+    twofactor_signin(client, user)
+
+    url = reverse("selected_organisation_summary", kwargs={"organisation_id": org.pk})
+    response = client.get(url, data={"cohort": cohort_9.cohort_number})
+
+    assert response.status_code == HTTPStatus.OK
+    assert response.context["show_period_alert"] is False
+
+
+@pytest.mark.django_db
+def test_case_list_shows_predecessor_cases_via_identity(
+    client,
+    reorganisation,
+    seed_groups_fixture,
+    seed_users_fixture,
+    e12_case_factory,
+):
+    """Cases attached to an inactive predecessor organisation must remain
+    visible in the case list when viewed from the active successor.
+    """
+    org_current = reorganisation["org_a_current"]
+    org_predecessor = reorganisation["org_a_predecessor"]
+
+    # Create a case attached to the predecessor organisation.
+    case = e12_case_factory(
+        first_name="predecessor_case_test",
+        organisations__organisation=org_predecessor,
+        registration__first_paediatric_assessment_date=date.today() - timedelta(days=30),
+    )
+
+    user = Epilepsy12User.objects.filter(
+        first_name=test_user_rcpch_audit_team_data.role_str,
+        is_active=True,
+    ).first()
+    client.force_login(user)
+    twofactor_signin(client, user)
+
+    url = reverse("cases", kwargs={"organisation_id": org_current.pk})
+    response = client.get(url)
+
+    assert response.status_code == HTTPStatus.OK
+    case_pks = {case.pk for case in response.context["case_list"].object_list}
+    assert case.pk in case_pks
