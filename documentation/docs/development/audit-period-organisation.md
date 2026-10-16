@@ -1124,8 +1124,8 @@ This table is the single source of truth for what has shipped. Per-PR ✅ marker
 | PR 1 | `AuditPeriodOrganisation` / `OrganisationIdentity` models + migration | ✅ Complete |
 | PR 2 | Per-cohort sync, population, approval, hierarchy service layer | ✅ Complete |
 | PR 3 | Period-aware permission services | ✅ Complete (built and tested) — **not yet consumed by any production view** |
-| PR 4 | Operational dashboard simplification + reporting-workflow split | ⬜ Not complete — design revised in docs only; recruiting-cohort template tweak aside, the scoped deliverables and characterisation tests are outstanding |
-| PR 5 | Period-aware case collections and clinical permissions | ⬜ Not started — no `audit-periods/<slug>/cases/` route exists; `case_list` still uses the legacy integer route and legacy permission path |
+| PR 4 | Operational dashboard simplification + reporting-workflow split | ✅ Complete (merged) — period-aware parent resolution with fallback, identity-chain visibility, recruiting-cohort simplification, period-context alert |
+| PR 5 | Period-aware case collections and clinical permissions | ✅ Complete — case list period-aware parent resolution with fallback, identity-chain case visibility, direct/inherited clinical permission policy, period-context alert |
 | PR 6 | Submission, extension and Organisational Audit compatibility | ⬜ Not started |
 | PR 7 | Foundation hardening and publication readiness | ⬜ Not started |
 
@@ -1505,7 +1505,7 @@ period-correct parent from `AuditPeriodOrganisation`; the reporting
 workflow phase must still handle the pre-aggregated KPI tables for
 historical publication.
 
-### PR 5 — case-list compatibility and clinical permissions
+### PR 5 — case-list compatibility and clinical permissions ✅ COMPLETE
 
 This pull request preserves the current patient-facing collection routes and toggle behaviour while applying the established period context to direct clinical access. Field-level URLs remain identifier-based.
 
