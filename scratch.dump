@@ -1,0 +1,1211 @@
+Dry-run mode: no changes will be written to the database.
+Comparing API state against local DB...
+
+  Trusts:
+    1 unchanged, 6 new, 242 changed, 0 local-only
+    New (would be created):
+      + TAF: CAMDEN AND ISLINGTON NHS FOUNDATION TRUST
+      + RBQ: LIVERPOOL HEART AND CHEST HOSPITAL NHS FOUNDATION TRUST
+      + YK301: NOBLES HOSPITAL
+      + G6V2S: NORTH LONDON NHS FOUNDATION TRUST
+      + K0N6A: THE ONLINE NHS TRUST
+      + RQF: VELINDRE NHS TRUST
+    Changed (would be updated):
+      ~ RCF: AIREDALE NHS FOUNDATION TRUST
+          telephone: '' → '01535 652511'
+          website: '' → 'HTTP://WWW.AIREDALE-TRUST.NHS.UK/'
+      ~ RBS: ALDER HEY CHILDREN'S NHS FOUNDATION TRUST
+          telephone: '' → '0151 228 4811'
+          website: '' → 'HTTPS://ALDERHEY.NHS.UK/'
+      ~ RTK: ASHFORD AND ST PETER'S HOSPITALS NHS FOUNDATION TRUST
+          telephone: '' → '01932 872000'
+          website: '' → 'HTTP://WWW.ASHFORDSTPETERS.NHS.UK/'
+      ~ RVN: AVON AND WILTSHIRE MENTAL HEALTH PARTNERSHIP NHS TRUST
+          telephone: '' → '01225 325680'
+          website: '' → 'HTTP://WWW.AWP.NHS.UK/'
+      ~ RF4: BARKING, HAVERING AND REDBRIDGE UNIVERSITY HOSPITALS NHS TRUST
+          telephone: '' → '0330 400 4333'
+          website: '' → 'HTTPS://WWW.BHRHOSPITALS.NHS.UK/'
+      ~ RRP: BARNET, ENFIELD AND HARINGEY MENTAL HEALTH NHS TRUST
+          telephone: '' → '020 8702 3000'
+          website: '' → 'HTTP://WWW.BEH-MHT.NHS.UK/'
+          active: True → False
+          Exposure: 0 reg (0 in-flight), 0 cases across 0 organisations
+      ~ RFF: BARNSLEY HOSPITAL NHS FOUNDATION TRUST
+          telephone: '' → '01226 730000'
+          website: '' → 'HTTPS://WWW.BARNSLEYHOSPITAL.NHS.UK/'
+      ~ R1H: BARTS HEALTH NHS TRUST
+          website: '' → 'HTTPS://WWW.BARTSHEALTH.NHS.UK/'
+      ~ RDD: BASILDON AND THURROCK UNIVERSITY HOSPITALS NHS FOUNDATION TRUST
+          telephone: '' → '01268 524900'
+          website: '' → 'HTTP://WWW.BASILDONANDTHURROCK.NHS.UK/'
+          active: True → False
+          Exposure: 0 reg (0 in-flight), 0 cases across 0 organisations
+      ~ RC1: BEDFORD HOSPITAL NHS TRUST
+          telephone: '' → '01234 355122'
+          website: '' → 'HTTPS://WWW.BEDFORDHOSPITAL.NHS.UK/'
+          active: True → False
+          Exposure: 0 reg (0 in-flight), 0 cases across 0 organisations
+      ~ RC9: BEDFORDSHIRE HOSPITALS NHS FOUNDATION TRUST
+          telephone: '' → '01582 491166'
+      ~ RWX: BERKSHIRE HEALTHCARE NHS FOUNDATION TRUST
+          address_line_1: 'FITZWILLIAM HOUSE' → 'LONDON HOUSE'
+          address_line_2: 'SKIMPED HILL LANE' → 'LONDON ROAD'
+          postcode: 'RG12 1BQ' → 'RG12 2UT'
+          telephone: '' → '01344 415600'
+          website: '' → 'HTTPS://WWW.BERKSHIREHEALTHCARE.NHS.UK/'
+      ~ RXT: BIRMINGHAM AND SOLIHULL MENTAL HEALTH NHS FOUNDATION TRUST
+          address_line_1: 'UNIT 1' → 'THE UFFCULME CENTRE'
+          address_line_2: '50 SUMMER HILL ROAD' → '52 QUEENSBRIDGE ROAD'
+          postcode: 'B1 3RB' → 'B13 8QY'
+          telephone: '' → '0121 301 0000'
+          website: '' → 'HTTPS://WWW.BSMHFT.NHS.UK/'
+      ~ RYW: BIRMINGHAM COMMUNITY HEALTHCARE NHS FOUNDATION TRUST
+          telephone: '' → '0121 466 6000'
+          website: '' → 'HTTPS://WWW.BHAMCOMMUNITY.NHS.UK/'
+      ~ RQ3: BIRMINGHAM WOMEN'S AND CHILDREN'S NHS FOUNDATION TRUST
+          telephone: '' → '0121 333 9999'
+          website: '' → 'HTTPS://BWC.NHS.UK/'
+      ~ RLU: BIRMINGHAM WOMEN'S NHS FOUNDATION TRUST
+          telephone: '' → '0121 472 1377'
+          active: True → False
+          Exposure: 0 reg (0 in-flight), 0 cases across 0 organisations
+      ~ RXL: BLACKPOOL TEACHING HOSPITALS NHS FOUNDATION TRUST
+          telephone: '' → '01253 300000'
+          website: '' → 'HTTPS://WWW.BFWH.NHS.UK/'
+      ~ RMC: BOLTON NHS FOUNDATION TRUST
+          telephone: '' → '01204 390390'
+          website: '' → 'HTTP://WWW.BOLTONFT.NHS.UK/'
+      ~ RAE: BRADFORD TEACHING HOSPITALS NHS FOUNDATION TRUST
+          telephone: '' → '01274 542 200'
+          website: '' → 'HTTPS://WWW.BRADFORDHOSPITALS.NHS.UK/'
+      ~ RY2: BRIDGEWATER COMMUNITY HEALTHCARE NHS FOUNDATION TRUST
+          address_line_1: 'EUROPA POINT' → '89 DEWHURST ROAD'
+          address_line_2: 'EUROPA BOULEVARD' → 'BIRCHWOOD'
+          postcode: 'WA5 7TY' → 'WA3 7PG'
+          telephone: '' → '0844 264 3614'
+          website: '' → 'HTTP://BRIDGEWATER.NHS.UK/'
+          active: True → False
+          Exposure: 0 reg (0 in-flight), 0 cases across 0 organisations
+      ~ RXH: BRIGHTON AND SUSSEX UNIVERSITY HOSPITALS NHS TRUST
+          telephone: '' → '01273 696955'
+          website: '' → 'HTTPS://WWW.BSUH.NHS.UK/'
+          active: True → False
+          Exposure: 0 reg (0 in-flight), 0 cases across 0 organisations
+      ~ RA7: BRISTOL NHS FOUNDATION TRUST
+          name: 'UNIVERSITY HOSPITALS BRISTOL AND WESTON NHS FOUNDATION TRUST' → 'BRISTOL NHS FOUNDATION TRUST'
+          telephone: '' → '0117 923 0000'
+      ~ RXQ: BUCKINGHAMSHIRE HEALTHCARE NHS TRUST
+          telephone: '' → '01494 434411'
+          website: '' → 'HTTPS://WWW.BUCKSHEALTHCARE.NHS.UK/'
+      ~ RJF: BURTON HOSPITALS NHS FOUNDATION TRUST
+          telephone: '' → '01283 566333'
+          active: True → False
+          Exposure: 0 reg (0 in-flight), 0 cases across 0 organisations
+      ~ RWY: CALDERDALE AND HUDDERSFIELD NHS FOUNDATION TRUST
+          telephone: '' → '01484 342000'
+          website: '' → 'HTTPS://WWW.CHT.NHS.UK/HOME/'
+      ~ RJX: CALDERSTONES PARTNERSHIP NHS FOUNDATION TRUST
+          address_line_2: '' → 'WHALLEY'
+          telephone: '' → '01253 822121'
+          active: True → False
+          Exposure: 0 reg (0 in-flight), 0 cases across 0 organisations
+      ~ RT1: CAMBRIDGESHIRE AND PETERBOROUGH NHS FOUNDATION TRUST
+          address_line_1: 'ELIZABETH HOUSE,' → 'ELIZABETH HOUSE'
+          telephone: '' → '01223 219400'
+          website: '' → 'HTTPS://WWW.CPFT.NHS.UK/'
+      ~ RYV: CAMBRIDGESHIRE COMMUNITY SERVICES NHS TRUST
+          telephone: '' → '0300 555 6655'
+          website: '' → 'HTTPS://WWW.CAMBSCOMMUNITYSERVICES.NHS.UK/'
+          active: True → False
+          Exposure: 0 reg (0 in-flight), 0 cases across 3 organisations
+      ~ RGT: CAMBRIDGE UNIVERSITY HOSPITALS NHS FOUNDATION TRUST
+          telephone: '' → '01223 245151'
+          website: '' → 'HTTPS://WWW.CUH.NHS.UK/'
+      ~ RV3: CENTRAL AND NORTH WEST LONDON NHS FOUNDATION TRUST
+          telephone: '' → '020 3317 5833'
+          website: '' → 'HTTPS://WWW.CNWL.NHS.UK/'
+      ~ RYX: CENTRAL LONDON COMMUNITY HEALTHCARE NHS TRUST
+          telephone: '' → '020 7798 1300'
+          website: '' → 'HTTPS://WWW.CLCH.NHS.UK/'
+      ~ RW3: CENTRAL MANCHESTER UNIVERSITY HOSPITALS NHS FOUNDATION TRUST
+          telephone: '' → '0161 276 1234'
+          active: True → False
+          Exposure: 0 reg (0 in-flight), 0 cases across 0 organisations
+      ~ RQM: CHELSEA AND WESTMINSTER HOSPITAL NHS FOUNDATION TRUST
+          telephone: '' → '020 3315 8000'
+          website: '' → 'HTTPS://WWW.CHELWEST.NHS.UK/'
+      ~ RXA: CHESHIRE AND WIRRAL PARTNERSHIP NHS FOUNDATION TRUST
+          telephone: '' → '01244 397397'
+          website: '' → 'HTTP://WWW.CWP.NHS.UK/'
+      ~ RFS: CHESTERFIELD ROYAL HOSPITAL NHS FOUNDATION TRUST
+          telephone: '' → '01246 277271'
+          website: '' → 'HTTPS://WWW.CHESTERFIELDROYAL.NHS.UK/'
+      ~ RLN: CITY HOSPITALS SUNDERLAND NHS FOUNDATION TRUST
+          telephone: '' → '0191 565 6256'
+          active: True → False
+          Exposure: 0 reg (0 in-flight), 0 cases across 0 organisations
+      ~ RJ8: CORNWALL PARTNERSHIP NHS FOUNDATION TRUST
+          telephone: '' → '01208 834600'
+          website: '' → 'HTTPS://WWW.CORNWALLFT.NHS.UK/'
+      ~ RJR: COUNTESS OF CHESTER HOSPITAL NHS FOUNDATION TRUST
+          telephone: '' → '01244 365000'
+          website: '' → 'HTTPS://WWW.COCH.NHS.UK/'
+      ~ RXP: COUNTY DURHAM AND DARLINGTON NHS FOUNDATION TRUST
+          telephone: '' → '01325 380100'
+          website: '' → 'HTTPS://WWW.CDDFT.NHS.UK/'
+      ~ RYG: COVENTRY AND WARWICKSHIRE PARTNERSHIP NHS TRUST
+          telephone: '' → '024 7636 2100'
+          website: '' → 'HTTPS://WWW.COVWARKPT.NHS.UK/'
+      ~ RJ6: CROYDON HEALTH SERVICES NHS TRUST
+          telephone: '' → '020 8401 3000'
+          website: '' → 'HTTPS://WWW.CROYDONHEALTHSERVICES.NHS.UK/'
+      ~ RX4: CUMBRIA, NORTHUMBERLAND, TYNE AND WEAR NHS FOUNDATION TRUST
+          telephone: '' → '0191 246 6800'
+          website: '' → 'HTTP://WWW.CNTW.NHS.UK'
+      ~ RN7: DARTFORD AND GRAVESHAM NHS TRUST
+          telephone: '' → '01322 428100'
+          website: '' → 'HTTPS://WWW.DGT.NHS.UK/'
+      ~ RY8: DERBYSHIRE COMMUNITY HEALTH SERVICES NHS FOUNDATION TRUST
+          telephone: '' → '01246 565000'
+          website: '' → 'HTTP://WWW.DCHS.NHS.UK/'
+      ~ RXM: DERBYSHIRE HEALTHCARE NHS FOUNDATION TRUST
+          telephone: '' → '01332 623700'
+          website: '' → 'HTTPS://WWW.DERBYSHIREHEALTHCAREFT.NHS.UK/'
+      ~ RWV: DEVON PARTNERSHIP NHS TRUST
+          telephone: '' → '01392 208866'
+          website: '' → 'HTTPS://WWW.DPT.NHS.UK/'
+      ~ RP5: DONCASTER AND BASSETLAW TEACHING HOSPITALS NHS FOUNDATION TRUST
+          telephone: '' → '01302 366666'
+          website: '' → 'HTTPS://WWW.DBTH.NHS.UK/'
+      ~ RBD: DORSET COUNTY HOSPITAL NHS FOUNDATION TRUST
+          telephone: '' → '01305 251150'
+          website: '' → 'HTTPS://WWW.DCHFT.NHS.UK/PAGES/HOME1.ASPX'
+      ~ RDY: DORSET HEALTHCARE UNIVERSITY NHS FOUNDATION TRUST
+          address_line_1: 'SENTINEL HOUSE' → 'DORSET HEALTHCARE HQ'
+          address_line_2: '4-6 NUFFIELD ROAD' → '2 NUFFIELD ROAD'
+          telephone: '' → '01202 277000'
+          website: '' → 'HTTPS://WWW.DORSETHEALTHCARE.NHS.UK/'
+      ~ RYK: DUDLEY INTEGRATED HEALTH AND CARE NHS TRUST
+          telephone: '' → '01922 607 000'
+      ~ RWH: EAST AND NORTH HERTFORDSHIRE TEACHING NHS TRUST
+          name: 'EAST AND NORTH HERTFORDSHIRE NHS TRUST' → 'EAST AND NORTH HERTFORDSHIRE TEACHING NHS TRUST'
+          telephone: '' → '01438 314333'
+          website: '' → 'HTTPS://WWW.ENHERTS-TR.NHS.UK/'
+      ~ RJN: EAST CHESHIRE NHS TRUST
+          telephone: '' → '01625 661449'
+          website: '' → 'HTTPS://WWW.EASTCHESHIRE.NHS.UK/'
+      ~ RVV: EAST KENT HOSPITALS UNIVERSITY NHS FOUNDATION TRUST
+          telephone: '' → '01227 766877'
+          website: '' → 'HTTPS://WWW.EKHUFT.NHS.UK/PATIENTS-AND-VISITORS/'
+      ~ RXR: EAST LANCASHIRE HOSPITALS NHS TRUST
+          telephone: '' → '01282 425071'
+          website: '' → 'HTTPS://ELHT.NHS.UK/'
+      ~ RWK: EAST LONDON NHS FOUNDATION TRUST
+          telephone: '' → '020 7655 4000'
+          website: '' → 'HTTPS://WWW.ELFT.NHS.UK/'
+      ~ RX9: EAST MIDLANDS AMBULANCE SERVICE NHS TRUST
+          telephone: '' → '0115 884 5000'
+          website: '' → 'HTTPS://WWW.EMAS.NHS.UK/'
+      ~ RYC: EAST OF ENGLAND AMBULANCE SERVICE NHS TRUST
+          telephone: '' → '0345 601 3733'
+          website: '' → 'HTTPS://WWW.EASTAMB.NHS.UK/'
+      ~ RY3: EAST OF ENGLAND COMMUNITY HEALTH AND CARE NHS TRUST
+          name: 'NORFOLK COMMUNITY HEALTH AND CARE NHS TRUST' → 'EAST OF ENGLAND COMMUNITY HEALTH AND CARE NHS TRUST'
+          telephone: '' → '01603 697381'
+      ~ RDE: EAST SUFFOLK AND NORTH ESSEX NHS FOUNDATION TRUST
+          telephone: '' → '01206 747474'
+          website: '' → 'HTTPS://WWW.ESNEFT.NHS.UK/'
+      ~ RXC: EAST SUSSEX HEALTHCARE NHS TRUST
+          telephone: '' → '01424 755255'
+          website: '' → 'HTTPS://WWW.ESHT.NHS.UK/'
+      ~ RVR: EPSOM AND ST HELIER UNIVERSITY HOSPITALS NHS TRUST
+          telephone: '' → '020 8296 2000'
+          website: '' → 'HTTPS://WWW.EPSOM-STHELIER.NHS.UK/'
+      ~ R1L: ESSEX PARTNERSHIP UNIVERSITY NHS FOUNDATION TRUST
+          website: '' → 'HTTPS://EPUT.NHS.UK/'
+      ~ RDU: FRIMLEY HEALTH NHS FOUNDATION TRUST
+          telephone: '' → '01276 604604'
+          website: '' → 'HTTPS://WWW.FHFT.NHS.UK/'
+      ~ RR7: GATESHEAD HEALTH NHS FOUNDATION TRUST
+          telephone: '' → '0191 482 0000'
+          website: '' → 'HTTPS://WWW.QEGATESHEAD.NHS.UK/'
+      ~ RLT: GEORGE ELIOT HOSPITAL NHS TRUST
+          telephone: '' → '024 7635 1351'
+          website: '' → 'HTTP://WWW.GEH.NHS.UK/'
+      ~ R1J: GLOUCESTERSHIRE CARE SERVICES NHS TRUST
+          website: '' → 'HTTPS://WWW.GLOS-CARE.NHS.UK/'
+          active: True → False
+          Exposure: 0 reg (0 in-flight), 0 cases across 0 organisations
+      ~ RTQ: GLOUCESTERSHIRE HEALTH AND CARE NHS FOUNDATION TRUST
+          telephone: '' → '0300 4218 100'
+          website: '' → 'HTTPS://GHC.NHS.UK/'
+      ~ RTE: GLOUCESTERSHIRE HOSPITALS NHS FOUNDATION TRUST
+          telephone: '' → '0300 422 2222'
+          website: '' → 'HTTPS://WWW.GLOSHOSPITALS.NHS.UK/'
+      ~ RXV: GREATER MANCHESTER MENTAL HEALTH NHS FOUNDATION TRUST
+          telephone: '' → '0161 773 9121'
+          website: '' → 'HTTPS://WWW.GMMH.NHS.UK/'
+      ~ RP4: GREAT ORMOND STREET HOSPITAL FOR CHILDREN NHS FOUNDATION TRUST
+          telephone: '' → '020 7405 9200'
+          website: '' → 'HTTPS://WWW.GOSH.NHS.UK/'
+      ~ RN3: GREAT WESTERN HOSPITALS NHS FOUNDATION TRUST
+          telephone: '' → '01793 604020'
+          website: '' → 'HTTPS://WWW.GWH.NHS.UK/'
+      ~ RJ1: GUY'S AND ST THOMAS' NHS FOUNDATION TRUST
+          telephone: '' → '020 7188 7188'
+          website: '' → 'HTTPS://WWW.GUYSANDSTTHOMAS.NHS.UK/HOME.ASPX'
+      ~ RW1: HAMPSHIRE AND ISLE OF WIGHT HEALTHCARE NHS FOUNDATION TRUST
+          name: 'SOUTHERN HEALTH NHS FOUNDATION TRUST' → 'HAMPSHIRE AND ISLE OF WIGHT HEALTHCARE NHS FOUNDATION TRUST'
+          telephone: '' → '023 8087 4000'
+      ~ RN5: HAMPSHIRE HOSPITALS NHS FOUNDATION TRUST
+          telephone: '' → '01256 473202'
+          website: '' → 'HTTPS://WWW.HAMPSHIREHOSPITALS.NHS.UK/'
+      ~ RCD: HARROGATE AND DISTRICT NHS FOUNDATION TRUST
+          telephone: '' → '01423 885959'
+          website: '' → 'HTTPS://WWW.HDFT.NHS.UK/'
+      ~ RR1: HEART OF ENGLAND NHS FOUNDATION TRUST
+          telephone: '' → '0121 424 2000'
+          active: True → False
+          Exposure: 0 reg (0 in-flight), 0 cases across 0 organisations
+      ~ R1A: HEREFORDSHIRE AND WORCESTERSHIRE HEALTH AND CARE NHS TRUST
+          website: '' → 'HTTPS://WWW.HACW.NHS.UK/'
+      ~ RY4: HERTFORDSHIRE COMMUNITY NHS TRUST
+          telephone: '' → '01707 388 000'
+          website: '' → 'HTTPS://WWW.HCT.NHS.UK/'
+      ~ RWR: HERTFORDSHIRE PARTNERSHIP UNIVERSITY NHS FOUNDATION TRUST
+          telephone: '' → '01707 253800'
+          website: '' → 'HTTPS://WWW.HPFT.NHS.UK/'
+      ~ RQQ: HINCHINGBROOKE HEALTH CARE NHS TRUST
+          telephone: '' → '01480 416416'
+          active: True → False
+          Exposure: 0 reg (0 in-flight), 0 cases across 0 organisations
+      ~ RQX: HOMERTON HEALTHCARE NHS FOUNDATION TRUST
+          telephone: '' → '020 8510 5555'
+          website: '' → 'HTTPS://WWW.HOMERTON.NHS.UK/'
+      ~ RY9: HOUNSLOW AND RICHMOND COMMUNITY HEALTHCARE NHS TRUST
+          telephone: '' → '020 8973 3000'
+          website: '' → 'HTTPS://WWW.HRCH.NHS.UK/'
+          active: True → False
+          Exposure: 0 reg (0 in-flight), 0 cases across 2 organisations
+      ~ RWA: HULL UNIVERSITY TEACHING HOSPITALS NHS TRUST
+          telephone: '' → '01482 875875'
+          website: '' → 'HTTPS://WWW.HEY.NHS.UK/'
+      ~ RV9: HUMBER TEACHING NHS FOUNDATION TRUST
+          address_line_1: 'TRUST HQ, WILLERBY HILL' → 'TRUST HQ BLOCK A WILLERBY HILL'
+          telephone: '' → '01482 301700'
+          website: '' → 'HTTPS://WWW.HUMBER.NHS.UK/'
+      ~ RYJ: IMPERIAL COLLEGE HEALTHCARE NHS TRUST
+          telephone: '' → '020 3311 3311'
+          website: '' → 'HTTPS://WWW.IMPERIAL.NHS.UK/'
+      ~ RGQ: IPSWICH HOSPITAL NHS TRUST
+          telephone: '' → '01473 712233'
+          active: True → False
+          Exposure: 0 reg (0 in-flight), 0 cases across 0 organisations
+      ~ R1F: ISLE OF WIGHT NHS TRUST
+          website: '' → 'HTTPS://WWW.IOW.NHS.UK/'
+      ~ RGP: JAMES PAGET UNIVERSITY HOSPITALS NHS FOUNDATION TRUST
+          telephone: '' → '01493 452452'
+          website: '' → 'HTTPS://WWW.JPAGET.NHS.UK/'
+      ~ RGT1W: JERSEY GENERAL HOSPITAL
+          town: 'ST HELIER' → 'JERSEY'
+          postcode: 'JE1 3Q' → 'JE1 3UH'
+          published_at: datetime.date(2015, 4, 1) → datetime.date(2015, 1, 4)
+      ~ RXY: KENT AND MEDWAY MENTAL HEALTH NHS TRUST
+          name: 'KENT AND MEDWAY NHS AND SOCIAL CARE PARTNERSHIP TRUST' → 'KENT AND MEDWAY MENTAL HEALTH NHS TRUST'
+          telephone: '' → '01622 724100'
+          website: '' → 'HTTPS://WWW.KMPT.NHS.UK/'
+      ~ RYY: KENT COMMUNITY HEALTH NHS FOUNDATION TRUST
+          address_line_1: 'UNIT D' → 'TRINITY HOUSE'
+          address_line_2: 'THE OAST' → '110-120 EUREKA PARK'
+          town: 'MAIDSTONE' → 'ASHFORD'
+          postcode: 'ME16 9NT' → 'TN25 4AZ'
+          telephone: '' → '01622 211900'
+          website: '' → 'HTTPS://WWW.KENTCHT.NHS.UK/'
+      ~ RNQ: KETTERING GENERAL HOSPITAL NHS FOUNDATION TRUST
+          telephone: '' → '01536 492000'
+          website: '' → 'HTTPS://WWW.KGH.NHS.UK/'
+      ~ RJZ: KING'S COLLEGE HOSPITAL NHS FOUNDATION TRUST
+          telephone: '' → '020 3299 9000'
+          website: '' → 'HTTPS://WWW.KCH.NHS.UK/'
+      ~ RAX: KINGSTON AND RICHMOND NHS FOUNDATION TRUST
+          name: 'KINGSTON HOSPITAL NHS FOUNDATION TRUST' → 'KINGSTON AND RICHMOND NHS FOUNDATION TRUST'
+          telephone: '' → '020 8546 7711'
+          website: '' → 'HTTPS://WWW.KINGSTONHOSPITAL.NHS.UK/'
+      ~ RW5: LANCASHIRE & SOUTH CUMBRIA NHS FOUNDATION TRUST
+          telephone: '' → '01772 695300'
+          website: '' → 'HTTPS://WWW.LSCFT.NHS.UK/'
+      ~ RXN: LANCASHIRE TEACHING HOSPITALS NHS FOUNDATION TRUST
+          telephone: '' → '01772 716565'
+          website: '' → 'HTTPS://WWW.LANCSTEACHINGHOSPITALS.NHS.UK/'
+      ~ RGD: LEEDS AND YORK PARTNERSHIP NHS FOUNDATION TRUST
+          address_line_1: '2150 CENTURY WAY' → 'ST. MARYS HOUSE'
+          address_line_2: 'THORPE PARK' → 'ST. MARYS ROAD'
+          postcode: 'LS15 8ZB' → 'LS7 3JX'
+          telephone: '' → '0113 8555000'
+          website: '' → 'HTTPS://WWW.LEEDSANDYORKPFT.NHS.UK/'
+      ~ RY6: LEEDS COMMUNITY HEALTHCARE NHS TRUST
+          address_line_1: 'STOCKDALE HOUSE' → '3 WHITE ROSE OFFICE PARK'
+          address_line_2: '8 VICTORIA ROAD' → 'MILLSHAW PARK LANE'
+          postcode: 'LS6 1PF' → 'LS11 0DL'
+          telephone: '' → '0113 220 8500'
+          website: '' → 'HTTPS://WWW.LEEDSCOMMUNITYHEALTHCARE.NHS.UK/'
+      ~ RR8: LEEDS TEACHING HOSPITALS NHS TRUST
+          telephone: '' → '0113 243 3144'
+          website: '' → 'HTTPS://WWW.LEEDSTH.NHS.UK/'
+      ~ RT5: LEICESTERSHIRE PARTNERSHIP NHS TRUST
+          address_line_1: 'RIVERSIDE HOUSE' → 'ROOM 100/110 PEN LLOYD BUILDING'
+          address_line_2: 'BRIDGE PARK PLAZA' → 'COUNTY HALL'
+          postcode: 'LE4 8PQ' → 'LE3 8RA'
+          telephone: '' → '0116 295 1350'
+          website: '' → 'HTTPS://WWW.LEICSPART.NHS.UK/'
+      ~ RJ2: LEWISHAM AND GREENWICH NHS TRUST
+          telephone: '' → '020 8333 3000'
+          website: '' → 'HTTPS://WWW.LEWISHAMANDGREENWICH.NHS.UK/'
+      ~ RY5: LINCOLNSHIRE COMMUNITY HEALTH SERVICES NHS TRUST
+          telephone: '' → '01522 308686'
+          website: '' → 'HTTPS://WWW.LINCOLNSHIRECOMMUNITYHEALTHSERVICES.NHS.UK/'
+      ~ RP7: LINCOLNSHIRE PARTNERSHIP NHS FOUNDATION TRUST
+          telephone: '' → '01522 309200'
+          website: '' → 'HTTPS://WWW.LPFT.NHS.UK/'
+      ~ RY1: LIVERPOOL COMMUNITY HEALTH NHS TRUST
+          active: True → False
+          Exposure: 0 reg (0 in-flight), 0 cases across 0 organisations
+      ~ REM: LIVERPOOL UNIVERSITY HOSPITALS NHS FOUNDATION TRUST
+          telephone: '' → '0151 706 2000'
+          website: '' → 'HTTPS://WWW.RLBUHT.NHS.UK/'
+      ~ REP: LIVERPOOL WOMEN'S NHS FOUNDATION TRUST
+          telephone: '' → '0151 708 9988'
+          website: '' → 'HTTPS://WWW.LIVERPOOLWOMENS.NHS.UK/'
+      ~ RRU: LONDON AMBULANCE SERVICE NHS TRUST
+          telephone: '' → '020 7783 2000'
+          website: '' → 'HTTPS://WWW.LONDONAMBULANCE.NHS.UK/'
+      ~ R1K: LONDON NORTH WEST UNIVERSITY HEALTHCARE NHS TRUST
+          website: '' → 'HTTPS://WWW.LNWH.NHS.UK/'
+      ~ RWF: MAIDSTONE AND TUNBRIDGE WELLS NHS TRUST
+          telephone: '' → '01622 729000'
+          website: '' → 'HTTPS://WWW.MTW.NHS.UK/'
+      ~ R0A: MANCHESTER UNIVERSITY NHS FOUNDATION TRUST
+          telephone: '' → '0300 3309444'
+          website: '' → 'HTTPS://MFT.NHS.UK/'
+      ~ RPA: MEDWAY NHS FOUNDATION TRUST
+          telephone: '' → '01634 830000'
+          website: '' → 'HTTPS://WWW.MEDWAY.NHS.UK/'
+      ~ RBN: MERSEY AND WEST LANCASHIRE TEACHING HOSPITALS NHS TRUST
+          telephone: '' → '0151 426 1600'
+          website: '' → 'HTTP://WWW.STHK.NHS.UK/'
+      ~ RW4: MERSEY CARE NHS FOUNDATION TRUST
+          telephone: '' → '0151 473 0303'
+          website: '' → 'HTTPS://WWW.MERSEYCARE.NHS.UK/'
+      ~ RAJ: MID AND SOUTH ESSEX NHS FOUNDATION TRUST
+          telephone: '' → '01702 435555'
+      ~ RBT: MID CHESHIRE HOSPITALS NHS FOUNDATION TRUST
+          telephone: '' → '01270 255141'
+          website: '' → 'HTTPS://WWW.MCHT.NHS.UK/'
+      ~ RQ8: MID ESSEX HOSPITAL SERVICES NHS TRUST
+          telephone: '' → '01245 362000'
+          website: '' → 'HTTPS://WWW.MEHT.NHS.UK/'
+          active: True → False
+          Exposure: 0 reg (0 in-flight), 0 cases across 0 organisations
+      ~ RRE: MIDLANDS PARTNERSHIP UNIVERSITY NHS FOUNDATION TRUST
+          name: 'MIDLANDS PARTNERSHIP NHS FOUNDATION TRUST' → 'MIDLANDS PARTNERSHIP UNIVERSITY NHS FOUNDATION TRUST'
+          telephone: '' → '0300 790 7000'
+          website: '' → 'HTTP://WWW.MPFT.NHS.UK/'
+      ~ RJD: MID STAFFORDSHIRE NHS FOUNDATION TRUST
+          telephone: '' → '01785 257731'
+          active: True → False
+          Exposure: 0 reg (0 in-flight), 0 cases across 0 organisations
+      ~ RXF: MID YORKSHIRE TEACHING NHS TRUST
+          name: 'MID YORKSHIRE HOSPITALS NHS TRUST' → 'MID YORKSHIRE TEACHING NHS TRUST'
+          telephone: '' → '01924 541000'
+          website: '' → 'HTTPS://WWW.MIDYORKS.NHS.UK/'
+      ~ RD8: MILTON KEYNES UNIVERSITY HOSPITAL NHS FOUNDATION TRUST
+          telephone: '' → '01908 660033'
+          website: '' → 'HTTPS://WWW.MKUH.NHS.UK/'
+      ~ RP6: MOORFIELDS EYE HOSPITAL NHS FOUNDATION TRUST
+          telephone: '' → '020 7253 3411'
+          website: '' → 'HTTPS://WWW.MOORFIELDS.NHS.UK/'
+      ~ RM1: NORFOLK AND NORWICH UNIVERSITY HOSPITALS NHS FOUNDATION TRUST
+          telephone: '' → '01603 286286'
+          website: '' → 'HTTP://WWW.NNUH.NHS.UK/'
+      ~ RMY: NORFOLK AND SUFFOLK NHS FOUNDATION TRUST
+          address_line_1: 'HELLESDON HOSPITAL' → 'COUNTY HALL'
+          address_line_2: 'DRAYTON HIGH ROAD' → 'MARTINEAU LANE'
+          postcode: 'NR6 5BE' → 'NR1 2DH'
+          telephone: '' → '01603 421421'
+          website: '' → 'HTTP://WWW.NSFT.NHS.UK/PAGES/HOME.ASPX'
+      ~ RNS: NORTHAMPTON GENERAL HOSPITAL NHS TRUST
+          telephone: '' → '01604 634700'
+          website: '' → 'HTTPS://WWW.NORTHAMPTONGENERAL.NHS.UK/HOME.ASPX'
+      ~ RP1: NORTHAMPTONSHIRE HEALTHCARE NHS FOUNDATION TRUST
+          telephone: '' → '01536 410141'
+          website: '' → 'HTTPS://WWW.NHFT.NHS.UK/'
+      ~ RVJ: NORTH BRISTOL NHS TRUST
+          telephone: '' → '0117 950 5050'
+          website: '' → 'HTTPS://WWW.NBT.NHS.UK/'
+          active: True → False
+          Exposure: 0 reg (0 in-flight), 0 cases across 4 organisations
+      ~ RWW: NORTH CHESHIRE AND MERSEY NHS FOUNDATION TRUST
+          name: 'WARRINGTON AND HALTON TEACHING HOSPITALS NHS FOUNDATION TRUST' → 'NORTH CHESHIRE AND MERSEY NHS FOUNDATION TRUST'
+          telephone: '' → '01925 635911'
+          website: '' → 'HTTPS://WWW.WHH.NHS.UK/'
+      ~ RNN: NORTH CUMBRIA INTEGRATED CARE NHS FOUNDATION TRUST
+          telephone: '' → '01228 602000'
+          website: '' → 'HTTPS://WWW.NCIC.NHS.UK/'
+      ~ RNL: NORTH CUMBRIA UNIVERSITY HOSPITALS NHS TRUST
+          telephone: '' → '01946 693181'
+          active: True → False
+          Exposure: 0 reg (0 in-flight), 0 cases across 0 organisations
+      ~ RX6: NORTH EAST AMBULANCE SERVICE NHS FOUNDATION TRUST
+          telephone: '' → '0191 430 2000'
+          website: '' → 'HTTPS://WWW.NEAS.NHS.UK/'
+      ~ RAT: NORTH EAST LONDON NHS FOUNDATION TRUST
+          address_line_1: 'WEST WING' → 'GOODMAYES HOSPITAL'
+          address_line_2: 'C E M E CENTRE' → '157 BARLEY LANE'
+          town: 'RAINHAM' → 'ILFORD'
+          postcode: 'RM13 8GQ' → 'IG3 8XJ'
+          telephone: '' → '0300 555 1200'
+          website: '' → 'HTTPS://WWW.NELFT.NHS.UK/'
+      ~ RM3: NORTHERN CARE ALLIANCE NHS FOUNDATION TRUST
+          telephone: '' → '0161 789 7373'
+          website: '' → 'HTTPS://WWW.SRFT.NHS.UK/'
+      ~ RBZ: NORTHERN DEVON HEALTHCARE NHS TRUST
+          telephone: '' → '01271 322577'
+          website: '' → 'HTTPS://WWW.NORTHDEVONHEALTH.NHS.UK/'
+          active: True → False
+          Exposure: 0 reg (0 in-flight), 0 cases across 0 organisations
+      ~ RJL: NORTHERN LINCOLNSHIRE AND GOOLE NHS FOUNDATION TRUST
+          telephone: '' → '01472 874111'
+          website: '' → 'HTTPS://WWW.NLG.NHS.UK/'
+      ~ RRD: NORTH ESSEX PARTNERSHIP UNIVERSITY NHS FOUNDATION TRUST
+          telephone: '' → '01245 546400'
+          active: True → False
+          Exposure: 0 reg (0 in-flight), 0 cases across 0 organisations
+      ~ RAP: NORTH MIDDLESEX UNIVERSITY HOSPITAL NHS TRUST
+          telephone: '' → '0208 887 3055'
+          website: '' → 'HTTP://WWW.NORTHMID.NHS.UK/'
+          active: True → False
+          Exposure: 40 reg (0 in-flight), 40 cases across 1 organisations
+      ~ RLY: NORTH STAFFORDSHIRE COMBINED HEALTHCARE NHS TRUST
+          telephone: '' → '0300 123 1535'
+          website: '' → 'HTTPS://COMBINED.NHS.UK/'
+      ~ RVW: NORTH TEES AND HARTLEPOOL NHS FOUNDATION TRUST
+          telephone: '' → '01642 617617'
+          website: '' → 'HTTPS://WWW.NTH.NHS.UK/'
+      ~ RTF: NORTHUMBRIA HEALTHCARE NHS FOUNDATION TRUST
+          telephone: '' → '0344 811 8111'
+          website: '' → 'HTTPS://WWW.NORTHUMBRIA.NHS.UK/'
+      ~ RX7: NORTH WEST AMBULANCE SERVICE NHS TRUST
+          telephone: '' → '0345 112 0999'
+          website: '' → 'HTTPS://WWW.NWAS.NHS.UK/'
+      ~ RGN: NORTH WEST ANGLIA NHS FOUNDATION TRUST
+          telephone: '' → '01733 678000'
+          website: '' → 'HTTPS://WWW.NWANGLIAFT.NHS.UK/'
+      ~ RTV: NORTH WEST BOROUGHS HEALTHCARE NHS FOUNDATION TRUST
+          telephone: '' → '01925 664000'
+          website: '' → 'HTTP://WWW.NWBH.NHS.UK/'
+          active: True → False
+          Exposure: 0 reg (0 in-flight), 0 cases across 0 organisations
+      ~ RHA: NOTTINGHAMSHIRE HEALTHCARE NHS FOUNDATION TRUST
+          telephone: '' → '0115 969 1300'
+          website: '' → 'HTTPS://WWW.NOTTINGHAMSHIREHEALTHCARE.NHS.UK/'
+      ~ RX1: NOTTINGHAM UNIVERSITY HOSPITALS NHS TRUST
+          telephone: '' → '0115 924 9924'
+          website: '' → 'HTTPS://WWW.NUH.NHS.UK/'
+      ~ RNU: OXFORD HEALTH NHS FOUNDATION TRUST
+          address_line_1: 'WARNEFORD HOSPITAL' → 'LITTLEMORE MENTAL HEALTH CENTRE'
+          address_line_2: 'WARNEFORD LANE' → 'SANDFORD ROAD'
+          postcode: 'OX3 7JX' → 'OX4 4XN'
+          telephone: '' → '01865 901000'
+          website: '' → 'HTTPS://WWW.OXFORDHEALTH.NHS.UK/'
+      ~ RTH: OXFORD UNIVERSITY HOSPITALS NHS FOUNDATION TRUST
+          telephone: '' → '0300 304 7777'
+          website: '' → 'HTTPS://WWW.OUH.NHS.UK/'
+      ~ RPG: OXLEAS NHS FOUNDATION TRUST
+          telephone: '' → '01322 625700'
+          website: '' → 'HTTP://OXLEAS.NHS.UK/'
+      ~ RW6: PENNINE ACUTE HOSPITALS NHS TRUST
+          telephone: '' → '0161 624 0420'
+          website: '' → 'HTTPS://WWW.PAT.NHS.UK/'
+          active: True → False
+          Exposure: 0 reg (0 in-flight), 0 cases across 0 organisations
+      ~ RT2: PENNINE CARE NHS FOUNDATION TRUST
+          telephone: '' → '0161 716 3000'
+          website: '' → 'HTTPS://WWW.PENNINECARE.NHS.UK/'
+      ~ RD3: POOLE HOSPITAL NHS FOUNDATION TRUST
+          telephone: '' → '01202 665511'
+          website: '' → 'HTTPS://WWW.POOLE.NHS.UK/'
+          active: True → False
+          Exposure: 0 reg (0 in-flight), 0 cases across 0 organisations
+      ~ RHU: PORTSMOUTH HOSPITALS UNIVERSITY NHS TRUST
+          name: 'PORTSMOUTH HOSPITALS UNIVERSITY NATIONAL HEALTH SERVICE TRUST' → 'PORTSMOUTH HOSPITALS UNIVERSITY NHS TRUST'
+          telephone: '' → '023 9228 6000'
+          website: '' → 'HTTPS://WWW.PORTHOSP.NHS.UK/'
+      ~ 7A7: POWYS TEACHING LOCAL HEALTH BOARD
+          address_line_1: 'GLASBURY HOUSE' → 'BRONLLYS HOSPITAL'
+          telephone: '' → '01874 711661'
+      ~ RYT: PUBLIC HEALTH WALES NHS TRUST
+          website: '' → 'HTTPS://PHW.NHS.WALES/'
+      ~ RPC: QUEEN VICTORIA HOSPITAL NHS FOUNDATION TRUST
+          telephone: '' → '01342 414000'
+          website: '' → 'HTTPS://WWW.QVH.NHS.UK/'
+      ~ RXE: ROTHERHAM DONCASTER AND SOUTH HUMBER NHS FOUNDATION TRUST
+          telephone: '' → '01302 796000'
+          website: '' → 'HTTPS://WWW.RDASH.NHS.UK/'
+      ~ RHW: ROYAL BERKSHIRE NHS FOUNDATION TRUST
+          telephone: '' → '0118 322 5111'
+          website: '' → 'HTTPS://WWW.ROYALBERKSHIRE.NHS.UK/'
+      ~ RT3: ROYAL BROMPTON & HAREFIELD NHS FOUNDATION TRUST
+          telephone: '' → '020 7352 8121'
+          website: '' → 'HTTPS://WWW.RBHT.NHS.UK/'
+          active: True → False
+          Exposure: 0 reg (0 in-flight), 0 cases across 0 organisations
+      ~ REF: ROYAL CORNWALL HOSPITALS NHS TRUST
+          telephone: '' → '01872 250000'
+          website: '' → 'HTTPS://WWW.ROYALCORNWALL.NHS.UK/'
+      ~ RH8: ROYAL DEVON UNIVERSITY HEALTHCARE NHS FOUNDATION TRUST
+          telephone: '' → '01392 411611'
+          website: '' → 'HTTPS://ROYALDEVON.NHS.UK/'
+      ~ RAL: ROYAL FREE LONDON NHS FOUNDATION TRUST
+          telephone: '' → '020 3758 2000'
+          website: '' → 'HTTPS://WWW.ROYALFREE.NHS.UK/'
+      ~ RQ6: ROYAL LIVERPOOL AND BROADGREEN UNIVERSITY HOSPITALS NHS TRUST
+          telephone: '' → '0151 706 2000'
+          active: True → False
+          Exposure: 0 reg (0 in-flight), 0 cases across 0 organisations
+      ~ RAN: ROYAL NATIONAL ORTHOPAEDIC HOSPITAL NHS TRUST
+          telephone: '' → '020 3947 0100'
+          website: '' → 'HTTPS://WWW.RNOH.NHS.UK/'
+      ~ RGM: ROYAL PAPWORTH HOSPITAL NHS FOUNDATION TRUST
+          telephone: '' → '01223 638000'
+          website: '' → 'HTTPS://ROYALPAPWORTH.NHS.UK/'
+      ~ RA2: ROYAL SURREY NHS FOUNDATION TRUST
+          name: 'ROYAL SURREY COUNTY HOSPITAL NHS FOUNDATION TRUST' → 'ROYAL SURREY NHS FOUNDATION TRUST'
+          telephone: '' → '01483 571122'
+          website: '' → 'HTTPS://WWW.ROYALSURREY.NHS.UK/'
+      ~ RD1: ROYAL UNITED HOSPITALS BATH NHS FOUNDATION TRUST
+          telephone: '' → '01225 428331'
+          website: '' → 'HTTPS://WWW.RUH.NHS.UK/'
+      ~ RNZ: SALISBURY NHS FOUNDATION TRUST
+          telephone: '' → '01722 336262'
+          website: '' → 'HTTPS://WWW.SALISBURY.NHS.UK/PAGES/HOME.ASPX'
+      ~ RXK: SANDWELL AND WEST BIRMINGHAM HOSPITALS NHS TRUST
+          address_line_1: 'CITY HOSPITAL' → 'MIDLAND METROPOLITAN UNIVERSITY HOS'
+          address_line_2: 'DUDLEY ROAD' → 'GROVE LANE'
+          town: 'BIRMINGHAM' → 'SMETHWICK'
+          postcode: 'B18 7QH' → 'B66 2QT'
+          telephone: '' → '0121 553 1831'
+          website: '' → 'HTTPS://WWW.SWBH.NHS.UK/'
+      ~ RCU: SHEFFIELD CHILDREN'S NHS FOUNDATION TRUST
+          telephone: '' → '0114 271 7000'
+          website: '' → 'HTTPS://WWW.SHEFFIELDCHILDRENS.NHS.UK/'
+      ~ RHQ: SHEFFIELD TEACHING HOSPITALS NHS FOUNDATION TRUST
+          telephone: '' → '0114 243 4343'
+          website: '' → 'HTTPS://WWW.STH.NHS.UK/'
+      ~ RK5: SHERWOOD FOREST HOSPITALS NHS FOUNDATION TRUST
+          telephone: '' → '01623 622515'
+          website: '' → 'HTTPS://WWW.SFH-TR.NHS.UK/'
+      ~ R1D: SHROPSHIRE COMMUNITY HEALTH NHS TRUST
+          address_line_1: 'WILLIAM FARR HOUSE' → 'MOUNT MCKINLEY'
+          address_line_2: 'MYTTON OAK ROAD' → 'ANCHORAGE AVENUE'
+          postcode: 'SY3 8XL' → 'SY2 6FG'
+          telephone: '' → '01743 277500'
+          website: '' → 'HTTPS://WWW.SHROPSCOMMUNITYHEALTH.NHS.UK/'
+      ~ R1C: SOLENT NHS TRUST
+          website: '' → 'HTTPS://WWW.SOLENT.NHS.UK/'
+          active: True → False
+          Exposure: 4 reg (0 in-flight), 4 cases across 6 organisations
+      ~ RH5: SOMERSET NHS FOUNDATION TRUST
+          telephone: '' → '01278 432000'
+          website: '' → 'HTTP://WWW.SOMPAR.NHS.UK/'
+      ~ RYE: SOUTH CENTRAL AMBULANCE SERVICE NHS FOUNDATION TRUST
+          telephone: '' → '01869 365000'
+          website: '' → 'HTTPS://WWW.SCAS.NHS.UK/'
+      ~ RYD: SOUTH EAST COAST AMBULANCE SERVICE NHS FOUNDATION TRUST
+          telephone: '' → '0300 123 0999'
+          website: '' → 'HTTP://WWW.SECAMB.NHS.UK/'
+      ~ RWN: SOUTH ESSEX PARTNERSHIP UNIVERSITY NHS FOUNDATION TRUST
+          telephone: '' → '01375 364650'
+          active: True → False
+          Exposure: 0 reg (0 in-flight), 0 cases across 0 organisations
+      ~ RV5: SOUTH LONDON AND MAUDSLEY NHS FOUNDATION TRUST
+          telephone: '' → '020 3228 6000'
+          website: '' → 'HTTPS://WWW.SLAM.NHS.UK/'
+      ~ RVY: SOUTHPORT AND ORMSKIRK HOSPITAL NHS TRUST
+          telephone: '' → '01704 547471'
+          website: '' → 'HTTPS://WWW.SOUTHPORTANDORMSKIRK.NHS.UK/'
+      ~ RTR: SOUTH TEES HOSPITALS NHS FOUNDATION TRUST
+          telephone: '' → '01642 850850'
+          website: '' → 'HTTPS://WWW.SOUTHTEES.NHS.UK/'
+      ~ R0B: SOUTH TYNESIDE AND SUNDERLAND NHS FOUNDATION TRUST
+          website: '' → 'HTTPS://WWW.STSFT.NHS.UK/'
+      ~ RE9: SOUTH TYNESIDE NHS FOUNDATION TRUST
+          telephone: '' → '0191 454 8888'
+          active: True → False
+          Exposure: 0 reg (0 in-flight), 0 cases across 0 organisations
+      ~ RJC: SOUTH WARWICKSHIRE UNIVERSITY NHS FOUNDATION TRUST
+          telephone: '' → '01926 495321'
+          website: '' → 'HTTPS://WWW.SWFT.NHS.UK/'
+      ~ RYF: SOUTH WESTERN AMBULANCE SERVICE NHS FOUNDATION TRUST
+          telephone: '' → '0300 369 0130'
+          website: '' → 'HTTPS://WWW.SWAST.NHS.UK/WELCOME'
+      ~ RQY: SOUTH WEST LONDON AND ST GEORGE'S MENTAL HEALTH NHS TRUST
+          telephone: '' → '020 3513 5000'
+          website: '' → 'HTTPS://WWW.SWLSTG.NHS.UK/'
+      ~ RXG: SOUTH WEST YORKSHIRE PARTNERSHIP TEACHING NHS FOUNDATION TRUST
+          name: 'SOUTH WEST YORKSHIRE PARTNERSHIP NHS FOUNDATION TRUST' → 'SOUTH WEST YORKSHIRE PARTNERSHIP TEACHING NHS FOUNDATION TRUST'
+          telephone: '' → '01924 316000'
+          website: '' → 'HTTPS://WWW.SOUTHWESTYORKSHIRE.NHS.UK/'
+      ~ R1E: STAFFORDSHIRE AND STOKE ON TRENT PARTNERSHIP NHS TRUST
+          active: True → False
+          Exposure: 0 reg (0 in-flight), 0 cases across 0 organisations
+      ~ RJ7: ST GEORGE'S UNIVERSITY HOSPITALS NHS FOUNDATION TRUST
+          telephone: '' → '020 8672 1255'
+          website: '' → 'HTTPS://WWW.STGEORGES.NHS.UK/'
+      ~ RWJ: STOCKPORT NHS FOUNDATION TRUST
+          telephone: '' → '0161 483 1010'
+          website: '' → 'HTTPS://WWW.STOCKPORT.NHS.UK/'
+      ~ RXX: SURREY AND BORDERS PARTNERSHIP NHS FOUNDATION TRUST
+          telephone: '' → '0300 5555 222'
+          website: '' → 'HTTPS://WWW.SABP.NHS.UK/'
+      ~ RTP: SURREY AND SUSSEX HEALTHCARE NHS TRUST
+          telephone: '' → '01737 768511'
+          website: '' → 'HTTPS://WWW.SURREYANDSUSSEX.NHS.UK/'
+      ~ RDR: SUSSEX COMMUNITY NHS FOUNDATION TRUST
+          telephone: '' → '01273 696011'
+          website: '' → 'HTTPS://WWW.SUSSEXCOMMUNITY.NHS.UK/'
+      ~ RX2: SUSSEX PARTNERSHIP NHS FOUNDATION TRUST
+          telephone: '' → '01903 843000'
+          website: '' → 'HTTPS://WWW.SUSSEXPARTNERSHIP.NHS.UK/'
+      ~ RMP: TAMESIDE AND GLOSSOP INTEGRATED CARE NHS FOUNDATION TRUST
+          telephone: '' → '0161 922 6000'
+          website: '' → 'HTTPS://WWW.TAMESIDEHOSPITAL.NHS.UK/'
+      ~ RBA: TAUNTON AND SOMERSET NHS FOUNDATION TRUST
+          telephone: '' → '01823 333444'
+          website: '' → 'HTTPS://WWW.TSFT.NHS.UK/'
+          active: True → False
+          Exposure: 0 reg (0 in-flight), 0 cases across 0 organisations
+      ~ RNK: TAVISTOCK AND PORTMAN NHS FOUNDATION TRUST
+          telephone: '' → '020 7435 7111'
+          website: '' → 'HTTPS://TAVISTOCKANDPORTMAN.NHS.UK/'
+          active: True → False
+          Exposure: 0 reg (0 in-flight), 0 cases across 0 organisations
+      ~ RX3: TEES, ESK AND WEAR VALLEYS NHS FOUNDATION TRUST
+          telephone: '' → '01325 552077'
+          website: '' → 'HTTPS://WWW.TEWV.NHS.UK/'
+      ~ RBV: THE CHRISTIE NHS FOUNDATION TRUST
+          telephone: '' → '0161 446 3000'
+          website: '' → 'HTTPS://WWW.CHRISTIE.NHS.UK/'
+      ~ REN: THE CLATTERBRIDGE CANCER CENTRE NHS FOUNDATION TRUST
+          telephone: '' → '0151 556 5000'
+          website: '' → 'HTTPS://WWW.CLATTERBRIDGECC.NHS.UK/'
+      ~ RNA: THE DUDLEY GROUP NHS FOUNDATION TRUST
+          telephone: '' → '01384 456111'
+          website: '' → 'HTTPS://WWW.DGFT.NHS.UK/'
+      ~ RAS: THE HILLINGDON HOSPITALS NHS FOUNDATION TRUST
+          telephone: '' → '01895 238282'
+          website: '' → 'HTTPS://WWW.THH.NHS.UK/'
+      ~ RTD: THE NEWCASTLE UPON TYNE HOSPITALS NHS FOUNDATION TRUST
+          telephone: '' → '0191 233 6161'
+          website: '' → 'HTTP://WWW.NEWCASTLE-HOSPITALS.ORG.UK/'
+      ~ RQW: THE PRINCESS ALEXANDRA HOSPITAL NHS TRUST
+          telephone: '' → '01279 444455'
+          website: '' → 'HTTPS://WWW.PAH.NHS.UK/'
+      ~ RCX: THE QUEEN ELIZABETH HOSPITAL, KING'S LYNN, NHS FOUNDATION TRUST
+          telephone: '' → '01553 613613'
+          website: '' → 'HTTP://WWW.QEHKL.NHS.UK/'
+      ~ RL1: THE ROBERT JONES AND AGNES HUNT ORTHOPAEDIC HOSPITAL NHS FOUNDATION TRUST
+          telephone: '' → '01691 404000'
+          website: '' → 'HTTPS://WWW.RJAH.NHS.UK/'
+      ~ RFR: THE ROTHERHAM NHS FOUNDATION TRUST
+          telephone: '' → '01709 820000'
+          website: '' → 'HTTP://WWW.THEROTHERHAMFT.NHS.UK/'
+      ~ RDZ: THE ROYAL BOURNEMOUTH AND CHRISTCHURCH HOSPITALS NHS FOUNDATION TRUST
+          telephone: '' → '01202 303626'
+          website: '' → 'HTTP://WWW.RBCH.NHS.UK/'
+          active: True → False
+          Exposure: 0 reg (0 in-flight), 0 cases across 0 organisations
+      ~ RPY: THE ROYAL MARSDEN NHS FOUNDATION TRUST
+          telephone: '' → '020 7352 8171'
+      ~ RRJ: THE ROYAL ORTHOPAEDIC HOSPITAL NHS FOUNDATION TRUST
+          telephone: '' → '0121 685 4000'
+          website: '' → 'HTTPS://WWW.ROH.NHS.UK/'
+      ~ RL4: THE ROYAL WOLVERHAMPTON NHS TRUST
+          telephone: '' → '01902 307999'
+          website: '' → 'HTTPS://WWW.ROYALWOLVERHAMPTON.NHS.UK/'
+      ~ RXW: THE SHREWSBURY AND TELFORD HOSPITAL NHS TRUST
+          telephone: '' → '01743 261000'
+          website: '' → 'HTTPS://WWW.SATH.NHS.UK/'
+      ~ RET: THE WALTON CENTRE NHS FOUNDATION TRUST
+          telephone: '' → '0151 525 3611'
+          website: '' → 'HTTPS://WWW.THEWALTONCENTRE.NHS.UK/'
+      ~ RA9: TORBAY AND SOUTH DEVON NHS FOUNDATION TRUST
+          telephone: '' → '01803 614567'
+          website: '' → 'HTTP://WWW.TORBAYANDSOUTHDEVON.NHS.UK'
+      ~ R1G: TORBAY AND SOUTHERN DEVON HEALTH AND CARE NHS TRUST
+          active: True → False
+          Exposure: 0 reg (0 in-flight), 0 cases across 0 organisations
+      ~ RWD: UNITED LINCOLNSHIRE TEACHING HOSPITALS NHS TRUST
+          name: 'UNITED LINCOLNSHIRE HOSPITALS NHS TRUST' → 'UNITED LINCOLNSHIRE TEACHING HOSPITALS NHS TRUST'
+          telephone: '' → '01522 512512'
+          website: '' → 'HTTPS://WWW.ULH.NHS.UK/'
+      ~ RRV: UNIVERSITY COLLEGE LONDON HOSPITALS NHS FOUNDATION TRUST
+          telephone: '' → '020 3456 7890'
+          website: '' → 'HTTP://WWW.UCLH.NHS.UK/PAGES/HOME.ASPX'
+      ~ RM2: UNIVERSITY HOSPITAL OF SOUTH MANCHESTER NHS FOUNDATION TRUST
+          telephone: '' → '0161 998 7070'
+          active: True → False
+          Exposure: 0 reg (0 in-flight), 0 cases across 0 organisations
+      ~ RRK: UNIVERSITY HOSPITALS BIRMINGHAM NHS FOUNDATION TRUST
+          telephone: '' → '0121 371 2000'
+          website: '' → 'HTTPS://WWW.UHB.NHS.UK/HOME.HTM'
+      ~ RKB: UNIVERSITY HOSPITALS COVENTRY AND WARWICKSHIRE NHS TRUST
+          telephone: '' → '024 7696 4000'
+          website: '' → 'HTTPS://WWW.UHCW.NHS.UK/'
+      ~ RTG: UNIVERSITY HOSPITALS OF DERBY AND BURTON NHS FOUNDATION TRUST
+          telephone: '' → '01332 340131'
+          website: '' → 'HTTPS://WWW.UHDB.NHS.UK/'
+      ~ RWE: UNIVERSITY HOSPITALS OF LEICESTER NHS TRUST
+          telephone: '' → '0300 303 1573'
+          website: '' → 'HTTPS://WWW.LEICESTERSHOSPITALS.NHS.UK/'
+      ~ RTX: UNIVERSITY HOSPITALS OF MORECAMBE BAY NHS FOUNDATION TRUST
+          telephone: '' → '01539 732288'
+          website: '' → 'HTTPS://WWW.UHMB.NHS.UK/'
+      ~ RJE: UNIVERSITY HOSPITALS OF NORTH MIDLANDS NHS TRUST
+          telephone: '' → '01782 715444'
+          website: '' → 'HTTP://WWW.UHNM.NHS.UK/PAGES/HOME.ASPX'
+      ~ RHM: UNIVERSITY HOSPITAL SOUTHAMPTON NHS FOUNDATION TRUST
+          telephone: '' → '023 8077 7222'
+          website: '' → 'HTTPS://WWW.UHS.NHS.UK/HOME.ASPX'
+      ~ RK9: UNIVERSITY HOSPITALS PLYMOUTH NHS TRUST
+          telephone: '' → '01752 202082'
+          website: '' → 'HTTPS://WWW.PLYMOUTHHOSPITALS.NHS.UK/'
+      ~ RYR: UNIVERSITY HOSPITALS SUSSEX NHS FOUNDATION TRUST
+          telephone: '' → '01903 205111'
+      ~ RBK: WALSALL HEALTHCARE NHS TRUST
+          telephone: '' → '01922 721172'
+          website: '' → 'HTTPS://WWW.WALSALLHEALTHCARE.NHS.UK/'
+      ~ RT4: WELSH AMBULANCE SERVICES NHS TRUST
+          telephone: '' → '01745 532900'
+          website: '' → 'HTTPS://WWW.AMBULANCE.WALES.NHS.UK/'
+      ~ RWG: WEST HERTFORDSHIRE TEACHING HOSPITALS NHS TRUST
+          telephone: '' → '01923 244366'
+          website: '' → 'HTTPS://WWW.WESTHERTSHOSPITALS.NHS.UK/DEFAULT.ASP'
+      ~ RKL: WEST LONDON NHS TRUST
+          telephone: '' → '020 8354 8354'
+          website: '' → 'HTTPS://WWW.WESTLONDON.NHS.UK/'
+      ~ RFW: WEST MIDDLESEX UNIVERSITY HOSPITAL NHS TRUST
+          telephone: '' → '020 8560 2121'
+          active: True → False
+          Exposure: 0 reg (0 in-flight), 0 cases across 0 organisations
+      ~ RYA: WEST MIDLANDS AMBULANCE SERVICE UNIVERSITY NHS FOUNDATION TRUST
+          telephone: '' → '01384 215555'
+          website: '' → 'HTTPS://WMAS.NHS.UK/'
+      ~ RA3: WESTON AREA HEALTH NHS TRUST
+          telephone: '' → '01934 636363'
+          website: '' → 'HTTP://WWW.WAHT.NHS.UK/'
+          active: True → False
+          Exposure: 0 reg (0 in-flight), 0 cases across 0 organisations
+      ~ RGR: WEST SUFFOLK NHS FOUNDATION TRUST
+          telephone: '' → '01284 713000'
+          website: '' → 'HTTPS://WWW.WSH.NHS.UK/HOME.ASPX'
+      ~ RKE: WHITTINGTON HEALTH NHS TRUST
+          telephone: '' → '020 7272 3070'
+          website: '' → 'HTTPS://WWW.WHITTINGTON.NHS.UK/'
+      ~ RY7: WIRRAL COMMUNITY HEALTH AND CARE NHS FOUNDATION TRUST
+          telephone: '' → '0151 514 2888'
+          website: '' → 'HTTPS://WWW.WIRRALCT.NHS.UK/'
+      ~ RBL: WIRRAL UNIVERSITY TEACHING HOSPITAL NHS FOUNDATION TRUST
+          telephone: '' → '0151 678 5111'
+          website: '' → 'HTTPS://WWW.WUTH.NHS.UK/'
+      ~ RWP: WORCESTERSHIRE ACUTE HOSPITALS NHS TRUST
+          telephone: '' → '01905 763333'
+          website: '' → 'HTTPS://WWW.WORCSACUTE.NHS.UK/'
+      ~ RRF: WRIGHTINGTON, WIGAN AND LEIGH TEACHING HOSPITALS NHS FOUNDATION TRUST
+          name: 'WRIGHTINGTON, WIGAN AND LEIGH NHS FOUNDATION TRUST' → 'WRIGHTINGTON, WIGAN AND LEIGH TEACHING HOSPITALS NHS FOUNDATION TRUST'
+          telephone: '' → '01942 244000'
+          website: '' → 'HTTPS://WWW.WWL.NHS.UK/'
+      ~ RLQ: WYE VALLEY NHS TRUST
+          telephone: '' → '01432 355444'
+          website: '' → 'HTTPS://WWW.WYEVALLEY.NHS.UK/'
+      ~ RA4: YEOVIL DISTRICT HOSPITAL NHS FOUNDATION TRUST
+          telephone: '' → '01935 475122'
+          website: '' → 'HTTPS://YEOVILHOSPITAL.CO.UK/'
+          active: True → False
+          Exposure: 0 reg (0 in-flight), 0 cases across 0 organisations
+      ~ RCB: YORK AND SCARBOROUGH TEACHING HOSPITALS NHS FOUNDATION TRUST
+          telephone: '' → '01904 631313'
+      ~ RX8: YORKSHIRE AMBULANCE SERVICE NHS TRUST
+          telephone: '' → '0333 130 0550'
+          website: '' → 'HTTPS://WWW.YAS.NHS.UK/'
+
+  Local Health Boards:
+    0 unchanged, 0 new, 7 changed, 0 local-only
+    Changed (would be updated):
+      ~ 7A3: SWANSEA BAY UNIVERSITY LOCAL HEALTH BOARD
+          name: 'Swansea Bay University Health Board' → 'SWANSEA BAY UNIVERSITY LOCAL HEALTH BOARD'
+      ~ 7A7: POWYS TEACHING LOCAL HEALTH BOARD
+          name: 'Powys Teaching Health Board' → 'POWYS TEACHING LOCAL HEALTH BOARD'
+      ~ 7A2: HYWEL DDA UNIVERSITY LHB
+          name: 'Hywel Dda University Health Board' → 'HYWEL DDA UNIVERSITY LHB'
+      ~ 7A5: CWM TAF MORGANNWG UNIVERSITY LOCAL HEALTH BOARD
+          name: 'Cwm Taf Morgannwg University Health Board' → 'CWM TAF MORGANNWG UNIVERSITY LOCAL HEALTH BOARD'
+      ~ 7A4: CARDIFF & VALE UNIVERSITY LHB
+          name: 'Cardiff and Vale University Health Board' → 'CARDIFF & VALE UNIVERSITY LHB'
+      ~ 7A1: BETSI CADWALADR UNIVERSITY LHB
+          name: 'Betsi Cadwaladr University Health Board' → 'BETSI CADWALADR UNIVERSITY LHB'
+      ~ 7A6: ANEURIN BEVAN UNIVERSITY LHB
+          name: 'Aneurin Bevan University Health Board' → 'ANEURIN BEVAN UNIVERSITY LHB'
+
+  Integrated Care Boards:
+    0 unchanged, 9 new, 42 changed, 0 local-only
+    New (would be created):
+      + QMK: DURHAM, DARLINGTON, TEESIDE, HAMBLETON, RICHMONDSHIRE AND WHITBY STP
+      + S1Y5D: NHS CENTRAL EAST INTEGRATED CARE BOARD
+      + D7T5G: NHS ESSEX INTEGRATED CARE BOARD
+      + T6Y0W: NHS NORFOLK AND SUFFOLK INTEGRATED CARE BOARD
+      + S9B9J: NHS SURREY AND SUSSEX INTEGRATED CARE BOARD
+      + S0E4D: NHS THAMES VALLEY INTEGRATED CARE BOARD
+      + Z9B2Z: NHS WEST AND NORTH LONDON INTEGRATED CARE BOARD
+      + QVP: NORTHUMBERLAND, TYNE AND WEAR AND NORTH DURHAM STP
+      + QT8: WEST, NORTH AND EAST CUMBRIA HEALTH & CARE PARTNERSHIP (STP)
+    Changed (would be updated):
+      ~ QOX: NHS BATH AND NORTH EAST SOMERSET, SWINDON AND WILTSHIRE INTEGRATED CARE BOARD
+          name: 'NHS Bath and North East Somerset, Swindon and Wiltshire Integrated Care Board' → 'NHS BATH AND NORTH EAST SOMERSET, SWINDON AND WILTSHIRE INTEGRATED CARE BOARD'
+      ~ QHG: NHS BEDFORDSHIRE, LUTON AND MILTON KEYNES INTEGRATED CARE BOARD
+          name: 'NHS Bedfordshire, Luton and Milton Keynes Integrated Care Board' → 'NHS BEDFORDSHIRE, LUTON AND MILTON KEYNES INTEGRATED CARE BOARD'
+      ~ QHL: NHS BIRMINGHAM AND SOLIHULL INTEGRATED CARE BOARD
+          name: 'NHS Birmingham and Solihull Integrated Care Board' → 'NHS BIRMINGHAM AND SOLIHULL INTEGRATED CARE BOARD'
+      ~ QUA: NHS BLACK COUNTRY INTEGRATED CARE BOARD
+          name: 'NHS Black Country Integrated Care Board' → 'NHS BLACK COUNTRY INTEGRATED CARE BOARD'
+      ~ QUY: NHS BRISTOL, NORTH SOMERSET AND SOUTH GLOUCESTERSHIRE INTEGRATED CARE BOARD
+          name: 'NHS Bristol, North Somerset and South Gloucestershire Integrated Care Board' → 'NHS BRISTOL, NORTH SOMERSET AND SOUTH GLOUCESTERSHIRE INTEGRATED CARE BOARD'
+      ~ QU9: NHS BUCKINGHAMSHIRE, OXFORDSHIRE AND BERKSHIRE WEST INTEGRATED CARE BOARD
+          name: 'NHS Buckinghamshire, Oxfordshire and Berkshire West Integrated Care Board' → 'NHS BUCKINGHAMSHIRE, OXFORDSHIRE AND BERKSHIRE WEST INTEGRATED CARE BOARD'
+      ~ QUE: NHS CAMBRIDGESHIRE AND PETERBOROUGH INTEGRATED CARE BOARD
+          name: 'NHS Cambridgeshire and Peterborough Integrated Care Board' → 'NHS CAMBRIDGESHIRE AND PETERBOROUGH INTEGRATED CARE BOARD'
+      ~ QYG: NHS CHESHIRE AND MERSEYSIDE INTEGRATED CARE BOARD
+          name: 'NHS Cheshire and Merseyside Integrated Care Board' → 'NHS CHESHIRE AND MERSEYSIDE INTEGRATED CARE BOARD'
+      ~ QT6: NHS CORNWALL AND THE ISLES OF SCILLY INTEGRATED CARE BOARD
+          name: 'NHS Cornwall and the Isles of Scilly Integrated Care Board' → 'NHS CORNWALL AND THE ISLES OF SCILLY INTEGRATED CARE BOARD'
+      ~ QWU: NHS COVENTRY AND WARWICKSHIRE INTEGRATED CARE BOARD
+          name: 'NHS Coventry and Warwickshire Integrated Care Board' → 'NHS COVENTRY AND WARWICKSHIRE INTEGRATED CARE BOARD'
+      ~ QJ2: NHS DERBY AND DERBYSHIRE INTEGRATED CARE BOARD
+          name: 'NHS Derby and Derbyshire Integrated Care Board' → 'NHS DERBY AND DERBYSHIRE INTEGRATED CARE BOARD'
+      ~ QJK: NHS DEVON INTEGRATED CARE BOARD
+          name: 'NHS Devon Integrated Care Board' → 'NHS DEVON INTEGRATED CARE BOARD'
+      ~ QVV: NHS DORSET INTEGRATED CARE BOARD
+          name: 'NHS Dorset Integrated Care Board' → 'NHS DORSET INTEGRATED CARE BOARD'
+      ~ QNQ: NHS FRIMLEY INTEGRATED CARE BOARD
+          name: 'NHS Frimley Integrated Care Board' → 'NHS FRIMLEY INTEGRATED CARE BOARD'
+      ~ QR1: NHS GLOUCESTERSHIRE INTEGRATED CARE BOARD
+          name: 'NHS Gloucestershire Integrated Care Board' → 'NHS GLOUCESTERSHIRE INTEGRATED CARE BOARD'
+      ~ QOP: NHS GREATER MANCHESTER INTEGRATED CARE BOARD
+          name: 'NHS Greater Manchester Integrated Care Board' → 'NHS GREATER MANCHESTER INTEGRATED CARE BOARD'
+      ~ QRL: NHS HAMPSHIRE AND ISLE OF WIGHT INTEGRATED CARE BOARD
+          name: 'NHS Hampshire and Isle of Wight Integrated Care Board' → 'NHS HAMPSHIRE AND ISLE OF WIGHT INTEGRATED CARE BOARD'
+      ~ QGH: NHS HEREFORDSHIRE AND WORCESTERSHIRE INTEGRATED CARE BOARD
+          name: 'NHS Herefordshire and Worcestershire Integrated Care Board' → 'NHS HEREFORDSHIRE AND WORCESTERSHIRE INTEGRATED CARE BOARD'
+      ~ QM7: NHS HERTFORDSHIRE AND WEST ESSEX INTEGRATED CARE BOARD
+          name: 'NHS Hertfordshire and West Essex Integrated Care Board' → 'NHS HERTFORDSHIRE AND WEST ESSEX INTEGRATED CARE BOARD'
+      ~ QOQ: NHS HUMBER AND NORTH YORKSHIRE INTEGRATED CARE BOARD
+          name: 'NHS Humber and North Yorkshire Integrated Care Board' → 'NHS HUMBER AND NORTH YORKSHIRE INTEGRATED CARE BOARD'
+      ~ QKS: NHS KENT AND MEDWAY INTEGRATED CARE BOARD
+          name: 'NHS Kent and Medway Integrated Care Board' → 'NHS KENT AND MEDWAY INTEGRATED CARE BOARD'
+      ~ QE1: NHS LANCASHIRE AND SOUTH CUMBRIA INTEGRATED CARE BOARD
+          name: 'NHS Lancashire and South Cumbria Integrated Care Board' → 'NHS LANCASHIRE AND SOUTH CUMBRIA INTEGRATED CARE BOARD'
+      ~ QK1: NHS LEICESTER, LEICESTERSHIRE AND RUTLAND INTEGRATED CARE BOARD
+          name: 'NHS Leicester, Leicestershire and Rutland Integrated Care Board' → 'NHS LEICESTER, LEICESTERSHIRE AND RUTLAND INTEGRATED CARE BOARD'
+      ~ QJM: NHS LINCOLNSHIRE INTEGRATED CARE BOARD
+          name: 'NHS Lincolnshire Integrated Care Board' → 'NHS LINCOLNSHIRE INTEGRATED CARE BOARD'
+      ~ QH8: NHS MID AND SOUTH ESSEX INTEGRATED CARE BOARD
+          name: 'NHS Mid and South Essex Integrated Care Board' → 'NHS MID AND SOUTH ESSEX INTEGRATED CARE BOARD'
+      ~ QMM: NHS NORFOLK AND WAVENEY INTEGRATED CARE BOARD
+          name: 'NHS Norfolk and Waveney Integrated Care Board' → 'NHS NORFOLK AND WAVENEY INTEGRATED CARE BOARD'
+      ~ QPM: NHS NORTHAMPTONSHIRE INTEGRATED CARE BOARD
+          name: 'NHS Northamptonshire Integrated Care Board' → 'NHS NORTHAMPTONSHIRE INTEGRATED CARE BOARD'
+      ~ QMJ: NHS NORTH CENTRAL LONDON INTEGRATED CARE BOARD
+          name: 'NHS North Central London Integrated Care Board' → 'NHS NORTH CENTRAL LONDON INTEGRATED CARE BOARD'
+      ~ QHM: NHS NORTH EAST AND NORTH CUMBRIA INTEGRATED CARE BOARD
+          name: 'NHS North East and North Cumbria Integrated Care Board' → 'NHS NORTH EAST AND NORTH CUMBRIA INTEGRATED CARE BOARD'
+      ~ QMF: NHS NORTH EAST LONDON INTEGRATED CARE BOARD
+          name: 'NHS North East London Integrated Care Board' → 'NHS NORTH EAST LONDON INTEGRATED CARE BOARD'
+      ~ QRV: NHS NORTH WEST LONDON INTEGRATED CARE BOARD
+          name: 'NHS North West London Integrated Care Board' → 'NHS NORTH WEST LONDON INTEGRATED CARE BOARD'
+      ~ QT1: NHS NOTTINGHAM AND NOTTINGHAMSHIRE INTEGRATED CARE BOARD
+          name: 'NHS Nottingham and Nottinghamshire Integrated Care Board' → 'NHS NOTTINGHAM AND NOTTINGHAMSHIRE INTEGRATED CARE BOARD'
+      ~ QOC: NHS SHROPSHIRE, TELFORD AND WREKIN INTEGRATED CARE BOARD
+          name: 'NHS Shropshire, Telford and Wrekin Integrated Care Board' → 'NHS SHROPSHIRE, TELFORD AND WREKIN INTEGRATED CARE BOARD'
+      ~ QSL: NHS SOMERSET INTEGRATED CARE BOARD
+          name: 'NHS Somerset Integrated Care Board' → 'NHS SOMERSET INTEGRATED CARE BOARD'
+      ~ QKK: NHS SOUTH EAST LONDON INTEGRATED CARE BOARD
+          name: 'NHS South East London Integrated Care Board' → 'NHS SOUTH EAST LONDON INTEGRATED CARE BOARD'
+      ~ QWE: NHS SOUTH WEST LONDON INTEGRATED CARE BOARD
+          name: 'NHS South West London Integrated Care Board' → 'NHS SOUTH WEST LONDON INTEGRATED CARE BOARD'
+      ~ QF7: NHS SOUTH YORKSHIRE INTEGRATED CARE BOARD
+          name: 'NHS South Yorkshire Integrated Care Board' → 'NHS SOUTH YORKSHIRE INTEGRATED CARE BOARD'
+      ~ QNC: NHS STAFFORDSHIRE AND STOKE-ON-TRENT INTEGRATED CARE BOARD
+          name: 'NHS Staffordshire and Stoke-on-Trent Integrated Care Board' → 'NHS STAFFORDSHIRE AND STOKE-ON-TRENT INTEGRATED CARE BOARD'
+      ~ QJG: NHS SUFFOLK AND NORTH EAST ESSEX INTEGRATED CARE BOARD
+          name: 'NHS Suffolk and North East Essex Integrated Care Board' → 'NHS SUFFOLK AND NORTH EAST ESSEX INTEGRATED CARE BOARD'
+      ~ QXU: NHS SURREY HEARTLANDS INTEGRATED CARE BOARD
+          name: 'NHS Surrey Heartlands Integrated Care Board' → 'NHS SURREY HEARTLANDS INTEGRATED CARE BOARD'
+      ~ QNX: NHS SUSSEX INTEGRATED CARE BOARD
+          name: 'NHS Sussex Integrated Care Board' → 'NHS SUSSEX INTEGRATED CARE BOARD'
+      ~ QWO: NHS WEST YORKSHIRE INTEGRATED CARE BOARD
+          name: 'NHS West Yorkshire Integrated Care Board' → 'NHS WEST YORKSHIRE INTEGRATED CARE BOARD'
+
+  Nhs England Regions:
+    7 unchanged, 0 new, 0 changed, 0 local-only
+
+  Countries:
+    5 unchanged, 1 new, 0 changed, 0 local-only
+    New (would be created):
+      + M83000003: Isle of Man
+
+  Openuk Networks:
+    15 unchanged, 0 new, 0 changed, 0 local-only
+
+  Organisations:
+    288 unchanged, 27 new, 53 changed, 1 local-only
+    New (would be created):
+      + RWP01: ALEXANDRA HOSPITAL
+      + RW1YH: ASHURST HOSPITAL
+      + C1G7Z: CDC POOLE @ DORSET HEALTH VILLAGE
+      + RALC7: CHASE FARM HOSPITAL
+      + H8P9C: COMMUNITY PAEDIATRICS - WEST
+      + RJE09: COUNTY HOSPITAL
+      + RXF10: DEWSBURY & DISTRICT HOSPITAL
+      + RM315: FAIRFIELD GENERAL HOSPITAL
+      + RTD10: GREAT NORTH CHILDREN'S HOSPITAL
+      + D1Y9J: HAM CLINIC
+      + RWP31: KIDDERMINSTER HOSPITAL
+      + YK301: NOBLES HOSPITAL
+      + RAL27: NORTH MIDDLESEX HOSPITAL
+      + RX1RA: NOTTINGHAM UNIVERSITY HOSPITALS NHS TRUST - QUEEN'S MEDICAL CENTRE CAMPUS
+      + RBN52: ORMSKIRK AND DISTRICT GENERAL HOSPITAL
+      + RXF3C: PAEDIATRICS PONTEFRACT
+      + RXF03: PONTEFRACT GENERAL INFIRMARY
+      + RM316: ROCHDALE INFIRMARY
+      + RXH06: ROYAL ALEXANDRA CHILDREN'S HOSPITAL
+      + 8HV48: ROYAL COLLEGE OF PAEDIATRICS & CHILD HEALTH
+      + R0B0Q: SOUTH TYNESIDE DISTRICT HOSPITAL
+      + RAE05: ST LUKES HOSPITAL
+      + RXH58: ST RICHARDS HOSPITAL
+      + RW155: WESTERN COMMUNITY HOSPITAL
+      + RA7C2: WESTON GENERAL HOSPITAL
+      + RXH42: WORTHING HOSPITAL
+      + RH5O4: YEOVIL DISTRICT HOSPITAL
+    Changed (would be updated):
+      ~ RBS25: ALDER HEY CHILDREN'S NHS FOUNDATION TRUST
+          name: "ALDER HEY CHILDREN'S HOSPITAL" → "ALDER HEY CHILDREN'S NHS FOUNDATION TRUST"
+          Exposure: 324 reg (118 in-flight), 324 cases
+      ~ RTFDJ: ALNWICK COMMUNITY HOSPITAL
+          name: 'ALNWICK INFIRMARY' → 'ALNWICK COMMUNITY HOSPITAL'
+          Exposure: 1 reg (1 in-flight), 1 cases
+      ~ RBL14: ARROWE PARK HOSPITAL
+          address2: '' → 'UPTON'
+          Exposure: 74 reg (19 in-flight), 76 cases
+      ~ RFFAA: BARNSLEY HOSPITAL
+          name: 'BARNSLEY HOSPITAL AND COMMUNITY PAEDIATRICS' → 'BARNSLEY HOSPITAL'
+          Exposure: 68 reg (34 in-flight), 68 cases
+      ~ RVN38: BARTON HILL SETTLEMENT
+          address1: 'BARTON HILL SETTLEMENT' → '43 DUCIE ROAD'
+          address2: '43 DUCIE ROAD' → 'LAWRENCE HILL'
+          Exposure: 1 reg (0 in-flight), 1 cases
+      ~ RYK14: BLAKENALL VILLAGE CENTRE
+          active: True → False
+          Exposure: 0 reg (0 in-flight), 0 cases
+      ~ RAE01: BRADFORD ROYAL INFIRMARY
+          postcode: 'BD9 6RH' → 'BD9 6RJ'
+          Exposure: 103 reg (28 in-flight), 103 cases
+      ~ RDR08: CHAILEY HERITAGE CLINICAL SERVICES
+          latitude: 50.9718517455867 → 50.972281
+          longitude: -0.032393500807627075 → -0.032044
+          published_at: datetime.date(2013, 4, 1) → datetime.date(1992, 4, 1)
+          Exposure: 0 reg (0 in-flight), 0 cases
+      ~ RYW91: CHILD DEVELOPMENT CENTRE
+          address2: '45 BORDESLEY GREEN EAST,' → 'BORDESLEY GREEN EAST'
+          address3: '' → 'BORDESLEY GREEN'
+          postcode: 'SW10 9NH' → 'B9 5SS'
+          Exposure: 5 reg (2 in-flight), 5 cases
+      ~ RXPCD: CHILD DEVELOPMENT CENTRE
+          active: True → False
+          Exposure: 0 reg (0 in-flight), 0 cases
+      ~ RATE2: CHILD DEVELOPMENT CENTRE (E-PACT)
+          name: 'CHILD DEVELOPMENT CENTRE' → 'CHILD DEVELOPMENT CENTRE (E-PACT)'
+          address1: 'BRENTWOOD COMMUNITY HOSPITAL' → 'BRENTWOOD COMMUNITY CENTRE'
+          active: True → False
+          Exposure: 6 reg (0 in-flight), 6 cases
+      ~ RDRC7: CHILD DEVELOPMENT CENTRE PRESCRIPTIONS
+          name: 'CRAWLEY AND HORSHAM CHILD DEVELOPMENT CENTRE' → 'CHILD DEVELOPMENT CENTRE PRESCRIPTIONS'
+          website: 'CRAWLEY HOSPITAL' → ''
+          address1: 'WEST GREEN DRIVE' → 'CRAWLEY HOSPITAL'
+          address2: '' → 'WEST GREEN DRIVE'
+          latitude: 51.117103971967 → 51.1166
+          longitude: -0.1963630536629743 → -0.197375
+          Exposure: 0 reg (0 in-flight), 0 cases
+      ~ RT5CF: CITY COMMUNITY PAEDS (EPMA)
+          address1: 'RIVERSIDE HOUSE' → 'LPT PHARMACY'
+          address2: 'BRIDGE PARK PLAZA' → 'GLENFIELD HOSP'
+          address3: 'BRIDGE PARK ROAD' → 'GROBY RD'
+          postcode: 'LE4 8PQ' → 'LE3 9EJ'
+          Exposure: 0 reg (0 in-flight), 2 cases
+      ~ RNNHT: COMM PAEDIATRICS FURNESS
+          name: 'COMMUNITY PAEDIATRICS' → 'COMM PAEDIATRICS FURNESS'
+          address1: 'FURNESS GENERAL HOSPITAL' → 'ALFRED BARROW HEALTH CENT'
+          address2: 'DALTON LANE' → 'DUKE STREET'
+          postcode: 'LA14 4LF' → 'LA14 2LB'
+          Exposure: 0 reg (0 in-flight), 0 cases
+      ~ RY327: COMMUNITY CHILDRENS SERVICES
+          active: True → False
+          Exposure: 0 reg (0 in-flight), 0 cases
+      ~ RKEAA: COMMUNITY PAED.HARINGEY
+          name: 'COMM. PAED. MEDICAL TEAM' → 'COMMUNITY PAED.HARINGEY'
+          address1: "ST. ANN'S ROAD" → 'TYNEMOUTH ROAD HC'
+          address2: '' → 'TYNEMOUTH ROAD'
+          postcode: 'N15 3TH' → 'N15 4RH'
+          Exposure: 0 reg (0 in-flight), 0 cases
+      ~ R1C22: COMMUNITY PAEDIATRIC EAST
+          name: 'COMMUNITY PAEDIATRICS - EAST' → 'COMMUNITY PAEDIATRIC EAST'
+          address1: 'ST. JAMES HOSPITAL' → 'BATTENBURG CHILD DEV CTR'
+          address2: 'LOCKSWAY ROAD' → 'BATTENBURG AVENUE'
+          city: 'SOUTHSEA' → 'PORTSMOUTH'
+          postcode: 'PO4 8LD' → 'PO2 0TA'
+          Exposure: 1 reg (0 in-flight), 1 cases
+      ~ RBTCP: COMMUNITY PAEDIATRICS
+          active: True → False
+          Exposure: 0 reg (0 in-flight), 0 cases
+      ~ RYV42: COMMUNITY PAEDIATRICS
+          name: 'COMMUNITY CHILD HEALTH' → 'COMMUNITY PAEDIATRICS'
+          address1: '1 OAK DRIVE' → 'THE PEACOCK CENTRE'
+          address2: '' → 'BROOKFIELDS HOSP, MILL RD'
+          city: 'HUNTINGDON' → 'CAMBRIDGE'
+          postcode: 'PE29 7HN' → 'CB1 3DF'
+          Exposure: 0 reg (0 in-flight), 0 cases
+      ~ R1CA6: COMMUNITY PAEDS N.FOREST
+          active: True → False
+          Exposure: 0 reg (0 in-flight), 0 cases
+      ~ RBD01: DORSET COUNTY HOSPITAL
+          telephone: '' → '01305 251150'
+          Exposure: 61 reg (11 in-flight), 134 cases
+      ~ RWDLP: GRANTHAM & DISTRICT HOSPITAL
+          name: 'GRANTHAM & DISTRICT HOSPITAL AND COMMUNITY PAEDIATRICS' → 'GRANTHAM & DISTRICT HOSPITAL'
+          Exposure: 1 reg (0 in-flight), 1 cases
+      ~ RY905: HAM CLINIC
+          active: True → False
+          Exposure: 0 reg (0 in-flight), 0 cases
+      ~ RLQ01: HEREFORD COUNTY HOSPITAL
+          telephone: '' → '01432 355444'
+          Exposure: 17 reg (0 in-flight), 17 cases
+      ~ RWH23: HERTFORD COUNTY HOSPITAL
+          name: 'HERTFORD COUNTY HOSPITAL AND COMMUNITY PAEDIATRICS' → 'HERTFORD COUNTY HOSPITAL'
+          Exposure: 1 reg (0 in-flight), 1 cases
+      ~ RGT1W: JERSEY GENERAL HOSPITAL
+          website: '' → 'https://www.gov.je/Health/Hospitals/HospitalDepartments/pages/index.aspx'
+          city: 'ST HELIER' → 'JERSEY'
+          county: 'JERSEY' → ''
+          latitude: 49.18841258908002 → 49.1859
+          longitude: -2.1122213730166157 → -2.1101
+          postcode: 'JE1 3Q' → 'JE1 3UH'
+          published_at: datetime.date(2015, 4, 1) → datetime.date(2015, 1, 4)
+          Exposure: 9 reg (1 in-flight), 11 cases
+      ~ RK5CP: KMH COMMUNITY PAEDIATRICIANS
+          published_at: datetime.date(2024, 1, 4) → None
+          Exposure: 0 reg (0 in-flight), 0 cases
+      ~ RWDDA: LINCOLN COUNTY HOSPITAL
+          name: 'LINCOLN COUNTY HOSPITAL AND COMMUNITY PAEDIATRICS' → 'LINCOLN COUNTY HOSPITAL'
+          Exposure: 110 reg (33 in-flight), 146 cases
+      ~ RWH01: LISTER HOSPITAL
+          name: 'LISTER HOSPITAL AND COMMUNITY PAEDIATRICS' → 'LISTER HOSPITAL'
+          Exposure: 57 reg (1 in-flight), 57 cases
+      ~ I3W1A: MIDLAND METROPOLITAN UNIVERSITY HOSPITAL
+          published_at: datetime.date(2023, 4, 1) → None
+          Exposure: 0 reg (0 in-flight), 0 cases
+      ~ RK5HP: NEWARK HOSPITAL
+          published_at: datetime.date(2024, 1, 4) → None
+          Exposure: 2 reg (0 in-flight), 2 cases
+      ~ RY8NA: NEWHOLME HEALTH CENTRE
+          name: 'NEWHOLME HOSPITAL' → 'NEWHOLME HEALTH CENTRE'
+          postcode: 'DE45 1AD' → 'DE45 1AB'
+          Exposure: 0 reg (0 in-flight), 0 cases
+      ~ RAPNM: NORTH MIDDLESEX HOSPITAL
+          active: True → False
+          Exposure: 40 reg (0 in-flight), 40 cases
+      ~ RVY02: ORMSKIRK & DISTRICT GENERAL HOSPITAL
+          active: True → False
+          trust: 'RBN (MERSEY AND WEST LANCASHIRE TEACHING HOSPITALS NHS TRUST)' → 'RVY (SOUTHPORT AND ORMSKIRK HOSPITAL NHS TRUST)'
+          Exposure: 66 reg (15 in-flight), 66 cases
+      ~ RWDLA: PILGRIM HOSPITAL
+          name: 'PILGRIM HOSPITAL AND COMMUNITY PAEDIATRICS' → 'PILGRIM HOSPITAL'
+          Exposure: 12 reg (0 in-flight), 12 cases
+      ~ RWH20: QUEEN ELIZABETH I I HOSPITAL
+          name: 'QUEEN ELIZABETH II HOSPITAL AND COMMUNITY PAEDIATRICS' → 'QUEEN ELIZABETH I I HOSPITAL'
+          Exposure: 59 reg (1 in-flight), 59 cases
+      ~ RL131: ROBERT JONES & AGNES HUNT ORTHOPAEDIC HOSPITAL
+          latitude: 52.8846159748024 → 52.884226
+          longitude: -3.0335475872529485 → -3.032684
+          openuk_network: 'BRPNF (Birmingham Regional Paediatric Neurology Forum)' → 'None'
+          Exposure: 2 reg (0 in-flight), 2 cases
+      ~ G0W1C: ROYAL ALEXANDRA CHILDREN'S HOSPITAL
+          name: 'ROYAL ALEXANDRA CHILDREN’S HOSPITAL' → "ROYAL ALEXANDRA CHILDREN'S HOSPITAL"
+          published_at: datetime.date(2021, 4, 1) → None
+          openuk_network: 'SETPEG (South East Thames Paediatric Epilepsy Group)' → 'WPNN (Wessex Paediatric Neurosciences Network)'
+          Exposure: 62 reg (18 in-flight), 86 cases
+      ~ RK963: ROYAL DEVON & EXETER FOUNDATION HOSPITAL
+          active: False → True
+          trust: 'RH8 (ROYAL DEVON UNIVERSITY HEALTHCARE NHS FOUNDATION TRUST)' → 'RK9 (UNIVERSITY HOSPITALS PLYMOUTH NHS TRUST)'
+          Exposure: 0 reg (0 in-flight), 0 cases
+      ~ RH801: ROYAL DEVON & EXETER HOSPITAL (WONFORD)
+          telephone: '' → '01392 411611'
+          Exposure: 21 reg (4 in-flight), 26 cases
+      ~ RAL01: ROYAL FREE HOSPITAL
+          telephone: '' → '020 7794 0500'
+          Exposure: 24 reg (0 in-flight), 24 cases
+      ~ RM366: SANDRINGHAM HOUSE
+          name: 'SALFORD CARE ORGANISATION' → 'SANDRINGHAM HOUSE'
+          address1: 'PENDLETON WAY' → 'WINDSOR STREET'
+          postcode: 'M6 5FW' → 'M5 4DG'
+          Exposure: 41 reg (0 in-flight), 41 cases
+      ~ RN341: SWINDON HEALTH CENTRE
+          address1: 'CARFAX STREET' → '1 ISLINGTON STREET'
+          postcode: 'SN1 1ED' → 'SN1 2DQ'
+          Exposure: 3 reg (0 in-flight), 3 cases
+      ~ RM357: SWINTON GATEWAY
+          postcode: 'M27 6BP' → 'M27 6FA'
+          Exposure: 0 reg (0 in-flight), 0 cases
+      ~ RN325: THE GREAT WESTERN HOSPITAL
+          telephone: '' → '01793 604020'
+          Exposure: 33 reg (0 in-flight), 85 cases
+      ~ 7A5B1: THE ROYAL GLAMORGAN HOSPITAL
+          name: 'THE ROYAL GLAMORGAN HOSPITAL AND COMMUNITY PAEDIATRICS' → 'THE ROYAL GLAMORGAN HOSPITAL'
+          Exposure: 66 reg (1 in-flight), 66 cases
+      ~ RWX85: UPTON HOSPITAL
+          telephone: '' → '0118 950 3094'
+          Exposure: 20 reg (0 in-flight), 20 cases
+      ~ R1C03: WESTERN COMMUNITY HOSPITAL
+          active: True → False
+          Exposure: 3 reg (0 in-flight), 3 cases
+      ~ RVJJ8: WESTON GENERAL HOSPITAL
+          active: True → False
+          Exposure: 0 reg (0 in-flight), 0 cases
+      ~ RM311: WITHINGTON COMMUNITY HOSPITAL
+          address1: 'WITHINGTON COMMUNITY HOSPITAL' → 'NELL LANE'
+          Exposure: 0 reg (0 in-flight), 0 cases
+      ~ RM325: WYTHENSHAWE HOSPITAL
+          active: False → True
+          Exposure: 0 reg (0 in-flight), 0 cases
+      ~ R0A07: WYTHENSHAWE HOSPITAL
+          published_at: datetime.date(2017, 10, 1) → datetime.date(2017, 9, 7)
+          Exposure: 118 reg (36 in-flight), 118 cases
+      ~ RA430: YEOVIL DISTRICT HOSPITAL
+          telephone: '' → '01935 475122'
+          active: True → False
+          trust: 'RH5 (SOMERSET NHS FOUNDATION TRUST)' → 'RA4 (YEOVIL DISTRICT HOSPITAL NHS FOUNDATION TRUST)'
+          Exposure: 40 reg (9 in-flight), 46 cases
+    Local-only (not in API, would not be touched):
+      - 7A2BM: Withybush General Hospital
+
+  Total: 316 unchanged, 43 new, 344 changed, 1 local-only
+  Exposure across all changed entities: 1495 registrations (332 in-flight), 1697 distinct cases would be affected
+Dry-run complete. No changes written.
