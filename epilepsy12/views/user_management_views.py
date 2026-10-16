@@ -55,6 +55,9 @@ from ..general_functions import (
 )
 from ..general_functions.client_ip import get_client_ip
 from ..common_view_functions import group_for_role
+from epilepsy12.general_functions.audit_period_hierarchy import (
+    expand_organisation_ids_via_identity,
+)
 from ..decorator import (
     user_may_view_this_organisation,
     user_can_access_user,
@@ -99,6 +102,16 @@ def epilepsy12_user_list(request, organisation_id):
             trust=parent_trust, active=True
         ).all()
 
+    # --- Identity-chain expansion (PR 4) ----------------------------------
+    # Expand the organisation sets through the OrganisationIdentity chain
+    # so that users attached to inactive predecessor organisations remain
+    # visible.  Before the cutover commands have run, no identity links
+    # exist, so the expansion is a no-op.
+    organisation_org_ids = expand_organisation_ids_via_identity({organisation.pk})
+    trust_org_ids = expand_organisation_ids_via_identity(
+        set(organisation_children.values_list("pk", flat=True))
+    )
+
     if filter_term:
         filter_term_Q = (
             Q(first_name__icontains=filter_term)
@@ -114,23 +127,17 @@ def epilepsy12_user_list(request, organisation_id):
         if request.user.view_preference == 0:
             # user has requested organisation level view
             basic_filter = Q(
-                employer_organisations__employer_organisation=organisation,
+                employer_organisations__employer_organisation__pk__in=organisation_org_ids,
                 employer_organisations__is_active=True,
             )
         elif request.user.view_preference == 1:
             # user has requested trust level view
-            if organisation.country.boundary_identifier == "W92000004":
-                parent_trust = organisation.local_health_board
-                basic_filter = Q(
-                    employer_organisations__employer_organisation__local_health_board=parent_trust,
-                    employer_organisations__is_active=True,
-                )
-            else:
-                parent_trust = organisation.trust
-                basic_filter = Q(
-                    employer_organisations__employer_organisation__trust=parent_trust,
-                    employer_organisations__is_active=True,
-                )
+            # Expand through the identity chain so that users attached to
+            # inactive predecessor organisations remain visible.
+            basic_filter = Q(
+                employer_organisations__employer_organisation__pk__in=trust_org_ids,
+                employer_organisations__is_active=True,
+            )
         elif request.user.view_preference == 2:
             # user has requested national level view
             basic_filter = None
@@ -184,20 +191,17 @@ def epilepsy12_user_list(request, organisation_id):
 
         elif request.user.view_preference == 1:
             # filters all primary Trust level centres, irrespective of if active or inactive
-            if organisation.country.boundary_identifier == "W92000004":
-                parent_trust = organisation.local_health_board
-                basic_filter = Q(
-                    employer_organisations__employer_organisation__local_health_board=parent_trust
-                )
-            else:
-                parent_trust = organisation.trust
-                basic_filter = Q(
-                    employer_organisations__employer_organisation__trust__name=parent_trust
-                )
+            # Expand through the identity chain so that users attached to
+            # inactive predecessor organisations remain visible.
+            basic_filter = Q(
+                employer_organisations__employer_organisation__pk__in=trust_org_ids
+            )
 
         elif request.user.view_preference == 0:
             # filters all primary centres at organisation level, irrespective of if active or inactive
-            basic_filter = Q(employer_organisations__employer_organisation=organisation)
+            basic_filter = Q(
+                employer_organisations__employer_organisation__pk__in=organisation_org_ids
+            )
         else:
             raise Exception("No View Preference supplied")
 

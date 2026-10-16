@@ -1,37 +1,66 @@
 from django.apps import apps
 from django.db.models import Q
 
+from epilepsy12.general_functions.audit_period_hierarchy import (
+    expand_organisation_ids_via_identity,
+)
+
 
 def organisation_white_list_for_user(epilepsy12_user):
     """
-    Returns a list of organisations that the user can access.
+    Returns a queryset of organisations that the user can access.
+
+    Includes both:
+
+    - **inherited access** — all active organisations in the same Trust or
+      Local Health Board as the user's active employer organisations; and
+    - **direct access** — the user's active employer organisations plus
+      inactive predecessor organisations that share the same
+      ``OrganisationIdentity`` (so that a user employed at a successor
+      ODS code can still see cases and users attached to the predecessor).
+
+    Before the cutover commands have run, no ``OrganisationIdentity``
+    links exist, so the identity-chain expansion is a no-op and the result
+    is identical to the pre-foundation behaviour (active organisations in
+    the user's Trust/LHB only).
     """
     Organisation = apps.get_model("epilepsy12", "Organisation")
-    return (
-        Organisation.objects.filter(
-            Q(
-                trust__in=Organisation.objects.filter(
-                    epilepsy12_users__epilepsy12_user=epilepsy12_user,
-                    epilepsy12_users__is_active=True,
-                    trust__isnull=False,
-                )
-                .values_list("trust", flat=True)
-                .distinct()
+
+    # Inherited access: active organisations in the user's current trusts/LHBs.
+    inherited = Organisation.objects.filter(
+        Q(
+            trust__in=Organisation.objects.filter(
+                epilepsy12_users__epilepsy12_user=epilepsy12_user,
+                epilepsy12_users__is_active=True,
+                trust__isnull=False,
             )
-            | Q(
-                local_health_board__in=Organisation.objects.filter(
-                    epilepsy12_users__epilepsy12_user=epilepsy12_user,
-                    epilepsy12_users__is_active=True,
-                    local_health_board__isnull=False,
-                )
-                .values_list("local_health_board", flat=True)
-                .distinct()
-            )
+            .values_list("trust", flat=True)
+            .distinct()
         )
-        .filter(active=True)
-        .distinct()
-        .order_by("name")
+        | Q(
+            local_health_board__in=Organisation.objects.filter(
+                epilepsy12_users__epilepsy12_user=epilepsy12_user,
+                epilepsy12_users__is_active=True,
+                local_health_board__isnull=False,
+            )
+            .values_list("local_health_board", flat=True)
+            .distinct()
+        )
+    ).filter(active=True)
+
+    # Direct access: the user's active employers expanded through the
+    # OrganisationIdentity chain (includes inactive predecessors).
+    employer_ids = list(
+        Organisation.objects.filter(
+            epilepsy12_users__epilepsy12_user=epilepsy12_user,
+            epilepsy12_users__is_active=True,
+        ).values_list("pk", flat=True)
     )
+    direct_ids = expand_organisation_ids_via_identity(employer_ids)
+
+    return Organisation.objects.filter(
+        Q(pk__in=inherited.values_list("pk", flat=True)) | Q(pk__in=direct_ids)
+    ).distinct().order_by("name")
 
 
 def merged_parent_list_for_user(epilepsy12_user, organisation_list=None):
@@ -101,11 +130,18 @@ def merged_parent_list_for_user(epilepsy12_user, organisation_list=None):
     ).values_list('local_health_board', flat=True).distinct()
 
     # Fetch all trusts and LHBs in two queries (not N+1)
-    # Only trusts have an active field - LHBs don't
+    # Only trusts have an active field - LHBs don't.
+    # We do NOT filter trusts by active=True here: the organisation whitelist
+    # now includes inactive predecessor organisations (via OrganisationIdentity),
+    # and those organisations may belong to trusts that have gone inactive
+    # (e.g. a dissolved trust whose organisations moved to a successor).  The
+    # parent dropdown needs to show those inactive trusts so that the user can
+    # navigate to the period-correct parent.  Before the cutover commands have
+    # run, no inactive organisations are in the whitelist, so the trust_ids set
+    # only contains active trusts and the behaviour is unchanged.
     # Include country field for Jersey filtering
     trusts = Trust.objects.filter(
         id__in=trust_ids,
-        active=True
     ).values('pk', 'name', 'ods_code', 'country').order_by('name')
 
     lhbs = LocalHealthBoard.objects.filter(

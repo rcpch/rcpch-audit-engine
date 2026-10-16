@@ -85,6 +85,22 @@
                 {% endif %}
         </div>
 
+        {% if show_period_alert %}
+        <div class="fluid row" id="period_context_alert">
+            <div class="sixteen wide column">
+                <div class="ui rcpch_warning message">
+                    <i class="close icon" onclick="this.parentElement.parentElement.remove()"></i>
+                    <div class="header">Organisational hierarchy for this cohort</div>
+                    <p>
+                        The organisation and trust/local health board list for cohort {{ cohort_number }}
+                        reflects the hierarchy at the time of that cohort. It may differ from the current
+                        organisation/trust.
+                    </p>
+                </div>
+            </div>
+        </div>
+        {% endif %}
+
         <div class="fluid centered row">
             <div class="cohorts_dates_three_grid">
                 {% include 'epilepsy12/partials/organisation/cohort_card.html' with cohort=cohort_data.grace_cohort cohort_data=cohort_data %}
@@ -219,6 +235,7 @@
 
         </div>
 
+        {% if not is_recruiting_cohort %}
         <div class="equal width row" style="height: 100%;">
 
 
@@ -330,6 +347,7 @@
 
 
         </div>
+        {% endif %}
 
         <div class="sixteen wide right fluid column">
             <div class="ui rcpch_light_blue fluid card">

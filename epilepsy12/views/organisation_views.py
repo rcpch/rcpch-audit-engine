@@ -48,6 +48,10 @@ from epilepsy12.common_view_functions.sanction_user_access import (
     organisation_white_list_for_user,
     merged_parent_list_for_user,
 )
+from epilepsy12.general_functions.audit_period_hierarchy import (
+    resolve_period_parent,
+    get_period_organisation_ids,
+)
 from ..general_functions import (
     value_from_key,
     construct_extension_granted_email,
@@ -101,11 +105,15 @@ def filter_organisations_by_parent(request, parent_id, parent_type):
             pass
 
     # Filter organisations by parent type
+    # Do not filter by active=True here: after the cutover, the parent
+    # dropdown may include inactive trusts whose organisations have moved
+    # to a successor.  The user's access is still controlled by the
+    # whitelist filter below.
     if parent_type == "trust":
-        organisations = Organisation.objects.filter(trust__id=parent_id, active=True)
+        organisations = Organisation.objects.filter(trust__id=parent_id)
     else:  # local_health_board
         organisations = Organisation.objects.filter(
-            local_health_board__id=parent_id, active=True
+            local_health_board__id=parent_id
         )
 
     # Apply user access restrictions if not admin
@@ -171,6 +179,52 @@ def selected_organisation_summary(request, organisation_id):
             if cohort_data["within_grace_period"]
             else cohort_data["submitting_cohort"]
         )
+
+    # --- Period-aware parent resolution (PR 4) ----------------------------
+    #
+    # When a specific cohort is selected (?cohort=<number>), resolve the
+    # period-correct parent (trust/LHB) from the approved
+    # AuditPeriodOrganisation membership.  When no approved membership
+    # exists (pre-cutover, or a new organisation with no membership),
+    # fall back to the current parent.
+    #
+    # When no specific cohort is selected (the default grace/submitting
+    # selection is not a user-chosen cohort), use the current parent.
+    #
+    # The alert flag is set when the period-correct parent differs from
+    # the organisation's current parent, so the template can show a
+    # contextual banner explaining the difference.
+
+    audit_period = AuditPeriod.objects.by_cohort(cohort_number=cohort_number)
+    specific_cohort_selected = requested_cohort_number is not None
+
+    if specific_cohort_selected and audit_period is not None:
+        period_parent, is_period_correct = resolve_period_parent(
+            selected_organisation, audit_period
+        )
+    else:
+        period_parent = selected_organisation.trust or selected_organisation.local_health_board
+        is_period_correct = False
+
+    current_parent = selected_organisation.trust or selected_organisation.local_health_board
+    show_period_alert = (
+        is_period_correct
+        and period_parent is not None
+        and period_parent != current_parent
+    )
+
+    # The parent used for display and aggregation.  Before cutover (no
+    # approved memberships), this is always the current parent.
+    selected_parent = period_parent or current_parent
+
+    # Determine whether the selected cohort is the currently-recruiting
+    # cohort.  The recruiting cohort shows only recruitment numbers (case
+    # counts) — the full KPI table and aggregations are not relevant at
+    # this stage because most cases are not scored yet.
+    is_recruiting_cohort = (
+        cohort_data.get("currently_recruiting_cohort") is not None
+        and cohort_number == cohort_data["currently_recruiting_cohort"]
+    )
 
     # these are all registered cases for the current cohort at the selected organisation to be plotted in the map
     cases_to_plot = filter_all_registered_cases_by_active_lead_site_and_cohort_and_level_of_abstraction(
@@ -264,6 +318,7 @@ def selected_organisation_summary(request, organisation_id):
             cohort=cohort_number,
             case_complete=True,
             abstraction_level="organisation",
+            audit_period=audit_period,
         ).count()
     )
     # query to return all cases (including incomplete) registered in the current cohort at this organisation
@@ -273,6 +328,7 @@ def selected_organisation_summary(request, organisation_id):
             cohort=cohort_number,
             case_complete=False,
             abstraction_level="organisation",
+            audit_period=audit_period,
         ).count()
     )
 
@@ -283,6 +339,7 @@ def selected_organisation_summary(request, organisation_id):
             cohort=cohort_number,
             case_complete=True,
             abstraction_level=abstraction_level,
+            audit_period=audit_period,
         ).count()
     )
     # query to return all cases (including incomplete) registered in the current cohort at this organisation trust
@@ -292,6 +349,7 @@ def selected_organisation_summary(request, organisation_id):
             cohort=cohort_number,
             case_complete=False,
             abstraction_level=abstraction_level,
+            audit_period=audit_period,
         ).count()
     )
 
@@ -340,12 +398,37 @@ def selected_organisation_summary(request, organisation_id):
             epilepsy12_user=request.user, organisation_list=organisation_list
         )
 
-    # Filter organisation_list to only show organisations within the selected parent
-    # This makes the organisation dropdown dependent on the parent dropdown
-    if selected_organisation.trust:
+    # Filter organisation_list to only show organisations within the selected parent.
+    # When a specific cohort is selected and the period-correct parent was
+    # resolved from AuditPeriodOrganisation, narrow to the period-correct
+    # organisation set (organisations whose membership for that period
+    # assigns them to the period-correct parent, expanded through the
+    # OrganisationIdentity chain).  Otherwise, filter by the current parent
+    # (the pre-foundation behaviour).
+    if is_period_correct and audit_period is not None and selected_parent is not None:
+        if selected_organisation.trust_id is not None:
+            period_org_ids = get_period_organisation_ids(
+                selected_parent, audit_period, "trust"
+            )
+            parent_type = "trust"
+        else:
+            period_org_ids = get_period_organisation_ids(
+                selected_parent, audit_period, "local_health_board"
+            )
+            parent_type = "local_health_board"
+        if period_org_ids:
+            organisation_list = organisation_list.filter(pk__in=period_org_ids)
+        else:
+            # No approved memberships — fall back to current parent filter.
+            if selected_organisation.trust_id is not None:
+                organisation_list = organisation_list.filter(trust=selected_parent)
+            elif selected_organisation.local_health_board_id is not None:
+                organisation_list = organisation_list.filter(local_health_board=selected_parent)
+            parent_type = "trust" if selected_organisation.trust_id else "local_health_board"
+    elif selected_organisation.trust_id is not None:
         organisation_list = organisation_list.filter(trust=selected_parent)
         parent_type = "trust"
-    elif selected_organisation.local_health_board:
+    elif selected_organisation.local_health_board_id is not None:
         organisation_list = organisation_list.filter(local_health_board=selected_parent)
         parent_type = "local_health_board"
     else:
@@ -365,27 +448,39 @@ def selected_organisation_summary(request, organisation_id):
         "selected_parent": selected_parent,
         "parent_list": parent_list,
         "parent_type": parent_type,  # Set above based on selected_organisation's parent
-        "cases_aggregated_by_ethnicity": cases_aggregated_by_ethnicity(
-            selected_organisation=selected_organisation
+        "is_recruiting_cohort": is_recruiting_cohort,
+        "show_period_alert": show_period_alert,
+        "cases_aggregated_by_ethnicity": (
+            cases_aggregated_by_ethnicity(selected_organisation=selected_organisation)
+            if not is_recruiting_cohort else None
         ),
-        "cases_aggregated_by_sex": cases_aggregated_by_sex(
-            selected_organisation=selected_organisation
+        "cases_aggregated_by_sex": (
+            cases_aggregated_by_sex(selected_organisation=selected_organisation)
+            if not is_recruiting_cohort else None
         ),
-        "cases_aggregated_by_deprivation": cases_aggregated_by_deprivation_score(
-            selected_organisation=selected_organisation
+        "cases_aggregated_by_deprivation": (
+            cases_aggregated_by_deprivation_score(selected_organisation=selected_organisation)
+            if not is_recruiting_cohort else None
         ),
-        "cases_aggregated_by_age_range": cases_aggregated_by_age(
-            selected_organisation=selected_organisation
+        "cases_aggregated_by_age_range": (
+            cases_aggregated_by_age(selected_organisation=selected_organisation)
+            if not is_recruiting_cohort else None
         ),
-        "index_of_multiple_deprivation_score_piechart": piechart_plot_cases_by_index_of_multiple_deprivation(
-            organisation=selected_organisation
+        "index_of_multiple_deprivation_score_piechart": (
+            piechart_plot_cases_by_index_of_multiple_deprivation(organisation=selected_organisation)
+            if not is_recruiting_cohort else None
         ),
-        "ethnicity_piechart": piechart_plot_cases_by_ethnicity(
-            organisation=selected_organisation
+        "ethnicity_piechart": (
+            piechart_plot_cases_by_ethnicity(organisation=selected_organisation)
+            if not is_recruiting_cohort else None
         ),
-        "sex_piechart": piechart_plot_cases_by_sex(organisation=selected_organisation),
-        "age_range_piechart": piechart_plot_cases_by_age_range(
-            organisation=selected_organisation
+        "sex_piechart": (
+            piechart_plot_cases_by_sex(organisation=selected_organisation)
+            if not is_recruiting_cohort else None
+        ),
+        "age_range_piechart": (
+            piechart_plot_cases_by_age_range(organisation=selected_organisation)
+            if not is_recruiting_cohort else None
         ),
         "percent_completed_organisation": total_percent_organisation,
         "percent_completed_trust": total_percent_trust,
