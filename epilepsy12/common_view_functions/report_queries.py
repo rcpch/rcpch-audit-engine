@@ -11,6 +11,17 @@ from epilepsy12.general_functions.audit_period_hierarchy import (
     expand_organisation_ids_via_identity,
 )
 
+# Maps abstraction_level strings used by the view layer to the FK field
+# names on Organisation / AuditPeriodOrganisation.
+_PARENT_FIELD = {
+    "trust": "trust",
+    "local_health_board": "local_health_board",
+    "icb": "integrated_care_board",
+    "nhs_england_region": "nhs_england_region",
+    "open_uk": "openuk_network",
+    "country": "country",
+}
+
 
 def all_registered_cases_for_cohort_and_abstraction_level(
     organisation_instance,
@@ -79,15 +90,6 @@ def all_registered_cases_for_cohort_and_abstraction_level(
     # When audit_period is None, the original live-parent behaviour is used
     # — the function behaves exactly as before.
 
-    _PARENT_FIELD = {
-        "trust": "trust",
-        "local_health_board": "local_health_board",
-        "icb": "integrated_care_board",
-        "nhs_england_region": "nhs_england_region",
-        "open_uk": "openuk_network",
-        "country": "country",
-    }
-
     site_active_q = (
         Q(epilepsy12_sites__site_is_actively_involved_in_epilepsy_care=True)
         & Q(epilepsy12_sites__site_is_primary_centre_of_epilepsy_care=True)
@@ -129,16 +131,16 @@ def all_registered_cases_for_cohort_and_abstraction_level(
                     # No approved memberships for this parent/period — fall
                     # back to current parent.
                     q_filter = _current_parent_filter(
-                        abstraction_level, current_parent, site_active_q
+                        abstraction_level, organisation_instance, site_active_q
                     )
             else:
                 # Fallback: no approved membership — use current parent.
                 q_filter = _current_parent_filter(
-                    abstraction_level, current_parent, site_active_q
+                    abstraction_level, organisation_instance, site_active_q
                 )
         else:
             q_filter = _current_parent_filter(
-                abstraction_level, current_parent, site_active_q
+                abstraction_level, organisation_instance, site_active_q
             )
 
     elif abstraction_level == "national":
@@ -152,12 +154,15 @@ def all_registered_cases_for_cohort_and_abstraction_level(
     return all_cases_for_cohort.filter(q_filter)
 
 
-def _current_parent_filter(abstraction_level, current_parent, site_active_q):
+def _current_parent_filter(abstraction_level, organisation_instance, site_active_q):
     """Build the Q filter for a given abstraction level using the current
     (live) parent.  This is the pre-foundation behaviour, used both when
     audit_period is None and as the fallback when no approved
     AuditPeriodOrganisation membership exists.
     """
+    parent_field = _PARENT_FIELD[abstraction_level]
+    current_parent = getattr(organisation_instance, parent_field, None)
+
     if current_parent is None:
         # No parent for this abstraction level (e.g. Wales has no ICB).
         # Return a Q that matches nothing — the caller already handles
@@ -189,7 +194,7 @@ def _current_parent_filter(abstraction_level, current_parent, site_active_q):
                 epilepsy12_sites__organisation__nhs_england_region__region_code=current_parent.region_code
             )
             & Q(
-                epilepsy12_sites__organisation__country__boundary_identifier=current_parent.country.boundary_identifier
+                epilepsy12_sites__organisation__country__boundary_identifier=organisation_instance.country.boundary_identifier
             )
             & site_active_q
         )
