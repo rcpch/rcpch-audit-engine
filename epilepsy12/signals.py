@@ -159,6 +159,7 @@ ACTIVITY = (
     (15, "User assigned to Employer"),  # ASSIGNED_USER_TO_EMPLOYER
     (16, "User removed from Employer"),  # REMOVED_USER_FROM_EMPLOYER
     (17, "User Employer role changed"),  # USER_EMPLOYER_ROLE_CHANGED
+    (18, "Password reset failed"),  # PASSWORD_RESET_FAILED
 )
 
 

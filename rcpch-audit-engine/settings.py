@@ -294,8 +294,8 @@ logger.info("EMAIL_BACKEND: %s", EMAIL_BACKEND)
 #     "PASSWORD_RESET_TIMEOUT", 120
 # )  # Default: 259200 (2 minutes, in seconds) - 2 minutes for testing
 
-PASSWORD_RESET_TIMEOUT = os.environ.get(
-    "PASSWORD_RESET_TIMEOUT", 259200
+PASSWORD_RESET_TIMEOUT = int(
+    os.environ.get("PASSWORD_RESET_TIMEOUT", 259200)
 )  # Default: 259200 (3 days, in seconds)
 
 SITE_CONTACT_EMAIL = os.environ.get("SITE_CONTACT_EMAIL")
