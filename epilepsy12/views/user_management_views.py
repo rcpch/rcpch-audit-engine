@@ -53,6 +53,7 @@ from ..general_functions import (
     match_in_choice_key,
     send_email_to_recipients,
 )
+from ..general_functions.client_ip import get_client_ip
 from ..common_view_functions import group_for_role
 from ..decorator import (
     user_may_view_this_organisation,
@@ -790,6 +791,32 @@ class ResetPasswordConfirmView(PasswordResetConfirmView):
         self.request.session["user_email"] = form.user.email
         logging.info(f"Password reset requested for {form.user.email}")
         return super().form_valid(form)
+
+    def form_invalid(self, form):
+        """
+        Audit failed password reset attempts.
+
+        A rejected password is otherwise invisible in the audit trail: the
+        response is a 200 re-render of the form, indistinguishable from
+        simply viewing the form page in the request logs, and no
+        VisitActivity entry is recorded. This has previously made failed
+        resets undiagnosable from production logs.
+        """
+        error_details = "; ".join(
+            f"{field if field != '__all__' else 'form'}: {' '.join(errors)}"
+            for field, errors in form.errors.items()
+        )
+        VisitActivity.objects.create(
+            activity_datetime=timezone.now(),
+            activity=VisitActivity.PASSWORD_RESET_FAILED,
+            ip_address=get_client_ip(self.request),
+            epilepsy12user=form.user,
+            details=f"Password reset failed validation: {error_details}",
+        )
+        logger.warning(
+            f"Password reset failed validation for {form.user.email}: {error_details}"
+        )
+        return super().form_invalid(form)
 
 
 class ResetPasswordComplete(PasswordResetCompleteView):
