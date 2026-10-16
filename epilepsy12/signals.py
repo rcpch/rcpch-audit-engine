@@ -43,30 +43,51 @@ def log_user_login(sender, request, user, **kwargs):
     )
 
 
+def _login_failure_reason(user):
+    """
+    Infer why ModelBackend rejected the login attempt. Django scrubs the
+    password before sending the user_login_failed signal (and it must never
+    be recorded anyway), so the reason is inferred from the account state:
+    an active account with a usable password can only fail on the password
+    itself.
+    """
+    if not user.has_usable_password():
+        return "No password set on account (password reset required)"
+    if not user.is_active:
+        return "Account is inactive"
+    return "Incorrect password"
+
+
 @receiver(user_login_failed)
 def log_user_login_failed(sender, request, user=None, **kwargs):
-    if user is not None:
-        VisitActivity.objects.create(
-            activity=2, ip_address=get_client_ip(request), epilepsy12user=user
-        )
-        logger.info(
-            f"{user} ({user.email}) failed log in from {get_client_ip(request)}."
-        )
-    elif "credentials" in kwargs:
-        if Epilepsy12User.objects.filter(
-            email=kwargs["credentials"]["username"]
-        ).exists():
-            user = Epilepsy12User.objects.get(email=kwargs["credentials"]["username"])
-            VisitActivity.objects.create(
-                activity=2, ip_address=get_client_ip(request), epilepsy12user=user
-            )
-            logger.info(
-                f"{user} ({user.email}) failed log in from {get_client_ip(request)}."
-            )
-        else:
-            logger.info("Login failure by unknown user")
-    else:
-        logger.info("Login failure by unknown user")
+    """
+    Audit failed login attempts with the reason, while the message shown to
+    the user stays generic. VisitActivity requires a user, so attempts
+    against unknown emails can only be recorded in the application log.
+    """
+    ip_address = get_client_ip(request) if request else None
+    credentials = kwargs.get("credentials", {})
+    username = credentials.get("username")
+
+    if user is None and username is not None:
+        # Mirror the exact lookup ModelBackend just failed against
+        # (USERNAME_FIELD is email)
+        user = Epilepsy12User.objects.filter(email=username).first()
+
+    if user is None:
+        logger.info(f"Login failure by unknown user ({username}) from {ip_address}.")
+        return
+
+    reason = _login_failure_reason(user)
+    VisitActivity.objects.create(
+        activity=2,
+        ip_address=ip_address,
+        epilepsy12user=user,
+        details=reason,
+    )
+    logger.info(
+        f"{user} ({user.email}) failed log in from {ip_address}. Reason: {reason}"
+    )
 
 
 @receiver(user_logged_out)
