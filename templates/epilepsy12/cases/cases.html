@@ -43,6 +43,20 @@
             </div>
         </div>
 
+        {% if show_period_alert %}
+        <div class="sixteen wide notupperpadded column" id="period_context_alert">
+            <div class="ui rcpch_warning message">
+                <i class="close icon" onclick="this.parentElement.remove()"></i>
+                <div class="header">Organisational hierarchy for this cohort</div>
+                <p>
+                    The organisation and trust/local health board list for cohort {{ cohort_number }}
+                    reflects the hierarchy at the time of that cohort. It may differ from the current
+                    organisation/trust.
+                </p>
+            </div>
+        </div>
+        {% endif %}
+
         <div class="sixteen wide notupperpadded column">
 
           <div class="ui rcpch icon fluid input" data-tooltip="Start typing to Filter by name, NHS Number or case ID.">

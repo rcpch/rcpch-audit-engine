@@ -49,6 +49,8 @@ from ..general_functions import (
 )
 from epilepsy12.general_functions.audit_period_hierarchy import (
     expand_organisation_ids_via_identity,
+    resolve_period_parent,
+    get_period_organisation_ids,
 )
 
 # Logging setup
@@ -104,6 +106,67 @@ def case_list(request, organisation_id):
             trust=parent_trust, active=True
         ).all()
 
+    # --- Period-aware parent resolution (PR 5) ----------------------------
+    #
+    # When a specific cohort is selected (?cohort=<number>), resolve the
+    # period-correct parent (trust/LHB) from the approved
+    # AuditPeriodOrganisation membership. When no approved membership
+    # exists (pre-cutover, or a new organisation with no membership),
+    # fall back to the current parent.
+    #
+    # When no specific cohort is selected (all_children / all_cohorts),
+    # use the current parent — cross-period views use current hierarchy.
+    #
+    # The alert flag is set when the period-correct parent differs from
+    # the organisation's current parent, so the template can show a
+    # contextual banner explaining the difference (same pattern as PR 4).
+
+    specific_cohort_selected = cohort_filter_term not in (None, "all_children", "all_cohorts")
+    audit_period = None
+    if specific_cohort_selected:
+        try:
+            audit_period = AuditPeriod.objects.by_cohort(cohort_number=int(cohort_filter_term))
+        except (ValueError, TypeError):
+            specific_cohort_selected = False
+
+    if specific_cohort_selected and audit_period is not None:
+        period_parent, is_period_correct = resolve_period_parent(
+            organisation, audit_period
+        )
+    else:
+        period_parent = parent_trust
+        is_period_correct = False
+
+    current_parent = parent_trust
+    show_period_alert = (
+        is_period_correct
+        and period_parent is not None
+        and period_parent != current_parent
+    )
+
+    # When the period-correct parent was resolved from an approved
+    # membership, narrow the trust-level organisation set to the
+    # period-correct organisation set (organisations whose membership for
+    # that period assigns them to the period-correct parent, expanded
+    # through the OrganisationIdentity chain). Otherwise, use the current
+    # parent's organisation set (the pre-foundation behaviour).
+    if is_period_correct and audit_period is not None and period_parent is not None:
+        if organisation.trust_id is not None:
+            period_org_ids = get_period_organisation_ids(
+                period_parent, audit_period, "trust"
+            )
+        else:
+            period_org_ids = get_period_organisation_ids(
+                period_parent, audit_period, "local_health_board"
+            )
+        if period_org_ids:
+            trust_level_org_ids = period_org_ids
+        else:
+            # No approved memberships — fall back to current parent set.
+            trust_level_org_ids = set(organisation_children.values_list("pk", flat=True))
+    else:
+        trust_level_org_ids = set(organisation_children.values_list("pk", flat=True))
+
     # --- Identity-chain expansion (PR 4) ----------------------------------
     # Expand the organisation sets through the OrganisationIdentity chain
     # so that cases/registrations attached to inactive predecessor
@@ -113,12 +176,13 @@ def case_list(request, organisation_id):
     #
     # organisation_org_ids — for the organisation-level view, includes
     #   the selected organisation plus its identity-linked predecessors.
-    # trust_org_ids — for the trust/LHB-level view, includes all active
-    #   organisations in the current trust/LHB plus their identity-linked
-    #   predecessors.
+    # trust_org_ids — for the trust/LHB-level view, includes the
+    #   period-correct organisation set (when a specific cohort is
+    #   selected and an approved membership exists) or the current
+    #   trust/LHB organisation set, expanded through the identity chain.
     organisation_org_ids = expand_organisation_ids_via_identity({organisation.pk})
     trust_org_ids = expand_organisation_ids_via_identity(
-        set(organisation_children.values_list("pk", flat=True))
+        trust_level_org_ids
     )
 
     if filter_term:
@@ -443,6 +507,8 @@ def case_list(request, organisation_id):
         "filtered_case_list": filter_term,
         "cohort_choices": merged_cohort_counts,
         "selected_cohort": selected_cohort,
+        "show_period_alert": show_period_alert,
+        "cohort_number": cohort_filter_term if specific_cohort_selected else None,
         "all_filtered_counts": filtered_totals["unregistered"]
         + filtered_totals[
             "registered"
