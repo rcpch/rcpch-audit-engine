@@ -1126,7 +1126,7 @@ This table is the single source of truth for what has shipped. Per-PR ✅ marker
 | PR 3 | Period-aware permission services | ✅ Complete (built and tested) — **not yet consumed by any production view** |
 | PR 4 | Operational dashboard simplification + reporting-workflow split | ✅ Complete (merged) — period-aware parent resolution with fallback, identity-chain visibility, recruiting-cohort simplification, period-context alert |
 | PR 5 | Period-aware case collections and clinical permissions | ✅ Complete — case list period-aware parent resolution with fallback, identity-chain case visibility, direct/inherited clinical permission policy, period-context alert |
-| PR 6 | Submission, extension and Organisational Audit compatibility | ⬜ Not started |
+| PR 6 | Submission, extension and Organisational Audit compatibility | ✅ Complete — submission/locking redirect preserves `?cohort=` period context; direct users can submit predecessor in-flight registrations via `OrganisationIdentity`; Organisational Audit access and export unchanged |
 | PR 7 | Foundation hardening and publication readiness | ⬜ Not started |
 
 !!! warning "PR 3 is built but not wired in"
@@ -1566,7 +1566,7 @@ New tests should cover:
 
 Exit condition: current case collections keep their existing route/toggle behaviour, cases from inactive predecessor organisations are visible through their active successors via `OrganisationIdentity`, the period-correct parent is resolved per-cohort with fallback to current parent when no approved membership exists, and direct clinical views derive period-aware access from `Registration.audit_period`.
 
-### PR 6 — submission, extension and Organisational Audit compatibility
+### PR 6 — submission, extension and Organisational Audit compatibility ✅ COMPLETE
 
 This pull request completes and proves the critical-workflow integration. It should avoid changing the underlying submission models unless a test exposes a genuine defect.
 
@@ -1601,7 +1601,21 @@ New or updated tests should prove:
 - Organisational Audit access, editing, submission and export are unchanged; and
 - shared helper changes do not alter Organisational Audit behaviour.
 
-Exit condition: all critical submission workflows pass their focused regression suites under the new permission and routing foundation.
+Exit condition: all critical submission workflows pass their focused regression suites under the new permission and routing foundation. ✅
+
+Delivered:
+
+- `epilepsy12/views/case_views.py` — `case_submit` now threads the `?cohort=` query parameter from the originating case table through to the redirect back to `cases`, so the user lands on the same period-correct view they were on. No-op before cutover: the case list already accepts `?cohort=`, and omitting it (the pre-foundation default) shows "all children" exactly as before.
+- `templates/epilepsy12/partials/case_table.html` — the submit button's `hx-post` URL appends `?cohort=<selected_cohort>` when a specific cohort is selected (matching the pagination buttons' existing pattern), so the cohort context reaches `case_submit`.
+- `epilepsy12/tests/view_tests/test_critical_workflow_characterisation.py` — six new PR 6 regression tests:
+  - `test_case_submit_redirect_preserves_selected_cohort` — the redirect URL contains `cohort=<n>` when one is supplied;
+  - `test_case_submit_redirect_without_cohort_returns_all_children` — no `cohort=` parameter is added when none is supplied (pre-foundation default preserved);
+  - `test_direct_user_can_submit_predecessor_in_flight_registration` — a user employed at the current ODS code (RJZ30) can submit (lock) a case registered against the predecessor ODS code (RYQ30) for an in-flight cohort, via direct `OrganisationIdentity` access (PR 5 permission path);
+  - `test_organisational_audit_access_unchanged_after_reorganisation` — a lead clinician at the current org can access Trust B's Organisational Audit and is denied Trust A's, exactly as today (Organisational Audit permissions are not period-aware);
+  - `test_organisational_audit_export_unchanged_after_reorganisation` — `export_submission_period_as_csv` produces non-empty CSV with approved memberships and identity links in place;
+  - `test_audit_period_extension_route_remains_non_slugged` — the extension route resolves the `AuditPeriod` from the cohort number, not a slug.
+
+The extension route/workflow, `AuditPeriodExtension` identity, `Registration.days_remaining_before_submission`, `Case.editable()`, `OrganisationalAuditSubmission`, `OrganisationalAuditSubmissionPeriod`, and the Organisational Audit permission decorator (`user_may_view_organisational_audit`) are all unchanged. The existing focused regression suites (`test_audit_period_extension.py`, `test_permissions_closed_cohort.py`, `test_permissions_organisational_audit.py`, `test_audit_period.py`, `test_registration.py`, and the PR 0 submission/locking characterisation tests) all pass unchanged.
 
 ### PR 7 — foundation hardening and publication readiness
 
