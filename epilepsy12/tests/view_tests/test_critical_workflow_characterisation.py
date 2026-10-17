@@ -1249,3 +1249,158 @@ def test_audit_period_extension_route_remains_non_slugged(
     # The route resolves the AuditPeriod from the cohort number, not a slug.
     assert response.context["audit_period"].pk == submitting.pk
     assert response.context["cohort"] == submitting.cohort_number
+
+
+# ---------------------------------------------------------------------------
+# PR 7 — concurrent-period visibility across a reorganisation
+# ---------------------------------------------------------------------------
+#
+# The reorganisation canary (Princess Royal University Hospital) moved from
+# Trust A (RYQ, dissolved) to Trust B (RJZ, King's) at the cohort 8 -> 9
+# boundary, with an ODS code change (RYQ30 -> RJZ30) sharing one
+# OrganisationIdentity.  Cohort 8's membership is frozen under Trust A;
+# cohort 9's under Trust B.  These tests prove that the period-aware
+# hierarchy and permission services correctly resolve different parents for
+# the two concurrent periods, and that a direct user at the current ODS code
+# can see cases registered against the predecessor in the older cohort.
+
+
+@pytest.mark.django_db
+def test_concurrent_periods_resolve_different_parents(reorganisation):
+    """``resolve_period_parent`` must return Trust A for cohort 8 and Trust B
+    for cohort 9 — the two concurrent periods have different period-correct
+    parents for the same physical hospital.
+    """
+    org_current = reorganisation["org_a_current"]
+    cohort_8 = reorganisation["cohort_8"]
+    cohort_9 = reorganisation["cohort_9"]
+    trust_a = reorganisation["trust_a"]
+    trust_b = reorganisation["trust_b"]
+
+    parent_8, is_correct_8 = resolve_period_parent(org_current, cohort_8)
+    parent_9, is_correct_9 = resolve_period_parent(org_current, cohort_9)
+
+    assert is_correct_8 is True
+    assert parent_8 == trust_a
+    assert is_correct_9 is True
+    assert parent_9 == trust_b
+    assert parent_8 != parent_9
+
+
+@pytest.mark.django_db
+def test_concurrent_periods_identity_chain_includes_predecessor(reorganisation):
+    """``expand_organisation_ids_via_identity`` from the current organisation
+    must include the predecessor organisation, so cases registered against the
+    predecessor's ODS code remain visible through the successor.
+    """
+    org_current = reorganisation["org_a_current"]
+    org_predecessor = reorganisation["org_a_predecessor"]
+
+    expanded = expand_organisation_ids_via_identity({org_current.pk})
+
+    assert org_predecessor.pk in expanded
+    assert org_current.pk in expanded
+
+
+@pytest.mark.django_db
+def test_concurrent_periods_direct_user_sees_predecessor_cohort_8(
+    client,
+    reorganisation,
+    seed_groups_fixture,
+    seed_users_fixture,
+    e12_case_factory,
+):
+    """A user employed at the current ODS code (RJZ30) must be able to view a
+    case registered against the predecessor ODS code (RYQ30) for cohort 8 —
+    the older in-flight period — via the ``OrganisationIdentity`` chain,
+    when filtering the case list by ``?cohort=8``.
+
+    This proves the concurrent-period contract: the same user, viewing the
+    same physical hospital, sees cases from both the predecessor period
+    (cohort 8, Trust A) and the current period (cohort 9, Trust B) without
+    the cases disappearing after the reorganisation.
+    """
+    from epilepsy12.models import OrganisationEmployer
+
+    org_current = reorganisation["org_a_current"]
+    org_predecessor = reorganisation["org_a_predecessor"]
+
+    # Case registered against the predecessor in cohort 8 (Dec 2024).
+    case_c8 = e12_case_factory(
+        first_name="concurrent_predecessor_c8",
+        organisations__organisation=org_predecessor,
+        registration__first_paediatric_assessment_date=date(2024, 12, 15),
+    )
+    assert case_c8.registration.audit_period_id == reorganisation["cohort_8"].pk
+
+    # Case registered against the current org in cohort 9 (today - 30 days).
+    case_c9 = e12_case_factory(
+        first_name="concurrent_current_c9",
+        organisations__organisation=org_current,
+        registration__first_paediatric_assessment_date=date.today() - timedelta(days=30),
+    )
+
+    # Employ the lead clinician at the current org.
+    user = Epilepsy12User.objects.filter(
+        first_name=test_user_audit_centre_lead_clinician_data.role_str,
+        is_active=True,
+    ).first()
+    OrganisationEmployer.objects.get_or_create(
+        epilepsy12_user=user,
+        employer_organisation=org_current,
+        defaults={"is_active": True},
+    )
+    client.force_login(user)
+    twofactor_signin(client, user)
+
+    # Cohort 8 case list: must include the predecessor's cohort-8 case.
+    url_c8 = reverse(
+        "cases",
+        kwargs={"organisation_id": org_current.pk},
+    )
+    response_c8 = client.get(f"{url_c8}?cohort=8")
+    assert response_c8.status_code == HTTPStatus.OK
+    case_pks_c8 = {c.pk for c in response_c8.context["case_list"].object_list}
+    assert case_c8.pk in case_pks_c8, (
+        "Predecessor cohort-8 case should be visible when viewing cohort 8 "
+        "from the current organisation."
+    )
+
+    # Cohort 9 case list: must include the current org's cohort-9 case.
+    url_c9 = reverse(
+        "cases",
+        kwargs={"organisation_id": org_current.pk},
+    )
+    response_c9 = client.get(f"{url_c9}?cohort=9")
+    assert response_c9.status_code == HTTPStatus.OK
+    case_pks_c9 = {c.pk for c in response_c9.context["case_list"].object_list}
+    assert case_c9.pk in case_pks_c9, (
+        "Current org's cohort-9 case should be visible when viewing cohort 9."
+    )
+
+
+@pytest.mark.django_db
+def test_concurrent_periods_period_org_ids_differ_between_cohorts(
+    reorganisation,
+):
+    """``get_period_organisation_ids`` for Trust A in cohort 8 must include the
+    predecessor organisation, while for Trust B in cohort 9 it must include the
+    current organisation.  The two concurrent periods produce different
+    organisation sets for the same physical hospital.
+    """
+    from epilepsy12.general_functions.audit_period_hierarchy import (
+        get_period_organisation_ids,
+    )
+
+    org_current = reorganisation["org_a_current"]
+    org_predecessor = reorganisation["org_a_predecessor"]
+    cohort_8 = reorganisation["cohort_8"]
+    cohort_9 = reorganisation["cohort_9"]
+    trust_a = reorganisation["trust_a"]
+    trust_b = reorganisation["trust_b"]
+
+    org_ids_c8 = get_period_organisation_ids(trust_a, cohort_8, "trust")
+    org_ids_c9 = get_period_organisation_ids(trust_b, cohort_9, "trust")
+
+    assert org_predecessor.pk in org_ids_c8
+    assert org_current.pk in org_ids_c9

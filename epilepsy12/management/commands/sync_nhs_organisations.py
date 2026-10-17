@@ -160,6 +160,7 @@ class Command(BaseCommand):
                     for entry in (changed if changed_limit is None else changed[:changed_limit]):
                         identifier, name, field_diffs = entry[0], entry[1], entry[2]
                         exposure = entry[3] if len(entry) > 3 else None
+                        successor_info = entry[4] if len(entry) > 4 else None
                         self.stdout.write(f"      ~ {identifier}: {name}")
                         for field, (old_val, new_val) in field_diffs.items():
                             self.stdout.write(
@@ -174,6 +175,29 @@ class Command(BaseCommand):
                                     f" across {exposure['organisations']} organisations"
                                     if "organisations" in exposure
                                     else ""
+                                )
+                            )
+                        if successor_info is not None:
+                            self.stdout.write(
+                                self.style.WARNING(
+                                    f"          Successor: {successor_info['successor_ods_code']} "
+                                    f"({successor_info['successor_name']}) under "
+                                    f"{successor_info['successor_trust_name']} — "
+                                    f"cases visible via cohort-selected view and "
+                                    f"identity chain; not visible in no-cohort trust dropdown"
+                                )
+                            )
+                        elif (
+                            exposure
+                            and "active" in field_diffs
+                            and field_diffs["active"] == (True, False)
+                            and exposure.get("cases_all_periods", 0) > 0
+                        ):
+                            self.stdout.write(
+                                self.style.ERROR(
+                                    f"          No active successor found — "
+                                    f"{exposure['cases_all_periods']} cases "
+                                    f"would be orphaned from no-cohort UI"
                                 )
                             )
                     if changed_limit is not None and len(changed) > changed_limit:
@@ -198,6 +222,7 @@ class Command(BaseCommand):
             total_registrations = 0
             total_registrations_in_flight = 0
             total_cases = 0
+            total_orphaned = 0
             for entity_name, diff in diffs.items():
                 for entry in diff.get("changed", []):
                     if len(entry) > 3 and entry[3]:
@@ -205,6 +230,17 @@ class Command(BaseCommand):
                         total_registrations += exposure.get("registrations_all_periods", 0)
                         total_registrations_in_flight += exposure.get("registrations_in_flight", 0)
                         total_cases += exposure.get("cases_all_periods", 0)
+                    # Orphaned cases: orgs going inactive with cases but no
+                    # active successor via OrganisationIdentity.
+                    if len(entry) > 4 and entry[4] is None and len(entry) > 3 and entry[3]:
+                        field_diffs = entry[2]
+                        exposure = entry[3]
+                        if (
+                            "active" in field_diffs
+                            and field_diffs["active"] == (True, False)
+                            and exposure.get("cases_all_periods", 0) > 0
+                        ):
+                            total_orphaned += exposure["cases_all_periods"]
             if total_registrations or total_cases:
                 self.stdout.write(
                     self.style.WARNING(
@@ -212,6 +248,19 @@ class Command(BaseCommand):
                         f"{total_registrations} registrations "
                         f"({total_registrations_in_flight} in-flight), "
                         f"{total_cases} distinct cases would be affected"
+                    )
+                )
+            if total_orphaned:
+                self.stdout.write(
+                    self.style.ERROR(
+                        f"  Cases orphaned from no-cohort UI: "
+                        f"{total_orphaned} cases on organisations going "
+                        f"inactive with no active successor — these would "
+                        f"not appear in the no-cohort trust dropdown after "
+                        f"cutover. Run "
+                        f"`sync_audit_period_organisations --link-identities` "
+                        f"after the current-state sync to link them via "
+                        f"OrganisationIdentity."
                     )
                 )
 
@@ -269,6 +318,34 @@ class Command(BaseCommand):
                 if high_impact_limit is not None and len(changes) > high_impact_limit:
                     self.stdout.write(
                         f"    ... and {len(changes) - high_impact_limit} more"
+                    )
+            if safety.get("orphaned_cases", 0) > 0:
+                self.stdout.write("")
+                self.stdout.write(
+                    self.style.ERROR(
+                        f"  Cases orphaned from no-cohort UI: "
+                        f"{safety['orphaned_cases']} cases on organisations "
+                        f"going inactive with no active successor. These would "
+                        f"not appear in the no-cohort trust dropdown after "
+                        f"cutover. Run "
+                        f"`sync_audit_period_organisations --link-identities` "
+                        f"after this sync to link them via "
+                        f"OrganisationIdentity."
+                    )
+                )
+            if safety.get("inactivation_successors"):
+                self.stdout.write("")
+                self.stdout.write(
+                    self.style.WARNING(
+                        f"  Organisations going inactive with active "
+                        f"successors (cases visible via identity chain):"
+                    )
+                )
+                for succ in safety["inactivation_successors"]:
+                    self.stdout.write(
+                        f"    {succ['ods_code']} ({succ['name']}) → "
+                        f"{succ['successor_ods_code']} ({succ['successor_name']}), "
+                        f"{succ['cases']} cases"
                     )
             return
 
