@@ -734,6 +734,15 @@ def case_submit(request, can_edit, organisation_id, case_id):
     POST request callback from submit button in case_list partial.
     Disables further editing of case information. Case considered submitted
     There is a specific permission both for locking and unlocking which is tested in this function
+
+    The redirect back to the case list preserves the period context (the
+    selected cohort) by threading the ``?cohort=`` query parameter through
+    from the originating case table. This is a no-op before the audit-period
+    cutover: the case list accepts the same ``?cohort=`` toggle today, and
+    omitting it (the pre-foundation behaviour) simply shows "all children".
+    After cutover, preserving the cohort keeps the user on the period-correct
+    view they were already looking at, consistent with the operational
+    dashboard and the case list (PR 4 / PR 5).
     """
     case = Case.objects.get(pk=case_id)
     if case.locked is True and request.user.has_perm(
@@ -748,9 +757,16 @@ def case_submit(request, can_edit, organisation_id, case_id):
         raise PermissionDenied()
     case.save()
 
-    return HttpResponseClientRedirect(
-        reverse("cases", kwargs={"organisation_id": organisation_id})
-    )
+    redirect_url = reverse("cases", kwargs={"organisation_id": organisation_id})
+    # Preserve the period context (selected cohort) from the originating case
+    # table. The template appends ``?cohort=<n>`` (or ``all_cohorts``) when a
+    # specific cohort is selected; ``all_children`` is the default and is not
+    # threaded through, matching the pagination buttons in case_table.html.
+    cohort = request.GET.get("cohort")
+    if cohort:
+        redirect_url = f"{redirect_url}?cohort={cohort}"
+
+    return HttpResponseClientRedirect(redirect_url)
 
 
 @login_and_otp_required()

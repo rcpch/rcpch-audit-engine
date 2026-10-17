@@ -177,7 +177,7 @@
                 hx-headers='{"X-CSRFToken": "{{ csrf_token }}"}'
                 class="ui rcpch_primary icon button"
                 tabindexed="1"
-                hx-post="{{hx_post}}"
+                hx-post="{{hx_post}}{% if selected_cohort and selected_cohort != 'all_children' %}?cohort={{selected_cohort}}{% endif %}"
                 hx_trigger='click'
                 hx-target="#case_table"
                 {% if case.registration.days_remaining_before_submission == 0 or case.locked and not perms.epilepsy12.can_unlock_child_case_data_from_editing or not case.locked and not perms.epilepsy12.can_lock_child_case_data_from_editing  %}

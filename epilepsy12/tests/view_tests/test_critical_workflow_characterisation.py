@@ -965,3 +965,287 @@ def test_case_list_unregistered_case_visible(
     assert response.status_code == HTTPStatus.OK
     case_pks = {c.pk for c in response.context["case_list"].object_list}
     assert unreg.pk in case_pks
+
+
+# ---------------------------------------------------------------------------
+# PR 6 — submission/locking redirect preserves period context; direct users
+# can finish in-flight registrations across a reorganisation; Organisational
+# Audit remains unchanged.
+# ---------------------------------------------------------------------------
+
+
+@pytest.mark.django_db
+def test_case_submit_redirect_preserves_selected_cohort(
+    client,
+    seed_groups_fixture,
+    seed_users_fixture,
+    e12_case_factory,
+):
+    """The ``case_submit`` redirect must thread the ``?cohort=`` query
+    parameter through from the originating case table so the user lands back
+    on the same period-correct view they were on.
+
+    This is the PR 6 'update submission/locking redirects to preserve period
+    context' requirement. Before cutover it is a no-op: the case list accepts
+    the same ``?cohort=`` toggle today, and omitting it simply shows
+    'all children'.
+    """
+    GOSH = Organisation.objects.get(ods_code="RP401", trust__ods_code="RP4")
+
+    case = e12_case_factory(
+        first_name="submit_redirect_cohort_test",
+        organisations__organisation=GOSH,
+        registration__first_paediatric_assessment_date=date.today() - timedelta(days=30),
+    )
+    cohort_number = case.registration.audit_period.cohort_number
+
+    user = Epilepsy12User.objects.get(
+        first_name=test_user_audit_centre_lead_clinician_data.role_str,
+        is_active=True,
+    )
+    client.force_login(user)
+    twofactor_signin(client, user)
+
+    url = reverse(
+        "case_submit",
+        kwargs={"organisation_id": GOSH.pk, "case_id": case.pk},
+    )
+    # The case_table template appends ``?cohort=<n>`` to the hx-post URL so
+    # the redirect preserves the period context. Mirror that here.
+    response = client.post(f"{url}?cohort={cohort_number}")
+
+    assert response.status_code == HTTPStatus.OK
+    # HttpResponseClientRedirect stores the target in the HX-Redirect header.
+    redirect_url = response.headers.get("HX-Redirect", "")
+    assert f"cohort={cohort_number}" in redirect_url, (
+        f"Expected the redirect to preserve the cohort context, got {redirect_url!r}."
+    )
+
+
+@pytest.mark.django_db
+def test_case_submit_redirect_without_cohort_returns_all_children(
+    client,
+    seed_groups_fixture,
+    seed_users_fixture,
+    e12_case_factory,
+):
+    """When no cohort is threaded through (the pre-foundation default), the
+    redirect must not add a ``?cohort=`` parameter — the user lands on the
+    'all children' view, exactly as today.
+    """
+    GOSH = Organisation.objects.get(ods_code="RP401", trust__ods_code="RP4")
+
+    case = e12_case_factory(
+        first_name="submit_redirect_no_cohort_test",
+        organisations__organisation=GOSH,
+        registration__first_paediatric_assessment_date=date.today() - timedelta(days=30),
+    )
+
+    user = Epilepsy12User.objects.get(
+        first_name=test_user_audit_centre_lead_clinician_data.role_str,
+        is_active=True,
+    )
+    client.force_login(user)
+    twofactor_signin(client, user)
+
+    url = reverse(
+        "case_submit",
+        kwargs={"organisation_id": GOSH.pk, "case_id": case.pk},
+    )
+    response = client.post(url)
+
+    assert response.status_code == HTTPStatus.OK
+    redirect_url = response.headers.get("HX-Redirect", "")
+    assert "cohort=" not in redirect_url, (
+        f"Expected no cohort parameter when none was supplied, got {redirect_url!r}."
+    )
+
+
+@pytest.mark.django_db
+def test_direct_user_can_submit_predecessor_in_flight_registration(
+    client,
+    reorganisation,
+    seed_groups_fixture,
+    seed_users_fixture,
+    e12_case_factory,
+):
+    """A user employed at the current ODS code (RJZ30) must be able to submit
+    (lock) a case registered against the predecessor ODS code (RYQ30) for an
+    in-flight cohort, via direct ``OrganisationIdentity`` access.
+
+    This proves the PR 6 requirement that 'direct organisation users can
+    complete agreed older in-flight registrations'. The case is in the
+    currently-open cohort (editable), so locking is permitted. The
+    period-aware permission check (PR 5) grants access via the identity chain.
+    """
+    from epilepsy12.models import OrganisationEmployer
+
+    org_current = reorganisation["org_a_current"]
+    org_predecessor = reorganisation["org_a_predecessor"]
+
+    # In-flight case registered against the predecessor, in the open cohort.
+    case = e12_case_factory(
+        first_name="direct_submit_predecessor",
+        organisations__organisation=org_predecessor,
+        registration__first_paediatric_assessment_date=date.today() - timedelta(days=30),
+    )
+    assert case.editable(), "Case should be editable (open cohort)"
+
+    user = Epilepsy12User.objects.filter(
+        first_name=test_user_audit_centre_lead_clinician_data.role_str,
+        is_active=True,
+    ).first()
+    OrganisationEmployer.objects.get_or_create(
+        epilepsy12_user=user,
+        employer_organisation=org_current,
+        defaults={"is_active": True},
+    )
+    client.force_login(user)
+    twofactor_signin(client, user)
+
+    url = reverse(
+        "case_submit",
+        kwargs={"organisation_id": org_current.pk, "case_id": case.pk},
+    )
+    response = client.post(url)
+
+    assert response.status_code == HTTPStatus.OK, (
+        f"Direct user at current ODS code should be able to submit predecessor "
+        f"case, got {response.status_code}."
+    )
+
+    case.refresh_from_db()
+    assert case.locked, "Case should be locked after submission"
+
+
+@pytest.mark.django_db
+def test_organisational_audit_access_unchanged_after_reorganisation(
+    client,
+    reorganisation,
+    seed_groups_fixture,
+    seed_users_fixture,
+):
+    """Organisational Audit access must continue to use its existing,
+    separately-tested permission semantics after the audit-period
+    foundation is in place.
+
+    The reorganisation fixture creates approved ``AuditPeriodOrganisation``
+    memberships and ``OrganisationIdentity`` links. A lead clinician employed
+    at the current ODS code (RJZ30, Trust B) must still be able to access
+    Trust B's Organisational Audit, and must still be denied Trust A's
+    Organisational Audit — exactly as today, because Organisational Audit
+    permissions are not period-aware.
+    """
+    from epilepsy12.constants import AUDIT_CENTRE_LEAD_CLINICIAN
+    from epilepsy12.models import OrganisationEmployer
+
+    org_current = reorganisation["org_a_current"]
+    trust_a = reorganisation["trust_a"]
+    trust_b = reorganisation["trust_b"]
+
+    # Ensure a lead clinician is employed at the current organisation.
+    user = Epilepsy12User.objects.filter(
+        role=AUDIT_CENTRE_LEAD_CLINICIAN, is_active=True
+    ).first()
+    OrganisationEmployer.objects.get_or_create(
+        epilepsy12_user=user,
+        employer_organisation=org_current,
+        defaults={"is_active": True},
+    )
+    user.set_organisation_employer(organisation_employer=org_current, is_primary=True)
+    client.force_login(user)
+    twofactor_signin(client, user)
+
+    # Create a submission period so the view has something to load.
+    submission_period = OrganisationalAuditSubmissionPeriod.objects.create(
+        year=2026, is_open=True
+    )
+    OrganisationalAuditSubmission.objects.create(
+        submission_period=submission_period,
+        trust=trust_b,
+    )
+
+    # Trust B (the user's current parent) — allowed.
+    response = client.get(
+        reverse("organisational_audit_trust", kwargs={"id": trust_b.pk})
+    )
+    assert response.status_code == HTTPStatus.OK, (
+        f"Lead clinician should access their own trust's Organisational Audit, "
+        f"got {response.status_code}."
+    )
+
+    # Trust A (the dissolved predecessor) — denied, because the user is not
+    # employed there. Period-aware membership does not widen Organisational
+    # Audit access.
+    response = client.get(
+        reverse("organisational_audit_trust", kwargs={"id": trust_a.pk})
+    )
+    assert response.status_code == HTTPStatus.FORBIDDEN, (
+        f"Lead clinician must NOT access the predecessor trust's Organisational "
+        f"Audit via period-awareness, got {response.status_code}."
+    )
+
+
+@pytest.mark.django_db
+def test_organisational_audit_export_unchanged_after_reorganisation(
+    reorganisation,
+    seed_groups_fixture,
+    seed_users_fixture,
+):
+    """``export_submission_period_as_csv`` must produce the same shape of
+    output after the audit-period foundation is in place. The reorganisation
+    fixture creates approved memberships and identity links; the export must
+    not be affected by them.
+    """
+    trust_b = reorganisation["trust_b"]
+
+    submission_period = OrganisationalAuditSubmissionPeriod.objects.create(
+        year=2026, is_open=False
+    )
+    OrganisationalAuditSubmission.objects.create(
+        submission_period=submission_period,
+        trust=trust_b,
+        submitted=True,
+    )
+
+    csv_data = export_submission_period_as_csv(submission_period)
+
+    assert csv_data, "Export should produce non-empty CSV"
+    assert isinstance(csv_data, str)
+
+
+@pytest.mark.django_db
+def test_audit_period_extension_route_remains_non_slugged(
+    client,
+    seed_groups_fixture,
+    seed_users_fixture,
+    GOSH,
+):
+    """The extension route must remain non-slotted for the foundation: it is
+    addressed by ``organisation_id`` and ``cohort`` number, not by an
+    ``AuditPeriod.slug``. This pins the PR 6 'keep the extension
+    route/workflow non-slugged' requirement.
+    """
+    from epilepsy12.models import AuditPeriod
+
+    user = Epilepsy12User.objects.get(
+        first_name=test_user_rcpch_audit_team_data.role_str,
+        is_active=True,
+    )
+    client.force_login(user)
+    user.set_organisation_employer(organisation_employer=GOSH, is_primary=True)
+    twofactor_signin(client, user)
+
+    submitting = AuditPeriod.objects.currently_submitting()
+    assert submitting is not None, "No seeded cohort is currently submitting."
+
+    url = reverse(
+        "audit_period_extension",
+        kwargs={"organisation_id": GOSH.pk, "cohort": submitting.cohort_number},
+    )
+    response = client.get(url)
+
+    assert response.status_code == HTTPStatus.OK
+    # The route resolves the AuditPeriod from the cohort number, not a slug.
+    assert response.context["audit_period"].pk == submitting.pk
+    assert response.context["cohort"] == submitting.cohort_number
