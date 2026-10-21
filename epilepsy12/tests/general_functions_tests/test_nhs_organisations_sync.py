@@ -1309,12 +1309,12 @@ def test_dry_run_flags_orphaned_cases_for_inactivated_org_without_successor(
     e12_case_factory,
 ):
     """When an organisation going ``active=False`` has cases but no active
-    successor via ``OrganisationIdentity``, the pre-sync safety check must
-    report those cases as orphaned from the no-cohort trust dropdown.
+    successor from either the local identity chain or the API snapshot, the
+    pre-sync safety check must report those cases as permanently orphaned.
     """
     GOSH = Organisation.objects.get(ods_code="RP401", trust__ods_code="RP4")
 
-    # GOSH has no identity link — no successor exists.
+    # GOSH has no identity link — no local successor exists.
     assert GOSH.identity_id is None
 
     e12_case_factory(
@@ -1328,7 +1328,24 @@ def test_dry_run_flags_orphaned_cases_for_inactivated_org_without_successor(
     api_org = _make_org_list_entry(GOSH, trust=GOSH.trust)
     api_org["active"] = False
 
-    with patch.object(nhs_organisations_sync, "list_organisations", return_value=[api_org]):
+    # Mock the snapshot call to return GOSH's own state (no walk, no successor).
+    snapshot_response = {
+        "ods_code": GOSH.ods_code,
+        "name": GOSH.name,
+        "trust": {"ods_code": GOSH.trust.ods_code, "name": GOSH.trust.name},
+        "local_health_board": "",
+        "integrated_care_board": "",
+        "nhs_england_region": "",
+        "openuk_network": "",
+        "country": {"boundary_identifier": "E92000001", "name": "England"},
+        "predecessor_ods_code": None,
+        "successor_ods_code": None,
+    }
+
+    with (
+        patch.object(nhs_organisations_sync, "list_organisations", return_value=[api_org]),
+        patch.object(nhs_organisations_sync, "get_organisation_snapshot", return_value=snapshot_response),
+    ):
         safety = nhs_organisations_sync.pre_sync_safety_check(only="organisations")
 
     assert safety["orphaned_cases"] >= 1
@@ -1378,3 +1395,62 @@ def test_dry_run_no_orphaned_cases_for_inactivated_org_with_successor(
     assert safety["orphaned_cases"] == 0
     assert len(safety["inactivation_successors"]) == 1
     assert safety["inactivation_successors"][0]["successor_ods_code"] == "RP401SUCC2"
+
+
+@pytest.mark.django_db
+def test_dry_run_resolves_successor_via_api_snapshot_when_no_local_identity(
+    e12_case_factory,
+):
+    """When an organisation going ``active=False`` has no local
+    ``OrganisationIdentity`` link (the pre-``--link-identities`` state on
+    first cutover), the dry-run must resolve the active successor by calling
+    the API snapshot endpoint, which walks the succession chain forward.
+
+    This is the Ormskirk case: ``RVY02`` (inactive) is succeeded by ``RBN52``
+    (active, under ``RBN``).  No local identity link exists yet, but the API
+    snapshot for ``RVY02`` at today's date walks forward to ``RBN52``.
+    """
+    from epilepsy12.models import Trust
+
+    GOSH = Organisation.objects.get(ods_code="RP401", trust__ods_code="RP4")
+
+    # GOSH has no identity link — the pre-link-identities state.
+    assert GOSH.identity_id is None
+
+    e12_case_factory(
+        first_name="api_fallback_successor",
+        organisations__organisation=GOSH,
+        registration__first_paediatric_assessment_date=date(2021, 6, 1),
+        registration__audit_period__cohort_number=4,
+    )
+
+    # API list endpoint returns GOSH as active=False.
+    api_org = _make_org_list_entry(GOSH, trust=GOSH.trust)
+    api_org["active"] = False
+
+    # API snapshot walks forward to the active successor (RP401SUCC3).
+    rjz = Trust.objects.get(ods_code="RJZ")
+    snapshot_response = {
+        "ods_code": "RP401SUCC3",
+        "name": "GOSH API SUCCESSOR",
+        "trust": {"ods_code": "RJZ", "name": rjz.name},
+        "local_health_board": "",
+        "integrated_care_board": "",
+        "nhs_england_region": "",
+        "openuk_network": "",
+        "country": {"boundary_identifier": "E92000001", "name": "England"},
+        "predecessor_ods_code": "RP401",
+        "successor_ods_code": None,
+    }
+
+    with (
+        patch.object(nhs_organisations_sync, "list_organisations", return_value=[api_org]),
+        patch.object(nhs_organisations_sync, "get_organisation_snapshot", return_value=snapshot_response),
+    ):
+        safety = nhs_organisations_sync.pre_sync_safety_check(only="organisations")
+
+    # No permanently orphaned cases — the successor was resolved from the API.
+    assert safety["orphaned_cases"] == 0
+    assert len(safety["inactivation_successors"]) == 1
+    assert safety["inactivation_successors"][0]["successor_ods_code"] == "RP401SUCC3"
+    assert safety["inactivation_successors"][0]["successor_name"] == "GOSH API SUCCESSOR"

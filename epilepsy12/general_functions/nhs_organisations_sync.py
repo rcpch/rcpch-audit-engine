@@ -38,6 +38,7 @@ from django.contrib.gis.geos import Point
 from django.db import transaction
 
 from .nhs_organisations import (
+    get_organisation_snapshot,
     list_countries,
     list_integrated_care_boards,
     list_local_health_boards,
@@ -877,18 +878,29 @@ def _count_parent_exposure(parent, parent_field: str) -> dict[str, int]:
 
 def _resolve_inactivation_successor(organisation) -> dict[str, Any] | None:
     """Resolve the active successor for an organisation that is going
-    ``active=False`` under an inactive trust (or LHB), via the
-    ``OrganisationIdentity`` chain.
+    ``active=False`` under an inactive trust (or LHB).
 
     When an organisation is deactivated by the current-state sync (e.g.
     ``RVY02`` — Ormskirk under the dissolved Southport & Ormskirk trust
-    ``RVY``), its cases remain attached via ``Site.organisation``.  They are
-    still reachable in the UI through the active successor organisation
-    (e.g. ``RBN52`` — Ormskirk under Mersey & West Lancs ``RBN``) **if** both
-    organisations share the same ``OrganisationIdentity``.  The identity link
-    is created by the ``--link-identities`` step of
-    ``sync_audit_period_organisations``, which runs after the current-state
-    sync.
+    ``RVY``), its cases remain attached via ``Site.organisation``.  They
+    are still reachable in the UI through the active successor organisation
+    (e.g. ``RBN52`` — Ormskirk under Mersey & West Lancs ``RBN``) **if**
+    both organisations share the same ``OrganisationIdentity``.
+
+    Resolution tries two sources, in order:
+
+    1. **Local identity chain** — if the ``OrganisationIdentity`` link
+       already exists locally (e.g. from a previous ``--link-identities``
+       run), resolve the active successor directly from the local DB.
+
+    2. **API snapshot** — if no local identity link exists (the
+       pre-``--link-identities`` state on the first cutover), call the
+       API's snapshot endpoint at today's date.  The snapshot walks the
+       ``OrganisationSuccession`` chain forward to the active successor
+       and returns ``ods_code`` (the resolved successor) and
+       ``predecessor_ods_code`` (the queried code).  This lets the dry-run
+       report the successor even before the identity links have been
+       created locally.
 
     Returns a dict with:
     - ``successor_ods_code``: the successor organisation's ODS code
@@ -896,39 +908,82 @@ def _resolve_inactivation_successor(organisation) -> dict[str, Any] | None:
     - ``successor_trust_name``: the successor's trust name (or LHB name)
     - ``identity_linked``: True if the identity link already exists locally
 
-    Returns ``None`` if no active successor is found — the cases would be
-    orphaned from the no-cohort trust dropdown (though still present in the
-    database and reachable via direct organisation URLs).
+    Returns ``None`` if no active successor is found from either source —
+    the cases would be permanently orphaned from the no-cohort trust
+    dropdown (though still present in the database and reachable via
+    direct organisation URLs).
     """
     Organisation = _get_model("Organisation")
 
-    if organisation.identity_id is None:
-        return None
-
-    successors = (
-        Organisation.objects.filter(
-            identity_id=organisation.identity_id,
-            active=True,
-        ).exclude(pk=organisation.pk)
-    )
-    successor = successors.first()
-    if successor is None:
-        return None
-
-    if successor.trust_id is not None:
-        parent_name = successor.trust.name if successor.trust else None
-    else:
-        parent_name = (
-            successor.local_health_board.name
-            if successor.local_health_board
-            else None
+    # 1. Try the local identity chain.
+    if organisation.identity_id is not None:
+        successors = (
+            Organisation.objects.filter(
+                identity_id=organisation.identity_id,
+                active=True,
+            ).exclude(pk=organisation.pk)
         )
+        successor = successors.first()
+        if successor is not None:
+            if successor.trust_id is not None:
+                parent_name = successor.trust.name if successor.trust else None
+            else:
+                parent_name = (
+                    successor.local_health_board.name
+                    if successor.local_health_board
+                    else None
+                )
+            return {
+                "successor_ods_code": successor.ods_code,
+                "successor_name": successor.name,
+                "successor_trust_name": parent_name,
+                "identity_linked": True,
+            }
+
+    # 2. Fallback: call the API snapshot endpoint to walk the succession
+    #    chain forward.  This is the pre---link-identities state on the
+    #    first cutover, when no local identity links exist yet.
+    try:
+        snapshot = get_organisation_snapshot(
+            organisation.ods_code, on_date=date_class.today()
+        )
+    except Exception:
+        # API call failed (network error, 404, etc.) — don't block the
+        # dry-run on an API failure.  Report None so the audit team sees
+        # the orphan warning and can investigate manually.
+        logger.warning(
+            "Could not resolve successor for %s via API snapshot: %s",
+            organisation.ods_code,
+            "API call failed",
+            exc_info=True,
+        )
+        return None
+
+    resolved_ods_code = snapshot.get("ods_code")
+    if not resolved_ods_code or resolved_ods_code == organisation.ods_code:
+        # No walk happened — the org is the current resolved entity, so
+        # there is no successor.
+        return None
+
+    # The snapshot walked forward to the active successor.  Read its name
+    # and trust from the snapshot response (the successor may not exist
+    # locally yet, so we can't look it up in the local DB).
+    successor_name = snapshot.get("name", "") or resolved_ods_code
+    nested_trust = snapshot.get("trust")
+    if isinstance(nested_trust, dict) and nested_trust.get("name"):
+        successor_trust_name = nested_trust["name"]
+    else:
+        nested_lhb = snapshot.get("local_health_board")
+        if isinstance(nested_lhb, dict) and nested_lhb.get("name"):
+            successor_trust_name = nested_lhb["name"]
+        else:
+            successor_trust_name = None
 
     return {
-        "successor_ods_code": successor.ods_code,
-        "successor_name": successor.name,
-        "successor_trust_name": parent_name,
-        "identity_linked": True,
+        "successor_ods_code": resolved_ods_code,
+        "successor_name": successor_name,
+        "successor_trust_name": successor_trust_name,
+        "identity_linked": False,
     }
 
 

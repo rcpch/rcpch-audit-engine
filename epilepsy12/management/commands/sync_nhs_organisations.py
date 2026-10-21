@@ -178,13 +178,24 @@ class Command(BaseCommand):
                                 )
                             )
                         if successor_info is not None:
+                            identity_status = (
+                                "identity link already exists"
+                                if successor_info.get("identity_linked")
+                                else "identity link will be created by "
+                                "`sync_audit_period_organisations --link-identities` "
+                                "(Step 4 of the cutover)"
+                            )
                             self.stdout.write(
                                 self.style.WARNING(
                                     f"          Successor: {successor_info['successor_ods_code']} "
                                     f"({successor_info['successor_name']}) under "
                                     f"{successor_info['successor_trust_name']} — "
-                                    f"cases visible via cohort-selected view and "
-                                    f"identity chain; not visible in no-cohort trust dropdown"
+                                    f"all {exposure['cases_all_periods']} cases "
+                                    f"WILL be retrievable after cutover; "
+                                    f"{identity_status}. Cases are temporarily "
+                                    f"not visible in the no-cohort trust dropdown "
+                                    f"between Step 3 (--confirm) and Step 4 "
+                                    f"(--link-identities)."
                                 )
                             )
                         elif (
@@ -195,9 +206,11 @@ class Command(BaseCommand):
                         ):
                             self.stdout.write(
                                 self.style.ERROR(
-                                    f"          No active successor found — "
-                                    f"{exposure['cases_all_periods']} cases "
-                                    f"would be orphaned from no-cohort UI"
+                                    f"          WARNING: No active successor found "
+                                    f"for {exposure['cases_all_periods']} cases — "
+                                    f"these cases would be PERMANENTLY orphaned "
+                                    f"from the no-cohort trust dropdown. "
+                                    f"Investigate manually before proceeding."
                                 )
                             )
                     if changed_limit is not None and len(changed) > changed_limit:
@@ -223,6 +236,7 @@ class Command(BaseCommand):
             total_registrations_in_flight = 0
             total_cases = 0
             total_orphaned = 0
+            total_recoverable = 0
             for entity_name, diff in diffs.items():
                 for entry in diff.get("changed", []):
                     if len(entry) > 3 and entry[3]:
@@ -230,17 +244,19 @@ class Command(BaseCommand):
                         total_registrations += exposure.get("registrations_all_periods", 0)
                         total_registrations_in_flight += exposure.get("registrations_in_flight", 0)
                         total_cases += exposure.get("cases_all_periods", 0)
-                    # Orphaned cases: orgs going inactive with cases but no
-                    # active successor via OrganisationIdentity.
-                    if len(entry) > 4 and entry[4] is None and len(entry) > 3 and entry[3]:
-                        field_diffs = entry[2]
-                        exposure = entry[3]
-                        if (
-                            "active" in field_diffs
-                            and field_diffs["active"] == (True, False)
-                            and exposure.get("cases_all_periods", 0) > 0
-                        ):
-                            total_orphaned += exposure["cases_all_periods"]
+                    # Classify orgs going inactive with cases by successor status.
+                    if (
+                        len(entry) > 3
+                        and entry[3]
+                        and "active" in entry[2]
+                        and entry[2]["active"] == (True, False)
+                        and entry[3].get("cases_all_periods", 0) > 0
+                    ):
+                        successor_info = entry[4] if len(entry) > 4 else None
+                        if successor_info is not None:
+                            total_recoverable += entry[3]["cases_all_periods"]
+                        else:
+                            total_orphaned += entry[3]["cases_all_periods"]
             if total_registrations or total_cases:
                 self.stdout.write(
                     self.style.WARNING(
@@ -250,17 +266,29 @@ class Command(BaseCommand):
                         f"{total_cases} distinct cases would be affected"
                     )
                 )
+            if total_recoverable:
+                self.stdout.write(
+                    self.style.WARNING(
+                        f"  Cases with known successor (recoverable after "
+                        f"--link-identities): {total_recoverable} cases on "
+                        f"organisations going inactive whose active successor "
+                        f"was resolved from the API. These cases WILL be "
+                        f"retrievable after running "
+                        f"`sync_audit_period_organisations --link-identities` "
+                        f"(Step 4 of the cutover). They are temporarily not "
+                        f"visible in the no-cohort trust dropdown between "
+                        f"Step 3 (--confirm) and Step 4."
+                    )
+                )
             if total_orphaned:
                 self.stdout.write(
                     self.style.ERROR(
-                        f"  Cases orphaned from no-cohort UI: "
+                        f"  PERMANENTLY orphaned cases (no successor found): "
                         f"{total_orphaned} cases on organisations going "
-                        f"inactive with no active successor — these would "
-                        f"not appear in the no-cohort trust dropdown after "
-                        f"cutover. Run "
-                        f"`sync_audit_period_organisations --link-identities` "
-                        f"after the current-state sync to link them via "
-                        f"OrganisationIdentity."
+                        f"inactive with no active successor found from the "
+                        f"API or local identity chain. These would NOT "
+                        f"appear in the no-cohort trust dropdown after "
+                        f"cutover. Investigate manually before proceeding."
                     )
                 )
 
@@ -323,29 +351,28 @@ class Command(BaseCommand):
                 self.stdout.write("")
                 self.stdout.write(
                     self.style.ERROR(
-                        f"  Cases orphaned from no-cohort UI: "
+                        f"  PERMANENTLY orphaned cases (no successor found): "
                         f"{safety['orphaned_cases']} cases on organisations "
-                        f"going inactive with no active successor. These would "
-                        f"not appear in the no-cohort trust dropdown after "
-                        f"cutover. Run "
-                        f"`sync_audit_period_organisations --link-identities` "
-                        f"after this sync to link them via "
-                        f"OrganisationIdentity."
+                        f"going inactive with no active successor found "
+                        f"from the API or local identity chain. These would "
+                        f"NOT appear in the no-cohort trust dropdown after "
+                        f"cutover. Investigate manually before proceeding."
                     )
                 )
             if safety.get("inactivation_successors"):
                 self.stdout.write("")
                 self.stdout.write(
                     self.style.WARNING(
-                        f"  Organisations going inactive with active "
-                        f"successors (cases visible via identity chain):"
+                        f"  Cases with known successor (recoverable after "
+                        f"--link-identities):"
                     )
                 )
                 for succ in safety["inactivation_successors"]:
                     self.stdout.write(
-                        f"    {succ['ods_code']} ({succ['name']}) → "
+                        f"    {succ['ods_code']} ({succ['name']}) -> "
                         f"{succ['successor_ods_code']} ({succ['successor_name']}), "
-                        f"{succ['cases']} cases"
+                        f"{succ['cases']} cases — WILL be retrievable after "
+                        f"`sync_audit_period_organisations --link-identities`"
                     )
             return
 
