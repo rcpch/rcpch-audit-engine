@@ -867,13 +867,48 @@ Approval is a one-way freeze: once `approved_at` is set, re-running the per-coho
 
 The hierarchy is country-specific. An English organisation's reporting parent is its **`Trust`** (`Organisation.trust` / `AuditPeriodOrganisation.trust`); a Welsh organisation's reporting parent is its **`Local Health Board`** (`Organisation.local_health_board` / `AuditPeriodOrganisation.local_health_board`). The two are mutually exclusive for a given organisation: an English organisation has `trust` set and `local_health_board` null; a Welsh organisation has `local_health_board` set and `trust` null. The per-cohort and current-state syncs both preserve this invariant; reconciliation reports Trust/LHB changes between periods but does not conflate the two.
 
-### Pre-floor mergers
+### Succession walking
 
-The API's temporal history layer has a floor date (the earliest date for which it records state). For audit period reference dates **before** that floor, the snapshot endpoint returns the state as it was at the floor date — which may be the **pre-merger** state if the merger predates the floor. The current-state list endpoint, by contrast, returns the operationally correct (post-merger) state.
+The `rcpch-nhs-organisations` API's snapshot endpoint walks the
+`OrganisationSuccession` chain to resolve the entity that was in force on
+the queried date. When the queried ODS code was inactive by the reference
+date (because a merger or dissolution occurred before then), the snapshot
+walks **forward** to the active successor and returns the successor's
+state — its ODS code, trust, ICB, region, network, and country — with
+`predecessor_ods_code` set to the queried code. When the queried code did
+not yet exist on the reference date, the snapshot walks **backward** to the
+predecessor.
 
-Worked examples: Ormskirk & District General Hospital (`RVY02`) and Yeovil District Hospital (`RA430`) both moved to active successor trusts (Mersey & West Lancs `RBN`, Somerset `RH5`) before the API's temporal floor. The snapshot returns the dissolved predecessor trust (`RVY` / `RA4`) for every reference date in its window; the local DB has the organisations under the active successor trust (`RBN` / `RH5`).
+The snapshot response now carries both `predecessor_ods_code` and
+`successor_ods_code` describing the **resolved** entity's immediate
+neighbours, plus `ods_code` (the resolved entity's ODS code). A walk is
+detected by comparing `ods_code` to the queried code. This is a breaking
+change from the earlier `predecessor_ods_code`-only semantics (where it
+meant "the resolved code when it differs from what you queried").
 
-When the per-cohort sync creates a candidate membership whose snapshot-sourced trust differs from the operationally correct live trust, the audit team should decline that row in `approve_audit_period_organisations` with a note and either manually correct the trust FK (setting `source = "manual"`) or accept the API's view. The `source` field records whether the row came from `snapshot`, `detail_fallback` (the snapshot 404'd and the sync fell back to the detail endpoint), or `manual`. Rows sourced from `detail_fallback` should be re-synced once the API backfills temporal history for the relevant period.
+This means the per-cohort sync does not need to reconstruct succession
+locally: the API does it. For each cohort, the snapshot returns the
+organisation and trust that were in force at that cohort's reference date,
+and the sync freezes them into the `AuditPeriodOrganisation` membership.
+The sync also links predecessor and successor `Organisation` rows via
+`OrganisationIdentity` using the `predecessor_ods_code` /
+`successor_ods_code` fields, so cases registered against a predecessor ODS
+code remain visible through the active successor after cutover.
+
+Worked example — Ormskirk & District General Hospital (`RVY02`),
+succeeded by `RBN52` (Mersey & West Lancs) on 2023-07-01:
+
+| Cohort | Reference date | Snapshot for `RVY02` returns | Membership frozen as |
+|---|---|---|---|
+| 4 (2022-11-30) | before merger | `ods_code=RVY02`, `trust=RVY`, `successor=RBN52` | `trust=RVY` |
+| 7 (2025-11-30) | after merger | `ods_code=RBN52`, `trust=RBN`, `predecessor=RVY02` | `trust=RBN` |
+| 8 (2026-12-31) | after merger | `ods_code=RBN52`, `trust=RBN`, `predecessor=RVY02` | `trust=RBN` |
+
+The `source` field on each `AuditPeriodOrganisation` row records whether
+the row came from `"snapshot"`, `"detail_fallback"` (the snapshot
+returned 404 and the sync fell back to the detail endpoint), or
+`"manual"`. Rows sourced from `detail_fallback` should be re-synced once
+the API backfills temporal history for the relevant period.
 
 ### Operational procedure
 
