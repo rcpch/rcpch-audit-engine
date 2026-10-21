@@ -265,57 +265,90 @@ def _resolve_or_upsert_entity(api_nested, upsert_fn, lookup_field: str):
 
 
 def _upsert_organisation_identity(
-    organisation, predecessor_ods_code: str | None
+    organisation,
+    predecessor_ods_code: str | None = None,
+    successor_ods_code: str | None = None,
 ):
-    """Link ``organisation`` and its predecessor (if any) to a shared
-    ``OrganisationIdentity``.
+    """Link ``organisation`` to its predecessor and/or successor (if any)
+    via a shared ``OrganisationIdentity``.
 
-    If the snapshot returned a ``predecessor_ods_code``, the predecessor
-    organisation is fetched or created (with ``active=False``) and both
-    rows are linked to the same ``OrganisationIdentity``. If the
-    organisation already has an identity, the predecessor is linked to it.
+    The API snapshot endpoint now returns ``predecessor_ods_code`` and
+    ``successor_ods_code`` describing the **resolved** entity's immediate
+    neighbours in the succession chain.  Either, both, or neither may be
+    non-null:
+
+    - **No walk** (queried date is before the merger): ``successor_ods_code``
+      is non-null.  Link the org to its successor.
+    - **Forward walk** (queried date is after the merger, the snapshot walked
+      to the successor): ``predecessor_ods_code`` is the resolved entity's
+      predecessor — which may be the queried org itself.  In that case the
+      ``successor_ods_code`` is null, but the resolved ``ods_code`` differs
+      from the queried code, so the caller passes it as ``successor_ods_code``.
+    - **Backward walk** (queried code did not exist on the date, the snapshot
+      walked to the predecessor): ``successor_ods_code`` is non-null.
+
+    Any non-null code that differs from the organisation's own ODS code is
+    fetched or created (with ``active=False`` for predecessors) and linked
+    to the same ``OrganisationIdentity``.
     """
     OrganisationIdentity = _get_model("OrganisationIdentity")
     Organisation = _get_model("Organisation")
 
-    if not predecessor_ods_code:
+    # Collect the ODS codes to link, excluding the org itself.
+    other_codes: set[str] = set()
+    if predecessor_ods_code and predecessor_ods_code != organisation.ods_code:
+        other_codes.add((predecessor_ods_code, False))  # (code, is_predecessor)
+    if successor_ods_code and successor_ods_code != organisation.ods_code:
+        other_codes.add((successor_ods_code, True))  # (code, is_successor)
+
+    if not other_codes:
         return None
 
-    # Fetch or create the predecessor organisation row.
-    predecessor, created = Organisation.objects.get_or_create(
-        ods_code=predecessor_ods_code,
-        defaults={"name": "", "active": False},
-    )
-    if created:
-        logger.info(
-            "Created predecessor Organisation %s (inactive, from succession data)",
-            predecessor_ods_code,
-        )
-
     # Resolve the shared identity.
-    if organisation.identity is not None:
-        identity = organisation.identity
-    elif predecessor.identity is not None:
-        identity = predecessor.identity
-    else:
-        # Neither has an identity yet — create one.
+    identity = organisation.identity
+    if identity is None:
+        # Check if any linked org already has an identity.
+        for code, _ in other_codes:
+            other = Organisation.objects.filter(ods_code=code).first()
+            if other and other.identity_id is not None:
+                identity = other.identity
+                break
+
+    if identity is None:
+        # Neither the org nor any linked org has an identity — create one.
+        names = [organisation.name] + [
+            Organisation.objects.filter(ods_code=code).values_list("name", flat=True).first() or code
+            for code, _ in other_codes
+        ]
         identity = OrganisationIdentity.objects.create(
-            name=organisation.name or predecessor.name or predecessor_ods_code
+            name=next((n for n in names if n), organisation.ods_code)
         )
         logger.info(
-            "Created OrganisationIdentity %s for %s / %s",
+            "Created OrganisationIdentity %s for %s",
             identity.pk,
             organisation.ods_code,
-            predecessor_ods_code,
         )
 
-    # Link both rows to the identity (idempotent).
+    # Link the organisation to the identity (idempotent).
     if organisation.identity_id != identity.id:
         organisation.identity = identity
         organisation.save(update_fields=["identity"])
-    if predecessor.identity_id != identity.id:
-        predecessor.identity = identity
-        predecessor.save(update_fields=["identity"])
+
+    # Link each other org to the identity (idempotent).
+    for code, is_successor in other_codes:
+        other, created = Organisation.objects.get_or_create(
+            ods_code=code,
+            defaults={"name": "", "active": is_successor},
+        )
+        if created:
+            logger.info(
+                "Created %s Organisation %s (from succession data)",
+                "successor" if is_successor else "predecessor",
+                code,
+            )
+        if other.identity_id != identity.id:
+            other.identity = identity
+            other.save(update_fields=["identity"])
 
     return identity
 
@@ -399,7 +432,23 @@ def _sync_organisation_for_period(
         return result
 
     predecessor_ods_code = snapshot.get("predecessor_ods_code")
+    successor_ods_code = snapshot.get("successor_ods_code")
+    resolved_ods_code = snapshot.get("ods_code")
     result["predecessor_ods_code"] = predecessor_ods_code
+
+    # When the snapshot walked the succession chain forward (resolved
+    # ods_code differs from the queried code), the resolved entity is the
+    # successor.  Link the queried org to the resolved org via
+    # OrganisationIdentity so cases on the predecessor remain visible
+    # through the successor.
+    if (
+        resolved_ods_code
+        and resolved_ods_code != ods_code
+        and not successor_ods_code
+    ):
+        # Forward walk: the resolved entity is the successor.  Pass it
+        # as the successor for identity linking.
+        successor_ods_code = resolved_ods_code
 
     # Upsert dissolved hierarchy entities from the snapshot.
     trust = _resolve_or_upsert_entity(
@@ -451,7 +500,9 @@ def _sync_organisation_for_period(
     country_name = (snapshot.get("country") or {}).get("name", "")
 
     # Link OrganisationIdentity for ODS code succession.
-    _upsert_organisation_identity(organisation, predecessor_ods_code)
+    _upsert_organisation_identity(
+        organisation, predecessor_ods_code, successor_ods_code
+    )
 
     defaults = {
         "included_in_reporting": True,
@@ -916,12 +967,26 @@ def link_organisation_identities(
             continue
 
         predecessor_ods_code = snapshot.get("predecessor_ods_code")
-        if not predecessor_ods_code:
+        successor_ods_code = snapshot.get("successor_ods_code")
+        resolved_ods_code = snapshot.get("ods_code")
+
+        # When the snapshot walked the succession chain, the resolved
+        # ods_code differs from the queried code.  Use whichever of
+        # predecessor / successor / resolved is non-null and differs
+        # from the queried code to link the identity.
+        if (
+            resolved_ods_code
+            and resolved_ods_code != organisation.ods_code
+            and not successor_ods_code
+        ):
+            successor_ods_code = resolved_ods_code
+
+        if not predecessor_ods_code and not successor_ods_code:
             no_predecessor += 1
             continue
 
         identity = _upsert_organisation_identity(
-            organisation, predecessor_ods_code
+            organisation, predecessor_ods_code, successor_ods_code
         )
         if identity is not None:
             linked += 1

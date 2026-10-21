@@ -183,65 +183,47 @@ counterpart to Step 3 — it confirms the sync was applied as expected.
 | 4 | `sync_audit_period_organisations --link-identities` | `Organisation.identity` / `OrganisationIdentity` | — | Link ODS code successors to predecessors |
 | 5 | `sync_audit_period_organisations --reconcile` | nothing | — | Verify the whole cutover |
 
-## Pre-floor mergers
+## Succession walking
 
-The `rcpch-nhs-organisations` API's temporal history layer started
-recording on a specific date (the "floor date"). For audit period
-reference dates **before** that floor date, the snapshot endpoint returns
-the state as it was at the floor date — which may be the **pre-merger**
-state if the merger predates the floor.
+The `rcpch-nhs-organisations` API's snapshot endpoint walks the
+`OrganisationSuccession` chain to resolve the entity that was in force on
+the queried date. When the queried ODS code was inactive by the reference
+date (because a merger or dissolution occurred before then), the snapshot
+walks **forward** to the active successor and returns the successor's
+state — its ODS code, trust, ICB, region, network, and country — with
+`predecessor_ods_code` set to the queried code. When the queried code did
+not yet exist on the reference date, the snapshot walks **backward** to the
+predecessor.
 
-### Worked examples
+This means the per-cohort sync does not need to reconstruct succession
+locally: the API does it. For each cohort, the snapshot returns the
+organisation and trust that were in force at that cohort's reference date,
+and the sync freezes them into the `AuditPeriodOrganisation` membership.
 
-**Ormskirk & District General Hospital (`RVY02`)**
+### Worked example: Ormskirk & District General Hospital (`RVY02`)
 
-Southport & Ormskirk Hospital NHS Trust (`RVY`) was dissolved in 2013;
-Ormskirk hospital then came under Mersey & West Lancashire Teaching
-Hospitals NHS Trust (`RBN`). The API's temporal floor is in 2020, so the
-snapshot endpoint returns trust `RVY` (the dissolved trust) for every
-reference date in its window. The local E12 database has `RVY02` under
-`RBN` (the operationally correct parent).
+Southport & Ormskirk Hospital NHS Trust (`RVY`) was dissolved on
+2023-07-01; Ormskirk hospital then came under Mersey & West Lancashire
+Teaching Hospitals NHS Trust (`RBN`) as `RBN52`.
 
-When the per-cohort sync runs, it will create a candidate
-`AuditPeriodOrganisation` row for `RVY02` with `trust = RVY` for **every**
-cohort — because that is what the snapshot returns. This is operationally
-wrong: the cases were managed under `RBN` for every cohort after the 2013
-merger.
+| Cohort | Reference date | Snapshot for `RVY02` returns | Membership frozen as |
+|---|---|---|---|
+| 4 (2022-11-30) | before merger | `ods_code=RVY02`, `trust=RVY`, `successor=RBN52` | `trust=RVY` ✓ |
+| 7 (2025-11-30) | after merger | `ods_code=RBN52`, `trust=RBN`, `predecessor=RVY02` | `trust=RBN` ✓ |
+| 8 (2026-12-31) | after merger | `ods_code=RBN52`, `trust=RBN`, `predecessor=RVY02` | `trust=RBN` ✓ |
 
-**Yeovil District Hospital (`RA430`)**
+The sync also links `RVY02` and `RBN52` via `OrganisationIdentity` using
+the `predecessor_ods_code` / `successor_ods_code` fields, so cases
+registered against the predecessor ODS code remain visible through the
+active successor after cutover.
 
-Same pattern: Yeovil District Hospital NHS Foundation Trust (`RA4`) merged
-into Somerset NHS Foundation Trust (`RH5`) in 2023. The snapshot returns
-`RA4` (the dissolved trust) for dates before the API's temporal floor. The
-local database has `RA430` under `RH5` (the operationally correct parent).
+### Genuine dissolution (no successor)
 
-### What to do
-
-When reviewing the per-cohort sync's candidate memberships in Step 2
-(`approve_audit_period_organisations`), the audit team must:
-
-1. **Identify pre-floor cases.** For each candidate row, compare the
-   snapshot-sourced trust against the live `Organisation.trust`. If they
-   differ and the snapshot-sourced trust is `active=False` (a dissolved
-   trust), the row is likely a pre-floor case.
-
-2. **Decline the row with a note.** Use the `n` (decline) option in the
-   approval command and record a note such as "Pre-floor merger —
-   operationally under `<live trust>` since `<year>`; snapshot returns
-   `<dissolved trust>` because the merger predates the API temporal floor."
-
-3. **Manually correct the membership** if the period-aware reporting needs
-   the operationally correct trust. The `AuditPeriodOrganisation` row can
-   be edited directly (via Django admin or a data migration) to set the
-   correct trust FK. The `source` field should be set to `"manual"` to
-   record that the row was corrected by hand.
-
-4. **Re-sync once the API backfills temporal history.** If the API later
-   backfills temporal history for the pre-floor period, re-running the
-   per-cohort sync will update the unapproved (or manually-corrected)
-   row. If the row was approved, the sync will not overwrite it — clear
-   `approved_at` first if you want the sync to pick up the new snapshot
-   data.
+When the snapshot returns an inactive trust with no successor
+(`predecessor_ods_code` and `successor_ods_code` both null for the
+resolved entity), the organisation is genuinely defunct. The sync freezes
+the inactive trust into the membership — this is correct, because there is
+no active successor to attribute the cases to.
 
 ### The `source` field
 
@@ -264,19 +246,14 @@ After cutover, the operational dashboard and case list update their
 dropdowns based on the organisational relationships at the time of the
 selected cohort:
 
-- **Cohort 7 selected** (pre-floor reference date) — the dashboard shows
-  the period-correct trust from the frozen `AuditPeriodOrganisation`
-  membership. For Ormskirk this would be `RVY` (Southport & Ormskirk) if
-  the snapshot-sourced membership was approved as-is, or `RBN` (Mersey &
-  West Lancs) if the audit team corrected it to the operational parent.
-  The period-context alert fires when the period-correct parent differs
-  from the current parent.
+- **Cohort 4 selected** (before the Ormskirk merger) — the dashboard shows
+  `RVY` (Southport & Ormskirk) from the frozen membership. The
+  period-context alert fires when the period-correct parent differs from
+  the current parent (`RBN`).
 
-- **Cohort 9 selected** (in-window reference date) — the dashboard shows
-  the period-correct trust from the frozen membership, which for Ormskirk
-  would be `RBN` (the operationally correct parent, as returned by the
-  snapshot for an in-window date). No alert fires if the period-correct
-  parent matches the current parent.
+- **Cohort 7 or 8 selected** (after the Ormskirk merger) — the dashboard
+  shows `RBN` (Mersey & West Lancs) from the frozen membership. No alert
+  fires if `RBN` is also the current parent.
 
 - **No cohort selected ("all children")** — the dashboard uses the
   current live parent. No period alert fires.

@@ -88,6 +88,7 @@ def _make_snapshot_response(
     country_boundary_id="E92000001",
     country_name="England",
     predecessor_ods_code=None,
+    successor_ods_code=None,
 ):
     """Build a mock API snapshot response dict."""
     return {
@@ -119,6 +120,7 @@ def _make_snapshot_response(
             "name": country_name,
         },
         "predecessor_ods_code": predecessor_ods_code,
+        "successor_ods_code": successor_ods_code,
     }
 
 
@@ -1528,3 +1530,186 @@ def test_reconcile_period_combines_all_reports(
     assert "hierarchy_changes" in report
     assert "registration_attribution" in report
     assert "sibling_organisations" in report
+
+
+# ---------------------------------------------------------------------------
+# PR 7 — forward-walk snapshot: the API walks the succession chain forward
+# so that the per-cohort sync freezes the active successor trust, not the
+# dissolved predecessor trust, for cohorts whose reference date is after the
+# merger.
+# ---------------------------------------------------------------------------
+
+
+@pytest.mark.django_db
+def test_sync_freezes_successor_trust_when_snapshot_walks_forward(
+    cohort_4, e12_case_factory
+):
+    """When the snapshot endpoint walks the succession chain forward (the
+    queried ODS code was inactive by the reference date, so the API resolves
+    to the active successor), the per-cohort sync must freeze the successor
+    trust into the ``AuditPeriodOrganisation`` membership — not the
+    dissolved predecessor trust.
+
+    This is the Ormskirk case: ``RVY02`` (Southport & Ormskirk, dissolved)
+    was succeeded by ``RBN52`` (Mersey & West Lancs, active) on 2023-07-01.
+    For cohort 8 (reference date 2026-12-31, after the merger), the snapshot
+    returns ``ods_code=RBN52``, ``trust=RBN``, with
+    ``predecessor_ods_code=RVY02``.  The sync must create the membership
+    with ``trust=RBN``.
+    """
+    from epilepsy12.models import Organisation, Trust, OrganisationIdentity
+
+    # Create the predecessor org (RVY02) under the dissolved trust (RVY).
+    rvy, _ = Trust.objects.get_or_create(
+        ods_code="RVY",
+        defaults={
+            "name": "SOUTHPORT AND ORMSKIRK HOSPITAL NHS TRUST",
+            "active": False,
+        },
+    )
+    rvy02, _ = Organisation.objects.get_or_create(
+        ods_code="RVY02",
+        defaults={
+            "name": "ORMSKIRK & DISTRICT GENERAL HOSPITAL",
+            "trust": rvy,
+            "country": Country.objects.get(boundary_identifier="E92000001"),
+            "active": False,
+        },
+    )
+
+    # Register a case against the predecessor org in cohort 4.
+    e12_case_factory(
+        first_name="ormskirk_forward_walk",
+        organisations__organisation=rvy02,
+        registration__first_paediatric_assessment_date=date(2021, 6, 1),
+        registration__audit_period__cohort_number=4,
+    )
+
+    # Mock the snapshot: the API walks forward to RBN52 with trust=RBN.
+    rbn, _ = Trust.objects.get_or_create(
+        ods_code="RBN",
+        defaults={
+            "name": "MERSEY AND WEST LANCASHIRE TEACHING HOSPITALS NHS TRUST",
+            "active": True,
+        },
+    )
+    rbn52, _ = Organisation.objects.get_or_create(
+        ods_code="RBN52",
+        defaults={
+            "name": "ORMSKIRK AND DISTRICT GENERAL HOSPITAL",
+            "trust": rbn,
+            "country": Country.objects.get(boundary_identifier="E92000001"),
+            "active": True,
+        },
+    )
+
+    snapshot_response = {
+        "ods_code": "RBN52",
+        "name": "ORMSKIRK AND DISTRICT GENERAL HOSPITAL",
+        "trust": {"ods_code": "RBN", "name": rbn.name, "active": True},
+        "local_health_board": "",
+        "integrated_care_board": {"ods_code": "QYG", "name": "NHS CHESHIRE AND MERSEYSIDE INTEGRATED CARE BOARD"},
+        "nhs_england_region": {"region_code": "Y62", "name": "North West"},
+        "openuk_network": {"boundary_identifier": "EPIC", "name": "Mersey and North Wales network"},
+        "country": {"boundary_identifier": "E92000001", "name": "England"},
+        "predecessor_ods_code": "RVY02",
+        "successor_ods_code": None,
+    }
+
+    with patch(
+        "epilepsy12.general_functions.audit_period_sync.get_organisation_snapshot",
+        return_value=snapshot_response,
+    ):
+        result = sync_audit_period(cohort_4)
+
+    # The membership must be created with trust=RBN (the active successor).
+    membership = AuditPeriodOrganisation.objects.get(
+        audit_period=cohort_4, organisation=rvy02,
+    )
+    assert membership.trust == rbn
+
+    # The identity chain must link RVY02 and RBN52.
+    rvy02.refresh_from_db()
+    rbn52.refresh_from_db()
+    assert rvy02.identity_id is not None
+    assert rvy02.identity_id == rbn52.identity_id
+
+
+@pytest.mark.django_db
+def test_sync_links_successor_when_snapshot_returns_successor_field(
+    cohort_4, e12_case_factory
+):
+    """When the snapshot returns a ``successor_ods_code`` (no walk — the
+    queried date is before the merger), the per-cohort sync must link the
+    queried org to its successor via ``OrganisationIdentity``.
+
+    This is the pre-merger case: querying ``RVY02`` at 2022 (before the
+    2023-07-01 merger) returns ``ods_code=RVY02``, ``trust=RVY``, with
+    ``successor_ods_code=RBN52``.  The sync creates the membership with
+    ``trust=RVY`` (correct for the pre-merger period) and links the identity
+    chain so cases remain visible after cutover.
+    """
+    from epilepsy12.models import Organisation, Trust
+
+    rvy2, _ = Trust.objects.get_or_create(
+        ods_code="RVY",
+        defaults={
+            "name": "SOUTHPORT AND ORMSKIRK HOSPITAL NHS TRUST",
+            "active": False,
+        },
+    )
+    rvy02, _ = Organisation.objects.get_or_create(
+        ods_code="RVY02",
+        defaults={
+            "name": "ORMSKIRK & DISTRICT GENERAL HOSPITAL",
+            "trust": rvy2,
+            "country": Country.objects.get(boundary_identifier="E92000001"),
+            "active": True,
+        },
+    )
+    rbn2, _ = Trust.objects.get_or_create(
+        ods_code="RBN",
+        defaults={
+            "name": "MERSEY AND WEST LANCASHIRE TEACHING HOSPITALS NHS TRUST",
+            "active": True,
+        },
+    )
+    rbn52, _ = Organisation.objects.get_or_create(
+        ods_code="RBN52",
+        defaults={
+            "name": "ORMSKIRK AND DISTRICT GENERAL HOSPITAL",
+            "trust": rbn2,
+            "country": Country.objects.get(boundary_identifier="E92000001"),
+            "active": True,
+        },
+    )
+
+    e12_case_factory(
+        first_name="ormskirk_pre_merger",
+        organisations__organisation=rvy02,
+        registration__first_paediatric_assessment_date=date(2021, 6, 1),
+        registration__audit_period__cohort_number=4,
+    )
+
+    snapshot_response = _make_snapshot_response(
+        ods_code="RVY02",
+        trust_ods_code="RVY",
+        trust_name=rvy2.name,
+        successor_ods_code="RBN52",
+    )
+
+    with patch(
+        "epilepsy12.general_functions.audit_period_sync.get_organisation_snapshot",
+        return_value=snapshot_response,
+    ):
+        sync_audit_period(cohort_4)
+
+    membership = AuditPeriodOrganisation.objects.get(
+        audit_period=cohort_4, organisation=rvy02,
+    )
+    assert membership.trust == rvy2
+
+    rvy02.refresh_from_db()
+    rbn52.refresh_from_db()
+    assert rvy02.identity_id is not None
+    assert rvy02.identity_id == rbn52.identity_id
