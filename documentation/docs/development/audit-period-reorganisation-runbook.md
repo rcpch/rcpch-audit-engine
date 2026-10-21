@@ -146,6 +146,16 @@ the API's current state.
 If the command prints `Sync blocked by the ordering constraint: ...`,
 return to Step 2 and approve the in-flight cohorts before re-running.
 
+**Temporary visibility window:** between this step and Step 4, cases on
+organisations that have gone `active=False` (e.g. `RVY02`, `RA430`) are
+temporarily not visible in the no-cohort trust dropdown. This is expected:
+the live `Organisation.trust` has moved to the (now-inactive) predecessor
+trust, and the `OrganisationIdentity` links don't exist yet. The cases
+remain in the database and are reachable via direct organisation URLs.
+Step 4 (`--link-identities`) creates the identity links that make them
+visible through the active successor. Minimise the time between Step 3
+and Step 4.
+
 ### Step 4 — Link OrganisationIdentity
 
 ```bash
@@ -157,10 +167,18 @@ Bridge ODS code changes from mergers/dissolutions by linking successor
 must run **after** Step 3 because the current-state sync creates the new
 ODS code rows that this step links.
 
-This step is what makes cases on an inactive predecessor organisation
-visible through the active successor in the no-cohort UI. Without it, the
-dry-run's "cases orphaned from no-cohort UI" warning would materialise:
-cases would remain in the database but not appear in the trust dropdown.
+This step makes cases on an inactive predecessor organisation visible
+through the active successor. After it runs:
+- **Cohort-selected views** show the predecessor's cases via
+  `expand_organisation_ids_via_identity` (PRs 4/5).
+- **No-cohort dropdown** will also show them once the dropdown population
+  is migrated to expand through the identity chain (a future follow-up).
+
+The dry-run (`--dry-run` before Step 3) resolves the active successor for
+each inactivated organisation by calling the API snapshot endpoint, so it
+can report — before you commit to the live sync — which cases are
+**recoverable** (successor found) vs **permanently orphaned** (no successor).
+Run `--dry-run` and review the successor report before proceeding.
 
 ### Step 5 — Confirm the changes
 
