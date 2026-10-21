@@ -177,42 +177,50 @@ class Command(BaseCommand):
                                     else ""
                                 )
                             )
-                        if successor_info is not None:
-                            identity_status = (
-                                "identity link already exists"
-                                if successor_info.get("identity_linked")
-                                else "identity link will be created by "
-                                "`sync_audit_period_organisations --link-identities` "
-                                "(Step 4 of the cutover)"
-                            )
-                            self.stdout.write(
-                                self.style.WARNING(
-                                    f"          Successor: {successor_info['successor_ods_code']} "
-                                    f"({successor_info['successor_name']}) under "
-                                    f"{successor_info['successor_trust_name']} — "
-                                    f"all {exposure['cases_all_periods']} cases "
-                                    f"WILL be retrievable after cutover; "
-                                    f"{identity_status}. Cases are temporarily "
-                                    f"not visible in the no-cohort trust dropdown "
-                                    f"between Step 3 (--confirm) and Step 4 "
-                                    f"(--link-identities)."
+                        # The successor/orphan check only applies to organisation
+                        # entries.  Trust/LHB entries aggregate cases across all
+                        # their child organisations; the per-organisation entries
+                        # below carry the successor resolution, so reporting an
+                        # orphan at the trust level would double-count and
+                        # mislead (the same cases are already reported as
+                        # recoverable on the organisation entry).
+                        if entity_name == "organisations":
+                            if successor_info is not None:
+                                identity_status = (
+                                    "identity link already exists"
+                                    if successor_info.get("identity_linked")
+                                    else "identity link will be created by "
+                                    "`sync_audit_period_organisations --link-identities` "
+                                    "(Step 4 of the cutover)"
                                 )
-                            )
-                        elif (
-                            exposure
-                            and "active" in field_diffs
-                            and field_diffs["active"] == (True, False)
-                            and exposure.get("cases_all_periods", 0) > 0
-                        ):
-                            self.stdout.write(
-                                self.style.ERROR(
-                                    f"          WARNING: No active successor found "
-                                    f"for {exposure['cases_all_periods']} cases — "
-                                    f"these cases would be PERMANENTLY orphaned "
-                                    f"from the no-cohort trust dropdown. "
-                                    f"Investigate manually before proceeding."
+                                self.stdout.write(
+                                    self.style.WARNING(
+                                        f"          Successor: {successor_info['successor_ods_code']} "
+                                        f"({successor_info['successor_name']}) under "
+                                        f"{successor_info['successor_trust_name']} — "
+                                        f"all {exposure['cases_all_periods']} cases "
+                                        f"WILL be retrievable after cutover; "
+                                        f"{identity_status}. Cases are temporarily "
+                                        f"not visible in the no-cohort trust dropdown "
+                                        f"between Step 3 (--confirm) and Step 4 "
+                                        f"(--link-identities)."
+                                    )
                                 )
-                            )
+                            elif (
+                                exposure
+                                and "active" in field_diffs
+                                and field_diffs["active"] == (True, False)
+                                and exposure.get("cases_all_periods", 0) > 0
+                            ):
+                                self.stdout.write(
+                                    self.style.ERROR(
+                                        f"          WARNING: No active successor found "
+                                        f"for {exposure['cases_all_periods']} cases — "
+                                        f"these cases would be PERMANENTLY orphaned "
+                                        f"from the no-cohort trust dropdown. "
+                                        f"Investigate manually before proceeding."
+                                    )
+                                )
                     if changed_limit is not None and len(changed) > changed_limit:
                         self.stdout.write(f"      ... and {len(changed) - changed_limit} more")
 
@@ -244,9 +252,12 @@ class Command(BaseCommand):
                         total_registrations += exposure.get("registrations_all_periods", 0)
                         total_registrations_in_flight += exposure.get("registrations_in_flight", 0)
                         total_cases += exposure.get("cases_all_periods", 0)
-                    # Classify orgs going inactive with cases by successor status.
+                    # The successor/orphan classification only applies to
+                    # organisation entries — trust/LHB entries aggregate the
+                    # same cases as their child orgs and would double-count.
                     if (
-                        len(entry) > 3
+                        entity_name == "organisations"
+                        and len(entry) > 3
                         and entry[3]
                         and "active" in entry[2]
                         and entry[2]["active"] == (True, False)
