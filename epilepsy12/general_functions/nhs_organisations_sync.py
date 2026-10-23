@@ -38,6 +38,7 @@ from django.contrib.gis.geos import Point
 from django.db import transaction
 
 from .nhs_organisations import (
+    get_organisation_snapshot,
     list_countries,
     list_integrated_care_boards,
     list_local_health_boards,
@@ -875,6 +876,117 @@ def _count_parent_exposure(parent, parent_field: str) -> dict[str, int]:
     }
 
 
+def _resolve_inactivation_successor(organisation) -> dict[str, Any] | None:
+    """Resolve the active successor for an organisation that is going
+    ``active=False`` under an inactive trust (or LHB).
+
+    When an organisation is deactivated by the current-state sync (e.g.
+    ``RVY02`` — Ormskirk under the dissolved Southport & Ormskirk trust
+    ``RVY``), its cases remain attached via ``Site.organisation``.  They
+    are still reachable in the UI through the active successor organisation
+    (e.g. ``RBN52`` — Ormskirk under Mersey & West Lancs ``RBN``) **if**
+    both organisations share the same ``OrganisationIdentity``.
+
+    Resolution tries two sources, in order:
+
+    1. **Local identity chain** — if the ``OrganisationIdentity`` link
+       already exists locally (e.g. from a previous ``--link-identities``
+       run), resolve the active successor directly from the local DB.
+
+    2. **API snapshot** — if no local identity link exists (the
+       pre-``--link-identities`` state on the first cutover), call the
+       API's snapshot endpoint at today's date.  The snapshot walks the
+       ``OrganisationSuccession`` chain forward to the active successor
+       and returns ``ods_code`` (the resolved successor) and
+       ``predecessor_ods_code`` (the queried code).  This lets the dry-run
+       report the successor even before the identity links have been
+       created locally.
+
+    Returns a dict with:
+    - ``successor_ods_code``: the successor organisation's ODS code
+    - ``successor_name``: the successor organisation's name
+    - ``successor_trust_name``: the successor's trust name (or LHB name)
+    - ``identity_linked``: True if the identity link already exists locally
+
+    Returns ``None`` if no active successor is found from either source —
+    the cases would be permanently orphaned from the no-cohort trust
+    dropdown (though still present in the database and reachable via
+    direct organisation URLs).
+    """
+    Organisation = _get_model("Organisation")
+
+    # 1. Try the local identity chain.
+    if organisation.identity_id is not None:
+        successors = (
+            Organisation.objects.filter(
+                identity_id=organisation.identity_id,
+                active=True,
+            ).exclude(pk=organisation.pk)
+        )
+        successor = successors.first()
+        if successor is not None:
+            if successor.trust_id is not None:
+                parent_name = successor.trust.name if successor.trust else None
+            else:
+                parent_name = (
+                    successor.local_health_board.name
+                    if successor.local_health_board
+                    else None
+                )
+            return {
+                "successor_ods_code": successor.ods_code,
+                "successor_name": successor.name,
+                "successor_trust_name": parent_name,
+                "identity_linked": True,
+            }
+
+    # 2. Fallback: call the API snapshot endpoint to walk the succession
+    #    chain forward.  This is the pre---link-identities state on the
+    #    first cutover, when no local identity links exist yet.
+    try:
+        snapshot = get_organisation_snapshot(
+            organisation.ods_code, on_date=date_class.today()
+        )
+    except Exception:
+        # API call failed (network error, 404, etc.) — don't block the
+        # dry-run on an API failure.  Report None so the audit team sees
+        # the orphan warning and can investigate manually.
+        logger.warning(
+            "Could not resolve successor for %s via API snapshot: %s",
+            organisation.ods_code,
+            "API call failed",
+            exc_info=True,
+        )
+        return None
+
+    resolved_ods_code = snapshot.get("ods_code")
+    if not resolved_ods_code or resolved_ods_code == organisation.ods_code:
+        # No walk happened — the org is the current resolved entity, so
+        # there is no successor.
+        return None
+
+    # The snapshot walked forward to the active successor.  Read its name
+    # and trust from the snapshot response (the successor may not exist
+    # locally yet, so we can't look it up in the local DB).
+    successor_name = snapshot.get("name", "") or resolved_ods_code
+    nested_trust = snapshot.get("trust")
+    if isinstance(nested_trust, dict) and nested_trust.get("name"):
+        successor_trust_name = nested_trust["name"]
+    else:
+        nested_lhb = snapshot.get("local_health_board")
+        if isinstance(nested_lhb, dict) and nested_lhb.get("name"):
+            successor_trust_name = nested_lhb["name"]
+        else:
+            successor_trust_name = None
+
+    return {
+        "successor_ods_code": resolved_ods_code,
+        "successor_name": successor_name,
+        "successor_trust_name": successor_trust_name,
+        "identity_linked": False,
+    }
+
+
 def dry_run_diff(only: str | None = None) -> dict[str, dict[str, Any]]:
     """Compare the API's current state against the local DB.
 
@@ -967,8 +1079,25 @@ def dry_run_diff(only: str | None = None) -> dict[str, dict[str, Any]]:
                 if local_org is not None
                 else {"registrations_all_periods": 0, "registrations_in_flight": 0, "cases_all_periods": 0}
             )
+            # Detect whether this organisation is going inactive (active:
+            # True → False).  If it carries cases, resolve the active
+            # successor via OrganisationIdentity so the dry-run can flag
+            # whether the cases would be orphaned from the no-cohort trust
+            # dropdown.
+            going_inactive = (
+                "active" in all_diffs
+                and all_diffs["active"] == (True, False)
+            )
+            successor_info = None
+            if (
+                going_inactive
+                and local_org is not None
+                and exposure.get("cases_all_periods", 0) > 0
+            ):
+                successor_info = _resolve_inactivation_successor(local_org)
+
             augmented_changed.append(
-                (identifier, name, all_diffs, exposure)
+                (identifier, name, all_diffs, exposure, successor_info)
             )
         results["organisations"]["changed"] = augmented_changed
 
@@ -1021,6 +1150,14 @@ def pre_sync_safety_check(only: str | None = None) -> dict[str, Any]:
     - ``total_cases``: int — distinct cases affected.
     - ``high_impact_changes``: list of (entity, identifier, description) for
       the changes that triggered the impact confirmation.
+    - ``orphaned_cases``: int — cases on organisations going
+      ``active=False`` with no active successor via ``OrganisationIdentity``.
+      These cases would not appear in the no-cohort trust dropdown after the
+      sync (though they remain in the database and are reachable via
+      cohort-selected views and direct organisation URLs).
+    - ``inactivation_successors``: list of dicts with ``ods_code``, ``name``,
+      ``successor_ods_code``, ``successor_name``, ``cases`` — organisations
+      going inactive that have an active successor via identity.
     """
     diffs = dry_run_diff(only=only)
 
@@ -1030,12 +1167,16 @@ def pre_sync_safety_check(only: str | None = None) -> dict[str, Any]:
     high_impact_changes: list[tuple[str, str, str]] = []
     has_org_fk_move = False
     has_parent_active_flip = False
+    orphaned_cases = 0
+    inactivation_successors: list[dict[str, Any]] = []
 
     for entity_name, diff in diffs.items():
         for entry in diff.get("changed", []):
             identifier = entry[0]
             field_diffs = entry[2]
             exposure = entry[3] if len(entry) > 3 else None
+            # Organisation entries now carry a 5th element: successor_info.
+            successor_info = entry[4] if len(entry) > 4 else None
 
             # Detect organisation FK moves.
             if entity_name == "organisations":
@@ -1047,6 +1188,23 @@ def pre_sync_safety_check(only: str | None = None) -> dict[str, Any]:
                         high_impact_changes.append(
                             (entity_name, identifier, f"{fk}: {old_label} -> {new_label}")
                         )
+
+                # Track inactivation successor / orphan status.
+                going_inactive = (
+                    "active" in field_diffs
+                    and field_diffs["active"] == (True, False)
+                )
+                if going_inactive and exposure and exposure.get("cases_all_periods", 0) > 0:
+                    if successor_info is not None:
+                        inactivation_successors.append({
+                            "ods_code": identifier,
+                            "name": entry[1],
+                            "successor_ods_code": successor_info["successor_ods_code"],
+                            "successor_name": successor_info["successor_name"],
+                            "cases": exposure["cases_all_periods"],
+                        })
+                    else:
+                        orphaned_cases += exposure["cases_all_periods"]
 
             # Detect trust/LHB active flips.
             if entity_name in ("trusts", "local_health_boards") and "active" in field_diffs:
@@ -1102,4 +1260,6 @@ def pre_sync_safety_check(only: str | None = None) -> dict[str, Any]:
         "total_registrations_in_flight": total_registrations_in_flight,
         "total_cases": total_cases,
         "high_impact_changes": high_impact_changes,
+        "orphaned_cases": orphaned_cases,
+        "inactivation_successors": inactivation_successors,
     }

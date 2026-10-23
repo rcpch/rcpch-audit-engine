@@ -10,7 +10,7 @@ Scope (per ``audit-period-organisation.md`` PR 0):
 
 - submission (lock/unlock) via ``case_submit``;
 - report-builder smoke test (route loads, representative facets render);
-- dashboard route and redirect behaviour (``?cohort=`` semantics); and
+- operational dashboard route behaviour (non-slugged ``?cohort=`` semantics); and
 - Organisational Audit export (CSV generation from a submission period).
 
 If a later PR changes one of these behaviours deliberately, the test should be
@@ -29,6 +29,14 @@ from epilepsy12.models import (
     Organisation,
     OrganisationalAuditSubmission,
     OrganisationalAuditSubmissionPeriod,
+    Site,
+)
+from epilepsy12.common_view_functions.sanction_user_access import (
+    organisation_white_list_for_user,
+)
+from epilepsy12.general_functions.audit_period_hierarchy import (
+    resolve_period_parent,
+    expand_organisation_ids_via_identity,
 )
 from epilepsy12.organisational_audit import export_submission_period_as_csv
 from epilepsy12.tests.UserDataClasses import (
@@ -285,8 +293,8 @@ def test_report_builder_forbidden_for_unauthenticated(client):
 def test_dashboard_redirects_to_login_when_unauthenticated(client):
     """The organisation dashboard must redirect to login for anonymous users.
 
-    This pins the current behaviour so that the period-aware dashboard
-    cutover (PR 4) does not accidentally expose the dashboard publicly.
+    This pins the current behaviour so that operational dashboard routing
+    changes do not accidentally expose the dashboard publicly.
     """
     GOSH = Organisation.objects.get(ods_code="RP401", trust__ods_code="RP4")
 
@@ -308,8 +316,9 @@ def test_dashboard_loads_with_cohort_query_param(
 ):
     """The dashboard currently selects the cohort via ``?cohort=<number>``.
 
-    This pins the current ``?cohort=`` semantics so that the PR 4 cutover to
-    ``AuditPeriod.slug`` routing can be verified as a deliberate change.
+    This pins the non-slugged operational dashboard route: the selected
+    audit period is resolved from the existing ``?cohort=`` toggle, not from
+    an ``AuditPeriod.slug`` URL.
     """
     GOSH = Organisation.objects.get(ods_code="RP401", trust__ods_code="RP4")
 
@@ -348,8 +357,8 @@ def test_dashboard_defaults_to_grace_or_submitting_cohort(
     to the grace cohort (or the submitting cohort if no grace cohort is
     active).
 
-    This pins the default-selection behaviour so that the PR 4 cutover to
-    slug-based routing can be verified as a deliberate change.
+    This pins the default-selection behaviour for the non-slugged
+    operational dashboard route.
     """
     GOSH = Organisation.objects.get(ods_code="RP401", trust__ods_code="RP4")
 
@@ -427,3 +436,971 @@ def test_organisational_audit_export_empty_period(
     csv_data = export_submission_period_as_csv(submission_period)
 
     assert isinstance(csv_data, str)
+
+
+# ---------------------------------------------------------------------------
+# PR 4 — period-correct dropdowns, identity-chain visibility, recruiting cohort
+# ---------------------------------------------------------------------------
+
+
+@pytest.mark.django_db
+def test_resolve_period_parent_falls_back_to_current_when_no_membership(
+    reorganisation,
+):
+    """resolve_period_parent must fall back to the current parent when no
+    approved AuditPeriodOrganisation membership exists for the selected
+    period.
+
+    This is the pre-cutover safety valve: before the cutover commands have
+    run, no membership rows exist, so every call falls back to the current
+    parent and behaviour is identical to the pre-foundation code.
+    """
+    org = reorganisation["org_a_current"]
+    cohort_9 = reorganisation["cohort_9"]
+
+    # Temporarily delete the cohort 9 membership to simulate pre-cutover.
+    from epilepsy12.models import AuditPeriodOrganisation
+
+    AuditPeriodOrganisation.objects.filter(
+        audit_period=cohort_9, organisation=org
+    ).delete()
+
+    parent, is_period_correct = resolve_period_parent(org, cohort_9)
+
+    assert is_period_correct is False
+    assert parent == org.trust  # the current parent
+
+
+@pytest.mark.django_db
+def test_resolve_period_parent_uses_membership_when_approved(
+    reorganisation,
+):
+    """resolve_period_parent must return the period-correct parent from
+    the approved AuditPeriodOrganisation membership when it exists.
+    """
+    org = reorganisation["org_a_predecessor"]
+    cohort_8 = reorganisation["cohort_8"]
+    trust_a = reorganisation["trust_a"]
+
+    parent, is_period_correct = resolve_period_parent(org, cohort_8)
+
+    assert is_period_correct is True
+    assert parent == trust_a  # the period-correct parent (Trust A)
+
+
+@pytest.mark.django_db
+def test_expand_organisation_ids_via_identity_includes_predecessor(
+    reorganisation,
+):
+    """expand_organisation_ids_via_identity must include inactive
+    predecessor organisations that share the same OrganisationIdentity.
+    """
+    org_current = reorganisation["org_a_current"]
+    org_predecessor = reorganisation["org_a_predecessor"]
+
+    expanded = expand_organisation_ids_via_identity({org_current.pk})
+
+    assert org_predecessor.pk in expanded
+    assert org_current.pk in expanded
+
+
+@pytest.mark.django_db
+def test_expand_organisation_ids_noop_without_identity():
+    """expand_organisation_ids_via_identity must be a no-op when no
+    identity links exist (the pre-cutover state).
+    """
+    # RP401 (GOSH) is seeded without an identity FK.
+    gosh = Organisation.objects.get(ods_code="RP401")
+    assert gosh.identity_id is None
+
+    expanded = expand_organisation_ids_via_identity({gosh.pk})
+
+    assert expanded == {gosh.pk}
+
+
+@pytest.mark.django_db
+def test_organisation_white_list_includes_identity_predecessor(
+    reorganisation,
+):
+    """organisation_white_list_for_user must include inactive predecessor
+    organisations that share an OrganisationIdentity with the user's
+    active employer, so that cases and users attached to the predecessor
+    remain visible after cutover.
+    """
+    org_current = reorganisation["org_a_current"]
+    org_predecessor = reorganisation["org_a_predecessor"]
+
+    # Find or create a user employed at the current organisation.
+    user = Epilepsy12User.objects.filter(
+        employer_organisations__employer_organisation=org_current,
+        employer_organisations__is_active=True,
+    ).first()
+    if user is None:
+        # Use the seeded lead clinician and add an employer at org_current.
+        user = Epilepsy12User.objects.filter(
+            first_name=test_user_audit_centre_lead_clinician_data.role_str,
+            is_active=True,
+        ).first()
+        from epilepsy12.models import OrganisationEmployer
+
+        OrganisationEmployer.objects.get_or_create(
+            epilepsy12_user=user,
+            employer_organisation=org_current,
+            defaults={"is_active": True},
+        )
+
+    whitelist = organisation_white_list_for_user(user)
+    whitelist_ids = set(whitelist.values_list("pk", flat=True))
+
+    assert org_current.pk in whitelist_ids
+    assert org_predecessor.pk in whitelist_ids
+
+
+@pytest.mark.django_db
+def test_dashboard_period_alert_appears_when_parent_differs(
+    client,
+    reorganisation,
+    seed_groups_fixture,
+    seed_users_fixture,
+):
+    """When a specific cohort is selected and the period-correct parent
+    differs from the current parent, the dashboard context must set
+    show_period_alert=True.
+    """
+    org = reorganisation["org_a_current"]
+    cohort_8 = reorganisation["cohort_8"]
+
+    user = Epilepsy12User.objects.filter(
+        first_name=test_user_rcpch_audit_team_data.role_str,
+        is_active=True,
+    ).first()
+    client.force_login(user)
+    twofactor_signin(client, user)
+
+    url = reverse("selected_organisation_summary", kwargs={"organisation_id": org.pk})
+    response = client.get(url, data={"cohort": cohort_8.cohort_number})
+
+    assert response.status_code == HTTPStatus.OK
+    assert response.context["show_period_alert"] is True
+
+
+@pytest.mark.django_db
+def test_dashboard_period_alert_absent_when_parent_matches(
+    client,
+    reorganisation,
+    seed_groups_fixture,
+    seed_users_fixture,
+):
+    """When the period-correct parent matches the current parent (cohort 9
+    for the current organisation), the alert must not appear.
+    """
+    org = reorganisation["org_a_current"]
+    cohort_9 = reorganisation["cohort_9"]
+
+    user = Epilepsy12User.objects.filter(
+        first_name=test_user_rcpch_audit_team_data.role_str,
+        is_active=True,
+    ).first()
+    client.force_login(user)
+    twofactor_signin(client, user)
+
+    url = reverse("selected_organisation_summary", kwargs={"organisation_id": org.pk})
+    response = client.get(url, data={"cohort": cohort_9.cohort_number})
+
+    assert response.status_code == HTTPStatus.OK
+    assert response.context["show_period_alert"] is False
+
+
+@pytest.mark.django_db
+def test_dashboard_falls_back_to_current_parent_without_membership(
+    client,
+    reorganisation,
+    seed_groups_fixture,
+    seed_users_fixture,
+):
+    """When no approved membership exists for the selected cohort (the
+    pre-cutover state), the dashboard must fall back to the current parent
+    and not show the period alert.
+    """
+    org = reorganisation["org_a_current"]
+    cohort_9 = reorganisation["cohort_9"]
+
+    # Delete the cohort 9 membership to simulate pre-cutover.
+    from epilepsy12.models import AuditPeriodOrganisation
+
+    AuditPeriodOrganisation.objects.filter(
+        audit_period=cohort_9, organisation=org
+    ).delete()
+
+    user = Epilepsy12User.objects.filter(
+        first_name=test_user_rcpch_audit_team_data.role_str,
+        is_active=True,
+    ).first()
+    client.force_login(user)
+    twofactor_signin(client, user)
+
+    url = reverse("selected_organisation_summary", kwargs={"organisation_id": org.pk})
+    response = client.get(url, data={"cohort": cohort_9.cohort_number})
+
+    assert response.status_code == HTTPStatus.OK
+    assert response.context["show_period_alert"] is False
+
+
+@pytest.mark.django_db
+def test_case_list_shows_predecessor_cases_via_identity(
+    client,
+    reorganisation,
+    seed_groups_fixture,
+    seed_users_fixture,
+    e12_case_factory,
+):
+    """Cases attached to an inactive predecessor organisation must remain
+    visible in the case list when viewed from the active successor.
+    """
+    org_current = reorganisation["org_a_current"]
+    org_predecessor = reorganisation["org_a_predecessor"]
+
+    # Create a case attached to the predecessor organisation.
+    case = e12_case_factory(
+        first_name="predecessor_case_test",
+        organisations__organisation=org_predecessor,
+        registration__first_paediatric_assessment_date=date.today() - timedelta(days=30),
+    )
+
+    user = Epilepsy12User.objects.filter(
+        first_name=test_user_rcpch_audit_team_data.role_str,
+        is_active=True,
+    ).first()
+    client.force_login(user)
+    twofactor_signin(client, user)
+
+    url = reverse("cases", kwargs={"organisation_id": org_current.pk})
+    response = client.get(url)
+
+    assert response.status_code == HTTPStatus.OK
+    case_pks = {case.pk for case in response.context["case_list"].object_list}
+    assert case.pk in case_pks
+
+
+# ---------------------------------------------------------------------------
+# PR 5 — case-list compatibility and clinical permissions
+# ---------------------------------------------------------------------------
+
+
+@pytest.mark.django_db
+def test_case_list_period_alert_appears_when_parent_differs(
+    client,
+    reorganisation,
+    seed_groups_fixture,
+    seed_users_fixture,
+):
+    """When a specific cohort is selected and the period-correct parent differs
+    from the current parent, the case list context must set
+    show_period_alert=True (same pattern as the dashboard in PR 4).
+    """
+    org = reorganisation["org_a_current"]
+    cohort_8 = reorganisation["cohort_8"]
+
+    user = Epilepsy12User.objects.filter(
+        first_name=test_user_rcpch_audit_team_data.role_str,
+        is_active=True,
+    ).first()
+    client.force_login(user)
+    twofactor_signin(client, user)
+
+    url = reverse("cases", kwargs={"organisation_id": org.pk})
+    response = client.get(url, data={"cohort": cohort_8.cohort_number})
+
+    assert response.status_code == HTTPStatus.OK
+    assert response.context["show_period_alert"] is True
+
+
+@pytest.mark.django_db
+def test_case_list_period_alert_absent_when_parent_matches(
+    client,
+    reorganisation,
+    seed_groups_fixture,
+    seed_users_fixture,
+):
+    """When the period-correct parent matches the current parent (cohort 9 for
+    the current organisation), the case list alert must not appear.
+    """
+    org = reorganisation["org_a_current"]
+    cohort_9 = reorganisation["cohort_9"]
+
+    user = Epilepsy12User.objects.filter(
+        first_name=test_user_rcpch_audit_team_data.role_str,
+        is_active=True,
+    ).first()
+    client.force_login(user)
+    twofactor_signin(client, user)
+
+    url = reverse("cases", kwargs={"organisation_id": org.pk})
+    response = client.get(url, data={"cohort": cohort_9.cohort_number})
+
+    assert response.status_code == HTTPStatus.OK
+    assert response.context["show_period_alert"] is False
+
+
+@pytest.mark.django_db
+def test_case_list_alert_absent_when_no_cohort_selected(
+    client,
+    reorganisation,
+    seed_groups_fixture,
+    seed_users_fixture,
+):
+    """When no specific cohort is selected (all_children / all_cohorts), the
+    case list must fall back to the current parent and not show the alert.
+    """
+    org = reorganisation["org_a_current"]
+
+    user = Epilepsy12User.objects.filter(
+        first_name=test_user_rcpch_audit_team_data.role_str,
+        is_active=True,
+    ).first()
+    client.force_login(user)
+    twofactor_signin(client, user)
+
+    url = reverse("cases", kwargs={"organisation_id": org.pk})
+    response = client.get(url, data={"cohort": "all_children"})
+
+    assert response.status_code == HTTPStatus.OK
+    assert response.context["show_period_alert"] is False
+
+
+@pytest.mark.django_db
+def test_case_list_falls_back_to_current_parent_without_membership(
+    client,
+    reorganisation,
+    seed_groups_fixture,
+    seed_users_fixture,
+):
+    """When no approved membership exists for the selected cohort (the
+    pre-cutover state), the case list must fall back to the current parent
+    and not show the period alert.
+    """
+    from epilepsy12.models import AuditPeriodOrganisation
+
+    org = reorganisation["org_a_current"]
+    cohort_9 = reorganisation["cohort_9"]
+
+    AuditPeriodOrganisation.objects.filter(
+        audit_period=cohort_9, organisation=org
+    ).delete()
+
+    user = Epilepsy12User.objects.filter(
+        first_name=test_user_rcpch_audit_team_data.role_str,
+        is_active=True,
+    ).first()
+    client.force_login(user)
+    twofactor_signin(client, user)
+
+    url = reverse("cases", kwargs={"organisation_id": org.pk})
+    response = client.get(url, data={"cohort": cohort_9.cohort_number})
+
+    assert response.status_code == HTTPStatus.OK
+    assert response.context["show_period_alert"] is False
+
+
+@pytest.mark.django_db
+def test_case_list_route_has_no_period_slug(
+    client,
+    reorganisation,
+    seed_groups_fixture,
+    seed_users_fixture,
+):
+    """The case list route must continue to use ?cohort=<number> and not a
+    period-aware slug. Reverse('cases') must not accept an audit-period slug.
+    """
+    org = reorganisation["org_a_current"]
+
+    url = reverse("cases", kwargs={"organisation_id": org.pk})
+    assert "audit-period" not in url
+    assert "audit_period" not in url
+
+
+@pytest.mark.django_db
+def test_direct_user_can_view_predecessor_registration(
+    client,
+    reorganisation,
+    seed_groups_fixture,
+    seed_users_fixture,
+    e12_case_factory,
+):
+    """A user employed at the current ODS code (RJZ30) must be able to view a
+    clinical field (e.g. the registration) for a case registered against the
+    predecessor ODS code (RYQ30), via direct OrganisationIdentity access.
+    """
+    from epilepsy12.models import OrganisationEmployer
+
+    org_current = reorganisation["org_a_current"]
+    org_predecessor = reorganisation["org_a_predecessor"]
+
+    case = e12_case_factory(
+        first_name="direct_access_predecessor",
+        organisations__organisation=org_predecessor,
+        registration__first_paediatric_assessment_date=date.today() - timedelta(days=30),
+    )
+
+    # Create or reuse a user employed at the current organisation.
+    user = Epilepsy12User.objects.filter(
+        first_name=test_user_audit_centre_lead_clinician_data.role_str,
+        is_active=True,
+    ).first()
+    OrganisationEmployer.objects.get_or_create(
+        epilepsy12_user=user,
+        employer_organisation=org_current,
+        defaults={"is_active": True},
+    )
+    client.force_login(user)
+    twofactor_signin(client, user)
+
+    url = reverse(
+        "register",
+        kwargs={
+            "case_id": case.pk,
+        },
+    )
+    response = client.get(url)
+
+    assert response.status_code == HTTPStatus.OK
+
+
+@pytest.mark.django_db
+def test_inherited_user_denied_across_reorganisation_boundary(
+    client,
+    reorganisation,
+    seed_groups_fixture,
+    seed_users_fixture,
+    e12_case_factory,
+):
+    """A user elsewhere in Trust B (the current parent) must NOT be able to
+    view a cohort-8 case registered against the predecessor under Trust A,
+    because inherited access is period-aware and Trust B was not the parent
+    for cohort 8. Before cutover this is a no-op (no memberships), so the test
+    only exercises the period-aware path by using the reorganisation fixture
+    which has approved memberships.
+    """
+    from epilepsy12.models import OrganisationEmployer
+    from epilepsy12.tests.UserDataClasses import test_user_audit_centre_clinician_data
+
+    org_current = reorganisation["org_a_current"]
+    org_predecessor = reorganisation["org_a_predecessor"]
+    cohort_8 = reorganisation["cohort_8"]
+
+    # Case registered in cohort 8 under the predecessor (Trust A).
+    case = e12_case_factory(
+        first_name="inherited_boundary",
+        organisations__organisation=org_predecessor,
+        registration__first_paediatric_assessment_date=cohort_8.recruitment_start_date,
+    )
+
+    # Find a Trust B sibling organisation that is NOT the current org, so the
+    # user's inherited access is via the parent, not direct identity.
+    trust_b = reorganisation["trust_b"]
+    sibling = (
+        Organisation.objects.filter(trust=trust_b, active=True)
+        .exclude(pk=org_current.pk)
+        .first()
+    )
+    if sibling is None:
+        pytest.skip("No Trust B sibling organisation available for inherited-access test.")
+
+    user = Epilepsy12User.objects.filter(
+        first_name=test_user_audit_centre_clinician_data.role_str,
+        is_active=True,
+    ).first()
+    OrganisationEmployer.objects.get_or_create(
+        epilepsy12_user=user,
+        employer_organisation=sibling,
+        defaults={"is_active": True},
+    )
+    client.force_login(user)
+    twofactor_signin(client, user)
+
+    url = reverse(
+        "register",
+        kwargs={
+            "case_id": case.pk,
+        },
+    )
+    response = client.get(url)
+
+    # Period-aware inherited access: Trust B was not the parent for cohort 8,
+    # so the user must be denied.
+    assert response.status_code == HTTPStatus.FORBIDDEN
+
+
+@pytest.mark.django_db
+def test_case_list_unregistered_case_visible(
+    client,
+    reorganisation,
+    seed_groups_fixture,
+    seed_users_fixture,
+    e12_case_factory,
+):
+    """An unregistered case (no Registration / no audit_period) must still be
+    visible in the case list — period-aware access cannot apply before a
+    Registration exists, so the pre-foundation current-organisation rule is
+    used.
+    """
+    org_current = reorganisation["org_a_current"]
+
+    unreg = e12_case_factory(
+        first_name="unregistered_period_test",
+        organisations__organisation=org_current,
+        registration=None,
+    )
+
+    user = Epilepsy12User.objects.filter(
+        first_name=test_user_rcpch_audit_team_data.role_str,
+        is_active=True,
+    ).first()
+    client.force_login(user)
+    twofactor_signin(client, user)
+
+    url = reverse("cases", kwargs={"organisation_id": org_current.pk})
+    response = client.get(url, data={"cohort": "all_children"})
+
+    assert response.status_code == HTTPStatus.OK
+    case_pks = {c.pk for c in response.context["case_list"].object_list}
+    assert unreg.pk in case_pks
+
+
+# ---------------------------------------------------------------------------
+# PR 6 — submission/locking redirect preserves period context; direct users
+# can finish in-flight registrations across a reorganisation; Organisational
+# Audit remains unchanged.
+# ---------------------------------------------------------------------------
+
+
+@pytest.mark.django_db
+def test_case_submit_redirect_preserves_selected_cohort(
+    client,
+    seed_groups_fixture,
+    seed_users_fixture,
+    e12_case_factory,
+):
+    """The ``case_submit`` redirect must thread the ``?cohort=`` query
+    parameter through from the originating case table so the user lands back
+    on the same period-correct view they were on.
+
+    This is the PR 6 'update submission/locking redirects to preserve period
+    context' requirement. Before cutover it is a no-op: the case list accepts
+    the same ``?cohort=`` toggle today, and omitting it simply shows
+    'all children'.
+    """
+    GOSH = Organisation.objects.get(ods_code="RP401", trust__ods_code="RP4")
+
+    case = e12_case_factory(
+        first_name="submit_redirect_cohort_test",
+        organisations__organisation=GOSH,
+        registration__first_paediatric_assessment_date=date.today() - timedelta(days=30),
+    )
+    cohort_number = case.registration.audit_period.cohort_number
+
+    user = Epilepsy12User.objects.get(
+        first_name=test_user_audit_centre_lead_clinician_data.role_str,
+        is_active=True,
+    )
+    client.force_login(user)
+    twofactor_signin(client, user)
+
+    url = reverse(
+        "case_submit",
+        kwargs={"organisation_id": GOSH.pk, "case_id": case.pk},
+    )
+    # The case_table template appends ``?cohort=<n>`` to the hx-post URL so
+    # the redirect preserves the period context. Mirror that here.
+    response = client.post(f"{url}?cohort={cohort_number}")
+
+    assert response.status_code == HTTPStatus.OK
+    # HttpResponseClientRedirect stores the target in the HX-Redirect header.
+    redirect_url = response.headers.get("HX-Redirect", "")
+    assert f"cohort={cohort_number}" in redirect_url, (
+        f"Expected the redirect to preserve the cohort context, got {redirect_url!r}."
+    )
+
+
+@pytest.mark.django_db
+def test_case_submit_redirect_without_cohort_returns_all_children(
+    client,
+    seed_groups_fixture,
+    seed_users_fixture,
+    e12_case_factory,
+):
+    """When no cohort is threaded through (the pre-foundation default), the
+    redirect must not add a ``?cohort=`` parameter — the user lands on the
+    'all children' view, exactly as today.
+    """
+    GOSH = Organisation.objects.get(ods_code="RP401", trust__ods_code="RP4")
+
+    case = e12_case_factory(
+        first_name="submit_redirect_no_cohort_test",
+        organisations__organisation=GOSH,
+        registration__first_paediatric_assessment_date=date.today() - timedelta(days=30),
+    )
+
+    user = Epilepsy12User.objects.get(
+        first_name=test_user_audit_centre_lead_clinician_data.role_str,
+        is_active=True,
+    )
+    client.force_login(user)
+    twofactor_signin(client, user)
+
+    url = reverse(
+        "case_submit",
+        kwargs={"organisation_id": GOSH.pk, "case_id": case.pk},
+    )
+    response = client.post(url)
+
+    assert response.status_code == HTTPStatus.OK
+    redirect_url = response.headers.get("HX-Redirect", "")
+    assert "cohort=" not in redirect_url, (
+        f"Expected no cohort parameter when none was supplied, got {redirect_url!r}."
+    )
+
+
+@pytest.mark.django_db
+def test_direct_user_can_submit_predecessor_in_flight_registration(
+    client,
+    reorganisation,
+    seed_groups_fixture,
+    seed_users_fixture,
+    e12_case_factory,
+):
+    """A user employed at the current ODS code (RJZ30) must be able to submit
+    (lock) a case registered against the predecessor ODS code (RYQ30) for an
+    in-flight cohort, via direct ``OrganisationIdentity`` access.
+
+    This proves the PR 6 requirement that 'direct organisation users can
+    complete agreed older in-flight registrations'. The case is in the
+    currently-open cohort (editable), so locking is permitted. The
+    period-aware permission check (PR 5) grants access via the identity chain.
+    """
+    from epilepsy12.models import OrganisationEmployer
+
+    org_current = reorganisation["org_a_current"]
+    org_predecessor = reorganisation["org_a_predecessor"]
+
+    # In-flight case registered against the predecessor, in the open cohort.
+    case = e12_case_factory(
+        first_name="direct_submit_predecessor",
+        organisations__organisation=org_predecessor,
+        registration__first_paediatric_assessment_date=date.today() - timedelta(days=30),
+    )
+    assert case.editable(), "Case should be editable (open cohort)"
+
+    user = Epilepsy12User.objects.filter(
+        first_name=test_user_audit_centre_lead_clinician_data.role_str,
+        is_active=True,
+    ).first()
+    OrganisationEmployer.objects.get_or_create(
+        epilepsy12_user=user,
+        employer_organisation=org_current,
+        defaults={"is_active": True},
+    )
+    client.force_login(user)
+    twofactor_signin(client, user)
+
+    url = reverse(
+        "case_submit",
+        kwargs={"organisation_id": org_current.pk, "case_id": case.pk},
+    )
+    response = client.post(url)
+
+    assert response.status_code == HTTPStatus.OK, (
+        f"Direct user at current ODS code should be able to submit predecessor "
+        f"case, got {response.status_code}."
+    )
+
+    case.refresh_from_db()
+    assert case.locked, "Case should be locked after submission"
+
+
+@pytest.mark.django_db
+def test_organisational_audit_access_unchanged_after_reorganisation(
+    client,
+    reorganisation,
+    seed_groups_fixture,
+    seed_users_fixture,
+):
+    """Organisational Audit access must continue to use its existing,
+    separately-tested permission semantics after the audit-period
+    foundation is in place.
+
+    The reorganisation fixture creates approved ``AuditPeriodOrganisation``
+    memberships and ``OrganisationIdentity`` links. A lead clinician employed
+    at the current ODS code (RJZ30, Trust B) must still be able to access
+    Trust B's Organisational Audit, and must still be denied Trust A's
+    Organisational Audit — exactly as today, because Organisational Audit
+    permissions are not period-aware.
+    """
+    from epilepsy12.constants import AUDIT_CENTRE_LEAD_CLINICIAN
+    from epilepsy12.models import OrganisationEmployer
+
+    org_current = reorganisation["org_a_current"]
+    trust_a = reorganisation["trust_a"]
+    trust_b = reorganisation["trust_b"]
+
+    # Ensure a lead clinician is employed at the current organisation.
+    user = Epilepsy12User.objects.filter(
+        role=AUDIT_CENTRE_LEAD_CLINICIAN, is_active=True
+    ).first()
+    OrganisationEmployer.objects.get_or_create(
+        epilepsy12_user=user,
+        employer_organisation=org_current,
+        defaults={"is_active": True},
+    )
+    user.set_organisation_employer(organisation_employer=org_current, is_primary=True)
+    client.force_login(user)
+    twofactor_signin(client, user)
+
+    # Create a submission period so the view has something to load.
+    submission_period = OrganisationalAuditSubmissionPeriod.objects.create(
+        year=2026, is_open=True
+    )
+    OrganisationalAuditSubmission.objects.create(
+        submission_period=submission_period,
+        trust=trust_b,
+    )
+
+    # Trust B (the user's current parent) — allowed.
+    response = client.get(
+        reverse("organisational_audit_trust", kwargs={"id": trust_b.pk})
+    )
+    assert response.status_code == HTTPStatus.OK, (
+        f"Lead clinician should access their own trust's Organisational Audit, "
+        f"got {response.status_code}."
+    )
+
+    # Trust A (the dissolved predecessor) — denied, because the user is not
+    # employed there. Period-aware membership does not widen Organisational
+    # Audit access.
+    response = client.get(
+        reverse("organisational_audit_trust", kwargs={"id": trust_a.pk})
+    )
+    assert response.status_code == HTTPStatus.FORBIDDEN, (
+        f"Lead clinician must NOT access the predecessor trust's Organisational "
+        f"Audit via period-awareness, got {response.status_code}."
+    )
+
+
+@pytest.mark.django_db
+def test_organisational_audit_export_unchanged_after_reorganisation(
+    reorganisation,
+    seed_groups_fixture,
+    seed_users_fixture,
+):
+    """``export_submission_period_as_csv`` must produce the same shape of
+    output after the audit-period foundation is in place. The reorganisation
+    fixture creates approved memberships and identity links; the export must
+    not be affected by them.
+    """
+    trust_b = reorganisation["trust_b"]
+
+    submission_period = OrganisationalAuditSubmissionPeriod.objects.create(
+        year=2026, is_open=False
+    )
+    OrganisationalAuditSubmission.objects.create(
+        submission_period=submission_period,
+        trust=trust_b,
+        submitted=True,
+    )
+
+    csv_data = export_submission_period_as_csv(submission_period)
+
+    assert csv_data, "Export should produce non-empty CSV"
+    assert isinstance(csv_data, str)
+
+
+@pytest.mark.django_db
+def test_audit_period_extension_route_remains_non_slugged(
+    client,
+    seed_groups_fixture,
+    seed_users_fixture,
+    GOSH,
+):
+    """The extension route must remain non-slotted for the foundation: it is
+    addressed by ``organisation_id`` and ``cohort`` number, not by an
+    ``AuditPeriod.slug``. This pins the PR 6 'keep the extension
+    route/workflow non-slugged' requirement.
+    """
+    from epilepsy12.models import AuditPeriod
+
+    user = Epilepsy12User.objects.get(
+        first_name=test_user_rcpch_audit_team_data.role_str,
+        is_active=True,
+    )
+    client.force_login(user)
+    user.set_organisation_employer(organisation_employer=GOSH, is_primary=True)
+    twofactor_signin(client, user)
+
+    submitting = AuditPeriod.objects.currently_submitting()
+    assert submitting is not None, "No seeded cohort is currently submitting."
+
+    url = reverse(
+        "audit_period_extension",
+        kwargs={"organisation_id": GOSH.pk, "cohort": submitting.cohort_number},
+    )
+    response = client.get(url)
+
+    assert response.status_code == HTTPStatus.OK
+    # The route resolves the AuditPeriod from the cohort number, not a slug.
+    assert response.context["audit_period"].pk == submitting.pk
+    assert response.context["cohort"] == submitting.cohort_number
+
+
+# ---------------------------------------------------------------------------
+# PR 7 — concurrent-period visibility across a reorganisation
+# ---------------------------------------------------------------------------
+#
+# The reorganisation canary (Princess Royal University Hospital) moved from
+# Trust A (RYQ, dissolved) to Trust B (RJZ, King's) at the cohort 8 -> 9
+# boundary, with an ODS code change (RYQ30 -> RJZ30) sharing one
+# OrganisationIdentity.  Cohort 8's membership is frozen under Trust A;
+# cohort 9's under Trust B.  These tests prove that the period-aware
+# hierarchy and permission services correctly resolve different parents for
+# the two concurrent periods, and that a direct user at the current ODS code
+# can see cases registered against the predecessor in the older cohort.
+
+
+@pytest.mark.django_db
+def test_concurrent_periods_resolve_different_parents(reorganisation):
+    """``resolve_period_parent`` must return Trust A for cohort 8 and Trust B
+    for cohort 9 — the two concurrent periods have different period-correct
+    parents for the same physical hospital.
+    """
+    org_current = reorganisation["org_a_current"]
+    cohort_8 = reorganisation["cohort_8"]
+    cohort_9 = reorganisation["cohort_9"]
+    trust_a = reorganisation["trust_a"]
+    trust_b = reorganisation["trust_b"]
+
+    parent_8, is_correct_8 = resolve_period_parent(org_current, cohort_8)
+    parent_9, is_correct_9 = resolve_period_parent(org_current, cohort_9)
+
+    assert is_correct_8 is True
+    assert parent_8 == trust_a
+    assert is_correct_9 is True
+    assert parent_9 == trust_b
+    assert parent_8 != parent_9
+
+
+@pytest.mark.django_db
+def test_concurrent_periods_identity_chain_includes_predecessor(reorganisation):
+    """``expand_organisation_ids_via_identity`` from the current organisation
+    must include the predecessor organisation, so cases registered against the
+    predecessor's ODS code remain visible through the successor.
+    """
+    org_current = reorganisation["org_a_current"]
+    org_predecessor = reorganisation["org_a_predecessor"]
+
+    expanded = expand_organisation_ids_via_identity({org_current.pk})
+
+    assert org_predecessor.pk in expanded
+    assert org_current.pk in expanded
+
+
+@pytest.mark.django_db
+def test_concurrent_periods_direct_user_sees_predecessor_cohort_8(
+    client,
+    reorganisation,
+    seed_groups_fixture,
+    seed_users_fixture,
+    e12_case_factory,
+):
+    """A user employed at the current ODS code (RJZ30) must be able to view a
+    case registered against the predecessor ODS code (RYQ30) for cohort 8 —
+    the older in-flight period — via the ``OrganisationIdentity`` chain,
+    when filtering the case list by ``?cohort=8``.
+
+    This proves the concurrent-period contract: the same user, viewing the
+    same physical hospital, sees cases from both the predecessor period
+    (cohort 8, Trust A) and the current period (cohort 9, Trust B) without
+    the cases disappearing after the reorganisation.
+    """
+    from epilepsy12.models import OrganisationEmployer
+
+    org_current = reorganisation["org_a_current"]
+    org_predecessor = reorganisation["org_a_predecessor"]
+
+    # Case registered against the predecessor in cohort 8 (Dec 2024).
+    case_c8 = e12_case_factory(
+        first_name="concurrent_predecessor_c8",
+        organisations__organisation=org_predecessor,
+        registration__first_paediatric_assessment_date=date(2024, 12, 15),
+    )
+    assert case_c8.registration.audit_period_id == reorganisation["cohort_8"].pk
+
+    # Case registered against the current org in cohort 9 (today - 30 days).
+    case_c9 = e12_case_factory(
+        first_name="concurrent_current_c9",
+        organisations__organisation=org_current,
+        registration__first_paediatric_assessment_date=date.today() - timedelta(days=30),
+    )
+
+    # Employ the lead clinician at the current org.
+    user = Epilepsy12User.objects.filter(
+        first_name=test_user_audit_centre_lead_clinician_data.role_str,
+        is_active=True,
+    ).first()
+    OrganisationEmployer.objects.get_or_create(
+        epilepsy12_user=user,
+        employer_organisation=org_current,
+        defaults={"is_active": True},
+    )
+    client.force_login(user)
+    twofactor_signin(client, user)
+
+    # Cohort 8 case list: must include the predecessor's cohort-8 case.
+    url_c8 = reverse(
+        "cases",
+        kwargs={"organisation_id": org_current.pk},
+    )
+    response_c8 = client.get(f"{url_c8}?cohort=8")
+    assert response_c8.status_code == HTTPStatus.OK
+    case_pks_c8 = {c.pk for c in response_c8.context["case_list"].object_list}
+    assert case_c8.pk in case_pks_c8, (
+        "Predecessor cohort-8 case should be visible when viewing cohort 8 "
+        "from the current organisation."
+    )
+
+    # Cohort 9 case list: must include the current org's cohort-9 case.
+    url_c9 = reverse(
+        "cases",
+        kwargs={"organisation_id": org_current.pk},
+    )
+    response_c9 = client.get(f"{url_c9}?cohort=9")
+    assert response_c9.status_code == HTTPStatus.OK
+    case_pks_c9 = {c.pk for c in response_c9.context["case_list"].object_list}
+    assert case_c9.pk in case_pks_c9, (
+        "Current org's cohort-9 case should be visible when viewing cohort 9."
+    )
+
+
+@pytest.mark.django_db
+def test_concurrent_periods_period_org_ids_differ_between_cohorts(
+    reorganisation,
+):
+    """``get_period_organisation_ids`` for Trust A in cohort 8 must include the
+    predecessor organisation, while for Trust B in cohort 9 it must include the
+    current organisation.  The two concurrent periods produce different
+    organisation sets for the same physical hospital.
+    """
+    from epilepsy12.general_functions.audit_period_hierarchy import (
+        get_period_organisation_ids,
+    )
+
+    org_current = reorganisation["org_a_current"]
+    org_predecessor = reorganisation["org_a_predecessor"]
+    cohort_8 = reorganisation["cohort_8"]
+    cohort_9 = reorganisation["cohort_9"]
+    trust_a = reorganisation["trust_a"]
+    trust_b = reorganisation["trust_b"]
+
+    org_ids_c8 = get_period_organisation_ids(trust_a, cohort_8, "trust")
+    org_ids_c9 = get_period_organisation_ids(trust_b, cohort_9, "trust")
+
+    assert org_predecessor.pk in org_ids_c8
+    assert org_current.pk in org_ids_c9

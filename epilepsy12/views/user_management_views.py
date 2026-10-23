@@ -53,7 +53,11 @@ from ..general_functions import (
     match_in_choice_key,
     send_email_to_recipients,
 )
+from ..general_functions.client_ip import get_client_ip
 from ..common_view_functions import group_for_role
+from epilepsy12.general_functions.audit_period_hierarchy import (
+    expand_organisation_ids_via_identity,
+)
 from ..decorator import (
     user_may_view_this_organisation,
     user_can_access_user,
@@ -98,6 +102,16 @@ def epilepsy12_user_list(request, organisation_id):
             trust=parent_trust, active=True
         ).all()
 
+    # --- Identity-chain expansion (PR 4) ----------------------------------
+    # Expand the organisation sets through the OrganisationIdentity chain
+    # so that users attached to inactive predecessor organisations remain
+    # visible.  Before the cutover commands have run, no identity links
+    # exist, so the expansion is a no-op.
+    organisation_org_ids = expand_organisation_ids_via_identity({organisation.pk})
+    trust_org_ids = expand_organisation_ids_via_identity(
+        set(organisation_children.values_list("pk", flat=True))
+    )
+
     if filter_term:
         filter_term_Q = (
             Q(first_name__icontains=filter_term)
@@ -113,23 +127,17 @@ def epilepsy12_user_list(request, organisation_id):
         if request.user.view_preference == 0:
             # user has requested organisation level view
             basic_filter = Q(
-                employer_organisations__employer_organisation=organisation,
+                employer_organisations__employer_organisation__pk__in=organisation_org_ids,
                 employer_organisations__is_active=True,
             )
         elif request.user.view_preference == 1:
             # user has requested trust level view
-            if organisation.country.boundary_identifier == "W92000004":
-                parent_trust = organisation.local_health_board
-                basic_filter = Q(
-                    employer_organisations__employer_organisation__local_health_board=parent_trust,
-                    employer_organisations__is_active=True,
-                )
-            else:
-                parent_trust = organisation.trust
-                basic_filter = Q(
-                    employer_organisations__employer_organisation__trust=parent_trust,
-                    employer_organisations__is_active=True,
-                )
+            # Expand through the identity chain so that users attached to
+            # inactive predecessor organisations remain visible.
+            basic_filter = Q(
+                employer_organisations__employer_organisation__pk__in=trust_org_ids,
+                employer_organisations__is_active=True,
+            )
         elif request.user.view_preference == 2:
             # user has requested national level view
             basic_filter = None
@@ -183,20 +191,17 @@ def epilepsy12_user_list(request, organisation_id):
 
         elif request.user.view_preference == 1:
             # filters all primary Trust level centres, irrespective of if active or inactive
-            if organisation.country.boundary_identifier == "W92000004":
-                parent_trust = organisation.local_health_board
-                basic_filter = Q(
-                    employer_organisations__employer_organisation__local_health_board=parent_trust
-                )
-            else:
-                parent_trust = organisation.trust
-                basic_filter = Q(
-                    employer_organisations__employer_organisation__trust__name=parent_trust
-                )
+            # Expand through the identity chain so that users attached to
+            # inactive predecessor organisations remain visible.
+            basic_filter = Q(
+                employer_organisations__employer_organisation__pk__in=trust_org_ids
+            )
 
         elif request.user.view_preference == 0:
             # filters all primary centres at organisation level, irrespective of if active or inactive
-            basic_filter = Q(employer_organisations__employer_organisation=organisation)
+            basic_filter = Q(
+                employer_organisations__employer_organisation__pk__in=organisation_org_ids
+            )
         else:
             raise Exception("No View Preference supplied")
 
@@ -791,6 +796,32 @@ class ResetPasswordConfirmView(PasswordResetConfirmView):
         logging.info(f"Password reset requested for {form.user.email}")
         return super().form_valid(form)
 
+    def form_invalid(self, form):
+        """
+        Audit failed password reset attempts.
+
+        A rejected password is otherwise invisible in the audit trail: the
+        response is a 200 re-render of the form, indistinguishable from
+        simply viewing the form page in the request logs, and no
+        VisitActivity entry is recorded. This has previously made failed
+        resets undiagnosable from production logs.
+        """
+        error_details = "; ".join(
+            f"{field if field != '__all__' else 'form'}: {' '.join(errors)}"
+            for field, errors in form.errors.items()
+        )
+        VisitActivity.objects.create(
+            activity_datetime=timezone.now(),
+            activity=VisitActivity.PASSWORD_RESET_FAILED,
+            ip_address=get_client_ip(self.request),
+            epilepsy12user=form.user,
+            details=f"Password reset failed validation: {error_details}",
+        )
+        logger.warning(
+            f"Password reset failed validation for {form.user.email}: {error_details}"
+        )
+        return super().form_invalid(form)
+
 
 class ResetPasswordComplete(PasswordResetCompleteView):
     # Overridden custom django password reset work flow. Picks up user email who has reset password from session
@@ -839,20 +870,21 @@ class RCPCHLoginView(TwoFactorLoginView):
     # Override successful login redirect to org summary page
     def get_success_url(self):
         url = self.get_redirect_url()
-        
+
         if url:
             return url
-        
-        org_employer = self.request.user.organisation_employer 
+
+        org_employer = self.request.user.organisation_employer
         org_id = org_employer.id if org_employer else None
 
         if org_id:
             return reverse("selected_organisation_summary", kwargs={"organisation_id": org_id})
-        
+
         return reverse(settings.LOGIN_REDIRECT_URL)
 
     def done(self, form_list, **kwargs):
-        response = super().done(form_list)
+
+        response = super().done(form_list, **kwargs)
 
         user = self.get_user()
 
@@ -914,12 +946,12 @@ def logs(request, organisation_id, epilepsy12_user_id):
         for device in devices:
             if device.name == request.htmx.trigger_name:
                 device.delete()
-        
+
         devices = devices_for_user(user=epilepsy12_user, confirmed=True)
         template_name = "epilepsy12/logs_user_summary.html"
     else:
         template_name = "epilepsy12/logs.html"
-    
+
     device_data = [
         {
             "name": device.name,
@@ -951,7 +983,7 @@ def all_epilepsy12_users_list(request, organisation_id):
         raise PermissionDenied()
 
     all_users = Epilepsy12User.objects.all()
-    
+
     user_list = []
     for user in all_users:
         created_by = user.created_by.email if user.created_by else None

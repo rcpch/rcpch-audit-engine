@@ -1,6 +1,7 @@
 """
 - [ ] user can login with correct credentials
 - [ ] user cannot login with wrong credentials
+- [ ] failed logins record the reason in the audit trail
 
 - [ ] can create user with correct credentials
 - [ ] cannot create user with wrong credentials
@@ -16,7 +17,7 @@ from django.urls import reverse
 
 # E12 imports
 from epilepsy12.forms import Epilepsy12UserUpdatePasswordForm
-from epilepsy12.models import Epilepsy12User
+from epilepsy12.models import Epilepsy12User, VisitActivity
 from epilepsy12.tests.UserDataClasses import (
     test_user_rcpch_audit_team_data,
 )
@@ -141,6 +142,71 @@ def test_unsuccessful_login_lockout(client, seed_groups_fixture):
     form = login_response.context['form']
     # this is the item including errors
     assert form.errors['username'][0] == "You have failed to login 5 or more consecutive times. You have been locked out for 10 minutes"
+
+
+@pytest.mark.django_db
+def test_failed_login_records_reason_in_audit_trail(client, seed_groups_fixture):
+    """
+    Failed logins are audited with the reason, while the message shown to
+    the user stays generic. Django scrubs the password before the
+    user_login_failed signal fires, so the reason is inferred from the
+    account state: an active account with a usable password can only fail
+    on the password itself.
+    """
+    user = E12UserFactory(
+        first_name="LOGIN_FAIL_TEST_USER",
+        email="login_fail_test_user@nhs.net",
+        is_active=True,
+    )
+    user.set_password("correct-password")
+    user.save()
+
+    client.post(
+        reverse('login'),
+        data={
+            'rcpch_login_view-current_step' : 'auth',
+            'auth-username': user.email,
+            'auth-password' : 'incorrect password',
+            'auth-captacha_1': 'PASSED',
+        }
+    )
+
+    failed_activity = VisitActivity.objects.filter(
+        epilepsy12user=user, activity=VisitActivity.UNSUCCESSFUL_LOGIN
+    ).first()
+    assert failed_activity is not None
+    assert failed_activity.details == "Incorrect password"
+
+
+@pytest.mark.django_db
+def test_failed_login_inactive_account_records_reason(client, seed_groups_fixture):
+    """
+    A correct password on an inactive account fails authentication, and the
+    audit trail records the account state as the reason.
+    """
+    user = E12UserFactory(
+        first_name="LOGIN_INACTIVE_TEST_USER",
+        email="login_inactive_test_user@nhs.net",
+        is_active=False,
+    )
+    user.set_password("correct-password")
+    user.save()
+
+    client.post(
+        reverse('login'),
+        data={
+            'rcpch_login_view-current_step' : 'auth',
+            'auth-username': user.email,
+            'auth-password' : 'correct-password',
+            'auth-captacha_1': 'PASSED',
+        }
+    )
+
+    failed_activity = VisitActivity.objects.filter(
+        epilepsy12user=user, activity=VisitActivity.UNSUCCESSFUL_LOGIN
+    ).first()
+    assert failed_activity is not None
+    assert failed_activity.details == "Account is inactive"
 
 
 @pytest.mark.django_db

@@ -1,4 +1,4 @@
-# This Action builds the documentation site in mkdocs from where it is deployed to Azure
+# This Action builds the documentation site in Zensical from where it is deployed to Azure
 # Azure Static Web Sites is the main site: https://epilepsy12docs.rcpch.tech/
 #
 # Azure will build a preview site for any PRs against prerelease
@@ -22,9 +22,6 @@ jobs:
   build_and_deploy_job:
     if: github.event_name == 'push' || (github.event_name == 'pull_request' && github.event.action != 'closed')
     runs-on: ubuntu-latest
-    env:
-      ENABLE_PDF_EXPORT: 1 # Makes PDF export an option, default disabled, when building locally
-      ENABLE_GIT_COMMITTERS: True # Makes git-committers an option, default disabled, when building locally
     name: Build and Deploy to Azure
     steps:
       - uses: actions/checkout@v3
@@ -33,10 +30,9 @@ jobs:
           submodules: true
       - uses: actions/setup-python@v4
         with:
-          python-version: '3.11'
-      - run: pip install git+https://${{ secrets.MATERIAL_FOR_MKDOCS_ACCESS_TOKEN }}@github.com/squidfunk/mkdocs-material-insiders.git
+          python-version: '3.12'
       - run: pip install -r requirements.txt
-      - run: mkdocs build
+      - run: zensical build --clean
       - name: Upload to Azure
         id: builddeploy
         uses: Azure/static-web-apps-deploy@v1
@@ -48,7 +44,7 @@ jobs:
           ###### Repository/Build Configurations ######
           app_location: "" # App source code path relative to repository root
           api_location: "" # Api source code path relative to repository root - optional
-          output_location: "site" # Built app content directory, relative to app_location - optional
+          output_location: "staticdocs" # Built app content directory (site_dir in mkdocs.yml is staticdocs)
           ###### End of Repository/Build Configurations ######
 
   close_pull_request_job:

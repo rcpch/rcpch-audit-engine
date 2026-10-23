@@ -27,6 +27,10 @@ from .constants import AUDIT_CENTRE_LEAD_CLINICIAN
 from epilepsy12.common_view_functions.sanction_user_access import (
     organisation_white_list_for_user,
 )
+from epilepsy12.general_functions.audit_period_hierarchy import (
+    expand_organisation_ids_via_identity,
+    resolve_period_parent_for_field,
+)
 
 # Logging setup
 logger = logging.getLogger(__name__)
@@ -131,11 +135,133 @@ def user_may_view_organisational_audit(parent_model, parent_type):
     return decorator
 
 
+def _get_case_audit_period(child):
+    """Return the ``Registration.audit_period`` for the child Case, or None.
+
+    A case may not yet have a Registration (unregistered), or the
+    Registration may not yet have an audit_period (first paediatric
+    assessment date not set). In either case, period-aware access cannot
+    apply and the caller must fall back to the current-organisation rule.
+    """
+    try:
+        registration = child.registration
+    except Registration.DoesNotExist:
+        return None
+    return registration.audit_period
+
+
+def _user_has_direct_access(user, child):
+    """Direct organisation access (PR 5).
+
+    A user with active employment at an organisation may access all of that
+    organisation's historical cases, irrespective of historical affiliation,
+    including cases registered against a predecessor ODS code that shares
+    the same ``OrganisationIdentity``.
+
+    All of the user's active employers are considered (not just the
+    primary one), consistent with ``organisation_white_list_for_user``.
+
+    Before the cutover commands have run, no ``OrganisationIdentity`` links
+    exist, so ``expand_organisation_ids_via_identity`` returns only the
+    user's active employer IDs. This is a subset of the inherited
+    trust-level check below, so the behaviour is unchanged (no-op).
+    """
+    employer_ids = list(
+        Organisation.objects.filter(
+            epilepsy12_users__epilepsy12_user=user,
+            epilepsy12_users__is_active=True,
+        ).values_list("pk", flat=True)
+    )
+    if not employer_ids:
+        return False
+    direct_org_ids = expand_organisation_ids_via_identity(employer_ids)
+    return Organisation.objects.filter(
+        pk__in=direct_org_ids,
+        cases=child,
+        patient_sites__site_is_actively_involved_in_epilepsy_care=True,
+        patient_sites__site_is_primary_centre_of_epilepsy_care=True,
+    ).exists()
+
+
+def _user_has_inherited_access(user, child):
+    """Inherited Trust/LHB access (PR 5).
+
+    A user elsewhere in a Trust or LHB may access the child only for audit
+    periods in which ``AuditPeriodOrganisation`` assigns the lead site
+    organisation to that parent, and only for the parent the user is
+    currently affiliated with.
+
+    Before the cutover commands have run, no approved memberships exist.
+    ``resolve_period_parent_for_field`` falls back to the current parent
+    (``is_period_correct=False``), so the period-aware check is equivalent
+    to the pre-foundation trust-level check and the behaviour is unchanged
+    (no-op).
+
+    When approved memberships exist but none match the user's parent, access
+    is denied (the period-aware restriction). When no approved memberships
+    exist, the pre-foundation current-trust check stands.
+    """
+    user_trust = user.organisation_employer.trust
+    user_lhb = user.organisation_employer.local_health_board
+
+    # Pre-foundation current trust/LHB check. For English users this filters
+    # by trust; for Welsh users ``trust`` is None which matches all orgs with
+    # no trust (the pre-foundation behaviour, preserved as the no-op
+    # fallback).
+    org_filters = {
+        "cases": child,
+        "patient_sites__site_is_actively_involved_in_epilepsy_care": True,
+        "patient_sites__site_is_primary_centre_of_epilepsy_care": True,
+        "trust": user_trust,
+    }
+    if not Organisation.objects.filter(**org_filters).exists():
+        return False
+
+    # Current check passes. Apply the period-aware restriction only when
+    # approved memberships exist (post-cutover). Before cutover this is a
+    # no-op.
+    audit_period = _get_case_audit_period(child)
+    if audit_period is None:
+        return True  # No period — current behaviour
+
+    lead_orgs = Organisation.objects.filter(
+        cases=child,
+        patient_sites__site_is_actively_involved_in_epilepsy_care=True,
+        patient_sites__site_is_primary_centre_of_epilepsy_care=True,
+    )
+
+    has_approved_membership = False
+    for lead_org in lead_orgs:
+        if user_trust is not None:
+            period_parent, is_period_correct = resolve_period_parent_for_field(
+                lead_org, audit_period, "trust"
+            )
+            if is_period_correct:
+                has_approved_membership = True
+                if period_parent == user_trust:
+                    return True
+        if user_lhb is not None:
+            period_parent, is_period_correct = resolve_period_parent_for_field(
+                lead_org, audit_period, "local_health_board"
+            )
+            if is_period_correct:
+                has_approved_membership = True
+                if period_parent == user_lhb:
+                    return True
+
+    # If approved memberships exist but none matched the user's parent,
+    # deny (period-aware restriction). If no approved memberships exist
+    # (pre-cutover), the current-trust check above already passed.
+    if has_approved_membership:
+        return False
+    return True
+
+
 def lookup_child_if_user_has_permission(request_kwargs, user):
     # Guard against users with no active primary employer
     if not user.organisation_employer:
         return None
-    
+
     via_registration = lambda obj: obj.registration.case
     via_multiaxial_dagnosis = lambda obj: obj.multiaxial_diagnosis.registration.case
     via_management = lambda obj: obj.management.registration.case
@@ -161,16 +287,18 @@ def lookup_child_if_user_has_permission(request_kwargs, user):
         if pk is not None:
             obj = model.objects.get(pk=pk)
             child = via_fn(obj)
-            
-            org_filters = {
-                "cases": child,
-                "patient_sites__site_is_actively_involved_in_epilepsy_care": True,
-                "patient_sites__site_is_primary_centre_of_epilepsy_care": True,
-                # Access is sliced by trust - so members of other organisations in that trust can see data
-                "trust": user.organisation_employer.trust,
-            }
 
-            if Organisation.objects.filter(**org_filters).exists():
+            # Direct access across the OrganisationIdentity succession
+            # chain takes precedence — a user employed at the current ODS
+            # code may view cases registered against a predecessor ODS
+            # code. No-op before cutover (identity expansion is a no-op).
+            if _user_has_direct_access(user, child):
+                return child
+
+            # Inherited Trust/LHB access, period-aware when memberships
+            # exist. No-op before cutover (falls back to current trust
+            # check).
+            if _user_has_inherited_access(user, child):
                 return child
 
 
@@ -182,14 +310,14 @@ def lookup_user_permissions_on_child(request, request_kwargs):
     # 3. Active trust level users with confirmed email where their trust is the same as the child
     # Editing is allowed if the cohort is still open or if you are an RCPCH audit member
     user = request.user
-    
+
     # Check user is active and has confirmed their email (unless superuser)
     if not user.is_superuser and not (user.is_active and user.email_confirmed):
         return {
             "can_view": False,
             "can_edit": False,
         }
-    
+
     is_admin = user.is_rcpch_audit_team_member or user.is_rcpch_staff or user.is_superuser
 
     if is_admin:
@@ -199,7 +327,7 @@ def lookup_user_permissions_on_child(request, request_kwargs):
         }
 
     child = lookup_child_if_user_has_permission(request_kwargs, request.user)
-    
+
     if child:
         return {
             "can_view": True,
@@ -222,7 +350,7 @@ def user_may_view_this_child():
 
             if permissions["can_view"]:
                 return view(request, permissions["can_edit"], *args, **kwargs)
-            
+
             raise PermissionDenied()
 
         return wrapper
@@ -288,7 +416,6 @@ def login_and_otp_required():
         def wrapper(request, *args, **kwargs):
             # Then, ensure 2fa verified
             user = request.user
-
             # Bypass 2fa if local dev, with warning message
             if settings.LOCAL_DEV_BYPASS_2FA_AND_CAPTCHA and user.is_authenticated:
                 logger.warning(

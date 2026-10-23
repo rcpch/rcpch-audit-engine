@@ -696,7 +696,6 @@ def get_all_kpi_aggregation_data_for_view(
                 "aggregation_model": None,
                 "total_cases_registered": filtered_cases.count(),
             }
-
     return ALL_DATA
 
 

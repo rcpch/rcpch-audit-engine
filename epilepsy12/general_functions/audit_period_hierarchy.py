@@ -146,6 +146,151 @@ def get_participating_organisations(audit_period):
     )
 
 
+def _get_membership_for_identity_chain(organisation, audit_period):
+    """Resolve an approved ``AuditPeriodOrganisation`` membership for
+    ``organisation`` in ``audit_period``, walking the
+    ``OrganisationIdentity`` chain if the organisation itself has no
+    direct membership.
+
+    This is the key bridge: a user at the current ODS code (e.g. RJZ30)
+    can read the predecessor's (e.g. RYQ30) historical membership because
+    both ``Organisation`` rows share the same ``OrganisationIdentity``.
+
+    Returns the membership, or ``None`` if no approved membership exists
+    anywhere in the chain for this audit period.
+    """
+    AuditPeriodOrganisation = _get_model("AuditPeriodOrganisation")
+
+    # 1. Direct membership for this organisation.
+    try:
+        return get_membership(organisation, audit_period)
+    except MembershipError:
+        pass
+
+    # 2. Walk the identity chain.
+    if organisation.identity_id is None:
+        return None
+
+    chain_org_ids = list(
+        _get_model("Organisation")
+        .objects.filter(identity_id=organisation.identity_id)
+        .values_list("pk", flat=True)
+    )
+    if not chain_org_ids:
+        return None
+
+    membership = (
+        AuditPeriodOrganisation.objects.filter(
+            audit_period=audit_period,
+            organisation_id__in=chain_org_ids,
+            approved_at__isnull=False,
+            included_in_reporting=True,
+        )
+        .select_related("organisation", "trust", "local_health_board")
+        .first()
+    )
+    return membership
+
+
+def resolve_period_parent(organisation, audit_period):
+    """Resolve the period-correct parent (Trust or LocalHealthBoard) for
+    an organisation in an audit period, with fallback to the current
+    parent when no approved membership exists.
+
+    Walks the ``OrganisationIdentity`` chain: if the organisation itself
+    has no membership for the period, the function checks whether a
+    predecessor or successor sharing the same identity has one. This lets
+    a user at the current ODS code (e.g. RJZ30) read the predecessor's
+    (e.g. RYQ30) historical membership.
+
+    Returns a ``(parent, is_period_correct)`` tuple where:
+
+    - ``parent`` is the ``Trust`` or ``LocalHealthBoard`` instance (or
+      ``None`` if the organisation has neither);
+    - ``is_period_correct`` is ``True`` if the parent was resolved from
+      an approved ``AuditPeriodOrganisation`` membership, ``False`` if
+      it fell back to the current ``Organisation.trust`` /
+      ``Organisation.local_health_board``.
+    """
+    membership = _get_membership_for_identity_chain(organisation, audit_period)
+    if membership is not None:
+        if membership.trust_id is not None:
+            return (membership.trust, True)
+        return (membership.local_health_board, True)
+
+    # Fall back to current parent.
+    if organisation.trust_id is not None:
+        return (organisation.trust, False)
+    return (organisation.local_health_board, False)
+
+
+def resolve_period_parent_for_field(organisation, audit_period, parent_field):
+    """Resolve the period-correct parent for a specific hierarchy field
+    (``"trust"``, ``"local_health_board"``, ``"integrated_care_board"``,
+    ``"nhs_england_region"``, ``"openuk_network"``, ``"country"``).
+
+    Walks the ``OrganisationIdentity`` chain, like
+    ``resolve_period_parent``.
+
+    Returns a ``(parent, is_period_correct)`` tuple. When no approved
+    membership exists, falls back to the current ``Organisation.<field>``
+    and returns ``is_period_correct=False``.
+    """
+    membership = _get_membership_for_identity_chain(organisation, audit_period)
+    if membership is not None:
+        return (getattr(membership, parent_field), True)
+    return (getattr(organisation, parent_field, None), False)
+
+
+def expand_organisation_ids_via_identity(organisation_ids):
+    """Given an iterable of ``Organisation`` IDs, return the expanded
+    set including inactive predecessors/successors that share the same
+    ``OrganisationIdentity``.
+
+    If none of the organisations have an ``identity`` FK (the
+    pre-cutover state), the original set is returned unchanged. This
+    makes the function a safe no-op before the identity-linking step
+    has run.
+    """
+    Organisation = _get_model("Organisation")
+    organisation_ids = set(organisation_ids)
+    if not organisation_ids:
+        return organisation_ids
+
+    identity_ids = list(
+        Organisation.objects.filter(
+            pk__in=organisation_ids,
+            identity__isnull=False,
+        )
+        .values_list("identity", flat=True)
+        .distinct()
+    )
+    if not identity_ids:
+        return organisation_ids
+
+    expanded = set(organisation_ids)
+    expanded.update(
+        Organisation.objects.filter(
+            identity_id__in=identity_ids
+        ).values_list("pk", flat=True)
+    )
+    return expanded
+
+
+def get_period_organisation_ids(parent, audit_period, parent_field: str):
+    """Return the set of ``Organisation`` IDs that belong to the given
+    parent for the given audit period, expanded through the
+    ``OrganisationIdentity`` chain to include inactive predecessors.
+
+    Uses the approved, included ``AuditPeriodOrganisation`` memberships.
+    Returns an empty set if no approved memberships exist for the
+    parent/period combination (the pre-cutover state).
+    """
+    memberships = get_organisations_for_parent(parent, audit_period, parent_field)
+    org_ids = set(memberships.values_list("organisation", flat=True))
+    return expand_organisation_ids_via_identity(org_ids)
+
+
 def get_expected_reporting_hierarchies(audit_period) -> dict[str, Any]:
     """Return the distinct reporting hierarchies that apply across all
     participating organisations for the given audit period.

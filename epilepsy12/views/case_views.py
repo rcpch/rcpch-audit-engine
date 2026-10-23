@@ -47,6 +47,11 @@ from ..general_functions import (
     construct_transfer_epilepsy12_site_outcome_email,
     send_email_to_recipients,
 )
+from epilepsy12.general_functions.audit_period_hierarchy import (
+    expand_organisation_ids_via_identity,
+    resolve_period_parent,
+    get_period_organisation_ids,
+)
 
 # Logging setup
 logger = logging.getLogger(__name__)
@@ -101,6 +106,85 @@ def case_list(request, organisation_id):
             trust=parent_trust, active=True
         ).all()
 
+    # --- Period-aware parent resolution (PR 5) ----------------------------
+    #
+    # When a specific cohort is selected (?cohort=<number>), resolve the
+    # period-correct parent (trust/LHB) from the approved
+    # AuditPeriodOrganisation membership. When no approved membership
+    # exists (pre-cutover, or a new organisation with no membership),
+    # fall back to the current parent.
+    #
+    # When no specific cohort is selected (all_children / all_cohorts),
+    # use the current parent — cross-period views use current hierarchy.
+    #
+    # The alert flag is set when the period-correct parent differs from
+    # the organisation's current parent, so the template can show a
+    # contextual banner explaining the difference (same pattern as PR 4).
+
+    specific_cohort_selected = cohort_filter_term not in (None, "all_children", "all_cohorts")
+    audit_period = None
+    if specific_cohort_selected:
+        try:
+            audit_period = AuditPeriod.objects.by_cohort(cohort_number=int(cohort_filter_term))
+        except (ValueError, TypeError):
+            specific_cohort_selected = False
+
+    if specific_cohort_selected and audit_period is not None:
+        period_parent, is_period_correct = resolve_period_parent(
+            organisation, audit_period
+        )
+    else:
+        period_parent = parent_trust
+        is_period_correct = False
+
+    current_parent = parent_trust
+    show_period_alert = (
+        is_period_correct
+        and period_parent is not None
+        and period_parent != current_parent
+    )
+
+    # When the period-correct parent was resolved from an approved
+    # membership, narrow the trust-level organisation set to the
+    # period-correct organisation set (organisations whose membership for
+    # that period assigns them to the period-correct parent, expanded
+    # through the OrganisationIdentity chain). Otherwise, use the current
+    # parent's organisation set (the pre-foundation behaviour).
+    if is_period_correct and audit_period is not None and period_parent is not None:
+        if organisation.trust_id is not None:
+            period_org_ids = get_period_organisation_ids(
+                period_parent, audit_period, "trust"
+            )
+        else:
+            period_org_ids = get_period_organisation_ids(
+                period_parent, audit_period, "local_health_board"
+            )
+        if period_org_ids:
+            trust_level_org_ids = period_org_ids
+        else:
+            # No approved memberships — fall back to current parent set.
+            trust_level_org_ids = set(organisation_children.values_list("pk", flat=True))
+    else:
+        trust_level_org_ids = set(organisation_children.values_list("pk", flat=True))
+
+    # --- Identity-chain expansion (PR 4) ----------------------------------
+    # Expand the organisation sets through the OrganisationIdentity chain
+    # so that cases/registrations attached to inactive predecessor
+    # organisations remain visible.  Before the cutover commands have run,
+    # no identity links exist, so the expansion is a no-op and the IDs are
+    # identical to the pre-foundation sets.
+    #
+    # organisation_org_ids — for the organisation-level view, includes
+    #   the selected organisation plus its identity-linked predecessors.
+    # trust_org_ids — for the trust/LHB-level view, includes the
+    #   period-correct organisation set (when a specific cohort is
+    #   selected and an approved membership exists) or the current
+    #   trust/LHB organisation set, expanded through the identity chain.
+    organisation_org_ids = expand_organisation_ids_via_identity({organisation.pk})
+    trust_org_ids = expand_organisation_ids_via_identity(
+        trust_level_org_ids
+    )
+
     if filter_term:
         # filter_term is called if filtering by search box
         if request.user.view_preference == 0:
@@ -109,7 +193,7 @@ def case_list(request, organisation_id):
                 Case.objects.filter(
                     cohort_filter  # filter by cohort if selected
                     & Q(
-                        epilepsy12_sites__organisation=organisation,
+                        epilepsy12_sites__organisation__pk__in=organisation_org_ids,
                         epilepsy12_sites__site_is_primary_centre_of_epilepsy_care=True,
                         epilepsy12_sites__site_is_actively_involved_in_epilepsy_care=True
                     )
@@ -126,20 +210,13 @@ def case_list(request, organisation_id):
             )
         elif request.user.view_preference == 1:
             # user has requested trust level view
-            if organisation.country.boundary_identifier == "W92000004":
-                # in Wales filter by health board
-                trust_filter = Q(
-                    epilepsy12_sites__organisation__local_health_board=organisation.local_health_board,
-                    epilepsy12_sites__site_is_primary_centre_of_epilepsy_care=True,
-                    epilepsy12_sites__site_is_actively_involved_in_epilepsy_care=True
-                )
-            else:
-                # England filter by Trust
-                trust_filter = Q(
-                    epilepsy12_sites__organisation__trust=organisation.trust,
-                    epilepsy12_sites__site_is_primary_centre_of_epilepsy_care=True,
-                    epilepsy12_sites__site_is_actively_involved_in_epilepsy_care=True
-                )
+            # Expand through the identity chain so that cases from inactive
+            # predecessor organisations remain visible.
+            trust_filter = Q(
+                epilepsy12_sites__organisation__pk__in=trust_org_ids,
+                epilepsy12_sites__site_is_primary_centre_of_epilepsy_care=True,
+                epilepsy12_sites__site_is_actively_involved_in_epilepsy_care=True
+            )
 
             all_cases = (
                 Case.objects.filter(
@@ -197,32 +274,24 @@ def case_list(request, organisation_id):
             )
         elif request.user.view_preference == 1:
             # filters all primary Trust level centres where site is active and primary
-            if organisation.country.boundary_identifier == "W92000004":
-                # welsh - select health boards
-                filtered_cases = Case.objects.filter(
-                    Q(
-                        epilepsy12_sites__organisation__local_health_board=parent_trust,
-                        epilepsy12_sites__site_is_primary_centre_of_epilepsy_care=True,
-                        epilepsy12_sites__site_is_actively_involved_in_epilepsy_care=True
-                    )
-                    & cohort_filter  # filter by cohort if selected
+            # Expand through the identity chain so that cases from inactive
+            # predecessor organisations remain visible.
+            filtered_cases = Case.objects.filter(
+                Q(
+                    epilepsy12_sites__organisation__pk__in=trust_org_ids,
+                    epilepsy12_sites__site_is_primary_centre_of_epilepsy_care=True,
+                    epilepsy12_sites__site_is_actively_involved_in_epilepsy_care=True
                 )
-            else:
-                # England - select trusts
-                filtered_cases = Case.objects.filter(
-                    Q(
-                        epilepsy12_sites__organisation__trust=parent_trust,
-                        epilepsy12_sites__site_is_primary_centre_of_epilepsy_care=True,
-                        epilepsy12_sites__site_is_actively_involved_in_epilepsy_care=True
-                    )
-                    & cohort_filter  # filter by cohort if selected
-                )
+                & cohort_filter  # filter by cohort if selected
+            )
 
         else:
             # filters all primary centres at organisation level where site is active and primary
+            # Expand through the identity chain so that cases from inactive
+            # predecessor organisations remain visible.
             filtered_cases = Case.objects.filter(
                 Q(
-                    epilepsy12_sites__organisation=organisation,
+                    epilepsy12_sites__organisation__pk__in=organisation_org_ids,
                     epilepsy12_sites__site_is_primary_centre_of_epilepsy_care=True,
                     epilepsy12_sites__site_is_actively_involved_in_epilepsy_care=True
                 )
@@ -438,6 +507,8 @@ def case_list(request, organisation_id):
         "filtered_case_list": filter_term,
         "cohort_choices": merged_cohort_counts,
         "selected_cohort": selected_cohort,
+        "show_period_alert": show_period_alert,
+        "cohort_number": cohort_filter_term if specific_cohort_selected else None,
         "all_filtered_counts": filtered_totals["unregistered"]
         + filtered_totals[
             "registered"
@@ -663,6 +734,15 @@ def case_submit(request, can_edit, organisation_id, case_id):
     POST request callback from submit button in case_list partial.
     Disables further editing of case information. Case considered submitted
     There is a specific permission both for locking and unlocking which is tested in this function
+
+    The redirect back to the case list preserves the period context (the
+    selected cohort) by threading the ``?cohort=`` query parameter through
+    from the originating case table. This is a no-op before the audit-period
+    cutover: the case list accepts the same ``?cohort=`` toggle today, and
+    omitting it (the pre-foundation behaviour) simply shows "all children".
+    After cutover, preserving the cohort keeps the user on the period-correct
+    view they were already looking at, consistent with the operational
+    dashboard and the case list (PR 4 / PR 5).
     """
     case = Case.objects.get(pk=case_id)
     if case.locked is True and request.user.has_perm(
@@ -677,9 +757,16 @@ def case_submit(request, can_edit, organisation_id, case_id):
         raise PermissionDenied()
     case.save()
 
-    return HttpResponseClientRedirect(
-        reverse("cases", kwargs={"organisation_id": organisation_id})
-    )
+    redirect_url = reverse("cases", kwargs={"organisation_id": organisation_id})
+    # Preserve the period context (selected cohort) from the originating case
+    # table. The template appends ``?cohort=<n>`` (or ``all_cohorts``) when a
+    # specific cohort is selected; ``all_children`` is the default and is not
+    # threaded through, matching the pagination buttons in case_table.html.
+    cohort = request.GET.get("cohort")
+    if cohort:
+        redirect_url = f"{redirect_url}?cohort={cohort}"
+
+    return HttpResponseClientRedirect(redirect_url)
 
 
 @login_and_otp_required()

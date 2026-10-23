@@ -40,14 +40,15 @@ services:
       - postgis-data:/var/lib/postgresql/data
     restart: always
 
-  mkdocs:
+  zensical:
     <<: *global # this will inherit config from x-global-environment
     image: e12-django:built
     ports:
       - 8001:8001
+    # Zensical auto-discovers ./mkdocs.yml at the repo root (project root)
     command: >
-      sh -c "mkdocs build --config-file documentation/mkdocs.yml &&
-        mkdocs serve --config-file documentation/mkdocs.yml"
+      sh -c "zensical build &&
+        zensical serve"
     restart: always
 
 volumes:

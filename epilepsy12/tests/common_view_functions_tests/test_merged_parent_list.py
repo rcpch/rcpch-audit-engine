@@ -206,16 +206,22 @@ def test_merged_parent_list_sorted_by_name(
 
 
 @pytest.mark.django_db
-def test_merged_parent_list_excludes_inactive_trusts(
+def test_merged_parent_list_includes_inactive_trusts_with_active_organisations(
     seed_groups_fixture,
     seed_users_fixture,
 ):
     """
-    Test that inactive trusts (active=False) are excluded from the merged list.
-    Note: LocalHealthBoard does not have an active field, only Trust does.
+    Test that inactive trusts are still included in the merged parent list
+    when they have organisations in the whitelist.
+
+    After PR 4, the merged parent list no longer filters trusts by
+    active=True. Inactive trusts whose organisations appear in the
+    organisation whitelist (e.g. through the OrganisationIdentity chain)
+    should remain visible in the parent dropdown so that users can
+    navigate to period-correct parents.
     """
 
-    # Get a trust and deactivate it
+    # Get a trust that has active organisations and deactivate it
     trust_to_deactivate = Trust.objects.filter(
         organisation__active=True
     ).first()
@@ -230,9 +236,12 @@ def test_merged_parent_list_excludes_inactive_trusts(
         all_organisations = Organisation.objects.get_organisation_list()
         parent_list = merged_parent_list_for_user(admin_user, organisation_list=all_organisations)
 
-        # Inactive trust should not appear
+        # Inactive trust should still appear because it has organisations
+        # in the whitelist (the organisations under it are still active).
         parent_names = [p['name'] for p in parent_list]
-        assert trust_name not in parent_names, "Inactive trust should not appear in parent list"
+        assert trust_name in parent_names, (
+            "Inactive trust with active organisations should appear in parent list"
+        )
 
         # Reactivate for other tests
         trust_to_deactivate.active = True

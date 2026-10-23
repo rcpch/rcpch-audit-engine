@@ -132,7 +132,7 @@ root.crt
 
 .kube/
 
-# exclude site/ and .cache/ folders anywhere (MkDocs)
+# exclude site/ and .cache/ folders anywhere (Zensical)
 */site/
 */.cache/
 staticdocs

@@ -5,7 +5,7 @@ author: Dr Anchit Chandran
 
 ## Markdown Files
 
-This site is created using the MkDocs documentation framework. All text content comes from *markdown* files.
+This site is created using the Zensical documentation framework (previously MkDocs). All text content comes from *markdown* files.
 
 Markdown is a simple, lightweight markup language that allows you to format text using a few simple symbols. It was designed to be easy to read and write, even for people unfamiliar with coding.
 
@@ -49,11 +49,11 @@ Markdown also allows you to add links and images to your text using a simple syn
 
 Markdown is widely used on the web, especially in blogs, documentation, and forums. It's a great way to format your text without learning complex HTML or other markup languages.
 
-## Material for MkDocs
+## Zensical
 
-On top of MkDocs, this site uses the '*Material for MkDocs*' theme, which adds several extra features and a more modern appearance. In addition, we use the *Material for MkDocs Insiders* edition, allowing us to support the project whilst getting a few neat early-access features.
+This site uses [Zensical](https://zensical.org/), a static site generator built by the same team as *Material for MkDocs*, which adds several extra features and a more modern appearance.
 
-As you’d expect, there is delightful documentation for both projects: [Material for MkDocs](https://squidfunk.github.io/mkdocs-material/), and for the underlying [MkDocs](https://www.mkdocs.org/), on which it’s built. At times, you may need to refer to both for different features.
+As you'd expect, there is delightful documentation for [Zensical](https://zensical.org/docs/) and for the underlying [MkDocs](https://www.mkdocs.org/), on which it's built. At times, you may need to refer to both for different features.
 
 ## Editing these docs
 
@@ -71,7 +71,7 @@ Again, click on the edit button near the top right:
 
 ### Make your edits
 
-Make any changes you wish to suggest on this page. You can see a preview of the output markdown using the 'Preview' button (*note: Material for MkDocs' flavour of markdown is slightly different to GitHub's, so it may not appear perfectly.*)
+Make any changes you wish to suggest on this page. You can see a preview of the output markdown using the 'Preview' button (*note: Zensical's flavour of markdown is slightly different to GitHub's, so it may not appear perfectly.*)
 
 Once done, scroll to the bottom of the file. Here, you will submit the proposal for your change:
 

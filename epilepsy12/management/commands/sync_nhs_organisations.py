@@ -7,6 +7,7 @@ Usage:
     python manage.py sync_nhs_organisations --dry-run  # report what would change, write nothing
     python manage.py sync_nhs_organisations --only trusts  # sync only the specified entity
     python manage.py sync_nhs_organisations --confirm  # proceed despite registration/case impact
+    python manage.py sync_nhs_organisations --dry-run --full  # show every item, no truncation
 
 The command calls ``sync_current_state()`` which upserts Trust, LocalHealthBoard,
 IntegratedCareBoard, NHSEnglandRegion, Country, OPENUKNetwork and Organisation
@@ -92,10 +93,23 @@ class Command(BaseCommand):
             "organisations. Without --confirm, the sync aborts and prints the "
             "exposure summary. Run --dry-run first to see the exposure.",
         )
+        parser.add_argument(
+            "--full",
+            action="store_true",
+            help="Do not truncate the new/changed/local-only and high-impact-changes "
+            "listings. By default only the first 20 (or 10) entries per section are "
+            "shown with a '... and N more' summary; pass this flag to print every "
+            "entry, which is useful when reviewing the full impact of a --dry-run.",
+        )
 
     def handle(self, *args, **options):
         dry_run = options["dry_run"]
         only = options.get("only")
+        full = options.get("full")
+        new_limit = None if full else 20
+        changed_limit = None if full else 20
+        local_only_limit = None if full else 10
+        high_impact_limit = None if full else 20
 
         if dry_run:
             self.stdout.write(
@@ -136,16 +150,17 @@ class Command(BaseCommand):
 
                 if new:
                     self.stdout.write(self.style.SUCCESS(f"    New (would be created):"))
-                    for identifier, name in new[:20]:
+                    for identifier, name in (new if new_limit is None else new[:new_limit]):
                         self.stdout.write(f"      + {identifier}: {name}")
-                    if len(new) > 20:
-                        self.stdout.write(f"      ... and {len(new) - 20} more")
+                    if new_limit is not None and len(new) > new_limit:
+                        self.stdout.write(f"      ... and {len(new) - new_limit} more")
 
                 if changed:
                     self.stdout.write(self.style.WARNING(f"    Changed (would be updated):"))
-                    for entry in changed[:20]:
+                    for entry in (changed if changed_limit is None else changed[:changed_limit]):
                         identifier, name, field_diffs = entry[0], entry[1], entry[2]
                         exposure = entry[3] if len(entry) > 3 else None
+                        successor_info = entry[4] if len(entry) > 4 else None
                         self.stdout.write(f"      ~ {identifier}: {name}")
                         for field, (old_val, new_val) in field_diffs.items():
                             self.stdout.write(
@@ -162,17 +177,61 @@ class Command(BaseCommand):
                                     else ""
                                 )
                             )
-                    if len(changed) > 20:
-                        self.stdout.write(f"      ... and {len(changed) - 20} more")
+                        # The successor/orphan check only applies to organisation
+                        # entries.  Trust/LHB entries aggregate cases across all
+                        # their child organisations; the per-organisation entries
+                        # below carry the successor resolution, so reporting an
+                        # orphan at the trust level would double-count and
+                        # mislead (the same cases are already reported as
+                        # recoverable on the organisation entry).
+                        if entity_name == "organisations":
+                            if successor_info is not None:
+                                identity_status = (
+                                    "identity link already exists"
+                                    if successor_info.get("identity_linked")
+                                    else "identity link will be created by "
+                                    "`sync_audit_period_organisations --link-identities` "
+                                    "(Step 4 of the cutover)"
+                                )
+                                self.stdout.write(
+                                    self.style.WARNING(
+                                        f"          Successor: {successor_info['successor_ods_code']} "
+                                        f"({successor_info['successor_name']}) under "
+                                        f"{successor_info['successor_trust_name']} — "
+                                        f"all {exposure['cases_all_periods']} cases "
+                                        f"WILL be retrievable after cutover; "
+                                        f"{identity_status}. Cases are temporarily "
+                                        f"not visible in the no-cohort trust dropdown "
+                                        f"between Step 3 (--confirm) and Step 4 "
+                                        f"(--link-identities)."
+                                    )
+                                )
+                            elif (
+                                exposure
+                                and "active" in field_diffs
+                                and field_diffs["active"] == (True, False)
+                                and exposure.get("cases_all_periods", 0) > 0
+                            ):
+                                self.stdout.write(
+                                    self.style.ERROR(
+                                        f"          WARNING: No active successor found "
+                                        f"for {exposure['cases_all_periods']} cases — "
+                                        f"these cases would be PERMANENTLY orphaned "
+                                        f"from the no-cohort trust dropdown. "
+                                        f"Investigate manually before proceeding."
+                                    )
+                                )
+                    if changed_limit is not None and len(changed) > changed_limit:
+                        self.stdout.write(f"      ... and {len(changed) - changed_limit} more")
 
                 if local_only:
                     self.stdout.write(
                         self.style.HTTP_INFO(f"    Local-only (not in API, would not be touched):")
                     )
-                    for identifier, name in local_only[:10]:
+                    for identifier, name in (local_only if local_only_limit is None else local_only[:local_only_limit]):
                         self.stdout.write(f"      - {identifier}: {name}")
-                    if len(local_only) > 10:
-                        self.stdout.write(f"      ... and {len(local_only) - 10} more")
+                    if local_only_limit is not None and len(local_only) > local_only_limit:
+                        self.stdout.write(f"      ... and {len(local_only) - local_only_limit} more")
 
             self.stdout.write("")
             self.stdout.write(
@@ -184,6 +243,8 @@ class Command(BaseCommand):
             total_registrations = 0
             total_registrations_in_flight = 0
             total_cases = 0
+            total_orphaned = 0
+            total_recoverable = 0
             for entity_name, diff in diffs.items():
                 for entry in diff.get("changed", []):
                     if len(entry) > 3 and entry[3]:
@@ -191,6 +252,22 @@ class Command(BaseCommand):
                         total_registrations += exposure.get("registrations_all_periods", 0)
                         total_registrations_in_flight += exposure.get("registrations_in_flight", 0)
                         total_cases += exposure.get("cases_all_periods", 0)
+                    # The successor/orphan classification only applies to
+                    # organisation entries — trust/LHB entries aggregate the
+                    # same cases as their child orgs and would double-count.
+                    if (
+                        entity_name == "organisations"
+                        and len(entry) > 3
+                        and entry[3]
+                        and "active" in entry[2]
+                        and entry[2]["active"] == (True, False)
+                        and entry[3].get("cases_all_periods", 0) > 0
+                    ):
+                        successor_info = entry[4] if len(entry) > 4 else None
+                        if successor_info is not None:
+                            total_recoverable += entry[3]["cases_all_periods"]
+                        else:
+                            total_orphaned += entry[3]["cases_all_periods"]
             if total_registrations or total_cases:
                 self.stdout.write(
                     self.style.WARNING(
@@ -198,6 +275,31 @@ class Command(BaseCommand):
                         f"{total_registrations} registrations "
                         f"({total_registrations_in_flight} in-flight), "
                         f"{total_cases} distinct cases would be affected"
+                    )
+                )
+            if total_recoverable:
+                self.stdout.write(
+                    self.style.WARNING(
+                        f"  Cases with known successor (recoverable after "
+                        f"--link-identities): {total_recoverable} cases on "
+                        f"organisations going inactive whose active successor "
+                        f"was resolved from the API. These cases WILL be "
+                        f"retrievable after running "
+                        f"`sync_audit_period_organisations --link-identities` "
+                        f"(Step 4 of the cutover). They are temporarily not "
+                        f"visible in the no-cohort trust dropdown between "
+                        f"Step 3 (--confirm) and Step 4."
+                    )
+                )
+            if total_orphaned:
+                self.stdout.write(
+                    self.style.ERROR(
+                        f"  PERMANENTLY orphaned cases (no successor found): "
+                        f"{total_orphaned} cases on organisations going "
+                        f"inactive with no active successor found from the "
+                        f"API or local identity chain. These would NOT "
+                        f"appear in the no-cohort trust dropdown after "
+                        f"cutover. Investigate manually before proceeding."
                     )
                 )
 
@@ -247,11 +349,41 @@ class Command(BaseCommand):
             if safety["high_impact_changes"]:
                 self.stdout.write("")
                 self.stdout.write("  High-impact changes:")
-                for entity, identifier, description in safety["high_impact_changes"][:20]:
+                changes = safety["high_impact_changes"]
+                for entity, identifier, description in (
+                    changes if high_impact_limit is None else changes[:high_impact_limit]
+                ):
                     self.stdout.write(f"    {entity}: {identifier} — {description}")
-                if len(safety["high_impact_changes"]) > 20:
+                if high_impact_limit is not None and len(changes) > high_impact_limit:
                     self.stdout.write(
-                        f"    ... and {len(safety['high_impact_changes']) - 20} more"
+                        f"    ... and {len(changes) - high_impact_limit} more"
+                    )
+            if safety.get("orphaned_cases", 0) > 0:
+                self.stdout.write("")
+                self.stdout.write(
+                    self.style.ERROR(
+                        f"  PERMANENTLY orphaned cases (no successor found): "
+                        f"{safety['orphaned_cases']} cases on organisations "
+                        f"going inactive with no active successor found "
+                        f"from the API or local identity chain. These would "
+                        f"NOT appear in the no-cohort trust dropdown after "
+                        f"cutover. Investigate manually before proceeding."
+                    )
+                )
+            if safety.get("inactivation_successors"):
+                self.stdout.write("")
+                self.stdout.write(
+                    self.style.WARNING(
+                        f"  Cases with known successor (recoverable after "
+                        f"--link-identities):"
+                    )
+                )
+                for succ in safety["inactivation_successors"]:
+                    self.stdout.write(
+                        f"    {succ['ods_code']} ({succ['name']}) -> "
+                        f"{succ['successor_ods_code']} ({succ['successor_name']}), "
+                        f"{succ['cases']} cases — WILL be retrievable after "
+                        f"`sync_audit_period_organisations --link-identities`"
                     )
             return
 
