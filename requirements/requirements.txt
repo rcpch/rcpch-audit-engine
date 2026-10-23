@@ -40,7 +40,7 @@ gunicorn==23.0.0
 
 # code linting and formatting
 autopep8==2.3.2
-black==26.3.1
+black==26.10.1
 
 # testing and code analysis
 coverage==7.14.1
