@@ -46,6 +46,26 @@ from epilepsy12.constants.audit_period_dates import AUDIT_PERIODS
 
 
 @pytest.fixture(scope="session", autouse=True)
+def seed_groups_and_users_fixture(seed_groups_fixture, seed_users_fixture):
+    """Seed E12 groups and the shared test users once per session.
+
+    Under pytest-xdist each worker is a separate pytest session with its own
+    test database (pytest-django suffixes the test DB name with the worker
+    id), and session-scoped fixtures run lazily - only when first requested by
+    a test on that worker. Tests that read the seeded users without
+    requesting ``seed_users_fixture`` therefore depended on some *other* test
+    having seeded the DB first, and failed with empty querysets whenever their
+    worker had not yet run a seeder (the cause of the intermittent
+    ``test_permissions_create.py`` / ``test_permissions_delete.py`` CI
+    failures). Making the seeding autouse guarantees every worker seeds its
+    own test DB before its first test.
+
+    The underlying fixtures are idempotent (get_or_create on natural keys), so
+    this is safe with --reuse-db and adds no per-test cost.
+    """
+
+
+@pytest.fixture(scope="session", autouse=True)
 def seed_audit_periods_fixture(django_db_setup,django_db_blocker):
     """Ensure AuditPeriod rows exist in the test DB so Registration.save()
     can resolve audit_period from first_paediatric_assessment_date.

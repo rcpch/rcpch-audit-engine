@@ -1,13 +1,19 @@
 """
 conftest for view_tests.
 
-The seed fixtures (`seed_groups_fixture`, `seed_users_fixture`) are
-session-scoped and commit their rows via `django_db_blocker.unblock()`.
-Committed session data is visible to every test in this subtree (and every
-xdist worker's own connection), so tests that look users up by `first_name`
-and `force_login` them work without an autouse wrapper.
+Groups and the shared test users are seeded once per pytest session by the
+autouse `seed_groups_and_users_fixture` in `epilepsy12/tests/conftest.py`.
 
-Tests that need the seed data should request the fixtures explicitly in their
-signature (`seed_groups_fixture, seed_users_fixture`); the fixtures run once
-per session so there is no per-test cost.
+Under pytest-xdist each worker is a separate pytest session with its *own*
+test database (pytest-django suffixes the DB name with the worker id), so
+each worker seeds its own DB before its first test. Tests in this subtree can
+therefore look users up by `first_name` and `force_login` them without
+requesting the seed fixtures explicitly.
+
+Before this fixture existed, seeding only ran when a test explicitly
+requested `seed_groups_fixture`/`seed_users_fixture`, so tests that read the
+seeded users without requesting them passed or failed depending on whether
+their worker happened to have run a seeder first — the source of the
+intermittent CI failures in test_permissions_create.py /
+test_permissions_delete.py (and latent in _update.py / _view.py).
 """

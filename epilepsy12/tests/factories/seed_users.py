@@ -2,10 +2,12 @@
 Seeds E12 Users in the test db.
 
 Session-scoped: runs once per pytest session (not per test) and commits via
-``django_db_blocker.unblock()``. Committed session rows are visible to every
-test and every xdist worker's own connection - the per-worker isolation
-concern that drove the original function-scope change did not apply to
-committed seed data, only to in-flight test-transaction writes.
+``django_db_blocker.unblock()``. Under pytest-xdist each worker is a separate
+pytest session with its *own* test database (pytest-django suffixes the DB name
+with the worker id), so this seeds once per worker. The autouse
+``seed_groups_and_users_fixture`` in ``epilepsy12/tests/conftest.py`` triggers
+it for every worker before its first test, so tests can rely on the seeded
+users without requesting this fixture explicitly.
 
 Idempotent: each user is fetched-or-created by its deterministic ``first_name``
 (a stable natural key per role + organisation), with a deterministic email,
@@ -40,7 +42,9 @@ from epilepsy12.constants.user_types import (
 
 
 @pytest.fixture(scope="session")
-def seed_users_fixture(django_db_setup, django_db_blocker):
+def seed_users_fixture(django_db_setup, django_db_blocker, seed_groups_fixture):
+    # Depends on seed_groups_fixture explicitly: newly created users are added
+    # to a Group, so the groups must be seeded first.
     users = [
         test_user_audit_centre_administrator_data,
         test_user_audit_centre_clinician_data,
