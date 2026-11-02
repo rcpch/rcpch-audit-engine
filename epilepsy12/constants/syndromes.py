@@ -39,4 +39,5 @@ SYNDROMES = (
     (37, "Rasmussen syndrome"),
     (38, "Progressive myoclonus epilepsies"),
     (39, "Epilepsy with reading-induced seizures"),
+    (40, "Okur-Chung Neurodevelopmental Syndrome")
 )
