@@ -11,10 +11,11 @@ def seed_groups_fixture(django_db_setup, django_db_blocker):
     ~20 ContentType lookups and per-permission get_or_create work in
     groups_seeder() running for every test that requests this fixture.
 
-    Safe under xdist: this fixture commits via django_db_blocker.unblock(),
-    and committed session-scoped rows are visible to every worker's own
-    connection to the same test DB. The per-worker isolation concern in the
-    xdist PR applied to test-transaction writes, not to committed seed data.
+    Safe under xdist: under pytest-xdist each worker is a separate pytest
+    session with its own test database (pytest-django suffixes the DB name
+    with the worker id), so this runs once per worker. The autouse
+    ``seed_groups_and_users_fixture`` in ``epilepsy12/tests/conftest.py``
+    triggers it for every worker before its first test.
     """
     with django_db_blocker.unblock():
         # groups_seeder is idempotent: it creates missing groups and adds
