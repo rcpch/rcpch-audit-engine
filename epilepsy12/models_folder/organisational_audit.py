@@ -12,7 +12,7 @@ from .time_and_user_abstract_base_classes import TimeStampAbstractBaseClass, Use
 
 def DecimalField():
     return models.DecimalField(
-        null=True, 
+        null=True,
         blank=True,
         max_digits=7,
         decimal_places=3,
@@ -140,7 +140,7 @@ class OrganisationalAuditSubmission(TimeStampAbstractBaseClass, UserStampAbstrac
     S03VNSInsertion = YesNoUncertainField() # 3.5iii
     S03VNSReview = YesNoUncertainField() # 3.5iv
 
-    
+
     # 4. Investigations
 
     # 4.1 itself has no representation in the model, we construct it from the help text alone
@@ -192,6 +192,7 @@ class OrganisationalAuditSubmission(TimeStampAbstractBaseClass, UserStampAbstrac
 
     S06OutpatientClinicYoungPeopleEpilepsies = YesNoField() # 6.2
     S06WhatAgeDoesThisClinicAcceptYoungPeople = PositiveIntegerField() # 6.2i
+    S06IsAgeForTransitionPlanningAdjustedToDevelopmentalReadiness = YesNoField() # 6.2ii (new for 2026)
 
     S06ServiceForEpilepsyBothAdultAndPaed = YesNoField() # 6.3
     S06IsThisUsually = ChoiceField(choices={
@@ -215,7 +216,30 @@ class OrganisationalAuditSubmission(TimeStampAbstractBaseClass, UserStampAbstrac
     S06ProfessionalsRoutinelyInvolvedInTransitionOtherDetails = TextField() # 6.4
 
     S06StructuredResourcesToSupportTransition = YesNoField() # 6.5
+    S06WhichStructuredResourcesToSupportTransition = MultiSelectField(choices={
+        1: 'Ready Steady Go',
+        2: 'Hull / Epilepsy Action transition tools',
+        3: 'EpiTRAQ',
+        4: 'A local tool (please specify)'
+    }) # 6.5i (new for 2026)
+    S06WhichStructuredResourcesToSupportTransitionOtherDetails = TextField()
 
+    S06ReferredTo = ChoiceField(choices={
+        "1": 'All to adult neurology',
+        "2": 'Some to adult neurology and some to general practice',
+        "3": 'All to general practice'
+    }) # 6.6 (new for 2026)
+
+    S06ConfirmSeenInAdultServices = ChoiceField(choices={
+        "1": 'Yes, routinely',
+        "2": 'Sometimes',
+        "3": 'No'
+    }) # 6.7 (new for 2026)
+
+    S06AccessToMentalHealthSupportInTransition = YesNoField() # 6.8 (new for 2026)
+    S06AccessToMentalHealthSupportInTransitionBarriers = TextField() # 6.8i (new for 2026)
+
+    S06KeyIssuesCoveredInTransition = YesNoField() # 6.9 (new for 2026)
 
     # 7. Mental health
 
@@ -234,7 +258,7 @@ class OrganisationalAuditSubmission(TimeStampAbstractBaseClass, UserStampAbstrac
         10: 'PHQ - Patient Health Questionnaire, PHQ 2, PHQ 9',
         11: 'SDQ (Strengths and Difficulties Questionnaire)',
         12: 'Other'
-    }) 
+    })
     S07MentalHealthQuestionnaireOtherDetails = TextField() # 7.1i
 
     S07MentalHealthAgreedPathway = MultiSelectField(choices={
