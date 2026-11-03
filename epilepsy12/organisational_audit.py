@@ -85,6 +85,21 @@ MULTISELECT_FIELD_MAPPINGS = {
     }
 }
 
+def widened_columns_for_multiselect_field(field_name):
+    """
+    Column names a multiselect field is widened into, one per choice.
+
+    Fields carried over from the old platform are mapped by hand in
+    MULTISELECT_FIELD_MAPPINGS to match its CSV column names. Fields added on
+    the new platform have no old name to match, so each choice becomes a
+    column named f"{field_name}_{choice}".
+    """
+    if field_name in MULTISELECT_FIELD_MAPPINGS:
+        return MULTISELECT_FIELD_MAPPINGS[field_name]
+
+    choices = OrganisationalAuditSubmission._meta.get_field(field_name).choices
+    return {str(value): f"{field_name}_{value}" for value, _ in choices}
+
 def adapt_multiselect_field(row, choices_to_column):
     return [key for key, value in choices_to_column.items() if row[value] == 1]
 
@@ -138,7 +153,7 @@ def export_submission_period_as_csv(submission_period):
 
     for field in OrganisationalAuditSubmissionForm():
         if type(field.field) is MultiSelectFormField:
-            columns.extend(MULTISELECT_FIELD_MAPPINGS[field.name].values())
+            columns.extend(widened_columns_for_multiselect_field(field.name).values())
         else:
             columns.append(field.name)
 
@@ -165,13 +180,18 @@ def export_submission_period_as_csv(submission_period):
             value = getattr(submission, field.name)
 
             if type(field.field) is MultiSelectFormField:
+                choice_to_column = widened_columns_for_multiselect_field(field.name)
+
                 if value is None:
                     logger.warn(f"No value for MultiSelectFormField {field.name} for {site_name} ({site_code})")
-                    row[field.name] = None
+                    for column in choice_to_column.values():
+                        row[column] = None
                 else:
-                    selected_choices = list(value)
+                    # choices may come back from the database as strings ("1,3")
+                    # but be int-typed in the model field definitions, so compare as strings
+                    selected_choices = [str(choice) for choice in value]
 
-                    for choice, column in MULTISELECT_FIELD_MAPPINGS[field.name].items():
+                    for choice, column in choice_to_column.items():
                         row[column] = "1" if choice in selected_choices else "2"
             else:
                 row[field.name] = value

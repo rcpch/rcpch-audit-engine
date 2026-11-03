@@ -78,14 +78,14 @@ class OrganisationalAuditSubmissionForm(forms.ModelForm):
             "S01ESNFunctions": {
                 "parent_question_number": "1.4",
                 "question_number": "1.4i",
-                "label": "Which of the following Paediatric ESN functions is the epilepsy service currently able to support?",        
+                "label": "Which of the following Paediatric ESN functions is the epilepsy service currently able to support?",
             },
 
             "S01JobPlannedHoursPerWeekLeadershipQIActivities": {
                 "section": "1. Workforce",
                 "question_number": "1.5",
                 "label": "What are the total number of hours per week for your Health Board/Trust specified towards local epilepsy audit and quality improvement?",
-                "reference": "For example in nurse, doctor or allied professionals job plans. You can specify partial hours as a decimal (1.5 would be an hour and a half)."            
+                "reference": "For example in nurse, doctor or allied professionals job plans. You can specify partial hours as a decimal (1.5 would be an hour and a half)."
             },
 
             "S01LeadershipHours": {
@@ -135,7 +135,7 @@ class OrganisationalAuditSubmissionForm(forms.ModelForm):
                         Acutely and or non-acutely.
                     </p>
                     <p>
-                        This should not include visiting neurologists who are primarily employed by another trust 
+                        This should not include visiting neurologists who are primarily employed by another trust
                     </p>
                 """
             },
@@ -161,7 +161,7 @@ class OrganisationalAuditSubmissionForm(forms.ModelForm):
                         e.g. a paediatric neurologist visits a site within the trust to undertake paediatric neurology clinics
                     </p>
                     <p>
-                        A satellite clinic is where a neurologist supports a clinic outside their base hospital. This might be another hospital or clinic location in their trust or another hospital or clinic location in another trust. 
+                        A satellite clinic is where a neurologist supports a clinic outside their base hospital. This might be another hospital or clinic location in their trust or another hospital or clinic location in another trust.
                     </p>
                 """
             },
@@ -303,7 +303,7 @@ class OrganisationalAuditSubmissionForm(forms.ModelForm):
             "S05WhoProvidesSpecialistAdvice": {
                 "section": "5. Service Contact",
                 "question_number": "5.3",
-                "label": "Who typically provides the initial ‘specialist advice’?"   
+                "label": "Who typically provides the initial ‘specialist advice’?"
             },
             "S05WhoProvidesSpecialistAdviceOther": {
                 "parent_question_number": "5.3",
@@ -336,6 +336,11 @@ class OrganisationalAuditSubmissionForm(forms.ModelForm):
                 "question_number": "6.2i",
                 "parent_question_number": "6.2",
                 "label": "From what age does this clinic typically accept young people?"
+            },
+            "S06IsAgeForTransitionPlanningAdjustedToDevelopmentalReadiness": {
+                "question_number": "6.2ii",
+                "parent_question_number": "6.2",
+                "label": "Is the age at which transition planning occurs adjusted to the young person's ‘developmental readiness’?"
             },
 
             "S06ServiceForEpilepsyBothAdultAndPaed": {
@@ -375,7 +380,49 @@ class OrganisationalAuditSubmissionForm(forms.ModelForm):
                 "section": "6. Young People and Transition",
                 "question_number": "6.5",
                 "label": "Do you use structured resources to support transition?",
-                "reference": "e.g. Ready Steady Go"
+                "reference": "Ready Steady Go, Hull / Epilepsy Action transition tools, EpiTRAQ or a local tool"
+            },
+            "S06WhichStructuredResourcesToSupportTransition": {
+                "question_number": "6.5i",
+                "parent_question_number": "6.5",
+                "label": "Which resources do you use?"
+            },
+            "S06WhichStructuredResourcesToSupportTransitionOtherDetails": {
+                "parent_question_number": "6.5i",
+                "parent_question_value": "4",
+                "label": "A local tool (please specify)"
+            },
+
+            "S06ReferredTo": {
+                "section": "6. Young People and Transition",
+                "question_number": "6.6",
+                "label": "How are young people with an ongoing epilepsy referred?",
+                "reference": "Pick the answer that best describes your clinic"
+            },
+
+            "S06ConfirmSeenInAdultServices": {
+                "section": "6. Young People and Transition",
+                "question_number": "6.7",
+                "label": "Does your paediatric service confirm the young person has been seen in adult services?",
+                "reference": "for example joint clinic, not discharged from paediatrics until seen, paediatric team attending first adult appointment"
+            },
+
+            "S06AccessToMentalHealthSupportInTransition": {
+                "section": "6. Young People and Transition",
+                "question_number": "6.8",
+                "label": "Do young people have access to mental health support or services throughout the transition process?"
+            },
+            "S06AccessToMentalHealthSupportInTransitionBarriers": {
+                "question_number": "6.8i",
+                "parent_question_number": "6.8",
+                "label": "Are there any barriers to this?",
+            },
+
+            "S06KeyIssuesCoveredInTransition": {
+                "section": "6. Young People and Transition",
+                "question_number": "6.9",
+                "label": "Does the transition process include a process to ensure key issues are covered?",
+                "reference": "e.g. SUDEP, contraception, driving, sleep, alcohol and recreational drugs, self-management, adherence, etc"
             },
 
 
