@@ -233,6 +233,16 @@ if os.environ.get("E12_POSTGRES_DB_USE_AAD_TOKEN", "False") == "True":
 else:
     database_config["PASSWORD"] = os.environ.get("E12_POSTGRES_DB_PASSWORD")
 
+# Persistent connections: reuse the DB connection across requests instead of
+# opening a new one per request. 10 minutes covers gaps between requests during
+# active use, while still releasing connections overnight. The AAD token is
+# only presented when a connection is established, so this also reduces token
+# churn when USE_AAD_TOKEN is enabled.
+database_config["CONN_MAX_AGE"] = 600
+# Ping the server before reusing a connection so that connections dropped
+# while idle (e.g. by network infrastructure) are re-established transparently.
+database_config["CONN_HEALTH_CHECKS"] = True
+
 DATABASES = {"default": database_config}
 
 # Password validation
