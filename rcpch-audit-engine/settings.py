@@ -184,6 +184,29 @@ AUTO_LOGOUT = {
     "MESSAGE": "You have been automatically logged out as there was no activity for 30 minutes. Please login again to continue.",
 }
 
+# Deactivation of accounts due to inactivity
+# Users who have not logged in for longer than this period (in days) are
+# deactivated the next time they attempt to log in. A value of 0 (or less)
+# disables the check. Users who have never logged in are measured against the
+# date their account was created.
+if not (
+    env_account_inactivity_deactivation_period_days := os.environ.get(
+        "ACCOUNT_INACTIVITY_DEACTIVATION_PERIOD_DAYS"
+    )
+):
+    env_account_inactivity_deactivation_period_days = 730  # Default: 2 years
+    logger.warning(
+        "ENV VAR ACCOUNT_INACTIVITY_DEACTIVATION_PERIOD_DAYS MISSING: SETTING DEFAULT TIME: "
+        f"{env_account_inactivity_deactivation_period_days=}"
+    )
+ACCOUNT_INACTIVITY_DEACTIVATION_PERIOD_DAYS = int(
+    env_account_inactivity_deactivation_period_days
+)
+logger.info(
+    "ACCOUNT_INACTIVITY_DEACTIVATION_PERIOD_DAYS: %s",
+    ACCOUNT_INACTIVITY_DEACTIVATION_PERIOD_DAYS,
+)
+
 # LOGIN_URL = "/registration/login/"
 LOGIN_URL = "two_factor:login"  # change LOGIN_URL to the 2fa one
 LOGIN_REDIRECT_URL = "index"  # not actually used, see RCPCHLoginView.get_success_url

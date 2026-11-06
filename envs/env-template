@@ -22,6 +22,9 @@ RCPCH_NHS_ORGANISATIONS_API_KEY = "XXXXXXXXXX"
 
 
 # DJANGO
+# Users who have not logged in for longer than this many days are deactivated the
+# next time they attempt to log in. 0 disables the check.
+ACCOUNT_INACTIVITY_DEACTIVATION_PERIOD_DAYS=730 # 2 years
 AUTO_LOGOUT_DELAY_SECONDS=1800 # default 30 minutes
 DEBUG="True" # Set DEBUG=True for Local dev and Development, not Staging or Live
 DJANGO_ALLOWED_HOSTS="${SITE_DOMAIN}"

@@ -22,6 +22,7 @@ class VisitActivity(models.Model):
     REMOVED_USER_FROM_EMPLOYER = 16
     USER_EMPLOYER_ROLE_CHANGED = 17
     PASSWORD_RESET_FAILED = 18
+    ACCOUNT_DEACTIVATED_INACTIVITY = 19
 
     ACTIVITY = (
         (SUCCESSFUL_LOGIN, "Successful login"),
@@ -45,6 +46,10 @@ class VisitActivity(models.Model):
         (REMOVED_USER_FROM_EMPLOYER, "User removed from employer"),
         (USER_EMPLOYER_ROLE_CHANGED, "User employer role changed"),
         (PASSWORD_RESET_FAILED, "Password reset failed"),
+        (
+            ACCOUNT_DEACTIVATED_INACTIVITY,
+            "Account deactivated due to inactivity",
+        ),
     )
 
     activity_datetime = models.DateTimeField(auto_created=True, default=timezone.now)
