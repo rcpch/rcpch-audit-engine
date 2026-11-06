@@ -10,6 +10,7 @@ from .date_functions import *
 from .email import *
 from .fuzzy_matching import *
 from .has_all_attributes import *
+from .inactivity_deactivation import *
 from .index_multiple_deprivation import *
 from .item_from_choice import *
 from .nhs_organisations import *

@@ -21,6 +21,7 @@ from django.contrib.auth.signals import (
 )
 from django.db.models.signals import pre_save, post_save, pre_delete, post_delete
 from django.dispatch import receiver
+from django.utils import timezone
 
 # third party
 from two_factor.signals import user_verified
@@ -181,6 +182,7 @@ ACTIVITY = (
     (16, "User removed from Employer"),  # REMOVED_USER_FROM_EMPLOYER
     (17, "User Employer role changed"),  # USER_EMPLOYER_ROLE_CHANGED
     (18, "Password reset failed"),  # PASSWORD_RESET_FAILED
+    (19, "Account deactivated due to inactivity"),  # ACCOUNT_DEACTIVATED_INACTIVITY
 )
 
 
@@ -231,6 +233,15 @@ def log_and_notify_user_changes(sender, instance, created, **kwargs):
             changes = _detect_changes(instance, original_values)
 
             if changes:
+                # Reactivation of a deactivated account (eg by a lead
+                # clinician, after an automatic deactivation due to
+                # inactivity) restarts the inactivity deactivation clock.
+                # A queryset update is used so the signals are not retriggered.
+                if changes.get("is_active", {}).get("new") is True:
+                    Epilepsy12User.objects.filter(pk=instance.pk).update(
+                        reactivated_at=timezone.now()
+                    )
+
                 # Log all changes
                 _log_user_changes(instance, changes, current_user)
 
