@@ -21,6 +21,11 @@ from epilepsy12.constants.user_types import (
     AUDIT_CENTRE_ROLES,
     TITLES,
 )
+from ..general_functions.inactivity_deactivation import (
+    deactivate_user_for_inactivity,
+    get_inactivity_deactivation_message,
+    is_inactive_beyond_deactivation_period,
+)
 from ..models import Epilepsy12User, Organisation, VisitActivity, OrganisationEmployer
 
 # Logging setup
@@ -329,6 +334,18 @@ class CaptchaAuthenticationForm(AuthenticationForm):
                 settings.LOCAL_DEV_ADMIN_PASSWORD
                 or "SET LOCAL_DEV_ADMIN_PASSWORD IN ENVIRONMENT VARIABLES"
             )
+
+    def confirm_login_allowed(self, user):
+        # Deactivate the account if the user has not logged in for longer
+        # than the configured inactivity period
+        if is_inactive_beyond_deactivation_period(user):
+            deactivate_user_for_inactivity(user, request=self.request)
+            raise forms.ValidationError(
+                get_inactivity_deactivation_message(),
+                code="inactive",
+            )
+
+        super().confirm_login_allowed(user)
 
     def clean_username(self) -> dict[str, Any]:
         email = super().clean()["username"]

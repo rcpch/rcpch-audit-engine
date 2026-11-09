@@ -195,6 +195,11 @@ class Epilepsy12User(AbstractUser, PermissionsMixin):
     role = models.PositiveSmallIntegerField(choices=ROLES, blank=True, null=True)
     email_confirmed = models.BooleanField(default=False)
     password_last_set = models.DateTimeField(default=timezone.now)
+    reactivated_at = models.DateTimeField(
+        null=True,
+        blank=True,
+        help_text="The date and time this account was last reactivated by an administrator, if ever. Reactivation restarts the inactivity deactivation clock.",
+    )
 
     # Tracking fields
     created_at = models.DateTimeField(auto_now_add=True, null=True, blank=True)
