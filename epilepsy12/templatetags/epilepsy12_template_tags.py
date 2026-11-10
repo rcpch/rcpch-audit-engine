@@ -484,7 +484,7 @@ def capitalise_org_names(organisation_name):
 # TWO FACTOR TAGS
 @register.filter
 def get_org_id_from_user(user):
-    if not user.organisation_employer:
+    if not user or not user.organisation_employer:
         return 1
 
     return user.organisation_employer.id

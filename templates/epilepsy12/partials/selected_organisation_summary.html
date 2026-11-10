@@ -69,7 +69,7 @@
                 </div>
                 {% if organisational_audit_submission_period.is_open %}
                 <div class="column">
-                    <a class="ui rcpch_purple button bold fluid" href="{% url 'organisational_audit' %}">
+                    <a class="ui rcpch_purple button bold fluid" href="{% url 'organisational_audit' organisation_id=selected_organisation.pk %}">
                         View Organisational Audit for
                         {% if selected_organisation.trust %}
                             {% with organisation_name=selected_organisation.trust.name|title %}

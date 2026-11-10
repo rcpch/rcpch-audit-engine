@@ -1066,6 +1066,11 @@ organisational_audit_patterns = [
         name="organisational_audit_local_health_board",
     ),
     path(
+        "organisational_audit/organisation/<int:organisation_id>",
+        view=organisational_audit,
+        name="organisational_audit",
+    ),
+    path(
         "organisational_audit",
         view=organisational_audit,
         name="organisational_audit",
