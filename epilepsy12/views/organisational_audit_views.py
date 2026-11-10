@@ -1,6 +1,7 @@
 from collections.abc import Iterable
 import decimal
 
+from django.contrib import messages
 from django.shortcuts import render, redirect
 from django.forms import model_to_dict
 
@@ -9,6 +10,7 @@ from django.shortcuts import render
 from ..models import (
     Trust,
     LocalHealthBoard,
+    Organisation,
     OrganisationalAuditSubmissionPeriod,
     OrganisationalAuditSubmission,
 )
@@ -293,11 +295,35 @@ def organisational_audit_local_health_board(request, id):
 
 
 @login_and_otp_required()
-def organisational_audit(request):
-    organisation = request.user.organisation_employer
+def organisational_audit(request, organisation_id=None):
+    """
+    Redirects to the organisational audit for the parent (trust or local
+    health board) of an organisation.
+
+    If an organisation_id is provided (the link from an organisation's
+    summary page), that organisation's parent is used, so that RCPCH staff
+    can view the audit of the organisation they are browsing. Otherwise the
+    user's own employer is used.
+    """
+    if organisation_id is not None:
+        organisation = Organisation.objects.filter(pk=organisation_id).first()
+    else:
+        organisation = request.user.organisation_employer
+
+    if organisation is None:
+        # RCPCH staff members may not be attached to an organisation, in
+        # which case there is no organisational audit to redirect to
+        messages.warning(
+            request,
+            "Your account is not associated with an organisation, so there is no organisational audit to view.",
+        )
+        return redirect("index")
 
     if organisation.local_health_board:
-        return redirect("organisational_audit_local_health_board", id=organisation.local_health_board.id)
+        return redirect(
+            "organisational_audit_local_health_board",
+            id=organisation.local_health_board.id,
+        )
     elif organisation.trust:
         return redirect("organisational_audit_trust", id=organisation.trust.id)
     else:
