@@ -111,7 +111,6 @@ class Epilepsy12UserManager(BaseUserManager):
         extra_fields.setdefault("is_superuser", True)
         extra_fields.setdefault("is_active", True)
         extra_fields.setdefault("is_rcpch_audit_team_member", True)
-        extra_fields.setdefault("is_rcpch_staff", False)
         extra_fields.setdefault("email_confirmed", True)
         extra_fields.setdefault("password_last_set", timezone.now())
         # Organisation level preference

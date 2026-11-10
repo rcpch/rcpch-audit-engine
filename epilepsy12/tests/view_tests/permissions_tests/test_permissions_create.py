@@ -431,6 +431,82 @@ def test_rcpch_staff_can_create_rcpch_staff_user(
 
 
 @pytest.mark.django_db
+def test_superuser_can_create_rcpch_staff_user(
+    client,
+    seed_groups_fixture,
+    seed_users_fixture,
+    e12_user_factory,
+):
+    """Regression test: superusers must be able to create new RCPCH staff users.
+
+    Superusers created through Epilepsy12UserManager.create_superuser() used to
+    end up with is_rcpch_staff=False (a dead setdefault meant the intended
+    True default never applied), and _user_may_view_this_organisation() only
+    allowed is_rcpch_staff users on the rcpch-staff route - so a superuser
+    clicking 'Add a new RCPCH Staff User' got a 403. This test replicates that
+    account (superuser + audit team member, but is_rcpch_staff=False) and
+    asserts both GET and POST now succeed.
+    """
+
+    # GOSH - used as the organisation_id in the URL (RCPCH staff are not tied to an org)
+    TEST_USER_ORGANISATION = Organisation.objects.get(
+        ods_code="RP401",
+        trust__ods_code="RP4",
+    )
+
+    TEMP_CREATED_USER_FIRST_NAME = "TEMP_RCPCH_STAFF_CREATED_BY_SUPERUSER"
+
+    # replicate the dev superuser (eg the incubator@rcpch.ac.uk dev account):
+    # superuser and RCPCH audit team member, but NOT flagged as RCPCH staff
+    superuser = e12_user_factory(
+        is_superuser=True,
+        role=RCPCH_AUDIT_TEAM,
+        is_rcpch_audit_team_member=True,
+        is_rcpch_staff=False,
+    )
+    superuser.refresh_from_db()
+
+    client.force_login(superuser)
+    twofactor_signin(client, superuser)
+
+    url = reverse(
+        "create_epilepsy12_user",
+        kwargs={
+            "organisation_id": TEST_USER_ORGANISATION.id,
+            "user_type": "rcpch-staff",
+        },
+    )
+
+    response = client.get(url)
+
+    assert (
+        response.status_code == HTTPStatus.OK
+    ), f"Superuser (is_rcpch_staff=False) requested `{url}`. Expected {HTTPStatus.OK}, received {response.status_code}"
+
+    data = {
+        "title": 1,
+        "email": f"{TEMP_CREATED_USER_FIRST_NAME}@rcpch.ac.uk",
+        "role": RCPCH_AUDIT_TEAM,
+        "first_name": TEMP_CREATED_USER_FIRST_NAME,
+        "surname": "Staff",
+        "is_rcpch_audit_team_member": True,
+        "is_rcpch_staff": True,
+        "email_confirmed": True,
+    }
+
+    response = client.post(url, data=data)
+
+    assert (
+        response.status_code == HTTPStatus.FOUND
+    ), f"Superuser (is_rcpch_staff=False) POSTed valid data to `{url}`. Expected {HTTPStatus.FOUND}, received {response.status_code}"
+
+    assert (
+        Epilepsy12User.objects.filter(first_name=TEMP_CREATED_USER_FIRST_NAME).count()
+        == 1
+    ), f"Expected 1 newly created RCPCH staff user with first_name={TEMP_CREATED_USER_FIRST_NAME}, found 0."
+
+
+@pytest.mark.django_db
 @patch("epilepsy12.models_folder.case.coordinates_for_postcode")
 def test_patient_create_success(
     mock_coords,

@@ -13,6 +13,9 @@ to organisation level (0) by the model's save() hook.
 # Standard imports
 import pytest
 
+# Django imports
+from django.contrib.auth import get_user_model
+
 # RCPCH imports
 from epilepsy12.constants.user_types import (
     AUDIT_CENTRE_ADMINISTRATOR,
@@ -136,3 +139,37 @@ class TestViewPreferenceNationalSync:
 
         user.refresh_from_db()
         assert user.view_preference == 2
+
+
+@pytest.mark.django_db
+class TestCreateSuperuserDefaults:
+    """create_superuser must produce a fully-privileged RCPCH user.
+
+    Regression test: an early ``setdefault("is_rcpch_staff", False)`` shadowed
+    the intended ``setdefault("is_rcpch_staff", True)`` later in the method, so
+    superusers created via the manager ended up NOT being RCPCH staff. That
+    then tripped the RCPCH-staff-only check guarding the create-rcpch-staff
+    route (see test_permissions_create.py), 403-ing superusers on the "Add a
+    new RCPCH Staff User" button. It also meant ``manage.py createsuperuser``
+    (which passes no organisation_employer) raised a ValueError in
+    create_user, since only RCPCH staff may be created without an employer.
+    """
+
+    def test_create_superuser_defaults_rcpch_flags(self, seed_groups_fixture):
+        """Superusers are RCPCH staff and RCPCH audit team members by default."""
+        user_model = get_user_model()
+
+        # No organisation_employer passed: mirrors how `manage.py
+        # createsuperuser` invokes the manager (REQUIRED_FIELDS only).
+        superuser = user_model.objects.create_superuser(
+            email="new_superuser@example.com",
+            password="Ep!lepsy12_Audit",
+            first_name="Super",
+            surname="User",
+            role=RCPCH_AUDIT_TEAM,
+            is_rcpch_audit_team_member=True,
+        )
+
+        assert superuser.is_superuser is True
+        assert superuser.is_rcpch_staff is True
+        assert superuser.is_rcpch_audit_team_member is True

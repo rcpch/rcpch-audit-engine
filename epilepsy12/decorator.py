@@ -71,8 +71,15 @@ def _user_may_view_this_organisation(request, kwargs):
         ):
             # user's has an organisation employer in the same trust or LHB as the organisation requested
             if kwargs.get("user_type") is not None:
-                if kwargs.get("user_type") == "rcpch-staff" and not user.is_rcpch_staff:
-                    # this route is for rcpch staff to create new rcpch staff members only
+                if kwargs.get("user_type") == "rcpch-staff" and not (
+                    user.is_rcpch_staff
+                    or user.is_rcpch_audit_team_member
+                    or user.is_superuser
+                ):
+                    # this route is for RCPCH staff, RCPCH audit team members and
+                    # superusers to create new RCPCH staff members only. This
+                    # mirrors the authorisation in
+                    # Epilepsy12UserAdminCreationForm.clean().
                     raise PermissionDenied()
             # user is allowed
         else:
