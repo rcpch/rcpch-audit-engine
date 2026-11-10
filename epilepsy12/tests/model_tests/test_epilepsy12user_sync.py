@@ -173,3 +173,48 @@ class TestCreateSuperuserDefaults:
         assert superuser.is_superuser is True
         assert superuser.is_rcpch_staff is True
         assert superuser.is_rcpch_audit_team_member is True
+
+    def test_create_superuser_defaults_national_view_preference(
+        self, seed_groups_fixture
+    ):
+        """Superusers default to the national view scope (2).
+
+        The intended ``setdefault("view_preference", 2)`` in create_superuser
+        was dead code: it was shadowed by an earlier ``setdefault(0)`` in the
+        same method, and create_user then clobbered it with an unconditional
+        ``user.view_preference = 0`` anyway - so superusers always landed on
+        organisation scope despite the "national scope" intent.
+        """
+        user_model = get_user_model()
+
+        superuser = user_model.objects.create_superuser(
+            email="national_superuser@example.com",
+            password="Ep!lepsy12_Audit",
+            first_name="National",
+            surname="Superuser",
+            role=RCPCH_AUDIT_TEAM,
+            is_rcpch_audit_team_member=True,
+        )
+
+        superuser.refresh_from_db()
+        assert superuser.view_preference == 2
+
+    def test_create_user_still_defaults_organisation_view_preference(
+        self, seed_groups_fixture, GOSH
+    ):
+        """create_user must keep defaulting to organisation scope (0) when no
+        view_preference is passed - only an explicit preference is honoured.
+        """
+        user_model = get_user_model()
+
+        user = user_model.objects.create_user(
+            email="org_default@example.com",
+            password="Ep!lepsy12_Audit",
+            first_name="Org",
+            surname="User",
+            role=AUDIT_CENTRE_ADMINISTRATOR,
+            organisation_employer=GOSH,
+        )
+
+        user.refresh_from_db()
+        assert user.view_preference == 0

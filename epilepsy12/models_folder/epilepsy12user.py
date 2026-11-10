@@ -72,7 +72,10 @@ class Epilepsy12UserManager(BaseUserManager):
         )
 
         user.set_password(password)
-        user.view_preference = 0  # organisation level view preference
+        if not extra_fields.get("view_preference"):
+            # default to organisation level view unless a preference was
+            # explicitly provided (create_superuser passes national scope)
+            user.view_preference = 0
         if not extra_fields.get("is_superuser"):
             user.is_superuser = False
         if not extra_fields.get("is_active"):
@@ -113,8 +116,6 @@ class Epilepsy12UserManager(BaseUserManager):
         extra_fields.setdefault("is_rcpch_audit_team_member", True)
         extra_fields.setdefault("email_confirmed", True)
         extra_fields.setdefault("password_last_set", timezone.now())
-        # Organisation level preference
-        extra_fields.setdefault("view_preference", 0)
 
         if extra_fields.get("is_active") is not True:
             raise ValueError(_("Superuser must have is_active=True."))
