@@ -11,15 +11,14 @@ This is the plan for replacing the two `Epilepsy12User` boolean flags with permi
 
 ## New permissions
 
-Define each in `constants/user_types.py`, add it to `PERMISSIONS` and to `Epilepsy12User.Meta.permissions`, and attach it only to the audit team group.
+Define each new permission in `constants/user_types.py`, add it to `PERMISSIONS` and to the `Meta.permissions` of the model it most relates to, and attach it only to the audit team group. Where a built-in model permission already fits (`view_banner`), use that instead.
 
 | Permission | Replaces the flag checks in |
 |---|---|
-| `can_access_all_organisations` (view any organisation, user or child nationally) | `decorator._user_may_view_this_organisation`, `user_may_view_organisational_audit`, `user_can_access_user`, `lookup_user_permissions_on_child` (`can_view`), `permissions.CanAccessOrganisation`, `organisation_views.py:120,381`, `case_views.py:1164`, `user_management_views.py:149,209,495`, `sanction_user_access.merged_parent_list_for_user` (Jersey rule), `case_table.html:117` |
+| `can_access_all_organisations` (view any organisation, user or child nationally, including the national view preference and the submission dashboard) | `decorator._user_may_view_this_organisation`, `user_may_view_organisational_audit`, `user_can_access_user`, `lookup_user_permissions_on_child` (`can_view`), `permissions.CanAccessOrganisation`, `organisation_views.py:120,381`, `case_views.py:1164`, `user_management_views.py:149,209,495`, `sanction_user_access.merged_parent_list_for_user` (Jersey rule), `case_table.html:117`; national view: `Epilepsy12User.save()` invariant, `organisation_views.py:938` toggle, `rcpch_choices` in `user_management_views.py:332` and `case_views.py:455`, `partials/cases/view_preference.html`; admin data banner and submission dashboard link: `nav.html:5,27` |
 | `can_edit_case_outside_audit_period` (edit any child whatever its organisation, lock state or period) | `lookup_user_permissions_on_child` (`can_edit`), `audit_period_permissions._is_rcpch_user` (5 callers), `registration_views.py:612` (earliest date = DOB), `case_table.html:136–150` |
-| `can_select_national_view_preference` | `Epilepsy12User.save()` invariant, `organisation_views.py:938` toggle, `rcpch_choices` in `user_management_views.py:332` and `case_views.py:455`, `partials/cases/view_preference.html` |
 | `can_manage_rcpch_audit_team_users` (create/edit RCPCH audit team users, edit emails) | `decorator.py:74` (`user_type == "rcpch-staff"`), `Epilepsy12UserAdminCreationForm.__init__` / `clean()`, `epilepsy12_user_list.html:31`, `admin_create_user.html:73` |
-| `can_view_admin_tools` (admin banner, submission dashboard link, all banners) | `nav.html:5,27`, `context_processors/banner.py:19` |
+| `view_banner` (built-in; see banners targeted at any role, to check how they look) | `context_processors/banner.py:19` |
 | `can_approve_audit_period_organisations` | `approve_audit_period_organisations.py:117` |
 
 Line numbers are as of the commit this plan was written against.
@@ -59,18 +58,35 @@ The test seed users `*_CLINICAL_AUDIT_TEAM@nhs.net` (`tests/UserDataClasses.py`)
 
 ### Phase 1 – add the permissions (additive, safe to deploy)
 
-- Add the constants and `Meta.permissions` entries, then run `makemigrations` (permission-only migration).
-- Extend `EPILEPSY12_AUDIT_TEAM_ACCESS_PERMISSIONS` in `groups_seeder`.
-- Add a data migration that calls the seeder, or attaches the new permissions to the existing group. Production only gets them if `seed --mode=seed_groups_and_permissions` runs, so don't rely on that.
-- Add a data migration to re-sync every user's groups from their role (fixes any `group_mismatch` found in Phase 0).
-- Extend `tests/general_functions_tests/test_groups_seeder.py`.
+- Add the constants and `Meta.permissions` entries, then run `makemigrations` (permission-only migration, `0074_rcpch_audit_team_permissions`). Each permission sits on the model it most relates to:
+
+    | Permission | Model |
+    |---|---|
+    | `can_access_all_organisations` | `Organisation` |
+    | `can_edit_case_outside_audit_period` | `Case` |
+    | `can_manage_rcpch_audit_team_users` | `Epilepsy12User` |
+    | `can_approve_audit_period_organisations` | `AuditPeriodOrganisation` |
+
+- Extend `EPILEPSY12_AUDIT_TEAM_ACCESS_PERMISSIONS` in `groups_seeder` with the four new permissions and the built-in `view_banner`, which no group held before.
+- Extend `tests/general_functions_tests/test_groups_seeder.py`: the audit team group has all five (including `view_banner`), the other groups have none.
+
+**Deploying.** `migrate` creates the permission rows; it doesn't attach them to the group. After deploying, run the seeder by hand in each environment:
+
+```bash
+python manage.py seed --mode=seed_groups_and_permissions
+```
+
+Until Phase 2, nothing checks these permissions, so the gap between deploying and running the seeder doesn't affect anyone.
+
+**Groups.** The re-sync data migration originally planned here was dropped. [rcpch/rcpch-audit-engine#1496](https://github.com/rcpch/rcpch-audit-engine/pull/1496) lets audit team members and superusers change a user's role, which re-syncs that user's groups. Re-run `audit_rcpch_user_flags` and fix any remaining `group_mismatch` by setting the role again.
 
 ### Phase 2 – switch the checks
 
 - Replace each call site in the table with `user.has_perm("epilepsy12.<codename>")`, or `perms.epilepsy12.<codename>` in templates.
 - Turn `audit_period_permissions._is_rcpch_user` into a permission check, splitting it into view and edit where the callers differ.
 - In `Epilepsy12User.save()`, Django caches permissions on the user object, so don't use `has_perm` there. Move the national-view invariant into the toggle view and form, or have `save()` check `role == RCPCH_AUDIT_TEAM or is_superuser`.
-- **Optional, in scope:** `decorator.rcpch_full_access_only` currently checks group membership. It could become a permission check too.
+- Guard against deploying to an environment where the seeder never ran, which would lock the audit team out. Add a Django system check (`django.core.checks`) that reports an error if `epilepsy12_audit_team_full_access` lacks any of the five permissions. It runs on `migrate` and server start.
+- **Optional, in scope:** `decorator.rcpch_full_access_only` (guards the submission dashboard) currently checks group membership. It could check `can_access_all_organisations` instead, to match the nav link.
 
 ### Phase 3 – remove the fields
 

@@ -26,13 +26,19 @@ from epilepsy12.constants.user_types import (
     CAN_PUBLISH_EPILEPSY12_DATA,
     CAN_ALLOCATE_USER_TO_ORGANISATION,
     CAN_RESET_TWO_FACTOR_AUTHENTICATION,
-    CAN_EXTEND_SUBMISSION_DEADLINE
+    CAN_EXTEND_SUBMISSION_DEADLINE,
+    CAN_ACCESS_ALL_ORGANISATIONS,
+    CAN_EDIT_CASE_OUTSIDE_AUDIT_PERIOD,
+    CAN_MANAGE_RCPCH_AUDIT_TEAM_USERS,
+    CAN_APPROVE_AUDIT_PERIOD_ORGANISATIONS,
 )
 from epilepsy12.models import (
     AntiEpilepsyMedicine,
     Assessment,
     AuditPeriodExtension,
+    AuditPeriodOrganisation,
     AuditProgress,
+    Banner,
     Comorbidity,
     EpilepsyContext,
     Episode,
@@ -94,6 +100,10 @@ def groups_seeder(verbose=True, **_deprecated_kwargs):
     )
     visitactivityContentType = ContentType.objects.get_for_model(VisitActivity)
     auditperiodextensionContentType = ContentType.objects.get_for_model(AuditPeriodExtension)
+    auditperiodorganisationContentType = ContentType.objects.get_for_model(
+        AuditPeriodOrganisation
+    )
+    bannerContentType = ContentType.objects.get_for_model(Banner)
 
     """
     Note view permissions include viewing users, but not creating, updating or deleting them
@@ -365,6 +375,25 @@ def groups_seeder(verbose=True, **_deprecated_kwargs):
         {
             "codename": CAN_EXTEND_SUBMISSION_DEADLINE[0],
             "content_type": auditperiodextensionContentType,
+        },
+        # Replace the is_rcpch_audit_team_member / is_rcpch_staff flags
+        {
+            "codename": CAN_ACCESS_ALL_ORGANISATIONS[0],
+            "content_type": organisationContentType,
+        },
+        {
+            "codename": CAN_EDIT_CASE_OUTSIDE_AUDIT_PERIOD[0],
+            "content_type": caseContentType,
+        },
+        {
+            "codename": CAN_MANAGE_RCPCH_AUDIT_TEAM_USERS[0],
+            "content_type": epilepsy12userContentType,
+        },
+        # built-in: see banners targeted at any role, to check how they look
+        {"codename": "view_banner", "content_type": bannerContentType},
+        {
+            "codename": CAN_APPROVE_AUDIT_PERIOD_ORGANISATIONS[0],
+            "content_type": auditperiodorganisationContentType,
         },
     ]
 

@@ -13,6 +13,7 @@ from django.dispatch import receiver
 # 3rd party
 from simple_history.models import HistoricalRecords
 from ..time_and_user_abstract_base_classes import TimeStampAbstractBaseClass
+from ...constants.user_types import CAN_ACCESS_ALL_ORGANISATIONS
 
 
 class OrganisationManager(models.Manager):
@@ -135,6 +136,7 @@ class Organisation(TimeStampAbstractBaseClass):
         verbose_name = "Organisation"
         verbose_name_plural = "Organisations"
         ordering = ("name",)
+        permissions = [CAN_ACCESS_ALL_ORGANISATIONS]
 
     def __str__(self) -> str:
         return self.name
