@@ -17,6 +17,7 @@ from django.utils import timezone
 from captcha.fields import CaptchaField
 
 from epilepsy12.constants.user_types import (
+    RCPCH_AUDIT_TEAM,
     RCPCH_AUDIT_TEAM_ROLES,
     AUDIT_CENTRE_ROLES,
     TITLES,
@@ -111,6 +112,16 @@ class Epilepsy12UserAdminCreationForm(forms.ModelForm):
         )
         self.fields["role"].choices = choices
 
+        # RCPCH audit team members and superusers may move a user between the
+        # audit centre roles and the RCPCH Audit Team role. This is the Phase 0
+        # remedy for flag_without_role / role_without_flag findings reported by
+        # audit_rcpch_user_flags: role is the source of truth for national
+        # access. Everyone else only ever sees the roles of the user type they
+        # are editing. (RCPCH Audit Children and Family accounts are created
+        # through their own flow and are deliberately not offered here.)
+        if requesting_user.is_rcpch_audit_team_member or requesting_user.is_superuser:
+            self.fields["role"].choices = AUDIT_CENTRE_ROLES + RCPCH_AUDIT_TEAM_ROLES
+
         if getattr(self, "initial", None):
             initial = getattr(self, "initial")
             if initial.get("email"):
@@ -178,20 +189,6 @@ class Epilepsy12UserAdminCreationForm(forms.ModelForm):
         max_length=255, help_text="Please enter your surname", required=True
     )
 
-    is_superuser = forms.BooleanField(initial=False, required=False)
-
-    is_rcpch_audit_team_member = forms.BooleanField(
-        widget=forms.CheckboxInput(attrs={"class": "ui toggle checkbox"}),
-        initial=False,
-        required=False,
-    )
-
-    is_rcpch_staff = forms.BooleanField(
-        widget=forms.CheckboxInput(attrs={"class": "ui toggle checkbox"}),
-        initial=False,
-        required=False,
-    )
-
     is_child_or_carer = forms.BooleanField(
         widget=forms.CheckboxInput(attrs={"class": "ui toggle checkbox"}),
         initial=False,
@@ -212,9 +209,6 @@ class Epilepsy12UserAdminCreationForm(forms.ModelForm):
             "title",
             "first_name",
             "surname",
-            "is_rcpch_staff",
-            "is_rcpch_audit_team_member",
-            "is_superuser",
             "email_confirmed",
         )
 
@@ -236,76 +230,38 @@ class Epilepsy12UserAdminCreationForm(forms.ModelForm):
 
         return cleaned_email
 
-    def clean_is_rcpch_audit_team_member(self):
-        """
-        if is_rcpch_audit_team_member is positive, set view_preference to organisation_view
-        """
-        data = self.cleaned_data["is_rcpch_audit_team_member"]
-        if data:
-            self.cleaned_data["view_preference"] = 0
-        return data
-
-    def clean_is_superuser(self):
-        """
-        if is_superuser is positive, set view_preference to organisation_view
-        """
-        data = self.cleaned_data["is_superuser"]
-        if data:
-            self.cleaned_data["view_preference"] = 0
-        return data
-
-    def clean_is_rcpch_staff(self):
-        """
-        if is_rcpch_staff is positive, set view_preference to organisation_view
-        """
-        data = self.cleaned_data["is_rcpch_staff"]
-        if data:
-            self.cleaned_data["view_preference"] = 0
-        return data
-
     def clean(self):
         cleaned_data = super().clean()
         # new user being created is rcpch staff
         if self.rcpch_organisation == "rcpch-staff":
             # RCPCH staff are not affiliated with any organisation
-            if (
+            if not (
                 self.requesting_user.is_rcpch_audit_team_member
                 or self.requesting_user.is_superuser
             ):
-                cleaned_data["is_rcpch_staff"] = True
-                cleaned_data["is_rcpch_audit_team_member"] = True
-                cleaned_data["view_preference"] = 0
-            else:
                 # should not have managed to get here
                 raise ValidationError(
                     "You do not have permission to create RCPCH staff."
                 )
-        else:
-            # this new user being created  is not RCPCH staff
-            if (
-                self.requesting_user.is_rcpch_audit_team_member
-                or self.requesting_user.is_superuser
-            ):
-                # anything goes
-                return cleaned_data
-            else:
-                if cleaned_data["is_rcpch_audit_team_member"] == True:
-                    self.add_error(
-                        "is_rcpch_audit_team_member",
-                        "You do not have permission to allocate RCPCH audit team member status.",
-                    )
-                if cleaned_data["is_rcpch_staff"] == True:
-                    self.add_error(
-                        "is_rcpch_staff",
-                        "You do not have permission to allocate RCPCH staff member status.",
-                    )
-                if cleaned_data["is_superuser"] == True:
-                    self.add_error(
-                        "is_superuser",
-                        "You do not have permission to allocate superuser status.",
-                    )
 
         return cleaned_data
+
+    def save(self, commit=True):
+        """
+        The RCPCH flags are derived from the role until they are retired:
+        role is the single source of truth for national access (Phase 0 of the
+        is_rcpch_audit_team_member / is_rcpch_staff retirement plan), so a
+        user edited here can never drift out of step with their role.
+
+        Superuser status is deliberately not settable through this form - it
+        can only be granted in the Django admin, by another superuser.
+        """
+        user = super().save(commit=False)
+        user.is_rcpch_audit_team_member = user.role == RCPCH_AUDIT_TEAM
+        user.is_rcpch_staff = user.role == RCPCH_AUDIT_TEAM
+        if commit:
+            user.save()
+        return user
 
 
 # IF IN DEBUG MODE, PRE-FILL CAPTCHA VALUE

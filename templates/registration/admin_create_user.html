@@ -68,21 +68,6 @@
           
           </div>
 
-           <div class='two fields'>
-
-            {% if user.is_rcpch_audit_team_member %}
-              <div class='eight wide field'>
-                <label for="{{form.is_rcpch_audit_team_member.id_for_label}}">RCPCH Audit Team member</label>
-                <div class='ui toggle checkbox' id='is_staff' _="js $('.ui.toggle.checkbox').checkbox(); end">
-                  {{ form.is_rcpch_audit_team_member }}
-                </div>
-                {% if form.is_rcpch_audit_team_member.errors %}
-                  <div class="ui pointing red basic label">{{form.is_rcpch_audit_team_member.errors}}</div>
-                {% endif %}
-              </div>
-            {% endif %}
-
-          </div>
           <hr>
           
           {% if form.instance.pk and perms.epilepsy12.can_allocate_user_to_organisation %}
