@@ -167,11 +167,6 @@ CAN_MANAGE_RCPCH_AUDIT_TEAM_USERS = (
     "Can create and edit RCPCH audit team users, and edit any user's email address.",
 )
 
-CAN_VIEW_ALL_BANNERS = (
-    "can_view_all_banners",
-    "Can see banners targeted at any role, to check how they look.",
-)
-
 CAN_APPROVE_AUDIT_PERIOD_ORGANISATIONS = (
     "can_approve_audit_period_organisations",
     "Can approve organisation membership of an audit period.",
@@ -196,6 +191,5 @@ PERMISSIONS = (
     CAN_ACCESS_ALL_ORGANISATIONS,
     CAN_EDIT_CASE_OUTSIDE_AUDIT_PERIOD,
     CAN_MANAGE_RCPCH_AUDIT_TEAM_USERS,
-    CAN_VIEW_ALL_BANNERS,
     CAN_APPROVE_AUDIT_PERIOD_ORGANISATIONS,
 )

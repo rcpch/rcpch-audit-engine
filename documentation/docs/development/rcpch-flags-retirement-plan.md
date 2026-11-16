@@ -11,14 +11,14 @@ This is the plan for replacing the two `Epilepsy12User` boolean flags with permi
 
 ## New permissions
 
-Define each in `constants/user_types.py`, add it to `PERMISSIONS` and to the `Meta.permissions` of the model it most relates to, and attach it only to the audit team group.
+Define each new permission in `constants/user_types.py`, add it to `PERMISSIONS` and to the `Meta.permissions` of the model it most relates to, and attach it only to the audit team group. Where a built-in model permission already fits (`view_banner`), use that instead.
 
 | Permission | Replaces the flag checks in |
 |---|---|
 | `can_access_all_organisations` (view any organisation, user or child nationally, including the national view preference and the submission dashboard) | `decorator._user_may_view_this_organisation`, `user_may_view_organisational_audit`, `user_can_access_user`, `lookup_user_permissions_on_child` (`can_view`), `permissions.CanAccessOrganisation`, `organisation_views.py:120,381`, `case_views.py:1164`, `user_management_views.py:149,209,495`, `sanction_user_access.merged_parent_list_for_user` (Jersey rule), `case_table.html:117`; national view: `Epilepsy12User.save()` invariant, `organisation_views.py:938` toggle, `rcpch_choices` in `user_management_views.py:332` and `case_views.py:455`, `partials/cases/view_preference.html`; admin data banner and submission dashboard link: `nav.html:5,27` |
 | `can_edit_case_outside_audit_period` (edit any child whatever its organisation, lock state or period) | `lookup_user_permissions_on_child` (`can_edit`), `audit_period_permissions._is_rcpch_user` (5 callers), `registration_views.py:612` (earliest date = DOB), `case_table.html:136–150` |
 | `can_manage_rcpch_audit_team_users` (create/edit RCPCH audit team users, edit emails) | `decorator.py:74` (`user_type == "rcpch-staff"`), `Epilepsy12UserAdminCreationForm.__init__` / `clean()`, `epilepsy12_user_list.html:31`, `admin_create_user.html:73` |
-| `can_view_all_banners` (see banners targeted at any role, to check how they look) | `context_processors/banner.py:19` |
+| `view_banner` (built-in; see banners targeted at any role, to check how they look) | `context_processors/banner.py:19` |
 | `can_approve_audit_period_organisations` | `approve_audit_period_organisations.py:117` |
 
 Line numbers are as of the commit this plan was written against.
@@ -65,11 +65,10 @@ The test seed users `*_CLINICAL_AUDIT_TEAM@nhs.net` (`tests/UserDataClasses.py`)
     | `can_access_all_organisations` | `Organisation` |
     | `can_edit_case_outside_audit_period` | `Case` |
     | `can_manage_rcpch_audit_team_users` | `Epilepsy12User` |
-    | `can_view_all_banners` | `Banner` |
     | `can_approve_audit_period_organisations` | `AuditPeriodOrganisation` |
 
-- Extend `EPILEPSY12_AUDIT_TEAM_ACCESS_PERMISSIONS` in `groups_seeder`.
-- Extend `tests/general_functions_tests/test_groups_seeder.py`: the audit team group has all five, the other groups have none.
+- Extend `EPILEPSY12_AUDIT_TEAM_ACCESS_PERMISSIONS` in `groups_seeder` with the four new permissions and the built-in `view_banner`, which no group held before.
+- Extend `tests/general_functions_tests/test_groups_seeder.py`: the audit team group has all five (including `view_banner`), the other groups have none.
 
 **Deploying.** `migrate` creates the permission rows; it doesn't attach them to the group. After deploying, run the seeder by hand in each environment:
 

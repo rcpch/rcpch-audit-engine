@@ -30,7 +30,6 @@ from epilepsy12.constants.user_types import (
     CAN_ACCESS_ALL_ORGANISATIONS,
     CAN_EDIT_CASE_OUTSIDE_AUDIT_PERIOD,
     CAN_MANAGE_RCPCH_AUDIT_TEAM_USERS,
-    CAN_VIEW_ALL_BANNERS,
     CAN_APPROVE_AUDIT_PERIOD_ORGANISATIONS,
 )
 from epilepsy12.models import (
@@ -390,10 +389,8 @@ def groups_seeder(verbose=True, **_deprecated_kwargs):
             "codename": CAN_MANAGE_RCPCH_AUDIT_TEAM_USERS[0],
             "content_type": epilepsy12userContentType,
         },
-        {
-            "codename": CAN_VIEW_ALL_BANNERS[0],
-            "content_type": bannerContentType,
-        },
+        # built-in: see banners targeted at any role, to check how they look
+        {"codename": "view_banner", "content_type": bannerContentType},
         {
             "codename": CAN_APPROVE_AUDIT_PERIOD_ORGANISATIONS[0],
             "content_type": auditperiodorganisationContentType,
