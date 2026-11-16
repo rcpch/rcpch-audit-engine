@@ -90,16 +90,9 @@ ipython_config.py
 #Pipfile.lock
 
 # Environments
-*.env
-.venv
-env/
-venv/
-ENV/
-env.bak/
-venv.bak/
-*live.env
-*development.env
-envs/
+# Keep local environment files under envs/; only the template is tracked.
+/envs/*
+!/envs/template.env
 
 # mypy
 .mypy_cache/
