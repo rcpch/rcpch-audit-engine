@@ -57,7 +57,13 @@ def test_download_button_access(
                 kwargs={"organisation_id": TEST_USER_ORGANISATION.id},
             )
         )
-        if test_user.first_name.endswith(test_user_rcpch_audit_team_data.role_str):
+        # CLINICAL_AUDIT_TEAM users also have the RCPCH Audit Team role
+        if test_user.first_name.endswith(
+            (
+                test_user_rcpch_audit_team_data.role_str,
+                test_user_clinicial_audit_team_data.role_str,
+            )
+        ):
             assert (
                 response["Content-Disposition"]
                 == 'attachment; filename="epilepsy12users.csv"'

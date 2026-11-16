@@ -67,7 +67,6 @@ from ..constants import (
     RCPCH_AUDIT_TEAM,
     RCPCH_AUDIT_TEAM_ROLES,
     AUDIT_CENTRE_ROLES,
-    EPILEPSY12_AUDIT_TEAM_FULL_ACCESS,
     PERM_ACCESS_ALL_ORGANISATIONS,
 )
 
@@ -964,11 +963,7 @@ def logs(request, organisation_id, epilepsy12_user_id):
 @login_and_otp_required()
 @user_may_view_this_organisation()
 def all_epilepsy12_users_list(request, organisation_id):
-    allowed_groups = [EPILEPSY12_AUDIT_TEAM_FULL_ACCESS]
-
-    if not (
-        request.user.is_superuser or request.user.groups.filter(name__in=allowed_groups)
-    ):
+    if not request.user.has_perm(PERM_ACCESS_ALL_ORGANISATIONS):
         raise PermissionDenied()
 
     all_users = Epilepsy12User.objects.all()
