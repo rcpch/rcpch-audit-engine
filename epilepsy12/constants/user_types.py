@@ -162,19 +162,14 @@ CAN_EDIT_CASE_OUTSIDE_AUDIT_PERIOD = (
     "Can edit any child's record regardless of organisation, lock status or audit period.",
 )
 
-CAN_SELECT_NATIONAL_VIEW_PREFERENCE = (
-    "can_select_national_view_preference",
-    "Can select the national view preference.",
-)
-
 CAN_MANAGE_RCPCH_AUDIT_TEAM_USERS = (
     "can_manage_rcpch_audit_team_users",
     "Can create and edit RCPCH audit team users, and edit any user's email address.",
 )
 
-CAN_VIEW_ADMIN_TOOLS = (
-    "can_view_admin_tools",
-    "Can view admin tools, such as the admin banner, submission dashboard link and all banners.",
+CAN_VIEW_ALL_BANNERS = (
+    "can_view_all_banners",
+    "Can see banners targeted at any role, to check how they look.",
 )
 
 CAN_APPROVE_AUDIT_PERIOD_ORGANISATIONS = (
@@ -200,8 +195,7 @@ PERMISSIONS = (
     CAN_EXTEND_SUBMISSION_DEADLINE,
     CAN_ACCESS_ALL_ORGANISATIONS,
     CAN_EDIT_CASE_OUTSIDE_AUDIT_PERIOD,
-    CAN_SELECT_NATIONAL_VIEW_PREFERENCE,
     CAN_MANAGE_RCPCH_AUDIT_TEAM_USERS,
-    CAN_VIEW_ADMIN_TOOLS,
+    CAN_VIEW_ALL_BANNERS,
     CAN_APPROVE_AUDIT_PERIOD_ORGANISATIONS,
 )

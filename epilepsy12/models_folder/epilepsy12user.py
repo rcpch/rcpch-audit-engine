@@ -24,9 +24,7 @@ from epilepsy12.constants.user_types import (
     RCPCH_AUDIT_TEAM,
     CAN_ALLOCATE_USER_TO_ORGANISATION,
     CAN_RESET_TWO_FACTOR_AUTHENTICATION,
-    CAN_SELECT_NATIONAL_VIEW_PREFERENCE,
     CAN_MANAGE_RCPCH_AUDIT_TEAM_USERS,
-    CAN_VIEW_ADMIN_TOOLS,
 )
 
 logger = logging.getLogger(__name__)
@@ -287,9 +285,7 @@ class Epilepsy12User(AbstractUser, PermissionsMixin):
         permissions = [
             CAN_ALLOCATE_USER_TO_ORGANISATION,
             CAN_RESET_TWO_FACTOR_AUTHENTICATION,
-            CAN_SELECT_NATIONAL_VIEW_PREFERENCE,
             CAN_MANAGE_RCPCH_AUDIT_TEAM_USERS,
-            CAN_VIEW_ADMIN_TOOLS,
         ]
 
     def __str__(self) -> str:

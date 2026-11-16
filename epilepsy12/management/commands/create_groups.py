@@ -29,9 +29,8 @@ from epilepsy12.constants.user_types import (
     CAN_EXTEND_SUBMISSION_DEADLINE,
     CAN_ACCESS_ALL_ORGANISATIONS,
     CAN_EDIT_CASE_OUTSIDE_AUDIT_PERIOD,
-    CAN_SELECT_NATIONAL_VIEW_PREFERENCE,
     CAN_MANAGE_RCPCH_AUDIT_TEAM_USERS,
-    CAN_VIEW_ADMIN_TOOLS,
+    CAN_VIEW_ALL_BANNERS,
     CAN_APPROVE_AUDIT_PERIOD_ORGANISATIONS,
 )
 from epilepsy12.models import (
@@ -40,6 +39,7 @@ from epilepsy12.models import (
     AuditPeriodExtension,
     AuditPeriodOrganisation,
     AuditProgress,
+    Banner,
     Comorbidity,
     EpilepsyContext,
     Episode,
@@ -104,6 +104,7 @@ def groups_seeder(verbose=True, **_deprecated_kwargs):
     auditperiodorganisationContentType = ContentType.objects.get_for_model(
         AuditPeriodOrganisation
     )
+    bannerContentType = ContentType.objects.get_for_model(Banner)
 
     """
     Note view permissions include viewing users, but not creating, updating or deleting them
@@ -386,16 +387,12 @@ def groups_seeder(verbose=True, **_deprecated_kwargs):
             "content_type": caseContentType,
         },
         {
-            "codename": CAN_SELECT_NATIONAL_VIEW_PREFERENCE[0],
-            "content_type": epilepsy12userContentType,
-        },
-        {
             "codename": CAN_MANAGE_RCPCH_AUDIT_TEAM_USERS[0],
             "content_type": epilepsy12userContentType,
         },
         {
-            "codename": CAN_VIEW_ADMIN_TOOLS[0],
-            "content_type": epilepsy12userContentType,
+            "codename": CAN_VIEW_ALL_BANNERS[0],
+            "content_type": bannerContentType,
         },
         {
             "codename": CAN_APPROVE_AUDIT_PERIOD_ORGANISATIONS[0],

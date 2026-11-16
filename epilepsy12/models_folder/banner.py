@@ -2,7 +2,7 @@ import nh3
 from django.core.exceptions import ValidationError
 from django.db import models
 
-from epilepsy12.constants.user_types import ROLES
+from epilepsy12.constants.user_types import ROLES, CAN_VIEW_ALL_BANNERS
 
 class Banner(models.Model):
     url_matcher = models.CharField(max_length=255)
@@ -12,6 +12,9 @@ class Banner(models.Model):
     # Only show the banner if the user has a given role (eg Lead Clinicians to see Org Audit banner)
     # RCPCH audit team members always see banners so they can check how they look
     user_role_to_target = models.PositiveSmallIntegerField(choices=ROLES, blank=True, null=True)
+
+    class Meta:
+        permissions = [CAN_VIEW_ALL_BANNERS]
 
     def clean(self):
         super().clean()
