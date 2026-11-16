@@ -256,6 +256,10 @@ from django.contrib.auth.models import Group
 import factory
 
 # E12 imports
+from epilepsy12.constants.user_types import (
+    EPILEPSY12_AUDIT_TEAM_FULL_ACCESS,
+    RCPCH_AUDIT_TEAM,
+)
 from epilepsy12.models import (
     Case,
     Comorbidity,
@@ -3400,3 +3404,75 @@ def test_e12_audit_team_can_set_primary_employer(client):
             epilepsy12_user=test_user,
             is_primary=False,
         ).exists(), f"E12 Audit Team member should have set {DIFF_TRUST_DIFF_ORGANISATION} as primary and {TEST_USER_ORGANISATION} as secondary employer but did not."
+
+
+@pytest.mark.django_db
+def test_rcpch_audit_team_member_can_promote_a_user_to_the_rcpch_audit_team_role(
+    client,
+):
+    """
+    Regression test: an RCPCH audit team member can change a Lead Clinician's
+    role to RCPCH Audit Team from the user management UI (the Phase 0 remedy
+    for flag_without_role findings from audit_rcpch_user_flags). The flags
+    follow the role and the view re-syncs the user's group.
+    """
+
+    # GOSH
+    TEST_USER_ORGANISATION = Organisation.objects.get(
+        ods_code="RP401",
+        trust__ods_code="RP4",
+    )
+
+    test_user = Epilepsy12User.objects.get(
+        first_name=test_user_rcpch_audit_team_data.role_str
+    )
+
+    user_to_promote = E12UserFactory(
+        email="temp_view_promotion_candidate@test.com",
+        first_name="TEMP_VIEW_PROMOTION_CANDIDATE",
+        role=test_user_audit_centre_lead_clinician_data.role,
+        is_rcpch_audit_team_member=False,
+        is_rcpch_staff=False,
+        employer_organisations=[TEST_USER_ORGANISATION],
+        groups=[
+            Group.objects.get(
+                name=test_user_audit_centre_lead_clinician_data.group_name
+            )
+        ],
+    )
+
+    client.force_login(test_user)
+    twofactor_signin(client, test_user)
+
+    url = reverse(
+        "edit_epilepsy12_user",
+        kwargs={
+            "organisation_id": TEST_USER_ORGANISATION.id,
+            "epilepsy12_user_id": user_to_promote.id,
+        },
+    )
+
+    response = client.post(
+        url,
+        {
+            "title": 1,
+            "first_name": user_to_promote.first_name,
+            "surname": user_to_promote.surname,
+            "role": RCPCH_AUDIT_TEAM,
+            "email": user_to_promote.email,
+            "email_confirmed": False,
+        },
+    )
+
+    assert (
+        response.status_code == HTTPStatus.FOUND
+    ), f"Expected redirect after successful promotion, got {response.status_code}"
+
+    user_to_promote.refresh_from_db()
+
+    assert user_to_promote.role == RCPCH_AUDIT_TEAM
+    assert user_to_promote.is_rcpch_audit_team_member == True
+    assert user_to_promote.is_rcpch_staff == True
+    assert list(user_to_promote.groups.values_list("name", flat=True)) == [
+        EPILEPSY12_AUDIT_TEAM_FULL_ACCESS
+    ], "Promotion should move the user into the RCPCH audit team group"
