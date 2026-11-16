@@ -7,5 +7,6 @@ class Epilepsy12Config(AppConfig):
 
     def ready(self) -> None:
         import epilepsy12.signals
+        import epilepsy12.checks
 
         return super().ready()

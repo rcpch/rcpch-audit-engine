@@ -61,8 +61,11 @@ test_user_audit_centre_lead_clinician_data = TestUser(
     is_rcpch_staff=False,
 )
 
+# An RCPCH audit team member who is also employed by an organisation (e.g. a
+# clinician promoted to the RCPCH Audit Team role). National access comes from
+# the role's group permissions, not the flags.
 test_user_clinicial_audit_team_data = TestUser(
-    role=AUDIT_CENTRE_LEAD_CLINICIAN,
+    role=RCPCH_AUDIT_TEAM,
     role_str="CLINICAL_AUDIT_TEAM",
     is_active=True,
     is_staff=False,

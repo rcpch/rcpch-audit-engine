@@ -10,7 +10,7 @@ audit team approve or decline each one. These tests exercise:
 - the interactive prompt flow (approve / decline / skip / quit) via a patched
   ``input``;
 - filtering by ``--cohort`` and ``--ods-code``;
-- the approver validation (only RCPCH audit team / staff / superusers).
+- the approver validation (only users with can_approve_audit_period_organisations).
 
 The seeded ``AuditPeriod`` rows come from the session-scoped
 ``seed_audit_periods_fixture`` in ``conftest.py``. The ``reorganisation``
@@ -23,12 +23,19 @@ from io import StringIO
 from unittest.mock import patch
 
 import pytest
+from django.contrib.auth.models import Group
 from django.core.management import call_command
 from django.utils import timezone
 
 from epilepsy12.models import (
     AuditPeriod,
     AuditPeriodOrganisation,
+)
+from epilepsy12.constants.user_types import (
+    AUDIT_CENTRE_LEAD_CLINICIAN,
+    EPILEPSY12_AUDIT_TEAM_FULL_ACCESS,
+    RCPCH_AUDIT_TEAM,
+    TRUST_AUDIT_TEAM_FULL_ACCESS,
 )
 
 
@@ -58,6 +65,14 @@ def _make_unapproved_membership(cohort_number, organisation, **overrides):
     )
 
 
+def _make_audit_team_user(e12_user_factory):
+    """An RCPCH audit team member: approval permission comes from the role's group."""
+    return e12_user_factory(
+        role=RCPCH_AUDIT_TEAM,
+        groups=[Group.objects.get(name=EPILEPSY12_AUDIT_TEAM_FULL_ACCESS)],
+    )
+
+
 @pytest.mark.django_db
 def test_dry_run_reports_exposure_without_writing(GOSH):
     """--dry-run reports each unapproved row and its exposure but writes
@@ -82,7 +97,7 @@ def test_auto_approve_sets_approved_at_and_by(GOSH, e12_user_factory):
     """--auto-approve approves every unapproved row, setting approved_at and
     approved_by to the resolving user."""
     membership = _make_unapproved_membership(4, GOSH)
-    approver = e12_user_factory(is_rcpch_audit_team_member=True)
+    approver = _make_audit_team_user(e12_user_factory)
 
     out = StringIO()
     call_command(
@@ -103,7 +118,7 @@ def test_auto_approve_sets_approved_at_and_by(GOSH, e12_user_factory):
 def test_auto_approve_skips_already_approved(GOSH, e12_user_factory):
     """--auto-approve only touches unapproved rows; already-approved rows are
     left untouched."""
-    approver = e12_user_factory(is_rcpch_audit_team_member=True)
+    approver = _make_audit_team_user(e12_user_factory)
     already_approved = _make_unapproved_membership(
         4, GOSH, approved_at=APPROVED_AT, approved_by=approver
     )
@@ -131,7 +146,7 @@ def test_auto_approve_skips_already_approved(GOSH, e12_user_factory):
 def test_interactive_approve(GOSH, e12_user_factory):
     """Interactive mode approves a row when the user answers 'y'."""
     membership = _make_unapproved_membership(4, GOSH)
-    approver = e12_user_factory(is_rcpch_audit_team_member=True)
+    approver = _make_audit_team_user(e12_user_factory)
 
     # First prompt is the approver email (blank -> we pass --user instead),
     # then the per-row approve prompt.
@@ -154,7 +169,7 @@ def test_interactive_approve(GOSH, e12_user_factory):
 def test_interactive_decline_records_note(GOSH, e12_user_factory):
     """Declining a row leaves it unapproved and records the reason in notes."""
     membership = _make_unapproved_membership(4, GOSH)
-    approver = e12_user_factory(is_rcpch_audit_team_member=True)
+    approver = _make_audit_team_user(e12_user_factory)
 
     with patch("builtins.input", side_effect=["n", "wrong trust"]):
         out = StringIO()
@@ -174,7 +189,7 @@ def test_interactive_decline_records_note(GOSH, e12_user_factory):
 def test_interactive_skip_leaves_row_untouched(GOSH, e12_user_factory):
     """Skipping a row leaves it unapproved with no note."""
     membership = _make_unapproved_membership(4, GOSH)
-    approver = e12_user_factory(is_rcpch_audit_team_member=True)
+    approver = _make_audit_team_user(e12_user_factory)
 
     with patch("builtins.input", side_effect=["s"]):
         out = StringIO()
@@ -196,7 +211,7 @@ def test_interactive_quit_stops_processing(GOSH, e12_user_factory):
     """Quitting stops the review before later rows are processed."""
     first = _make_unapproved_membership(4, GOSH)
     second = _make_unapproved_membership(5, GOSH)
-    approver = e12_user_factory(is_rcpch_audit_team_member=True)
+    approver = _make_audit_team_user(e12_user_factory)
 
     # Approve the first, then quit before the second.
     with patch("builtins.input", side_effect=["y", "q"]):
@@ -270,11 +285,14 @@ def test_no_unapproved_rows_reports_nothing(GOSH):
 def test_approver_must_be_audit_team(GOSH, e12_user_factory):
     """A non-audit-team user cannot be recorded as the approver."""
     _make_unapproved_membership(4, GOSH)
-    clinician = e12_user_factory(is_rcpch_audit_team_member=False)
+    clinician = e12_user_factory(
+        role=AUDIT_CENTRE_LEAD_CLINICIAN,
+        groups=[Group.objects.get(name=TRUST_AUDIT_TEAM_FULL_ACCESS)],
+    )
 
     from django.core.management.base import CommandError
 
-    with pytest.raises(CommandError, match="not an RCPCH audit-team member"):
+    with pytest.raises(CommandError, match="does not have permission to approve"):
         call_command(
             "approve_audit_period_organisations",
             "--auto-approve",

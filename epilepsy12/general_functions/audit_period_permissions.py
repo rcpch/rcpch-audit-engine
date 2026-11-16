@@ -47,6 +47,8 @@ from collections.abc import Iterable
 
 from django.apps import apps
 
+from epilepsy12.constants.user_types import PERM_ACCESS_ALL_ORGANISATIONS
+
 from .audit_period_hierarchy import (
     get_membership,
     MembershipMissing,
@@ -66,18 +68,16 @@ def _get_model(name: str):
 
 
 def _is_rcpch_user(user) -> bool:
-    """Return True for authorised RCPCH audit team / staff / superusers.
+    """Return True for users who can access all organisations nationally
+    (the RCPCH audit team and superusers).
 
     These users retain broader access that is not constrained by the
-    period-aware affiliation rules.
+    period-aware affiliation rules. Every caller is a view check; editing is
+    still constrained by ``Case.editable()``.
     """
     if user is None:
         return False
-    return bool(
-        getattr(user, "is_superuser", False)
-        or getattr(user, "is_rcpch_audit_team_member", False)
-        or getattr(user, "is_rcpch_staff", False)
-    )
+    return user.has_perm(PERM_ACCESS_ALL_ORGANISATIONS)
 
 
 def _user_is_active_and_confirmed(user) -> bool:

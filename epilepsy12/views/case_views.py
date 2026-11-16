@@ -32,6 +32,7 @@ from epilepsy12.models import (
 )
 from ..constants import (
     UNKNOWN_POSTCODES_NO_SPACES,
+    PERM_ACCESS_ALL_ORGANISATIONS,
 )
 from ..decorator import (
     user_may_view_this_organisation,
@@ -451,11 +452,7 @@ def case_list(request, organisation_id):
     # case_count = all_cases.count()
     # registered_count = registered_cases.count()
 
-    if (
-        request.user.is_rcpch_audit_team_member
-        or request.user.is_rcpch_staff
-        or request.user.is_superuser
-    ):
+    if request.user.has_perm(PERM_ACCESS_ALL_ORGANISATIONS):
         if organisation.country.boundary_identifier == "W92000004":
             rcpch_choices = (
                 (0, "Organisation level"),
@@ -1161,7 +1158,7 @@ class CaseListView(LoginAndOTPRequiredMixin, PermissionRequiredMixin, Organisati
 
         filtered_queryset = base_queryset
         # First filter by the organization from the URL parameter
-        if not self.request.user.is_rcpch_audit_team_member:
+        if not self.request.user.has_perm(PERM_ACCESS_ALL_ORGANISATIONS):
             filtered_queryset = CaseFilterMethods.filter_by_organisation(
                 base_queryset, organisation_id
             )

@@ -114,7 +114,7 @@
               <tr>
           {% endif %}
           <td>
-            {% if request.user.is_rcpch_audit_team_member %}
+            {% if perms.epilepsy12.can_access_all_organisations %}
               {% with case.lead_site as lead_site  %}
                 <span {% if lead_site %} data-tooltip="Lead site: {{lead_site.organisation}} ({{lead_site.organisation.trust}})" {% else %}  data-tooltip="There is no allocated lead site" {% endif %}data-position="top left">
                   <i class="rcpch question circle icon"></i>
@@ -133,7 +133,7 @@
           <td class='two wide'>
             <div class='ui buttons'>
               <button
-                {% if case.editable or request.user.is_superuser or request.user.is_rcpch_audit_team_member %}
+                {% if case.editable or perms.epilepsy12.can_edit_case_outside_audit_period %}
                   data-tooltip='Edit or delete child.'
                 {% else %}
                   data-tooltip='View child details.'
@@ -142,12 +142,12 @@
                 tabindexed="0"
                 {% if not perms.epilepsy12.change_case %}disabled{% endif %}>
                 <a href="{% url 'update_case' organisation_id=organisation_id case_id=case.id%}" class="rcpch_purple half_button">
-                  <i class="{% if case.editable or request.user.is_superuser or request.user.is_rcpch_audit_team_member %}edit outline{% else %}eye{% endif %} icon icon_white"></i>
-                  {% if case.editable or request.user.is_superuser or request.user.is_rcpch_audit_team_member %}Edit{% else %}View{% endif %}
+                  <i class="{% if case.editable or perms.epilepsy12.can_edit_case_outside_audit_period %}edit outline{% else %}eye{% endif %} icon icon_white"></i>
+                  {% if case.editable or perms.epilepsy12.can_edit_case_outside_audit_period %}Edit{% else %}View{% endif %}
                 </a>
               </button>
               <button
-                  {% if case.editable or request.user.is_superuser or request.user.is_rcpch_audit_team_member %}
+                  {% if case.editable or perms.epilepsy12.can_edit_case_outside_audit_period %}
                     data-tooltip='Complete audit details.'
                   {% else %}
                     data-tooltip='View audit details.'

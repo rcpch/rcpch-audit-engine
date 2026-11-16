@@ -37,6 +37,8 @@ import logging
 from django.core.management.base import BaseCommand, CommandError
 from django.utils import timezone
 
+from epilepsy12.constants.user_types import PERM_APPROVE_AUDIT_PERIOD_ORGANISATIONS
+
 from epilepsy12.models import (
     AuditPeriod,
     AuditPeriodOrganisation,
@@ -112,14 +114,11 @@ class Command(BaseCommand):
                     self.stderr.write(self.style.ERROR(f"  No user with email {email!r}."))
                     user = None
 
-        if not (
-            user.is_superuser
-            or user.is_rcpch_audit_team_member
-            or user.is_rcpch_staff
-        ):
+        if not user.has_perm(PERM_APPROVE_AUDIT_PERIOD_ORGANISATIONS):
             raise CommandError(
-                f"{user.email} is not an RCPCH audit-team member, RCPCH staff, "
-                "or superuser. Approval should be recorded by an audit-team user."
+                f"{user.email} does not have permission to approve audit period "
+                "organisations. Approval should be recorded by an active "
+                "RCPCH audit-team member or superuser."
             )
         return user
 

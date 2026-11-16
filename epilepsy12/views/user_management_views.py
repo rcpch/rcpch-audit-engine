@@ -64,9 +64,11 @@ from ..decorator import (
     login_and_otp_required,
 )
 from ..constants import (
+    RCPCH_AUDIT_TEAM,
     RCPCH_AUDIT_TEAM_ROLES,
     AUDIT_CENTRE_ROLES,
     EPILEPSY12_AUDIT_TEAM_FULL_ACCESS,
+    PERM_ACCESS_ALL_ORGANISATIONS,
 )
 
 logger = logging.getLogger(__name__)
@@ -145,11 +147,7 @@ def epilepsy12_user_list(request, organisation_id):
         if basic_filter:
             # the basic filter filters users based on the selected organisation view
             # the filter_term_Q filters based on what the user has put in the search box
-            if (
-                request.user.is_rcpch_staff
-                or request.user.is_rcpch_audit_team_member
-                or request.user.is_superuser
-            ):
+            if request.user.has_perm(PERM_ACCESS_ALL_ORGANISATIONS):
                 # user is RCPCH or E12 audit staff so can see RCPCH staff also
                 # who will not be affiliated with any organisation
                 epilepsy12_user_list = (
@@ -205,11 +203,7 @@ def epilepsy12_user_list(request, organisation_id):
         else:
             raise Exception("No View Preference supplied")
 
-        if (
-            request.user.is_rcpch_staff
-            or request.user.is_rcpch_audit_team_member
-            or request.user.is_superuser
-        ):
+        if request.user.has_perm(PERM_ACCESS_ALL_ORGANISATIONS):
             if basic_filter:
                 # organisational or trust view
                 filtered_epilepsy12_users = (
@@ -328,11 +322,7 @@ def epilepsy12_user_list(request, organisation_id):
     else:
         parent_trust = organisation.trust
 
-    if (
-        request.user.is_rcpch_audit_team_member
-        or request.user.is_rcpch_staff
-        or request.user.is_superuser
-    ):
+    if request.user.has_perm(PERM_ACCESS_ALL_ORGANISATIONS):
         if organisation.country.boundary_identifier == "W92000004":
             rcpch_choices = (
                 (0, "Organisation level"),
@@ -492,11 +482,10 @@ def edit_epilepsy12_user(request, organisation_id, epilepsy12_user_id):
     epilepsy12_user_to_edit = get_object_or_404(Epilepsy12User, pk=epilepsy12_user_id)
     can_edit = False
     if (
-        request.user.is_rcpch_staff
+        request.user.has_perm(PERM_ACCESS_ALL_ORGANISATIONS)
         or request.user.organisation_employer == organisation
-        or request.user.is_rcpch_audit_team_member
     ):
-        # user is RCPCH staff or has the same organisation as the user being edited
+        # user can access all organisations or has the same organisation as the user being edited
         can_edit = True
     if match_in_choice_key(AUDIT_CENTRE_ROLES, epilepsy12_user_to_edit.role):
         user_type = "organisation-staff"
@@ -591,7 +580,7 @@ def edit_epilepsy12_user(request, organisation_id, epilepsy12_user_id):
 
     template_name = "registration/admin_create_user.html"
 
-    if epilepsy12_user_to_edit.is_rcpch_staff:
+    if epilepsy12_user_to_edit.role == RCPCH_AUDIT_TEAM:
         admin_title = "Edit RCPCH Epilepsy12 staff member"
         user_type = "rcpch-staff"
     else:
@@ -672,7 +661,7 @@ def add_employer_organisation(request, organisation_id, epilepsy12_user_id):
     template_name = "registration/user_management/add_employer.html"
     if request.htmx:
         template_name = "registration/user_management/add_employer_partial.html"
-        if request.user.has_perm("can_allocate_user_to_organisation"):
+        if request.user.has_perm("epilepsy12.can_allocate_user_to_organisation"):
             editable = True
 
     epilepsy12_user = get_object_or_404(Epilepsy12User, pk=epilepsy12_user_id)

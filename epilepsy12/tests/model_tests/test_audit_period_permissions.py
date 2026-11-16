@@ -28,6 +28,8 @@ from datetime import date
 
 import pytest
 
+from epilepsy12.common_view_functions.group_for_group import group_for_role
+
 from epilepsy12.general_functions.audit_period_permissions import (
     can_view_organisation_for_period,
     get_accessible_periods,
@@ -98,6 +100,9 @@ def _make_user(
         is_superuser=is_superuser,
         password="pw",
     )
+    # Real users always belong to their role's group, which is where their
+    # permissions (including national access) come from.
+    user.groups.add(group_for_role(role))
     if employers is not None:
         for org in employers:
             OrganisationEmployer.objects.create(

@@ -23,7 +23,12 @@ from .models import (
     Epilepsy12User,
 )
 
-from .constants import AUDIT_CENTRE_LEAD_CLINICIAN
+from .constants import (
+    AUDIT_CENTRE_LEAD_CLINICIAN,
+    PERM_ACCESS_ALL_ORGANISATIONS,
+    PERM_EDIT_CASE_OUTSIDE_AUDIT_PERIOD,
+    PERM_MANAGE_RCPCH_AUDIT_TEAM_USERS,
+)
 from epilepsy12.common_view_functions.sanction_user_access import (
     organisation_white_list_for_user,
 )
@@ -66,18 +71,15 @@ def _user_may_view_this_organisation(request, kwargs):
                 and user.is_active
                 and user.email_confirmed
             )
-            or user.is_superuser
-            or user.is_rcpch_audit_team_member
+            or user.has_perm(PERM_ACCESS_ALL_ORGANISATIONS)
         ):
             # user's has an organisation employer in the same trust or LHB as the organisation requested
             if kwargs.get("user_type") is not None:
-                if kwargs.get("user_type") == "rcpch-staff" and not (
-                    user.is_rcpch_staff
-                    or user.is_rcpch_audit_team_member
-                    or user.is_superuser
+                if kwargs.get("user_type") == "rcpch-staff" and not user.has_perm(
+                    PERM_MANAGE_RCPCH_AUDIT_TEAM_USERS
                 ):
-                    # this route is for RCPCH staff, RCPCH audit team members and
-                    # superusers to create new RCPCH staff members only. This
+                    # this route is for users who may manage RCPCH audit team
+                    # users (the RCPCH audit team and superusers) only. This
                     # mirrors the authorisation in
                     # Epilepsy12UserAdminCreationForm.clean().
                     raise PermissionDenied()
@@ -127,7 +129,7 @@ def user_may_view_organisational_audit(parent_model, parent_type):
             can_view_parent = parent and parent.id == requested_id
             is_lead_clinican = user.role == AUDIT_CENTRE_LEAD_CLINICIAN
 
-            if user.is_rcpch_audit_team_member or (
+            if user.has_perm(PERM_ACCESS_ALL_ORGANISATIONS) or (
                 can_view_parent and is_lead_clinican
             ):
                 if not parent_model.objects.filter(id=requested_id).exists():
@@ -325,12 +327,10 @@ def lookup_user_permissions_on_child(request, request_kwargs):
             "can_edit": False,
         }
 
-    is_admin = user.is_rcpch_audit_team_member or user.is_rcpch_staff or user.is_superuser
-
-    if is_admin:
+    if user.has_perm(PERM_ACCESS_ALL_ORGANISATIONS):
         return {
             "can_view": True,
-            "can_edit": True,
+            "can_edit": user.has_perm(PERM_EDIT_CASE_OUTSIDE_AUDIT_PERIOD),
         }
 
     child = lookup_child_if_user_has_permission(request_kwargs, request.user)
@@ -367,13 +367,14 @@ def user_may_view_this_child():
 
 def rcpch_full_access_only():
     """
-    Only permits access to rcpch_audit_team_full_access group members
+    Only permits access to users who can access all organisations nationally
+    (the RCPCH audit team and superusers)
     """
 
     def decorator(view):
         def wrapper(request, *args, **kwargs):
             user = request.user
-            if user.groups.filter(name="epilepsy12_audit_team_full_access").exists():
+            if user.has_perm(PERM_ACCESS_ALL_ORGANISATIONS):
                 return view(request, *args, **kwargs)
             else:
                 raise PermissionDenied()
@@ -393,18 +394,14 @@ def user_can_access_user():
             user_to_edit_id = kwargs["epilepsy12_user_id"]
             user_to_edit = Epilepsy12User.objects.get(pk=user_to_edit_id)
 
-            if (
-                request.user.is_rcpch_audit_team_member
-                or request.user.is_rcpch_staff
-                or request.user.is_superuser
-                or request.user.organisation_employer
-                in organisation_white_list_for_user(user_to_edit)
+            if request.user.has_perm(
+                PERM_ACCESS_ALL_ORGANISATIONS
+            ) or request.user.organisation_employer in organisation_white_list_for_user(
+                user_to_edit
             ):
-                # allow access if user requesting acess is:
-                # 1. a superuser
-                # 2. rcpch_autdit_team_member
-                # 3. rcpch_staff
-                # 4. not 1-3 but is in the same trust as the user being accessed
+                # allow access if user requesting access either:
+                # 1. can access all organisations (RCPCH audit team, superusers)
+                # 2. is in the same trust as the user being accessed
                 return view(request, *args, **kwargs)
             else:
                 raise PermissionDenied()

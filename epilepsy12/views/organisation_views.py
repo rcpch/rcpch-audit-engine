@@ -19,7 +19,11 @@ from epilepsy12.models_folder.entities.local_health_board import LocalHealthBoar
 
 # E12 imports
 from ..decorator import user_may_view_this_organisation, login_and_otp_required
-from epilepsy12.constants import INDIVIDUAL_KPI_MEASURES, AUDIT_PERIOD_EXTENSION_REASONS
+from epilepsy12.constants import (
+    INDIVIDUAL_KPI_MEASURES,
+    AUDIT_PERIOD_EXTENSION_REASONS,
+    PERM_ACCESS_ALL_ORGANISATIONS,
+)
 from epilepsy12.models import (
     AuditPeriod,
     Epilepsy12User,
@@ -117,7 +121,7 @@ def filter_organisations_by_parent(request, parent_id, parent_type):
         )
 
     # Apply user access restrictions if not admin
-    if not (request.user.is_rcpch_staff or request.user.is_superuser):
+    if not request.user.has_perm(PERM_ACCESS_ALL_ORGANISATIONS):
         allowed_orgs = organisation_white_list_for_user(request.user)
         organisations = organisations.filter(
             id__in=allowed_orgs.values_list("id", flat=True)
@@ -377,11 +381,7 @@ def selected_organisation_summary(request, organisation_id):
         total_percent_trust = 0
 
     # organisation list scoped to permissions of user
-    if (
-        request.user.is_rcpch_audit_team_member
-        or request.user.is_superuser
-        or request.user.is_rcpch_staff
-    ):
+    if request.user.has_perm(PERM_ACCESS_ALL_ORGANISATIONS):
         # Admin users: select any organisations except currently selected organisation
         organisation_list = Organisation.objects.get_organisation_list()
         # Get merged parent list for all active organisations
@@ -928,14 +928,15 @@ def view_preference(request, organisation_id, template_name):
     """
     POST request from Toggle in has rcpch_view_preference.html template
     Users can toggle between national, trust and organisation views.
-    Only RCPCH staff can request a National level.
+    Only users who can access all organisations (the RCPCH audit team and
+    superusers) can request a National level.
     """
     organisation = Organisation.objects.get(pk=organisation_id)
 
     view_preference = int(request.htmx.trigger_name)
 
-    if view_preference == 2 and not (
-        request.user.is_rcpch_audit_team_member or request.user.is_superuser
+    if view_preference == 2 and not request.user.has_perm(
+        PERM_ACCESS_ALL_ORGANISATIONS
     ):
         return HttpResponseForbidden(
             "Only RCPCH audit team members or superusers can select the National view preference."
@@ -955,11 +956,6 @@ def kpi_download(request, organisation_id, cohort):
     """
     GET: Loads the page necessary for downloading KPIs
     """
-    if not request.user.is_superuser and not request.user.is_rcpch_audit_team_member:
-        return HttpResponseForbidden(
-            "You do not have permission to download KPIs"
-        )
-
     context = {"organisation_id": organisation_id, "cohort": cohort}
 
     template_name = "epilepsy12/partials/kpis/kpi_download.html"
@@ -970,11 +966,6 @@ def kpi_download(request, organisation_id, cohort):
 @login_and_otp_required()
 @permission_required("epilepsy12.can_publish_epilepsy12_data", raise_exception=True)
 def kpi_download_file(request, cohort):
-    if not request.user.is_superuser and not request.user.is_rcpch_audit_team_member:
-        return HttpResponseForbidden(
-            "You do not have permission to download KPIs"
-        )
-
     (
         country_df,
         trust_hb_df,
