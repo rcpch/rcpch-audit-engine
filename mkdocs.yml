@@ -184,6 +184,7 @@ nav:
       - Shape Files and Maps: 'development/shape-files.md'
       - Public KPI reporting scope: 'development/public-kpi-reporting-scope.md'
       - User Groups: 'development/user-groups.md'
+      - Retiring the RCPCH user flags: 'development/rcpch-flags-retirement-plan.md'
       - Users: 'development/user-workflow.md'
       - Views: 'development/views.md'
     - API: 'development/api.md'
