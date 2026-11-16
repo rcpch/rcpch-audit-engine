@@ -15,6 +15,12 @@ import pytest
 from django.contrib.auth.models import Group
 
 from epilepsy12.constants.user_types import (
+    CAN_ACCESS_ALL_ORGANISATIONS,
+    CAN_APPROVE_AUDIT_PERIOD_ORGANISATIONS,
+    CAN_EDIT_CASE_OUTSIDE_AUDIT_PERIOD,
+    CAN_MANAGE_RCPCH_AUDIT_TEAM_USERS,
+    CAN_SELECT_NATIONAL_VIEW_PREFERENCE,
+    CAN_VIEW_ADMIN_TOOLS,
     EPILEPSY12_AUDIT_TEAM_FULL_ACCESS,
     PATIENT_ACCESS,
     TRUST_AUDIT_TEAM_EDIT_ACCESS,
@@ -101,6 +107,41 @@ def test_audit_team_group_custom_permissions(seeded_groups):
     assert "can_transfer_epilepsy12_lead_centre" in codenames
     # plus everything the clinical groups hold
     assert {"view_case", "add_case", "change_case", "delete_case"} <= codenames
+
+
+# Permissions that replace the is_rcpch_audit_team_member / is_rcpch_staff
+# flags. Only the RCPCH audit team group may hold them.
+RCPCH_AUDIT_TEAM_ONLY_PERMISSIONS = {
+    CAN_ACCESS_ALL_ORGANISATIONS[0],
+    CAN_EDIT_CASE_OUTSIDE_AUDIT_PERIOD[0],
+    CAN_SELECT_NATIONAL_VIEW_PREFERENCE[0],
+    CAN_MANAGE_RCPCH_AUDIT_TEAM_USERS[0],
+    CAN_VIEW_ADMIN_TOOLS[0],
+    CAN_APPROVE_AUDIT_PERIOD_ORGANISATIONS[0],
+}
+
+
+@pytest.mark.django_db
+def test_audit_team_group_has_flag_replacement_permissions(seeded_groups):
+    audit_team = seeded_groups.get(name=EPILEPSY12_AUDIT_TEAM_FULL_ACCESS)
+
+    assert RCPCH_AUDIT_TEAM_ONLY_PERMISSIONS <= _codenames(audit_team)
+
+
+@pytest.mark.parametrize(
+    "group_name",
+    [
+        TRUST_AUDIT_TEAM_VIEW_ONLY,
+        TRUST_AUDIT_TEAM_EDIT_ACCESS,
+        TRUST_AUDIT_TEAM_FULL_ACCESS,
+        PATIENT_ACCESS,
+    ],
+)
+@pytest.mark.django_db
+def test_other_groups_lack_flag_replacement_permissions(seeded_groups, group_name):
+    group = seeded_groups.get(name=group_name)
+
+    assert not RCPCH_AUDIT_TEAM_ONLY_PERMISSIONS & _codenames(group)
 
 
 @pytest.mark.django_db

@@ -149,6 +149,39 @@ CAN_EXTEND_SUBMISSION_DEADLINE = (
     "Can extend the submission deadline for an audit period."
 )
 
+# RCPCH Audit Team
+# These replace the is_rcpch_audit_team_member / is_rcpch_staff flags. See
+# documentation/docs/development/rcpch-flags-retirement-plan.md
+CAN_ACCESS_ALL_ORGANISATIONS = (
+    "can_access_all_organisations",
+    "Can view any organisation, and its users and children, nationally.",
+)
+
+CAN_EDIT_CASE_OUTSIDE_AUDIT_PERIOD = (
+    "can_edit_case_outside_audit_period",
+    "Can edit any child's record regardless of organisation, lock status or audit period.",
+)
+
+CAN_SELECT_NATIONAL_VIEW_PREFERENCE = (
+    "can_select_national_view_preference",
+    "Can select the national view preference.",
+)
+
+CAN_MANAGE_RCPCH_AUDIT_TEAM_USERS = (
+    "can_manage_rcpch_audit_team_users",
+    "Can create and edit RCPCH audit team users, and edit any user's email address.",
+)
+
+CAN_VIEW_ADMIN_TOOLS = (
+    "can_view_admin_tools",
+    "Can view admin tools, such as the admin banner, submission dashboard link and all banners.",
+)
+
+CAN_APPROVE_AUDIT_PERIOD_ORGANISATIONS = (
+    "can_approve_audit_period_organisations",
+    "Can approve organisation membership of an audit period.",
+)
+
 PERMISSIONS = (
     CAN_LOCK_CHILD_CASE_DATA_FROM_EDITING,
     CAN_UNLOCK_CHILD_CASE_DATA_FROM_EDITING,
@@ -164,5 +197,11 @@ PERMISSIONS = (
     CAN_PUBLISH_EPILEPSY12_DATA,
     CAN_ALLOCATE_USER_TO_ORGANISATION,
     CAN_RESET_TWO_FACTOR_AUTHENTICATION,
-    CAN_EXTEND_SUBMISSION_DEADLINE
+    CAN_EXTEND_SUBMISSION_DEADLINE,
+    CAN_ACCESS_ALL_ORGANISATIONS,
+    CAN_EDIT_CASE_OUTSIDE_AUDIT_PERIOD,
+    CAN_SELECT_NATIONAL_VIEW_PREFERENCE,
+    CAN_MANAGE_RCPCH_AUDIT_TEAM_USERS,
+    CAN_VIEW_ADMIN_TOOLS,
+    CAN_APPROVE_AUDIT_PERIOD_ORGANISATIONS,
 )

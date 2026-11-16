@@ -59,17 +59,34 @@ The test seed users `*_CLINICAL_AUDIT_TEAM@nhs.net` (`tests/UserDataClasses.py`)
 
 ### Phase 1 – add the permissions (additive, safe to deploy)
 
-- Add the constants and `Meta.permissions` entries, then run `makemigrations` (permission-only migration).
+- Add the constants and `Meta.permissions` entries, then run `makemigrations` (permission-only migration, `0074_rcpch_audit_team_permissions`). Each permission sits on the model it most relates to:
+
+    | Permission | Model |
+    |---|---|
+    | `can_access_all_organisations` | `Organisation` |
+    | `can_edit_case_outside_audit_period` | `Case` |
+    | `can_select_national_view_preference`, `can_manage_rcpch_audit_team_users`, `can_view_admin_tools` | `Epilepsy12User` |
+    | `can_approve_audit_period_organisations` | `AuditPeriodOrganisation` |
+
 - Extend `EPILEPSY12_AUDIT_TEAM_ACCESS_PERMISSIONS` in `groups_seeder`.
-- Add a data migration that calls the seeder, or attaches the new permissions to the existing group. Production only gets them if `seed --mode=seed_groups_and_permissions` runs, so don't rely on that.
-- Add a data migration to re-sync every user's groups from their role (fixes any `group_mismatch` found in Phase 0).
-- Extend `tests/general_functions_tests/test_groups_seeder.py`.
+- Extend `tests/general_functions_tests/test_groups_seeder.py`: the audit team group has all six, the other groups have none.
+
+**Deploying.** `migrate` creates the permission rows; it doesn't attach them to the group. After deploying, run the seeder by hand in each environment:
+
+```bash
+python manage.py seed --mode=seed_groups_and_permissions
+```
+
+Until Phase 2, nothing checks these permissions, so the gap between deploying and running the seeder doesn't affect anyone.
+
+**Groups.** The re-sync data migration originally planned here was dropped. [rcpch/rcpch-audit-engine#1496](https://github.com/rcpch/rcpch-audit-engine/pull/1496) lets audit team members and superusers change a user's role, which re-syncs that user's groups. Re-run `audit_rcpch_user_flags` and fix any remaining `group_mismatch` by setting the role again.
 
 ### Phase 2 – switch the checks
 
 - Replace each call site in the table with `user.has_perm("epilepsy12.<codename>")`, or `perms.epilepsy12.<codename>` in templates.
 - Turn `audit_period_permissions._is_rcpch_user` into a permission check, splitting it into view and edit where the callers differ.
 - In `Epilepsy12User.save()`, Django caches permissions on the user object, so don't use `has_perm` there. Move the national-view invariant into the toggle view and form, or have `save()` check `role == RCPCH_AUDIT_TEAM or is_superuser`.
+- Guard against deploying to an environment where the seeder never ran, which would lock the audit team out. Add a Django system check (`django.core.checks`) that reports an error if `epilepsy12_audit_team_full_access` lacks any of the six permissions. It runs on `migrate` and server start.
 - **Optional, in scope:** `decorator.rcpch_full_access_only` currently checks group membership. It could become a permission check too.
 
 ### Phase 3 – remove the fields

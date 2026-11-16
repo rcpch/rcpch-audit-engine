@@ -3,6 +3,8 @@ from django.contrib.gis.db import models
 
 from simple_history.models import HistoricalRecords
 
+from ..constants.user_types import CAN_APPROVE_AUDIT_PERIOD_ORGANISATIONS
+
 from .time_and_user_abstract_base_classes import (
     TimeStampAbstractBaseClass,
     UserStampAbstractBaseClass,
@@ -200,6 +202,7 @@ class AuditPeriodOrganisation(
     class Meta:
         verbose_name = "Audit period organisation"
         verbose_name_plural = "Audit period organisations"
+        permissions = [CAN_APPROVE_AUDIT_PERIOD_ORGANISATIONS]
         constraints = [
             models.UniqueConstraint(
                 fields=["audit_period", "organisation"],

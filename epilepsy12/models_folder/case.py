@@ -23,6 +23,7 @@ from ..constants import (
     CAN_UNLOCK_CHILD_CASE_DATA_FROM_EDITING,
     CAN_OPT_OUT_CHILD_FROM_INCLUSION_IN_AUDIT,
     CAN_CONSENT_TO_AUDIT_PARTICIPATION,
+    CAN_EDIT_CASE_OUTSIDE_AUDIT_PERIOD,
 )
 from ..general_functions import (
     coordinates_for_postcode,
@@ -285,6 +286,7 @@ class Case(TimeStampAbstractBaseClass, UserStampAbstractBaseClass, HelpTextMixin
             CAN_UNLOCK_CHILD_CASE_DATA_FROM_EDITING,
             CAN_OPT_OUT_CHILD_FROM_INCLUSION_IN_AUDIT,
             CAN_CONSENT_TO_AUDIT_PARTICIPATION,
+            CAN_EDIT_CASE_OUTSIDE_AUDIT_PERIOD,
         ]
         ordering = ["surname"]
 
