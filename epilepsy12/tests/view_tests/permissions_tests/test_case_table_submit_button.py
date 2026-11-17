@@ -27,6 +27,7 @@ characterised separately in
 [x] Locked + incomplete case: button disabled for view-only users (no can_unlock)
 [x] Locked + complete case: enabled unsubmit button
 [x] Locked case after the submission deadline: disabled even for RCPCH audit team
+[x] Locked case: button disabled for trust-level users (clinician/lead clinician) - case_submit 403s their POSTs
 [x] Unlocked + complete case: enabled submit button for clinician (has can_lock)
 [x] Unlocked + complete case: disabled submit button for view-only users (no can_lock)
 [x] Unlocked + incomplete case: no submit button at all - progress bar instead
@@ -50,6 +51,7 @@ from epilepsy12.models import Epilepsy12User, Organisation
 from epilepsy12.tests.UserDataClasses import (
     test_user_audit_centre_administrator_data,
     test_user_audit_centre_clinician_data,
+    test_user_audit_centre_lead_clinician_data,
     test_user_rcpch_audit_team_data,
 )
 from epilepsy12.tests.view_tests.permissions_tests.perm_tests_utils import (
@@ -256,6 +258,68 @@ def test_locked_case_unsubmit_button_disabled_after_submission_deadline(
         "The unsubmit button must be disabled once the deadline has passed"
     )
     assert "data-tooltip" not in attrs
+
+
+@pytest.mark.parametrize(
+    "user_data",
+    [
+        test_user_audit_centre_clinician_data,
+        test_user_audit_centre_lead_clinician_data,
+    ],
+    ids=["clinician", "lead_clinician"],
+)
+@pytest.mark.django_db
+def test_locked_case_unsubmit_button_disabled_for_trust_level_users(
+    client,
+    seed_groups_fixture,
+    seed_users_fixture,
+    e12_case_factory,
+    user_data,
+):
+    """Trust-level editors (clinician, lead clinician) hold
+    ``can_unlock_child_case_data_from_editing`` through EDITOR_PERMISSIONS, so
+    the template previously showed them an *enabled* unsubmit button on
+    locked cases - but clicking it 403s: ``user_may_view_this_child`` denies
+    POSTs on locked cases for non-RCPCH users because ``Case.editable()`` is
+    False when locked. The button is now disabled for exactly the users the
+    view would reject.
+    """
+    GOSH = Organisation.objects.get(ods_code="RP401", trust__ods_code="RP4")
+
+    case = e12_case_factory(
+        first_name=f"locked_{user_data.role_str.lower()}_child",
+        organisations__organisation=GOSH,
+        locked=True,
+        registration__first_paediatric_assessment_date=OPEN_COHORT_FPA_DATE,
+    )
+    assert case.locked
+    assert case.registration.audit_progress.audit_complete
+    assert case.registration.days_remaining_before_submission > 0
+
+    login(client, user_data)
+    html = render_case_table(client, GOSH)
+
+    buttons = cloud_buttons(html)
+    assert len(buttons) == 1
+    attrs, direction = buttons[0]
+    assert direction == "download"
+    assert "disabled" in attrs, (
+        "Trust-level users cannot POST case_submit on a locked case - the "
+        "button must be disabled for them"
+    )
+    assert "data-tooltip" not in attrs
+
+    # The view rejects their POST even though they hold the unlock
+    # permission - this is why the template disables the button.
+    response = client.post(
+        reverse(
+            "case_submit",
+            kwargs={"organisation_id": GOSH.pk, "case_id": case.pk},
+        )
+    )
+    assert response.status_code == HTTPStatus.FORBIDDEN
+    case.refresh_from_db()
+    assert case.locked, "Case must remain locked"
 
 
 @pytest.mark.django_db
