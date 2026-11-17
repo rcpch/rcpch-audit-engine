@@ -167,9 +167,11 @@
             {% endif %}
           </td>
 
-          {% if case.registration.audit_progress.audit_complete %}
+          {% if case.registration.audit_progress.audit_complete or case.locked %}
             {% comment %}
               If the audit for this child is complete, the upload button is enabled only if the submission deadline has not yet passed.
+              A locked (submitted) case still shows the unsubmit button even if the audit is incomplete
+              (e.g. new questions added mid-cohort, https://github.com/rcpch/rcpch-audit-engine/issues/1492).
             {% endcomment %}
             {% url 'case_submit' organisation_id=organisation_id case_id=case.id as hx_post %}
             <td>
@@ -193,8 +195,9 @@
               {% if case.locked %}
                 <i class="cloud download icon"></i>
               {% else %}
-                <i class="cloud upload icon"></i></button>
+                <i class="cloud upload icon"></i>
               {% endif %}
+              </button>
 
             </td>
           {% else %}
