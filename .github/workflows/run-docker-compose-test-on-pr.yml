@@ -19,7 +19,7 @@ jobs:
 
       - name: Create .env file
         run: |
-          cp envs/env-template envs/.env
+          cp envs/template.env envs/.env
 
       - name: Run PR check script
         env:

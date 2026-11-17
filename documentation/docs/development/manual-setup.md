@@ -11,7 +11,7 @@ This manual approach will require you to have much more familiarity with configu
 
 You will need the [Postgresql](https://www.postgresql.org/) database, which can be installed natively on your development machine, or (recommended) can be installed using Docker.
 
-Using the command below will create a development database with credentials that match those in our `envs/env-template` file.
+Using the command below will create a development database with credentials that match those in our `envs/template.env` file.
 You will need Docker to be installed on your local machine. (Please search the web for instructions for installation on your operating system and setup)
 
 ```console
@@ -56,7 +56,7 @@ pip install -r requirements/development-requirements.txt
 
 ## Set and initialize the environment variables
 
-You will need to set the environment variables for your local development, using the `envs/env-template` file as a starting point. **This file should not be committed to the repository**. You can use real values for the environment variables in this file.
+You will need to set the environment variables for your local development, using `envs/template.env` as a starting point and copying it to `envs/.env`. **The local `envs/.env` file must not be committed to the repository**. You can use real values for the environment variables in this local file.
 
 ```console
 source envs/.env
