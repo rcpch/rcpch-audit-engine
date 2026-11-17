@@ -40,10 +40,10 @@ These files contain credentials and secrets and therefore the `.env` files thems
 
 If you work with the RCPCH Incubator team, another member of the team may be able to supply you with a completed `.env` file.
 
-For anyone else, there is a template environment file in the repository root which you can rename to `.env` and use as a starting point. **Be extremely careful to make sure it is named `.env` so that it is ignored by Git. Do not ever commit `.env` files to version control!**
+For anyone else, copy `envs/template.env` to `envs/.env` and use it as a starting point. Local environment files belong in `envs/`, where everything except the template is ignored by Git. **Do not commit local environment files to version control.** See the [environment file warning](environment-variables.md#local-files-and-git-ignore-rules) before staging changes.
 
 ```console
-cp envs/env-template envs/.env
+cp envs/template.env envs/.env
 ```
 
 !!! warning "Mac Users"
