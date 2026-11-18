@@ -92,9 +92,23 @@ def deactivate_user_for_inactivity(user, request=None) -> None:
     Deactivates the user. The message shown on the login page (see
     get_inactivity_deactivation_message) tells them to contact the Epilepsy12
     team to have their account reactivated.
+
+    The is_active change is still logged (with VisitActivity entries) by the
+    user change signals, but it does not email the admins: an automatic
+    deactivation is routine housekeeping, not a permission change made by an
+    administrator.
     """
-    user.is_active = False
-    user.save()
+    # Flag the save so the user change signals can tell this automatic
+    # deactivation apart from one made by an administrator (see
+    # _send_change_notifications in epilepsy12/signals.py).
+    user._is_deactivated_for_inactivity = True
+    try:
+        user.is_active = False
+        user.save()
+    finally:
+        # The flag must not outlive the save: a later save of the same
+        # instance would otherwise be mistaken for an automatic deactivation.
+        del user._is_deactivated_for_inactivity
 
     # The is_active change is also picked up by the user change signals
     # (logged as "Superuser or admin status changed"); this entry records
