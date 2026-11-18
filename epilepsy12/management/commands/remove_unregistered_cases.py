@@ -36,10 +36,16 @@ class Command(BaseCommand):
             action="store_true",
             help="Show which cases would be deleted without actually deleting them.",
         )
+        parser.add_argument(
+            "--no-input",
+            action="store_true",
+            help="Do not prompt for confirmation before deleting cases.",
+        )
 
     def handle(self, *args, **options):
         before_date = options["before"]
         dry_run = options["dry_run"]
+        no_input = options["no_input"]
 
         # Normalise to an aware datetime at start-of-day
         cutoff = timezone.make_aware(datetime.combine(before_date, datetime.min.time()))
@@ -82,10 +88,11 @@ class Command(BaseCommand):
         for row in org_counts:
             org_name = row["organisations__name"] or "(no organisation)"
             self.stdout.write(f"  {row['n']:>4}  {org_name}")
-        confirm = input("Delete these cases? [y/N] ").strip().lower()
-        if confirm != "y":
-            self.stdout.write("Aborted. No cases deleted.")
-            return
+        if not no_input:
+            confirm = input("Delete these cases? [y/N] ").strip().lower()
+            if confirm != "y":
+                self.stdout.write("Aborted. No cases deleted.")
+                return
 
         deleted = 0
         for case in cases.prefetch_related("organisations"):
