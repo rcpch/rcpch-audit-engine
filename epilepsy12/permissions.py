@@ -7,6 +7,8 @@ Custom permissions for API - these permissions are not applied to the views
 # Django imports
 from rest_framework import permissions
 
+from epilepsy12.constants.user_types import PERM_ACCESS_ALL_ORGANISATIONS
+
 # 3rd party imports
 
 # E12 imports
@@ -19,8 +21,8 @@ class CanAccessOrganisation(permissions.BasePermission):
         return False
 
     def has_object_permission(self, request, view, obj):
-        # superusers and RCPCH audit team members can acccess all organisations
-        if request.user.is_superuser or request.user.is_rcpch_audit_team_member:
+        # superusers and RCPCH audit team members can access all organisations
+        if request.user.has_perm(PERM_ACCESS_ALL_ORGANISATIONS):
             return True
 
         return False

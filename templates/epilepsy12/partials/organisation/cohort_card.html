@@ -53,7 +53,7 @@
     <div class="rcpch_summary_stats_row">
       <a class="ui rcpch_positive button" href="?cohort={{cohort.cohort}}">View dashboard</a>
     </div>
-  {% elif cohort_number == cohort.cohort and request.user.is_rcpch_audit_team_member %}
+  {% elif cohort_number == cohort.cohort and perms.epilepsy12.can_publish_epilepsy12_data %}
     <div class="rcpch_summary_stats_row">
       <a class="ui rcpch_positive button jump" href="{% url 'kpi_download' organisation_id=selected_organisation.pk cohort=cohort_number %}">Download KPI metrics</a>
       <div class="rcpch_summary_stats_description">

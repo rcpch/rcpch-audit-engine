@@ -21,6 +21,7 @@ from epilepsy12.constants.user_types import (
     RCPCH_AUDIT_TEAM_ROLES,
     AUDIT_CENTRE_ROLES,
     TITLES,
+    PERM_MANAGE_RCPCH_AUDIT_TEAM_USERS,
 )
 from ..general_functions.inactivity_deactivation import (
     deactivate_user_for_inactivity,
@@ -40,11 +41,10 @@ class Epilepsy12UserUpdatePasswordForm(SetPasswordForm):
 
     def __init__(self, user, *args, **kwargs):
         self.user = user
-        if (
-            self.user.is_rcpch_audit_team_member
-            or self.user.is_superuser
-            or self.user.is_rcpch_staff
-        ):
+        # Deliberately based on role, not has_perm(): this form also runs for
+        # password resets and first-time setup, when the account may still be
+        # inactive, and has_perm() is always False for inactive users.
+        if self.user.is_superuser or self.user.role == RCPCH_AUDIT_TEAM:
             self.is_admin = True
         super(SetPasswordForm, self).__init__(*args, **kwargs)
 
@@ -112,24 +112,19 @@ class Epilepsy12UserAdminCreationForm(forms.ModelForm):
         )
         self.fields["role"].choices = choices
 
-        # RCPCH audit team members and superusers may move a user between the
-        # audit centre roles and the RCPCH Audit Team role. This is the Phase 0
-        # remedy for flag_without_role / role_without_flag findings reported by
-        # audit_rcpch_user_flags: role is the source of truth for national
+        # Users who may manage RCPCH audit team users (the RCPCH audit team and
+        # superusers) may move a user between the audit centre roles and the
+        # RCPCH Audit Team role: role is the source of truth for national
         # access. Everyone else only ever sees the roles of the user type they
         # are editing. (RCPCH Audit Children and Family accounts are created
         # through their own flow and are deliberately not offered here.)
-        if requesting_user.is_rcpch_audit_team_member or requesting_user.is_superuser:
+        if requesting_user.has_perm(PERM_MANAGE_RCPCH_AUDIT_TEAM_USERS):
             self.fields["role"].choices = AUDIT_CENTRE_ROLES + RCPCH_AUDIT_TEAM_ROLES
 
         if getattr(self, "initial", None):
             initial = getattr(self, "initial")
             if initial.get("email"):
-                if (
-                    requesting_user.is_superuser
-                    or requesting_user.is_rcpch_staff
-                    or requesting_user.is_rcpch_audit_team_member
-                ):
+                if requesting_user.has_perm(PERM_MANAGE_RCPCH_AUDIT_TEAM_USERS):
                     self.fields["email"].widget.attrs["readonly"] = False
                     self.fields["email"].widget.attrs["disabled"] = False
                     self.fields["email"].widget.attrs.update(
@@ -235,10 +230,7 @@ class Epilepsy12UserAdminCreationForm(forms.ModelForm):
         # new user being created is rcpch staff
         if self.rcpch_organisation == "rcpch-staff":
             # RCPCH staff are not affiliated with any organisation
-            if not (
-                self.requesting_user.is_rcpch_audit_team_member
-                or self.requesting_user.is_superuser
-            ):
+            if not self.requesting_user.has_perm(PERM_MANAGE_RCPCH_AUDIT_TEAM_USERS):
                 # should not have managed to get here
                 raise ValidationError(
                     "You do not have permission to create RCPCH staff."

@@ -114,7 +114,7 @@
               <tr>
           {% endif %}
           <td>
-            {% if request.user.is_rcpch_audit_team_member %}
+            {% if perms.epilepsy12.can_access_all_organisations %}
               {% with case.lead_site as lead_site  %}
                 <span {% if lead_site %} data-tooltip="Lead site: {{lead_site.organisation}} ({{lead_site.organisation.trust}})" {% else %}  data-tooltip="There is no allocated lead site" {% endif %}data-position="top left">
                   <i class="rcpch question circle icon"></i>
@@ -133,7 +133,7 @@
           <td class='two wide'>
             <div class='ui buttons'>
               <button
-                {% if case.editable or request.user.is_superuser or request.user.is_rcpch_audit_team_member %}
+                {% if case.editable or perms.epilepsy12.can_edit_case_outside_audit_period %}
                   data-tooltip='Edit or delete child.'
                 {% else %}
                   data-tooltip='View child details.'
@@ -142,12 +142,12 @@
                 tabindexed="0"
                 {% if not perms.epilepsy12.change_case %}disabled{% endif %}>
                 <a href="{% url 'update_case' organisation_id=organisation_id case_id=case.id%}" class="rcpch_purple half_button">
-                  <i class="{% if case.editable or request.user.is_superuser or request.user.is_rcpch_audit_team_member %}edit outline{% else %}eye{% endif %} icon icon_white"></i>
-                  {% if case.editable or request.user.is_superuser or request.user.is_rcpch_audit_team_member %}Edit{% else %}View{% endif %}
+                  <i class="{% if case.editable or perms.epilepsy12.can_edit_case_outside_audit_period %}edit outline{% else %}eye{% endif %} icon icon_white"></i>
+                  {% if case.editable or perms.epilepsy12.can_edit_case_outside_audit_period %}Edit{% else %}View{% endif %}
                 </a>
               </button>
               <button
-                  {% if case.editable or request.user.is_superuser or request.user.is_rcpch_audit_team_member %}
+                  {% if case.editable or perms.epilepsy12.can_edit_case_outside_audit_period %}
                     data-tooltip='Complete audit details.'
                   {% else %}
                     data-tooltip='View audit details.'
@@ -173,9 +173,10 @@
               A locked (submitted) case still shows the unsubmit button even if the audit is incomplete
               (e.g. new questions added mid-cohort, https://github.com/rcpch/rcpch-audit-engine/issues/1492).
               The enabled/disabled state mirrors what case_submit actually enforces: unsubmitting a locked
-              case is only possible for the RCPCH audit team (user_may_view_this_child denies POSTs from
-              trust-level users because Case.editable() is False when locked), so the button is disabled
-              for trust-level users even if they hold can_unlock_child_case_data_from_editing.
+              case is only possible for users with can_edit_case_outside_audit_period, i.e. the RCPCH audit
+              team and superusers (user_may_view_this_child denies POSTs from everyone else because
+              Case.editable() is False when locked), so the button is disabled for trust-level users even
+              if they hold can_unlock_child_case_data_from_editing.
             {% endcomment %}
             {% url 'case_submit' organisation_id=organisation_id case_id=case.id as hx_post %}
             <td>
@@ -186,7 +187,7 @@
                 hx-post="{{hx_post}}{% if selected_cohort and selected_cohort != 'all_children' %}?cohort={{selected_cohort}}{% endif %}"
                 hx_trigger='click'
                 hx-target="#case_table"
-                {% if case.registration.days_remaining_before_submission == 0 or case.locked and not request.user.is_rcpch_audit_team_member and not request.user.is_rcpch_staff and not request.user.is_superuser or case.locked and not perms.epilepsy12.can_unlock_child_case_data_from_editing or not case.locked and not perms.epilepsy12.can_lock_child_case_data_from_editing %}
+                {% if case.registration.days_remaining_before_submission == 0 or case.locked and not perms.epilepsy12.can_edit_case_outside_audit_period or case.locked and not perms.epilepsy12.can_unlock_child_case_data_from_editing or not case.locked and not perms.epilepsy12.can_lock_child_case_data_from_editing %}
                   disabled
                 {% else %}
                     {% if case.locked %}

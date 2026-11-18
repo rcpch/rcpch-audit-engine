@@ -2,6 +2,7 @@ import re
 
 from django.core.cache import cache
 
+from ..constants import PERM_VIEW_BANNER
 from ..models import Banner
 
 def banner(request):
@@ -16,7 +17,7 @@ def banner(request):
 
         if url_matcher.match(request.path) and not banner.disabled:
             if banner.user_role_to_target and request.user:
-                if request.user.role == banner.user_role_to_target or request.user.is_rcpch_audit_team_member:
+                if request.user.role == banner.user_role_to_target or request.user.has_perm(PERM_VIEW_BANNER):
                     return { "banner": banner }
             elif not banner.user_role_to_target:
                 return { "banner": banner }

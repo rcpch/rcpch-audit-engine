@@ -193,3 +193,26 @@ PERMISSIONS = (
     CAN_MANAGE_RCPCH_AUDIT_TEAM_USERS,
     CAN_APPROVE_AUDIT_PERIOD_ORGANISATIONS,
 )
+
+"""
+Full permission names for user.has_perm() checks on the RCPCH Audit Team
+permissions. Templates use perms.epilepsy12.<codename> instead.
+"""
+PERM_ACCESS_ALL_ORGANISATIONS = f"epilepsy12.{CAN_ACCESS_ALL_ORGANISATIONS[0]}"
+PERM_EDIT_CASE_OUTSIDE_AUDIT_PERIOD = f"epilepsy12.{CAN_EDIT_CASE_OUTSIDE_AUDIT_PERIOD[0]}"
+PERM_MANAGE_RCPCH_AUDIT_TEAM_USERS = f"epilepsy12.{CAN_MANAGE_RCPCH_AUDIT_TEAM_USERS[0]}"
+PERM_APPROVE_AUDIT_PERIOD_ORGANISATIONS = (
+    f"epilepsy12.{CAN_APPROVE_AUDIT_PERIOD_ORGANISATIONS[0]}"
+)
+PERM_VIEW_BANNER = "epilepsy12.view_banner"
+
+# Every permission the RCPCH Audit Team group must hold for the checks above to
+# work. The epilepsy12 system check (epilepsy12/checks.py) errors if any is
+# missing, i.e. the groups seeder has not been run since they were added.
+RCPCH_AUDIT_TEAM_REQUIRED_PERMISSIONS = (
+    PERM_ACCESS_ALL_ORGANISATIONS,
+    PERM_EDIT_CASE_OUTSIDE_AUDIT_PERIOD,
+    PERM_MANAGE_RCPCH_AUDIT_TEAM_USERS,
+    PERM_APPROVE_AUDIT_PERIOD_ORGANISATIONS,
+    PERM_VIEW_BANNER,
+)

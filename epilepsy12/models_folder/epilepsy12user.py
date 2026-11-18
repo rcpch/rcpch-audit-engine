@@ -262,8 +262,10 @@ class Epilepsy12User(AbstractUser, PermissionsMixin):
         # view_preference 2 (national) is only permitted for superusers or RCPCH audit
         # team members. Any other user attempting to set it is silently downgraded to
         # organisation level (0) to keep the invariant enforced at the model layer.
+        # This checks role rather than has_perm(): permissions are cached on the
+        # instance, and a role change only updates groups after this save.
         if self.view_preference == 2 and not (
-            self.is_superuser or self.is_rcpch_audit_team_member
+            self.is_superuser or self.role == RCPCH_AUDIT_TEAM
         ):
             self.view_preference = 0
 

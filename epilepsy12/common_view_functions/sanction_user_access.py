@@ -1,6 +1,8 @@
 from django.apps import apps
 from django.db.models import Q
 
+from epilepsy12.constants.user_types import PERM_ACCESS_ALL_ORGANISATIONS
+
 from epilepsy12.general_functions.audit_period_hierarchy import (
     expand_organisation_ids_via_identity,
 )
@@ -98,11 +100,7 @@ def merged_parent_list_for_user(epilepsy12_user, organisation_list=None):
         organisation_list = organisation_white_list_for_user(epilepsy12_user)
 
     # Check if user is admin (can see all trusts including Jersey)
-    is_admin = (
-        epilepsy12_user.is_rcpch_staff or
-        epilepsy12_user.is_superuser or
-        epilepsy12_user.is_rcpch_audit_team_member
-    )
+    is_admin = epilepsy12_user.has_perm(PERM_ACCESS_ALL_ORGANISATIONS)
 
     # Check if user is employed at Jersey (only do this check for non-admin users)
     # Jersey country can be "Jersey" or "JERSEY" (case-insensitive check)

@@ -32,6 +32,7 @@ from ..decorator import (
     user_may_view_this_child, 
     login_and_otp_required
 )
+from ..constants import PERM_EDIT_CASE_OUTSIDE_AUDIT_PERIOD
 from ..general_functions import (
     construct_transfer_epilepsy12_site_email,
     send_email_to_recipients,
@@ -609,7 +610,7 @@ def first_paediatric_assessment_date(request, can_edit, case_id):
     case = Case.objects.get(pk=case_id)
     registration = Registration.objects.filter(case=case).get()
 
-    if request.user.is_superuser or request.user.is_rcpch_audit_team_member:
+    if request.user.has_perm(PERM_EDIT_CASE_OUTSIDE_AUDIT_PERIOD):
         earliest_allowable_date = case.date_of_birth
     else:
         # registering a new child in the audit by a clinical team
