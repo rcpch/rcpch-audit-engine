@@ -4,4 +4,4 @@
 .git
 .github
 .gitignore
-*.env
+**/*.env
