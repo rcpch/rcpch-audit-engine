@@ -5,6 +5,9 @@ az acr login --name ${AZURE_REGISTRY_NAME}
 # Burn in build info (git hash, branch etc) into the image
 s/get-build-info > build_info.json
 
+# Copy template env file as Docker Compose requires it
+cp envs/template.env envs/.env
+
 # Build the app
 docker compose build
 
@@ -18,9 +21,6 @@ docker compose build
 azure_tag="${AZURE_REGISTRY_NAME}.azurecr.io/e12-django:${GITHUB_SHA}"
 docker tag e12-django:built ${azure_tag}
 docker push ${azure_tag}
-
-# Copy template env file to ensure the tests runs
-cp envs/template.env envs/.env
 
 # Tests (against local Postgres)
 # Avoid the start-dev script seeding and pytest seeding fighting
