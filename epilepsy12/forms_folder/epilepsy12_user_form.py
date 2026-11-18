@@ -238,23 +238,6 @@ class Epilepsy12UserAdminCreationForm(forms.ModelForm):
 
         return cleaned_data
 
-    def save(self, commit=True):
-        """
-        The RCPCH flags are derived from the role until they are retired:
-        role is the single source of truth for national access (Phase 0 of the
-        is_rcpch_audit_team_member / is_rcpch_staff retirement plan), so a
-        user edited here can never drift out of step with their role.
-
-        Superuser status is deliberately not settable through this form - it
-        can only be granted in the Django admin, by another superuser.
-        """
-        user = super().save(commit=False)
-        user.is_rcpch_audit_team_member = user.role == RCPCH_AUDIT_TEAM
-        user.is_rcpch_staff = user.role == RCPCH_AUDIT_TEAM
-        if commit:
-            user.save()
-        return user
-
 
 # IF IN DEBUG MODE, PRE-FILL CAPTCHA VALUE
 class DebugCaptchaField(CaptchaField):

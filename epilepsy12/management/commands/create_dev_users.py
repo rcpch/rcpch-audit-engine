@@ -25,13 +25,6 @@ class Command(BaseCommand):
                 ods_code="RJZ01"  # Kings College Hospital
             )
 
-            if role == RCPCH_AUDIT_TEAM:
-                is_rcpch_audit_team_member = True
-                is_rcpch_staff = True
-            else:
-                is_rcpch_audit_team_member = False
-                is_rcpch_staff = False
-
             user_model.objects.create_user(
                 first_name=first_name,
                 surname=surname,
@@ -41,8 +34,6 @@ class Command(BaseCommand):
                 is_active=True,
                 organisation_employer=dev_organisation_employer,
                 email_confirmed=True,
-                is_rcpch_audit_team_member=is_rcpch_audit_team_member,
-                is_rcpch_staff=is_rcpch_staff,
             )
 
             self.stdout.write(self.style.SUCCESS(f"Successfully created {email}."))

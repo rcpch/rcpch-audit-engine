@@ -69,8 +69,6 @@ def _make_user(
     role=AUDIT_CENTRE_CLINICIAN,
     is_active=True,
     email_confirmed=True,
-    is_rcpch_audit_team_member=False,
-    is_rcpch_staff=False,
     is_superuser=False,
     employers=None,
 ):
@@ -95,8 +93,6 @@ def _make_user(
         role=role,
         is_active=is_active,
         email_confirmed=email_confirmed,
-        is_rcpch_audit_team_member=is_rcpch_audit_team_member,
-        is_rcpch_staff=is_rcpch_staff,
         is_superuser=is_superuser,
         password="pw",
     )
@@ -293,8 +289,6 @@ def test_rcpch_audit_team_member_can_view_any_period(reorganisation):
     user = _make_user(
         email="rcpch@rcpch.ac.uk",
         role=RCPCH_AUDIT_TEAM,
-        is_rcpch_audit_team_member=True,
-        is_rcpch_staff=True,
         employers=[],  # RCPCH staff need no employer
     )
 
@@ -315,8 +309,6 @@ def test_rcpch_superuser_can_view_any_period(reorganisation):
         email="superuser@rcpch.ac.uk",
         role=RCPCH_AUDIT_TEAM,
         is_superuser=True,
-        is_rcpch_audit_team_member=True,
-        is_rcpch_staff=True,
         employers=[],
     )
 
@@ -607,8 +599,6 @@ def test_get_accessible_periods_rcpch_user_sees_all_participating_periods(
     user = _make_user(
         email="periods-rcpch@rcpch.ac.uk",
         role=RCPCH_AUDIT_TEAM,
-        is_rcpch_audit_team_member=True,
-        is_rcpch_staff=True,
         employers=[],
     )
 
@@ -666,8 +656,6 @@ def test_get_accessible_memberships_rcpch_user_sees_all_for_period(
     user = _make_user(
         email="memberships-rcpch@rcpch.ac.uk",
         role=RCPCH_AUDIT_TEAM,
-        is_rcpch_audit_team_member=True,
-        is_rcpch_staff=True,
         employers=[],
     )
 
@@ -778,8 +766,6 @@ def test_get_accessible_organisations_rcpch_user_sees_all_for_period(
     user = _make_user(
         email="orgs-rcpch@rcpch.ac.uk",
         role=RCPCH_AUDIT_TEAM,
-        is_rcpch_audit_team_member=True,
-        is_rcpch_staff=True,
         employers=[],
     )
 
@@ -858,8 +844,6 @@ def test_get_accessible_organisations_with_parent_filter(
     user = _make_user(
         email="orgs-parent-filter@rcpch.ac.uk",
         role=RCPCH_AUDIT_TEAM,
-        is_rcpch_audit_team_member=True,
-        is_rcpch_staff=True,
         employers=[],
     )
 
@@ -1314,8 +1298,6 @@ def test_can_view_case_rcpch_user(reorganisation, e12_case_factory):
     user = _make_user(
         email="case-rcpch@rcpch.ac.uk",
         role=RCPCH_AUDIT_TEAM,
-        is_rcpch_audit_team_member=True,
-        is_rcpch_staff=True,
         employers=[],
     )
 
@@ -1430,8 +1412,6 @@ def test_can_view_case_pre_registration_rcpch_user(reorganisation, e12_case_fact
     user = _make_user(
         email="pre-reg-rcpch@rcpch.ac.uk",
         role=RCPCH_AUDIT_TEAM,
-        is_rcpch_audit_team_member=True,
-        is_rcpch_staff=True,
         employers=[],
     )
 

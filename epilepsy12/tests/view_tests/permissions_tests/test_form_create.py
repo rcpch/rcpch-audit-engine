@@ -72,8 +72,6 @@ def test_lead_clinician_cannot_create_a_user_in_another_trust(client, seed_group
         "role": 1,
         "first_name": TEMP_CREATED_USER_FIRST_NAME,
         "surname": "User",
-        "is_rcpch_audit_team_member": False,
-        "is_rcpch_staff": False,
         "is_superuser": False,
         "email_confirmed": False,
         "is_staff": False,
@@ -132,8 +130,6 @@ def test_lead_clinician_can_create_a_user_in_the_same_trust(client, seed_groups_
         "role": 1,
         "first_name": TEMP_CREATED_USER_FIRST_NAME,
         "surname": "User",
-        "is_rcpch_audit_team_member": False,
-        "is_rcpch_staff": False,
         "is_superuser": False,
         "email_confirmed": False,
         "is_staff": False,
@@ -200,8 +196,6 @@ def test_lead_clinician_cannot_create_a_user_in_another_local_health_board(clien
         email=f"welsh.leadclinician@test.com",
         role=1,
         first_name="welsh",
-        is_rcpch_audit_team_member=False,
-        is_rcpch_staff=False,
         is_superuser=False,
         email_confirmed=False,
         is_staff=False,
@@ -219,8 +213,6 @@ def test_lead_clinician_cannot_create_a_user_in_another_local_health_board(clien
         "role": 1,
         "first_name": TEMP_CREATED_USER_FIRST_NAME,
         "surname": "User",
-        "is_rcpch_audit_team_member": False,
-        "is_rcpch_staff": False,
         "is_superuser": False,
         "email_confirmed": False,
         "is_staff": False,
@@ -286,8 +278,6 @@ def test_lead_clinician_can_create_a_user_in_the_same_local_health_board(client,
         "organisation_employer": OTHER_ORGANISATION_SAME_LOCAL_HEALTH_BOARD,
         "first_name": TEMP_CREATED_USER_FIRST_NAME,
         "surname": "User",
-        "is_rcpch_audit_team_member": False,
-        "is_rcpch_staff": False,
         "is_superuser": False,
         "email_confirmed": False,
         "is_staff": False,
@@ -474,8 +464,7 @@ def test_lead_clinician_cannot_create_a_superuser(client, seed_groups_fixture, s
 def test_rcpch_audit_team_member_can_promote_a_user_to_the_rcpch_audit_team_role(seed_groups_fixture, seed_users_fixture):
     """
     RCPCH audit team members (and superusers) may change a user's role to
-    RCPCH Audit Team. The flags follow the role, so the promoted user does not
-    show up as role_without_flag in audit_rcpch_user_flags.
+    RCPCH Audit Team.
     """
 
     test_user = Epilepsy12User.objects.get(
@@ -486,8 +475,6 @@ def test_rcpch_audit_team_member_can_promote_a_user_to_the_rcpch_audit_team_role
         email="temp_promotion_candidate@test.com",
         first_name="TEMP_PROMOTION_CANDIDATE",
         role=AUDIT_CENTRE_LEAD_CLINICIAN,
-        is_rcpch_audit_team_member=False,
-        is_rcpch_staff=False,
     )
 
     data = {
@@ -512,16 +499,13 @@ def test_rcpch_audit_team_member_can_promote_a_user_to_the_rcpch_audit_team_role
     promoted_user.refresh_from_db()
 
     assert promoted_user.role == RCPCH_AUDIT_TEAM
-    assert promoted_user.is_rcpch_audit_team_member == True
-    assert promoted_user.is_rcpch_staff == True
 
 
 @pytest.mark.django_db
 def test_rcpch_audit_team_member_can_demote_an_rcpch_audit_team_member(seed_groups_fixture, seed_users_fixture):
     """
     The reverse of a promotion is also allowed: demoting an RCPCH Audit Team
-    member to an audit centre role clears the flags, so the demoted user does
-    not show up as flag_without_role in audit_rcpch_user_flags.
+    member to an audit centre role.
     """
 
     test_user = Epilepsy12User.objects.get(
@@ -532,8 +516,6 @@ def test_rcpch_audit_team_member_can_demote_an_rcpch_audit_team_member(seed_grou
         email="temp_demotion_candidate@test.com",
         first_name="TEMP_DEMOTION_CANDIDATE",
         role=RCPCH_AUDIT_TEAM,
-        is_rcpch_audit_team_member=True,
-        is_rcpch_staff=True,
     )
 
     data = {
@@ -558,5 +540,3 @@ def test_rcpch_audit_team_member_can_demote_an_rcpch_audit_team_member(seed_grou
     demoted_user.refresh_from_db()
 
     assert demoted_user.role == AUDIT_CENTRE_CLINICIAN
-    assert demoted_user.is_rcpch_audit_team_member == False
-    assert demoted_user.is_rcpch_staff == False

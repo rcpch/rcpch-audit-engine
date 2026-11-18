@@ -185,8 +185,6 @@ def test_user_create_same_org_success(
             "role": 1,
             "first_name": TEMP_CREATED_USER_FIRST_NAME,
             "surname": "User",
-            "is_rcpch_audit_team_member": False,
-            "is_rcpch_staff": False,
             "email_confirmed": True,
         }
 
@@ -259,8 +257,6 @@ def test_user_create_diff_org_success(
             "role": 1,
             "first_name": TEMP_CREATED_USER_FIRST_NAME,
             "surname": "User",
-            "is_rcpch_audit_team_member": True,
-            "is_rcpch_staff": False,
             "email_confirmed": True,
         }
 
@@ -341,8 +337,6 @@ def test_user_creation_forbidden(
             "role": 1,
             "first_name": TEMP_CREATED_USER_FIRST_NAME,
             "surname": "User",
-            "is_rcpch_audit_team_member": False,
-            "is_rcpch_staff": False,
             "email_confirmed": True,
         }
 
@@ -413,8 +407,6 @@ def test_rcpch_staff_can_create_rcpch_staff_user(
         "role": RCPCH_AUDIT_TEAM,
         "first_name": TEMP_CREATED_USER_FIRST_NAME,
         "surname": "Staff",
-        "is_rcpch_audit_team_member": True,
-        "is_rcpch_staff": True,
         "email_confirmed": True,
     }
 
@@ -439,13 +431,10 @@ def test_superuser_can_create_rcpch_staff_user(
 ):
     """Regression test: superusers must be able to create new RCPCH staff users.
 
-    Superusers created through Epilepsy12UserManager.create_superuser() used to
-    end up with is_rcpch_staff=False (a dead setdefault meant the intended
-    True default never applied), and _user_may_view_this_organisation() only
-    allowed is_rcpch_staff users on the rcpch-staff route - so a superuser
-    clicking 'Add a new RCPCH Staff User' got a 403. This test replicates that
-    account (superuser + audit team member, but is_rcpch_staff=False) and
-    asserts both GET and POST now succeed.
+    A superuser clicking 'Add a new RCPCH Staff User' used to get a 403. The
+    rcpch-staff route now checks can_manage_rcpch_audit_team_users, which
+    superusers hold implicitly. Asserts both GET and POST succeed for a
+    superuser who isn't in any group.
     """
 
     # GOSH - used as the organisation_id in the URL (RCPCH staff are not tied to an org)
@@ -456,13 +445,10 @@ def test_superuser_can_create_rcpch_staff_user(
 
     TEMP_CREATED_USER_FIRST_NAME = "TEMP_RCPCH_STAFF_CREATED_BY_SUPERUSER"
 
-    # replicate the dev superuser (eg the incubator@rcpch.ac.uk dev account):
-    # superuser and RCPCH audit team member, but NOT flagged as RCPCH staff
+    # a superuser with no groups: access comes from is_superuser alone
     superuser = e12_user_factory(
         is_superuser=True,
         role=RCPCH_AUDIT_TEAM,
-        is_rcpch_audit_team_member=True,
-        is_rcpch_staff=False,
     )
     superuser.refresh_from_db()
 
@@ -481,7 +467,7 @@ def test_superuser_can_create_rcpch_staff_user(
 
     assert (
         response.status_code == HTTPStatus.OK
-    ), f"Superuser (is_rcpch_staff=False) requested `{url}`. Expected {HTTPStatus.OK}, received {response.status_code}"
+    ), f"Superuser requested `{url}`. Expected {HTTPStatus.OK}, received {response.status_code}"
 
     data = {
         "title": 1,
@@ -489,8 +475,6 @@ def test_superuser_can_create_rcpch_staff_user(
         "role": RCPCH_AUDIT_TEAM,
         "first_name": TEMP_CREATED_USER_FIRST_NAME,
         "surname": "Staff",
-        "is_rcpch_audit_team_member": True,
-        "is_rcpch_staff": True,
         "email_confirmed": True,
     }
 
@@ -498,7 +482,7 @@ def test_superuser_can_create_rcpch_staff_user(
 
     assert (
         response.status_code == HTTPStatus.FOUND
-    ), f"Superuser (is_rcpch_staff=False) POSTed valid data to `{url}`. Expected {HTTPStatus.FOUND}, received {response.status_code}"
+    ), f"Superuser POSTed valid data to `{url}`. Expected {HTTPStatus.FOUND}, received {response.status_code}"
 
     assert (
         Epilepsy12User.objects.filter(first_name=TEMP_CREATED_USER_FIRST_NAME).count()

@@ -53,8 +53,6 @@ def test_merged_parent_list_multi_employer_england_wales(
         email="multi.employer@test.com",
         is_active=True,
         is_staff=False,
-        is_rcpch_audit_team_member=False,
-        is_rcpch_staff=False,
     )
 
     # Add both organisations as employers
@@ -364,8 +362,6 @@ def test_merged_parent_list_jersey_user_cannot_see_uk_trusts(
         email="jersey.user@test.com",
         is_active=True,
         is_staff=False,
-        is_rcpch_audit_team_member=False,
-        is_rcpch_staff=False,
     )
 
     OrganisationEmployer.objects.create(
@@ -416,8 +412,6 @@ def test_merged_parent_list_uk_user_cannot_see_jersey(
         email="uk.user@test.com",
         is_active=True,
         is_staff=False,
-        is_rcpch_audit_team_member=False,
-        is_rcpch_staff=False,
     )
 
     OrganisationEmployer.objects.create(
@@ -501,8 +495,6 @@ def test_merged_parent_list_user_employed_both_jersey_and_uk(
         email="dual.user@test.com",
         is_active=True,
         is_staff=False,
-        is_rcpch_audit_team_member=False,
-        is_rcpch_staff=False,
     )
 
     OrganisationEmployer.objects.create(

@@ -35,9 +35,8 @@ class Epilepsy12UserManager(BaseUserManager):
     Custom user model manager where email is the unique identifiers
     for authentication instead of usernames.
 
-    RCPCH Audit team members can be clinicians or RCPCH staff
-    RCPCH staff cannot be associated with a organisation trust
-    All clinicians must be associated with a organisation trust
+    RCPCH Audit Team members (role RCPCH_AUDIT_TEAM) need not be associated with an
+    organisation. All other users must be associated with an organisation.
     """
 
     def create_user(self, email, password, first_name, role, **extra_fields):
@@ -48,10 +47,8 @@ class Epilepsy12UserManager(BaseUserManager):
         if not email:
             raise ValueError(_("You must provide an email address"))
 
-        if not extra_fields.get("organisation_employer") and not extra_fields.get(
-            "is_rcpch_staff"
-        ):
-            # Non-RCPCH staff (is_rcpch_staff) are not affiliated with a organisation
+        if not extra_fields.get("organisation_employer") and role != RCPCH_AUDIT_TEAM:
+            # Only RCPCH Audit Team members may be unaffiliated with an organisation
             raise ValueError(
                 _("You must provide the name of your main organisation trust.")
             )
@@ -59,9 +56,8 @@ class Epilepsy12UserManager(BaseUserManager):
         if not role:
             raise ValueError(_("You must provide your role in the Epilepsy12 audit."))
 
-        organisation_employer = extra_fields.get("organisation_employer")
-        # now remove the organisation_employer from extra_fields
-        del extra_fields["organisation_employer"]
+        # remove the organisation_employer from extra_fields
+        organisation_employer = extra_fields.pop("organisation_employer", None)
 
         email = self.normalize_email(str(email))
         user = self.model(
@@ -114,7 +110,6 @@ class Epilepsy12UserManager(BaseUserManager):
 
         extra_fields.setdefault("is_superuser", True)
         extra_fields.setdefault("is_active", True)
-        extra_fields.setdefault("is_rcpch_audit_team_member", True)
         extra_fields.setdefault("email_confirmed", True)
         extra_fields.setdefault("password_last_set", timezone.now())
 
@@ -125,7 +120,6 @@ class Epilepsy12UserManager(BaseUserManager):
         if not extra_fields.get("role") == RCPCH_AUDIT_TEAM:
             raise ValueError(_("Superuser must have role=RCPCH_AUDIT_TEAM."))
 
-        extra_fields.setdefault("is_rcpch_staff", True)
         extra_fields.setdefault("view_preference", 2)  # national scope
         extra_fields.setdefault("organisation_employer", None)
 
@@ -170,17 +164,6 @@ class Epilepsy12User(AbstractUser, PermissionsMixin):
         default=False
     )
     is_superuser = models.BooleanField(default=False)
-    is_rcpch_audit_team_member = models.BooleanField(
-        # reflects is a member of the RCPCH audit team. If is_rcpch_audit_team_member is True and
-        # is_rcpch_staff is False, user is also a clinician/organisation admin and therefore must
-        # may be affiliated with a organisation trust
-        default=False
-    )
-    is_rcpch_staff = models.BooleanField(
-        # reflects if user is an RCPCH employee
-        # Any non-RCPCH staff must be affiliated with an organisation
-        default=False
-    )
     is_patient_or_carer = models.BooleanField(
         # reflects is a patient or carer
         # must be affiliated with an organisation
@@ -222,7 +205,7 @@ class Epilepsy12User(AbstractUser, PermissionsMixin):
 
     history = HistoricalRecords(cascade_delete_history=True)
 
-    REQUIRED_FIELDS = ["role", "first_name", "surname", "is_rcpch_audit_team_member"]
+    REQUIRED_FIELDS = ["role", "first_name", "surname"]
     USERNAME_FIELD = "email"
 
     objects = Epilepsy12UserManager()

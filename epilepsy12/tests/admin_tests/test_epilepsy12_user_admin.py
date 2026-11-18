@@ -1,12 +1,9 @@
 """
 Tests for Epilepsy12UserAdmin.save_model.
 
-Changing a user's role in the Django admin keeps the RCPCH flags and the
-user's group in step with the new role (Phase 0 of the
-is_rcpch_audit_team_member / is_rcpch_staff retirement plan: role is the
-source of truth for national access). Flags edited *without* a role change
-are preserved, so superusers can triage audit_rcpch_user_flags findings
-here.
+Changing a user's role in the Django admin moves them into the new role's
+group: role is the source of truth for a user's permissions, including
+national access. Edits that don't change the role leave groups alone.
 """
 
 from types import SimpleNamespace
@@ -29,10 +26,10 @@ from epilepsy12.tests.factories import E12UserFactory
 
 
 @pytest.mark.django_db
-def test_admin_role_change_syncs_flags_and_group():
+def test_admin_role_change_syncs_group():
     """
-    Promoting a Lead Clinician to the RCPCH Audit Team role in the admin sets
-    both flags and moves the user into the RCPCH audit team group.
+    Promoting a Lead Clinician to the RCPCH Audit Team role in the admin moves
+    the user into the RCPCH audit team group.
     """
     user_admin = Epilepsy12UserAdmin(Epilepsy12User, AdminSite())
 
@@ -40,8 +37,6 @@ def test_admin_role_change_syncs_flags_and_group():
         email="temp_admin_promotion_candidate@test.com",
         first_name="TEMP_ADMIN_PROMOTION_CANDIDATE",
         role=AUDIT_CENTRE_LEAD_CLINICIAN,
-        is_rcpch_audit_team_member=False,
-        is_rcpch_staff=False,
         groups=[Group.objects.get(name=TRUST_AUDIT_TEAM_FULL_ACCESS)],
     )
 
@@ -55,18 +50,16 @@ def test_admin_role_change_syncs_flags_and_group():
     user.refresh_from_db()
 
     assert user.role == RCPCH_AUDIT_TEAM
-    assert user.is_rcpch_audit_team_member == True
-    assert user.is_rcpch_staff == True
     assert list(user.groups.values_list("name", flat=True)) == [
         EPILEPSY12_AUDIT_TEAM_FULL_ACCESS
     ]
 
 
 @pytest.mark.django_db
-def test_admin_role_change_can_demote_and_clear_flags():
+def test_admin_role_change_can_demote():
     """
     Demoting an RCPCH Audit Team member to an audit centre role in the admin
-    clears both flags and moves the user back into the role's group.
+    moves the user back into the role's group.
     """
     user_admin = Epilepsy12UserAdmin(Epilepsy12User, AdminSite())
 
@@ -74,8 +67,6 @@ def test_admin_role_change_can_demote_and_clear_flags():
         email="temp_admin_demotion_candidate@test.com",
         first_name="TEMP_ADMIN_DEMOTION_CANDIDATE",
         role=RCPCH_AUDIT_TEAM,
-        is_rcpch_audit_team_member=True,
-        is_rcpch_staff=True,
         groups=[Group.objects.get(name=EPILEPSY12_AUDIT_TEAM_FULL_ACCESS)],
     )
 
@@ -89,36 +80,28 @@ def test_admin_role_change_can_demote_and_clear_flags():
     user.refresh_from_db()
 
     assert user.role == AUDIT_CENTRE_LEAD_CLINICIAN
-    assert user.is_rcpch_audit_team_member == False
-    assert user.is_rcpch_staff == False
     assert list(user.groups.values_list("name", flat=True)) == [
         TRUST_AUDIT_TEAM_FULL_ACCESS
     ]
 
 
 @pytest.mark.django_db
-def test_admin_flag_change_without_role_change_is_preserved():
+def test_admin_edit_without_role_change_leaves_groups_alone():
     """
-    A flag edited in the admin without a role change is kept, so superusers
-    can triage audit_rcpch_user_flags findings here (e.g. accept the loss of
-    national access for a flag_without_role user by clearing their flag but
-    keeping their role).
+    Editing a field other than role in the admin doesn't touch groups, so a
+    group a superuser set by hand is kept.
     """
     user_admin = Epilepsy12UserAdmin(Epilepsy12User, AdminSite())
 
-    # a flag_without_role finding: Lead Clinician with the audit team flag
     user = E12UserFactory(
-        email="temp_admin_triage_candidate@test.com",
-        first_name="TEMP_ADMIN_TRIAGE_CANDIDATE",
+        email="temp_admin_edit_candidate@test.com",
+        first_name="TEMP_ADMIN_EDIT_CANDIDATE",
         role=AUDIT_CENTRE_LEAD_CLINICIAN,
-        is_rcpch_audit_team_member=True,
-        is_rcpch_staff=False,
         groups=[Group.objects.get(name=TRUST_AUDIT_TEAM_FULL_ACCESS)],
     )
 
-    # superuser clears the flag, role untouched
-    user.is_rcpch_audit_team_member = False
-    form = SimpleNamespace(changed_data=["is_rcpch_audit_team_member"])
+    user.surname = "Edited"
+    form = SimpleNamespace(changed_data=["surname"])
 
     request = RequestFactory().get("/")
     request.user = user  # SimpleHistoryAdmin records request.user as the history user
@@ -126,9 +109,7 @@ def test_admin_flag_change_without_role_change_is_preserved():
 
     user.refresh_from_db()
 
-    assert user.role == AUDIT_CENTRE_LEAD_CLINICIAN
-    assert user.is_rcpch_audit_team_member == False
-    assert user.is_rcpch_staff == False
+    assert user.surname == "Edited"
     assert list(user.groups.values_list("name", flat=True)) == [
         TRUST_AUDIT_TEAM_FULL_ACCESS
     ]

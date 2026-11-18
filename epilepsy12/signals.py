@@ -142,9 +142,9 @@ def two_factor_auth_setup(request, user, device, **kwargs):
 # Fields that should trigger email notifications when changed
 EMAIL_TRIGGER_FIELDS = [
     "is_superuser",
-    "is_rcpch_audit_team_member",
-    "is_rcpch_staff",
-    "is_superuser",
+    # role decides a user's permissions, including national access for the
+    # RCPCH Audit Team, so role changes notify admins
+    "role",
     "email",
     "is_active",
 ]
@@ -153,8 +153,6 @@ EMAIL_TRIGGER_FIELDS = [
 LOGGED_FIELDS = [
     "role",
     "is_active",
-    "is_rcpch_audit_team_member",
-    "is_rcpch_staff",
     "email",
     "first_name",
     "surname",
@@ -432,7 +430,7 @@ def _send_change_notifications(user, changes, current_user):
         field: change
         for field, change in email_worthy_changes.items()
         if field
-        in ["role", "is_rcpch_audit_team_member", "is_rcpch_staff", "is_active"]
+        in ["role", "is_active"]
     }
 
     if role_permission_changes:
@@ -552,7 +550,7 @@ def _map_changes_to_visit_activity(changes):
     )
     """
 
-    ADMIN_FLAGS = ["is_active", "is_rcpch_audit_team_member", "is_rcpch_staff"]
+    ADMIN_FLAGS = ["is_active"]
     USER_RECORD_FIELDS = ["email", "first_name", "surname"]
 
     if "role" in changes:

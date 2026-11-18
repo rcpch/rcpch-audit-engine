@@ -107,8 +107,8 @@ def test_audit_team_group_custom_permissions(seeded_groups):
     assert {"view_case", "add_case", "change_case", "delete_case"} <= codenames
 
 
-# Permissions that replace the is_rcpch_audit_team_member / is_rcpch_staff
-# flags. Only the RCPCH audit team group may hold them.
+# Permissions that give the RCPCH Audit Team national access. Only the RCPCH
+# audit team group may hold them.
 RCPCH_AUDIT_TEAM_ONLY_PERMISSIONS = {
     CAN_ACCESS_ALL_ORGANISATIONS[0],
     CAN_EDIT_CASE_OUTSIDE_AUDIT_PERIOD[0],

@@ -39,7 +39,6 @@ def test_cohort_filter_includes_unregistered_and_all_children(
         email="cohort_test@test.com",
         role=1,
         is_staff=True,
-        is_rcpch_audit_team_member=False,
         view_preference=0,
         groups=[group],
     )
@@ -96,7 +95,6 @@ def test_search_filters_name_id_nhs(client, seed_groups_fixture, seed_users_fixt
         email="search_test@test.com",
         role=1,
         is_staff=True,
-        is_rcpch_audit_team_member=False,
         view_preference=0,
         groups=[group],
     )
@@ -157,7 +155,6 @@ def test_sorting_name_sex_nhs_deadline(client, seed_groups_fixture, seed_users_f
         email="sort_test@test.com",
         role=1,
         is_staff=True,
-        is_rcpch_audit_team_member=False,
         view_preference=0,
         groups=[group],
     )
@@ -262,7 +259,6 @@ def test_individual_cohort_filtering(client, seed_groups_fixture, seed_users_fix
         email="ind_cohort_test@test.com",
         role=1,
         is_staff=True,
-        is_rcpch_audit_team_member=False,
         view_preference=0,
         groups=[group],
     )
@@ -345,7 +341,6 @@ def test_national_view_preference_restricted_to_rcpch_audit_team(client, seed_gr
         email="national_view_test_user@test.com",
         role=1,
         is_staff=False,
-        is_rcpch_audit_team_member=False,
         view_preference=0,
         groups=[group],
     )
