@@ -93,7 +93,7 @@ Until Phase 2, nothing checks these permissions, so the gap between deploying an
 
 ### Phase 3 – remove the fields
 
-- Migration `0075_remove_rcpch_user_flags` drops both fields from `Epilepsy12User` and `HistoricalEpilepsy12User`. Their past values in the history table go with them.
+- Migration `0075_remove_rcpch_user_flags` drops both fields from `Epilepsy12User` and `HistoricalEpilepsy12User`. First it copies the flag values from every history row into `RetiredUserFlagHistory`, a read-only archive (viewable in the Django admin), so the record of who held the flags, and when, stays in the platform. Reversing the migration restores the values. Flag changes are also still in `VisitActivity.details` as text.
 - `create_user` requires an organisation unless `role == RCPCH_AUDIT_TEAM` (previously: unless `is_rcpch_staff`). `REQUIRED_FIELDS` and `create_superuser` no longer mention the flags.
 - Removed the flags from:
     - the user form's `save()`, and the admin's list display, fieldsets and `save_model`, which used to sync them from role. The admin still re-syncs groups on a role change.
