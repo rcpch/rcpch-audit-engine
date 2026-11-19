@@ -1,0 +1,20 @@
+{% extends "admin/index.html" %}
+
+{% block content %}
+  {% if request.user.is_superuser %}
+    <div class="module">
+      <table>
+        <caption>Administrative tools</caption>
+        <tbody>
+          <tr>
+            <th scope="row">
+              <a href="{% url 'admin:remove_unregistered_cases' %}">Remove unregistered cases</a>
+            </th>
+            <td>Preview and permanently remove abandoned case records.</td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+  {% endif %}
+  {{ block.super }}
+{% endblock %}
