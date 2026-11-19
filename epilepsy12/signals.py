@@ -433,6 +433,13 @@ def _send_change_notifications(user, changes, current_user):
         in ["role", "is_active"]
     }
 
+    # An automatic deactivation due to inactivity is routine housekeeping,
+    # not a permission change made by an administrator: it is already logged
+    # (with a VisitActivity entry) by deactivate_user_for_inactivity, so the
+    # admins are not emailed.
+    if getattr(user, "_is_deactivated_for_inactivity", False):
+        role_permission_changes.pop("is_active", None)
+
     if role_permission_changes:
         _send_admin_notification(user, role_permission_changes, current_user)
 
