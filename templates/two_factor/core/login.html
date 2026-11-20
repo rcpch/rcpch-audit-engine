@@ -41,6 +41,23 @@
         {% include "two_factor/_wizard_actions.html" %}
       </form>
 
+      {% if wizard.steps.current == 'auth' and entra_id_login_enabled %}
+      <div class="ui horizontal divider">or</div>
+      <div class="ui rcpch form">
+        <div class="field">
+          <a href="{% url 'entra_id_login' %}{% if request.GET.next %}?next={{ request.GET.next|urlencode }}{% endif %}"
+            class="ui rcpch_primary button"
+            id="entra_id_login_button"
+          >
+            Sign in with Microsoft
+          </a>
+          <p>
+            For superusers and RCPCH Audit Team members only{% if entra_id_login_required %}, who must sign in this way{% endif %}.
+          </p>
+        </div>
+      </div>
+      {% endif %}
+
     </div>
   </div>
 </div>

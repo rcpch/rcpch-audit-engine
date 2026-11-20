@@ -855,6 +855,14 @@ class RCPCHLoginView(TwoFactorLoginView):
         # Override original Django Auth Form with Captcha field inserted
         self.form_list["auth"] = CaptchaAuthenticationForm
 
+    def get_context_data(self, form, **kwargs):
+        context = super().get_context_data(form, **kwargs)
+        context["entra_id_login_enabled"] = settings.ENTRA_ID_LOGIN_ENABLED
+        context["entra_id_login_required"] = (
+            settings.ENTRA_ID_LOGIN_REQUIRED_FOR_RCPCH_STAFF
+        )
+        return context
+
     # Override successful login redirect to org summary page
     def get_success_url(self):
         url = self.get_redirect_url()
@@ -862,51 +870,61 @@ class RCPCHLoginView(TwoFactorLoginView):
         if url:
             return url
 
-        org_employer = self.request.user.organisation_employer
-        org_id = org_employer.id if org_employer else None
-
-        if org_id:
-            return reverse("selected_organisation_summary", kwargs={"organisation_id": org_id})
-
-        return reverse(settings.LOGIN_REDIRECT_URL)
+        return get_post_login_url(self.request.user)
 
     def done(self, form_list, **kwargs):
 
         response = super().done(form_list, **kwargs)
 
-        user = self.get_user()
-
-        # check for outstanding transfers in to this organisation
-        if Site.objects.filter(
-            active_transfer=True, organisation=user.organisation_employer
-        ).exists() and user.has_perm(
-            "epilepsy12.can_transfer_epilepsy12_lead_centre"
-        ):
-            # there is an outstanding request for transfer in to this user's organisation. User is a lead clinician and can act on this
-            transfers = Site.objects.filter(
-                active_transfer=True, organisation=user.organisation_employer
-            )
-            for transfer in transfers:
-                messages.info(
-                    self.request,
-                    f"{transfer.transfer_origin_organisation} have requested transfer of {transfer.case} to {user.organisation_employer} for their Epilepsy12 care. Please find {transfer.case} in the case table to accept or decline this transfer request.",
-                )
-
-        last_logged_in = VisitActivity.objects.filter(
-            activity=1, epilepsy12user=user
-        ).order_by("-activity_datetime")[:2]
-        if last_logged_in.count() > 1:
-            messages.info(
-                self.request,
-                f"You are now logged in as {user.email}. You last logged in at {timezone.localtime(last_logged_in[1].activity_datetime).strftime('%H:%M %p on %A, %d %B %Y')} from {last_logged_in[1].ip_address}.",
-            )
-        else:
-            messages.info(
-                self.request,
-                f"You are now logged in as {user.email}. Welcome to Epilepsy12! This is your first time logging in ({timezone.localtime(last_logged_in[0].activity_datetime).strftime('%H:%M %p on %A, %d %B %Y')} from {last_logged_in[0].ip_address}).",
-            )
+        add_post_login_messages(self.request, self.get_user())
 
         return response
+
+
+def get_post_login_url(user):
+    """Default page after login: the user's organisation summary."""
+    org_employer = user.organisation_employer
+    org_id = org_employer.id if org_employer else None
+
+    if org_id:
+        return reverse("selected_organisation_summary", kwargs={"organisation_id": org_id})
+
+    return reverse(settings.LOGIN_REDIRECT_URL)
+
+
+def add_post_login_messages(request, user):
+    """
+    Messages shown after any successful login (password and 2FA, or Entra ID).
+    """
+    # check for outstanding transfers in to this organisation
+    if Site.objects.filter(
+        active_transfer=True, organisation=user.organisation_employer
+    ).exists() and user.has_perm(
+        "epilepsy12.can_transfer_epilepsy12_lead_centre"
+    ):
+        # there is an outstanding request for transfer in to this user's organisation. User is a lead clinician and can act on this
+        transfers = Site.objects.filter(
+            active_transfer=True, organisation=user.organisation_employer
+        )
+        for transfer in transfers:
+            messages.info(
+                request,
+                f"{transfer.transfer_origin_organisation} have requested transfer of {transfer.case} to {user.organisation_employer} for their Epilepsy12 care. Please find {transfer.case} in the case table to accept or decline this transfer request.",
+            )
+
+    last_logged_in = VisitActivity.objects.filter(
+        activity=1, epilepsy12user=user
+    ).order_by("-activity_datetime")[:2]
+    if last_logged_in.count() > 1:
+        messages.info(
+            request,
+            f"You are now logged in as {user.email}. You last logged in at {timezone.localtime(last_logged_in[1].activity_datetime).strftime('%H:%M %p on %A, %d %B %Y')} from {last_logged_in[1].ip_address}.",
+        )
+    else:
+        messages.info(
+            request,
+            f"You are now logged in as {user.email}. Welcome to Epilepsy12! This is your first time logging in ({timezone.localtime(last_logged_in[0].activity_datetime).strftime('%H:%M %p on %A, %d %B %Y')} from {last_logged_in[0].ip_address}).",
+        )
 
 
 @login_and_otp_required()

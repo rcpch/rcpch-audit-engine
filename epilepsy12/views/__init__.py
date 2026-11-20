@@ -14,4 +14,5 @@ from .registration_views import *
 from .route_views import *
 from .syndrome_views import *
 from .user_management_views import *
+from .entra_id_views import entra_id_login, entra_id_callback
 from .report_views import *
