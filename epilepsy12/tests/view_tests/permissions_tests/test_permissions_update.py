@@ -2,8 +2,7 @@
 ## Update Tests
 
 # Epilepsy12Users
-    [ ] Assert an Audit Centre Lead Clinician CANNOT make themselves is_rcpch_audit_team_member
-    [ ] Assert an Audit Centre Lead Clinician CANNOT make themselves is_rcpch_staff
+    [ ] Assert an Audit Centre Lead Clinician CANNOT give themselves the RCPCH Audit Team role
     [x] Assert an Audit Centre Administrator CANNOT update users inside own Trust
     [x] Assert an Audit Centre Administrator CANNOT update users from outside own Trust
     [x] Assert an audit centre clinician CANNOT update users inside own Trust
@@ -321,11 +320,8 @@ def test_users_update_users_forbidden(
         email=f"{DIFF_TRUST_DIFF_ORGANISATION}_ADMINISTRATOR@email.com",
         first_name=f"{DIFF_TRUST_DIFF_ORGANISATION}_ADMINISTRATOR",
         role=test_user_audit_centre_administrator_data.role,
-        # Assign flags based on user role
         is_active=test_user_audit_centre_administrator_data.is_active,
         is_staff=test_user_audit_centre_administrator_data.is_staff,
-        is_rcpch_audit_team_member=test_user_audit_centre_administrator_data.is_rcpch_audit_team_member,
-        is_rcpch_staff=test_user_audit_centre_administrator_data.is_rcpch_staff,
         employer_organisations=[TEST_USER_ORGANISATION],
         groups=[
             Group.objects.get(name=test_user_audit_centre_administrator_data.group_name)
@@ -393,7 +389,7 @@ def test_user_cant_change_rcpch_or_superuser_flag(
     client,
 ):
     """
-    Ensuring non-RCPCH users / non-superusers CANNOT send POST request to change rcpch/superuser flags.
+    Ensuring non-RCPCH users / non-superusers CANNOT send POST request to give the RCPCH Audit Team role or superuser status.
     """
 
     # set up constants
@@ -415,11 +411,8 @@ def test_user_cant_change_rcpch_or_superuser_flag(
         email=f"{DIFF_TRUST_DIFF_ORGANISATION}_ADMINISTRATOR@email.com",
         first_name=f"{DIFF_TRUST_DIFF_ORGANISATION}_ADMINISTRATOR",
         role=test_user_audit_centre_administrator_data.role,
-        # Assign flags based on user role
         is_active=test_user_audit_centre_administrator_data.is_active,
         is_staff=test_user_audit_centre_administrator_data.is_staff,
-        is_rcpch_audit_team_member=test_user_audit_centre_administrator_data.is_rcpch_audit_team_member,
-        is_rcpch_staff=test_user_audit_centre_administrator_data.is_rcpch_staff,
         employer_organisations=[TEST_USER_ORGANISATION],
         groups=[
             Group.objects.get(name=test_user_audit_centre_administrator_data.group_name)
@@ -456,14 +449,13 @@ def test_user_cant_change_rcpch_or_superuser_flag(
             },
         )
 
-        # Attempt to change rcpch_audit_team_member
+        # Attempt to give the RCPCH Audit Team role
         r = client.post(
             url,
             {
                 "first_name": USER_FROM_DIFFERENT_ORG.first_name,
                 "surname": USER_FROM_DIFFERENT_ORG.surname,
-                "role": USER_FROM_DIFFERENT_ORG.role,
-                "is_rcpch_audit_team_member": True,
+                "role": RCPCH_AUDIT_TEAM,
                 "is_superuser": False,
                 "email": USER_FROM_DIFFERENT_ORG.email,
             },
@@ -478,7 +470,6 @@ def test_user_cant_change_rcpch_or_superuser_flag(
                 "first_name": USER_FROM_DIFFERENT_ORG.first_name,
                 "surname": USER_FROM_DIFFERENT_ORG.surname,
                 "role": USER_FROM_DIFFERENT_ORG.role,
-                "is_rcpch_audit_team_member": False,
                 "is_superuser": True,
                 "email": USER_FROM_DIFFERENT_ORG.email,
             },
@@ -514,11 +505,8 @@ def test_user_cannot_see_rcpch_or_superuser_flag_in_template(
         email=f"{DIFF_TRUST_DIFF_ORGANISATION}_ADMINISTRATOR@email.com",
         first_name=f"{DIFF_TRUST_DIFF_ORGANISATION}_ADMINISTRATOR",
         role=test_user_audit_centre_administrator_data.role,
-        # Assign flags based on user role
         is_active=test_user_audit_centre_administrator_data.is_active,
         is_staff=test_user_audit_centre_administrator_data.is_staff,
-        is_rcpch_audit_team_member=test_user_audit_centre_administrator_data.is_rcpch_audit_team_member,
-        is_rcpch_staff=test_user_audit_centre_administrator_data.is_rcpch_staff,
         employer_organisations=[TEST_USER_ORGANISATION],
         groups=[
             Group.objects.get(name=test_user_audit_centre_administrator_data.group_name)
@@ -556,7 +544,7 @@ def test_user_cannot_see_rcpch_or_superuser_flag_in_template(
         )
         r = client.get(url)
 
-        for flag in ["id_is_rcpch_audit_team_member", "id_is_superuser"]:
+        for flag in ["id_is_superuser"]:
             assert (
                 flag.encode() not in r.content
             ), f"{test_user} should not be able to see {flag} in template"
@@ -590,11 +578,8 @@ def test_users_update_users_success(
         email=f"{DIFF_TRUST_DIFF_ORGANISATION}_ADMINISTRATOR@email.com".lower(),
         first_name=f"{DIFF_TRUST_DIFF_ORGANISATION}_ADMINISTRATOR",
         role=test_user_audit_centre_administrator_data.role,
-        # Assign flags based on user role
         is_active=test_user_audit_centre_administrator_data.is_active,
         is_staff=test_user_audit_centre_administrator_data.is_staff,
-        is_rcpch_audit_team_member=test_user_audit_centre_administrator_data.is_rcpch_audit_team_member,
-        is_rcpch_staff=test_user_audit_centre_administrator_data.is_rcpch_staff,
         employer_organisations=[DIFF_TRUST_DIFF_ORGANISATION],
         groups=[
             Group.objects.get(name=test_user_audit_centre_administrator_data.group_name)
@@ -605,11 +590,8 @@ def test_users_update_users_success(
         email=f"{TEST_USER_ORGANISATION}_ADMINISTRATOR@email.com".lower(),
         first_name=f"{TEST_USER_ORGANISATION}_ADMINISTRATOR",
         role=test_user_audit_centre_administrator_data.role,
-        # Assign flags based on user role
         is_active=test_user_audit_centre_administrator_data.is_active,
         is_staff=test_user_audit_centre_administrator_data.is_staff,
-        is_rcpch_audit_team_member=test_user_audit_centre_administrator_data.is_rcpch_audit_team_member,
-        is_rcpch_staff=test_user_audit_centre_administrator_data.is_rcpch_staff,
         employer_organisations=[TEST_USER_ORGANISATION],
         groups=[
             Group.objects.get(name=test_user_audit_centre_administrator_data.group_name)
@@ -3412,9 +3394,8 @@ def test_rcpch_audit_team_member_can_promote_a_user_to_the_rcpch_audit_team_role
 ):
     """
     Regression test: an RCPCH audit team member can change a Lead Clinician's
-    role to RCPCH Audit Team from the user management UI (the Phase 0 remedy
-    for flag_without_role findings from audit_rcpch_user_flags). The flags
-    follow the role and the view re-syncs the user's group.
+    role to RCPCH Audit Team from the user management UI, and the view
+    re-syncs the user's group.
     """
 
     # GOSH
@@ -3431,8 +3412,6 @@ def test_rcpch_audit_team_member_can_promote_a_user_to_the_rcpch_audit_team_role
         email="temp_view_promotion_candidate@test.com",
         first_name="TEMP_VIEW_PROMOTION_CANDIDATE",
         role=test_user_audit_centre_lead_clinician_data.role,
-        is_rcpch_audit_team_member=False,
-        is_rcpch_staff=False,
         employer_organisations=[TEST_USER_ORGANISATION],
         groups=[
             Group.objects.get(
@@ -3471,8 +3450,93 @@ def test_rcpch_audit_team_member_can_promote_a_user_to_the_rcpch_audit_team_role
     user_to_promote.refresh_from_db()
 
     assert user_to_promote.role == RCPCH_AUDIT_TEAM
-    assert user_to_promote.is_rcpch_audit_team_member == True
-    assert user_to_promote.is_rcpch_staff == True
     assert list(user_to_promote.groups.values_list("name", flat=True)) == [
         EPILEPSY12_AUDIT_TEAM_FULL_ACCESS
     ], "Promotion should move the user into the RCPCH audit team group"
+
+
+@pytest.mark.django_db
+@pytest.mark.parametrize("target", ["colleague", "self"])
+def test_lead_clinician_cannot_give_the_rcpch_audit_team_role(
+    client,
+    seed_groups_fixture,
+    seed_users_fixture,
+    target,
+):
+    """
+    A Lead Clinician may edit users in their own organisation, but can't give
+    anyone (including themselves) the RCPCH Audit Team role: their role choices
+    are the audit centre roles only, so the form rejects it. Role and groups
+    stay as they were.
+    """
+
+    # GOSH: the Lead Clinician's own organisation, so the organisation and
+    # user access checks pass and the form's role validation runs
+    TEST_USER_ORGANISATION = Organisation.objects.get(
+        ods_code="RP401",
+        trust__ods_code="RP4",
+    )
+
+    # Created here rather than using the seeded Lead Clinician, whose
+    # upper-case email the edit form can't look up
+    lead_clinician = E12UserFactory(
+        email="temp_escalating_lead_clinician@test.com",
+        first_name="TEMP_ESCALATING_LEAD_CLINICIAN",
+        surname="Lead",
+        role=test_user_audit_centre_lead_clinician_data.role,
+        employer_organisations=[TEST_USER_ORGANISATION],
+        groups=[
+            Group.objects.get(
+                name=test_user_audit_centre_lead_clinician_data.group_name
+            )
+        ],
+    )
+
+    if target == "self":
+        user_to_edit = lead_clinician
+    else:
+        user_to_edit = E12UserFactory(
+            email="temp_escalation_candidate@test.com",
+            first_name="TEMP_ESCALATION_CANDIDATE",
+            surname="Candidate",
+            role=test_user_audit_centre_clinician_data.role,
+            employer_organisations=[TEST_USER_ORGANISATION],
+            groups=[
+                Group.objects.get(name=test_user_audit_centre_clinician_data.group_name)
+            ],
+        )
+    original_role = user_to_edit.role
+    original_groups = set(user_to_edit.groups.values_list("name", flat=True))
+
+    client.force_login(lead_clinician)
+    twofactor_signin(client, lead_clinician)
+
+    url = reverse(
+        "edit_epilepsy12_user",
+        kwargs={
+            "organisation_id": TEST_USER_ORGANISATION.id,
+            "epilepsy12_user_id": user_to_edit.id,
+        },
+    )
+
+    response = client.post(
+        url,
+        {
+            "title": 1,
+            "first_name": user_to_edit.first_name,
+            "surname": user_to_edit.surname,
+            "role": RCPCH_AUDIT_TEAM,
+            "email": user_to_edit.email,
+            "email_confirmed": True,
+        },
+    )
+
+    # the form is re-rendered with a role error rather than saved
+    assert (
+        response.status_code == HTTPStatus.OK
+    ), f"Expected the form to be re-rendered with errors, got {response.status_code}"
+    assert "role" in response.context["form"].errors
+
+    user_to_edit.refresh_from_db()
+    assert user_to_edit.role == original_role
+    assert set(user_to_edit.groups.values_list("name", flat=True)) == original_groups

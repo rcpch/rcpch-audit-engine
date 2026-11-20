@@ -35,8 +35,6 @@ def _make_rcpch_staff_user_without_organisation(email):
         role=RCPCH_AUDIT_TEAM,
         is_active=True,
         email_confirmed=True,
-        is_rcpch_audit_team_member=True,
-        is_rcpch_staff=True,
         password="pw",
     )
 
@@ -235,7 +233,7 @@ def test_users_cannot_access_organisational_audit_for_a_local_health_board_that_
 def test_rcpch_audit_team_can_access_all_organisational_audits(
     client, seed_groups_fixture, seed_users_fixture
 ):
-    rcpch_user = Epilepsy12User.objects.filter(is_rcpch_audit_team_member=True).first()
+    rcpch_user = Epilepsy12User.objects.filter(role=RCPCH_AUDIT_TEAM).first()
 
     client.force_login(rcpch_user)
     twofactor_signin(client, rcpch_user)
@@ -278,7 +276,7 @@ def test_rcpch_audit_team_can_access_all_organisational_audits(
 def test_organisational_audit_for_trust_that_doesnt_exist(
     client, seed_groups_fixture, seed_users_fixture
 ):
-    rcpch_user = Epilepsy12User.objects.filter(is_rcpch_audit_team_member=True).first()
+    rcpch_user = Epilepsy12User.objects.filter(role=RCPCH_AUDIT_TEAM).first()
 
     client.force_login(rcpch_user)
     twofactor_signin(client, rcpch_user)
@@ -291,7 +289,7 @@ def test_organisational_audit_for_trust_that_doesnt_exist(
 def test_organisational_audit_for_local_health_board_that_doesnt_exist(
     client, seed_groups_fixture, seed_users_fixture
 ):
-    rcpch_user = Epilepsy12User.objects.filter(is_rcpch_audit_team_member=True).first()
+    rcpch_user = Epilepsy12User.objects.filter(role=RCPCH_AUDIT_TEAM).first()
 
     client.force_login(rcpch_user)
     twofactor_signin(client, rcpch_user)

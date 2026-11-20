@@ -9,7 +9,7 @@ from django.utils.safestring import mark_safe
 from epilepsy12.constants.kpi import KPI_MAP
 from epilepsy12.models_folder.case import Case
 
-from ..constants import ETHNICITIES, KPI_LABEL_MAP, SEX_TYPE
+from ..constants import ETHNICITIES, KPI_LABEL_MAP, RCPCH_AUDIT_TEAM, SEX_TYPE
 from ..models import (
     Country,
     IntegratedCareBoard,
@@ -1070,3 +1070,12 @@ def missing_completed_fields_for_model(case_id, model):
         return mark_safe(html)
 
     return mark_safe("<p>All expected fields completed for this model</p>")
+
+
+@register.filter
+def has_rcpch_audit_team_role(user):
+    """
+    True if the user has the RCPCH Audit Team role. For display only: check
+    permissions (perms / has_perm) to decide what a user may do.
+    """
+    return getattr(user, "role", None) == RCPCH_AUDIT_TEAM

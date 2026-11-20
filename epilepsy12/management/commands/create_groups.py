@@ -376,7 +376,7 @@ def groups_seeder(verbose=True, **_deprecated_kwargs):
             "codename": CAN_EXTEND_SUBMISSION_DEADLINE[0],
             "content_type": auditperiodextensionContentType,
         },
-        # Replace the is_rcpch_audit_team_member / is_rcpch_staff flags
+        # National access for the RCPCH Audit Team role
         {
             "codename": CAN_ACCESS_ALL_ORGANISATIONS[0],
             "content_type": organisationContentType,

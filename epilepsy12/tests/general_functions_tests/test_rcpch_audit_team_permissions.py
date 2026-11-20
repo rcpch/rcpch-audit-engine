@@ -1,8 +1,7 @@
 """
-Tests for Phase 2 of retiring is_rcpch_audit_team_member / is_rcpch_staff:
-national access comes from the RCPCH Audit Team role's group permissions, not
-the flags, and a system check catches an audit team group the seeder has not
-brought up to date.
+Tests that national access comes from the RCPCH Audit Team role's group
+permissions, and that a system check catches an audit team group the seeder
+has not brought up to date.
 """
 
 from types import SimpleNamespace
@@ -80,7 +79,7 @@ def test_check_ignores_permission_not_created_yet():
 
 
 # ---------------------------------------------------------------------------
-# Access comes from the role's group, not the flags
+# Access comes from the role's group
 # ---------------------------------------------------------------------------
 
 
@@ -91,13 +90,11 @@ def other_trust_organisation():
 
 
 @pytest.mark.django_db
-def test_flags_alone_no_longer_grant_national_access(
+def test_trust_role_has_no_national_access(
     e12_user_factory, other_trust_organisation
 ):
     clinician = e12_user_factory(
         role=AUDIT_CENTRE_LEAD_CLINICIAN,
-        is_rcpch_audit_team_member=True,
-        is_rcpch_staff=True,
         groups=[Group.objects.get(name=TRUST_AUDIT_TEAM_FULL_ACCESS)],
     )
 
@@ -110,13 +107,11 @@ def test_flags_alone_no_longer_grant_national_access(
 
 
 @pytest.mark.django_db
-def test_audit_team_role_grants_national_access_without_flags(
+def test_audit_team_role_grants_national_access(
     e12_user_factory, other_trust_organisation
 ):
     audit_team_member = e12_user_factory(
         role=RCPCH_AUDIT_TEAM,
-        is_rcpch_audit_team_member=False,
-        is_rcpch_staff=False,
         groups=[_audit_team_group()],
     )
 

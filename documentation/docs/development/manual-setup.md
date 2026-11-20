@@ -79,9 +79,7 @@ python manage.py createsuperuser
 
 Then follow the command line prompts to create the first user. Createsuperuser is a Django base feature but there are some custom fields which are mandatory. These include:
 
-- `role`: The options are: `1 - Clinical Lead, 2 - Clinician, 3 - E12 Site Administrator, 4 - RCPCH Audit Team`. If the integer selected in 1-3 (ie a role within the E12 site) KCH is automatically allocated. If it is an RCPCH user, `is_rcpch_staff` is automatically set to true, as is `is_rcpch_audit_team_member`
-
-- `is_rcpch_audit_team_member`: `True|False`.
+- `role`: The options are: `1 - Clinical Lead, 2 - Clinician, 3 - E12 Site Administrator, 4 - RCPCH Audit Team`. A superuser must have role `4`. The role decides which group, and so which permissions, the user gets.
 
 Further users can subsequently be created in the Admin UI
 

@@ -64,10 +64,6 @@ def seed_users_fixture(django_db_setup, django_db_blocker, seed_groups_fixture):
         for org in [GOSH, KINGS, NOAHS_ARK, JERSEY]:
             is_active = True
             is_staff = False
-            is_rcpch_audit_team_member = False
-            is_rcpch_staff = False
-
-            # seed a user of each type
             for user in users:
                 # HACK: a lot of tests assume there is only one organisation and so look up the user
                 # user by name. To avoid changing all the tests, for GOSH only) set this as it was before
@@ -76,13 +72,7 @@ def seed_users_fixture(django_db_setup, django_db_blocker, seed_groups_fixture):
                     user.role_str if org == GOSH else f"{org.name}_{user.role_str}"
                 )
 
-                # set RCPCH AUDIT TEAM MEMBER ATTRIBUTE
-                if user.role == RCPCH_AUDIT_TEAM:
-                    is_rcpch_audit_team_member = True
-                    is_rcpch_staff = True
-
                 if user.is_clinical_audit_team:
-                    is_rcpch_audit_team_member = True
                     first_name = (
                         "CLINICAL_AUDIT_TEAM"
                         if org == GOSH
@@ -102,8 +92,6 @@ def seed_users_fixture(django_db_setup, django_db_blocker, seed_groups_fixture):
                         "role": user.role,
                         "is_active": is_active,
                         "is_staff": is_staff,
-                        "is_rcpch_audit_team_member": is_rcpch_audit_team_member,
-                        "is_rcpch_staff": is_rcpch_staff,
                         "email_confirmed": True,
                     },
                 )

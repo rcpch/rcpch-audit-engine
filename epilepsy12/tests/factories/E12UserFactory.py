@@ -7,7 +7,6 @@ Note default values include:
 The following parameters must be specified:
 
     - is_staff
-    - is_rcpch_audit_team_member
     - role
 
 """

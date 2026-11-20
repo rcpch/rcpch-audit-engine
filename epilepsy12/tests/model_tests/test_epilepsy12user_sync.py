@@ -19,6 +19,7 @@ from django.contrib.auth import get_user_model
 # RCPCH imports
 from epilepsy12.constants.user_types import (
     AUDIT_CENTRE_ADMINISTRATOR,
+    EPILEPSY12_AUDIT_TEAM_FULL_ACCESS,
     RCPCH_AUDIT_TEAM,
 )
 from epilepsy12.models import Epilepsy12User
@@ -26,8 +27,8 @@ from epilepsy12.models import Epilepsy12User
 
 @pytest.mark.django_db
 class TestViewPreferenceNationalSync:
-    """view_preference == 2 (national) must be gated on superuser or
-    is_rcpch_audit_team_member, enforced at the model layer."""
+    """view_preference == 2 (national) must be gated on superuser or the
+    RCPCH Audit Team role, enforced at the model layer."""
 
     def test_national_view_preference_downgraded_for_plain_user(
         self, seed_groups_fixture
@@ -41,7 +42,6 @@ class TestViewPreferenceNationalSync:
             is_active=True,
             is_staff=False,
             is_superuser=False,
-            is_rcpch_audit_team_member=False,
             view_preference=2,  # national - should be rejected
         )
         user.set_password("pw")
@@ -62,7 +62,6 @@ class TestViewPreferenceNationalSync:
             is_active=True,
             is_staff=False,
             is_superuser=False,
-            is_rcpch_audit_team_member=True,
             view_preference=2,
         )
         user.set_password("pw")
@@ -81,7 +80,6 @@ class TestViewPreferenceNationalSync:
             is_active=True,
             is_staff=True,
             is_superuser=True,
-            is_rcpch_audit_team_member=False,
             view_preference=2,
         )
         user.set_password("pw")
@@ -100,7 +98,6 @@ class TestViewPreferenceNationalSync:
             is_active=True,
             is_staff=False,
             is_superuser=False,
-            is_rcpch_audit_team_member=False,
             view_preference=0,
         )
         user.set_password("pw")
@@ -126,16 +123,14 @@ class TestViewPreferenceNationalSync:
             is_active=True,
             is_staff=False,
             is_superuser=False,
-            is_rcpch_audit_team_member=False,
             view_preference=0,
         )
         user.set_password("pw")
         user.save()
 
-        user.is_rcpch_audit_team_member = True
         user.role = RCPCH_AUDIT_TEAM
         user.view_preference = 2
-        user.save(update_fields=["is_rcpch_audit_team_member", "role", "view_preference"])
+        user.save(update_fields=["role", "view_preference"])
 
         user.refresh_from_db()
         assert user.view_preference == 2
@@ -145,18 +140,12 @@ class TestViewPreferenceNationalSync:
 class TestCreateSuperuserDefaults:
     """create_superuser must produce a fully-privileged RCPCH user.
 
-    Regression test: an early ``setdefault("is_rcpch_staff", False)`` shadowed
-    the intended ``setdefault("is_rcpch_staff", True)`` later in the method, so
-    superusers created via the manager ended up NOT being RCPCH staff. That
-    then tripped the RCPCH-staff-only check guarding the create-rcpch-staff
-    route (see test_permissions_create.py), 403-ing superusers on the "Add a
-    new RCPCH Staff User" button. It also meant ``manage.py createsuperuser``
-    (which passes no organisation_employer) raised a ValueError in
-    create_user, since only RCPCH staff may be created without an employer.
+    ``manage.py createsuperuser`` passes no organisation_employer, which
+    create_user only allows for the RCPCH Audit Team role.
     """
 
-    def test_create_superuser_defaults_rcpch_flags(self, seed_groups_fixture):
-        """Superusers are RCPCH staff and RCPCH audit team members by default."""
+    def test_create_superuser_without_employer(self, seed_groups_fixture):
+        """Superusers are RCPCH Audit Team members in the audit team group."""
         user_model = get_user_model()
 
         # No organisation_employer passed: mirrors how `manage.py
@@ -167,12 +156,14 @@ class TestCreateSuperuserDefaults:
             first_name="Super",
             surname="User",
             role=RCPCH_AUDIT_TEAM,
-            is_rcpch_audit_team_member=True,
         )
 
         assert superuser.is_superuser is True
-        assert superuser.is_rcpch_staff is True
-        assert superuser.is_rcpch_audit_team_member is True
+        assert superuser.role == RCPCH_AUDIT_TEAM
+        assert superuser.organisation_employer is None
+        assert list(superuser.groups.values_list("name", flat=True)) == [
+            EPILEPSY12_AUDIT_TEAM_FULL_ACCESS
+        ]
 
     def test_create_superuser_defaults_national_view_preference(
         self, seed_groups_fixture
@@ -193,7 +184,6 @@ class TestCreateSuperuserDefaults:
             first_name="National",
             surname="Superuser",
             role=RCPCH_AUDIT_TEAM,
-            is_rcpch_audit_team_member=True,
         )
 
         superuser.refresh_from_db()

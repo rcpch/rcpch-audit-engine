@@ -2,6 +2,8 @@
 
 This is the plan for replacing the two `Epilepsy12User` boolean flags with permissions attached to the **RCPCH Audit Team** role. Code checks those permissions with `has_perm`, not group membership.
 
+> **Status: Phase 3a done; Phase 3b (archive and drop the columns) still to do.** National access now comes only from the RCPCH Audit Team role's group permissions, and no code uses the flags. The database columns stay until Phase 3b.
+
 ## How the code works now
 
 - **Two separate systems.** The `RCPCH_AUDIT_TEAM` role (4) puts a user in the `epilepsy12_audit_team_full_access` group (`common_view_functions/group_for_group.py`). The two booleans are set on their own, and about 70 non-test call sites check them directly.
@@ -38,7 +40,7 @@ Where code needs to know *what a user is*, not *what they may do*, use `user.rol
 
 ### Phase 0 – data audit (before any code change)
 
-Run the read-only report:
+Run the read-only report (removed in Phase 3, once the flags were gone):
 
 ```bash
 python manage.py audit_rcpch_user_flags
@@ -91,29 +93,41 @@ Until Phase 2, nothing checks these permissions, so the gap between deploying an
 
 ### Phase 3 – remove the fields
 
-- Drop both fields from the model and run `makemigrations`. Simple History also changes `HistoricalEpilepsy12User`.
-- Update `REQUIRED_FIELDS` (it currently lists `is_rcpch_audit_team_member`) and remove the flags from `create_superuser`'s `setdefault`s.
-- Remove the flags from:
-    - the form fields and `clean_is_*` methods;
-    - `admin.py` (list display and fieldsets);
-    - `Epilepsy12UserSerializer`;
-    - the user export dict at `user_management_views.py:1003`;
-    - `signals.py` (`EMAIL_TRIGGER_FIELDS`, `LOGGED_FIELDS`, `ADMIN_FLAGS`, the role-change notification list). Role changes already trigger both notifications.
-- Remove the toggle from `admin_create_user.html` and the badges from `epilepsy12_user_table.html`.
-- Update `create_dev_users`, `user_scripts`, `documentation/docs/development/manual-setup.md` and `tests/misc_py_shell_code.py`.
-- Delete the `audit_rcpch_user_flags` command and its tests.
+Deploys (`s/ci`) start a new Azure Container Apps revision, which runs `migrate` (`s/start-prod`) while the previous revision is still serving. Dropping the columns in the same release that stops using them would break every request that loads a user until the previous revision is gone. It could also miss history rows the previous revision writes during the archive copy. So Phase 3 is two releases (expand/contract).
+
+**Phase 3a – stop using the fields.**
+
+- Migration `0075_remove_rcpch_user_flags_from_models` first writes a `VisitActivity` entry (activity 13, "Superuser or admin status changed") for every user with either flag set, e.g. `RCPCH flags at removal: is_rcpch_audit_team_member=True, is_rcpch_staff=False`. That records who held them at removal, including users created with a flag set, who have no earlier record. It then gives both columns a database default of `False`, on the user and history tables. Then it removes the fields from Django's model state only (`SeparateDatabaseAndState`). The columns stay: the previous revision keeps reading and writing them, and inserts from this release onwards get the default.
+- `create_user` requires an organisation unless `role == RCPCH_AUDIT_TEAM` (previously: unless `is_rcpch_staff`). `REQUIRED_FIELDS` and `create_superuser` no longer mention the flags.
+- Removed the flags from:
+    - the user form's `save()`, and the admin's list display, fieldsets and `save_model`, which used to sync them from role. The admin still re-syncs groups on a role change.
+    - `Epilepsy12UserSerializer` and the user list CSV export;
+    - `signals.py`. `role` is now in `EMAIL_TRIGGER_FIELDS`: promotion to the RCPCH Audit Team used to email admins only because the flags changed with it.
+    - `create_dev_users`, `user_scripts` and `manual-setup.md`.
+- The user table's two flag badges are now one "RCPCH Audit Team Member" badge, shown by the display-only template filter `has_rcpch_audit_team_role`.
+- Deleted the `audit_rcpch_user_flags` command and its tests.
+
+### Phase 3b – archive the history and drop the columns
+
+Ship this only once Phase 3a is live everywhere, so no running revision uses the columns.
+
+- Create `RetiredUserFlagHistory`, a read-only archive (viewable in the Django admin). Copy the flag values from every `HistoricalEpilepsy12User` row into it, so the record of who held the flags, and when, stays in the platform. Then drop the four columns.
+- The fields are no longer in Django's model state, so the copy and the drop use SQL (`RunPython` with a cursor, and `RunSQL` with a reverse that re-adds the columns). A first version, using the ORM, is in the history of [rcpch/rcpch-audit-engine#1504](https://github.com/rcpch/rcpch-audit-engine/pull/1504); adapt it.
+- Rows saved after Phase 3a will be archived with `False`, which is accurate: nobody holds the retired flags then.
+- Flag changes are also still in `VisitActivity.details` as text.
 
 ### Phase 4 – tests
 
-- Update the factories (`E12UserFactory`, `seed_users`, `UserDataClasses`), which set the flags directly.
-- Update about 15 test modules: the `permissions_tests/*`, `test_audit_period_permissions`, `test_case_list_filters`, `test_merged_parent_list`, `test_epilepsy12user_sync`, `test_inactivity_deactivation`, `test_approve_audit_period_organisations_command`.
-- Add a test per new permission: audit team has it, the other groups don't.
-- Run the full suite.
+Done alongside Phases 2 and 3:
 
-## Existing bugs to fix along the way
+- The factories and fixtures (`E12UserFactory`, `seed_users`, `UserDataClasses`) no longer set flags. The seeded `CLINICAL_AUDIT_TEAM` user has the RCPCH Audit Team role, and test helpers add users to their role's group.
+- Tests that asserted flag values now assert role and group, and lookups by flag now filter on `role=RCPCH_AUDIT_TEAM`.
+- `test_groups_seeder.py` checks the audit team group holds every RCPCH Audit Team permission and the other groups hold none.
 
-- **Missing app label:** `user_management_views.py:675` calls `has_perm("can_allocate_user_to_organisation")` without the `epilepsy12.` prefix. It's always False for non-superusers.
-- **Typo:** `epilepsy12_user_list.html:31` checks `user.is_rcpch_team_member`, which doesn't exist.
+## Existing bugs fixed along the way
+
+- **Missing app label** (Phase 2): `add_employer_organisation` called `has_perm("can_allocate_user_to_organisation")` without the `epilepsy12.` prefix, so it was always False for non-superusers.
+- **Typo:** `epilepsy12_user_list.html` checked `user.is_rcpch_team_member`, which doesn't exist. It now checks `can_manage_rcpch_audit_team_users`.
 
 ## Behaviour changes to sign off
 
@@ -124,4 +138,5 @@ Until Phase 2, nothing checks these permissions, so the gap between deploying an
 
 1. Phases 0–1.
 2. Phase 2.
-3. Phases 3–4, after Phase 2 has run in production.
+3. Phases 3a and 4, after Phase 2 has run in production.
+4. Phase 3b, after Phase 3a is live everywhere.

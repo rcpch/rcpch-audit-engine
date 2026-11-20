@@ -27,6 +27,7 @@ from django.core.exceptions import ValidationError
 from epilepsy12.constants.audit_period_extension_reasons import (
     AUDIT_PERIOD_EXTENSION_REASONS,
 )
+from epilepsy12.constants.user_types import RCPCH_AUDIT_TEAM
 from epilepsy12.models import AuditPeriod, AuditPeriodExtension, Epilepsy12User
 
 # Cohort 6 seeded dates (see epilepsy12/constants/audit_period_dates.py):
@@ -369,7 +370,7 @@ def test_close_submission_sets_extension_to_today(GOSH):
     """Closing sets the extension date to today, with no reason required."""
     audit_period = AuditPeriod.objects.currently_submitting()
     assert audit_period is not None, "No seeded cohort is currently submitting."
-    admin = Epilepsy12User.objects.filter(is_rcpch_audit_team_member=True).first()
+    admin = Epilepsy12User.objects.filter(role=RCPCH_AUDIT_TEAM).first()
 
     extension = audit_period.close_submission_for_organisation(GOSH, user=admin)
 
@@ -383,7 +384,7 @@ def test_remove_submission_extension_reverts_to_audit_wide(GOSH):
     """Removing the extension reverts the organisation to the audit-wide deadline."""
     audit_period = AuditPeriod.objects.currently_submitting()
     assert audit_period is not None, "No seeded cohort is currently submitting."
-    admin = Epilepsy12User.objects.filter(is_rcpch_audit_team_member=True).first()
+    admin = Epilepsy12User.objects.filter(role=RCPCH_AUDIT_TEAM).first()
 
     _extension(audit_period, GOSH, days=28)
     assert audit_period.extensions.filter(organisation=GOSH).exists()
@@ -402,7 +403,7 @@ def test_remove_submission_extension_without_extension_raises(GOSH):
     """Removing an extension the organisation does not hold is an error."""
     audit_period = AuditPeriod.objects.currently_submitting()
     assert audit_period is not None, "No seeded cohort is currently submitting."
-    admin = Epilepsy12User.objects.filter(is_rcpch_audit_team_member=True).first()
+    admin = Epilepsy12User.objects.filter(role=RCPCH_AUDIT_TEAM).first()
 
     with pytest.raises(ValidationError, match="no extension"):
         audit_period.remove_submission_extension(GOSH, user=admin)
