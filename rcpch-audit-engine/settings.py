@@ -159,6 +159,8 @@ MIDDLEWARE = [
     "epilepsy12.middleware.Epilepsy12CustomLoggingAttributesMiddleware",
     # 2fa
     "django_otp.middleware.OTPMiddleware",
+    # Must come after OTPMiddleware as it inspects request.user.otp_device
+    "epilepsy12.middleware.EntraIDLoginRequiredMiddleware",
 ]
 
 # Django security middleware settings for HSTS support
@@ -299,6 +301,37 @@ AUTH_PASSWORD_VALIDATORS = [
 ]
 
 AUTH_USER_MODEL = "epilepsy12.Epilepsy12User"
+
+# MICROSOFT ENTRA ID SIGN IN (OAuth 2.0 / OpenID Connect)
+# Superusers and RCPCH Audit Team members can sign in with their RCPCH Microsoft
+# account. Sign in with Microsoft is offered whenever the app registration below
+# is configured.
+ENTRA_ID_TENANT_ID = os.getenv("ENTRA_ID_TENANT_ID", "")
+ENTRA_ID_CLIENT_ID = os.getenv("ENTRA_ID_CLIENT_ID", "")
+ENTRA_ID_CLIENT_SECRET = os.getenv("ENTRA_ID_CLIENT_SECRET", "")
+ENTRA_ID_LOGIN_ENABLED = bool(
+    ENTRA_ID_TENANT_ID and ENTRA_ID_CLIENT_ID and ENTRA_ID_CLIENT_SECRET
+)
+
+# When True, superusers and RCPCH Audit Team members MUST sign in with Microsoft
+# Entra ID: the email, password and one-time code login is refused for them and
+# any session they started that way is ended. Their existing passwords and 2FA
+# devices are left untouched, so setting this back to False restores the old
+# login immediately.
+ENTRA_ID_LOGIN_REQUIRED_FOR_RCPCH_STAFF = (
+    os.getenv("ENTRA_ID_LOGIN_REQUIRED_FOR_RCPCH_STAFF", "False") == "True"
+)
+if ENTRA_ID_LOGIN_REQUIRED_FOR_RCPCH_STAFF and not ENTRA_ID_LOGIN_ENABLED:
+    # Fail fast rather than lock every superuser out of the app
+    raise ImproperlyConfigured(
+        "ENTRA_ID_LOGIN_REQUIRED_FOR_RCPCH_STAFF is True but ENTRA_ID_TENANT_ID, "
+        "ENTRA_ID_CLIENT_ID and ENTRA_ID_CLIENT_SECRET are not all set."
+    )
+logger.info(
+    "ENTRA_ID_LOGIN_ENABLED: %s, ENTRA_ID_LOGIN_REQUIRED_FOR_RCPCH_STAFF: %s",
+    ENTRA_ID_LOGIN_ENABLED,
+    ENTRA_ID_LOGIN_REQUIRED_FOR_RCPCH_STAFF,
+)
 
 # Two Factor Authentication / One Time Password Settings (2FA / one-time login codes)
 OTP_EMAIL_SUBJECT = "Your Epilepsy12 one-time login code"

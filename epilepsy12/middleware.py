@@ -3,6 +3,15 @@ import logging
 from timeit import default_timer as timer
 from threading import local
 from django.conf import settings
+from django.contrib import messages
+from django.contrib.auth import logout
+from django.shortcuts import redirect
+
+from epilepsy12.general_functions.entra_id import (
+    ENTRA_ID_LOGIN_REQUIRED_MESSAGE,
+    must_use_entra_id_login,
+)
+from epilepsy12.models import EntraIDDevice
 
 request_logger = logging.getLogger("epilepsy12_request_log")
 
@@ -97,3 +106,33 @@ class Epilepsy12RequestLoggingMiddleware:
             request_logger.info(log_message)
 
         return response
+
+
+class EntraIDLoginRequiredMiddleware:
+    """
+    When settings.ENTRA_ID_LOGIN_REQUIRED_FOR_RCPCH_STAFF is True, end any
+    session of a superuser or RCPCH Audit Team member that was not started by
+    signing in with Microsoft Entra ID (for example one that began before the
+    setting was switched on). Must come after django_otp's OTPMiddleware.
+    """
+
+    def __init__(self, get_response):
+        self.get_response = get_response
+
+    def __call__(self, request):
+        if settings.ENTRA_ID_LOGIN_REQUIRED_FOR_RCPCH_STAFF:
+            user = getattr(request, "user", None)
+            if (
+                user is not None
+                and user.is_authenticated
+                and must_use_entra_id_login(user)
+                and not isinstance(getattr(user, "otp_device", None), EntraIDDevice)
+            ):
+                logging.getLogger(__name__).info(
+                    "Ending session for %s: must sign in with Entra ID", user.email
+                )
+                logout(request)
+                messages.warning(request, ENTRA_ID_LOGIN_REQUIRED_MESSAGE)
+                return redirect(settings.LOGIN_URL)
+
+        return self.get_response(request)
