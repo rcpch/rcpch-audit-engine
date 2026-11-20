@@ -794,6 +794,31 @@ admin.site.register(
 admin.site.register(Banner)
 
 
+@admin.register(RetiredUserFlagHistory)
+class RetiredUserFlagHistoryAdmin(admin.ModelAdmin):
+    """Read-only: an archive of the retired RCPCH user flags."""
+
+    list_display = (
+        "email",
+        "history_date",
+        "history_type",
+        "role",
+        "is_rcpch_audit_team_member",
+        "is_rcpch_staff",
+    )
+    list_filter = ("is_rcpch_audit_team_member", "is_rcpch_staff", "history_type")
+    search_fields = ("email",)
+
+    def has_add_permission(self, request):
+        return False
+
+    def has_change_permission(self, request, obj=None):
+        return False
+
+    def has_delete_permission(self, request, obj=None):
+        return False
+
+
 # Customise the admin site
 admin.site.site_header = "Epilepsy12 admin"
 admin.site.site_title = "Epilepsy12 admin"
