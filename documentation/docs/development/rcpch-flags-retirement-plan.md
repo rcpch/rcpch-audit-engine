@@ -97,7 +97,7 @@ Deploys (`s/ci`) start a new Azure Container Apps revision, which runs `migrate`
 
 **Phase 3a – stop using the fields.**
 
-- Migration `0075_remove_rcpch_user_flags_from_models` gives both columns a database default of `False`, on the user and history tables. Then it removes the fields from Django's model state only (`SeparateDatabaseAndState`). The columns stay: the previous revision keeps reading and writing them, and inserts from this release onwards get the default.
+- Migration `0075_remove_rcpch_user_flags_from_models` first writes a `VisitActivity` entry (activity 13, "Superuser or admin status changed") for every user with either flag set, e.g. `RCPCH flags at removal: is_rcpch_audit_team_member=True, is_rcpch_staff=False`. That records who held them at removal, including users created with a flag set, who have no earlier record. It then gives both columns a database default of `False`, on the user and history tables. Then it removes the fields from Django's model state only (`SeparateDatabaseAndState`). The columns stay: the previous revision keeps reading and writing them, and inserts from this release onwards get the default.
 - `create_user` requires an organisation unless `role == RCPCH_AUDIT_TEAM` (previously: unless `is_rcpch_staff`). `REQUIRED_FIELDS` and `create_superuser` no longer mention the flags.
 - Removed the flags from:
     - the user form's `save()`, and the admin's list display, fieldsets and `save_model`, which used to sync them from role. The admin still re-syncs groups on a role change.
