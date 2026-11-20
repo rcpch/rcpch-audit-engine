@@ -2,7 +2,7 @@
 
 This is the plan for replacing the two `Epilepsy12User` boolean flags with permissions attached to the **RCPCH Audit Team** role. Code checks those permissions with `has_perm`, not group membership.
 
-> **Status: complete.** The flags were removed in Phase 3 (migration `0075_remove_rcpch_user_flags`). National access now comes only from the RCPCH Audit Team role's group permissions. This page records how the change was made.
+> **Status: Phase 3a done; Phase 3b (archive and drop the columns) still to do.** National access now comes only from the RCPCH Audit Team role's group permissions, and no code uses the flags. The database columns stay until Phase 3b.
 
 ## How the code works now
 
@@ -93,7 +93,11 @@ Until Phase 2, nothing checks these permissions, so the gap between deploying an
 
 ### Phase 3 – remove the fields
 
-- Migration `0075_remove_rcpch_user_flags` drops both fields from `Epilepsy12User` and `HistoricalEpilepsy12User`. First it copies the flag values from every history row into `RetiredUserFlagHistory`, a read-only archive (viewable in the Django admin), so the record of who held the flags, and when, stays in the platform. Reversing the migration restores the values. Flag changes are also still in `VisitActivity.details` as text.
+Deploys (`s/ci`) start a new Azure Container Apps revision, which runs `migrate` (`s/start-prod`) while the previous revision is still serving. Dropping the columns in the same release that stops using them would break every request that loads a user until the previous revision is gone. It could also miss history rows the previous revision writes during the archive copy. So Phase 3 is two releases (expand/contract).
+
+**Phase 3a – stop using the fields.**
+
+- Migration `0075_remove_rcpch_user_flags_from_models` gives both columns a database default of `False`, on the user and history tables. Then it removes the fields from Django's model state only (`SeparateDatabaseAndState`). The columns stay: the previous revision keeps reading and writing them, and inserts from this release onwards get the default.
 - `create_user` requires an organisation unless `role == RCPCH_AUDIT_TEAM` (previously: unless `is_rcpch_staff`). `REQUIRED_FIELDS` and `create_superuser` no longer mention the flags.
 - Removed the flags from:
     - the user form's `save()`, and the admin's list display, fieldsets and `save_model`, which used to sync them from role. The admin still re-syncs groups on a role change.
@@ -102,6 +106,15 @@ Until Phase 2, nothing checks these permissions, so the gap between deploying an
     - `create_dev_users`, `user_scripts` and `manual-setup.md`.
 - The user table's two flag badges are now one "RCPCH Audit Team Member" badge, shown by the display-only template filter `has_rcpch_audit_team_role`.
 - Deleted the `audit_rcpch_user_flags` command and its tests.
+
+### Phase 3b – archive the history and drop the columns
+
+Ship this only once Phase 3a is live everywhere, so no running revision uses the columns.
+
+- Create `RetiredUserFlagHistory`, a read-only archive (viewable in the Django admin). Copy the flag values from every `HistoricalEpilepsy12User` row into it, so the record of who held the flags, and when, stays in the platform. Then drop the four columns.
+- The fields are no longer in Django's model state, so the copy and the drop use SQL (`RunPython` with a cursor, and `RunSQL` with a reverse that re-adds the columns). A first version, using the ORM, is in the history of [rcpch/rcpch-audit-engine#1504](https://github.com/rcpch/rcpch-audit-engine/pull/1504); adapt it.
+- Rows saved after Phase 3a will be archived with `False`, which is accurate: nobody holds the retired flags then.
+- Flag changes are also still in `VisitActivity.details` as text.
 
 ### Phase 4 – tests
 
@@ -125,4 +138,5 @@ Done alongside Phases 2 and 3:
 
 1. Phases 0–1.
 2. Phase 2.
-3. Phases 3–4, after Phase 2 has run in production.
+3. Phases 3a and 4, after Phase 2 has run in production.
+4. Phase 3b, after Phase 3a is live everywhere.
