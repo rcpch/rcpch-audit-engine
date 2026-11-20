@@ -82,3 +82,4 @@ from .organisational_audit import (
     OrganisationalAuditSubmission,
 )
 from .banner import Banner
+from .retired_user_flag_history import RetiredUserFlagHistory

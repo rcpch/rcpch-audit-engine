@@ -2,7 +2,7 @@
 
 This is the plan for replacing the two `Epilepsy12User` boolean flags with permissions attached to the **RCPCH Audit Team** role. Code checks those permissions with `has_perm`, not group membership.
 
-> **Status: Phase 3a done; Phase 3b (archive and drop the columns) still to do.** National access now comes only from the RCPCH Audit Team role's group permissions, and no code uses the flags. The database columns stay until Phase 3b.
+> **Status: complete.** National access comes only from the RCPCH Audit Team role's group permissions. The flag columns were dropped in Phase 3b (migration `0076_archive_and_drop_rcpch_user_flags`), and their full history is kept in `RetiredUserFlagHistory`. This page records how the change was made.
 
 ## How the code works now
 
@@ -111,10 +111,10 @@ Deploys (`s/ci`) start a new Azure Container Apps revision, which runs `migrate`
 
 Ship this only once Phase 3a is live everywhere, so no running revision uses the columns.
 
-- Create `RetiredUserFlagHistory`, a read-only archive (viewable in the Django admin). Copy the flag values from every `HistoricalEpilepsy12User` row into it, so the record of who held the flags, and when, stays in the platform. Then drop the four columns.
-- The fields are no longer in Django's model state, so the copy and the drop use SQL (`RunPython` with a cursor, and `RunSQL` with a reverse that re-adds the columns). A first version, using the ORM, is in the history of [rcpch/rcpch-audit-engine#1504](https://github.com/rcpch/rcpch-audit-engine/pull/1504); adapt it.
-- Rows saved after Phase 3a will be archived with `False`, which is accurate: nobody holds the retired flags then.
-- Flag changes are also still in `VisitActivity.details` as text.
+- Migration `0076_archive_and_drop_rcpch_user_flags` creates `RetiredUserFlagHistory`, a read-only archive (viewable in the Django admin, searchable by email and filterable by each flag). It copies the flag values from every `HistoricalEpilepsy12User` row into it, so the record of who held the flags, and when, stays in the platform. Then it drops the four columns.
+- The fields are no longer in Django's model state, so the copy and the drop are `RunSQL`. Reversing re-adds the columns as `0075` left them (`NOT NULL DEFAULT false`), writes the archived values back onto the history rows and each user's latest values back onto the user, then drops the archive table.
+- Rows saved after Phase 3a are archived with `False`, which is accurate: nobody holds the retired flags then.
+- Flag changes are also still in `VisitActivity.details` as text, and `0075` recorded every flagged user's values at removal.
 
 ### Phase 4 – tests
 
