@@ -3453,3 +3453,90 @@ def test_rcpch_audit_team_member_can_promote_a_user_to_the_rcpch_audit_team_role
     assert list(user_to_promote.groups.values_list("name", flat=True)) == [
         EPILEPSY12_AUDIT_TEAM_FULL_ACCESS
     ], "Promotion should move the user into the RCPCH audit team group"
+
+
+@pytest.mark.django_db
+@pytest.mark.parametrize("target", ["colleague", "self"])
+def test_lead_clinician_cannot_give_the_rcpch_audit_team_role(
+    client,
+    seed_groups_fixture,
+    seed_users_fixture,
+    target,
+):
+    """
+    A Lead Clinician may edit users in their own organisation, but can't give
+    anyone (including themselves) the RCPCH Audit Team role: their role choices
+    are the audit centre roles only, so the form rejects it. Role and groups
+    stay as they were.
+    """
+
+    # GOSH: the Lead Clinician's own organisation, so the organisation and
+    # user access checks pass and the form's role validation runs
+    TEST_USER_ORGANISATION = Organisation.objects.get(
+        ods_code="RP401",
+        trust__ods_code="RP4",
+    )
+
+    # Created here rather than using the seeded Lead Clinician, whose
+    # upper-case email the edit form can't look up
+    lead_clinician = E12UserFactory(
+        email="temp_escalating_lead_clinician@test.com",
+        first_name="TEMP_ESCALATING_LEAD_CLINICIAN",
+        surname="Lead",
+        role=test_user_audit_centre_lead_clinician_data.role,
+        employer_organisations=[TEST_USER_ORGANISATION],
+        groups=[
+            Group.objects.get(
+                name=test_user_audit_centre_lead_clinician_data.group_name
+            )
+        ],
+    )
+
+    if target == "self":
+        user_to_edit = lead_clinician
+    else:
+        user_to_edit = E12UserFactory(
+            email="temp_escalation_candidate@test.com",
+            first_name="TEMP_ESCALATION_CANDIDATE",
+            surname="Candidate",
+            role=test_user_audit_centre_clinician_data.role,
+            employer_organisations=[TEST_USER_ORGANISATION],
+            groups=[
+                Group.objects.get(name=test_user_audit_centre_clinician_data.group_name)
+            ],
+        )
+    original_role = user_to_edit.role
+    original_groups = set(user_to_edit.groups.values_list("name", flat=True))
+
+    client.force_login(lead_clinician)
+    twofactor_signin(client, lead_clinician)
+
+    url = reverse(
+        "edit_epilepsy12_user",
+        kwargs={
+            "organisation_id": TEST_USER_ORGANISATION.id,
+            "epilepsy12_user_id": user_to_edit.id,
+        },
+    )
+
+    response = client.post(
+        url,
+        {
+            "title": 1,
+            "first_name": user_to_edit.first_name,
+            "surname": user_to_edit.surname,
+            "role": RCPCH_AUDIT_TEAM,
+            "email": user_to_edit.email,
+            "email_confirmed": True,
+        },
+    )
+
+    # the form is re-rendered with a role error rather than saved
+    assert (
+        response.status_code == HTTPStatus.OK
+    ), f"Expected the form to be re-rendered with errors, got {response.status_code}"
+    assert "role" in response.context["form"].errors
+
+    user_to_edit.refresh_from_db()
+    assert user_to_edit.role == original_role
+    assert set(user_to_edit.groups.values_list("name", flat=True)) == original_groups

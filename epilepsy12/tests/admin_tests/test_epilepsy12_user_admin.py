@@ -18,6 +18,7 @@ from epilepsy12.admin import Epilepsy12UserAdmin
 from epilepsy12.constants.user_types import (
     AUDIT_CENTRE_LEAD_CLINICIAN,
     EPILEPSY12_AUDIT_TEAM_FULL_ACCESS,
+    PATIENT_ACCESS,
     RCPCH_AUDIT_TEAM,
     TRUST_AUDIT_TEAM_FULL_ACCESS,
 )
@@ -93,11 +94,16 @@ def test_admin_edit_without_role_change_leaves_groups_alone():
     """
     user_admin = Epilepsy12UserAdmin(Epilepsy12User, AdminSite())
 
+    # PATIENT_ACCESS is not the group group_for_role() gives a Lead Clinician,
+    # so it only survives if save_model leaves groups alone.
     user = E12UserFactory(
         email="temp_admin_edit_candidate@test.com",
         first_name="TEMP_ADMIN_EDIT_CANDIDATE",
         role=AUDIT_CENTRE_LEAD_CLINICIAN,
-        groups=[Group.objects.get(name=TRUST_AUDIT_TEAM_FULL_ACCESS)],
+        groups=[
+            Group.objects.get(name=TRUST_AUDIT_TEAM_FULL_ACCESS),
+            Group.objects.get(name=PATIENT_ACCESS),
+        ],
     )
 
     user.surname = "Edited"
@@ -110,9 +116,10 @@ def test_admin_edit_without_role_change_leaves_groups_alone():
     user.refresh_from_db()
 
     assert user.surname == "Edited"
-    assert list(user.groups.values_list("name", flat=True)) == [
-        TRUST_AUDIT_TEAM_FULL_ACCESS
-    ]
+    assert set(user.groups.values_list("name", flat=True)) == {
+        TRUST_AUDIT_TEAM_FULL_ACCESS,
+        PATIENT_ACCESS,
+    }
 
 
 def test_retired_user_flag_history_admin_is_read_only():
