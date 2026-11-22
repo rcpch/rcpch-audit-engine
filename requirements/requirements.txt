@@ -53,13 +53,14 @@ rapidfuzz==3.14.5
 # Documentation site theme
 # Ported from Material for MkDocs to Zensical (the successor, built by the same
 # team). See https://zensical.org/docs/get-started/
-zensical==0.0.59
+# >= 0.1.3 required for the built-in git-revision-date-localized plugin
+zensical==0.1.3
 
 # The following MkDocs plugins are NOT yet compatible with Zensical and are
 # suspended pending Zensical's module system. Re-enable each when the
 # corresponding Zensical backlog issue is resolved.
 # mkdocs-git-committers-plugin-2==2.5.0           # https://github.com/zensical/backlog/issues/17
-# mkdocs-git-revision-date-localized-plugin==1.4.5 # https://github.com/zensical/backlog/issues/18
+# git-revision-date-localized needs no separate package: it is built into Zensical since 0.1.3
 # mkdocs-macros-plugin==1.3.7                     # replaced by zensical.extensions.macros (built into Zensical >=0.0.40)
 # mkdocs-with-pdf==0.9.3                         # https://github.com/zensical/backlog/issues/25
 
