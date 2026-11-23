@@ -54,6 +54,7 @@ from ..general_functions import (
     send_email_to_recipients,
 )
 from ..general_functions.client_ip import get_client_ip
+from ..general_functions.entra_id import is_entra_id_email
 from ..common_view_functions import group_for_role
 from epilepsy12.general_functions.audit_period_hierarchy import (
     expand_organisation_ids_via_identity,
@@ -858,8 +859,17 @@ class RCPCHLoginView(TwoFactorLoginView):
     def get_context_data(self, form, **kwargs):
         context = super().get_context_data(form, **kwargs)
         context["entra_id_login_enabled"] = settings.ENTRA_ID_LOGIN_ENABLED
-        context["entra_id_login_required"] = (
-            settings.ENTRA_ID_LOGIN_REQUIRED_FOR_RCPCH_STAFF
+        context["entra_id_email_domain"] = settings.ENTRA_ID_EMAIL_DOMAIN
+
+        # On a re-rendered login page (e.g. after a refused password), show
+        # Sign in with Microsoft if the email typed is on the Entra ID domain.
+        # Decided from the address alone, so it works without JavaScript and
+        # reveals nothing about the account.
+        typed_email = ""
+        if self.steps.current == "auth" and form.is_bound:
+            typed_email = form.data.get(form.add_prefix("username"), "")
+        context["entra_id_login_hint"] = (
+            typed_email.strip().lower() if is_entra_id_email(typed_email) else ""
         )
         return context
 

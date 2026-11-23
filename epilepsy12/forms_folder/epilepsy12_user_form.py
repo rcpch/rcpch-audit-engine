@@ -23,10 +23,7 @@ from epilepsy12.constants.user_types import (
     TITLES,
     PERM_MANAGE_RCPCH_AUDIT_TEAM_USERS,
 )
-from ..general_functions.entra_id import (
-    ENTRA_ID_LOGIN_REQUIRED_MESSAGE,
-    must_use_entra_id_login,
-)
+from ..general_functions.entra_id import must_use_entra_id_login
 from ..general_functions.client_ip import get_client_ip
 from ..general_functions.inactivity_deactivation import (
     deactivate_user_for_inactivity,
@@ -275,6 +272,8 @@ class CaptchaAuthenticationForm(AuthenticationForm):
         # Superusers and the RCPCH Audit Team must sign in with Microsoft
         # Entra ID when the setting is on. Their password and 2FA devices are
         # left in place so that switching the setting off restores this login.
+        # The error shown is the same as for a wrong password, so this does not
+        # reveal that the password was correct or that the account is staff.
         if must_use_entra_id_login(user):
             VisitActivity.objects.create(
                 activity=VisitActivity.UNSUCCESSFUL_LOGIN,
@@ -285,10 +284,7 @@ class CaptchaAuthenticationForm(AuthenticationForm):
             logger.info(
                 f"Password login refused for {user.email}: must sign in with Entra ID"
             )
-            raise forms.ValidationError(
-                ENTRA_ID_LOGIN_REQUIRED_MESSAGE,
-                code="entra_id_required",
-            )
+            raise self.get_invalid_login_error()
 
         # Deactivate the account if the user has not logged in for longer
         # than the configured inactivity period

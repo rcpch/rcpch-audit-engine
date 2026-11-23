@@ -24,6 +24,7 @@ from django_otp import login as otp_login
 from ..general_functions.client_ip import get_client_ip
 from ..general_functions.entra_id import (
     build_entra_id_client,
+    is_entra_id_email,
     may_use_entra_id_login,
 )
 from ..general_functions.inactivity_deactivation import (
@@ -75,11 +76,19 @@ def entra_id_login(request):
     if not settings.ENTRA_ID_LOGIN_ENABLED:
         raise Http404()
 
+    # Pre-select the account the user typed on the login page. Only addresses
+    # on the Entra ID domain are passed on to Microsoft.
+    login_hint = request.GET.get("login_hint", "").strip().lower()
+    if is_entra_id_email(login_hint):
+        account_selection = {"login_hint": login_hint}
+    else:
+        account_selection = {"prompt": "select_account"}
+
     flow = build_entra_id_client().initiate_auth_code_flow(
         # msal adds the openid, profile and offline_access scopes itself
         scopes=[],
         redirect_uri=_redirect_uri(request),
-        prompt="select_account",
+        **account_selection,
     )
     # The flow holds the state, nonce and PKCE verifier checked on the way back
     request.session[ENTRA_ID_FLOW_SESSION_KEY] = flow
@@ -100,15 +109,17 @@ def entra_id_login(request):
 def _find_user(claims):
     """
     Match the Microsoft account to an Epilepsy12 user by email address. The
-    tenant is pinned so these claims can only come from RCPCH's own directory.
+    tenant is pinned so these claims can only come from RCPCH's own directory,
+    and only addresses on ENTRA_ID_EMAIL_DOMAIN are considered: a guest account
+    in the tenant can carry an outside email address in its claims.
     """
     candidate_emails = {
         claims[claim].strip().lower()
         for claim in ("email", "preferred_username", "upn")
-        if isinstance(claims.get(claim), str) and "@" in claims[claim]
+        if is_entra_id_email(claims.get(claim))
     }
     if not candidate_emails:
-        return None, None
+        return None, f"no email address on {settings.ENTRA_ID_EMAIL_DOMAIN}"
 
     query = Q()
     for email in candidate_emails:
@@ -166,6 +177,13 @@ def entra_id_callback(request):
             details=f"Unexpected tenant {claims.get('tid')}",
         )
 
+    if settings.ENTRA_ID_REQUIRE_MFA_CLAIM and "mfa" not in (claims.get("amr") or []):
+        return _fail(
+            request,
+            "Your Microsoft sign in did not use multi-factor authentication. Please contact the Epilepsy12 team.",
+            details=f"ID token amr claim does not include mfa (amr={claims.get('amr')})",
+        )
+
     object_id = claims.get("oid")
     if not object_id:
         return _fail(request, GENERIC_FAILURE_MESSAGE, details="No oid claim")
@@ -175,7 +193,7 @@ def entra_id_callback(request):
     if user is None:
         return _fail(
             request,
-            f"There is no Epilepsy12 account for your Microsoft account ({emails}).",
+            "There is no Epilepsy12 account for this Microsoft account. Please contact the Epilepsy12 team.",
             details=f"No single Epilepsy12 user matches {emails}",
         )
 

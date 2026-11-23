@@ -42,20 +42,56 @@
       </form>
 
       {% if wizard.steps.current == 'auth' and entra_id_login_enabled %}
-      <div class="ui horizontal divider">or</div>
-      <div class="ui rcpch form">
-        <div class="field">
-          <a href="{% url 'entra_id_login' %}{% if request.GET.next %}?next={{ request.GET.next|urlencode }}{% endif %}"
-            class="ui rcpch_primary button"
-            id="entra_id_login_button"
-          >
-            Sign in with Microsoft
-          </a>
-          <p>
-            For superusers and RCPCH Audit Team members only{% if entra_id_login_required %}, who must sign in this way{% endif %}.
-          </p>
+      {% comment %}
+        Shown only once an email address on the Entra ID domain has been typed
+        in. Decided from the address alone (in the browser, or by the server on
+        a re-rendered page so it works without JavaScript), so it reveals
+        nothing about any account. The password login stays available.
+      {% endcomment %}
+      <div id="entra_id_login"
+        data-email-domain="{{ entra_id_email_domain }}"
+        data-login-url="{% url 'entra_id_login' %}"
+        data-next="{{ request.GET.next|default:'' }}"
+        {% if not entra_id_login_hint %}hidden{% endif %}
+      >
+        <div class="ui horizontal divider">or</div>
+        <div class="ui rcpch form">
+          <div class="field">
+            <a href="{% url 'entra_id_login' %}?login_hint={{ entra_id_login_hint|urlencode }}{% if request.GET.next %}&amp;next={{ request.GET.next|urlencode }}{% endif %}"
+              class="ui rcpch_primary button"
+              id="entra_id_login_button"
+            >
+              Sign in with Microsoft
+            </a>
+          </div>
         </div>
       </div>
+      <script>
+        (function () {
+          var container = document.getElementById("entra_id_login");
+          var button = document.getElementById("entra_id_login_button");
+          var emailInput = document.getElementById("id_auth-username");
+          if (!container || !button || !emailInput) return;
+
+          var domain = container.dataset.emailDomain.toLowerCase();
+
+          function update() {
+            var email = emailInput.value.trim().toLowerCase();
+            var at = email.lastIndexOf("@");
+            var onDomain = at > 0 && email.slice(at + 1) === domain;
+
+            container.hidden = !onDomain;
+            if (onDomain) {
+              var params = new URLSearchParams({ login_hint: email });
+              if (container.dataset.next) params.set("next", container.dataset.next);
+              button.href = container.dataset.loginUrl + "?" + params.toString();
+            }
+          }
+
+          emailInput.addEventListener("input", update);
+          update();
+        })();
+      </script>
       {% endif %}
 
     </div>

@@ -7,6 +7,7 @@ Microsoft is never contacted: the msal client is replaced with a fake that
 returns the ID token claims we choose.
 """
 
+import re
 from unittest.mock import patch
 
 import pytest
@@ -22,6 +23,7 @@ from epilepsy12.constants.user_types import (
 )
 from epilepsy12.forms_folder.epilepsy12_user_form import CaptchaAuthenticationForm
 from epilepsy12.general_functions.entra_id import (
+    is_entra_id_email,
     may_use_entra_id_login,
     must_use_entra_id_login,
 )
@@ -38,7 +40,9 @@ ENTRA_CONFIGURED = dict(
     ENTRA_ID_TENANT_ID=TENANT_ID,
     ENTRA_ID_CLIENT_ID="client-id",
     ENTRA_ID_CLIENT_SECRET="client-secret",
+    ENTRA_ID_EMAIL_DOMAIN="rcpch.ac.uk",
     ENTRA_ID_LOGIN_ENABLED=True,
+    ENTRA_ID_REQUIRE_MFA_CLAIM=True,
 )
 ENTRA_REQUIRED = dict(ENTRA_CONFIGURED, ENTRA_ID_LOGIN_REQUIRED_FOR_RCPCH_STAFF=True)
 ENTRA_OPTIONAL = dict(ENTRA_CONFIGURED, ENTRA_ID_LOGIN_REQUIRED_FOR_RCPCH_STAFF=False)
@@ -52,8 +56,9 @@ class FakeEntraClient:
         self.raises = raises
         self.redeemed_with = None
 
-    def initiate_auth_code_flow(self, scopes, redirect_uri, prompt):
+    def initiate_auth_code_flow(self, scopes, redirect_uri, **kwargs):
         self.redirect_uri = redirect_uri
+        self.account_selection = kwargs
         return {
             "auth_uri": "https://login.microsoftonline.com/authorize?state=abc",
             "state": "abc",
@@ -66,8 +71,18 @@ class FakeEntraClient:
         return self.result
 
 
-def claims_for(email, tid=TENANT_ID, oid=OBJECT_ID):
-    return {"id_token_claims": {"tid": tid, "oid": oid, "preferred_username": email}}
+def claims_for(
+    preferred_username, tid=TENANT_ID, oid=OBJECT_ID, amr=("pwd", "mfa"), **extra
+):
+    claims = {
+        "tid": tid,
+        "oid": oid,
+        "preferred_username": preferred_username,
+        **extra,
+    }
+    if amr is not None:
+        claims["amr"] = list(amr)
+    return {"id_token_claims": claims}
 
 
 def complete_entra_sign_in(client, fake_client, next_url=None):
@@ -112,11 +127,39 @@ def audit_team_member(e12_user_factory):
 @pytest.fixture
 def clinician(e12_user_factory):
     return saved(
-        e12_user_factory(role=AUDIT_CENTRE_CLINICIAN, email="clinician@nhs.net")
+        e12_user_factory(
+            role=AUDIT_CENTRE_CLINICIAN,
+            email="first.last+lead_clinician@rcpch.ac.uk",
+        )
     )
 
 
 # Who the setting covers
+
+
+@override_settings(ENTRA_ID_EMAIL_DOMAIN="rcpch.ac.uk")
+@pytest.mark.parametrize(
+    "email,expected",
+    [
+        ("someone@rcpch.ac.uk", True),
+        ("  Someone@RCPCH.ac.uk ", True),
+        ("first.last+lead_clinician@rcpch.ac.uk", True),
+        ("someone@nhs.net", False),
+        ("someone@notrcpch.ac.uk", False),
+        ("someone@rcpch.ac.uk.evil.com", False),
+        ("@rcpch.ac.uk", False),
+        ("rcpch.ac.uk", False),
+        ("", False),
+        (None, False),
+    ],
+)
+def test_is_entra_id_email(email, expected):
+    assert is_entra_id_email(email) is expected
+
+
+@override_settings(ENTRA_ID_EMAIL_DOMAIN="")
+def test_no_email_is_entra_id_email_without_a_domain():
+    assert is_entra_id_email("someone@rcpch.ac.uk") is False
 
 
 @pytest.mark.django_db
@@ -162,8 +205,8 @@ def test_password_login_refused_for_rcpch_staff_when_required(request, user_fixt
     with pytest.raises(ValidationError) as excinfo:
         form.confirm_login_allowed(user)
 
-    assert excinfo.value.code == "entra_id_required"
-    assert "sign in with Microsoft" in str(excinfo.value)
+    # The same error as a wrong password, so a correct password is not revealed
+    assert excinfo.value.code == "invalid_login"
 
     refused = VisitActivity.objects.get(
         epilepsy12user=user, activity=VisitActivity.UNSUCCESSFUL_LOGIN
@@ -212,10 +255,45 @@ def test_password_login_view_refuses_rcpch_staff_when_required(client, superuser
         )
 
     assert response.status_code == 200
-    assert response.context["form"].non_field_errors() == [
-        "Superusers and RCPCH Audit Team members must sign in with Microsoft."
-    ]
+    form = response.context["form"]
+    # The normal "incorrect email or password" error
+    assert form.non_field_errors().as_data()[0].code == "invalid_login"
     assert "_auth_user_id" not in client.session
+
+    # Sign in with Microsoft is shown because the email is on the domain
+    assert response.context["entra_id_login_hint"] == superuser.email
+
+
+def post_password_login(client, email, password):
+    with patch("captcha.conf.settings.CAPTCHA_TEST_MODE", True):
+        return client.post(
+            reverse("two_factor:login"),
+            {
+                "rcpch_login_view-current_step": "auth",
+                "auth-username": email,
+                "auth-password": password,
+                "auth-captcha_0": "x",
+                "auth-captcha_1": "PASSED",
+            },
+        )
+
+
+@pytest.mark.django_db
+@override_settings(**ENTRA_REQUIRED)
+def test_refused_staff_password_looks_the_same_as_a_wrong_password(client, superuser):
+    superuser.set_password("A-Valid-Password-1!")
+    superuser.save()
+
+    correct = post_password_login(client, superuser.email, "A-Valid-Password-1!")
+    wrong = post_password_login(client, superuser.email, "Not-The-Password-1!")
+
+    assert (
+        correct.context["form"].non_field_errors()
+        == wrong.context["form"].non_field_errors()
+    )
+    assert (
+        correct.context["entra_id_login_hint"] == wrong.context["entra_id_login_hint"]
+    )
 
 
 # Login page
@@ -223,10 +301,35 @@ def test_password_login_view_refuses_rcpch_staff_when_required(client, superuser
 
 @pytest.mark.django_db
 @override_settings(**ENTRA_OPTIONAL)
-def test_login_page_offers_sign_in_with_microsoft_when_configured(client):
+def test_login_page_hides_sign_in_with_microsoft_until_domain_email_typed(client):
     response = client.get(reverse("two_factor:login"))
 
-    assert b"Sign in with Microsoft" in response.content
+    # Present for the JavaScript to reveal, but hidden
+    assert b'data-email-domain="rcpch.ac.uk"' in response.content
+    assert response.context["entra_id_login_hint"] == ""
+    assert re.search(rb'<div id="entra_id_login"[^>]*\shidden\s*>', response.content)
+
+
+@pytest.mark.django_db
+@override_settings(**ENTRA_OPTIONAL)
+def test_login_page_shows_sign_in_with_microsoft_for_domain_email_without_js(
+    client,
+):
+    response = post_password_login(client, "Nobody@RCPCH.ac.uk", "x")
+
+    assert response.context["entra_id_login_hint"] == "nobody@rcpch.ac.uk"
+    assert not re.search(
+        rb'<div id="entra_id_login"[^>]*\shidden\s*>', response.content
+    )
+    assert b"login_hint=nobody%40rcpch.ac.uk" in response.content
+
+
+@pytest.mark.django_db
+@override_settings(**ENTRA_OPTIONAL)
+def test_login_page_keeps_sign_in_with_microsoft_hidden_for_other_emails(client):
+    response = post_password_login(client, "clinician@nhs.net", "x")
+
+    assert response.context["entra_id_login_hint"] == ""
 
 
 @pytest.mark.django_db
@@ -261,6 +364,31 @@ def test_entra_id_login_redirects_to_microsoft_and_keeps_safe_next(client):
     assert fake.redirect_uri.endswith(reverse("entra_id_callback"))
     assert client.session[ENTRA_ID_FLOW_SESSION_KEY]["state"] == "abc"
     assert client.session[ENTRA_ID_NEXT_SESSION_KEY] == "/admin/"
+    assert fake.account_selection == {"prompt": "select_account"}
+
+
+@pytest.mark.django_db
+@override_settings(**ENTRA_OPTIONAL)
+def test_entra_id_login_passes_domain_email_to_microsoft(client):
+    fake = FakeEntraClient()
+    with patch(
+        "epilepsy12.views.entra_id_views.build_entra_id_client", return_value=fake
+    ):
+        client.get(reverse("entra_id_login"), {"login_hint": "Super@rcpch.ac.uk"})
+
+    assert fake.account_selection == {"login_hint": "super@rcpch.ac.uk"}
+
+
+@pytest.mark.django_db
+@override_settings(**ENTRA_OPTIONAL)
+def test_entra_id_login_ignores_login_hint_off_domain(client):
+    fake = FakeEntraClient()
+    with patch(
+        "epilepsy12.views.entra_id_views.build_entra_id_client", return_value=fake
+    ):
+        client.get(reverse("entra_id_login"), {"login_hint": "someone@nhs.net"})
+
+    assert fake.account_selection == {"prompt": "select_account"}
 
 
 @pytest.mark.django_db
@@ -336,6 +464,64 @@ def test_entra_id_sign_in_reuses_bound_device(client, superuser):
 
     assert int(client.session["_auth_user_id"]) == superuser.pk
     assert EntraIDDevice.objects.filter(user=superuser).count() == 1
+
+
+@pytest.mark.django_db
+@override_settings(**ENTRA_REQUIRED)
+def test_entra_id_sign_in_refused_without_mfa(client, superuser):
+    response = complete_entra_sign_in(
+        client, FakeEntraClient(claims_for(superuser.email, amr=["pwd"]))
+    )
+
+    assert_refused(client, response)
+    assert not EntraIDDevice.objects.filter(user=superuser).exists()
+
+
+@pytest.mark.django_db
+@override_settings(**ENTRA_REQUIRED)
+def test_entra_id_sign_in_refused_without_amr_claim(client, superuser):
+    response = complete_entra_sign_in(
+        client, FakeEntraClient(claims_for(superuser.email, amr=None))
+    )
+
+    assert_refused(client, response)
+
+
+@pytest.mark.django_db
+@override_settings(**dict(ENTRA_REQUIRED, ENTRA_ID_REQUIRE_MFA_CLAIM=False))
+def test_entra_id_sign_in_allowed_without_amr_when_mfa_check_off(client, superuser):
+    complete_entra_sign_in(
+        client, FakeEntraClient(claims_for(superuser.email, amr=None))
+    )
+
+    assert int(client.session["_auth_user_id"]) == superuser.pk
+
+
+@pytest.mark.django_db
+@override_settings(**ENTRA_REQUIRED)
+def test_entra_id_sign_in_ignores_email_claims_off_domain(client, e12_user_factory):
+    """
+    A guest account in the tenant can carry an outside email address in its
+    claims. Only addresses on ENTRA_ID_EMAIL_DOMAIN are matched to users.
+    """
+    outside_superuser = saved(
+        e12_user_factory(
+            role=RCPCH_AUDIT_TEAM, is_superuser=True, email="developer@example.com"
+        )
+    )
+
+    response = complete_entra_sign_in(
+        client,
+        FakeEntraClient(
+            claims_for(
+                "developer_example.com#EXT#@rcpch.onmicrosoft.com",
+                email="developer@example.com",
+            )
+        ),
+    )
+
+    assert_refused(client, response)
+    assert not EntraIDDevice.objects.filter(user=outside_superuser).exists()
 
 
 def assert_refused(client, response, user=None, details_contains=None):

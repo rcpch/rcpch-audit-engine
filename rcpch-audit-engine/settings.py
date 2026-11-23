@@ -302,14 +302,25 @@ AUTH_USER_MODEL = "epilepsy12.Epilepsy12User"
 
 # MICROSOFT ENTRA ID SIGN IN (OAuth 2.0 / OpenID Connect)
 # Superusers and RCPCH Audit Team members can sign in with their RCPCH Microsoft
-# account. Sign in with Microsoft is offered whenever the app registration below
-# is configured.
+# account. Sign in with Microsoft is enabled when the app registration and the
+# email domain below are all configured. The login page only offers it once an
+# email address on ENTRA_ID_EMAIL_DOMAIN has been typed in, and only Microsoft
+# accounts on that domain are accepted.
 ENTRA_ID_TENANT_ID = os.getenv("ENTRA_ID_TENANT_ID", "")
 ENTRA_ID_CLIENT_ID = os.getenv("ENTRA_ID_CLIENT_ID", "")
 ENTRA_ID_CLIENT_SECRET = os.getenv("ENTRA_ID_CLIENT_SECRET", "")
+ENTRA_ID_EMAIL_DOMAIN = os.getenv("ENTRA_ID_EMAIL_DOMAIN", "").strip().lstrip("@").lower()
 ENTRA_ID_LOGIN_ENABLED = bool(
-    ENTRA_ID_TENANT_ID and ENTRA_ID_CLIENT_ID and ENTRA_ID_CLIENT_SECRET
+    ENTRA_ID_TENANT_ID
+    and ENTRA_ID_CLIENT_ID
+    and ENTRA_ID_CLIENT_SECRET
+    and ENTRA_ID_EMAIL_DOMAIN
 )
+
+# Defence in depth: refuse a Microsoft sign in unless the ID token's amr claim
+# says multi-factor authentication was performed. RCPCH's Conditional Access
+# policy should already require it.
+ENTRA_ID_REQUIRE_MFA_CLAIM = os.getenv("ENTRA_ID_REQUIRE_MFA_CLAIM", "True") == "True"
 
 # When True, superusers and RCPCH Audit Team members MUST sign in with Microsoft
 # Entra ID: the email, password and one-time code login is refused for them
@@ -324,7 +335,8 @@ if ENTRA_ID_LOGIN_REQUIRED_FOR_RCPCH_STAFF and not ENTRA_ID_LOGIN_ENABLED:
     # Fail fast rather than lock every superuser out of the app
     raise ImproperlyConfigured(
         "ENTRA_ID_LOGIN_REQUIRED_FOR_RCPCH_STAFF is True but ENTRA_ID_TENANT_ID, "
-        "ENTRA_ID_CLIENT_ID and ENTRA_ID_CLIENT_SECRET are not all set."
+        "ENTRA_ID_CLIENT_ID, ENTRA_ID_CLIENT_SECRET and ENTRA_ID_EMAIL_DOMAIN are "
+        "not all set."
     )
 logger.info(
     "ENTRA_ID_LOGIN_ENABLED: %s, ENTRA_ID_LOGIN_REQUIRED_FOR_RCPCH_STAFF: %s",

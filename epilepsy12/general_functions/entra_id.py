@@ -10,9 +10,17 @@ from django.conf import settings
 
 from epilepsy12.constants.user_types import RCPCH_AUDIT_TEAM
 
-ENTRA_ID_LOGIN_REQUIRED_MESSAGE = (
-    "Superusers and RCPCH Audit Team members must sign in with Microsoft."
-)
+
+def is_entra_id_email(email) -> bool:
+    """
+    True if this email address is on settings.ENTRA_ID_EMAIL_DOMAIN. Decided
+    from the address alone, so it reveals nothing about any account.
+    """
+    domain = settings.ENTRA_ID_EMAIL_DOMAIN
+    if not domain or not isinstance(email, str):
+        return False
+    local_part, at, email_domain = email.strip().lower().rpartition("@")
+    return bool(at and local_part and email_domain == domain)
 
 
 def may_use_entra_id_login(user) -> bool:
