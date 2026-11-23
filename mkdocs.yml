@@ -65,8 +65,10 @@ plugins:
   #     repository: rcpch/epilepsy12-documentation
   #     branch: live
   #     enabled: !ENV [ENABLE_GIT_COMMITTERS, false] # makes Git Committers optional
-  # - git-revision-date-localized:  # https://github.com/zensical/backlog/issues/18
-  #     enable_creation_date: true
+  # git-revision-date-localized is supported natively by Zensical (since 0.1.3):
+  # https://zensical.org/docs/compatibility/mkdocs/plugins/#git-revision-date-localized
+  - git-revision-date-localized:
+      enable_creation_date: true
   # - macros:               # replaced by zensical.extensions.macros (see below)
   # - with-pdf:             # https://github.com/zensical/backlog/issues/25
   #     back_cover: false
