@@ -121,3 +121,16 @@ def test_admin_edit_without_role_change_leaves_groups_alone():
         PATIENT_ACCESS,
     }
 
+
+
+def test_retired_user_flag_history_admin_is_read_only():
+    """The archive of the retired RCPCH flags can be viewed but never edited."""
+    from epilepsy12.admin import RetiredUserFlagHistoryAdmin
+    from epilepsy12.models import RetiredUserFlagHistory
+
+    archive_admin = RetiredUserFlagHistoryAdmin(RetiredUserFlagHistory, AdminSite())
+    request = RequestFactory().get("/")
+
+    assert archive_admin.has_add_permission(request) is False
+    assert archive_admin.has_change_permission(request) is False
+    assert archive_admin.has_delete_permission(request) is False
