@@ -34,15 +34,13 @@ Multi-factor authentication is enforced by RCPCH's own Entra ID (Conditional Acc
 
 The Microsoft account's email (`email`, `preferred_username` or `upn` claim) must match exactly one Epilepsy12 user's email address. On the first successful sign in, the Microsoft account's immutable object id is stored on the user's Entra ID device. Later sign ins must come from the same Microsoft account. If an RCPCH email address is ever reassigned to a different person, sign in is refused until the Entra ID device is deleted from the user's logs page (the same place two-factor devices are reset).
 
-Failed sign ins are recorded in the user's visit activity as "Microsoft Entra ID login failed", with the reason.
+Failed sign ins are recorded in the user's visit activity as "Login failed", with details starting "Microsoft Entra ID sign in failed:" and the reason. They are also logged at error level, so the admins are emailed.
 
 ## Switching it on
 
 1. Set `ENTRA_ID_TENANT_ID`, `ENTRA_ID_CLIENT_ID` and `ENTRA_ID_CLIENT_SECRET` and deploy. Sign in with Microsoft now appears on the login page but is optional.
 2. Ask every superuser and RCPCH Audit Team member to sign in with Microsoft once to check their account matches.
-3. Set `ENTRA_ID_LOGIN_REQUIRED_FOR_RCPCH_STAFF="True"` and deploy. From then on:
-    - their email and password login is refused with a message telling them to sign in with Microsoft
-    - any session they started with their password is ended on their next request
+3. Set `ENTRA_ID_LOGIN_REQUIRED_FOR_RCPCH_STAFF="True"` and deploy. From then on their email and password login is refused with a message telling them to sign in with Microsoft. Sessions already open when the setting is switched on carry on until they log out or are automatically logged out.
 
 ## Switching it off
 

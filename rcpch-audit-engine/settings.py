@@ -159,8 +159,6 @@ MIDDLEWARE = [
     "epilepsy12.middleware.Epilepsy12CustomLoggingAttributesMiddleware",
     # 2fa
     "django_otp.middleware.OTPMiddleware",
-    # Must come after OTPMiddleware as it inspects request.user.otp_device
-    "epilepsy12.middleware.EntraIDLoginRequiredMiddleware",
 ]
 
 # Django security middleware settings for HSTS support
@@ -314,8 +312,9 @@ ENTRA_ID_LOGIN_ENABLED = bool(
 )
 
 # When True, superusers and RCPCH Audit Team members MUST sign in with Microsoft
-# Entra ID: the email, password and one-time code login is refused for them and
-# any session they started that way is ended. Their existing passwords and 2FA
+# Entra ID: the email, password and one-time code login is refused for them
+# (sessions already open carry on until they are auto logged out). Their
+# existing passwords and 2FA
 # devices are left untouched, so setting this back to False restores the old
 # login immediately.
 ENTRA_ID_LOGIN_REQUIRED_FOR_RCPCH_STAFF = (

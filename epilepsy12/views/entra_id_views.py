@@ -53,12 +53,13 @@ def _fail(request, message, user=None, details=None):
     """Show the user why sign in failed and audit it against their account."""
     if user is not None:
         VisitActivity.objects.create(
-            activity=VisitActivity.ENTRA_ID_LOGIN_FAILED,
+            activity=VisitActivity.UNSUCCESSFUL_LOGIN,
             ip_address=get_client_ip(request),
             epilepsy12user=user,
-            details=details or message,
+            details=f"Microsoft Entra ID sign in failed: {details or message}",
         )
-    logger.warning(
+    # error, not warning, so that it is emailed to the admins
+    logger.error(
         "Entra ID sign in failed from %s for %s: %s",
         get_client_ip(request),
         user.email if user else "unmatched account",

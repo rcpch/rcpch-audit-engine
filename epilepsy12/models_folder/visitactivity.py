@@ -23,7 +23,6 @@ class VisitActivity(models.Model):
     USER_EMPLOYER_ROLE_CHANGED = 17
     PASSWORD_RESET_FAILED = 18
     ACCOUNT_DEACTIVATED_INACTIVITY = 19
-    ENTRA_ID_LOGIN_FAILED = 20
 
     ACTIVITY = (
         (SUCCESSFUL_LOGIN, "Successful login"),
@@ -51,7 +50,6 @@ class VisitActivity(models.Model):
             ACCOUNT_DEACTIVATED_INACTIVITY,
             "Account deactivated due to inactivity",
         ),
-        (ENTRA_ID_LOGIN_FAILED, "Microsoft Entra ID login failed"),
     )
 
     activity_datetime = models.DateTimeField(auto_created=True, default=timezone.now)

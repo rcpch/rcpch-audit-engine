@@ -26,9 +26,6 @@ from epilepsy12.general_functions.entra_id import (
     must_use_entra_id_login,
 )
 from epilepsy12.models import EntraIDDevice, VisitActivity
-from epilepsy12.tests.view_tests.permissions_tests.perm_tests_utils import (
-    twofactor_signin,
-)
 from epilepsy12.views.entra_id_views import (
     ENTRA_ID_FLOW_SESSION_KEY,
     ENTRA_ID_NEXT_SESSION_KEY,
@@ -310,7 +307,7 @@ def test_entra_id_sign_in_logs_in_and_verifies_rcpch_staff(
         epilepsy12user=user, activity=VisitActivity.SUCCESSFUL_LOGIN
     ).exists()
 
-    # The session counts as 2FA verified and is not ended by the middleware
+    # The session counts as 2FA verified
     response = client.get(reverse("index"))
     assert response.status_code == 200
     assert response.wsgi_request.user.is_verified()
@@ -347,8 +344,9 @@ def assert_refused(client, response, user=None, details_contains=None):
     assert "_auth_user_id" not in client.session
     if user is not None:
         failure = VisitActivity.objects.get(
-            epilepsy12user=user, activity=VisitActivity.ENTRA_ID_LOGIN_FAILED
+            epilepsy12user=user, activity=VisitActivity.UNSUCCESSFUL_LOGIN
         )
+        assert failure.details.startswith("Microsoft Entra ID sign in failed: ")
         if details_contains:
             assert details_contains in failure.details
 
@@ -446,45 +444,3 @@ def test_entra_id_callback_refused_without_sign_in_in_progress(client, superuser
 
     assert_refused(client, response)
     assert fake.redeemed_with is None
-
-
-# Sessions started with a password (EntraIDLoginRequiredMiddleware)
-
-
-@pytest.mark.django_db
-@override_settings(**ENTRA_REQUIRED)
-def test_password_session_of_rcpch_staff_ended_when_required(client, superuser):
-    client.force_login(superuser)
-    twofactor_signin(client, superuser)
-
-    response = client.get(reverse("index"))
-
-    assert response.status_code == 302
-    assert response.url == reverse("two_factor:login")
-    assert "_auth_user_id" not in client.session
-    # Their 2FA device is not touched
-    assert TOTPDevice.objects.filter(user=superuser, name="default").exists()
-
-
-@pytest.mark.django_db
-@override_settings(**ENTRA_OPTIONAL)
-def test_password_session_of_rcpch_staff_kept_when_not_required(client, superuser):
-    client.force_login(superuser)
-    twofactor_signin(client, superuser)
-
-    response = client.get(reverse("index"))
-
-    assert response.status_code == 200
-    assert int(client.session["_auth_user_id"]) == superuser.pk
-
-
-@pytest.mark.django_db
-@override_settings(**ENTRA_REQUIRED)
-def test_password_session_of_clinician_kept_when_required(client, clinician):
-    client.force_login(clinician)
-    twofactor_signin(client, clinician)
-
-    response = client.get(reverse("index"))
-
-    assert response.status_code == 200
-    assert int(client.session["_auth_user_id"]) == clinician.pk
