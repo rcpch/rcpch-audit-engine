@@ -1,19 +1,38 @@
 {% extends "admin/index.html" %}
 
+{% comment %}
+  The admin uses django-semantic-admin, which restyles the dashboard with
+  Fomantic UI. Match the markup it uses for app model tables so this entry
+  picks up the same styling.
+{% endcomment %}
 {% block content %}
   {% if request.user.is_superuser %}
-    <div class="module">
-      <table>
-        <caption>Administrative tools</caption>
-        <tbody>
-          <tr>
-            <th scope="row">
-              <a href="{% url 'admin:remove_unregistered_cases' %}">Remove unregistered cases</a>
-            </th>
-            <td>Preview and permanently remove abandoned case records.</td>
-          </tr>
-        </tbody>
-      </table>
+    <div class="ui grid">
+      <div class="row">
+        <div class="ten wide column">
+          <div class="module">
+            <table class="ui large fixed celled table">
+              <thead>
+                <tr>
+                  <th colspan="3">Administrative tools</th>
+                </tr>
+              </thead>
+              <tbody>
+                <tr class="model-removeunregisteredcases">
+                  <td scope="row">
+                    <a href="{% url 'admin:remove_unregistered_cases' %}">Remove unregistered cases</a>
+                  </td>
+                  <td>Preview and permanently remove abandoned case records.</td>
+                  <td>
+                    <a href="{% url 'admin:remove_unregistered_cases' %}" class="ui primary button changelink">Open</a>
+                  </td>
+                </tr>
+              </tbody>
+            </table>
+            <br />
+          </div>
+        </div>
+      </div>
     </div>
   {% endif %}
   {{ block.super }}
