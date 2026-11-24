@@ -249,8 +249,6 @@ def test_lead_clinician_can_reactivate_user_deactivated_for_inactivity(
         role=AUDIT_CENTRE_CLINICIAN,
         is_active=True,
         email_confirmed=True,
-        is_rcpch_audit_team_member=False,
-        is_rcpch_staff=False,
         last_login=timezone.now() - timedelta(days=800),
     )
     user.set_organisation_employer(organisation_employer=GOSH, is_primary=True)

@@ -37,8 +37,6 @@ E12UserFactory(
     # Assign flags based on user role
     is_active=True,
     is_staff=False,
-    is_rcpch_audit_team_member=False,
-    is_rcpch_staff=False,
     organisation_employer=TEST_USER_ORGANISATION,
     groups=[test_user_audit_centre_administrator_data.group_name],
 )
@@ -48,8 +46,6 @@ E12UserFactory(
     # Assign flags based on user role
     is_active=True,
     is_staff=False,
-    is_rcpch_audit_team_member=False,
-    is_rcpch_staff=False,
     organisation_employer=TEST_USER_ORGANISATION,
     groups=[test_user_audit_centre_clinician_data.group_name],
 )
@@ -60,8 +56,6 @@ E12UserFactory(
     # Assign flags based on user role
     is_active=True,
     is_staff=False,
-    is_rcpch_audit_team_member=False,
-    is_rcpch_staff=False,
     organisation_employer=TEST_USER_ORGANISATION,
     groups=[test_user_rcpch_audit_team_data.group_name],
 )
@@ -73,8 +67,6 @@ E12UserFactory(
     surname="WELSH",
     is_active=False,
     is_staff=False,
-    is_rcpch_audit_team_member=False,
-    is_rcpch_staff=False,
     organisation_employer=Organisation.objects.get(pk=333),
     groups=[test_user_audit_centre_lead_clinician_data.group_name],
 )

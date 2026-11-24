@@ -150,7 +150,7 @@ CAN_EXTEND_SUBMISSION_DEADLINE = (
 )
 
 # RCPCH Audit Team
-# These replace the is_rcpch_audit_team_member / is_rcpch_staff flags. See
+# National access for the RCPCH Audit Team role. See
 # documentation/docs/development/rcpch-flags-retirement-plan.md
 CAN_ACCESS_ALL_ORGANISATIONS = (
     "can_access_all_organisations",

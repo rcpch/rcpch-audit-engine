@@ -214,7 +214,7 @@
                 {% endif %}
             </td>
             <td class="rcpch_team_member_image_wrapper">
-                {% if epilepsy12_user.is_rcpch_audit_team_member %}
+                {% if epilepsy12_user|has_rcpch_audit_team_role %}
                     <img 
                         src="{% static 'images/epilepsy12-logo-1.png' %}" 
                         class="ui avatar image rcpch_member_image"
@@ -224,18 +224,6 @@
                         data-position="top left"
                         data-variation="basic"
                         _="init js $('#{{epilepsy12_user.id}}_rcpch_audit_team_member_icon').popup(); end"
-                    >
-                {% endif %}
-                {% if epilepsy12_user.is_rcpch_staff %}
-                    <img 
-                        src="{% static 'images/rcpch-logo.jpg' %}" 
-                        class="ui avatar image rcpch_member_image"
-                        id="{{epilepsy12_user.id}}_staff_icon"
-                        data-title="RCPCH Staff Member"
-                        data-content="{{epilepsy12_user}} is a member of RCPCH staff.  They are not affiliated with any organisation or community trust and can view national data."
-                        data-position="top left"
-                        data-variation="basic"
-                        _="init js $('#{{epilepsy12_user.id}}_staff_icon').popup(); end"
                     >
                 {% endif %}
                 {% if epilepsy12_user.is_superuser %}

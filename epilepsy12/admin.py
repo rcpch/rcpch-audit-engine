@@ -26,7 +26,6 @@ from two_factor.admin import AdminSiteOTPRequiredMixin
 from .models import *
 from .organisational_audit import export_submission_period_as_csv
 from .filtersets import *
-from .constants.user_types import RCPCH_AUDIT_TEAM
 from .common_view_functions.group_for_group import group_for_role
 
 
@@ -464,8 +463,6 @@ class Epilepsy12UserAdmin(UserAdmin, SimpleHistoryAdmin):
         "surname",
         "is_active",
         "is_superuser",
-        "is_rcpch_staff",
-        "is_rcpch_audit_team_member",
         "role",
         "get_employer_organisations",
     ]
@@ -497,8 +494,6 @@ class Epilepsy12UserAdmin(UserAdmin, SimpleHistoryAdmin):
                 "fields": (
                     "role",
                     "is_active",
-                    "is_rcpch_staff",
-                    "is_rcpch_audit_team_member",
                     "is_superuser",
                     "email_confirmed",
                     "view_preference",
@@ -536,9 +531,7 @@ class Epilepsy12UserAdmin(UserAdmin, SimpleHistoryAdmin):
                     "title",
                     "first_name",
                     "surname",
-                    "is_rcpch_staff",
                     "is_active",
-                    "is_rcpch_audit_team_member",
                     "role",
                     "is_superuser",
                     "groups",
@@ -549,18 +542,13 @@ class Epilepsy12UserAdmin(UserAdmin, SimpleHistoryAdmin):
 
     def save_model(self, request, obj, form, change):
         """
-        Keep the RCPCH flags and the user's group in step with a role set or
-        changed in the admin (Phase 0 of the flags retirement: role is the
-        source of truth for national access). Flags edited *without* a role
-        change are preserved, so superusers can triage individual
-        audit_rcpch_user_flags findings here.
+        Keep the user's group in step with a role set or changed in the admin:
+        role is the source of truth for a user's permissions, including
+        national access.
         """
         sync_from_role = obj.role is not None and (
             not change or "role" in form.changed_data
         )
-        if sync_from_role:
-            obj.is_rcpch_audit_team_member = obj.role == RCPCH_AUDIT_TEAM
-            obj.is_rcpch_staff = obj.role == RCPCH_AUDIT_TEAM
         super().save_model(request, obj, form, change)
         if sync_from_role:
             obj.groups.clear()
@@ -880,6 +868,31 @@ admin.site.register(
     OrganisationalAuditSubmissionPeriod, OrganisationalAuditSubmissionPeriodAdmin
 )
 admin.site.register(Banner)
+
+
+@admin.register(RetiredUserFlagHistory)
+class RetiredUserFlagHistoryAdmin(admin.ModelAdmin):
+    """Read-only: an archive of the retired RCPCH user flags."""
+
+    list_display = (
+        "email",
+        "history_date",
+        "history_type",
+        "role",
+        "is_rcpch_audit_team_member",
+        "is_rcpch_staff",
+    )
+    list_filter = ("is_rcpch_audit_team_member", "is_rcpch_staff", "history_type")
+    search_fields = ("email",)
+
+    def has_add_permission(self, request):
+        return False
+
+    def has_change_permission(self, request, obj=None):
+        return False
+
+    def has_delete_permission(self, request, obj=None):
+        return False
 
 
 # Customise the admin site

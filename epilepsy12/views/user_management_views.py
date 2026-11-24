@@ -984,8 +984,6 @@ def all_epilepsy12_users_list(request, organisation_id):
                 "email": user.email,
                 "is_active": user.is_active,
                 "is_superuser": user.is_superuser,
-                "is_rcpch_audit_team_member": user.is_rcpch_audit_team_member,
-                "is_rcpch_staff": user.is_rcpch_staff,
                 "role": role,
                 "created_at": user.created_at,
                 "created_by": created_by,
