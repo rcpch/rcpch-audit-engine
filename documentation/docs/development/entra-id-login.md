@@ -26,18 +26,34 @@ New RCPCH Audit Team members do not need a password: they leave the password fie
 |---|---|
 | `ENTRA_ID_TENANT_ID` | Directory (tenant) id of the RCPCH Entra ID tenant. Only accounts from this tenant are accepted. |
 | `ENTRA_ID_CLIENT_ID` | Application (client) id of the app registration. |
-| `ENTRA_ID_CLIENT_SECRET` | Client secret of the app registration. |
 | `ENTRA_ID_EMAIL_DOMAIN` | e.g. `rcpch.ac.uk`. The button is shown for this domain, and only Microsoft accounts with an email on it are accepted. |
+| `ENTRA_ID_CLIENT_SECRET` | A client secret of the app registration. Use for local development. |
+| `ENTRA_ID_USE_MANAGED_IDENTITY` | `"True"` to authenticate as the container app's managed identity instead of with a client secret. Use for deployed environments. Defaults to `"False"`. |
+| `ENTRA_ID_MANAGED_IDENTITY_CLIENT_ID` | Optional. Client id of the user-assigned managed identity to use. Defaults to `AZURE_CLIENT_ID` (the identity the database connection uses), else the system-assigned identity. |
 | `ENTRA_ID_LOGIN_REQUIRED_FOR_RCPCH_STAFF` | `"True"` to make Sign in with Microsoft compulsory for superusers and the RCPCH Audit Team. Defaults to `"False"`. |
 
-Sign in with Microsoft is enabled when the first four are all set. If `ENTRA_ID_LOGIN_REQUIRED_FOR_RCPCH_STAFF` is `"True"` but they are not all set, the app refuses to start rather than lock every superuser out.
+Sign in with Microsoft is enabled when the tenant id, client id and email domain are set, plus **one** credential: `ENTRA_ID_CLIENT_SECRET` or `ENTRA_ID_USE_MANAGED_IDENTITY="True"`. Setting both makes the app refuse to start, so it is never ambiguous which is in use. If `ENTRA_ID_LOGIN_REQUIRED_FOR_RCPCH_STAFF` is `"True"` but sign in is not fully configured, the app also refuses to start rather than lock every superuser out.
 
 ## Setting up the app registration
 
-1. In the Entra admin centre, create an app registration for **accounts in this organisational directory only** (single tenant).
-2. Add a **Web** redirect URI of `https://<site domain>/account/entra-id/callback/` for each environment (for example the live and staging domains).
-3. Create a client secret and store it with the other secrets for the environment. Note its expiry date: when it expires, Sign in with Microsoft stops working (see [Switching it off](#switching-it-off)).
-4. No API permissions are needed beyond the default `openid` / `profile` sign in.
+1. In the Entra admin centre, create an app registration for **accounts in this organisational directory only** (single tenant). Keep it separate from the app registration used for GitHub Actions deployment: it needs no Azure role assignments.
+2. Add a **Web** redirect URI of `https://<site domain>/account/entra-id/callback/` for each environment (for example the live and staging domains, and `https://e12.localhost/account/entra-id/callback/` for local development).
+3. No API permissions are needed beyond the default `openid` / `profile` sign in.
+4. Give the app a credential, as below.
+
+### Deployed environments: managed identity (no secret)
+
+The container app's managed identity is trusted by the app registration as a **federated credential**. There is then no secret to store, rotate or let expire.
+
+1. On the app registration, go to **Certificates & secrets → Federated credentials → Add credential** and choose the **Managed identity** scenario.
+2. Select the managed identity the container app runs as (the one already used for the database connection).
+3. Set `ENTRA_ID_USE_MANAGED_IDENTITY="True"` and leave `ENTRA_ID_CLIENT_SECRET` unset. If the container app has more than one user-assigned identity and `AZURE_CLIENT_ID` is not the one you added, set `ENTRA_ID_MANAGED_IDENTITY_CLIENT_ID` to its client id.
+
+At sign in, Epilepsy12 gets a token for the managed identity (audience `api://AzureADTokenExchange`) and presents it to Entra ID in place of a client secret.
+
+### Local development: client secret
+
+A local machine has no managed identity, so use a client secret: create one under **Certificates & secrets → Client secrets** and set `ENTRA_ID_CLIENT_SECRET` in `envs/.env`. Note its expiry date: when it expires, Sign in with Microsoft stops working locally.
 
 ## Multi-factor authentication
 
@@ -55,7 +71,7 @@ Failed sign ins are recorded in the user's visit activity as "Login failed", wit
 
 ## Switching it on
 
-1. Set the four Entra ID variables above and deploy. Sign in with Microsoft now appears for `@rcpch.ac.uk` addresses but is optional.
+1. Set the Entra ID variables above (with the managed identity credential) and deploy. Sign in with Microsoft now appears for `@rcpch.ac.uk` addresses but is optional.
 2. Ask every superuser and RCPCH Audit Team member to sign in with Microsoft once to check their account matches.
 3. Set `ENTRA_ID_LOGIN_REQUIRED_FOR_RCPCH_STAFF="True"` and deploy. From then on, their email and password login is refused with the same "incorrect email or password" error as a wrong password, so a correct password is never revealed. The real reason is recorded in their visit activity. Sessions already open when the setting is switched on carry on until they log out or are automatically logged out.
 

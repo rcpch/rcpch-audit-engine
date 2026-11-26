@@ -308,30 +308,50 @@ AUTH_USER_MODEL = "epilepsy12.Epilepsy12User"
 # accounts on that domain are accepted.
 ENTRA_ID_TENANT_ID = os.getenv("ENTRA_ID_TENANT_ID", "")
 ENTRA_ID_CLIENT_ID = os.getenv("ENTRA_ID_CLIENT_ID", "")
-ENTRA_ID_CLIENT_SECRET = os.getenv("ENTRA_ID_CLIENT_SECRET", "")
 ENTRA_ID_EMAIL_DOMAIN = os.getenv("ENTRA_ID_EMAIL_DOMAIN", "").strip().lstrip("@").lower()
+
+# The app proves its identity to Entra ID in one of two ways (set exactly one):
+# - ENTRA_ID_CLIENT_SECRET: a client secret, e.g. for local development
+# - ENTRA_ID_USE_MANAGED_IDENTITY="True": the running container app's managed
+#   identity, added as a federated credential on the app registration, so there
+#   is no secret to store, rotate or expire. ENTRA_ID_MANAGED_IDENTITY_CLIENT_ID
+#   picks a user-assigned identity; it defaults to AZURE_CLIENT_ID (the identity
+#   the database connection uses), else the system-assigned identity.
+ENTRA_ID_CLIENT_SECRET = os.getenv("ENTRA_ID_CLIENT_SECRET", "")
+ENTRA_ID_USE_MANAGED_IDENTITY = (
+    os.getenv("ENTRA_ID_USE_MANAGED_IDENTITY", "False") == "True"
+)
+ENTRA_ID_MANAGED_IDENTITY_CLIENT_ID = os.getenv(
+    "ENTRA_ID_MANAGED_IDENTITY_CLIENT_ID", ""
+) or os.getenv("AZURE_CLIENT_ID", "")
+if ENTRA_ID_CLIENT_SECRET and ENTRA_ID_USE_MANAGED_IDENTITY:
+    raise ImproperlyConfigured(
+        "Set only one of ENTRA_ID_CLIENT_SECRET and "
+        "ENTRA_ID_USE_MANAGED_IDENTITY, not both."
+    )
+
 ENTRA_ID_LOGIN_ENABLED = bool(
     ENTRA_ID_TENANT_ID
     and ENTRA_ID_CLIENT_ID
-    and ENTRA_ID_CLIENT_SECRET
+    and (ENTRA_ID_CLIENT_SECRET or ENTRA_ID_USE_MANAGED_IDENTITY)
     and ENTRA_ID_EMAIL_DOMAIN
 )
 
 # When True, superusers and RCPCH Audit Team members MUST sign in with Microsoft
 # Entra ID: the email, password and one-time code login is refused for them
 # (sessions already open carry on until they are auto logged out). Their
-# existing passwords and 2FA
-# devices are left untouched, so setting this back to False restores the old
-# login immediately.
+# existing passwords and 2FA devices are left untouched, so setting this back
+# to False restores the old login immediately.
 ENTRA_ID_LOGIN_REQUIRED_FOR_RCPCH_STAFF = (
     os.getenv("ENTRA_ID_LOGIN_REQUIRED_FOR_RCPCH_STAFF", "False") == "True"
 )
 if ENTRA_ID_LOGIN_REQUIRED_FOR_RCPCH_STAFF and not ENTRA_ID_LOGIN_ENABLED:
     # Fail fast rather than lock every superuser out of the app
     raise ImproperlyConfigured(
-        "ENTRA_ID_LOGIN_REQUIRED_FOR_RCPCH_STAFF is True but ENTRA_ID_TENANT_ID, "
-        "ENTRA_ID_CLIENT_ID, ENTRA_ID_CLIENT_SECRET and ENTRA_ID_EMAIL_DOMAIN are "
-        "not all set."
+        "ENTRA_ID_LOGIN_REQUIRED_FOR_RCPCH_STAFF is True but Entra ID sign in is "
+        "not configured: ENTRA_ID_TENANT_ID, ENTRA_ID_CLIENT_ID, "
+        "ENTRA_ID_EMAIL_DOMAIN and either ENTRA_ID_CLIENT_SECRET or "
+        "ENTRA_ID_USE_MANAGED_IDENTITY must all be set."
     )
 logger.info(
     "ENTRA_ID_LOGIN_ENABLED: %s, ENTRA_ID_LOGIN_REQUIRED_FOR_RCPCH_STAFF: %s",

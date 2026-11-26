@@ -7,10 +7,14 @@ Microsoft is never contacted: the msal client is replaced with a fake that
 returns the ID token claims we choose.
 """
 
+import os
 import re
+import subprocess
+import sys
 from unittest.mock import patch
 
 import pytest
+from django.conf import settings
 from django.core.exceptions import ValidationError
 from django.test import override_settings
 from django.urls import reverse
@@ -22,7 +26,10 @@ from epilepsy12.constants.user_types import (
     RCPCH_AUDIT_TEAM,
 )
 from epilepsy12.forms_folder.epilepsy12_user_form import CaptchaAuthenticationForm
+from epilepsy12.general_functions import entra_id as entra_id_module
 from epilepsy12.general_functions.entra_id import (
+    build_entra_id_client,
+    get_managed_identity_assertion,
     is_entra_id_email,
     may_use_entra_id_login,
     must_use_entra_id_login,
@@ -594,3 +601,136 @@ def test_entra_id_callback_refused_without_sign_in_in_progress(client, superuser
 
     assert_refused(client, response)
     assert fake.redeemed_with is None
+
+
+# How the app authenticates to Entra ID (build_entra_id_client)
+
+
+@pytest.fixture
+def fresh_managed_identity_credential():
+    """Clear the cached credential so each test builds its own."""
+    entra_id_module._managed_identity_credential = None
+    yield
+    entra_id_module._managed_identity_credential = None
+
+
+@override_settings(
+    **dict(
+        ENTRA_CONFIGURED,
+        ENTRA_ID_CLIENT_SECRET="client-secret",
+        ENTRA_ID_USE_MANAGED_IDENTITY=False,
+    )
+)
+def test_entra_id_client_uses_client_secret():
+    with patch("msal.ConfidentialClientApplication") as client_class:
+        build_entra_id_client()
+
+    kwargs = client_class.call_args.kwargs
+    assert kwargs["client_id"] == "client-id"
+    assert kwargs["client_credential"] == "client-secret"
+    assert kwargs["authority"] == f"https://login.microsoftonline.com/{TENANT_ID}"
+
+
+@override_settings(
+    **dict(
+        ENTRA_CONFIGURED,
+        ENTRA_ID_CLIENT_SECRET="",
+        ENTRA_ID_USE_MANAGED_IDENTITY=True,
+        ENTRA_ID_MANAGED_IDENTITY_CLIENT_ID="managed-identity-client-id",
+    )
+)
+def test_entra_id_client_uses_managed_identity_as_client_assertion(
+    fresh_managed_identity_credential,
+):
+    with patch("msal.ConfidentialClientApplication") as client_class, patch(
+        "azure.identity.ManagedIdentityCredential"
+    ) as credential_class:
+        credential_class.return_value.get_token.return_value.token = "mi-token"
+
+        build_entra_id_client()
+        client_credential = client_class.call_args.kwargs["client_credential"]
+
+        # msal calls the assertion each time it needs one, so it stays current
+        assert set(client_credential) == {"client_assertion"}
+        assert client_credential["client_assertion"]() == "mi-token"
+        assert client_credential["client_assertion"]() == "mi-token"
+
+    credential_class.assert_called_once_with(client_id="managed-identity-client-id")
+    credential_class.return_value.get_token.assert_called_with(
+        "api://AzureADTokenExchange/.default"
+    )
+
+
+@override_settings(
+    **dict(
+        ENTRA_CONFIGURED,
+        ENTRA_ID_CLIENT_SECRET="",
+        ENTRA_ID_USE_MANAGED_IDENTITY=True,
+        ENTRA_ID_MANAGED_IDENTITY_CLIENT_ID="",
+    )
+)
+def test_entra_id_client_uses_system_assigned_identity_without_a_client_id(
+    fresh_managed_identity_credential,
+):
+    with patch("azure.identity.ManagedIdentityCredential") as credential_class:
+        credential_class.return_value.get_token.return_value.token = "mi-token"
+        get_managed_identity_assertion()
+
+    credential_class.assert_called_once_with(client_id=None)
+
+
+def _import_settings_with(env_overrides):
+    """Import the settings module in a fresh interpreter with these env vars."""
+    env = {
+        **os.environ,
+        "ENTRA_ID_TENANT_ID": TENANT_ID,
+        "ENTRA_ID_CLIENT_ID": "client-id",
+        "ENTRA_ID_EMAIL_DOMAIN": "rcpch.ac.uk",
+        "ENTRA_ID_CLIENT_SECRET": "",
+        "ENTRA_ID_USE_MANAGED_IDENTITY": "False",
+        "ENTRA_ID_LOGIN_REQUIRED_FOR_RCPCH_STAFF": "False",
+        **env_overrides,
+    }
+    return subprocess.run(
+        [
+            sys.executable,
+            "-c",
+            "import importlib, sys; sys.path.insert(0, '.'); "
+            "s = importlib.import_module('rcpch-audit-engine.settings'); "
+            "print('ENABLED', s.ENTRA_ID_LOGIN_ENABLED)",
+        ],
+        cwd=settings.BASE_DIR,
+        env=env,
+        capture_output=True,
+        text=True,
+    )
+
+
+def test_settings_refuse_both_client_secret_and_managed_identity():
+    result = _import_settings_with(
+        {"ENTRA_ID_CLIENT_SECRET": "secret", "ENTRA_ID_USE_MANAGED_IDENTITY": "True"}
+    )
+
+    assert result.returncode != 0
+    assert "Set only one of ENTRA_ID_CLIENT_SECRET" in result.stderr
+
+
+@pytest.mark.parametrize(
+    "credential_env",
+    [
+        {"ENTRA_ID_CLIENT_SECRET": "secret"},
+        {"ENTRA_ID_USE_MANAGED_IDENTITY": "True"},
+    ],
+)
+def test_settings_enable_entra_id_with_either_credential(credential_env):
+    result = _import_settings_with(credential_env)
+
+    assert result.returncode == 0, result.stderr
+    assert "ENABLED True" in result.stdout
+
+
+def test_settings_disable_entra_id_without_a_credential():
+    result = _import_settings_with({})
+
+    assert result.returncode == 0, result.stderr
+    assert "ENABLED False" in result.stdout

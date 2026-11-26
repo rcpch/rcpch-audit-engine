@@ -39,13 +39,49 @@ def must_use_entra_id_login(user) -> bool:
     )
 
 
+# Audience Entra ID expects on a managed identity token used as a federated
+# credential (global Azure cloud)
+MANAGED_IDENTITY_TOKEN_EXCHANGE_SCOPE = "api://AzureADTokenExchange/.default"
+
+# A single, reused credential: azure-identity caches tokens on the credential
+# instance, so the managed identity endpoint is only called near expiry (as in
+# epilepsy12/db_backend/base.py). Created lazily on first use.
+_managed_identity_credential = None
+
+
+def get_managed_identity_assertion() -> str:
+    """
+    A token for the container app's managed identity, presented to Entra ID as
+    the app registration's client assertion in place of a client secret.
+    """
+    global _managed_identity_credential
+
+    if _managed_identity_credential is None:
+        from azure.identity import ManagedIdentityCredential
+
+        _managed_identity_credential = ManagedIdentityCredential(
+            client_id=settings.ENTRA_ID_MANAGED_IDENTITY_CLIENT_ID or None
+        )
+
+    return _managed_identity_credential.get_token(
+        MANAGED_IDENTITY_TOKEN_EXCHANGE_SCOPE
+    ).token
+
+
 def build_entra_id_client():
     # Imported here so msal is only loaded when Entra ID sign in is used
     import msal
 
+    if settings.ENTRA_ID_USE_MANAGED_IDENTITY:
+        # msal calls this each time it talks to Entra ID, so the assertion is
+        # always a current token
+        client_credential = {"client_assertion": get_managed_identity_assertion}
+    else:
+        client_credential = settings.ENTRA_ID_CLIENT_SECRET
+
     return msal.ConfidentialClientApplication(
         client_id=settings.ENTRA_ID_CLIENT_ID,
-        client_credential=settings.ENTRA_ID_CLIENT_SECRET,
+        client_credential=client_credential,
         # Single tenant: only RCPCH accounts can sign in
         authority=f"https://login.microsoftonline.com/{settings.ENTRA_ID_TENANT_ID}",
     )
