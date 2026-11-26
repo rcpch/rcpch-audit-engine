@@ -177,13 +177,6 @@ def entra_id_callback(request):
             details=f"Unexpected tenant {claims.get('tid')}",
         )
 
-    if settings.ENTRA_ID_REQUIRE_MFA_CLAIM and "mfa" not in (claims.get("amr") or []):
-        return _fail(
-            request,
-            "Your Microsoft sign in did not use multi-factor authentication. Please contact the Epilepsy12 team.",
-            details=f"ID token amr claim does not include mfa (amr={claims.get('amr')})",
-        )
-
     object_id = claims.get("oid")
     if not object_id:
         return _fail(request, GENERIC_FAILURE_MESSAGE, details="No oid claim")

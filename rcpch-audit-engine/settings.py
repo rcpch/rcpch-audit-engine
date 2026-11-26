@@ -317,11 +317,6 @@ ENTRA_ID_LOGIN_ENABLED = bool(
     and ENTRA_ID_EMAIL_DOMAIN
 )
 
-# Defence in depth: refuse a Microsoft sign in unless the ID token's amr claim
-# says multi-factor authentication was performed. RCPCH's Conditional Access
-# policy should already require it.
-ENTRA_ID_REQUIRE_MFA_CLAIM = os.getenv("ENTRA_ID_REQUIRE_MFA_CLAIM", "True") == "True"
-
 # When True, superusers and RCPCH Audit Team members MUST sign in with Microsoft
 # Entra ID: the email, password and one-time code login is refused for them
 # (sessions already open carry on until they are auto logged out). Their

@@ -42,7 +42,6 @@ ENTRA_CONFIGURED = dict(
     ENTRA_ID_CLIENT_SECRET="client-secret",
     ENTRA_ID_EMAIL_DOMAIN="rcpch.ac.uk",
     ENTRA_ID_LOGIN_ENABLED=True,
-    ENTRA_ID_REQUIRE_MFA_CLAIM=True,
 )
 ENTRA_REQUIRED = dict(ENTRA_CONFIGURED, ENTRA_ID_LOGIN_REQUIRED_FOR_RCPCH_STAFF=True)
 ENTRA_OPTIONAL = dict(ENTRA_CONFIGURED, ENTRA_ID_LOGIN_REQUIRED_FOR_RCPCH_STAFF=False)
@@ -71,17 +70,13 @@ class FakeEntraClient:
         return self.result
 
 
-def claims_for(
-    preferred_username, tid=TENANT_ID, oid=OBJECT_ID, amr=("pwd", "mfa"), **extra
-):
+def claims_for(preferred_username, tid=TENANT_ID, oid=OBJECT_ID, **extra):
     claims = {
         "tid": tid,
         "oid": oid,
         "preferred_username": preferred_username,
         **extra,
     }
-    if amr is not None:
-        claims["amr"] = list(amr)
     return {"id_token_claims": claims}
 
 
@@ -464,37 +459,6 @@ def test_entra_id_sign_in_reuses_bound_device(client, superuser):
 
     assert int(client.session["_auth_user_id"]) == superuser.pk
     assert EntraIDDevice.objects.filter(user=superuser).count() == 1
-
-
-@pytest.mark.django_db
-@override_settings(**ENTRA_REQUIRED)
-def test_entra_id_sign_in_refused_without_mfa(client, superuser):
-    response = complete_entra_sign_in(
-        client, FakeEntraClient(claims_for(superuser.email, amr=["pwd"]))
-    )
-
-    assert_refused(client, response)
-    assert not EntraIDDevice.objects.filter(user=superuser).exists()
-
-
-@pytest.mark.django_db
-@override_settings(**ENTRA_REQUIRED)
-def test_entra_id_sign_in_refused_without_amr_claim(client, superuser):
-    response = complete_entra_sign_in(
-        client, FakeEntraClient(claims_for(superuser.email, amr=None))
-    )
-
-    assert_refused(client, response)
-
-
-@pytest.mark.django_db
-@override_settings(**dict(ENTRA_REQUIRED, ENTRA_ID_REQUIRE_MFA_CLAIM=False))
-def test_entra_id_sign_in_allowed_without_amr_when_mfa_check_off(client, superuser):
-    complete_entra_sign_in(
-        client, FakeEntraClient(claims_for(superuser.email, amr=None))
-    )
-
-    assert int(client.session["_auth_user_id"]) == superuser.pk
 
 
 @pytest.mark.django_db

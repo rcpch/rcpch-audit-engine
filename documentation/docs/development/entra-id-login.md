@@ -29,7 +29,6 @@ New RCPCH Audit Team members do not need a password: they leave the password fie
 | `ENTRA_ID_CLIENT_SECRET` | Client secret of the app registration. |
 | `ENTRA_ID_EMAIL_DOMAIN` | e.g. `rcpch.ac.uk`. The button is shown for this domain, and only Microsoft accounts with an email on it are accepted. |
 | `ENTRA_ID_LOGIN_REQUIRED_FOR_RCPCH_STAFF` | `"True"` to make Sign in with Microsoft compulsory for superusers and the RCPCH Audit Team. Defaults to `"False"`. |
-| `ENTRA_ID_REQUIRE_MFA_CLAIM` | Defaults to `"True"`: refuse a Microsoft sign in unless the ID token's `amr` claim includes `mfa`. See [Multi-factor authentication](#multi-factor-authentication). |
 
 Sign in with Microsoft is enabled when the first four are all set. If `ENTRA_ID_LOGIN_REQUIRED_FOR_RCPCH_STAFF` is `"True"` but they are not all set, the app refuses to start rather than lock every superuser out.
 
@@ -44,9 +43,7 @@ Sign in with Microsoft is enabled when the first four are all set. If `ENTRA_ID_
 
 A successful Sign in with Microsoft counts as the second factor, so there is no Epilepsy12 one-time code. It is recorded against an "Entra ID" device on the user, which you can see on the user's logs page.
 
-This relies on RCPCH's Entra ID Conditional Access policy requiring MFA for this app registration every time, including from any trusted or office networks. Confirm this with the tenant administrators before switching the setting on.
-
-As a defence in depth, sign ins are refused unless the ID token's `amr` (authentication methods) claim includes `mfa`. **Check this on staging first:** if every sign in is refused with "did not use multi-factor authentication", the error email shows the `amr` value received. If the claim is missing from the tokens altogether, set `ENTRA_ID_REQUIRE_MFA_CLAIM="False"` and rely on the Conditional Access policy.
+MFA is enforced across RCPCH's Entra ID tenant by Conditional Access policy, and Epilepsy12 relies on that policy. The app cannot check it from the token: the v2.0 ID tokens it receives do not include the `amr` (authentication methods) claim. If the policy changes (for example, an exclusion for trusted or office networks), Microsoft sign ins to Epilepsy12 would no longer be guaranteed to use MFA.
 
 ## How accounts are matched
 
