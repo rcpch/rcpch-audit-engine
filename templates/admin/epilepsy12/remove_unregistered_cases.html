@@ -1,0 +1,83 @@
+{% extends "admin/base_site.html" %}
+
+{% comment %}
+  The admin uses django-semantic-admin, so style this page with the Fomantic
+  UI classes used across its templates (segments, forms, buttons, messages).
+{% endcomment %}
+{% block breadcrumbs %}
+  <div class="ui large breadcrumb" style="padding-left: 1rem;">
+    <a class="section" href="{% url 'admin:index' %}">Home</a>
+    <i class="right chevron icon divider"></i>
+    <div class="active section">Remove unregistered cases</div>
+  </div>
+{% endblock %}
+
+{% block content %}
+  <div class="ui segment">
+    <p>
+      This tool runs <code>remove_unregistered_cases</code>. It permanently deletes
+      cases created before the selected date when they have no registration or no
+      first paediatric assessment date.
+    </p>
+
+    {% if confirm %}
+      <div class="ui secondary segment">
+        <pre>{{ output }}</pre>
+      </div>
+      <div class="ui negative message">
+        Confirm permanent deletion of the cases shown above. This cannot be undone.
+      </div>
+
+      <form method="post">
+        {% csrf_token %}
+        <input type="hidden" name="before" value="{{ form.cleaned_data.before|date:'Y-m-d' }}">
+        <div class="ui basic segment" style="margin-top: 0;">
+          <div class="ui form noprint">
+            <div class="equal width fields">
+              <div class="field">
+                <button class="ui fluid red button" type="submit" name="action" value="delete">
+                  Delete matching cases
+                </button>
+              </div>
+              <div class="field">
+                <a href="{% url 'admin:remove_unregistered_cases' %}" class="ui fluid button">Cancel</a>
+              </div>
+              <div class="field"></div>
+              <div class="field"></div>
+            </div>
+          </div>
+        </div>
+      </form>
+    {% else %}
+      <form method="post" novalidate>
+        {% csrf_token %}
+        <div class="ui form">
+          <div class="field{% if form.before.errors %} error{% endif %}">
+            <label for="{{ form.before.id_for_label }}">{{ form.before.label }}</label>
+            {{ form.before }}
+            {% if form.before.help_text %}
+              <div class="ui small pointing label">{{ form.before.help_text }}</div>
+            {% endif %}
+            {% for error in form.before.errors %}
+              <div class="ui red pointing label">{{ error }}</div>
+            {% endfor %}
+          </div>
+        </div>
+        <div class="ui basic segment" style="margin-top: 0;">
+          <div class="ui form noprint">
+            <div class="equal width fields">
+              <div class="field">
+                <button class="ui fluid blue button" type="submit" name="action" value="preview">
+                  Preview deletion
+                </button>
+              </div>
+              <div class="field"></div>
+              <div class="field"></div>
+              <div class="field"></div>
+            </div>
+          </div>
+        </div>
+      </form>
+    {% endif %}
+  </div>
+{% endblock %}

@@ -1,14 +1,19 @@
-from typing import Any
+from io import StringIO
 
 # Django
 from django.contrib import admin
 from django.contrib import messages
 from django.contrib.auth.admin import UserAdmin
+from django.core.exceptions import PermissionDenied
+from django.core.management import call_command
 from django.http import HttpResponse
 from django.db.models import Count, Prefetch
 from django.db import models
-from django.forms import forms
+from django import forms
 from django.conf import settings
+from django.shortcuts import redirect
+from django.template.response import TemplateResponse
+from django.urls import path
 from django.utils import timezone
 
 
@@ -24,12 +29,83 @@ from .filtersets import *
 from .common_view_functions.group_for_group import group_for_role
 
 
+class RemoveUnregisteredCasesForm(forms.Form):
+    before = forms.DateField(
+        label="Remove cases created before",
+        widget=forms.DateInput(attrs={"type": "date"}),
+        help_text="Cases created on this date are not included.",
+    )
+
+
 class E12AdminSite(AdminSiteOTPRequiredMixin, admin.AdminSite):
+    index_template = "admin/epilepsy12/index.html"
+
     def has_permission(self, request):
         if settings.LOCAL_DEV_BYPASS_2FA_AND_CAPTCHA and request.user.is_superuser:
             return True
 
         return super().has_permission(request)
+
+    def get_urls(self):
+        custom_urls = [
+            path(
+                "remove-unregistered-cases/",
+                self.admin_view(self.remove_unregistered_cases_view),
+                name="remove_unregistered_cases",
+            )
+        ]
+        return custom_urls + super().get_urls()
+
+    def remove_unregistered_cases_view(self, request):
+        if not request.user.is_superuser:
+            raise PermissionDenied
+
+        form = RemoveUnregisteredCasesForm(request.POST or None)
+        output = None
+        confirm = False
+
+        if request.method == "POST" and form.is_valid():
+            before_date = form.cleaned_data["before"]
+            action = request.POST.get("action")
+            stdout = StringIO()
+
+            if action == "preview":
+                call_command(
+                    "remove_unregistered_cases",
+                    before=before_date,
+                    dry_run=True,
+                    stdout=stdout,
+                )
+                output = stdout.getvalue()
+                confirm = True
+            elif action == "delete":
+                call_command(
+                    "remove_unregistered_cases",
+                    before=before_date,
+                    no_input=True,
+                    stdout=stdout,
+                )
+                output_lines = stdout.getvalue().strip().splitlines()
+                completion_message = (
+                    output_lines[-1] if output_lines else "Command completed."
+                )
+                messages.success(request, completion_message)
+                return redirect("admin:index")
+
+        context = self.each_context(request)
+        context.update(
+            {
+                "title": "Remove unregistered cases",
+                "form": form,
+                "output": output,
+                "confirm": confirm,
+            }
+        )
+        return TemplateResponse(
+            request,
+            "admin/epilepsy12/remove_unregistered_cases.html",
+            context,
+        )
 
 admin.site.__class__ = E12AdminSite
 
