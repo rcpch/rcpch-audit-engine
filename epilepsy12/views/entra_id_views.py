@@ -50,8 +50,21 @@ def _redirect_uri(request):
     return request.build_absolute_uri(reverse("entra_id_callback"))
 
 
-def _fail(request, message, user=None, details=None):
-    """Show the user why sign in failed and audit it against their account."""
+# Errors from Microsoft's token endpoint that mean our own configuration is
+# wrong (e.g. an expired client secret, or a missing or mismatched federated
+# credential). Anonymous requests cannot cause these, so they alert the admins.
+CONFIGURATION_ERRORS = {"invalid_client", "unauthorized_client"}
+
+
+def _fail(request, message, user=None, details=None, alert_admins=True):
+    """
+    Show the user why sign in failed and audit it against their account.
+
+    Failures are logged at error level, so the admins are emailed, unless
+    alert_admins is False. That is used before Microsoft has returned a valid
+    ID token, because anyone can make those requests: emailing on them would
+    let an anonymous caller flood the admins' inboxes.
+    """
     if user is not None:
         VisitActivity.objects.create(
             activity=VisitActivity.UNSUCCESSFUL_LOGIN,
@@ -59,8 +72,8 @@ def _fail(request, message, user=None, details=None):
             epilepsy12user=user,
             details=f"Microsoft Entra ID sign in failed: {details or message}",
         )
-    # error, not warning, so that it is emailed to the admins
-    logger.error(
+    log = logger.error if alert_admins else logger.warning
+    log(
         "Entra ID sign in failed from %s for %s: %s",
         get_client_ip(request),
         user.email if user else "unmatched account",
@@ -145,6 +158,7 @@ def entra_id_callback(request):
             request,
             "Your sign in with Microsoft has expired. Please try again.",
             details="No sign in in progress for this session",
+            alert_admins=False,
         )
 
     try:
@@ -159,6 +173,7 @@ def entra_id_callback(request):
             request,
             GENERIC_FAILURE_MESSAGE,
             details=f"Invalid response from Microsoft: {error}",
+            alert_admins=False,
         )
 
     if "error" in result:
@@ -166,6 +181,8 @@ def entra_id_callback(request):
             request,
             GENERIC_FAILURE_MESSAGE,
             details=f"{result.get('error')}: {result.get('error_description')}",
+            # e.g. the user cancelling at Microsoft, or a made-up code
+            alert_admins=result.get("error") in CONFIGURATION_ERRORS,
         )
 
     claims = result.get("id_token_claims") or {}
@@ -215,19 +232,24 @@ def entra_id_callback(request):
             details="Account deactivated due to inactivity",
         )
 
-    device = EntraIDDevice.objects.filter(user=user).first()
-    if device is None:
-        # First Entra ID sign in: bind this Microsoft account to the user
-        device = EntraIDDevice.objects.create(
-            user=user,
-            name=ENTRA_ID_DEVICE_NAME,
-            confirmed=True,
-            entra_object_id=object_id,
-        )
+    # First Entra ID sign in binds this Microsoft account to the user. A user
+    # has at most one EntraIDDevice (a database constraint), and get_or_create
+    # retries the read if a simultaneous sign in created it first, so two
+    # Microsoft accounts can never both be bound to one user.
+    device, created = EntraIDDevice.objects.get_or_create(
+        user=user,
+        defaults={
+            "name": ENTRA_ID_DEVICE_NAME,
+            "confirmed": True,
+            "entra_object_id": object_id,
+        },
+    )
+    if created:
         logger.info(
             "Bound Entra ID object %s to Epilepsy12 user %s", object_id, user.email
         )
-    elif device.entra_object_id != object_id:
+
+    if device.entra_object_id != object_id:
         # The email now belongs to a different Microsoft account. Refuse until
         # the binding is reset by deleting the device from the user's logs page.
         return _fail(
@@ -243,6 +265,14 @@ def entra_id_callback(request):
             user=user,
             details="Entra ID device is not confirmed",
         )
+
+    if not user.email_confirmed:
+        # email_confirmed is normally set when a user first sets a password.
+        # Audit Team members who only sign in with Microsoft never do, but
+        # signing in with their RCPCH account proves the same thing. A queryset
+        # update so no other save() side effects run.
+        Epilepsy12User.objects.filter(pk=user.pk).update(email_confirmed=True)
+        user.email_confirmed = True
 
     login(request, user, backend="django.contrib.auth.backends.ModelBackend")
     otp_login(request, device)

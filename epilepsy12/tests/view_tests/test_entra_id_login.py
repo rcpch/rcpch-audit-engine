@@ -16,6 +16,7 @@ from unittest.mock import patch
 import pytest
 from django.conf import settings
 from django.core.exceptions import ValidationError
+from django.db import IntegrityError, transaction
 from django.test import override_settings
 from django.urls import reverse
 from django_otp import DEVICE_ID_SESSION_KEY
@@ -34,7 +35,7 @@ from epilepsy12.general_functions.entra_id import (
     may_use_entra_id_login,
     must_use_entra_id_login,
 )
-from epilepsy12.models import EntraIDDevice, VisitActivity
+from epilepsy12.models import EntraIDDevice, Epilepsy12User, VisitActivity
 from epilepsy12.views.entra_id_views import (
     ENTRA_ID_FLOW_SESSION_KEY,
     ENTRA_ID_NEXT_SESSION_KEY,
@@ -734,3 +735,104 @@ def test_settings_disable_entra_id_without_a_credential():
 
     assert result.returncode == 0, result.stderr
     assert "ENABLED False" in result.stdout
+
+
+# Review fixes: admin alerts, one binding per user, email confirmation
+
+
+@pytest.mark.django_db
+@override_settings(**ENTRA_REQUIRED)
+def test_anonymous_callback_failures_do_not_email_admins(client):
+    """
+    Anyone can request the callback, so failures before Microsoft has returned
+    a valid ID token are logged as warnings, not emailed to the admins.
+    """
+    with patch("epilepsy12.views.entra_id_views.logger") as logger:
+        # No sign in in progress
+        client.get(reverse("entra_id_callback"), {"code": "x"})
+        # State mismatch
+        complete_entra_sign_in(client, FakeEntraClient(raises=ValueError("state")))
+        # User cancelled, or a made-up code
+        complete_entra_sign_in(
+            client,
+            FakeEntraClient({"error": "access_denied", "error_description": "no"}),
+        )
+        complete_entra_sign_in(
+            client,
+            FakeEntraClient({"error": "invalid_grant", "error_description": "no"}),
+        )
+
+    assert logger.warning.call_count == 4
+    logger.error.assert_not_called()
+
+
+@pytest.mark.django_db
+@override_settings(**ENTRA_REQUIRED)
+def test_configuration_errors_email_admins(client):
+    """An expired secret or wrong federated credential needs fixing."""
+    with patch("epilepsy12.views.entra_id_views.logger") as logger:
+        complete_entra_sign_in(
+            client,
+            FakeEntraClient(
+                {"error": "invalid_client", "error_description": "AADSTS7000215"}
+            ),
+        )
+
+    logger.error.assert_called_once()
+
+
+@pytest.mark.django_db
+@override_settings(**ENTRA_REQUIRED)
+def test_failures_for_a_validated_microsoft_account_email_admins(client, clinician):
+    with patch("epilepsy12.views.entra_id_views.logger") as logger:
+        complete_entra_sign_in(client, FakeEntraClient(claims_for(clinician.email)))
+
+    logger.error.assert_called_once()
+    logger.warning.assert_not_called()
+
+
+@pytest.mark.django_db
+def test_a_user_can_have_only_one_entra_id_device(superuser):
+    EntraIDDevice.objects.create(
+        user=superuser, name="Entra ID", entra_object_id=OBJECT_ID
+    )
+
+    with pytest.raises(IntegrityError), transaction.atomic():
+        EntraIDDevice.objects.create(
+            user=superuser, name="Entra ID", entra_object_id="another-object-id"
+        )
+
+
+@pytest.mark.django_db
+@override_settings(**ENTRA_REQUIRED)
+def test_entra_id_sign_in_confirms_email_of_passwordless_user(
+    client, audit_team_member
+):
+    """
+    New Audit Team members who only sign in with Microsoft never set a
+    password, so email_confirmed would otherwise stay False and deny them
+    access to patient records.
+    """
+    Epilepsy12User.objects.filter(pk=audit_team_member.pk).update(
+        email_confirmed=False, password="!unusable"
+    )
+    audit_team_member.refresh_from_db()
+    assert not audit_team_member.has_usable_password()
+
+    complete_entra_sign_in(client, FakeEntraClient(claims_for(audit_team_member.email)))
+
+    assert int(client.session["_auth_user_id"]) == audit_team_member.pk
+    audit_team_member.refresh_from_db()
+    assert audit_team_member.email_confirmed
+    assert not audit_team_member.has_usable_password()
+
+
+@pytest.mark.django_db
+@override_settings(**ENTRA_REQUIRED)
+def test_refused_entra_id_sign_in_does_not_confirm_email(client, clinician):
+    Epilepsy12User.objects.filter(pk=clinician.pk).update(email_confirmed=False)
+
+    complete_entra_sign_in(client, FakeEntraClient(claims_for(clinician.email)))
+
+    clinician.refresh_from_db()
+    assert not clinician.email_confirmed

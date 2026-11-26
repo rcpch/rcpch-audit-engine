@@ -27,6 +27,12 @@ class EntraIDDevice(TimestampMixin, Device):
     class Meta(Device.Meta):
         verbose_name = "Entra ID sign in"
         verbose_name_plural = "Entra ID sign ins"
+        constraints = [
+            # One bound Microsoft account per user
+            models.UniqueConstraint(
+                fields=["user"], name="one_entra_id_device_per_user"
+            ),
+        ]
 
     def verify_token(self, token):
         return False
