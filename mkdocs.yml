@@ -188,6 +188,7 @@ nav:
       - User Groups: 'development/user-groups.md'
       - Retiring the RCPCH user flags: 'development/rcpch-flags-retirement-plan.md'
       - Users: 'development/user-workflow.md'
+      - Microsoft Entra ID sign in: 'development/entra-id-login.md'
       - Views: 'development/views.md'
     - API: 'development/api.md'
     - Environment Variables: 'development/environment-variables.md'

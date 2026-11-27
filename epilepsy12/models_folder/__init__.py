@@ -40,6 +40,7 @@ from .audit_progress import AuditProgress
 
 from .kpi import KPI
 from .visitactivity import VisitActivity
+from .entra_id_device import EntraIDDevice
 
 # This stores the results of aggregations of the KPI model for different levels of abstraction
 from .kpi_aggregation import *

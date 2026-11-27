@@ -12,6 +12,12 @@ from .views import *
 # Auth, login, password reset
 user_patterns = [
     path("captcha/", include("captcha.urls")),
+    path("account/entra-id/login/", view=entra_id_login, name="entra_id_login"),
+    path(
+        "account/entra-id/callback/",
+        view=entra_id_callback,
+        name="entra_id_callback",
+    ),
     path("account/", include(auth_urls)),
     path(
         "account/password-reset/",
