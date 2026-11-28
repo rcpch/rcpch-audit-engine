@@ -37,6 +37,34 @@ class RemoveUnregisteredCasesForm(forms.Form):
     )
 
 
+ALL_COHORTS = "all"
+
+
+class RecalculatePostcodeDataForm(forms.Form):
+    cohort = forms.ChoiceField(
+        label="Cohort",
+        help_text="IMD is recalculated for every case in the cohort. Locations are looked up only for cases missing them.",
+    )
+
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+        cohorts = (
+            AuditPeriod.objects.exclude(cohort_number__isnull=True)
+            .order_by("-cohort_number")
+            .values_list("cohort_number", flat=True)
+            .distinct()
+        )
+        self.fields["cohort"].choices = [
+            (str(cohort), f"Cohort {cohort}") for cohort in cohorts
+        ] + [(ALL_COHORTS, "All cases (every cohort, and unregistered cases)")]
+
+    def command_options(self):
+        cohort = self.cleaned_data["cohort"]
+        if cohort == ALL_COHORTS:
+            return {"all_cohorts": True}
+        return {"cohort": int(cohort)}
+
+
 class E12AdminSite(AdminSiteOTPRequiredMixin, admin.AdminSite):
     index_template = "admin/epilepsy12/index.html"
 
@@ -52,7 +80,12 @@ class E12AdminSite(AdminSiteOTPRequiredMixin, admin.AdminSite):
                 "remove-unregistered-cases/",
                 self.admin_view(self.remove_unregistered_cases_view),
                 name="remove_unregistered_cases",
-            )
+            ),
+            path(
+                "recalculate-imd/",
+                self.admin_view(self.recalculate_imd_view),
+                name="recalculate_imd",
+            ),
         ]
         return custom_urls + super().get_urls()
 
@@ -104,6 +137,56 @@ class E12AdminSite(AdminSiteOTPRequiredMixin, admin.AdminSite):
         return TemplateResponse(
             request,
             "admin/epilepsy12/remove_unregistered_cases.html",
+            context,
+        )
+
+    def recalculate_imd_view(self, request):
+        if not request.user.is_superuser:
+            raise PermissionDenied
+
+        form = RecalculatePostcodeDataForm(request.POST or None)
+        output = None
+        confirm = False
+
+        if request.method == "POST" and form.is_valid():
+            action = request.POST.get("action")
+            stdout = StringIO()
+
+            if action == "preview":
+                call_command(
+                    "recalculate_imd",
+                    dry_run=True,
+                    stdout=stdout,
+                    **form.command_options(),
+                )
+                output = stdout.getvalue()
+                confirm = True
+            elif action == "run":
+                call_command(
+                    "recalculate_imd",
+                    stdout=stdout,
+                    stderr=stdout,
+                    **form.command_options(),
+                )
+                output_lines = stdout.getvalue().strip().splitlines()
+                completion_message = (
+                    output_lines[-1] if output_lines else "Command completed."
+                )
+                messages.success(request, completion_message)
+                return redirect("admin:index")
+
+        context = self.each_context(request)
+        context.update(
+            {
+                "title": "Recalculate IMD and locations",
+                "form": form,
+                "output": output,
+                "confirm": confirm,
+            }
+        )
+        return TemplateResponse(
+            request,
+            "admin/epilepsy12/recalculate_imd.html",
             context,
         )
 

@@ -25,3 +25,9 @@ To recalculate all postcodes in a given cohort use the convenience script:
 s/recalculate-imd        # all cohorts
 s/recalculate-imd 6      # cohort 6 only
 ```
+
+As well as recalculating the IMD quintile for every case, this fills in the location fields (`location_wgs84` and `location_bng`) for any case missing them, for example because postcodes.io was unavailable when the case was saved. Cases that already have a location are not looked up again.
+
+Add `--dry-run` to the underlying command (`python manage.py recalculate_imd --cohort 6 --dry-run`) to see how many cases would be processed without calling any APIs.
+
+Superusers can also run it from the Django admin: **Administrative tools → Recalculate IMD and locations**. Pick a cohort, preview the counts, then confirm. The admin page runs the command within the web request, so a large cohort can take several minutes.

@@ -3,7 +3,10 @@ import logging
 from random import randint
 import re
 
+from django.apps import apps
 from django.conf import settings
+from django.contrib.gis.geos import Point
+
 from ..constants import UNKNOWN_POSTCODES_NO_SPACES
 
 # Logging setup
@@ -97,6 +100,50 @@ def coordinates_for_postcode(postcode: str) -> bool:
         f"Postcode validation failure. Could not validate postcode at {url}. {response.status_code=}"
     )
     return None
+
+
+def fill_missing_location_for_case(case) -> str:
+    """
+    Looks up and stores ``location_wgs84`` and ``location_bng`` for a Case that
+    is missing either of them. Cases that already have both are left alone.
+
+    Returns one of:
+    - ``"present"``: the case already has both locations
+    - ``"skipped"``: no lookup is possible (no postcode, an unknown/placeholder
+      postcode, or a Jersey postcode, which postcodes.io does not cover)
+    - ``"filled"``: the locations were looked up and saved
+    - ``"failed"``: the lookup returned no coordinates
+
+    Mirrors the lookup in ``Case.save()``, but persists with a queryset
+    ``.update()`` so Case.save() and its post_save signals are not re-run.
+    Also updates the in-memory instance so the caller sees the new values.
+    """
+    if case.location_wgs84 is not None and case.location_bng is not None:
+        return "present"
+
+    if not case.postcode:
+        return "skipped"
+
+    normalised = str(case.postcode).replace(" ", "").replace("-", "").upper()
+    if normalised in UNKNOWN_POSTCODES_NO_SPACES or normalised.startswith("JE"):
+        return "skipped"
+
+    coordinates = coordinates_for_postcode(postcode=normalised)
+    if not isinstance(coordinates, tuple):
+        return "failed"
+
+    lon, lat = coordinates
+    location_wgs84 = Point(lon, lat, srid=4326)
+    # British National Grid (SRID 27700), see Case.save() for why both are stored.
+    location_bng = location_wgs84.transform(27700, clone=True)
+
+    Case = apps.get_model("epilepsy12", "Case")
+    Case.objects.filter(pk=case.pk).update(
+        location_wgs84=location_wgs84, location_bng=location_bng
+    )
+    case.location_wgs84 = location_wgs84
+    case.location_bng = location_bng
+    return "filled"
 
 
 def return_random_postcode(

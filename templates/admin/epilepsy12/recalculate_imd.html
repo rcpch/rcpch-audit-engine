@@ -1,0 +1,85 @@
+{% extends "admin/base_site.html" %}
+
+{% comment %}
+  The admin uses django-semantic-admin, so style this page with the Fomantic
+  UI classes used across its templates (segments, forms, buttons, messages).
+{% endcomment %}
+{% block breadcrumbs %}
+  <div class="ui large breadcrumb" style="padding-left: 1rem;">
+    <a class="section" href="{% url 'admin:index' %}">Home</a>
+    <i class="right chevron icon divider"></i>
+    <div class="active section">Recalculate IMD and locations</div>
+  </div>
+{% endblock %}
+
+{% block content %}
+  <div class="ui segment">
+    <p>
+      This tool runs <code>recalculate_imd</code>. For every case in the selected
+      cohort it recalculates the Index of Multiple Deprivation quintile from the
+      RCPCH Census Platform, and for cases missing a location it looks up the
+      coordinates from postcodes.io.
+    </p>
+
+    {% if confirm %}
+      <div class="ui secondary segment">
+        <pre>{{ output }}</pre>
+      </div>
+      <div class="ui warning message">
+        This makes API calls for every case shown above and can take several
+        minutes for a whole cohort. Keep this page open until it finishes.
+      </div>
+
+      <form method="post">
+        {% csrf_token %}
+        <input type="hidden" name="cohort" value="{{ form.cleaned_data.cohort }}">
+        <div class="ui basic segment" style="margin-top: 0;">
+          <div class="ui form noprint">
+            <div class="equal width fields">
+              <div class="field">
+                <button class="ui fluid primary button" type="submit" name="action" value="run">
+                  Recalculate
+                </button>
+              </div>
+              <div class="field">
+                <a href="{% url 'admin:recalculate_imd' %}" class="ui fluid button">Cancel</a>
+              </div>
+              <div class="field"></div>
+              <div class="field"></div>
+            </div>
+          </div>
+        </div>
+      </form>
+    {% else %}
+      <form method="post" novalidate>
+        {% csrf_token %}
+        <div class="ui form">
+          <div class="field{% if form.cohort.errors %} error{% endif %}">
+            <label for="{{ form.cohort.id_for_label }}">{{ form.cohort.label }}</label>
+            {{ form.cohort }}
+            {% if form.cohort.help_text %}
+              <div class="ui small pointing label">{{ form.cohort.help_text }}</div>
+            {% endif %}
+            {% for error in form.cohort.errors %}
+              <div class="ui red pointing label">{{ error }}</div>
+            {% endfor %}
+          </div>
+        </div>
+        <div class="ui basic segment" style="margin-top: 0;">
+          <div class="ui form noprint">
+            <div class="equal width fields">
+              <div class="field">
+                <button class="ui fluid blue button" type="submit" name="action" value="preview">
+                  Preview
+                </button>
+              </div>
+              <div class="field"></div>
+              <div class="field"></div>
+              <div class="field"></div>
+            </div>
+          </div>
+        </div>
+      </form>
+    {% endif %}
+  </div>
+{% endblock %}

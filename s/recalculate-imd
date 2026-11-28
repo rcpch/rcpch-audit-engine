@@ -2,7 +2,8 @@
 
 set -e  # Exit on error
 
-# Recalculates the IMD (Index of Multiple Deprivation) quintile for Cases.
+# Recalculates the IMD (Index of Multiple Deprivation) quintile for Cases, and
+# fills in the location fields for any Case missing them.
 # *** The project's containers MUST BE RUNNING! ***
 #
 # Usage:

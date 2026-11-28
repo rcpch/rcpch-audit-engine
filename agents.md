@@ -148,7 +148,7 @@ s/recalculate-imd          # all cohorts
 s/recalculate-imd 6        # cohort 6 only
 ```
 
-This wraps `manage.py recalculate_imd --all` / `--cohort N` (`epilepsy12/management/commands/recalculate_imd.py`).
+This wraps `manage.py recalculate_imd --all` / `--cohort N` (`epilepsy12/management/commands/recalculate_imd.py`). The command also fills in `location_wgs84` / `location_bng` for cases missing them, via `fill_missing_location_for_case()` in `epilepsy12/general_functions/postcode.py` (which, like the IMD helper, persists with queryset `.update()`). `--dry-run` reports counts without calling any APIs. Superusers can run it from the admin dashboard (**Administrative tools → Recalculate IMD and locations**, `E12AdminSite.recalculate_imd_view` in `epilepsy12/admin.py`).
 
 ### Key constants
 

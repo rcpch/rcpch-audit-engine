@@ -27,6 +27,15 @@
                     <a href="{% url 'admin:remove_unregistered_cases' %}" class="ui primary button changelink">Open</a>
                   </td>
                 </tr>
+                <tr class="model-recalculateimd">
+                  <td scope="row">
+                    <a href="{% url 'admin:recalculate_imd' %}">Recalculate IMD and locations</a>
+                  </td>
+                  <td>Recalculate IMD quintiles for a cohort and fill in missing case locations.</td>
+                  <td>
+                    <a href="{% url 'admin:recalculate_imd' %}" class="ui primary button changelink">Open</a>
+                  </td>
+                </tr>
               </tbody>
             </table>
             <br />
