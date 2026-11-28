@@ -39,17 +39,22 @@ def test_recalculate_postcode_data_tool_lists_cohorts(client, superuser):
     response = client.get(reverse("admin:recalculate_postcode_data"))
 
     assert response.status_code == 200
-    assert f"Cohort {cohort.cohort_number}" in response.content.decode()
+    content = response.content.decode()
+    assert f"Cohort {cohort.cohort_number}" in content
+    assert "Only fill in missing" in content
+    assert "Full rebuild" in content
+    # Missing values only is the default.
+    assert 'value="missing" id="id_mode_0" required checked' in content
 
 
 @pytest.mark.django_db
 @override_settings(LOCAL_DEV_BYPASS_2FA_AND_CAPTCHA=True)
 @pytest.mark.parametrize(
-    "cohort_value, expected_options",
-    [("COHORT", "cohort"), ("all", "all_cohorts")],
+    "cohort_value, mode",
+    [("COHORT", "missing"), ("all", "missing"), ("COHORT", "rebuild")],
 )
 def test_recalculate_postcode_data_tool_previews_then_runs_command(
-    client, superuser, cohort_value, expected_options
+    client, superuser, cohort_value, mode
 ):
     audit_period = AuditPeriod.objects.exclude(cohort_number__isnull=True).first()
     if audit_period is None:
@@ -59,6 +64,7 @@ def test_recalculate_postcode_data_tool_previews_then_runs_command(
         expected = {"cohort": audit_period.cohort_number}
     else:
         expected = {"all_cohorts": True}
+    expected["rebuild"] = mode == "rebuild"
 
     client.force_login(superuser)
     url = reverse("admin:recalculate_postcode_data")
@@ -67,10 +73,13 @@ def test_recalculate_postcode_data_tool_previews_then_runs_command(
         stdout.write("[DRY RUN] 3 case(s) would have IMD recalculated.")
 
     with patch("epilepsy12.admin.call_command", side_effect=write_preview) as command:
-        response = client.post(url, {"action": "preview", "cohort": cohort_value})
+        response = client.post(
+            url, {"action": "preview", "cohort": cohort_value, "mode": mode}
+        )
 
     assert response.status_code == 200
     assert b"3 case(s) would have IMD recalculated" in response.content
+    assert f'name="mode" value="{mode}"'.encode() in response.content
     assert b"Recalculate" in response.content
     assert command.call_args.args == ("recalculate_postcode_data",)
     assert command.call_args.kwargs["dry_run"] is True
@@ -81,7 +90,9 @@ def test_recalculate_postcode_data_tool_previews_then_runs_command(
         stdout.write("Done (cohort, 3 cases).")
 
     with patch("epilepsy12.admin.call_command", side_effect=write_run) as command:
-        response = client.post(url, {"action": "run", "cohort": cohort_value})
+        response = client.post(
+            url, {"action": "run", "cohort": cohort_value, "mode": mode}
+        )
 
     assert response.status_code == 302
     assert response.url == reverse("admin:index")

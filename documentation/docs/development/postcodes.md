@@ -19,15 +19,16 @@ To calculate an IMD we need the year for England as new data was published in 20
 
 If the patient is in cohort 8, this will by default use 2025 data. Earlier cohorts will use 2019.
 
-To recalculate all postcodes in a given cohort use the convenience script:
+To fill in or recalculate the postcode-derived fields (the IMD quintile, and the location fields `location_wgs84` and `location_bng`) use the convenience script:
 
 ```console
-s/recalculate-postcode-data        # all cohorts
-s/recalculate-postcode-data 6      # cohort 6 only
+s/recalculate-postcode-data                 # all cases, missing values only
+s/recalculate-postcode-data 6               # cohort 6, missing values only
+s/recalculate-postcode-data 6 --rebuild     # cohort 6, full rebuild
 ```
 
-As well as recalculating the IMD quintile for every case, this fills in the location fields (`location_wgs84` and `location_bng`) for any case missing them, for example because postcodes.io was unavailable when the case was saved. Cases that already have a location are not looked up again.
+By default only missing values are filled in, for example where postcodes.io or the Census Platform was unavailable when the case was saved. Cases that already have both values are not looked up again, so it can be rerun until nothing is left. `--rebuild` recalculates both fields for every case in scope, for example after a change to the IMD dataset. In a rebuild a failed lookup keeps the existing value, and a case whose postcode cannot be looked up (unknown or Jersey) has its location cleared, as saving the case does.
 
-Add `--dry-run` to the underlying command (`python manage.py recalculate_postcode_data --cohort 6 --dry-run`) to see how many cases would be processed without calling any APIs.
+Add `--dry-run` to the underlying command (`python manage.py recalculate_postcode_data --cohort 6 --dry-run`) to see how many lookups would be made without calling any APIs.
 
-Superusers can also run it from the Django admin: **Administrative tools → Recalculate IMD and locations**. Pick a cohort, preview the counts, then confirm. The admin page runs the command within the web request, so a large cohort can take several minutes.
+Superusers can also run it from the Django admin: **Administrative tools → Recalculate IMD and locations**. Pick a cohort and whether to fill in missing values or rebuild, preview the counts, then confirm. The admin page runs the command within the web request, so a large cohort can time out; if it does, rerun it with "Only fill in missing" until nothing is left.

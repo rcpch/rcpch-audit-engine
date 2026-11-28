@@ -15,10 +15,10 @@
 {% block content %}
   <div class="ui segment">
     <p>
-      This tool runs <code>recalculate_postcode_data</code>. For every case in the selected
-      cohort it recalculates the Index of Multiple Deprivation quintile from the
-      RCPCH Census Platform, and for cases missing a location it looks up the
-      coordinates from postcodes.io.
+      This tool runs <code>recalculate_postcode_data</code>. For cases in the
+      selected cohort it looks up the Index of Multiple Deprivation quintile from
+      the RCPCH Census Platform and the location from postcodes.io. By default it
+      only fills in missing values; a full rebuild recalculates both for every case.
     </p>
 
     {% if confirm %}
@@ -26,13 +26,16 @@
         <pre>{{ output }}</pre>
       </div>
       <div class="ui warning message">
-        This makes API calls for every case shown above and can take several
-        minutes for a whole cohort. Keep this page open until it finishes.
+        This makes API calls for the cases counted above and can take several
+        minutes for a whole cohort. Keep this page open until it finishes. If it
+        times out, run it again with "Only fill in missing" to pick up where it
+        stopped.
       </div>
 
       <form method="post">
         {% csrf_token %}
         <input type="hidden" name="cohort" value="{{ form.cleaned_data.cohort }}">
+        <input type="hidden" name="mode" value="{{ form.cleaned_data.mode }}">
         <div class="ui basic segment" style="margin-top: 0;">
           <div class="ui form noprint">
             <div class="equal width fields">
@@ -61,6 +64,23 @@
               <div class="ui small pointing label">{{ form.cohort.help_text }}</div>
             {% endif %}
             {% for error in form.cohort.errors %}
+              <div class="ui red pointing label">{{ error }}</div>
+            {% endfor %}
+          </div>
+          <div class="grouped fields{% if form.mode.errors %} error{% endif %}">
+            <label>{{ form.mode.label }}</label>
+            {% for radio in form.mode %}
+              <div class="field">
+                <div class="ui radio checkbox">
+                  {{ radio.tag }}
+                  <label for="{{ radio.id_for_label }}">{{ radio.choice_label }}</label>
+                </div>
+              </div>
+            {% endfor %}
+            {% if form.mode.help_text %}
+              <div class="ui small pointing label">{{ form.mode.help_text }}</div>
+            {% endif %}
+            {% for error in form.mode.errors %}
               <div class="ui red pointing label">{{ error }}</div>
             {% endfor %}
           </div>

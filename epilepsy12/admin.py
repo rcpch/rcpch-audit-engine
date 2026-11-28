@@ -41,9 +41,19 @@ ALL_COHORTS = "all"
 
 
 class RecalculatePostcodeDataForm(forms.Form):
-    cohort = forms.ChoiceField(
-        label="Cohort",
-        help_text="IMD is recalculated for every case in the cohort. Locations are looked up only for cases missing them.",
+    MISSING_ONLY = "missing"
+    REBUILD = "rebuild"
+
+    cohort = forms.ChoiceField(label="Cohort")
+    mode = forms.ChoiceField(
+        label="What to recalculate",
+        choices=[
+            (MISSING_ONLY, "Only fill in missing IMD quintiles and locations"),
+            (REBUILD, "Full rebuild: recalculate IMD and location for every case"),
+        ],
+        initial=MISSING_ONLY,
+        widget=forms.RadioSelect,
+        help_text="If a run times out, rerun with 'Only fill in missing' until nothing is left.",
     )
 
     def __init__(self, *args, **kwargs):
@@ -60,9 +70,12 @@ class RecalculatePostcodeDataForm(forms.Form):
 
     def command_options(self):
         cohort = self.cleaned_data["cohort"]
+        options = {"rebuild": self.cleaned_data["mode"] == self.REBUILD}
         if cohort == ALL_COHORTS:
-            return {"all_cohorts": True}
-        return {"cohort": int(cohort)}
+            options["all_cohorts"] = True
+        else:
+            options["cohort"] = int(cohort)
+        return options
 
 
 class E12AdminSite(AdminSiteOTPRequiredMixin, admin.AdminSite):
