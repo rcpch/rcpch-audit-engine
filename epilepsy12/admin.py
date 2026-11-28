@@ -82,9 +82,9 @@ class E12AdminSite(AdminSiteOTPRequiredMixin, admin.AdminSite):
                 name="remove_unregistered_cases",
             ),
             path(
-                "recalculate-imd/",
-                self.admin_view(self.recalculate_imd_view),
-                name="recalculate_imd",
+                "recalculate-postcode-data/",
+                self.admin_view(self.recalculate_postcode_data_view),
+                name="recalculate_postcode_data",
             ),
         ]
         return custom_urls + super().get_urls()
@@ -140,7 +140,7 @@ class E12AdminSite(AdminSiteOTPRequiredMixin, admin.AdminSite):
             context,
         )
 
-    def recalculate_imd_view(self, request):
+    def recalculate_postcode_data_view(self, request):
         if not request.user.is_superuser:
             raise PermissionDenied
 
@@ -154,7 +154,7 @@ class E12AdminSite(AdminSiteOTPRequiredMixin, admin.AdminSite):
 
             if action == "preview":
                 call_command(
-                    "recalculate_imd",
+                    "recalculate_postcode_data",
                     dry_run=True,
                     stdout=stdout,
                     **form.command_options(),
@@ -163,7 +163,7 @@ class E12AdminSite(AdminSiteOTPRequiredMixin, admin.AdminSite):
                 confirm = True
             elif action == "run":
                 call_command(
-                    "recalculate_imd",
+                    "recalculate_postcode_data",
                     stdout=stdout,
                     stderr=stdout,
                     **form.command_options(),
@@ -186,7 +186,7 @@ class E12AdminSite(AdminSiteOTPRequiredMixin, admin.AdminSite):
         )
         return TemplateResponse(
             request,
-            "admin/epilepsy12/recalculate_imd.html",
+            "admin/epilepsy12/recalculate_postcode_data.html",
             context,
         )
 

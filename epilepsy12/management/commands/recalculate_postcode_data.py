@@ -8,17 +8,17 @@ given cohort (or all cohorts):
 
 Usage:
     # All cases across all cohorts:
-    python manage.py recalculate_imd --all
+    python manage.py recalculate_postcode_data --all
 
     # All cases in cohort 6:
-    python manage.py recalculate_imd --cohort 6
+    python manage.py recalculate_postcode_data --cohort 6
 
     # Show how many cases would be processed, without calling any APIs:
-    python manage.py recalculate_imd --cohort 6 --dry-run
+    python manage.py recalculate_postcode_data --cohort 6 --dry-run
 
 Or via the convenience script:
-    s/recalculate-imd        # all cohorts
-    s/recalculate-imd 6      # cohort 6 only
+    s/recalculate-postcode-data        # all cohorts
+    s/recalculate-postcode-data 6      # cohort 6 only
 
 The same command is available to superusers in the Django admin, under
 "Administrative tools".
@@ -135,7 +135,9 @@ class Command(BaseCommand):
             except Exception as exc:
                 errors += 1
                 self.stderr.write(self.style.ERROR(f"{prefix} ERROR — {exc}"))
-                logger.exception("recalculate_imd failed for case %s", case.pk)
+                logger.exception(
+                    "recalculate_postcode_data failed for case %s", case.pk
+                )
 
         self.stdout.write(
             self.style.SUCCESS(

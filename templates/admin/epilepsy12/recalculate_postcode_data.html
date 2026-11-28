@@ -15,7 +15,7 @@
 {% block content %}
   <div class="ui segment">
     <p>
-      This tool runs <code>recalculate_imd</code>. For every case in the selected
+      This tool runs <code>recalculate_postcode_data</code>. For every case in the selected
       cohort it recalculates the Index of Multiple Deprivation quintile from the
       RCPCH Census Platform, and for cases missing a location it looks up the
       coordinates from postcodes.io.
@@ -42,7 +42,7 @@
                 </button>
               </div>
               <div class="field">
-                <a href="{% url 'admin:recalculate_imd' %}" class="ui fluid button">Cancel</a>
+                <a href="{% url 'admin:recalculate_postcode_data' %}" class="ui fluid button">Cancel</a>
               </div>
               <div class="field"></div>
               <div class="field"></div>

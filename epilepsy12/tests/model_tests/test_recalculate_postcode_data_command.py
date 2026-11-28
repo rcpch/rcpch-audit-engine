@@ -1,5 +1,5 @@
 """
-Tests for the recalculate_imd management command and fill_missing_location_for_case().
+Tests for the recalculate_postcode_data management command and fill_missing_location_for_case().
 
 The command recalculates the IMD quintile for every case in scope, and fills in
 location_wgs84 / location_bng only for cases missing them.
@@ -113,7 +113,7 @@ def test_fill_missing_location_reports_failed_lookup(
     assert Case.objects.get(pk=case.pk).location_wgs84 is None
 
 
-# ── recalculate_imd command ─────────────────────────────────────────────────
+# ── recalculate_postcode_data command ─────────────────────────────────────────────────
 
 
 @pytest.mark.django_db
@@ -147,7 +147,7 @@ def test_command_recalculates_imd_and_fills_missing_locations_for_cohort(
     mock_imd.reset_mock()
     mock_imd.return_value = 4
     stdout = StringIO()
-    call_command("recalculate_imd", "--cohort", str(cohort), stdout=stdout)
+    call_command("recalculate_postcode_data", "--cohort", str(cohort), stdout=stdout)
 
     assert mock_imd.call_count == 2
     mock_fill_coords.assert_called_once_with(postcode="WC1X8SH")
@@ -176,7 +176,7 @@ def test_command_all_fills_locations_for_unregistered_cases(
     case = e12_case_factory(postcode="WC1X8SH", registration=None)
     _clear_location(case)
 
-    call_command("recalculate_imd", "--all", stdout=StringIO())
+    call_command("recalculate_postcode_data", "--all", stdout=StringIO())
 
     assert Case.objects.get(pk=case.pk).location_wgs84 is not None
 
@@ -203,7 +203,9 @@ def test_command_dry_run_makes_no_api_calls(
     mock_imd.reset_mock()
     mock_country.reset_mock()
     stdout = StringIO()
-    call_command("recalculate_imd", "--cohort", str(cohort), "--dry-run", stdout=stdout)
+    call_command(
+        "recalculate_postcode_data", "--cohort", str(cohort), "--dry-run", stdout=stdout
+    )
 
     mock_imd.assert_not_called()
     mock_country.assert_not_called()

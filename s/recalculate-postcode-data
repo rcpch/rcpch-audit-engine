@@ -7,13 +7,13 @@ set -e  # Exit on error
 # *** The project's containers MUST BE RUNNING! ***
 #
 # Usage:
-#   s/recalculate-imd          — recalculate for ALL cases across all cohorts
-#   s/recalculate-imd 6        — recalculate only for cohort 6
+#   s/recalculate-postcode-data          — recalculate for ALL cases across all cohorts
+#   s/recalculate-postcode-data 6        — recalculate only for cohort 6
 
 if [ -n "$1" ]; then
     echo "Recalculating IMD for cohort $1..."
-    docker compose exec django python manage.py recalculate_imd --cohort "$1"
+    docker compose exec django python manage.py recalculate_postcode_data --cohort "$1"
 else
     echo "Recalculating IMD for all cohorts..."
-    docker compose exec django python manage.py recalculate_imd --all
+    docker compose exec django python manage.py recalculate_postcode_data --all
 fi
