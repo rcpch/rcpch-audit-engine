@@ -141,14 +141,15 @@ epilepsy12/signals.py
 
 ### Bulk recalculation
 
-To recalculate IMD for existing records (e.g. after a cohort boundary change or API update):
+To fill in or recalculate IMD (and the location fields) for existing records:
 
 ```bash
-s/recalculate-imd          # all cohorts
-s/recalculate-imd 6        # cohort 6 only
+s/recalculate-postcode-data                 # all cases, missing values only
+s/recalculate-postcode-data 6               # cohort 6, missing values only
+s/recalculate-postcode-data 6 --rebuild     # cohort 6, full rebuild (e.g. after a cohort boundary change or API update)
 ```
 
-This wraps `manage.py recalculate_imd --all` / `--cohort N` (`epilepsy12/management/commands/recalculate_imd.py`).
+This wraps `manage.py recalculate_postcode_data --all` / `--cohort N`, plus `--rebuild` and `--dry-run` (`epilepsy12/management/commands/recalculate_postcode_data.py`). By default it only processes cases missing IMD or a location. Locations are handled by `update_location_for_case()` in `epilepsy12/general_functions/postcode.py`, which, like the IMD helper, persists with queryset `.update()`. Superusers can run it from the admin dashboard (**Administrative tools → Recalculate IMD and locations**, `E12AdminSite.recalculate_postcode_data_view` in `epilepsy12/admin.py`).
 
 ### Key constants
 

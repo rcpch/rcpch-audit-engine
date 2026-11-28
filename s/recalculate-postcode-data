@@ -1,0 +1,30 @@
+#!/bin/bash
+
+set -e  # Exit on error
+
+# Fills in missing IMD (Index of Multiple Deprivation) quintiles and location
+# fields for Cases. Pass --rebuild to recalculate both for every Case instead.
+# *** The project's containers MUST BE RUNNING! ***
+#
+# Usage:
+#   s/recalculate-postcode-data                 — all cases, missing values only
+#   s/recalculate-postcode-data 6               — cohort 6, missing values only
+#   s/recalculate-postcode-data --rebuild       — all cases, full rebuild
+#   s/recalculate-postcode-data 6 --rebuild     — cohort 6, full rebuild
+
+COHORT=""
+EXTRA_ARGS=()
+for arg in "$@"; do
+    case "$arg" in
+        --rebuild|--dry-run) EXTRA_ARGS+=("$arg") ;;
+        *) COHORT="$arg" ;;
+    esac
+done
+
+if [ -n "$COHORT" ]; then
+    echo "Recalculating IMD and locations for cohort $COHORT..."
+    docker compose exec django python manage.py recalculate_postcode_data --cohort "$COHORT" "${EXTRA_ARGS[@]}"
+else
+    echo "Recalculating IMD and locations for all cases..."
+    docker compose exec django python manage.py recalculate_postcode_data --all "${EXTRA_ARGS[@]}"
+fi

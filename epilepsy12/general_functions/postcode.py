@@ -3,7 +3,10 @@ import logging
 from random import randint
 import re
 
+from django.apps import apps
 from django.conf import settings
+from django.contrib.gis.geos import Point
+
 from ..constants import UNKNOWN_POSTCODES_NO_SPACES
 
 # Logging setup
@@ -97,6 +100,76 @@ def coordinates_for_postcode(postcode: str) -> bool:
         f"Postcode validation failure. Could not validate postcode at {url}. {response.status_code=}"
     )
     return None
+
+
+def location_lookup_possible(postcode) -> bool:
+    """
+    Returns True if postcodes.io can be asked for this postcode's location:
+    it is present, not an unknown/placeholder postcode, and not a Jersey
+    postcode (postcodes.io does not cover Jersey). Makes no API call.
+    """
+    if not postcode:
+        return False
+    normalised = str(postcode).replace(" ", "").replace("-", "").upper()
+    return normalised not in UNKNOWN_POSTCODES_NO_SPACES and not normalised.startswith(
+        "JE"
+    )
+
+
+def update_location_for_case(case, rebuild: bool = False) -> str:
+    """
+    Looks up and stores ``location_wgs84`` and ``location_bng`` for a Case.
+
+    By default only a case missing either location is looked up. With
+    ``rebuild=True`` every case is looked up again, and a case whose postcode
+    cannot be looked up has its locations cleared, as ``Case.save()`` does.
+
+    Returns one of:
+    - ``"present"``: the case already has both locations (not rebuilding)
+    - ``"skipped"``: no lookup is possible (no postcode, an unknown/placeholder
+      postcode, or a Jersey postcode) and there was nothing to clear
+    - ``"cleared"``: rebuilding, no lookup is possible, and the existing
+      locations were cleared
+    - ``"filled"``: the locations were looked up and saved
+    - ``"failed"``: the lookup returned no coordinates. Any existing locations
+      are kept, so a failed API call during a rebuild loses no data.
+
+    Mirrors the lookup in ``Case.save()``, but persists with a queryset
+    ``.update()`` so Case.save() and its post_save signals are not re-run.
+    Also updates the in-memory instance so the caller sees the new values.
+    """
+    has_location = case.location_wgs84 is not None and case.location_bng is not None
+    if has_location and not rebuild:
+        return "present"
+
+    Case = apps.get_model("epilepsy12", "Case")
+
+    if not location_lookup_possible(case.postcode):
+        if rebuild and (case.location_wgs84 is not None or case.location_bng is not None):
+            Case.objects.filter(pk=case.pk).update(
+                location_wgs84=None, location_bng=None
+            )
+            case.location_wgs84 = None
+            case.location_bng = None
+            return "cleared"
+        return "skipped"
+
+    normalised = str(case.postcode).replace(" ", "").replace("-", "").upper()
+    coordinates = coordinates_for_postcode(postcode=normalised)
+    if not isinstance(coordinates, tuple):
+        return "failed"
+
+    lon, lat = coordinates
+    location_wgs84 = Point(lon, lat, srid=4326)
+    # British National Grid (SRID 27700), see Case.save() for why both are stored.
+    location_bng = location_wgs84.transform(27700, clone=True)
+
+    Case.objects.filter(pk=case.pk).update(
+        location_wgs84=location_wgs84, location_bng=location_bng
+    )
+    case.location_wgs84 = location_wgs84
+    case.location_bng = location_bng
+    return "filled"
 
 
 def return_random_postcode(
