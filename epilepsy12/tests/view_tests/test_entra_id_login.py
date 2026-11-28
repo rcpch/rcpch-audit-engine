@@ -783,6 +783,40 @@ def test_configuration_errors_email_admins(client):
 
 @pytest.mark.django_db
 @override_settings(**ENTRA_REQUIRED)
+def test_configuration_error_in_the_callback_itself_does_not_email_admins(client):
+    """
+    Without a code, msal returns the error from the callback's query string
+    without contacting Microsoft, so anyone who has started a sign in can
+    supply it. Only an error from redeeming a code is a real configuration
+    error.
+    """
+    session = client.session
+    session[ENTRA_ID_FLOW_SESSION_KEY] = {"state": "abc"}
+    session.save()
+    forged = {
+        "state": "abc",
+        "error": "invalid_client",
+        "error_description": "anything the caller likes",
+    }
+
+    with (
+        patch(
+            "epilepsy12.views.entra_id_views.build_entra_id_client",
+            return_value=FakeEntraClient(
+                {k: v for k, v in forged.items() if k != "state"}
+            ),
+        ),
+        patch("epilepsy12.views.entra_id_views.logger") as logger,
+    ):
+        response = client.get(reverse("entra_id_callback"), forged)
+
+    assert_refused(client, response)
+    logger.error.assert_not_called()
+    logger.warning.assert_called_once()
+
+
+@pytest.mark.django_db
+@override_settings(**ENTRA_REQUIRED)
 def test_failures_for_a_validated_microsoft_account_email_admins(client, clinician):
     with patch("epilepsy12.views.entra_id_views.logger") as logger:
         complete_entra_sign_in(client, FakeEntraClient(claims_for(clinician.email)))
