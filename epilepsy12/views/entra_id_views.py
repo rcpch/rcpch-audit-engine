@@ -52,7 +52,9 @@ def _redirect_uri(request):
 
 # Errors from Microsoft's token endpoint that mean our own configuration is
 # wrong (e.g. an expired client secret, or a missing or mismatched federated
-# credential). Anonymous requests cannot cause these, so they alert the admins.
+# credential). They alert the admins, but only when returned while redeeming a
+# code: msal passes an error in the callback's own query string straight
+# through, and anyone can put one there.
 CONFIGURATION_ERRORS = {"invalid_client", "unauthorized_client"}
 
 
@@ -181,8 +183,11 @@ def entra_id_callback(request):
             request,
             GENERIC_FAILURE_MESSAGE,
             details=f"{result.get('error')}: {result.get('error_description')}",
-            # e.g. the user cancelling at Microsoft, or a made-up code
-            alert_admins=result.get("error") in CONFIGURATION_ERRORS,
+            # e.g. the user cancelling at Microsoft, or a made-up code. With
+            # no code, msal returns the callback's own (anonymous) error
+            # without contacting Microsoft.
+            alert_admins=bool(request.GET.get("code"))
+            and result.get("error") in CONFIGURATION_ERRORS,
         )
 
     claims = result.get("id_token_claims") or {}
